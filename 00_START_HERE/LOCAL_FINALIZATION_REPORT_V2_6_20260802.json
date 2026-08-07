@@ -1,0 +1,51 @@
+{
+  "status": "technical_p0_pass_owner_inputs_pending",
+  "date": "2026-08-03",
+  "gpu_required": false,
+  "model_inference_rerun": false,
+  "primary_results_modified": false,
+  "validation": {
+    "tests": "136/136 pass_with_clean_release_integration",
+    "compileall": "pass",
+    "clean_extraction_reproduction": "pass_no_symlink_no_inherited_pythonpath",
+    "linux_host_validation": "pass_on_source_equivalent_pre_split_snapshot_136_tests_9_subtests",
+    "code_results_only_release_validation": "pass_no_latex_or_manuscript_entries",
+    "verified_samples": 300,
+    "verified_methods": 6,
+    "cascade_accuracy": 0.94,
+    "downstream_ablation_variants": 4,
+    "cross_family_audit": "95/95 pass"
+  },
+  "manuscript": {
+    "version": "v2.6_review_closure",
+    "abstract_words": 219,
+    "main_tables": 9,
+    "main_figures": 3,
+    "bibliography_entries": 25,
+    "unresolved_citations": 0,
+    "qa_main_pages": 14,
+    "qa_supplement_pages": 3,
+    "visual_reviewed_pages": 17
+  },
+  "submission_artifacts": {
+    "reproducible_release": "09_release_candidate/mp_fs_plus_code_and_results_v1_20260803.zip",
+    "reproducible_release_sha256": "419b716e641171e8de1b60d0626ee76fd82f50433e73c2ad26e99142596543c7",
+    "clean_code_results_report": "09_release_candidate/CLEAN_CODE_AND_RESULTS_REPRODUCTION_REPORT_20260803.json",
+    "linux_reproduction_report": "07_reproducibility/legacy_mixed_release_validation_20260803/CLEAN_LINUX_REPRODUCTION_REPORT_20260803.json",
+    "linux_reproduction_report_sha256": "d9387a68e125862c059bda423a3af70e796c8b22e3ca9d2429bc5ae58117bd06",
+    "linux_pytest_log": "07_reproducibility/legacy_mixed_release_validation_20260803/pytest_linux.log",
+    "linux_pytest_log_sha256": "44483fe7357430cdaa8fd067f8589741adc8d50c23f670d311a10e99dc3dc918",
+    "overleaf_archive": "../PAPER_WRITING/01_manuscript/submission/ieee_access_latex_20260801/MP_FS_PLUS_IEEE_ACCESS_OVERLEAF_REVISION_V2_6_20260802.zip",
+    "overleaf_archive_sha256": "e669c0a7f598693000c79ce4a02d14dd097fda96e378739736e3b21ad4d5eb5e",
+    "qa_main_pdf_sha256": "7237323d6d7c3baa2ef4423a2d6e35e4e315d1151cf6f178dae532478876abfa",
+    "qa_supplement_pdf_sha256": "6df3ebf8111b94dc51ccadf2bd2f96872da7c02b7b3cc97952dc78807c8193e1"
+  },
+  "owner_inputs_required": [
+    "author_list_order_affiliations_emails_orcid",
+    "corresponding_author_biographies_photos",
+    "funding_conflicts_credit_contributions",
+    "code_license_and_data_redistribution_rights",
+    "public_repository_url_doi_and_final_citation_cff",
+    "official_pdflatex_build_after_metadata"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "status": "adjudicated_oracle_complete",
+  "method_id": "Gold-MP",
+  "base_protocol_sha256": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330",
+  "amendment_id": "gold_oracle_null_status_gate_correction_v2_1_rev2",
+  "adjudication_record": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/artifacts/protocol_amendments/final_gold_oracle_gate_adjudication_v2_1_rev2.json",
+  "adjudication_record_sha256": "67e67616d1803557dd89da7bc15a6071dd0de891644061e9f72b7917ddd3baab",
+  "verified_rows": 300,
+  "target_state_accuracy": 1.0,
+  "prediction_artifacts_modified": false,
+  "evaluation_artifacts_modified": false,
+  "metrics_modified": false,
+  "original_invalid_marker_retained": true
+}

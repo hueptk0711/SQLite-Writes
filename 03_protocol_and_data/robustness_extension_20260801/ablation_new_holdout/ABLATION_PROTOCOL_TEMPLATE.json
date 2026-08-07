@@ -1,0 +1,35 @@
+{
+  "protocol_id": "mp_fs_plus_component_ablation_new_holdout_v1",
+  "status": "blocked_until_variants_implemented_and_new_holdout_dual_reviewed",
+  "paper_primary_result": false,
+  "forbidden_databases": [
+    "archeology",
+    "polar",
+    "robot",
+    "vaccine",
+    "virtual",
+    "cybermarket",
+    "museum"
+  ],
+  "variants": [
+    "MP-Base",
+    "MP-Evidence",
+    "MP-Norm",
+    "MP-Verify",
+    "MP-FS+"
+  ],
+  "controlled_constants": [
+    "model_snapshot",
+    "demonstrations",
+    "decoding",
+    "final_compiler",
+    "transactional_preflight",
+    "evaluator",
+    "dataset_and_split"
+  ],
+  "minimum_new_samples": 300,
+  "independent_authoring_required": true,
+  "two_independent_reviews_required": true,
+  "single_run_after_freeze": true,
+  "no_regeneration_of_failed_predictions": true
+}

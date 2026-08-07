@@ -1,0 +1,50 @@
+{
+  "lock_version": 1,
+  "stage": "second-model",
+  "method_id": "D-FS-M",
+  "hashes": {
+    "method_config_sha256": "bc7c04f9daecc6706129ae06a04b612e339bd65e5bf722855e3f17b413b7f2f6",
+    "inference_config_sha256": "61d227a48d2229c15b0cb1b148c9953e11e67fbcf83b6b703aba8d1266f9796e",
+    "base_config_sha256": "ad7bcde17a2e421b58a85061e6faa72ec90e1129f2dedba158f9f68dbd332f79",
+    "resolved_config_sha256": "7a61072a1c23a48d951aa02b5e187caed821d8244465117804a9ef580c6be1a9",
+    "dataset_sha256": "da2e281419cd368dc10f366dab703012c3a8ac16a3afb8a0c3abba715706566a",
+    "split_sha256": "240a3ccf6e3fed65e754fdafbc3f52d8cadaabf6282c36efea8616a25bf8884a",
+    "gold_plans_sha256": "6aa73f8dc4d1803c8be0588902a776f12e577a0539d54b60b3d0bcfe1e461b74",
+    "profile_aggregate_sha256": "8dccda25e1221b29bae11e6c4749ed4ab87bb17f846748d1c8c5d247e1f34a96",
+    "database_aggregate_sha256": "d7f1d3fe4baaef73f1a89e935b9d1b5ab17838dda400937885a8b9bb41325621",
+    "source_code_tree_sha256": "2bc1522cd90dfadd5d7410154191d381cca175daa338e03ef47e53951283d6a9",
+    "v2_source_tree_sha256": null,
+    "prompt_template_sha256": "afe8529bead93f628184e32afeea3ab354536ea2c0a4fc3b2fce9533fba19de9",
+    "prompt_set_sha256": "cf5b521970ae894162fa263cf946e47bfa055235bf85dcdc641e9322d2d31da7",
+    "dependency_lock_sha256": "861a24b179b5edd1245aba33109402dd4ab82a634098bd8d81fcb666f5bdf9f1",
+    "environment_manifest_sha256": "fa68c65f492928c2cbf70639b00b2d8220f937177cc1356b403e39b1ba3dd78c",
+    "final_protocol_sha256": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256"
+  },
+  "profiles": {
+    "archeology": "e142d8592a22f91e1678d683e88fdde6e077aef08e99e4993c7c3204675fbe26",
+    "polar": "6ab6ba0545d9450beb4bae1798e9970552f352c85cf8bac96ac601654c592167",
+    "robot": "307b85551192a486afc99875db9b6c1851518ad06b2e5b4c2a701733486ff462",
+    "vaccine": "6a7295bb7e70510d253338a581f097839331e001e9f5b2b6c73164727f9bc8e5",
+    "virtual": "aebf80c034e5d00bdb5a315c6195650a2d1f23c52212575377e544b58fd1c4d3"
+  },
+  "databases": {
+    "archeology": "b525a54561e866f12cb373e5d3588ffcfdda13f59966cd9e3e28bb2633b21fdd",
+    "polar": "6d351808b75c7adfb9d073741345ab2368eeb0accc53369977b531764f54fe8d",
+    "robot": "aef0e7b7134f891da0ae5621638abb12229accd916fb0c7fb2691a66223c05c4",
+    "vaccine": "2aaf3f42a086d2a70365390bde5db91682fcc842c27febad665f3fe14f0bd402",
+    "virtual": "d963a35900ac10f5b4a12cdf672ed999742fcf2b04b704e52411c6a1af2acd77"
+  },
+  "model": {
+    "backend": "hf",
+    "model_name_or_path": "/home/uet/hue_ptk/hf_cache/hub/models--01-ai--Yi-Coder-9B-Chat/snapshots/356a1f8d4e4a606d0b879e54191ca809918576b8",
+    "revision": null,
+    "model_hash": "881ebc7b893a9e12d704c40d2bdc908ed7958e0f671f5ccc434f5303102e6904",
+    "model_aggregate_sha256": "881ebc7b893a9e12d704c40d2bdc908ed7958e0f671f5ccc434f5303102e6904",
+    "tokenizer_sha256": "85ea859a522d44fa17595a5b42db569c3dd1746e4639bf68248fe5125cc96eaf",
+    "chat_template_sha256": "52126d0145882ab74147db63ae6d942823f5095ea5f60ada48d19f02e4543bf0",
+    "model_config_sha256": "5c5b540ceab26be44d5b47fc4bb95f59be34efe9e0db55f66e7e7870eea802b0",
+    "generation_config_sha256": "443804bd09568de67f4c55143ba1a7409220b5f4493566e193551769f388877f"
+  },
+  "environment_status": "gpu_ready",
+  "run_lock_sha256": "09403bdf4e40289f388cbe8a7acede1540a8a2b0ac30e834982d5d9b8253b0e1"
+}

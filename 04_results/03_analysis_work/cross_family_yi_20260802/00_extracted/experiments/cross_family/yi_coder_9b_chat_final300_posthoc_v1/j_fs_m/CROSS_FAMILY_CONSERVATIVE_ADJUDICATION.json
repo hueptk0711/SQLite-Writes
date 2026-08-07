@@ -1,0 +1,23 @@
+{
+  "status": "conservatively_retained_for_post_hoc_analysis",
+  "paper_primary_result": false,
+  "predictions_regenerated": false,
+  "evaluation_or_metrics_modified": false,
+  "denominator": 300,
+  "affected_samples": 3,
+  "input_truncation_failures": 0,
+  "output_limit_hits": 3,
+  "generation_status_failures": 0,
+  "affected_sample_ids": [
+    "final_archeology_040",
+    "final_archeology_058",
+    "final_virtual_033"
+  ],
+  "scoring_policy": "Every affected row was already target-incorrect and remains in the 300-sample denominator.",
+  "protocol_sha256": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256",
+  "protocol_id": "mp_fs_plus_post_hoc_cross_family_yi_coder_9b_chat_v1",
+  "invalid_marker_sha256": "5a1bbc928a6a13dbc43f92f9e0f8330b33b280334dc5772d36be1bf679c3c21b",
+  "evaluation_sha256": "698765b4ac9032b11bb7f1ecda28a8c85fd1a594a64adae392dd07de7efd4a54",
+  "raw_generations_sha256": "c515e01003e9434cd50e7ef74247cc5bfd992f4dae0566ff2a5e7d8fd38836db",
+  "metrics_sha256": "f55e55fe68ada33ba24d9e997771c1cf956a46f4860c7b4ed5dd0f098b08ab2b"
+}

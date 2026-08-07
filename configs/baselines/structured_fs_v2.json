@@ -1,0 +1,19 @@
+{
+  "method_id": "S-FS-v2",
+  "family": "record_json_original_v2_builder",
+  "representation": "legacy_table_operation_values",
+  "role": "paper_v2_structured_system_reproduction",
+  "demonstration_policy": "fixed_two_format_examples",
+  "demonstrations": [
+    {
+      "input": "Create major DS with name Data Science.",
+      "output": "{\"records\":[{\"table\":\"majors\",\"operation\":\"insert\",\"values\":{\"major_id\":\"DS\",\"major_name\":\"Data Science\"}}]}"
+    },
+    {
+      "input": "Upsert student S001 named Nguyen A.",
+      "output": "{\"records\":[{\"table\":\"students\",\"operation\":\"upsert\",\"values\":{\"student_id\":\"S001\",\"name\":\"Nguyen A\"}}]}"
+    }
+  ],
+  "builder": "frozen_paper_v2_builder",
+  "v2_source_env": "NLDB_V2_SOURCE"
+}

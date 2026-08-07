@@ -1,0 +1,184 @@
+{
+  "status": "frozen_conservative_failure_adjudication",
+  "amendment_id": "conservative_failure_adjudication_v2_1",
+  "base_protocol_id": "mp_fs_plus_external_holdout_v2_out8192",
+  "base_protocol_sha256": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330",
+  "rationale": "Two MP-FS+ generations entered deterministic schema-invalid sequential-reference expansion until the uniform output cap. All 300 predictions exist, with no input truncation, OOM, or missing prediction. The two rows remain in the denominator and are conservatively scored as incorrect.",
+  "scope": {
+    "method_id": "MP-FS+",
+    "affected_count": 2,
+    "all_other_methods_changed": false
+  },
+  "affected_sample_ids": [
+    "final_polar_048",
+    "final_vaccine_047"
+  ],
+  "affected_evidence": [
+    {
+      "sample_id": "final_polar_048",
+      "generation_status": "success",
+      "input_tokens": 13014,
+      "output_tokens": 8192,
+      "input_truncated": false,
+      "hit_max_new_tokens": true,
+      "oom_fallback_used": false,
+      "raw_output_characters": 32028,
+      "raw_output_sha256": "a80261d9873018319d376ad0dc095051e1ebe8b0e075eac30c45904da1befacb",
+      "max_sequential_column_reference": 250,
+      "repeated_line_evidence": [
+        {
+          "count": 252,
+          "line_prefix": "{"
+        },
+        {
+          "count": 250,
+          "line_prefix": "\"normalization\": \"identity\""
+        },
+        {
+          "count": 249,
+          "line_prefix": "}"
+        },
+        {
+          "count": 249,
+          "line_prefix": "},"
+        },
+        {
+          "count": 248,
+          "line_prefix": "\"value_from\": \"e3\","
+        }
+      ],
+      "parse_status": "schema_error",
+      "plan_validation_success": false,
+      "execution_success": false,
+      "target_state_correct": false,
+      "score": "incorrect"
+    },
+    {
+      "sample_id": "final_vaccine_047",
+      "generation_status": "success",
+      "input_tokens": 10916,
+      "output_tokens": 8192,
+      "input_truncated": false,
+      "hit_max_new_tokens": true,
+      "oom_fallback_used": false,
+      "raw_output_characters": 30345,
+      "raw_output_sha256": "6cb54d19f48cca354e15d1e59180dd378fa468fac463b4ebaa00c6d97c04c0af",
+      "max_sequential_column_reference": 241,
+      "repeated_line_evidence": [
+        {
+          "count": 241,
+          "line_prefix": "},"
+        },
+        {
+          "count": 233,
+          "line_prefix": "\"value_from\": \"e34\","
+        },
+        {
+          "count": 233,
+          "line_prefix": "\"normalization\": \"lossless_integer_parsing\""
+        },
+        {
+          "count": 6,
+          "line_prefix": "{"
+        },
+        {
+          "count": 6,
+          "line_prefix": "\"normalization\": \"identity\""
+        },
+        {
+          "count": 3,
+          "line_prefix": "}"
+        },
+        {
+          "count": 2,
+          "line_prefix": "\"table_id\": \"t1\","
+        },
+        {
+          "count": 2,
+          "line_prefix": "\"rows\": ["
+        },
+        {
+          "count": 2,
+          "line_prefix": "\"t1.c4\": {"
+        },
+        {
+          "count": 2,
+          "line_prefix": "\"value_from\": \"e16\","
+        }
+      ],
+      "parse_status": "schema_error",
+      "plan_validation_success": false,
+      "execution_success": false,
+      "target_state_correct": false,
+      "score": "incorrect"
+    }
+  ],
+  "score_policy": "retain_in_denominator_and_score_as_incorrect",
+  "generation_policy": {
+    "predictions_regenerated": false,
+    "prompt_changed": false,
+    "parser_changed": false,
+    "evaluator_correctness_changed": false,
+    "token_limit_increased": false,
+    "samples_removed": false
+  },
+  "prediction_artifacts_modified": false,
+  "completed_before_adjudication": {
+    "D-FS-M": {
+      "rows": 300,
+      "consumed_marker_sha256": "ebc9114c3a000a04cdb31aac3fe2eb1f21df27cb54cd14ac844c16a02e1c7ecf"
+    },
+    "J-FS-M": {
+      "rows": 300,
+      "consumed_marker_sha256": "4f852c1297d2def0c733187c59a029aa57ed2bfc428dcb20a2f64fceb7fd7f08"
+    },
+    "S-FS-v2-M": {
+      "rows": 300,
+      "consumed_marker_sha256": "740fdd53fb5a2cc2077ccfcec84eac3a9672b9b6f6710b47c08e375dc5ec4c6e"
+    },
+    "MP-FS-M": {
+      "rows": 300,
+      "consumed_marker_sha256": "3c69ddcef9130791deb755f575dafba350634e8533fffb790fc1c861820041e1"
+    }
+  },
+  "source_artifacts": {
+    "base_protocol": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/configs/experiments/final_protocol.json",
+      "sha256": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330"
+    },
+    "capacity_amendment": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/artifacts/protocol_amendments/final_protocol_amendment_v2_out8192.json",
+      "sha256": "1c9090b7e6644b0149c74f718ac57e4d7a1841952502086f2d90fe70f8085152"
+    },
+    "invalid_marker": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/final300_qwen25_7b_protocol_v2_out8192_20260731/mp_fs_plus/FINAL_RUN_INVALID.json",
+      "sha256": "2560f7fc16f46a8353135a2bb24389c2f8fa85e8a201615a927c5a915cddd104"
+    },
+    "raw_generations": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/final300_qwen25_7b_protocol_v2_out8192_20260731/mp_fs_plus/raw_generations.jsonl",
+      "sha256": "bf6e5365efd532c9e181ec77272c695dd22b49b9071dc83faa962b6528f24925"
+    },
+    "evaluation": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/final300_qwen25_7b_protocol_v2_out8192_20260731/mp_fs_plus/evaluation.jsonl",
+      "sha256": "ebf2b1ea14e9970fc1b6d19d9d41cdb648cc16b289d5957dfb594f6f8a4d908b"
+    },
+    "metrics": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/final300_qwen25_7b_protocol_v2_out8192_20260731/mp_fs_plus/metrics.json",
+      "sha256": "38e87e5cf157f1537d32a2a348774c053ccd904fe5f4794a5d33c4024a4e5f95"
+    },
+    "run_lock": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/final300_qwen25_7b_protocol_v2_out8192_20260731/mp_fs_plus/run_lock.json",
+      "sha256": "9e8ab0e11bf0c1270349d4a3c306816dd077e257da3aaa55cbe0bc1d753898b2"
+    },
+    "manifest": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/final300_qwen25_7b_protocol_v2_out8192_20260731/mp_fs_plus/manifest.json",
+      "sha256": "52861dc18155b62fb55b4094086cc5019cf255d5939a2ceca6d3461457948071"
+    }
+  },
+  "reporting_requirements": {
+    "disclose_post_run_reporting_amendment": true,
+    "report_affected_count": true,
+    "do_not_claim_strict_preregistration": true,
+    "retain_original_invalid_marker": true
+  }
+}

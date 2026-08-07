@@ -1,0 +1,20 @@
+{
+  "participants": [
+    {
+      "human": true,
+      "participant_id": "CAL-A01",
+      "role": "author"
+    },
+    {
+      "human": true,
+      "participant_id": "CAL-R01",
+      "role": "reviewer"
+    },
+    {
+      "human": true,
+      "participant_id": "CAL-R02",
+      "role": "reviewer"
+    }
+  ],
+  "status": "assigned"
+}

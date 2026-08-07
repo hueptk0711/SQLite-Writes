@@ -1,0 +1,34 @@
+﻿{
+    "status":  "pass",
+    "imported_at_utc":  "2026-07-31T12:19:17.3422568Z",
+    "run_id":  "mp_fs_plus_final300_protocol_v2_1_rev2_adjudicated_20260731T121531Z",
+    "archive":  "D:\\paper kltn\\text to sql\\paper_ready_workspace_20260731\\04_results\\00_incoming_from_server\\mp_fs_plus_final300_protocol_v2_1_rev2_adjudicated_20260731T121531Z.tar.gz",
+    "archive_filename":  "mp_fs_plus_final300_protocol_v2_1_rev2_adjudicated_20260731T121531Z.tar.gz",
+    "archive_original_path_is_provenance_only":  true,
+    "archive_sha256":  "e456037422281d56e03dd7766baf1cc9efa78a95061234444c452f3c04810911",
+    "checksum":  "D:\\paper kltn\\text to sql\\paper_ready_workspace_20260731\\04_results\\00_incoming_from_server\\mp_fs_plus_final300_protocol_v2_1_rev2_adjudicated_20260731T121531Z.tar.gz.sha256",
+    "final_protocol_id":  "mp_fs_plus_external_holdout_v2_out8192",
+    "final_protocol_sha256":  "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330",
+    "protocol_amendment_id":  "capacity_only_v2_out8192",
+    "predecessor_protocol_sha256":  "41eee8d41c2205af9485e03fd654a9a46a28720f78511b61babe1443c7d3820a",
+    "reporting_protocol_id":  "mp_fs_plus_external_holdout_v2_out8192+reporting_adjudication_v2_1_rev2",
+    "failure_adjudication_id":  "conservative_failure_adjudication_v2_1",
+    "failure_adjudication_sha256":  "d4527a35d58593ba2a2a5f4576e9ea0e7d62aaeb1eed482258afae48f4df1ac4",
+    "adjudicated_sample_ids":  [
+                                   "final_polar_048",
+                                   "final_vaccine_047"
+                               ],
+    "oracle_gate_adjudication_id":  "gold_oracle_null_status_gate_correction_v2_1_rev2",
+    "oracle_gate_adjudication_sha256":  "67e67616d1803557dd89da7bc15a6071dd0de891644061e9f72b7917ddd3baab",
+    "oracle_verified_rows":  300,
+    "extracted_to":  "D:\\paper kltn\\text to sql\\paper_ready_workspace_20260731\\04_results\\01_extracted_archive\\mp_fs_plus_final300_protocol_v2_1_rev2_adjudicated_20260731T121531Z",
+    "extracted_directory_name":  "mp_fs_plus_final300_protocol_v2_1_rev2_adjudicated_20260731T121531Z",
+    "paper_result_eligible":  true,
+    "sample_count":  300,
+    "method_count":  6,
+    "paper_ready_files":  [
+                              "D:\\paper kltn\\text to sql\\paper_ready_workspace_20260731\\04_results\\02_paper_ready\\reports\\final_matrix_results.json",
+                              "D:\\paper kltn\\text to sql\\paper_ready_workspace_20260731\\04_results\\02_paper_ready\\tables\\final_main_table.csv",
+                              "D:\\paper kltn\\text to sql\\paper_ready_workspace_20260731\\04_results\\02_paper_ready\\reports\\final_matrix_summary.md"
+                          ]
+}

@@ -1,0 +1,71 @@
+{
+  "protocol_id": "mp_fs_plus_calibration_v1",
+  "status": "template_requires_new_data",
+  "sample_count": 60,
+  "database_policy": {
+    "calibration_database_count": 2,
+    "samples_per_calibration_database": 30,
+    "must_not_overlap_final_holdout": true,
+    "must_not_overlap_current_11_databases": true,
+    "consumed_database_ids": [
+      "california_schools",
+      "card_games",
+      "codebase_community",
+      "debit_card_specializing",
+      "european_football_2",
+      "financial",
+      "formula_1",
+      "student_club",
+      "superhero",
+      "thrombosis_prediction",
+      "toxicology"
+    ],
+    "reserved_final_database_ids_file": "data/calibration/reserved_final_database_ids.txt"
+  },
+  "distribution": {
+    "operation_semantics": {
+      "plain_insert": 20,
+      "insert_ignore": 20,
+      "upsert_update": 20
+    },
+    "input_mode": {
+      "free_text": 20,
+      "semi_structured": 40
+    },
+    "complexity": {
+      "single_row": 20,
+      "small_batch": 20,
+      "large_or_relational": 20
+    },
+    "multi_table_min": 20
+  },
+  "authorship": {
+    "independently_authored_required": true,
+    "augmented_variants_allowed": false,
+    "approving_reviewers_per_sample": 2,
+    "author_must_not_review_own_sample": true
+  },
+  "methods": ["D-FS-M", "J-FS-M", "MP-FS-M", "MP-FS+", "Gold-MP"],
+  "go_no_go": {
+    "gold_mp_accuracy": 1.0,
+    "parse_success_min": 0.98,
+    "plan_build_success_min": 0.85,
+    "execution_success_min": 0.75,
+    "accepted_output_accuracy_min": 0.95,
+    "side_effect_rate": 0.0,
+    "input_truncation_rate": 0.0,
+    "missing_prediction_count": 0,
+    "invalid_selector_near_zero": true,
+    "unknown_column_near_zero": true
+  },
+  "required_artifacts": [
+    "data/calibration/dataset.json",
+    "data/calibration/gold_write_plans.jsonl",
+    "data/calibration/calibration_ids.txt",
+    "data/calibration/reserved_final_database_ids.txt",
+    "artifacts/audit/calibration_metadata.json",
+    "artifacts/audit/calibration_gold_execution.json",
+    "artifacts/reports/calibration_go_decision.json"
+  ],
+  "freeze_only_after_go": true
+}

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/nldbwrite-v3/write-plan.schema.json",
+  "title": "Materialized Lossless Write Plan",
+  "type": "object",
+  "required": [
+    "version",
+    "write_groups",
+    "dependencies",
+    "unresolved_fields"
+  ],
+  "properties": {
+    "version": {"const": "3.0"},
+    "plan_kind": {"type": "string"},
+    "sample_id": {"type": ["string", "null"]},
+    "source": {"type": "object"},
+    "write_groups": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "group_id",
+          "table",
+          "action",
+          "rows",
+          "conflict"
+        ],
+        "properties": {
+          "group_id": {"type": "string", "minLength": 1},
+          "table": {"type": "string", "minLength": 1},
+          "action": {"const": "insert"},
+          "rows": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "minProperties": 1
+            }
+          },
+          "conflict": {
+            "type": "object",
+            "required": ["action", "target", "update_columns"],
+            "properties": {
+              "action": {
+                "enum": ["error", "do_nothing", "do_update"]
+              },
+              "target": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "update_columns": {
+                "type": "array",
+                "items": {"type": "string"}
+              }
+            },
+            "additionalProperties": false
+          },
+          "provenance": {"type": "array"},
+          "value_evidence": {
+            "oneOf": [
+              {"type": "object"},
+              {
+                "type": "array",
+                "items": {"type": "object"}
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "dependencies": {"type": "array"},
+    "unresolved_fields": {"type": "array"}
+  },
+  "additionalProperties": false
+}

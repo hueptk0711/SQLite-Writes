@@ -1,0 +1,144 @@
+{
+  "accuracy_by_similarity_bin": [
+    {
+      "correct": 216,
+      "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+      "method": "D-FS-M",
+      "samples": 253,
+      "similarity_bin": "low",
+      "target_state_accuracy": 0.8537549407114624,
+      "wilson_95_high": 0.8920005179466578,
+      "wilson_95_low": 0.8049274656502708
+    },
+    {
+      "correct": 215,
+      "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+      "method": "J-FS-M",
+      "samples": 253,
+      "similarity_bin": "low",
+      "target_state_accuracy": 0.849802371541502,
+      "wilson_95_high": 0.8885750738757926,
+      "wilson_95_low": 0.8005660048764779
+    },
+    {
+      "correct": 128,
+      "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+      "method": "MP-FS+",
+      "samples": 253,
+      "similarity_bin": "low",
+      "target_state_accuracy": 0.5059288537549407,
+      "wilson_95_high": 0.5669844049277872,
+      "wilson_95_low": 0.4446959523392003
+    },
+    {
+      "correct": 42,
+      "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+      "method": "D-FS-M",
+      "samples": 47,
+      "similarity_bin": "medium",
+      "target_state_accuracy": 0.8936170212765957,
+      "wilson_95_high": 0.9536952178189183,
+      "wilson_95_low": 0.7740573065626163
+    },
+    {
+      "correct": 43,
+      "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+      "method": "J-FS-M",
+      "samples": 47,
+      "similarity_bin": "medium",
+      "target_state_accuracy": 0.9148936170212766,
+      "wilson_95_high": 0.9664058765420744,
+      "wilson_95_low": 0.8006846221303541
+    },
+    {
+      "correct": 20,
+      "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+      "method": "MP-FS+",
+      "samples": 47,
+      "similarity_bin": "medium",
+      "target_state_accuracy": 0.425531914893617,
+      "wilson_95_high": 0.5671808065450721,
+      "wilson_95_low": 0.2951362834367996
+    },
+    {
+      "correct": 0,
+      "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+      "method": "D-FS-M",
+      "samples": 0,
+      "similarity_bin": "high",
+      "target_state_accuracy": null,
+      "wilson_95_high": null,
+      "wilson_95_low": null
+    },
+    {
+      "correct": 0,
+      "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+      "method": "J-FS-M",
+      "samples": 0,
+      "similarity_bin": "high",
+      "target_state_accuracy": null,
+      "wilson_95_high": null,
+      "wilson_95_low": null
+    },
+    {
+      "correct": 0,
+      "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+      "method": "MP-FS+",
+      "samples": 0,
+      "similarity_bin": "high",
+      "target_state_accuracy": null,
+      "wilson_95_high": null,
+      "wilson_95_low": null
+    }
+  ],
+  "analysis_id": "dataset_redundancy_and_contamination_audit_v1",
+  "authorship_and_review": {
+    "author_count": 1,
+    "author_ids": [
+      "CAL-A01"
+    ],
+    "cohens_kappa_reported": false,
+    "reason_kappa_not_reported": "frozen records contain adjudicated approvals rather than a complete pre-adjudication independent decision matrix",
+    "reviewer_count": 2,
+    "reviewer_ids": [
+      "CAL-R01",
+      "CAL-R02"
+    ],
+    "revision_distribution": {
+      "1": 254,
+      "2": 46
+    }
+  },
+  "cross_split_similarity": {
+    "calibration_max_nearest": 0.22998375928972684,
+    "calibration_median_nearest": 0.07493449153901757,
+    "demonstration_max_nearest": 0.06237959840557835,
+    "demonstration_median_nearest": 0.013824755528225523
+  },
+  "exact_duplicate_groups": 0,
+  "exact_duplicate_rows": 0,
+  "method": {
+    "bins": {
+      "high": ">=0.80",
+      "low": "<0.50",
+      "medium": "0.50-<0.80"
+    },
+    "normalization": "Unicode NFKC, casefold, whitespace collapse",
+    "similarity": "character 3-5 gram TF-IDF with sublinear TF and smoothed IDF, cosine",
+    "value_masking": "replace scalar gold-record values plus URL/date/alphanumeric/numeric literals"
+  },
+  "nearest_similarity": {
+    "maximum": 0.6522606512364886,
+    "median": 0.37738114984874993,
+    "p95": 0.5871293048040158,
+    "relation_counts": {
+      "different_db": 6,
+      "same_db_different_format": 77,
+      "same_db_same_format": 217
+    }
+  },
+  "samples": 300,
+  "status": "pass",
+  "value_masked_duplicate_groups": 0,
+  "value_masked_duplicate_rows": 0
+}

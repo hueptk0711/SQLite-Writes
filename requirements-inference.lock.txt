@@ -1,0 +1,13 @@
+--extra-index-url https://download.pytorch.org/whl/cu124
+
+# Reproduces the verified paper-v2 Qwen server environment. Re-capture the
+# server manifest before use; a different NVIDIA driver may require another
+# official PyTorch CUDA build and therefore a new lock.
+torch==2.6.0+cu124
+transformers==5.5.3
+accelerate==1.14.0
+bitsandbytes==0.47.0
+sentencepiece==0.2.1
+protobuf==6.33.5
+safetensors==0.5.3
+tokenizers==0.22.2

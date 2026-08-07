@@ -1,0 +1,16 @@
+{
+  "experiment_id": "mp_fs_plus_selective_verifier_ablation",
+  "reuse_raw_plans": true,
+  "variants": [
+    "hard_verifier",
+    "warning_only_analysis",
+    "without_provenance_checks"
+  ],
+  "metrics": [
+    "coverage",
+    "accepted_output_accuracy",
+    "target_state_accuracy",
+    "side_effect_rate"
+  ],
+  "production_variant": "hard_verifier"
+}

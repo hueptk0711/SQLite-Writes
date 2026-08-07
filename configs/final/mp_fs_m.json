@@ -1,0 +1,9 @@
+{
+  "base_config": "configs/proposed/mp_fs.json",
+  "method_id": "MP-FS-M",
+  "demonstration_policy": "matched_semantic_bank_v1",
+  "demonstration_bank": "configs/demonstrations/matched_semantic_bank.json",
+  "demonstration_representation": "mapping_legacy",
+  "reference_planning": false,
+  "repair": false
+}

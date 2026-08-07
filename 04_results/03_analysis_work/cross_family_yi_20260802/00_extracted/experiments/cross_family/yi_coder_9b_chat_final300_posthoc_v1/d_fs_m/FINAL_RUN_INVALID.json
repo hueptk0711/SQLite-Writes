@@ -1,0 +1,8 @@
+{
+  "status": "invalid",
+  "reason": "truncation_or_missing_prediction",
+  "truncation_failures": 5,
+  "missing_predictions": 0,
+  "run_lock_sha256": "09403bdf4e40289f388cbe8a7acede1540a8a2b0ac30e834982d5d9b8253b0e1",
+  "final_protocol_sha256": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256"
+}

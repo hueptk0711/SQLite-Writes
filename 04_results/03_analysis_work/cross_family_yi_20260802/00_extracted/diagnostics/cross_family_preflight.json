@@ -1,0 +1,25 @@
+{
+  "status": "pass",
+  "gpu_required": true,
+  "prediction_generated": false,
+  "protocol": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/configs/experiments/cross_family_yi_coder_9b_chat_protocol_v1.json",
+  "protocol_sha256": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256",
+  "inference_config_sha256": "61d227a48d2229c15b0cb1b148c9953e11e67fbcf83b6b703aba8d1266f9796e",
+  "model_path": "/home/uet/hue_ptk/hf_cache/hub/models--01-ai--Yi-Coder-9B-Chat/snapshots/356a1f8d4e4a606d0b879e54191ca809918576b8",
+  "model_hash": "881ebc7b893a9e12d704c40d2bdc908ed7958e0f671f5ccc434f5303102e6904",
+  "model_type": "llama",
+  "max_position_embeddings": 131072,
+  "chat_template_sha256": "75f5fed5cd66cc75ae786ae18dfc2963a864001767000af694111675e947e0d5",
+  "packages": {
+    "python": "3.12.7",
+    "torch": "2.6.0+cu124",
+    "transformers": "5.5.3",
+    "bitsandbytes": "0.47.0",
+    "safetensors": "0.5.3"
+  },
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 4090",
+    "memory_bytes": 50875924480,
+    "cuda_runtime": "12.4"
+  }
+}

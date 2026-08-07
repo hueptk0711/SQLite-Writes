@@ -1,0 +1,174 @@
+{
+  "protocol_id": "mp_fs_plus_calibration_v3_in28672_out4096_locked_20260729",
+  "status": "locked_ready_for_gpu_calibration",
+  "sample_count": 60,
+  "stage": "calibration",
+  "paper_result_eligible": false,
+  "source_decision": {
+    "accepted_smoke_run_id": "mp_fs_plus_smoke15_v5_20260727T072146Z",
+    "accepted_smoke_archive_sha256": "a0752fe2116a56f9193d622e5ba57233ccc299abcd0e669eb28a883862d89750",
+    "gold_mp_audit_status": "gold_mp_pass_gpu_calibration_authorized"
+  },
+  "context_revision_history": [
+    {
+      "revision": 2,
+      "supersedes_protocol_id": "mp_fs_plus_calibration_v1_locked_20260729",
+      "reason": "non-reportable smoke found input_truncation_error at 16384 tokens",
+      "prompt_length_audit": {
+        "prompt_count": 240,
+        "model_context_limit": 32768,
+        "max_new_tokens": 2048,
+        "usable_input_context": 30720,
+        "maximum_observed_input_tokens": 28347,
+        "recommended_input_limit_next_1024": 28672,
+        "oversized_prompt_count_at_16384": 8,
+        "oversized_by_method_at_16384": {
+          "mp_fs_m": 3,
+          "mp_fs_plus": 5
+        }
+      },
+      "failed_smoke_result_root": "experiments/calibration/smoke_locked_v1",
+      "failed_smoke_is_reportable": false
+    },
+    {
+      "revision": 3,
+      "supersedes_protocol_id": "mp_fs_plus_calibration_v2_mnt28672_locked_20260729",
+      "reason": "non-reportable v2 smoke found MP-FS-M output cut mid-JSON at 2048 tokens",
+      "output_budget_evidence": {
+        "sample_id": "cal_museum_030",
+        "method_id": "MP-FS-M",
+        "observed_input_tokens": 26606,
+        "observed_output_tokens": 2048,
+        "hit_max_new_tokens": true,
+        "output_was_structurally_incomplete": true
+      },
+      "context_feasibility": {
+        "model_context_limit": 32768,
+        "maximum_observed_input_tokens": 28347,
+        "max_new_tokens": 4096,
+        "maximum_observed_total_budget": 32443,
+        "remaining_context_headroom": 325
+      },
+      "failed_smoke_result_root": "experiments/calibration/smoke_locked_v2_mnt28672",
+      "failed_smoke_is_reportable": false
+    }
+  ],
+  "locked_files": {
+    "data/calibration/dataset.json": "968efdef3b3bebe5d785dae37e6e477280afffc22b59b8aba4e5eb493dcf9c6f",
+    "data/calibration/calibration_ids.txt": "32b69be76cd095a7503be6371a79b188999f4e01ff00af8b5c060da2c79f264b",
+    "data/calibration/calibration_smoke_ids.txt": "e4882be7bf55feccebee9084144f6749d86fe7732aaff5301225f4a978710a58",
+    "data/calibration/gold_write_plans.jsonl": "d6f3240a5fef401c983f2da160cb1c8a4eeba31a759dfba81039aa92f4af15a9",
+    "data/calibration/reserved_final_database_ids.txt": "3c7bad450c9fa5f71cca93e43c90f35a33d9a29da99555c96e128bf829430b86",
+    "data/calibration/calibration_freeze_manifest.json": "a1e751c6a54d2ed13a171ac5cfe51dcb1e591b3140f6b2e61d3eb843b97e0085",
+    "data/calibration/authoring_kit/databases/cybermarket/cybermarket.sqlite": "23153eba8d258ef4846257326c4481850d7632bc2efdbe2b2236efa00d316922",
+    "data/calibration/authoring_kit/databases/museum/museum.sqlite": "4bc022713669f1cab2736e453a012f53eea396e9b94457e744c858cc034d1fb3",
+    "data/calibration/authoring_kit/profiles/cybermarket.json": "f24ccbd256d0aae30cf8b5b06b4dc0704b489ec0f21a23d1eec0b6e12579b33c",
+    "data/calibration/authoring_kit/profiles/museum.json": "de3fba03f603203de42a3a2c50c6897e1e721f736a6c5a1054e1a64017ef1951",
+    "artifacts/audit/calibration_metadata.json": "737eb76d9a1e2870979019dd215149ca5605ffa4170fc8c51bd32125b1d69cf4",
+    "artifacts/audit/calibration_gold_mp.json": "a1fe76104b190dee45fcfe9db512dc7afe7c8c81894b87b84f77be683aa86e65",
+    "configs/final/d_fs_m.json": "bc7c04f9daecc6706129ae06a04b612e339bd65e5bf722855e3f17b413b7f2f6",
+    "configs/final/j_fs_m.json": "832665a5953f92e4ea66642b3e1f3dcfa9e9842518e98393dc5ffa7a23e49765",
+    "configs/final/mp_fs_m.json": "f71ac4f1177a7c1b47bd3f98b735f056d3452424821fbdc337784b28f36636dd",
+    "configs/final/mp_fs_plus.json": "eed7feb1abdebdb5680e00922601135ea6f6ac809deaa9d548945569e7a5f206",
+    "configs/oracles/gold_mp.json": "b4f044fcbcd410c8fc3d8219c4b5fb97a24804b6f055355818a1663a2dd34b07",
+    "configs/baselines/direct_fs.json": "ad7bcde17a2e421b58a85061e6faa72ec90e1129f2dedba158f9f68dbd332f79",
+    "configs/baselines/record_json_fs_common.json": "90f5c3c6023e9ce4d7dc742497ce7dea331c46090f7f15dad7b536fc93bdaa78",
+    "configs/proposed/mp_fs.json": "69b57f6d6abad21699dcde6fda5eed1b1b9551ee3e4c05987a33835217ebd0c6",
+    "configs/demonstrations/matched_semantic_bank.json": "04ce6544866b8af31e1b4d67a2a3a800edb851cdf0ffed914fcef52ebbafff9c",
+    "requirements-inference.lock.txt": "861a24b179b5edd1245aba33109402dd4ab82a634098bd8d81fcb666f5bdf9f1"
+  },
+  "database_policy": {
+    "calibration_database_ids": [
+      "cybermarket",
+      "museum"
+    ],
+    "samples_per_database": 30,
+    "reserved_final_database_ids": [
+      "archeology",
+      "polar",
+      "robot",
+      "vaccine",
+      "virtual"
+    ],
+    "must_not_overlap_final_holdout": true
+  },
+  "methods": [
+    {
+      "slug": "d_fs_m",
+      "method_id": "D-FS-M",
+      "config": "configs/final/d_fs_m.json",
+      "backend": "gpu"
+    },
+    {
+      "slug": "j_fs_m",
+      "method_id": "J-FS-M",
+      "config": "configs/final/j_fs_m.json",
+      "backend": "gpu"
+    },
+    {
+      "slug": "mp_fs_m",
+      "method_id": "MP-FS-M",
+      "config": "configs/final/mp_fs_m.json",
+      "backend": "gpu"
+    },
+    {
+      "slug": "mp_fs_plus",
+      "method_id": "MP-FS+",
+      "config": "configs/final/mp_fs_plus.json",
+      "backend": "gpu"
+    },
+    {
+      "slug": "gold_mp",
+      "method_id": "Gold-MP",
+      "config": "configs/oracles/gold_mp.json",
+      "backend": "oracle"
+    }
+  ],
+  "model_lock": {
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "snapshot_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+    "tokenizer_sha256": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468",
+    "model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357"
+  },
+  "inference_lock": {
+    "backend": "hf",
+    "batch_size": 1,
+    "max_input_tokens": 28672,
+    "max_new_tokens": 4096,
+    "input_truncation_policy": "error",
+    "quantization": "4bit",
+    "compute_dtype": "float16",
+    "device_map": "auto",
+    "do_sample": false,
+    "seed": 42,
+    "trust_remote_code": false
+  },
+  "smoke": {
+    "ids_file": "data/calibration/calibration_smoke_ids.txt",
+    "sample_count": 7,
+    "purpose": "infrastructure_only_not_reportable",
+    "must_pass_before_full_matrix": true,
+    "includes_longest_prompt_sample": "cal_museum_030"
+  },
+  "go_no_go": {
+    "evaluated_method": "MP-FS+",
+    "gold_mp_accuracy": 1.0,
+    "parse_success_min": 0.98,
+    "plan_build_success_min": 0.85,
+    "execution_success_min": 0.75,
+    "accepted_output_accuracy_min": 0.95,
+    "side_effect_rate_max": 0.0,
+    "input_truncation_count_max_all_gpu_methods": 0,
+    "output_limit_hit_count_max_all_gpu_methods": 0,
+    "missing_prediction_count_max_all_methods": 0,
+    "invalid_source_selector_count_max": 1,
+    "unknown_column_count_max": 1
+  },
+  "output_policy": {
+    "resume": true,
+    "full_result_root": "experiments/calibration/full_locked_v3_in28672_out4096",
+    "smoke_result_root": "experiments/calibration/smoke_locked_v3_in28672_out4096",
+    "freeze_final_protocol_only_after_go": true
+  }
+}

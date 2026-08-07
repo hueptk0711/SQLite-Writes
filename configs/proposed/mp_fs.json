@@ -1,0 +1,40 @@
+{
+  "method_id": "MP-FS",
+  "representation": "dual_mode_mapping_first",
+  "demonstration_policy": "fixed_four_semi_two_free_text",
+  "demonstrations": {
+    "semi_structured": [
+      {
+        "input": "INSTRUCTION: Add school records. COLLECTION: schools at $.schools[*], fields: school code, status.",
+        "output": "{\"target_groups\":[{\"group_id\":\"g1\",\"source_collection\":\"schools\",\"source_rows\":\"$.schools[*]\",\"table\":\"schools\",\"field_mapping\":{\"school code\":\"CDSCode\",\"status\":\"StatusType\"},\"constants\":{},\"action\":\"insert\",\"conflict\":{\"action\":\"error\",\"target\":[],\"update_columns\":[]}}],\"dependencies\":[],\"ignored_fields\":{}}"
+      },
+      {
+        "input": "INSTRUCTION: Add product records; ignore duplicate product IDs. COLLECTION: products at $[*], fields: product id, description.",
+        "output": "{\"target_groups\":[{\"group_id\":\"g1\",\"source_collection\":\"products\",\"source_rows\":\"$[*]\",\"table\":\"products\",\"field_mapping\":{\"product id\":\"ProductID\",\"description\":\"Description\"},\"constants\":{},\"action\":\"insert\",\"conflict\":{\"action\":\"do_nothing\",\"target\":[\"ProductID\"],\"update_columns\":[]}}],\"dependencies\":[],\"ignored_fields\":{}}"
+      },
+      {
+        "input": "INSTRUCTION: Add user records; update existing IDs with the supplied values. COLLECTION: users at $[*], fields: user id, name, website.",
+        "output": "{\"target_groups\":[{\"group_id\":\"g1\",\"source_collection\":\"users\",\"source_rows\":\"$[*]\",\"table\":\"users\",\"field_mapping\":{\"user id\":\"Id\",\"name\":\"DisplayName\",\"website\":\"WebsiteUrl\"},\"constants\":{},\"action\":\"insert\",\"conflict\":{\"action\":\"do_update\",\"target\":[\"Id\"],\"update_columns\":[\"DisplayName\",\"WebsiteUrl\"]}}],\"dependencies\":[],\"ignored_fields\":{}}"
+      },
+      {
+        "input": "INSTRUCTION: Add related customer and order records; skip existing customer IDs. COLLECTIONS: customers at $.customers[*], fields: customer id; orders at $.orders[*], fields: order id, customer id, amount.",
+        "output": "{\"target_groups\":[{\"group_id\":\"customers_group\",\"source_collection\":\"customers\",\"source_rows\":\"$.customers[*]\",\"table\":\"customers\",\"field_mapping\":{\"customer id\":\"CustomerID\"},\"constants\":{},\"action\":\"insert\",\"conflict\":{\"action\":\"do_nothing\",\"target\":[\"CustomerID\"],\"update_columns\":[]}},{\"group_id\":\"orders_group\",\"source_collection\":\"orders\",\"source_rows\":\"$.orders[*]\",\"table\":\"orders\",\"field_mapping\":{\"order id\":\"OrderID\",\"customer id\":\"CustomerID\",\"amount\":\"Amount\"},\"constants\":{},\"action\":\"insert\",\"conflict\":{\"action\":\"error\",\"target\":[],\"update_columns\":[]}}],\"dependencies\":[{\"before\":\"customers_group\",\"after\":\"orders_group\"}],\"ignored_fields\":{}}"
+      }
+    ],
+    "free_text": [
+      {
+        "input": "Add major DS with name Data Science.",
+        "output": "{\"version\":\"3.0\",\"plan_kind\":\"free_text_write_plan\",\"write_groups\":[{\"group_id\":\"g1\",\"table\":\"majors\",\"action\":\"insert\",\"rows\":[{\"major_id\":\"DS\",\"major_name\":\"Data Science\"}],\"value_evidence\":[{\"major_id\":{\"source\":\"instruction_text\",\"exact_span\":\"major DS\"},\"major_name\":{\"source\":\"instruction_text\",\"exact_span\":\"name Data Science\"}}],\"conflict\":{\"action\":\"error\",\"target\":[],\"update_columns\":[]}}],\"dependencies\":[],\"unresolved_fields\":[]}"
+      },
+      {
+        "input": "Add product 650 described as Natural 95; ignore it if 650 exists.",
+        "output": "{\"version\":\"3.0\",\"plan_kind\":\"free_text_write_plan\",\"write_groups\":[{\"group_id\":\"g1\",\"table\":\"products\",\"action\":\"insert\",\"rows\":[{\"ProductID\":650,\"Description\":\"Natural 95\"}],\"value_evidence\":[{\"ProductID\":{\"source\":\"instruction_text\",\"exact_span\":\"product 650\"},\"Description\":{\"source\":\"instruction_text\",\"exact_span\":\"described as Natural 95\"}}],\"conflict\":{\"action\":\"do_nothing\",\"target\":[\"ProductID\"],\"update_columns\":[]}}],\"dependencies\":[],\"unresolved_fields\":[]}"
+      }
+    ]
+  },
+  "source_parser": "deterministic",
+  "free_text_branch": "evidence_grounded_extraction",
+  "semi_structured_branch": "mapping_only",
+  "verifier": "mandatory_hard",
+  "repair": false
+}

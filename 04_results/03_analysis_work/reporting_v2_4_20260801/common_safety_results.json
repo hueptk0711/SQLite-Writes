@@ -1,0 +1,36 @@
+{
+  "analysis_id": "post_hoc_common_transactional_preflight_v1",
+  "status": "pass",
+  "analysis_class": "post_hoc_deterministic_common_safety_replay",
+  "predictions_modified": false,
+  "model_inference_rerun": false,
+  "primary_results_modified": false,
+  "database_execution_replayed_on_in_memory_copies": true,
+  "scope_note": "The transactional dry-run boundary is standardized. The Write Plan hard verifier is applicable to J-FS-M but not to direct SQL.",
+  "methods": {
+    "D-FS-M": {
+      "samples": 300,
+      "transactional_preflight_coverage": 0.89,
+      "target_state_accuracy_after_common_preflight": 0.86,
+      "accuracy_conditional_on_common_preflight": 0.9662921348314607,
+      "false_accept_rate_conditional_on_common_preflight": 0.033707865168539325,
+      "false_accept_count": 9
+    },
+    "J-FS-M": {
+      "samples": 300,
+      "transactional_preflight_coverage": 0.88,
+      "target_state_accuracy_after_common_preflight": 0.86,
+      "accuracy_conditional_on_common_preflight": 0.9772727272727273,
+      "false_accept_rate_conditional_on_common_preflight": 0.022727272727272728,
+      "false_accept_count": 6
+    },
+    "MP-FS+": {
+      "samples": 300,
+      "transactional_preflight_coverage": 0.5466666666666666,
+      "target_state_accuracy_after_common_preflight": 0.49333333333333335,
+      "accuracy_conditional_on_common_preflight": 0.9024390243902439,
+      "false_accept_rate_conditional_on_common_preflight": 0.0975609756097561,
+      "false_accept_count": 16
+    }
+  }
+}

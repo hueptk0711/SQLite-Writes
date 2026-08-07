@@ -1,0 +1,18 @@
+{
+  "base_config": "configs/proposed/mp_fs.json",
+  "method_id": "MP-FS+",
+  "representation": "reference_based_mapping_first",
+  "demonstration_policy": "matched_semantic_bank_v1",
+  "demonstration_bank": "configs/demonstrations/matched_semantic_bank.json",
+  "demonstration_representation": "mapping_reference",
+  "reference_planning": true,
+  "source_selector_contract": "enumerated_ids_only",
+  "schema_reference_contract": "enumerated_ids_only",
+  "evidence_contract": "enumerated_spans_only",
+  "conflict_default_policy": "needs_clarification",
+  "normalization_mode": "lossless",
+  "normalize_values": false,
+  "transactional_preflight": true,
+  "verifier": "mandatory_hard",
+  "repair": false
+}

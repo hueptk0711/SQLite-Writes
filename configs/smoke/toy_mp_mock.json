@@ -1,0 +1,14 @@
+{
+  "method_id": "MP",
+  "representation": "dual_mode_mapping_first",
+  "verifier": "mandatory_hard",
+  "batch_size": 2,
+  "inference": {
+    "backend": "mock",
+    "mock_responses": {
+      "toy_001": "{\"version\":\"3.0\",\"plan_kind\":\"free_text_write_plan\",\"write_groups\":[{\"group_id\":\"students\",\"table\":\"students\",\"action\":\"insert\",\"rows\":[{\"student_id\":\"S001\",\"name\":\"Nguyen Van A\",\"age\":20,\"major_id\":\"AI\"}],\"value_evidence\":[{\"student_id\":{\"source\":\"instruction_text\",\"exact_span\":\"id S001\"},\"name\":{\"source\":\"instruction_text\",\"exact_span\":\"named Nguyen Van A\"},\"age\":{\"source\":\"instruction_text\",\"exact_span\":\"age 20\"},\"major_id\":{\"source\":\"instruction_text\",\"exact_span\":\"major AI\"}}],\"conflict\":{\"action\":\"error\",\"target\":[],\"update_columns\":[]}}],\"dependencies\":[],\"unresolved_fields\":[]}",
+      "toy_002": "{\"version\":\"3.0\",\"plan_kind\":\"free_text_write_plan\",\"write_groups\":[{\"group_id\":\"majors\",\"table\":\"majors\",\"action\":\"insert\",\"rows\":[{\"major_id\":\"DS\",\"major_name\":\"Data Science\"}],\"value_evidence\":[{\"major_id\":{\"source\":\"instruction_text\",\"exact_span\":\"major DS\"},\"major_name\":{\"source\":\"instruction_text\",\"exact_span\":\"name Data Science\"}}],\"conflict\":{\"action\":\"error\",\"target\":[],\"update_columns\":[]}}],\"dependencies\":[],\"unresolved_fields\":[]}",
+      "toy_003": "{\"version\":\"3.0\",\"plan_kind\":\"free_text_write_plan\",\"write_groups\":[{\"group_id\":\"students\",\"table\":\"students\",\"action\":\"insert\",\"rows\":[{\"student_id\":\"S002\",\"name\":\"Tran B\",\"age\":21,\"major_id\":\"CS\"},{\"student_id\":\"S003\",\"name\":\"Le C\",\"age\":19,\"major_id\":\"AI\"}],\"value_evidence\":[{\"student_id\":{\"source\":\"instruction_text\",\"exact_span\":\"S002\"},\"name\":{\"source\":\"instruction_text\",\"exact_span\":\"Tran B\"},\"age\":{\"source\":\"instruction_text\",\"exact_span\":\"age 21\"},\"major_id\":{\"source\":\"instruction_text\",\"exact_span\":\"major CS\"}},{\"student_id\":{\"source\":\"instruction_text\",\"exact_span\":\"S003\"},\"name\":{\"source\":\"instruction_text\",\"exact_span\":\"Le C\"},\"age\":{\"source\":\"instruction_text\",\"exact_span\":\"age 19\"},\"major_id\":{\"source\":\"instruction_text\",\"exact_span\":\"major AI\"}}],\"conflict\":{\"action\":\"error\",\"target\":[],\"update_columns\":[]}}],\"dependencies\":[],\"unresolved_fields\":[]}"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "backend": "hf",
+  "model_name_or_path": "organization/model-name",
+  "revision": "REPLACE_WITH_40_CHARACTER_HUGGING_FACE_COMMIT_HASH",
+  "batch_size": 4,
+  "max_input_tokens": 8192,
+  "max_new_tokens": 2048,
+  "input_truncation_policy": "error",
+  "quantization": "4bit",
+  "compute_dtype": "float16",
+  "device_map": "auto",
+  "do_sample": false,
+  "seed": 42,
+  "trust_remote_code": false
+}

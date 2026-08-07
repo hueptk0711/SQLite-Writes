@@ -1,0 +1,80 @@
+{
+  "status": "frozen_capacity_only_amendment",
+  "amendment_id": "capacity_only_v2_out8192",
+  "rationale": "Protocol v1 aborted because one otherwise successful MP-FS-M generation mechanically reached the pre-specified 4096-token output cap. The change is applied uniformly to all GPU methods.",
+  "predecessor": {
+    "protocol_id": "mp_fs_plus_external_holdout_v1",
+    "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_20260731/configs/experiments/final_protocol.json",
+    "sha256": "41eee8d41c2205af9485e03fd654a9a46a28720f78511b61babe1443c7d3820a",
+    "disposition": "aborted_infrastructure_run_not_paper_eligible",
+    "evidence_path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/artifacts/protocol_amendments/v1_abort_evidence.json",
+    "evidence_sha256": "8609d1d383220735c669643f34f4a755ccd42d21b605acdf6251a9c7e3b5644f"
+  },
+  "successor": {
+    "protocol_id": "mp_fs_plus_external_holdout_v2_out8192",
+    "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/configs/experiments/final_protocol.json",
+    "sha256": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330",
+    "project_root": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731",
+    "paper_eligibility_policy": "eligible_only_if_all_six_methods_complete_under_this_hash"
+  },
+  "sole_parameter_change": {
+    "field": "max_new_tokens",
+    "from": 4096,
+    "to": 8192,
+    "scope": [
+      "D-FS-M",
+      "J-FS-M",
+      "S-FS-v2-M",
+      "MP-FS-M",
+      "MP-FS+"
+    ],
+    "old_inference_config": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_20260731/artifacts/server/hf_final_qwen25_7b_in28672_out4096.json",
+    "old_inference_config_sha256": "f8ad6f6c5448df66e4e08e4f937db065686d0dacc1cf22d5d24c211dc7649336",
+    "new_inference_config": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/artifacts/server/hf_final_qwen25_7b_in28672_out8192.json",
+    "new_inference_config_sha256": "06846f45097dc9510eed8124d446ec43c4eaac8df81eb6a87c539a7e12863484"
+  },
+  "method_config_hashes": {
+    "D-FS-M": {
+      "v1_sha256": "bc7c04f9daecc6706129ae06a04b612e339bd65e5bf722855e3f17b413b7f2f6",
+      "v2_sha256": "bc7c04f9daecc6706129ae06a04b612e339bd65e5bf722855e3f17b413b7f2f6"
+    },
+    "J-FS-M": {
+      "v1_sha256": "832665a5953f92e4ea66642b3e1f3dcfa9e9842518e98393dc5ffa7a23e49765",
+      "v2_sha256": "832665a5953f92e4ea66642b3e1f3dcfa9e9842518e98393dc5ffa7a23e49765"
+    },
+    "S-FS-v2-M": {
+      "v1_sha256": "6c538ffec7440ddcfdb2b7543d35f29fb570d3dba01e7da55a5109d6e7bd2109",
+      "v2_sha256": "6c538ffec7440ddcfdb2b7543d35f29fb570d3dba01e7da55a5109d6e7bd2109"
+    },
+    "MP-FS-M": {
+      "v1_sha256": "f71ac4f1177a7c1b47bd3f98b735f056d3452424821fbdc337784b28f36636dd",
+      "v2_sha256": "f71ac4f1177a7c1b47bd3f98b735f056d3452424821fbdc337784b28f36636dd"
+    },
+    "MP-FS+": {
+      "v1_sha256": "eed7feb1abdebdb5680e00922601135ea6f6ac809deaa9d548945569e7a5f206",
+      "v2_sha256": "eed7feb1abdebdb5680e00922601135ea6f6ac809deaa9d548945569e7a5f206"
+    },
+    "Gold-MP": {
+      "v1_sha256": "b4f044fcbcd410c8fc3d8219c4b5fb97a24804b6f055355818a1663a2dd34b07",
+      "v2_sha256": "b4f044fcbcd410c8fc3d8219c4b5fb97a24804b6f055355818a1663a2dd34b07"
+    }
+  },
+  "unchanged_contracts": [
+    "authorized_hashes",
+    "primary_holdout",
+    "methods",
+    "pre_registered_comparisons",
+    "primary_metrics",
+    "statistics",
+    "freeze_contract",
+    "diagnostic_677_policy"
+  ],
+  "run_policy": {
+    "result_root_must_be_new": true,
+    "rerun_all_gpu_methods": true,
+    "rerun_gold_oracle": true,
+    "reuse_v1_predictions": false,
+    "selective_rerun": false,
+    "disclose_amendment_in_paper": true
+  }
+}

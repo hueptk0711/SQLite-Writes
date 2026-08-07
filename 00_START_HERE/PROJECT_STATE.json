@@ -1,0 +1,61 @@
+{
+  "workspace_id": "mp_fs_plus_code_and_results_reviewer_v2_20260805",
+  "updated_at_local": "2026-08-05",
+  "status": "internal_reviewer_candidate_public_rights_pending",
+  "layout": {
+    "canonical_source_root": ".",
+    "active_source_trees": 1,
+    "frozen_inference_source": "archive/frozen_inference_source.zip",
+    "paper_writing_root": "../PAPER_WRITING",
+    "contains_latex_or_manuscript": false
+  },
+  "primary_results": {
+    "sample_count": 300,
+    "database_count": 5,
+    "method_count": 6,
+    "protocol_sha256": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330",
+    "archive_sha256": "e456037422281d56e03dd7766baf1cc9efa78a95061234444c452f3c04810911",
+    "predictions_modified": false,
+    "target_correct_counts": {
+      "D-FS-M": 258,
+      "J-FS-M": 258,
+      "S-FS-v2-M": 78,
+      "MP-FS-M": 34,
+      "MP-FS+": 148,
+      "Gold-MP": 300
+    }
+  },
+  "state_scope_audit": {
+    "status": "pass",
+    "comparison_scope": "all_persistent_user_tables",
+    "method_sample_pairs": 1800,
+    "target_mismatches": 0,
+    "strict_mismatches": 0,
+    "off_target_mismatches": 0,
+    "gpu_required": false,
+    "model_inference_rerun": false
+  },
+  "local_validation": {
+    "python": "3.14.3",
+    "sqlite": "3.50.4",
+    "pytest": "8.4.2",
+    "fast_tests": 140,
+    "fast_tests_status": "pass",
+    "integration_tests": 1,
+    "direct_reproduction_status": "pass",
+    "direct_reproduction_seconds": 116.4
+  },
+  "post_hoc_results": {
+    "cascade_accuracy": 0.94,
+    "downstream_ablation_variants": 4,
+    "qwen14b": "same_family_robustness",
+    "yi9b": "cross_family_robustness"
+  },
+  "owner_blockers": [
+    "code_license",
+    "dataset_and_artifact_redistribution_rights",
+    "author_and_funding_metadata",
+    "public_repository_url_or_doi",
+    "citation_cff"
+  ]
+}

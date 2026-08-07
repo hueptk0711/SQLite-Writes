@@ -1,0 +1,9 @@
+Place exactly one matching pair here:
+
+mp_fs_plus_final300_<timestamp>.tar.gz
+mp_fs_plus_final300_<timestamp>.tar.gz.sha256
+
+Then run from the workspace root:
+
+.\08_tools\import_final_results.ps1
+

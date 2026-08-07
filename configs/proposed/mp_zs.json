@@ -1,0 +1,11 @@
+{
+  "method_id": "MP-ZS",
+  "representation": "dual_mode_mapping_first",
+  "demonstration_policy": "none",
+  "demonstrations": {},
+  "source_parser": "deterministic",
+  "free_text_branch": "evidence_grounded_extraction",
+  "semi_structured_branch": "mapping_only",
+  "verifier": "mandatory_hard",
+  "repair": false
+}

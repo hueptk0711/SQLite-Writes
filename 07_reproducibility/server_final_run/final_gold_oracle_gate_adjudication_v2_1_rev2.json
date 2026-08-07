@@ -1,0 +1,65 @@
+{
+  "status": "frozen_oracle_gate_correction",
+  "amendment_id": "gold_oracle_null_status_gate_correction_v2_1_rev2",
+  "base_protocol_sha256": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330",
+  "source_sha256": "79cedcb998f087d6b6b95a9a0199f304463d5e1d83e800f0b6bf04e14f7d1442",
+  "root_cause": "Gold-MP raw rows correctly use status=not_applicable, but the oracle evaluation branch leaves generation_status null. The generic final gate therefore misclassified all 300 complete oracle rows as missing predictions.",
+  "gate_reported_missing_predictions": 300,
+  "actual_missing_predictions": 0,
+  "verified_rows": 300,
+  "verified_metrics": {
+    "parse_success": 1.0,
+    "plan_validation_success": 1.0,
+    "build_success": 1.0,
+    "execution_success": 1.0,
+    "target_state_accuracy": 1.0,
+    "strict_full_state_accuracy": 1.0,
+    "database_macro_accuracy": 1.0
+  },
+  "input_truncation_rate": 0.0,
+  "output_limit_hit_rate": 0.0,
+  "score_policy": "accept_verified_gold_oracle_as_complete",
+  "prediction_artifacts_modified": false,
+  "evaluation_artifacts_modified": false,
+  "metrics_modified": false,
+  "oracle_rerun": false,
+  "source_artifacts": {
+    "protocol": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/configs/experiments/final_protocol.json",
+      "sha256": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330"
+    },
+    "run_method_source": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/src/nldbwrite_v3/experiments/run_method.py",
+      "sha256": "79cedcb998f087d6b6b95a9a0199f304463d5e1d83e800f0b6bf04e14f7d1442"
+    },
+    "invalid_marker": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/final300_qwen25_7b_protocol_v2_out8192_20260731/gold_mp/FINAL_RUN_INVALID.json",
+      "sha256": "a5fb4319d11f81f1b55b41e133a291716f35ac2e7762c0abb3208bdaaaed0040"
+    },
+    "raw_generations": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/final300_qwen25_7b_protocol_v2_out8192_20260731/gold_mp/raw_generations.jsonl",
+      "sha256": "984ddc56a5396f16cfe452e308daf333ddebffa1a2e9cdc3ed0f7107439b3ba0"
+    },
+    "evaluation": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/final300_qwen25_7b_protocol_v2_out8192_20260731/gold_mp/evaluation.jsonl",
+      "sha256": "9aefb9656df1f126c0ba3ce74eec100b8210c1e4561c60a6545ef0ea13b5d57e"
+    },
+    "metrics": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/final300_qwen25_7b_protocol_v2_out8192_20260731/gold_mp/metrics.json",
+      "sha256": "27556ba59734a344000918702381adccef3a73b23c67e79b6cd9eae0820615ef"
+    },
+    "run_lock": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/final300_qwen25_7b_protocol_v2_out8192_20260731/gold_mp/run_lock.json",
+      "sha256": "1a0bb87c87dc07b2cc9f715c3175ed417253b313a9d1069c81fbed9bb9fcc70e"
+    },
+    "manifest": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/final300_qwen25_7b_protocol_v2_out8192_20260731/gold_mp/manifest.json",
+      "sha256": "0e59696351ccb6fda583580c78c7e225d8bb28d5bea97426410fbbbec248da9b"
+    }
+  },
+  "reporting_requirements": {
+    "retain_original_invalid_marker": true,
+    "disclose_oracle_completion_gate_bug": true,
+    "do_not_describe_as_missing_gold_predictions": true
+  }
+}

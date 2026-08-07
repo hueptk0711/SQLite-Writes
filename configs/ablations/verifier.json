@@ -1,0 +1,10 @@
+{
+  "experiment_id": "verifier_ablation",
+  "main_method": "MP",
+  "variants": [
+    "hard_verification",
+    "warning_only_verification",
+    "without_provenance_checks"
+  ],
+  "main_table": false
+}

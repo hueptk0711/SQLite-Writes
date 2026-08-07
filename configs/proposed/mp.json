@@ -1,0 +1,15 @@
+{
+  "method_id": "MP",
+  "representation": "dual_mode_mapping_first",
+  "source_parser": "deterministic",
+  "free_text_branch": "evidence_grounded_extraction",
+  "semi_structured_branch": "mapping_only",
+  "verifier": "mandatory_hard",
+  "repair": false,
+  "compiler": {
+    "strict_atomic": true,
+    "parameterized_sql": true,
+    "normalize_values": false,
+    "infer_fk_order": true
+  }
+}

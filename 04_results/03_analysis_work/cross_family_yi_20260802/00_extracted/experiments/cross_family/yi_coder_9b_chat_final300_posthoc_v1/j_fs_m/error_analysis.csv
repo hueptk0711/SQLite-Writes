@@ -1,0 +1,301 @@
+sample_id,db_id,method,error_category,error_stage,error_type,error_message,detected_mode,detected_format
+final_archeology_001,archeology,J-FS-M,E1_invalid_output,parsing,parse_error,,free_text,free_text
+final_archeology_002,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_archeology_003,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_archeology_004,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_archeology_005,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_archeology_006,archeology,J-FS-M,correct,correct,,,semi_structured,json_object
+final_archeology_007,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_archeology_008,archeology,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_archeology_009,archeology,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_archeology_010,archeology,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,key_value
+final_archeology_011,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_archeology_012,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_archeology_013,archeology,J-FS-M,E16_state_mismatch,state,wrong_state,,semi_structured,csv
+final_archeology_014,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_archeology_015,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_archeology_016,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_archeology_017,archeology,J-FS-M,E3_unknown_column,interpretation,UNKNOWN_COLUMN,projects: unknown column 'project_id'.,free_text,free_text
+final_archeology_018,archeology,J-FS-M,E1_invalid_output,parsing,parse_error,,free_text,free_text
+final_archeology_019,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_archeology_020,archeology,J-FS-M,correct,correct,,,semi_structured,json_object
+final_archeology_021,archeology,J-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_archeology_022,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_archeology_023,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_archeology_024,archeology,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_archeology_025,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_archeology_026,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_archeology_027,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_archeology_028,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_archeology_029,archeology,J-FS-M,E3_unknown_column,interpretation,UNKNOWN_COLUMN,projects: unknown column 'conflict_action'.,semi_structured,csv
+final_archeology_030,archeology,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_archeology_031,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_archeology_032,archeology,J-FS-M,correct,correct,,,free_text,free_text
+final_archeology_033,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_archeology_034,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,json_object
+final_archeology_035,archeology,J-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_archeology_036,archeology,J-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_archeology_037,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_archeology_038,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_archeology_039,archeology,J-FS-M,correct,correct,,,semi_structured,markdown_table
+final_archeology_040,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_archeology_041,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_archeology_042,archeology,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,multi_table
+final_archeology_043,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_archeology_044,archeology,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_archeology_045,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_archeology_046,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_archeology_047,archeology,J-FS-M,E1_invalid_output,parsing,parse_error,,free_text,free_text
+final_archeology_048,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_archeology_049,archeology,J-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_archeology_050,archeology,J-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_archeology_051,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,json_array
+final_archeology_052,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_archeology_053,archeology,J-FS-M,correct,correct,,,semi_structured,markdown_table
+final_archeology_054,archeology,J-FS-M,correct,correct,,,semi_structured,markdown_table
+final_archeology_055,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_archeology_056,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_archeology_057,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_archeology_058,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_archeology_059,archeology,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_archeology_060,archeology,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_polar_001,polar,J-FS-M,E1_invalid_output,parsing,parse_error,,free_text,free_text
+final_polar_002,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_polar_003,polar,J-FS-M,E16_state_mismatch,state,wrong_state,,free_text,free_text
+final_polar_004,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_polar_005,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_polar_006,polar,J-FS-M,correct,correct,,,semi_structured,json_array
+final_polar_007,polar,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_polar_008,polar,J-FS-M,correct,correct,,,semi_structured,markdown_table
+final_polar_009,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_polar_010,polar,J-FS-M,correct,correct,,,semi_structured,key_value
+final_polar_011,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_polar_012,polar,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,key_value
+final_polar_013,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_polar_014,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_polar_015,polar,J-FS-M,correct,correct,,,semi_structured,csv
+final_polar_016,polar,J-FS-M,E3_unknown_column,interpretation,UNKNOWN_COLUMN,equipment: unknown column 'utilization'.,free_text,free_text
+final_polar_017,polar,J-FS-M,E1_invalid_output,parsing,parse_error,,free_text,free_text
+final_polar_018,polar,J-FS-M,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,lightingandsafety: missing required columns: lighteqref.,free_text,free_text
+final_polar_019,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_polar_020,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,json_array
+final_polar_021,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_polar_022,polar,J-FS-M,correct,correct,,,semi_structured,markdown_table
+final_polar_023,polar,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_polar_024,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_polar_025,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_polar_026,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_polar_027,polar,J-FS-M,correct,correct,,,semi_structured,multi_table
+final_polar_028,polar,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_polar_029,polar,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_polar_030,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_polar_031,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_polar_032,polar,J-FS-M,correct,correct,,,free_text,free_text
+final_polar_033,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_polar_034,polar,J-FS-M,correct,correct,,,semi_structured,json_object
+final_polar_035,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_polar_036,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_polar_037,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_polar_038,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_polar_039,polar,J-FS-M,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,engineandfluids: missing required columns: engfluidseqref.,semi_structured,markdown_table
+final_polar_040,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_polar_041,polar,J-FS-M,correct,correct,,,semi_structured,multi_table
+final_polar_042,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_polar_043,polar,J-FS-M,correct,correct,,,semi_structured,csv
+final_polar_044,polar,J-FS-M,correct,correct,,,semi_structured,csv
+final_polar_045,polar,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_polar_046,polar,J-FS-M,correct,correct,,,free_text,free_text
+final_polar_047,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_polar_048,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_polar_049,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_polar_050,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_polar_051,polar,J-FS-M,correct,correct,,,semi_structured,json_array
+final_polar_052,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_polar_053,polar,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_polar_054,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_polar_055,polar,J-FS-M,correct,correct,,,semi_structured,multi_table
+final_polar_056,polar,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,multi_table
+final_polar_057,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_polar_058,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_polar_059,polar,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_polar_060,polar,J-FS-M,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,cabinenvironment: missing required columns: cabineqref.,semi_structured,csv
+final_robot_001,robot,J-FS-M,correct,correct,,,free_text,free_text
+final_robot_002,robot,J-FS-M,correct,correct,,,free_text,free_text
+final_robot_003,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_robot_004,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_robot_005,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_robot_006,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,json_object
+final_robot_007,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_robot_008,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_robot_009,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_robot_010,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_robot_011,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_robot_012,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_robot_013,robot,J-FS-M,correct,correct,,,semi_structured,csv
+final_robot_014,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_robot_015,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_robot_016,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,free_text,free_text
+final_robot_017,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_robot_018,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_robot_019,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_robot_020,robot,J-FS-M,correct,correct,,,semi_structured,json_array
+final_robot_021,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_robot_022,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_robot_023,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_robot_024,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_robot_025,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_robot_026,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,multi_table
+final_robot_027,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_robot_028,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_robot_029,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_robot_030,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_robot_031,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_robot_032,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,free_text,free_text
+final_robot_033,robot,J-FS-M,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,robot_record: missing required columns: recreg.,free_text,free_text
+final_robot_034,robot,J-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_robot_035,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_robot_036,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,multi_json_collection
+final_robot_037,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_robot_038,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_robot_039,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_robot_040,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,multi_table
+final_robot_041,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_robot_042,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_robot_043,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_robot_044,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_robot_045,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_robot_046,robot,J-FS-M,correct,correct,,,free_text,free_text
+final_robot_047,robot,J-FS-M,correct,correct,,,free_text,free_text
+final_robot_048,robot,J-FS-M,E2_wrong_table,interpretation,UNKNOWN_TABLE,Unknown table 'majors'.,free_text,free_text
+final_robot_049,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_robot_050,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_robot_051,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,json_object
+final_robot_052,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_robot_053,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_robot_054,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_robot_055,robot,J-FS-M,correct,correct,,,semi_structured,multi_table
+final_robot_056,robot,J-FS-M,E3_unknown_column,interpretation,UNKNOWN_COLUMN,actuation_data: unknown column 'tcpuval'.,semi_structured,multi_table
+final_robot_057,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_robot_058,robot,J-FS-M,correct,correct,,,semi_structured,csv
+final_robot_059,robot,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_robot_060,robot,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_vaccine_001,vaccine,J-FS-M,E16_state_mismatch,state,wrong_state,,free_text,free_text
+final_vaccine_002,vaccine,J-FS-M,E2_wrong_table,interpretation,UNKNOWN_TABLE,Unknown table 'majors'.,free_text,free_text
+final_vaccine_003,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_vaccine_004,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_vaccine_005,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_vaccine_006,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_vaccine_007,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_vaccine_008,vaccine,J-FS-M,correct,correct,,,semi_structured,markdown_table
+final_vaccine_009,vaccine,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_vaccine_010,vaccine,J-FS-M,correct,correct,,,semi_structured,key_value
+final_vaccine_011,vaccine,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,multi_table
+final_vaccine_012,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_vaccine_013,vaccine,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_vaccine_014,vaccine,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_vaccine_015,vaccine,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_vaccine_016,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_vaccine_017,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_vaccine_018,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_vaccine_019,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_vaccine_020,vaccine,J-FS-M,correct,correct,,,semi_structured,json_array
+final_vaccine_021,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_vaccine_022,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_vaccine_023,vaccine,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_vaccine_024,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_vaccine_025,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_vaccine_026,vaccine,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,multi_table
+final_vaccine_027,vaccine,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,multi_table
+final_vaccine_028,vaccine,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_vaccine_029,vaccine,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_vaccine_030,vaccine,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_vaccine_031,vaccine,J-FS-M,E3_unknown_column,interpretation,UNKNOWN_COLUMN,shipments: unknown column 'customsstatus'.,free_text,free_text
+final_vaccine_032,vaccine,J-FS-M,E3_unknown_column,interpretation,UNKNOWN_COLUMN,container: unknown column 'shipmentregistry'.,free_text,free_text
+final_vaccine_033,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_vaccine_034,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,json_array
+final_vaccine_035,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_vaccine_036,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_vaccine_037,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_vaccine_038,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_vaccine_039,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_vaccine_040,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_vaccine_041,vaccine,J-FS-M,correct,correct,,,semi_structured,key_value
+final_vaccine_042,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_vaccine_043,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_vaccine_044,vaccine,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_vaccine_045,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_vaccine_046,vaccine,J-FS-M,E3_unknown_column,interpretation,UNKNOWN_COLUMN,regulatoryandmaintenance: unknown column 'shipmentregistry'.,free_text,free_text
+final_vaccine_047,vaccine,J-FS-M,E3_unknown_column,interpretation,UNKNOWN_COLUMN,container: unknown column 'status'.,free_text,free_text
+final_vaccine_048,vaccine,J-FS-M,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,shipments: missing required columns: shipmentregistry.,free_text,free_text
+final_vaccine_049,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_vaccine_050,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_vaccine_051,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,json_array
+final_vaccine_052,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_vaccine_053,vaccine,J-FS-M,correct,correct,,,semi_structured,markdown_table
+final_vaccine_054,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_vaccine_055,vaccine,J-FS-M,correct,correct,,,semi_structured,key_value
+final_vaccine_056,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_vaccine_057,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_vaccine_058,vaccine,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_vaccine_059,vaccine,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_vaccine_060,vaccine,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_virtual_001,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_virtual_002,virtual,J-FS-M,E16_state_mismatch,state,wrong_state,,free_text,free_text
+final_virtual_003,virtual,J-FS-M,correct,correct,,,free_text,free_text
+final_virtual_004,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_virtual_005,virtual,J-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_virtual_006,virtual,J-FS-M,correct,correct,,,semi_structured,json_array
+final_virtual_007,virtual,J-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_008,virtual,J-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_009,virtual,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_virtual_010,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_virtual_011,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_virtual_012,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_table
+final_virtual_013,virtual,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_virtual_014,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_virtual_015,virtual,J-FS-M,correct,correct,,,semi_structured,csv
+final_virtual_016,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_virtual_017,virtual,J-FS-M,E1_invalid_output,parsing,parse_error,,free_text,free_text
+final_virtual_018,virtual,J-FS-M,E1_invalid_output,parsing,parse_error,,free_text,free_text
+final_virtual_019,virtual,J-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_virtual_020,virtual,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,json_array
+final_virtual_021,virtual,J-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_virtual_022,virtual,J-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_023,virtual,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_virtual_024,virtual,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_virtual_025,virtual,J-FS-M,correct,correct,,,semi_structured,key_value
+final_virtual_026,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_virtual_027,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_virtual_028,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_virtual_029,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_virtual_030,virtual,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_virtual_031,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_virtual_032,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_virtual_033,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_virtual_034,virtual,J-FS-M,correct,correct,,,semi_structured,json_object
+final_virtual_035,virtual,J-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_virtual_036,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,multi_json_collection
+final_virtual_037,virtual,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_virtual_038,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_virtual_039,virtual,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_virtual_040,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_virtual_041,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_virtual_042,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_virtual_043,virtual,J-FS-M,correct,correct,,,semi_structured,csv
+final_virtual_044,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_virtual_045,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,csv
+final_virtual_046,virtual,J-FS-M,correct,correct,,,free_text,free_text
+final_virtual_047,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,free_text,free_text
+final_virtual_048,virtual,J-FS-M,E1_invalid_output,parsing,parse_error,,free_text,free_text
+final_virtual_049,virtual,J-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_virtual_050,virtual,J-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_virtual_051,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,json_array
+final_virtual_052,virtual,J-FS-M,E13_dependency_fk,execution,execution_error,FOREIGN KEY constraint failed,semi_structured,markdown_table
+final_virtual_053,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,markdown_table
+final_virtual_054,virtual,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,markdown_table
+final_virtual_055,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_virtual_056,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_virtual_057,virtual,J-FS-M,other,other,MISSING_WRITE_GROUPS,Write Plan must contain a non-empty write_groups list.,semi_structured,key_value
+final_virtual_058,virtual,J-FS-M,correct,correct,,,semi_structured,csv
+final_virtual_059,virtual,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv
+final_virtual_060,virtual,J-FS-M,E1_invalid_output,parsing,parse_error,,semi_structured,csv

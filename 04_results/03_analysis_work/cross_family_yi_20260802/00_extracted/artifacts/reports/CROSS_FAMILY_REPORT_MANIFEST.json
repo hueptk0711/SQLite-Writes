@@ -1,0 +1,9 @@
+{
+  "analysis_id": "post_hoc_cross_family_yi_coder_9b_chat_v1",
+  "protocol_sha256": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256",
+  "output_sha256": {
+    "cross_family_yi_coder_9b_chat_v1.json": "b2458ef7f12d8fc8c962e52843dae9021b234fcbf3434bc5963d8bff437fd8a8",
+    "cross_family_yi_coder_9b_chat_v1.csv": "c4b7389fc7a9d3e20802ead255a856b58d547af4afc1c53aa019e08c3621a8bc",
+    "cross_family_yi_coder_9b_chat_v1.md": "66b3f58c127500d8ed49949c7f02d521cbd6cba7a6cc65a6466e43be072f9875"
+  }
+}

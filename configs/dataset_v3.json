@@ -1,0 +1,21 @@
+{
+  "dataset_name": "nl_db_write_v3_final_677",
+  "selection_status": "frozen_after_full_audit_and_oracle",
+  "source_dataset": "../paper_v2_current/code/nl_db_write_pipeline/data/processed/nl_db_write_augmented900_v1_human_corrected.json",
+  "source_split": "../paper_v2_current/code/nl_db_write_pipeline/data/splits/augmented900_v1/test_ids_human_corrected.txt",
+  "comparison_dataset": "../paper_v2_current/code/nl_db_write_pipeline/data/processed/nl_db_write_augmented900_v1_human_corrected.json",
+  "comparison_split": "../paper_v2_current/code/nl_db_write_pipeline/data/splits/augmented900_v1/test_ids_human_corrected.txt",
+  "database_root_env": "NLDB_DATABASE_ROOT",
+  "profile_dir_env": "NLDB_PROFILE_DIR",
+  "frozen_dev_dataset": "data/frozen/dev/dataset_dev_v3.json",
+  "frozen_dev_split": "data/frozen/dev/dev_ids_v3.txt",
+  "frozen_dev_gold_plans": "data/frozen/dev/gold_write_plans_dev_v3.jsonl",
+  "frozen_dev_manifest": "data/frozen/dev/frozen_manifest_dev.json",
+  "frozen_test_dataset": "data/frozen/test/dataset_test_v3.json",
+  "frozen_test_split": "data/frozen/test/test_ids_v3.txt",
+  "frozen_test_gold_plans": "data/frozen/test/gold_write_plans_test_v3.jsonl",
+  "frozen_test_manifest": "data/frozen/test/frozen_manifest_test.json",
+  "dev_test_sample_overlap": 0,
+  "dev_test_source_group_overlap": 0,
+  "expected_test_samples": 677
+}

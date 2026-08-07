@@ -1,0 +1,762 @@
+{
+  "status": "pass",
+  "analysis_class": "post_hoc_external_model_robustness",
+  "paper_primary_result": false,
+  "holdout_reused": true,
+  "predictions_regenerated": false,
+  "database_execution_repeated": false,
+  "archive": "D:\\paper kltn\\text to sql\\paper_ready_workspace_20260731\\04_results\\00_incoming_from_server\\cross_family_yi_20260802\\mp_fs_plus_cross_family_yi_coder_9b_chat_v1_20260802T064346Z.tar.gz",
+  "archive_sha256": "5e087344cea56d7401e7af57898aaaf9304bd7c03aef2352d61e197f007c441e",
+  "protocol_sha256": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256",
+  "primary_protocol_sha256": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330",
+  "model_sha256": "881ebc7b893a9e12d704c40d2bdc908ed7958e0f671f5ccc434f5303102e6904",
+  "model_revision": "356a1f8d4e4a606d0b879e54191ca809918576b8",
+  "methods": {
+    "D-FS-M": {
+      "samples": 300,
+      "target_state_accuracy": 0.5833333333333334,
+      "execution_success": 0.6166666666666667,
+      "coverage": 1.0,
+      "accepted_output_accuracy": 0.5833333333333334,
+      "any_off_target_change_rate": 0.0,
+      "input_truncation_rate": 0.0,
+      "output_limit_hit_rate": 0.016666666666666666,
+      "output_limit_hit_count": 5
+    },
+    "J-FS-M": {
+      "samples": 300,
+      "target_state_accuracy": 0.19,
+      "execution_success": 0.20333333333333334,
+      "coverage": 0.20666666666666667,
+      "accepted_output_accuracy": 0.9193548387096774,
+      "any_off_target_change_rate": 0.0,
+      "input_truncation_rate": 0.0,
+      "output_limit_hit_rate": 0.01,
+      "output_limit_hit_count": 3
+    },
+    "MP-FS+": {
+      "samples": 300,
+      "target_state_accuracy": 0.37,
+      "execution_success": 0.38333333333333336,
+      "coverage": 0.38333333333333336,
+      "accepted_output_accuracy": 0.9652173913043478,
+      "any_off_target_change_rate": 0.0,
+      "input_truncation_rate": 0.0,
+      "output_limit_hit_rate": 0.01,
+      "output_limit_hit_count": 3
+    }
+  },
+  "paired_comparison": [
+    {
+      "method": "D-FS-M",
+      "qwen7b_target": 0.86,
+      "yi9b_target": 0.5833333333333334,
+      "target_delta": -0.27666666666666667,
+      "improved_7b_wrong_yi9b_correct": 12,
+      "degraded_7b_correct_yi9b_wrong": 95,
+      "exact_mcnemar_p": 3.485417306224237e-17,
+      "analysis_class": "post_hoc_cross_family_model_robustness",
+      "holm_adjusted_p": 6.970834612448474e-17
+    },
+    {
+      "method": "J-FS-M",
+      "qwen7b_target": 0.86,
+      "yi9b_target": 0.19,
+      "target_delta": -0.67,
+      "improved_7b_wrong_yi9b_correct": 3,
+      "degraded_7b_correct_yi9b_wrong": 204,
+      "exact_mcnemar_p": 1.4375787593387023e-56,
+      "analysis_class": "post_hoc_cross_family_model_robustness",
+      "holm_adjusted_p": 4.312736278016107e-56
+    },
+    {
+      "method": "MP-FS+",
+      "qwen7b_target": 0.49333333333333335,
+      "yi9b_target": 0.37,
+      "target_delta": -0.12333333333333334,
+      "improved_7b_wrong_yi9b_correct": 2,
+      "degraded_7b_correct_yi9b_wrong": 39,
+      "exact_mcnemar_p": 7.839844329282641e-10,
+      "analysis_class": "post_hoc_cross_family_model_robustness",
+      "holm_adjusted_p": 7.839844329282641e-10
+    }
+  ],
+  "off_target_metric": {
+    "definition": "any strict-state mismatch outside the locked Gold-MP target-table set",
+    "counts": {
+      "D-FS-M": 0,
+      "J-FS-M": 0,
+      "MP-FS+": 0
+    },
+    "affected_rows": []
+  },
+  "checks": [
+    {
+      "name": "archive_checksum",
+      "pass": true,
+      "detail": "5e087344cea56d7401e7af57898aaaf9304bd7c03aef2352d61e197f007c441e"
+    },
+    {
+      "name": "archive_paths_safe",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "server_report_status",
+      "pass": true,
+      "detail": "pass"
+    },
+    {
+      "name": "post_hoc_label",
+      "pass": true,
+      "detail": "post_hoc_external_model_robustness"
+    },
+    {
+      "name": "not_primary",
+      "pass": true,
+      "detail": {
+        "protocol": false,
+        "report": false
+      }
+    },
+    {
+      "name": "holdout_reused",
+      "pass": true,
+      "detail": {
+        "report": true,
+        "protocol": "consumed_reused_for_labeled_post_hoc_analysis"
+      }
+    },
+    {
+      "name": "protocol_frozen",
+      "pass": true,
+      "detail": "frozen"
+    },
+    {
+      "name": "protocol_hash_links",
+      "pass": true,
+      "detail": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256"
+    },
+    {
+      "name": "primary_protocol_link",
+      "pass": true,
+      "detail": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330"
+    },
+    {
+      "name": "authorized_methods",
+      "pass": true,
+      "detail": [
+        "D-FS-M",
+        "J-FS-M",
+        "MP-FS+"
+      ]
+    },
+    {
+      "name": "no_tuning_after_freeze",
+      "pass": true,
+      "detail": {
+        "protocol": true,
+        "report": false
+      }
+    },
+    {
+      "name": "model_family",
+      "pass": true,
+      "detail": "Yi-Coder"
+    },
+    {
+      "name": "model_revision",
+      "pass": true,
+      "detail": "356a1f8d4e4a606d0b879e54191ca809918576b8"
+    },
+    {
+      "name": "model_hash",
+      "pass": true,
+      "detail": "881ebc7b893a9e12d704c40d2bdc908ed7958e0f671f5ccc434f5303102e6904"
+    },
+    {
+      "name": "deterministic_generation",
+      "pass": true,
+      "detail": {
+        "do_sample": false,
+        "seed": 42
+      }
+    },
+    {
+      "name": "capacity",
+      "pass": true,
+      "detail": {
+        "max_input_tokens": 28672,
+        "max_new_tokens": 8192,
+        "input_truncation_policy": "error"
+      }
+    },
+    {
+      "name": "preflight",
+      "pass": true,
+      "detail": {
+        "status": "pass",
+        "prediction_generated": false
+      }
+    },
+    {
+      "name": "report_manifest:cross_family_yi_coder_9b_chat_v1.json",
+      "pass": true,
+      "detail": "b2458ef7f12d8fc8c962e52843dae9021b234fcbf3434bc5963d8bff437fd8a8"
+    },
+    {
+      "name": "report_manifest:cross_family_yi_coder_9b_chat_v1.csv",
+      "pass": true,
+      "detail": "c4b7389fc7a9d3e20802ead255a856b58d547af4afc1c53aa019e08c3621a8bc"
+    },
+    {
+      "name": "report_manifest:cross_family_yi_coder_9b_chat_v1.md",
+      "pass": true,
+      "detail": "66b3f58c127500d8ed49949c7f02d521cbd6cba7a6cc65a6466e43be072f9875"
+    },
+    {
+      "name": "gold_target_plans",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "D-FS-M:evaluation_rows",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "D-FS-M:raw_rows",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "D-FS-M:unique_ids",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "D-FS-M:raw_eval_ids",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "D-FS-M:generation_success",
+      "pass": true,
+      "detail": {
+        "raw_non_success": 0,
+        "eval_non_success": 0
+      }
+    },
+    {
+      "name": "D-FS-M:no_input_truncation",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "D-FS-M:matches_gold_ids",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "D-FS-M:invalid_reason",
+      "pass": true,
+      "detail": {
+        "status": "invalid",
+        "reason": "truncation_or_missing_prediction",
+        "truncation_failures": 5,
+        "missing_predictions": 0,
+        "run_lock_sha256": "09403bdf4e40289f388cbe8a7acede1540a8a2b0ac30e834982d5d9b8253b0e1",
+        "final_protocol_sha256": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256"
+      }
+    },
+    {
+      "name": "D-FS-M:conservative_adjudication",
+      "pass": true,
+      "detail": "conservatively_retained_for_post_hoc_analysis"
+    },
+    {
+      "name": "D-FS-M:affected_ids",
+      "pass": true,
+      "detail": {
+        "evaluation": [
+          "final_archeology_041",
+          "final_robot_033",
+          "final_vaccine_003",
+          "final_vaccine_031",
+          "final_virtual_031"
+        ],
+        "marker": [
+          "final_archeology_041",
+          "final_robot_033",
+          "final_vaccine_003",
+          "final_vaccine_031",
+          "final_virtual_031"
+        ]
+      }
+    },
+    {
+      "name": "D-FS-M:affected_rows_incorrect",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "D-FS-M:adjudication_hashes",
+      "pass": true,
+      "detail": {
+        "evaluation": "3da9ca67d1f53233113419fcc7b3076601acc85fc1e4339d630e8974d909ac9a",
+        "raw": "369cf77d071ab1e57228f43c40ef632a197e0a33a8e7a08ffbc89b197d0e4dfd",
+        "metrics": "3f11688c845381acd32330e7e049686cf8cbc3d88861351da2e76ba716c10c7a",
+        "invalid": "45d62c6820d6ea70c7ad6b680f5581ef9a3ea38e76eae197ec781f917295d9e0"
+      }
+    },
+    {
+      "name": "D-FS-M:protocol_sha",
+      "pass": true,
+      "detail": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256"
+    },
+    {
+      "name": "D-FS-M:model_manifest",
+      "pass": true,
+      "detail": "881ebc7b893a9e12d704c40d2bdc908ed7958e0f671f5ccc434f5303102e6904"
+    },
+    {
+      "name": "D-FS-M:dataset_hash",
+      "pass": true,
+      "detail": "da2e281419cd368dc10f366dab703012c3a8ac16a3afb8a0c3abba715706566a"
+    },
+    {
+      "name": "D-FS-M:recompute:samples",
+      "pass": true,
+      "detail": {
+        "recomputed": 300,
+        "server_report": 300
+      }
+    },
+    {
+      "name": "D-FS-M:recompute:target_state_accuracy",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.5833333333333334,
+        "server_report": 0.5833333333333334
+      }
+    },
+    {
+      "name": "D-FS-M:recompute:execution_success",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.6166666666666667,
+        "server_report": 0.6166666666666667
+      }
+    },
+    {
+      "name": "D-FS-M:recompute:coverage",
+      "pass": true,
+      "detail": {
+        "recomputed": 1.0,
+        "server_report": 1.0
+      }
+    },
+    {
+      "name": "D-FS-M:recompute:accepted_output_accuracy",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.5833333333333334,
+        "server_report": 0.5833333333333334
+      }
+    },
+    {
+      "name": "D-FS-M:recompute:input_truncation_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.0,
+        "server_report": 0.0
+      }
+    },
+    {
+      "name": "D-FS-M:recompute:output_limit_hit_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.016666666666666666,
+        "server_report": 0.016666666666666666
+      }
+    },
+    {
+      "name": "D-FS-M:server_side_effect_corrected",
+      "pass": true,
+      "detail": {
+        "corrected": 0.0,
+        "server_report": 0.0,
+        "metrics": 0.0
+      }
+    },
+    {
+      "name": "J-FS-M:evaluation_rows",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "J-FS-M:raw_rows",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "J-FS-M:unique_ids",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "J-FS-M:raw_eval_ids",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "J-FS-M:generation_success",
+      "pass": true,
+      "detail": {
+        "raw_non_success": 0,
+        "eval_non_success": 0
+      }
+    },
+    {
+      "name": "J-FS-M:no_input_truncation",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "J-FS-M:same_sample_order",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "J-FS-M:matches_gold_ids",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "J-FS-M:invalid_reason",
+      "pass": true,
+      "detail": {
+        "status": "invalid",
+        "reason": "truncation_or_missing_prediction",
+        "truncation_failures": 3,
+        "missing_predictions": 0,
+        "run_lock_sha256": "453c6cfd4f9989c64b2f3b99764fa252f7096b98fd1555dea1d40622ef36c131",
+        "final_protocol_sha256": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256"
+      }
+    },
+    {
+      "name": "J-FS-M:conservative_adjudication",
+      "pass": true,
+      "detail": "conservatively_retained_for_post_hoc_analysis"
+    },
+    {
+      "name": "J-FS-M:affected_ids",
+      "pass": true,
+      "detail": {
+        "evaluation": [
+          "final_archeology_040",
+          "final_archeology_058",
+          "final_virtual_033"
+        ],
+        "marker": [
+          "final_archeology_040",
+          "final_archeology_058",
+          "final_virtual_033"
+        ]
+      }
+    },
+    {
+      "name": "J-FS-M:affected_rows_incorrect",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "J-FS-M:adjudication_hashes",
+      "pass": true,
+      "detail": {
+        "evaluation": "698765b4ac9032b11bb7f1ecda28a8c85fd1a594a64adae392dd07de7efd4a54",
+        "raw": "c515e01003e9434cd50e7ef74247cc5bfd992f4dae0566ff2a5e7d8fd38836db",
+        "metrics": "f55e55fe68ada33ba24d9e997771c1cf956a46f4860c7b4ed5dd0f098b08ab2b",
+        "invalid": "5a1bbc928a6a13dbc43f92f9e0f8330b33b280334dc5772d36be1bf679c3c21b"
+      }
+    },
+    {
+      "name": "J-FS-M:protocol_sha",
+      "pass": true,
+      "detail": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256"
+    },
+    {
+      "name": "J-FS-M:model_manifest",
+      "pass": true,
+      "detail": "881ebc7b893a9e12d704c40d2bdc908ed7958e0f671f5ccc434f5303102e6904"
+    },
+    {
+      "name": "J-FS-M:dataset_hash",
+      "pass": true,
+      "detail": "da2e281419cd368dc10f366dab703012c3a8ac16a3afb8a0c3abba715706566a"
+    },
+    {
+      "name": "J-FS-M:recompute:samples",
+      "pass": true,
+      "detail": {
+        "recomputed": 300,
+        "server_report": 300
+      }
+    },
+    {
+      "name": "J-FS-M:recompute:target_state_accuracy",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.19,
+        "server_report": 0.19
+      }
+    },
+    {
+      "name": "J-FS-M:recompute:execution_success",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.20333333333333334,
+        "server_report": 0.20333333333333334
+      }
+    },
+    {
+      "name": "J-FS-M:recompute:coverage",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.20666666666666667,
+        "server_report": 0.20666666666666667
+      }
+    },
+    {
+      "name": "J-FS-M:recompute:accepted_output_accuracy",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.9193548387096774,
+        "server_report": 0.9193548387096774
+      }
+    },
+    {
+      "name": "J-FS-M:recompute:input_truncation_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.0,
+        "server_report": 0.0
+      }
+    },
+    {
+      "name": "J-FS-M:recompute:output_limit_hit_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.01,
+        "server_report": 0.01
+      }
+    },
+    {
+      "name": "J-FS-M:server_side_effect_corrected",
+      "pass": true,
+      "detail": {
+        "corrected": 0.0,
+        "server_report": 0.0,
+        "metrics": 0.0
+      }
+    },
+    {
+      "name": "MP-FS+:evaluation_rows",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "MP-FS+:raw_rows",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "MP-FS+:unique_ids",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "MP-FS+:raw_eval_ids",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "MP-FS+:generation_success",
+      "pass": true,
+      "detail": {
+        "raw_non_success": 0,
+        "eval_non_success": 0
+      }
+    },
+    {
+      "name": "MP-FS+:no_input_truncation",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "MP-FS+:same_sample_order",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "MP-FS+:matches_gold_ids",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "MP-FS+:invalid_reason",
+      "pass": true,
+      "detail": {
+        "status": "invalid",
+        "reason": "truncation_or_missing_prediction",
+        "truncation_failures": 3,
+        "missing_predictions": 0,
+        "run_lock_sha256": "89accf6c60e7a7fe7b4c74817f6f3f93417dbfcb81f1a858d71a0c60c450b9a2",
+        "final_protocol_sha256": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256"
+      }
+    },
+    {
+      "name": "MP-FS+:conservative_adjudication",
+      "pass": true,
+      "detail": "conservatively_retained_for_post_hoc_analysis"
+    },
+    {
+      "name": "MP-FS+:affected_ids",
+      "pass": true,
+      "detail": {
+        "evaluation": [
+          "final_archeology_018",
+          "final_archeology_031",
+          "final_polar_016"
+        ],
+        "marker": [
+          "final_archeology_018",
+          "final_archeology_031",
+          "final_polar_016"
+        ]
+      }
+    },
+    {
+      "name": "MP-FS+:affected_rows_incorrect",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "MP-FS+:adjudication_hashes",
+      "pass": true,
+      "detail": {
+        "evaluation": "f2d96433e9f923201f6f30374cf9dee7a90b9a4ed6b2fbf35d0a3b03ed8e6946",
+        "raw": "6d056dc09b120208b9718cfd12d270b4af21ac5765f47eb9b40e6752fc3f3a41",
+        "metrics": "5f90db6da3bc34a18952c3dad042f1a73bab56d4247ae78a5841dfb6ab378d50",
+        "invalid": "ea9d446bf14514afa86d49993418ad81a8227affed5e08cdc7558eea0c6a81e6"
+      }
+    },
+    {
+      "name": "MP-FS+:protocol_sha",
+      "pass": true,
+      "detail": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256"
+    },
+    {
+      "name": "MP-FS+:model_manifest",
+      "pass": true,
+      "detail": "881ebc7b893a9e12d704c40d2bdc908ed7958e0f671f5ccc434f5303102e6904"
+    },
+    {
+      "name": "MP-FS+:dataset_hash",
+      "pass": true,
+      "detail": "da2e281419cd368dc10f366dab703012c3a8ac16a3afb8a0c3abba715706566a"
+    },
+    {
+      "name": "MP-FS+:recompute:samples",
+      "pass": true,
+      "detail": {
+        "recomputed": 300,
+        "server_report": 300
+      }
+    },
+    {
+      "name": "MP-FS+:recompute:target_state_accuracy",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.37,
+        "server_report": 0.37
+      }
+    },
+    {
+      "name": "MP-FS+:recompute:execution_success",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.38333333333333336,
+        "server_report": 0.38333333333333336
+      }
+    },
+    {
+      "name": "MP-FS+:recompute:coverage",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.38333333333333336,
+        "server_report": 0.38333333333333336
+      }
+    },
+    {
+      "name": "MP-FS+:recompute:accepted_output_accuracy",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.9652173913043478,
+        "server_report": 0.9652173913043478
+      }
+    },
+    {
+      "name": "MP-FS+:recompute:input_truncation_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.0,
+        "server_report": 0.0
+      }
+    },
+    {
+      "name": "MP-FS+:recompute:output_limit_hit_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.01,
+        "server_report": 0.01
+      }
+    },
+    {
+      "name": "MP-FS+:server_side_effect_corrected",
+      "pass": true,
+      "detail": {
+        "corrected": 0.0,
+        "server_report": 0.0,
+        "metrics": 0.0
+      }
+    },
+    {
+      "name": "D-FS-M:paired_ids",
+      "pass": true,
+      "detail": {
+        "primary": 300,
+        "cross_family": 300,
+        "gold": 300
+      }
+    },
+    {
+      "name": "J-FS-M:paired_ids",
+      "pass": true,
+      "detail": {
+        "primary": 300,
+        "cross_family": 300,
+        "gold": 300
+      }
+    },
+    {
+      "name": "MP-FS+:paired_ids",
+      "pass": true,
+      "detail": {
+        "primary": 300,
+        "cross_family": 300,
+        "gold": 300
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "status": "conservatively_retained_for_post_hoc_analysis",
+  "paper_primary_result": false,
+  "predictions_regenerated": false,
+  "evaluation_or_metrics_modified": false,
+  "denominator": 300,
+  "affected_samples": 5,
+  "input_truncation_failures": 0,
+  "output_limit_hits": 5,
+  "generation_status_failures": 0,
+  "affected_sample_ids": [
+    "final_archeology_041",
+    "final_robot_033",
+    "final_vaccine_003",
+    "final_vaccine_031",
+    "final_virtual_031"
+  ],
+  "scoring_policy": "Every affected row was already target-incorrect and remains in the 300-sample denominator.",
+  "protocol_sha256": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256",
+  "protocol_id": "mp_fs_plus_post_hoc_cross_family_yi_coder_9b_chat_v1",
+  "invalid_marker_sha256": "45d62c6820d6ea70c7ad6b680f5581ef9a3ea38e76eae197ec781f917295d9e0",
+  "evaluation_sha256": "3da9ca67d1f53233113419fcc7b3076601acc85fc1e4339d630e8974d909ac9a",
+  "raw_generations_sha256": "369cf77d071ab1e57228f43c40ef632a197e0a33a8e7a08ffbc89b197d0e4dfd",
+  "metrics_sha256": "3f11688c845381acd32330e7e049686cf8cbc3d88861351da2e76ba716c10c7a"
+}

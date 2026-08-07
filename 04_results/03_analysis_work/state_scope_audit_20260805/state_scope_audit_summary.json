@@ -1,0 +1,30 @@
+{
+  "status": "pass",
+  "pairs": 1800,
+  "all_table_target_correct": {
+    "D-FS-M": 258,
+    "J-FS-M": 258,
+    "S-FS-v2-M": 78,
+    "MP-FS-M": 34,
+    "MP-FS+": 148,
+    "Gold-MP": 300
+  },
+  "expected_primary_anchors": {
+    "D-FS-M": 258,
+    "J-FS-M": 258,
+    "S-FS-v2-M": 78,
+    "MP-FS-M": 34,
+    "MP-FS+": 148,
+    "Gold-MP": 300
+  },
+  "primary_anchors_unchanged": true,
+  "mismatch_counts": {
+    "off_target": 0,
+    "strict": 0,
+    "target": 0
+  },
+  "decision": "use_all_user_tables",
+  "model_inference_rerun": false,
+  "gpu_required": false,
+  "csv": "04_results\\03_analysis_work\\state_scope_audit_20260805\\state_scope_audit.csv"
+}

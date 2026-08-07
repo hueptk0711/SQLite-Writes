@@ -1,0 +1,33 @@
+{
+  "decision_id": "post_hoc_cross_family_yi_coder_9b_chat_v1",
+  "decision_date_utc": "2026-08-02",
+  "status": "frozen_before_inference",
+  "analysis_class": "post_hoc_external_model_robustness",
+  "paper_primary_result": false,
+  "base_primary_protocol_sha256": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330",
+  "model_repository": "01-ai/Yi-Coder-9B-Chat",
+  "model_family": "Yi-Coder",
+  "model_size": "9B",
+  "license": "Apache-2.0",
+  "model_card": "https://huggingface.co/01-ai/Yi-Coder-9B-Chat",
+  "selection_rationale": "A non-Qwen code-instruct family with a comparable parameter scale and a native 128K context window, allowing the frozen 28,672-token input cap to remain unchanged. The model was selected before any Yi-Coder prediction on the consumed holdout was generated.",
+  "methods": [
+    "D-FS-M",
+    "J-FS-M",
+    "MP-FS+"
+  ],
+  "generation_policy": {
+    "batch_size": 1,
+    "max_input_tokens": 28672,
+    "max_new_tokens": 8192,
+    "input_truncation_policy": "error",
+    "quantization": "4bit",
+    "compute_dtype": "float16",
+    "device_map": "auto",
+    "do_sample": false,
+    "seed": 42,
+    "trust_remote_code": false
+  },
+  "failure_policy": "Retain every selected sample in the 300-sample denominator. Do not regenerate or repair a prediction after viewing it. Mechanical generation failures or token-limit hits are retained as incorrect and reported explicitly.",
+  "interpretation": "The consumed holdout is reused only for labeled post-hoc cross-family robustness. No prompt, parser, compiler, verifier, threshold, method, or output cap may be tuned from these outputs."
+}

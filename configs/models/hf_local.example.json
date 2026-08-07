@@ -1,0 +1,15 @@
+{
+  "backend": "hf",
+  "model_name_or_path": "/absolute/path/to/your-instruction-model",
+  "model_hash": "REPLACE_WITH_64_CHARACTER_SHA256_OF_THE_LOCKED_MODEL",
+  "batch_size": 4,
+  "max_input_tokens": 8192,
+  "max_new_tokens": 2048,
+  "input_truncation_policy": "error",
+  "quantization": "4bit",
+  "compute_dtype": "float16",
+  "device_map": "auto",
+  "do_sample": false,
+  "seed": 42,
+  "trust_remote_code": false
+}

@@ -1,0 +1,35 @@
+{
+  "status": "pass",
+  "artifact": "final_release",
+  "gpu_required": false,
+  "model_inference_rerun": false,
+  "primary_results_modified": false,
+  "corrective_v2_3": {
+    "status": "pass",
+    "artifact": "final_release",
+    "verified_archive_sha256": "e456037422281d56e03dd7766baf1cc9efa78a95061234444c452f3c04810911",
+    "verified_protocol_sha256": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330",
+    "verified_samples": 300,
+    "verified_methods": 6,
+    "verified_primary_results_unchanged": true,
+    "corrected_gold_target_column_f1": 1.0,
+    "uncategorized_error_rows": 0,
+    "off_target_metric_audit_status": "pass",
+    "off_target_counts": {
+      "D-FS-M": 1,
+      "J-FS-M": 0,
+      "S-FS-v2-M": 0,
+      "MP-FS-M": 1,
+      "MP-FS+": 0,
+      "Gold-MP": 0
+    },
+    "independent_primary_audit_status": "pass",
+    "reporting_amendment_sha256": "19365b4a80cf526b604e002d2fe8e2871472344ddda86226953ec645aae2ef2f"
+  },
+  "exploratory_v2_4": {
+    "status": "pass",
+    "samples": 300,
+    "cascade_accuracy": 0.94,
+    "downstream_ablation_variants": 4
+  }
+}

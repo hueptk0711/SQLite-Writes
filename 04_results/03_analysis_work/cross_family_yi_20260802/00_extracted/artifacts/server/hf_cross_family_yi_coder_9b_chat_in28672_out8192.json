@@ -1,0 +1,15 @@
+{
+  "backend": "hf",
+  "model_name_or_path": "/home/uet/hue_ptk/hf_cache/hub/models--01-ai--Yi-Coder-9B-Chat/snapshots/356a1f8d4e4a606d0b879e54191ca809918576b8",
+  "batch_size": 1,
+  "max_input_tokens": 28672,
+  "max_new_tokens": 8192,
+  "input_truncation_policy": "error",
+  "quantization": "4bit",
+  "compute_dtype": "float16",
+  "device_map": "auto",
+  "do_sample": false,
+  "seed": 42,
+  "trust_remote_code": false,
+  "model_hash": "881ebc7b893a9e12d704c40d2bdc908ed7958e0f671f5ccc434f5303102e6904"
+}

@@ -1,0 +1,120 @@
+{
+  "protocol_id": "mp_fs_plus_external_holdout_v1",
+  "status": "template_requires_300_new_requests",
+  "authorized_hashes": {
+    "dataset_sha256": null,
+    "split_sha256": null,
+    "gold_plans_sha256": null
+  },
+  "authorized_runs": {
+    "external-holdout": {
+      "D-FS-M": {
+        "resolved_config_sha256": null,
+        "inference_config_sha256": null
+      },
+      "J-FS-M": {
+        "resolved_config_sha256": null,
+        "inference_config_sha256": null
+      },
+      "S-FS-v2-M": {
+        "resolved_config_sha256": null,
+        "inference_config_sha256": null
+      },
+      "MP-FS-M": {
+        "resolved_config_sha256": null,
+        "inference_config_sha256": null
+      },
+      "MP-FS+": {
+        "resolved_config_sha256": null,
+        "inference_config_sha256": null
+      },
+      "Gold-MP": {
+        "resolved_config_sha256": null,
+        "inference_config_sha256": null
+      }
+    },
+    "second-model": {
+      "D-FS-M": {
+        "resolved_config_sha256": null,
+        "inference_config_sha256": null
+      },
+      "J-FS-M": {
+        "resolved_config_sha256": null,
+        "inference_config_sha256": null
+      },
+      "MP-FS+": {
+        "resolved_config_sha256": null,
+        "inference_config_sha256": null
+      }
+    }
+  },
+  "primary_holdout": {
+    "sample_count": 300,
+    "independently_authored_only": true,
+    "unseen_database_count_range": [3, 5],
+    "operations": {
+      "plain_insert": 100,
+      "insert_ignore": 100,
+      "upsert_update": 100
+    },
+    "input_formats": {
+      "free_text": 60,
+      "json": 60,
+      "markdown": 60,
+      "key_value": 60,
+      "csv_or_mixed": 60
+    },
+    "complexity": {
+      "single_row": 100,
+      "small_batch": 100,
+      "large_or_relational": 100
+    },
+    "minimum_multi_table": 80,
+    "minimum_conflict_sensitive": 120,
+    "minimum_state_changing": 240,
+    "augmentation_in_primary_result": false,
+    "two_independent_qa_reviews_required": true
+  },
+  "methods": [
+    "D-FS-M",
+    "J-FS-M",
+    "S-FS-v2-M",
+    "MP-FS-M",
+    "MP-FS+",
+    "Gold-MP"
+  ],
+  "pre_registered_comparisons": [
+    "MP-FS+ vs D-FS-M",
+    "MP-FS+ vs J-FS-M",
+    "MP-FS+ vs MP-FS-M",
+    "J-FS-M vs D-FS-M"
+  ],
+  "primary_metrics": [
+    "target_state_accuracy",
+    "original_request_accuracy",
+    "state_changing_accuracy",
+    "conflict_sensitive_accuracy",
+    "database_macro_accuracy",
+    "accepted_output_accuracy",
+    "coverage"
+  ],
+  "statistics": {
+    "paired_exact_mcnemar": true,
+    "source_group_clustered_bootstrap": true,
+    "database_macro_bootstrap": true,
+    "confidence_level": 0.95,
+    "multiple_comparison_correction": "Holm",
+    "report_paired_wins_losses": true
+  },
+  "freeze_contract": {
+    "open_gold_before_run": false,
+    "single_final_run": true,
+    "no_prompt_changes_after_results": true,
+    "required_files": [
+      "run_lock.json",
+      "SHA256SUMS.txt",
+      "final_protocol.json"
+    ]
+  },
+  "diagnostic_677_policy": "development_and_post_hoc_only"
+}

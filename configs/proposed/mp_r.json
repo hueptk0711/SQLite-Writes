@@ -1,0 +1,33 @@
+{
+  "method_id": "MP-R",
+  "deprecated_alias_for": "MP-FS-R-semi",
+  "representation": "dual_mode_mapping_first",
+  "source_parser": "deterministic",
+  "free_text_branch": "evidence_grounded_extraction",
+  "semi_structured_branch": "mapping_only",
+  "verifier": "mandatory_hard",
+  "repair": {
+    "mode": "json_patch",
+    "max_attempts": 1,
+    "eligibility": "semi_structured_only",
+    "report_eligibility_metrics": true,
+    "acceptance": [
+      "mapping_schema_valid",
+      "materialization_success",
+      "source_row_coverage_not_reduced",
+      "source_cell_coverage_not_reduced",
+      "no_new_values",
+      "verifier_has_no_errors",
+      "full_program_builds",
+      "transaction_dry_run_succeeds",
+      "payload_hash_unchanged",
+      "write_scope_not_unjustifiably_expanded"
+    ]
+  },
+  "compiler": {
+    "strict_atomic": true,
+    "parameterized_sql": true,
+    "normalize_values": false,
+    "infer_fk_order": true
+  }
+}

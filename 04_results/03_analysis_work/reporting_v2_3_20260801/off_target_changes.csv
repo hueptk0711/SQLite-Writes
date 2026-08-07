@@ -1,0 +1,3 @@
+method_id,sample_id,db_id,target_state_correct,target_mismatched_tables,off_target_mismatched_tables,error_type
+D-FS-M,final_archeology_047,archeology,False,projects,personnel,wrong_state_with_off_target_change
+MP-FS-M,final_archeology_025,archeology,False,personnel,equipment,wrong_state_with_off_target_change

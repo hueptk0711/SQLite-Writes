@@ -1,0 +1,23 @@
+{
+  "analysis_id": "post_hoc_common_transactional_preflight_v1",
+  "input_sha256": {
+    "final_holdout_archive": "525cdd7006ea32a8ab8d81f842332ac9b403dce2472cde608efb4e6962d456df",
+    "final_result_archive": "e456037422281d56e03dd7766baf1cc9efa78a95061234444c452f3c04810911"
+  },
+  "model_inference_rerun": false,
+  "output_sha256": {
+    "common_safety_replay.jsonl": "c0e5de3efe25a537a95d793781b28cd9ea9b4f576c559117d35d7336130a97fc",
+    "common_safety_results.json": "aa8e6a660f0bfe6f7a68c41447d40c4983ab376629b61fdb4399c3d5d8154ae9",
+    "common_safety_summary.csv": "356d0de850f06df90a5d4c9540945f71e7339b5657812f93bbe4435b2d2effbc",
+    "common_safety_summary.md": "8912083d2ad151c4a74919180548b75d5dd9da48373159801c9538ffce208632"
+  },
+  "predictions_modified": false,
+  "source_sha256": {
+    "run_common_safety_replay.py": "03c6de75a745bd4c484857ba7be6a46e7920c252432d1cb583022dfaad7981eb",
+    "src/nldbwrite_v3/analysis/common_safety_replay.py": "dc45a700f98afd2a8db287d27b9e4a454e12b46d3e1b36dac5f4c648d6392eca",
+    "src/nldbwrite_v3/compiler/executor.py": "cc76a3c4961f1656431a6f7150f472d371a0256e502cfde4eb4393a9a2adcee8",
+    "src/nldbwrite_v3/evaluator/state.py": "a7bd229b0f989aa5b5d9f8e4e113d194d37bcfcb3407a65746b3f296d568f289",
+    "tests/test_common_safety_replay.py": "916733948094e1e2eec5b9c68c33f7df4fcd76c483aabf24f506802d3d8a83f4"
+  },
+  "status": "frozen_post_hoc_deterministic_analysis"
+}

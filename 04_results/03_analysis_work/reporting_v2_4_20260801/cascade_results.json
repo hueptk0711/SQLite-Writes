@@ -1,0 +1,81 @@
+{
+  "abstention_rate": 0.03666666666666667,
+  "accepted_output_accuracy": 0.9757785467128027,
+  "admitted": 289,
+  "analysis_class": "post_hoc_exploratory_structured_fallback",
+  "analysis_id": "post_hoc_j_then_d_common_preflight_cascade_v1",
+  "by_database": [
+    {
+      "accepted_output_accuracy": 1.0,
+      "coverage": 0.9166666666666666,
+      "db_id": "archeology",
+      "samples": 60,
+      "target_state_accuracy": 0.9166666666666666
+    },
+    {
+      "accepted_output_accuracy": 0.9830508474576272,
+      "coverage": 0.9833333333333333,
+      "db_id": "polar",
+      "samples": 60,
+      "target_state_accuracy": 0.9666666666666667
+    },
+    {
+      "accepted_output_accuracy": 0.9833333333333333,
+      "coverage": 1.0,
+      "db_id": "robot",
+      "samples": 60,
+      "target_state_accuracy": 0.9833333333333333
+    },
+    {
+      "accepted_output_accuracy": 0.9649122807017544,
+      "coverage": 0.95,
+      "db_id": "vaccine",
+      "samples": 60,
+      "target_state_accuracy": 0.9166666666666666
+    },
+    {
+      "accepted_output_accuracy": 0.9482758620689655,
+      "coverage": 0.9666666666666667,
+      "db_id": "virtual",
+      "samples": 60,
+      "target_state_accuracy": 0.9166666666666666
+    }
+  ],
+  "correct": 282,
+  "coverage": 0.9633333333333334,
+  "false_accept_rate": 0.02422145328719723,
+  "false_accepts": 7,
+  "gold_label_used_by_policy": false,
+  "model_inference_rerun": false,
+  "off_target_modifications": 0,
+  "paired_vs_d": {
+    "exact_mcnemar_p": 1.1920928955078125e-07,
+    "losses": 0,
+    "wins": 24
+  },
+  "paired_vs_j": {
+    "exact_mcnemar_p": 1.1920928955078125e-07,
+    "losses": 0,
+    "wins": 24
+  },
+  "policy_order": [
+    "J-FS-M",
+    "D-FS-M",
+    "abstain"
+  ],
+  "predictions_modified": false,
+  "representation_complementarity": {
+    "both_correct": 234,
+    "both_wrong": 18,
+    "d_correct": 258,
+    "d_only_correct": 24,
+    "d_or_j_accuracy": 0.94,
+    "d_or_j_correct": 282,
+    "j_correct": 258,
+    "j_only_correct": 24,
+    "mp_plus_unique_beyond_d_or_j": 1
+  },
+  "samples": 300,
+  "status": "pass",
+  "target_state_accuracy": 0.94
+}

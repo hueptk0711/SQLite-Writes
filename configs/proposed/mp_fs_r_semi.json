@@ -1,0 +1,26 @@
+{
+  "method_id": "MP-FS-R-semi",
+  "representation": "dual_mode_mapping_first",
+  "base_config": "configs/proposed/mp_fs.json",
+  "demonstration_policy": "fixed_four_semi_two_free_text",
+  "repair_scope": "semi_structured_only",
+  "repair": {
+    "mode": "json_patch",
+    "max_attempts": 1,
+    "eligibility": "detected_mode == semi_structured",
+    "report_eligibility_metrics": true,
+    "acceptance": [
+      "mapping_schema_valid",
+      "materialization_success",
+      "source_row_coverage_not_reduced",
+      "source_cell_coverage_not_reduced",
+      "no_new_values",
+      "verifier_has_no_errors",
+      "full_program_builds",
+      "transaction_dry_run_succeeds",
+      "payload_hash_unchanged",
+      "write_scope_not_unjustifiably_expanded"
+    ]
+  },
+  "verifier": "mandatory_hard"
+}

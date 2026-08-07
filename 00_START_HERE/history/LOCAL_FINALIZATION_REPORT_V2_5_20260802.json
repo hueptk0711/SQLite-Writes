@@ -1,0 +1,47 @@
+{
+  "status": "pass_with_owner_metadata_and_license_blockers",
+  "date": "2026-08-02",
+  "gpu_required_for_remaining_automatic_work": false,
+  "checks": {
+    "primary_final_import": "pass_300_samples_6_methods",
+    "primary_results_unchanged": true,
+    "reporting_v2_3_v2_4_one_command_reproduction": "pass_clean_extraction_no_symlink_no_inherited_pythonpath_no_gpu_no_inference",
+    "unit_tests": "136/136 pass_with_clean_release_integration",
+    "compileall": "pass",
+    "second_model_import_audit": "72/72 pass",
+    "cross_family_import_audit": "95/95 pass_900_rows",
+    "cross_family_output_limit_policy": "11_rows_retained_incorrect_no_regeneration",
+    "cross_family_corrected_off_target_counts": {
+      "D-FS-M": 0,
+      "J-FS-M": 0,
+      "MP-FS+": 0
+    },
+    "latex_structure": "pass_9_tables_3_figures",
+    "abstract_words": 219,
+    "bibliography_entries": 25,
+    "unresolved_citations_or_references": 0,
+    "latex_qa_compile": "pass_tectonic_0.16.9",
+    "latex_qa_main": "14_pages_all_visually_reviewed",
+    "latex_qa_supplement": "3_pages_all_visually_reviewed",
+    "overleaf_archive_integrity": "pass"
+  },
+  "submission_artifacts": {
+    "main_tex": "01_manuscript/submission/ieee_access_latex_20260801/paper/main.tex",
+    "supplement_tex": "01_manuscript/submission/ieee_access_latex_20260801/paper/supplementary_material.tex",
+    "overleaf_archive": "01_manuscript/submission/ieee_access_latex_20260801/MP_FS_PLUS_IEEE_ACCESS_OVERLEAF_REVISION_V2_6_20260802.zip",
+    "overleaf_archive_sha256": "e669c0a7f598693000c79ce4a02d14dd097fda96e378739736e3b21ad4d5eb5e",
+    "qa_main_pdf_sha256": "7237323d6d7c3baa2ef4423a2d6e35e4e315d1151cf6f178dae532478876abfa",
+    "qa_supplement_pdf_sha256": "6df3ebf8111b94dc51ccadf2bd2f96872da7c02b7b3cc97952dc78807c8193e1"
+  },
+  "owner_inputs_required": [
+    "final_author_list_and_order",
+    "affiliations_postal_addresses_emails_orcid",
+    "corresponding_and_submitting_author",
+    "author_biographies_and_photos",
+    "funding_conflict_and_contributor_acknowledgments",
+    "code_license",
+    "dataset_redistribution_review",
+    "public_repository_url_and_citation_metadata",
+    "official_pdflatex_build_after_metadata"
+  ]
+}

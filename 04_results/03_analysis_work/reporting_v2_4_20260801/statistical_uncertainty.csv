@@ -1,0 +1,11 @@
+analysis_family,metric,method,successes,trials,estimate,wilson_95_low,wilson_95_high
+primary,target_state_accuracy,D-FS-M,258,300,0.86,0.8161683876490509,0.8947286730692758
+primary,target_state_accuracy,J-FS-M,258,300,0.86,0.8161683876490509,0.8947286730692758
+primary,target_state_accuracy,S-FS-v2-M,78,300,0.26,0.21362060325993487,0.3124480229278472
+primary,target_state_accuracy,MP-FS-M,34,300,0.11333333333333333,0.082244501875291,0.15419939587169124
+primary,target_state_accuracy,MP-FS+,148,300,0.49333333333333335,0.43720207035328285,0.5496331692630444
+primary,target_state_accuracy,Gold-MP,300,300,1.0,0.9873570287754538,0.9999999999999998
+post_hoc_exploratory,target_state_accuracy,J->D cascade,282,300,0.94,0.9071605548470915,0.9617136304753079
+post_hoc_exploratory,coverage,J->D cascade,289,300,0.9633333333333334,0.9355461518281071,0.979404694837147
+post_hoc_exploratory,accepted_output_accuracy,J->D cascade,282,289,0.9757785467128027,0.9508560470127583,0.9882186356071694
+rare_event_bound,off_target_event_probability_one_sided_95_upper,zero observed events in 300 trials,0,300,0.0,,0.00993608194445772

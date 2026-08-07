@@ -1,0 +1,41 @@
+{
+  "experiment_id": "mp_fs_plus_component_ablation",
+  "development_only": true,
+  "variants": [
+    {
+      "id": "MP-0",
+      "components": []
+    },
+    {
+      "id": "MP-1",
+      "components": ["source_collection_ids", "source_selector_ids"]
+    },
+    {
+      "id": "MP-2",
+      "components": [
+        "source_collection_ids",
+        "source_selector_ids",
+        "table_ids",
+        "column_ids",
+        "constraint_ids"
+      ]
+    },
+    {
+      "id": "MP-3",
+      "components": ["MP-2", "free_text_evidence_ids"]
+    },
+    {
+      "id": "MP-4",
+      "components": ["MP-3", "lossless_normalization"]
+    },
+    {
+      "id": "MP-FS+",
+      "components": ["MP-4", "transactional_preflight", "hard_verifier"]
+    }
+  ],
+  "evaluation_data": [
+    "DEV-120",
+    "consumed_677_hard_error_subset"
+  ],
+  "forbidden_claim": "untouched_final_holdout"
+}

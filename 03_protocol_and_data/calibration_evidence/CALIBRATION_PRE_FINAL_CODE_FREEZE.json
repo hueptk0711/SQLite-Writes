@@ -1,0 +1,63 @@
+{
+  "version": "1.0",
+  "status": "code_and_runtime_frozen_pending_final_dataset",
+  "frozen_at_date": "2026-07-29",
+  "calibration": {
+    "protocol_id": "mp_fs_plus_calibration_v3_in28672_out4096_locked_20260729",
+    "decision": "go",
+    "matrix_complete": true,
+    "gpu_run_complete": true,
+    "final_protocol_freeze_authorized": true,
+    "paper_result_eligible": false,
+    "result_archive": "mp_fs_plus_calibration60_20260729T141353Z.tar.gz",
+    "result_archive_sha256": "233e15f719ea81400d7aefb05fd7aff30efc710112d0945ab8ae7172a667cbac",
+    "go_decision_sha256": "c9e3f0b68860f11e5ba8fcbe910215b542cfcee476430c2265ea4be882f36648",
+    "run_lock_sha256": {
+      "D-FS-M": "a583954d9929fbb5e1891f2d9af0db6df48e161c12c509fd45a53cc46d038c47",
+      "J-FS-M": "22d3ac73adaac87344de5f823181da20c949b8b58ede3d2072f66ebdf4701048",
+      "MP-FS-M": "2f89116989b733eb3a7a5d2fdd82361015cb246a6bd12cfc8447d75a8be4a186",
+      "MP-FS+": "3ec163801f0d39c808874a57659c687cf0685a3e372901165c2ae76397cedd05",
+      "Gold-MP": "d12efc0f7d39daefbf4f3a0f1661ea2d4bf257fc6edb3dfadcc71836ff2ca3b9"
+    }
+  },
+  "source_freeze": {
+    "bundle": "mp_fs_plus_calibration_gpu_fix2_20260729.tar.gz",
+    "bundle_sha256": "72d4c88bb3a64a01bc43e573472ccbef3d4b5b9051721ee38ce9c7a57f947be2",
+    "bundle_manifest_sha256": "5fa29ed56df256cc55212b6585be9526c684fde80fb43dcb02dec92334cac032",
+    "dependency_lock_sha256": "861a24b179b5edd1245aba33109402dd4ab82a634098bd8d81fcb666f5bdf9f1",
+    "method_config_sha256": {
+      "D-FS-M": "bc7c04f9daecc6706129ae06a04b612e339bd65e5bf722855e3f17b413b7f2f6",
+      "J-FS-M": "832665a5953f92e4ea66642b3e1f3dcfa9e9842518e98393dc5ffa7a23e49765",
+      "S-FS-v2-M": "6c538ffec7440ddcfdb2b7543d35f29fb570d3dba01e7da55a5109d6e7bd2109",
+      "MP-FS-M": "f71ac4f1177a7c1b47bd3f98b735f056d3452424821fbdc337784b28f36636dd",
+      "MP-FS+": "eed7feb1abdebdb5680e00922601135ea6f6ac809deaa9d548945569e7a5f206",
+      "Gold-MP": "b4f044fcbcd410c8fc3d8219c4b5fb97a24804b6f055355818a1663a2dd34b07"
+    },
+    "inference_config_sha256": "f8ad6f6c5448df66e4e08e4f937db065686d0dacc1cf22d5d24c211dc7649336"
+  },
+  "model_lock": {
+    "aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+    "tokenizer_sha256": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468",
+    "model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357"
+  },
+  "final_holdout_allocation": {
+    "database_ids": [
+      "archeology",
+      "polar",
+      "robot",
+      "vaccine",
+      "virtual"
+    ],
+    "sample_count": 300,
+    "allocation_sha256": "1fcffc6489a30409027fd6054ff9efef4196d160ee3fe8670250e99644c15e64",
+    "dataset_frozen": false,
+    "gold_frozen": false,
+    "two_independent_reviews_complete": false
+  },
+  "prohibitions": [
+    "No source, prompt, method-config, model, inference, or dependency changes after this freeze.",
+    "No model output may be used to author or review final-holdout requests.",
+    "No final-holdout GPU run is allowed before all 300 samples and two independent reviews are frozen.",
+    "No changes are allowed in response to final-holdout results."
+  ]
+}

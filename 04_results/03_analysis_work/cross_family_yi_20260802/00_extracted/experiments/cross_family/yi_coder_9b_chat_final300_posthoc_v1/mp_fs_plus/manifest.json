@@ -1,0 +1,62 @@
+{
+  "method_id": "MP-FS+",
+  "stage": "second-model",
+  "created_at_unix": 1785653025.6614518,
+  "elapsed_sec": 5552.038247346878,
+  "sample_count": 300,
+  "resume_enabled": true,
+  "generation_checkpoint": "completed_batch_rows_keyed_by_sample_id",
+  "run_lock_sha256": "89accf6c60e7a7fe7b4c74817f6f3f93417dbfcb81f1a858d71a0c60c450b9a2",
+  "locked_config_sha256": null,
+  "final_protocol_sha256": "a5e6fdbd7dcbb6621092ea94dbc57bc45a08fa2d41d16fc62ba43802b250c256",
+  "locked_test_rerun_override": false,
+  "hashes": {
+    "method_config_sha256": "eed7feb1abdebdb5680e00922601135ea6f6ac809deaa9d548945569e7a5f206",
+    "inference_config_sha256": "61d227a48d2229c15b0cb1b148c9953e11e67fbcf83b6b703aba8d1266f9796e",
+    "dataset_sha256": "da2e281419cd368dc10f366dab703012c3a8ac16a3afb8a0c3abba715706566a",
+    "split_sha256": "240a3ccf6e3fed65e754fdafbc3f52d8cadaabf6282c36efea8616a25bf8884a",
+    "gold_plans_sha256": "6aa73f8dc4d1803c8be0588902a776f12e577a0539d54b60b3d0bcfe1e461b74",
+    "base_config_sha256": "69b57f6d6abad21699dcde6fda5eed1b1b9551ee3e4c05987a33835217ebd0c6",
+    "resolved_config_sha256": "35579cebad2052e210453cb749b00f2801865fb2a5f0bfd72c02e884ab3861b0",
+    "prompt_set_sha256": "451b2cab9ce0c891e188bfb7f8e77d4c2595e997b15642015f7e1a96e7078a3f"
+  },
+  "inference": {
+    "backend": "hf",
+    "model_name_or_path": "/home/uet/hue_ptk/hf_cache/hub/models--01-ai--Yi-Coder-9B-Chat/snapshots/356a1f8d4e4a606d0b879e54191ca809918576b8",
+    "revision": null,
+    "model_hash": "881ebc7b893a9e12d704c40d2bdc908ed7958e0f671f5ccc434f5303102e6904",
+    "padding_side": "left",
+    "input_truncation_policy": "error",
+    "transformers_version": "5.5.3",
+    "torch_version": "2.6.0+cu124",
+    "cuda_version": "12.4",
+    "gpu": "NVIDIA GeForce RTX 4090"
+  },
+  "generation": {
+    "batch_size": 1,
+    "max_input_tokens": 28672,
+    "max_new_tokens": 8192,
+    "do_sample": false,
+    "seed": 42
+  },
+  "environment": {
+    "python": "3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:27:36) [GCC 11.2.0]",
+    "platform": "Linux-6.11.0-29-generic-x86_64-with-glibc2.39"
+  },
+  "artifacts": [
+    "config.json",
+    "run_lock.json",
+    "manifest.json",
+    "prompts.jsonl",
+    "raw_generations.jsonl",
+    "parsed_mapping_plans.jsonl",
+    "materialized_write_plans.jsonl",
+    "verification.jsonl",
+    "compiled_programs.jsonl",
+    "execution_logs.jsonl",
+    "evaluation.jsonl",
+    "metrics.json",
+    "error_analysis.csv",
+    "model_manifest.json"
+  ]
+}

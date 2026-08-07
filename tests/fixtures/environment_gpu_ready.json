@@ -1,0 +1,9 @@
+{
+  "manifest_version": 1,
+  "status": "gpu_ready",
+  "fixture_only": true,
+  "dependency_lock": {
+    "path": "requirements-inference.lock.txt",
+    "sha256": "861a24b179b5edd1245aba33109402dd4ab82a634098bd8d81fcb666f5bdf9f1"
+  }
+}

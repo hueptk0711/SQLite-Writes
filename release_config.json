@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "release_id": "mp_fs_plus_code_and_results_reviewer_v2_20260805",
+  "canonical_source_root": ".",
+  "primary_archive": "04_results/00_incoming_from_server/mp_fs_plus_final300_protocol_v2_1_rev2_adjudicated_20260731T121531Z.tar.gz",
+  "primary_import_report": "07_reproducibility/server_final_run/IMPORT_REPORT.json",
+  "paper_ready_results": "04_results/02_paper_ready",
+  "corrective_reporting_output": "04_results/03_analysis_work/reporting_v2_3_20260801",
+  "exploratory_reporting_output": "04_results/03_analysis_work/reporting_v2_4_20260801",
+  "state_scope_audit": "04_results/03_analysis_work/state_scope_audit_20260805/state_scope_audit_summary.json",
+  "frozen_inference_source": "archive/frozen_inference_source.zip",
+  "gpu_required_for_reporting": false,
+  "model_inference_rerun": false
+}

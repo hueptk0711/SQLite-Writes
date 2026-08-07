@@ -1,0 +1,66 @@
+{
+  "status": "pass",
+  "evidence_class": "mechanical_output_limit",
+  "predecessor_protocol": {
+    "protocol_id": "mp_fs_plus_external_holdout_v1",
+    "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_20260731/configs/experiments/final_protocol.json",
+    "sha256": "41eee8d41c2205af9485e03fd654a9a46a28720f78511b61babe1443c7d3820a"
+  },
+  "v1_disposition": "aborted_infrastructure_run_not_paper_eligible",
+  "completed_before_abort": {
+    "D-FS-M": {
+      "rows": 300,
+      "consumed_marker_sha256": "2da67aa4ea4fc23b1bb3e26ab917d55d2691564f361c53faa5cb3bb6c5d670d0"
+    },
+    "J-FS-M": {
+      "rows": 300,
+      "consumed_marker_sha256": "af88f72cda537c2af0034c3bee1620a29c405d979f7320f40428753ff3b745e9"
+    },
+    "S-FS-v2-M": {
+      "rows": 300,
+      "consumed_marker_sha256": "87721225d4be827993b7152034029ad71e5fa0f9e98e437028de4d2e1e9034cb"
+    }
+  },
+  "unconsumed": {
+    "MP-FS-M": {
+      "directory_exists": true,
+      "consumed_marker_present": false
+    },
+    "MP-FS+": {
+      "directory_exists": false,
+      "consumed_marker_present": false
+    },
+    "Gold-MP": {
+      "directory_exists": false,
+      "consumed_marker_present": false
+    }
+  },
+  "trigger": {
+    "method_id": "MP-FS-M",
+    "sample_id": "final_vaccine_031",
+    "status": "success",
+    "input_tokens": 8095,
+    "output_tokens": 4096,
+    "input_truncated": false,
+    "hit_max_new_tokens": true,
+    "oom_fallback_used": false
+  },
+  "source_artifacts": {
+    "invalid_marker": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_20260731/experiments/external_holdout/final300_qwen25_7b_20260731/mp_fs_m/FINAL_RUN_INVALID.json",
+      "sha256": "8d6e270ab3d2a24e5df255ae6e19a33772492d7445cd111bf3bcf0e917e5e238"
+    },
+    "raw_generations": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_20260731/experiments/external_holdout/final300_qwen25_7b_20260731/mp_fs_m/raw_generations.jsonl",
+      "sha256": "60afdd5a7cbe2f2c9c6e8129a4993ff1cd2bd57e2fbfcd522da7a90dbb8fb2e0"
+    },
+    "evaluation": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_20260731/experiments/external_holdout/final300_qwen25_7b_20260731/mp_fs_m/evaluation.jsonl",
+      "sha256": "60886754a914431186ce80e60dd9e720700cce8f4bed9d6ebbe14bc6b769c967"
+    },
+    "metrics": {
+      "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_20260731/experiments/external_holdout/final300_qwen25_7b_20260731/mp_fs_m/metrics.json",
+      "sha256": "c51e81725fa536883990b087a6b6265a9492eb124fb18282c664cfe831642980"
+    }
+  }
+}

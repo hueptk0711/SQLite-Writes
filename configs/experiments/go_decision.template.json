@@ -1,0 +1,15 @@
+{
+  "decision": "no-go",
+  "locked_config_sha256": "REPLACE_AFTER_CREATE_LOCKED_CONFIG",
+  "manual_error_review_complete": false,
+  "no_silent_truncation": false,
+  "no_mixed_checkpoint": false,
+  "gold_mp_near_oracle": false,
+  "mp_fs_plus_calibration_gates_passed": false,
+  "external_holdout_audit_passed": false,
+  "matched_configs_verified": false,
+  "final_protocol_frozen": false,
+  "reviewer": "REPLACE",
+  "decision_date": "REPLACE",
+  "notes": "Change decision to go only after every boolean gate is true."
+}

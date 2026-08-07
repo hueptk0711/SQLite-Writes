@@ -1,0 +1,4 @@
+method,improved_7b_wrong_14b_correct,degraded_7b_correct_14b_wrong,exact_mcnemar_p,holm_adjusted_p,analysis_class
+D-FS-M,27,8,0.001878225477412343,0.005634676432237029,post_hoc_same_family_model_scale
+J-FS-M,16,10,0.32693958282470703,0.32693958282470703,post_hoc_same_family_model_scale
+MP-FS+,12,1,0.00341796875,0.0068359375,post_hoc_same_family_model_scale

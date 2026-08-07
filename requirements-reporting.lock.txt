@@ -1,0 +1,2 @@
+# Deterministic reporting runtime dependencies
+# Python 3.10-3.14 standard library only; no third-party runtime packages.

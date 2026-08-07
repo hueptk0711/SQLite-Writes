@@ -1,0 +1,27 @@
+{
+  "decision_id": "post_hoc_second_model_qwen25_coder_14b_v1",
+  "decision_date_utc": "2026-08-01",
+  "status": "frozen_before_inference",
+  "analysis_class": "post_hoc_robustness",
+  "base_primary_protocol_sha256": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330",
+  "model": "Qwen2.5-Coder-14B-Instruct",
+  "model_snapshot": "aedcc2d42b622764e023cf882b6652e646b95671",
+  "selection_rationale": "Same-family larger-capacity robustness check using a model snapshot already cached on the server; selected before viewing any second-model predictions.",
+  "methods": [
+    "D-FS-M",
+    "J-FS-M",
+    "MP-FS+"
+  ],
+  "generation_policy": {
+    "batch_size": 1,
+    "max_input_tokens": 28672,
+    "max_new_tokens": 8192,
+    "input_truncation_policy": "error",
+    "quantization": "4bit",
+    "compute_dtype": "float16",
+    "device_map": "auto",
+    "do_sample": false,
+    "seed": 42
+  },
+  "interpretation": "The consumed 300-sample holdout is reused only for a labeled post-hoc cross-model robustness analysis. No prompt, parser, method, or threshold may be tuned from these outputs."
+}

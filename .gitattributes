@@ -1,0 +1,11 @@
+* text=auto
+*.zip binary
+*.gz binary
+*.tar binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary

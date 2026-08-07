@@ -1,0 +1,7 @@
+method_id,samples,mean_input_tokens,median_input_tokens,mean_output_tokens,median_output_tokens,mean_generation_latency_sec,median_generation_latency_sec,mean_preflight_latency_sec,output_limit_hit_rate,deterministic_processing_latency_sec,end_to_end_latency_sec,latency_scope_note
+D-FS-M,300,8630.266666666666,8372.0,334.92,262.5,4.952294436893183,4.209538839000743,,0.0,,,latency_sec is model generation latency; deterministic parser/compiler/database time was not instrumented end to end
+J-FS-M,300,8632.226666666667,8374.5,429.1333333333333,320.5,6.018846711753479,4.701546716998564,,0.0,,,latency_sec is model generation latency; deterministic parser/compiler/database time was not instrumented end to end
+S-FS-v2-M,300,8632.226666666667,8374.5,429.1333333333333,320.5,6.044044495409519,4.7151107434983714,,0.0,,,latency_sec is model generation latency; deterministic parser/compiler/database time was not instrumented end to end
+MP-FS-M,300,9608.633333333333,9327.0,462.91333333333336,205.0,6.623313808703242,3.767272283002967,,0.0,,,latency_sec is model generation latency; deterministic parser/compiler/database time was not instrumented end to end
+MP-FS+,300,5511.463333333333,3222.5,409.57666666666665,201.0,5.581185331226443,2.7312772474979283,0.0002798603501287289,0.006666666666666667,,,latency_sec is model generation latency; deterministic parser/compiler/database time was not instrumented end to end
+Gold-MP,300,,,,,,,,0.0,,,latency_sec is model generation latency; deterministic parser/compiler/database time was not instrumented end to end

@@ -1,0 +1,301 @@
+sample_id,db_id,method,error_category,error_stage,error_type,error_message,detected_mode,detected_format
+final_archeology_001,archeology,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,free_text,free_text
+final_archeology_002,archeology,D-FS-M,E15_execution,execution,execution_error,table projects has no column named name,free_text,free_text
+final_archeology_003,archeology,D-FS-M,E15_execution,execution,execution_error,"near ""statements"": syntax error",free_text,free_text
+final_archeology_004,archeology,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_archeology_005,archeology,D-FS-M,E13_dependency_fk,execution,execution_error,FOREIGN KEY constraint failed,semi_structured,multi_json_collection
+final_archeology_006,archeology,D-FS-M,correct,correct,,,semi_structured,json_object
+final_archeology_007,archeology,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_archeology_008,archeology,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_archeology_009,archeology,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_archeology_010,archeology,D-FS-M,correct,correct,,,semi_structured,key_value
+final_archeology_011,archeology,D-FS-M,E15_execution,execution,execution_error,6 values for 5 columns,semi_structured,multi_table
+final_archeology_012,archeology,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,multi_table
+final_archeology_013,archeology,D-FS-M,correct,correct,,,semi_structured,csv
+final_archeology_014,archeology,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: projects.arcregistry,semi_structured,csv
+final_archeology_015,archeology,D-FS-M,correct,correct,,,semi_structured,csv
+final_archeology_016,archeology,D-FS-M,E15_execution,execution,execution_error,table projects has no column named project_id,free_text,free_text
+final_archeology_017,archeology,D-FS-M,E15_execution,execution,execution_error,table projects has no column named project_id,free_text,free_text
+final_archeology_018,archeology,D-FS-M,correct,correct,,,free_text,free_text
+final_archeology_019,archeology,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_archeology_020,archeology,D-FS-M,correct,correct,,,semi_structured,json_object
+final_archeology_021,archeology,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_archeology_022,archeology,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_archeology_023,archeology,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_archeology_024,archeology,D-FS-M,E15_execution,execution,execution_error,no such table: conservation,semi_structured,markdown_table
+final_archeology_025,archeology,D-FS-M,correct,correct,,,semi_structured,key_value
+final_archeology_026,archeology,D-FS-M,correct,correct,,,semi_structured,key_value
+final_archeology_027,archeology,D-FS-M,E16_state_mismatch,state,wrong_state,,semi_structured,multi_table
+final_archeology_028,archeology,D-FS-M,correct,correct,,,semi_structured,csv
+final_archeology_029,archeology,D-FS-M,correct,correct,,,semi_structured,csv
+final_archeology_030,archeology,D-FS-M,correct,correct,,,semi_structured,csv
+final_archeology_031,archeology,D-FS-M,E15_execution,execution,execution_error,"unrecognized token: ""{""",free_text,free_text
+final_archeology_032,archeology,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,free_text,free_text
+final_archeology_033,archeology,D-FS-M,E15_execution,execution,execution_error,"near ""UPDATE"": syntax error",free_text,free_text
+final_archeology_034,archeology,D-FS-M,E15_execution,execution,execution_error,"near ""DELETE"": syntax error",semi_structured,json_object
+final_archeology_035,archeology,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_archeology_036,archeology,D-FS-M,E16_state_mismatch,state,wrong_state,,semi_structured,multi_json_collection
+final_archeology_037,archeology,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_archeology_038,archeology,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,markdown_table
+final_archeology_039,archeology,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_archeology_040,archeology,D-FS-M,correct,correct,,,semi_structured,key_value
+final_archeology_041,archeology,D-FS-M,E15_execution,execution,execution_error,incomplete input,semi_structured,key_value
+final_archeology_042,archeology,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,multi_table
+final_archeology_043,archeology,D-FS-M,correct,correct,,,semi_structured,csv
+final_archeology_044,archeology,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,csv
+final_archeology_045,archeology,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,csv
+final_archeology_046,archeology,D-FS-M,correct,correct,,,free_text,free_text
+final_archeology_047,archeology,D-FS-M,E15_execution,execution,execution_error,table scanconservation has no column named intervention_history,free_text,free_text
+final_archeology_048,archeology,D-FS-M,E15_execution,execution,execution_error,"near ""statements"": syntax error",free_text,free_text
+final_archeology_049,archeology,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_archeology_050,archeology,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_archeology_051,archeology,D-FS-M,correct,correct,,,semi_structured,json_array
+final_archeology_052,archeology,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_archeology_053,archeology,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_archeology_054,archeology,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_archeology_055,archeology,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_archeology_056,archeology,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_archeology_057,archeology,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,multi_table
+final_archeology_058,archeology,D-FS-M,correct,correct,,,semi_structured,csv
+final_archeology_059,archeology,D-FS-M,correct,correct,,,semi_structured,csv
+final_archeology_060,archeology,D-FS-M,correct,correct,,,semi_structured,csv
+final_polar_001,polar,D-FS-M,correct,correct,,,free_text,free_text
+final_polar_002,polar,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,free_text,free_text
+final_polar_003,polar,D-FS-M,correct,correct,,,free_text,free_text
+final_polar_004,polar,D-FS-M,E15_execution,execution,execution_error,table lightingandsafety has no column named emergcylightstatus,semi_structured,multi_json_collection
+final_polar_005,polar,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_polar_006,polar,D-FS-M,E15_execution,execution,execution_error,no such column: excluded.powerconsumption,semi_structured,json_array
+final_polar_007,polar,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_polar_008,polar,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_polar_009,polar,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_polar_010,polar,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,key_value
+final_polar_011,polar,D-FS-M,E15_execution,execution,execution_error,"near ""ON"": syntax error",semi_structured,key_value
+final_polar_012,polar,D-FS-M,correct,correct,,,semi_structured,key_value
+final_polar_013,polar,D-FS-M,correct,correct,,,semi_structured,csv
+final_polar_014,polar,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: weatherandstructure.weatherregistry,semi_structured,csv
+final_polar_015,polar,D-FS-M,E15_execution,execution,execution_error,NOT NULL constraint failed: operationmaintenance.opmainteqref,semi_structured,csv
+final_polar_016,polar,D-FS-M,E15_execution,execution,execution_error,table location has no column named altitude,free_text,free_text
+final_polar_017,polar,D-FS-M,E15_execution,execution,execution_error,table equipment has no column named servicelife,free_text,free_text
+final_polar_018,polar,D-FS-M,E15_execution,execution,execution_error,NOT NULL constraint failed: lightingandsafety.lightregistry,free_text,free_text
+final_polar_019,polar,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_polar_020,polar,D-FS-M,correct,correct,,,semi_structured,json_array
+final_polar_021,polar,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_polar_022,polar,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_polar_023,polar,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_polar_024,polar,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_polar_025,polar,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_polar_026,polar,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: transmission.transregistry,semi_structured,multi_table
+final_polar_027,polar,D-FS-M,E16_state_mismatch,state,wrong_state,,semi_structured,multi_table
+final_polar_028,polar,D-FS-M,correct,correct,,,semi_structured,csv
+final_polar_029,polar,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,csv
+final_polar_030,polar,D-FS-M,E15_execution,execution,execution_error,NOT NULL constraint failed: weatherandstructure.weatherlocref,semi_structured,csv
+final_polar_031,polar,D-FS-M,E16_state_mismatch,state,wrong_state,,free_text,free_text
+final_polar_032,polar,D-FS-M,correct,correct,,,free_text,free_text
+final_polar_033,polar,D-FS-M,E15_execution,execution,execution_error,"near ""INSERT"": syntax error",free_text,free_text
+final_polar_034,polar,D-FS-M,correct,correct,,,semi_structured,json_object
+final_polar_035,polar,D-FS-M,E15_execution,execution,execution_error,ON CONFLICT clause does not match any PRIMARY KEY or UNIQUE constraint,semi_structured,multi_json_collection
+final_polar_036,polar,D-FS-M,E15_execution,execution,execution_error,NOT NULL constraint failed: location.locationregistry,semi_structured,multi_json_collection
+final_polar_037,polar,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_polar_038,polar,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_polar_039,polar,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_polar_040,polar,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_polar_041,polar,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_polar_042,polar,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_polar_043,polar,D-FS-M,E15_execution,execution,execution_error,"near ""ON"": syntax error",semi_structured,csv
+final_polar_044,polar,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,csv
+final_polar_045,polar,D-FS-M,correct,correct,,,semi_structured,csv
+final_polar_046,polar,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,free_text,free_text
+final_polar_047,polar,D-FS-M,correct,correct,,,free_text,free_text
+final_polar_048,polar,D-FS-M,correct,correct,,,free_text,free_text
+final_polar_049,polar,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_polar_050,polar,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_polar_051,polar,D-FS-M,correct,correct,,,semi_structured,json_array
+final_polar_052,polar,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_polar_053,polar,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_polar_054,polar,D-FS-M,E15_execution,execution,execution_error,no such column: excluded.powerconsumption,semi_structured,markdown_table
+final_polar_055,polar,D-FS-M,E15_execution,execution,execution_error,table lightingandsafety has no column named lightstatus,semi_structured,multi_table
+final_polar_056,polar,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: transmission.transregistry,semi_structured,multi_table
+final_polar_057,polar,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_polar_058,polar,D-FS-M,correct,correct,,,semi_structured,csv
+final_polar_059,polar,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: waterandwaste.waterregistry,semi_structured,csv
+final_polar_060,polar,D-FS-M,E15_execution,execution,execution_error,NOT NULL constraint failed: cabinenvironment.cabineqref,semi_structured,csv
+final_robot_001,robot,D-FS-M,E15_execution,execution,execution_error,"near ""RAISE"": syntax error",free_text,free_text
+final_robot_002,robot,D-FS-M,E15_execution,execution,execution_error,8 values for 9 columns,free_text,free_text
+final_robot_003,robot,D-FS-M,correct,correct,,,free_text,free_text
+final_robot_004,robot,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_robot_005,robot,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_robot_006,robot,D-FS-M,correct,correct,,,semi_structured,json_object
+final_robot_007,robot,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,markdown_table
+final_robot_008,robot,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_robot_009,robot,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_robot_010,robot,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,multi_table
+final_robot_011,robot,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_robot_012,robot,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: maintenance_and_fault.upkeepactuation,semi_structured,multi_table
+final_robot_013,robot,D-FS-M,correct,correct,,,semi_structured,csv
+final_robot_014,robot,D-FS-M,correct,correct,,,semi_structured,csv
+final_robot_015,robot,D-FS-M,correct,correct,,,semi_structured,csv
+final_robot_016,robot,D-FS-M,E15_execution,execution,execution_error,"near ""statements"": syntax error",free_text,free_text
+final_robot_017,robot,D-FS-M,E15_execution,execution,execution_error,table actuation_data has no column named tcprxval,free_text,free_text
+final_robot_018,robot,D-FS-M,E16_state_mismatch,state,wrong_state,,free_text,free_text
+final_robot_019,robot,D-FS-M,E15_execution,execution,execution_error,"unrecognized token: ""'{\""load_value\"": 42.19, \""memory_usage\"": 58.19, \""thermal_level\"": 39.19, \""cabinet_humidity\"": 46.19, \""cabinet_temperature\"": 31.19});""",semi_structured,multi_json_collection
+final_robot_020,robot,D-FS-M,correct,correct,,,semi_structured,json_array
+final_robot_021,robot,D-FS-M,E16_state_mismatch,state,wrong_state,,semi_structured,multi_json_collection
+final_robot_022,robot,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_robot_023,robot,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_robot_024,robot,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_robot_025,robot,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_robot_026,robot,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_robot_027,robot,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_robot_028,robot,D-FS-M,correct,correct,,,semi_structured,csv
+final_robot_029,robot,D-FS-M,correct,correct,,,semi_structured,csv
+final_robot_030,robot,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: actuation_data.actreg,semi_structured,csv
+final_robot_031,robot,D-FS-M,E15_execution,execution,execution_error,"near ""RAISE"": syntax error",free_text,free_text
+final_robot_032,robot,D-FS-M,correct,correct,,,free_text,free_text
+final_robot_033,robot,D-FS-M,E15_execution,execution,execution_error,"near ""statements"": syntax error",free_text,free_text
+final_robot_034,robot,D-FS-M,E15_execution,execution,execution_error,"near ""RAISE"": syntax error",semi_structured,multi_json_collection
+final_robot_035,robot,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: robot_details.botdetreg,semi_structured,multi_json_collection
+final_robot_036,robot,D-FS-M,E16_state_mismatch,state,wrong_state,,semi_structured,multi_json_collection
+final_robot_037,robot,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_robot_038,robot,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,markdown_table
+final_robot_039,robot,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_robot_040,robot,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_robot_041,robot,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_robot_042,robot,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,multi_table
+final_robot_043,robot,D-FS-M,E15_execution,execution,execution_error,"near ""ROLLBACK"": syntax error",semi_structured,csv
+final_robot_044,robot,D-FS-M,correct,correct,,,semi_structured,csv
+final_robot_045,robot,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: operation.operreg,semi_structured,csv
+final_robot_046,robot,D-FS-M,E15_execution,execution,execution_error,"near ""ABORT"": syntax error",free_text,free_text
+final_robot_047,robot,D-FS-M,correct,correct,,,free_text,free_text
+final_robot_048,robot,D-FS-M,correct,correct,,,free_text,free_text
+final_robot_049,robot,D-FS-M,E15_execution,execution,execution_error,"near "";"": syntax error",semi_structured,multi_json_collection
+final_robot_050,robot,D-FS-M,E13_dependency_fk,execution,execution_error,FOREIGN KEY constraint failed,semi_structured,multi_json_collection
+final_robot_051,robot,D-FS-M,correct,correct,,,semi_structured,json_object
+final_robot_052,robot,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_robot_053,robot,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_robot_054,robot,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_robot_055,robot,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_robot_056,robot,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,multi_table
+final_robot_057,robot,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: maintenance_and_fault.upkeepactuation,semi_structured,multi_table
+final_robot_058,robot,D-FS-M,correct,correct,,,semi_structured,csv
+final_robot_059,robot,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,csv
+final_robot_060,robot,D-FS-M,correct,correct,,,semi_structured,csv
+final_vaccine_001,vaccine,D-FS-M,E15_execution,execution,execution_error,table shipments has no column named qualitycheck,free_text,free_text
+final_vaccine_002,vaccine,D-FS-M,E15_execution,execution,execution_error,table container has no column named status,free_text,free_text
+final_vaccine_003,vaccine,D-FS-M,E15_execution,execution,execution_error,incomplete input,free_text,free_text
+final_vaccine_004,vaccine,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_vaccine_005,vaccine,D-FS-M,E13_dependency_fk,execution,execution_error,FOREIGN KEY constraint failed,semi_structured,multi_json_collection
+final_vaccine_006,vaccine,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,multi_json_collection
+final_vaccine_007,vaccine,D-FS-M,E15_execution,execution,execution_error,"near ""ROLLBACK"": syntax error",semi_structured,markdown_table
+final_vaccine_008,vaccine,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_vaccine_009,vaccine,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_vaccine_010,vaccine,D-FS-M,correct,correct,,,semi_structured,key_value
+final_vaccine_011,vaccine,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,multi_table
+final_vaccine_012,vaccine,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_vaccine_013,vaccine,D-FS-M,correct,correct,,,semi_structured,csv
+final_vaccine_014,vaccine,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: datalogger.loggerreg,semi_structured,csv
+final_vaccine_015,vaccine,D-FS-M,correct,correct,,,semi_structured,csv
+final_vaccine_016,vaccine,D-FS-M,E15_execution,execution,execution_error,"near ""INSERT"": syntax error",free_text,free_text
+final_vaccine_017,vaccine,D-FS-M,E15_execution,execution,execution_error,table container has no column named status,free_text,free_text
+final_vaccine_018,vaccine,D-FS-M,correct,correct,,,free_text,free_text
+final_vaccine_019,vaccine,D-FS-M,E16_state_mismatch,state,wrong_state,,semi_structured,multi_json_collection
+final_vaccine_020,vaccine,D-FS-M,correct,correct,,,semi_structured,json_array
+final_vaccine_021,vaccine,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,multi_json_collection
+final_vaccine_022,vaccine,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_vaccine_023,vaccine,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_vaccine_024,vaccine,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_vaccine_025,vaccine,D-FS-M,E16_state_mismatch,state,wrong_state,,semi_structured,multi_table
+final_vaccine_026,vaccine,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_vaccine_027,vaccine,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_vaccine_028,vaccine,D-FS-M,correct,correct,,,semi_structured,csv
+final_vaccine_029,vaccine,D-FS-M,correct,correct,,,semi_structured,csv
+final_vaccine_030,vaccine,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,csv
+final_vaccine_031,vaccine,D-FS-M,E15_execution,execution,execution_error,"near ""INSERT"": syntax error",free_text,free_text
+final_vaccine_032,vaccine,D-FS-M,correct,correct,,,free_text,free_text
+final_vaccine_033,vaccine,D-FS-M,E15_execution,execution,execution_error,NOT NULL constraint failed: container.shipown,free_text,free_text
+final_vaccine_034,vaccine,D-FS-M,correct,correct,,,semi_structured,json_array
+final_vaccine_035,vaccine,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_vaccine_036,vaccine,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_vaccine_037,vaccine,D-FS-M,E15_execution,execution,execution_error,"near ""ABORT"": syntax error",semi_structured,markdown_table
+final_vaccine_038,vaccine,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,markdown_table
+final_vaccine_039,vaccine,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_vaccine_040,vaccine,D-FS-M,E15_execution,execution,execution_error,all VALUES must have the same number of terms,semi_structured,key_value
+final_vaccine_041,vaccine,D-FS-M,correct,correct,,,semi_structured,key_value
+final_vaccine_042,vaccine,D-FS-M,correct,correct,,,semi_structured,key_value
+final_vaccine_043,vaccine,D-FS-M,E15_execution,execution,execution_error,no such table: loggerdata,semi_structured,csv
+final_vaccine_044,vaccine,D-FS-M,correct,correct,,,semi_structured,csv
+final_vaccine_045,vaccine,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,csv
+final_vaccine_046,vaccine,D-FS-M,E15_execution,execution,execution_error,table regulatoryandmaintenance has no column named shipmentref,free_text,free_text
+final_vaccine_047,vaccine,D-FS-M,E15_execution,execution,execution_error,table container has no column named own,free_text,free_text
+final_vaccine_048,vaccine,D-FS-M,E15_execution,execution,execution_error,NOT NULL constraint failed: shipments.timemark,free_text,free_text
+final_vaccine_049,vaccine,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_vaccine_050,vaccine,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: shipments.shipmentregistry,semi_structured,multi_json_collection
+final_vaccine_051,vaccine,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: regulatoryandmaintenance.regmaintregistry,semi_structured,json_array
+final_vaccine_052,vaccine,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_vaccine_053,vaccine,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_vaccine_054,vaccine,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_vaccine_055,vaccine,D-FS-M,correct,correct,,,semi_structured,key_value
+final_vaccine_056,vaccine,D-FS-M,correct,correct,,,semi_structured,key_value
+final_vaccine_057,vaccine,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: datalogger.loggerreg,semi_structured,key_value
+final_vaccine_058,vaccine,D-FS-M,correct,correct,,,semi_structured,csv
+final_vaccine_059,vaccine,D-FS-M,correct,correct,,,semi_structured,csv
+final_vaccine_060,vaccine,D-FS-M,correct,correct,,,semi_structured,csv
+final_virtual_001,virtual,D-FS-M,correct,correct,,,free_text,free_text
+final_virtual_002,virtual,D-FS-M,E15_execution,execution,execution_error,table virtualidols has no column named assocgrouptag,free_text,free_text
+final_virtual_003,virtual,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,free_text,free_text
+final_virtual_004,virtual,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_virtual_005,virtual,D-FS-M,E15_execution,execution,execution_error,table virtualidols has no column named assocgroupt,semi_structured,multi_json_collection
+final_virtual_006,virtual,D-FS-M,E15_execution,execution,execution_error,table virtualidols has no column named assocgrouptag,semi_structured,json_array
+final_virtual_007,virtual,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_008,virtual,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_009,virtual,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_010,virtual,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_virtual_011,virtual,D-FS-M,correct,correct,,,semi_structured,multi_table
+final_virtual_012,virtual,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,multi_table
+final_virtual_013,virtual,D-FS-M,correct,correct,,,semi_structured,csv
+final_virtual_014,virtual,D-FS-M,correct,correct,,,semi_structured,csv
+final_virtual_015,virtual,D-FS-M,correct,correct,,,semi_structured,csv
+final_virtual_016,virtual,D-FS-M,E15_execution,execution,execution_error,table membershipandspending has no column named membspend,free_text,free_text
+final_virtual_017,virtual,D-FS-M,E15_execution,execution,execution_error,table fans has no column named nickname,free_text,free_text
+final_virtual_018,virtual,D-FS-M,correct,correct,,,free_text,free_text
+final_virtual_019,virtual,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_virtual_020,virtual,D-FS-M,correct,correct,,,semi_structured,json_array
+final_virtual_021,virtual,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: preferencesandsettings.prefreg,semi_structured,multi_json_collection
+final_virtual_022,virtual,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_023,virtual,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_024,virtual,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_025,virtual,D-FS-M,correct,correct,,,semi_structured,key_value
+final_virtual_026,virtual,D-FS-M,correct,correct,,,semi_structured,key_value
+final_virtual_027,virtual,D-FS-M,correct,correct,,,semi_structured,key_value
+final_virtual_028,virtual,D-FS-M,correct,correct,,,semi_structured,csv
+final_virtual_029,virtual,D-FS-M,correct,correct,,,semi_structured,csv
+final_virtual_030,virtual,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,csv
+final_virtual_031,virtual,D-FS-M,E15_execution,execution,execution_error,table membershipandspending has no column named membreg,free_text,free_text
+final_virtual_032,virtual,D-FS-M,E15_execution,execution,execution_error,table virtualidols has no column named assocgrouptag,free_text,free_text
+final_virtual_033,virtual,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: commerceandcollection.commercereg,free_text,free_text
+final_virtual_034,virtual,D-FS-M,E15_execution,execution,execution_error,"near ""ERROR"": syntax error",semi_structured,json_object
+final_virtual_035,virtual,D-FS-M,E15_execution,execution,execution_error,table interactions has no column named favgiftag,semi_structured,multi_json_collection
+final_virtual_036,virtual,D-FS-M,E15_execution,execution,execution_error,table interactions has no column named favgiftag,semi_structured,multi_json_collection
+final_virtual_037,virtual,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_038,virtual,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_039,virtual,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_040,virtual,D-FS-M,correct,correct,,,semi_structured,key_value
+final_virtual_041,virtual,D-FS-M,correct,correct,,,semi_structured,key_value
+final_virtual_042,virtual,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: fans.userregistry,semi_structured,key_value
+final_virtual_043,virtual,D-FS-M,correct,correct,,,semi_structured,csv
+final_virtual_044,virtual,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,csv
+final_virtual_045,virtual,D-FS-M,correct,correct,,,semi_structured,csv
+final_virtual_046,virtual,D-FS-M,correct,correct,,,free_text,free_text
+final_virtual_047,virtual,D-FS-M,E15_execution,execution,execution_error,table virtualidols has no column named gentag,free_text,free_text
+final_virtual_048,virtual,D-FS-M,correct,correct,,,free_text,free_text
+final_virtual_049,virtual,D-FS-M,correct,correct,,,semi_structured,multi_json_collection
+final_virtual_050,virtual,D-FS-M,E15_execution,execution,execution_error,table interactions has no column named favgiftag,semi_structured,multi_json_collection
+final_virtual_051,virtual,D-FS-M,correct,correct,,,semi_structured,json_array
+final_virtual_052,virtual,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_053,virtual,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_054,virtual,D-FS-M,correct,correct,,,semi_structured,markdown_table
+final_virtual_055,virtual,D-FS-M,correct,correct,,,semi_structured,key_value
+final_virtual_056,virtual,D-FS-M,correct,correct,,,semi_structured,key_value
+final_virtual_057,virtual,D-FS-M,E15_execution,execution,unsafe_sql,Only INSERT/REPLACE statements are allowed.,semi_structured,key_value
+final_virtual_058,virtual,D-FS-M,correct,correct,,,semi_structured,csv
+final_virtual_059,virtual,D-FS-M,E15_execution,execution,execution_error,UNIQUE constraint failed: virtualidols.entityreg,semi_structured,csv
+final_virtual_060,virtual,D-FS-M,E16_state_mismatch,state,wrong_state,,semi_structured,csv

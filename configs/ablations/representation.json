@@ -1,0 +1,17 @@
+{
+  "experiment_id": "E2_representation",
+  "variants": [
+    "R0_record_json",
+    "R1_grouped_rows",
+    "R2_mapping_first"
+  ],
+  "locked_factors": [
+    "model",
+    "prompt_examples",
+    "generation_parameters",
+    "development_split",
+    "compiler",
+    "evaluator"
+  ]
+}
+

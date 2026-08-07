@@ -1,0 +1,64 @@
+{
+  "manifest_version": 1,
+  "model_path": "/home/uet/hue_ptk/hf_cache/hub/models--01-ai--Yi-Coder-9B-Chat/snapshots/356a1f8d4e4a606d0b879e54191ca809918576b8",
+  "file_count": 12,
+  "files": {
+    ".gitattributes": {
+      "size_bytes": 1519,
+      "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361"
+    },
+    "README.md": {
+      "size_bytes": 5181,
+      "sha256": "9d97418b74124986be89c0c8a9a264b3eb1dd309c4e2dad828550f47a2d0c243"
+    },
+    "config.json": {
+      "size_bytes": 683,
+      "sha256": "b1651532a93794fef9d1cddbe14aed5d40a96c04ab73c8708a0b125da425cf06"
+    },
+    "generation_config.json": {
+      "size_bytes": 132,
+      "sha256": "ada25958d6fef607707816ae3a704b9d341fe07bc49e43ee5512494bb115ead7"
+    },
+    "model-00001-of-00004.safetensors": {
+      "size_bytes": 4932711424,
+      "sha256": "ee4746e218b60b800840c62cef670c309489b832d3908a3605800c2769596601"
+    },
+    "model-00002-of-00004.safetensors": {
+      "size_bytes": 4976802816,
+      "sha256": "e37ba7b04039ed5e9564d54c45cece5166ed7c86f75528567f019f9c2ab31ba9"
+    },
+    "model-00003-of-00004.safetensors": {
+      "size_bytes": 4968397360,
+      "sha256": "03c62b8eaec0ec5478d9dfdfe6e5ca0424173d4a2dab647d8a0d6bd029e892f2"
+    },
+    "model-00004-of-00004.safetensors": {
+      "size_bytes": 2780953384,
+      "sha256": "09e5d5d075c8d582b50780b541e97ea625e192665fa7eeb211963fa421ff368d"
+    },
+    "model.safetensors.index.json": {
+      "size_bytes": 35838,
+      "sha256": "b84d6ebdcbaa08a91d99947222b5ee792a4503f6e4e857c07fb6cf2a3c8a2117"
+    },
+    "special_tokens_map.json": {
+      "size_bytes": 570,
+      "sha256": "60e13afe3f527b158f80280639bf11d3f7bf5ac660fb282be3dd5669042a6099"
+    },
+    "tokenizer.model": {
+      "size_bytes": 1033105,
+      "sha256": "386c49cf943d71aa110361135338c50e38beeff0a66593480421f37b319e1a39"
+    },
+    "tokenizer_config.json": {
+      "size_bytes": 1890,
+      "sha256": "1deeef9eb7e68757c205b334cbfebd2e20281761634acb4792a8ff78ccb524f5"
+    }
+  },
+  "aggregate_sha256": "881ebc7b893a9e12d704c40d2bdc908ed7958e0f671f5ccc434f5303102e6904",
+  "verified": true,
+  "source": "local",
+  "model_name_or_path": "/home/uet/hue_ptk/hf_cache/hub/models--01-ai--Yi-Coder-9B-Chat/snapshots/356a1f8d4e4a606d0b879e54191ca809918576b8",
+  "revision": null,
+  "tokenizer_sha256": "85ea859a522d44fa17595a5b42db569c3dd1746e4639bf68248fe5125cc96eaf",
+  "chat_template_sha256": "52126d0145882ab74147db63ae6d942823f5095ea5f60ada48d19f02e4543bf0",
+  "model_config_sha256": "5c5b540ceab26be44d5b47fc4bb95f59be34efe9e0db55f66e7e7870eea802b0",
+  "generation_config_sha256": "443804bd09568de67f4c55143ba1a7409220b5f4493566e193551769f388877f"
+}

@@ -1,0 +1,8 @@
+{
+  "base_config": "configs/final/mp_fs_plus.json",
+  "batch_size": 1,
+  "inference": {
+    "backend": "mock",
+    "mock_default_response": "{}"
+  }
+}

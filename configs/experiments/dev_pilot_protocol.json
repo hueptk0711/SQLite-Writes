@@ -1,0 +1,83 @@
+{
+  "protocol_id": "v3_dev_pilot_120",
+  "status": "ready_for_pinned_model",
+  "dataset": "data/frozen/dev/dataset_dev_v3.json",
+  "ids": "data/frozen/dev/dev_ids_v3.txt",
+  "sample_count": 120,
+  "seed": 42,
+  "database_identity": {
+    "aggregate_sha256": "7cabf4aac32dc7be6518e51e42ce835924632acd14eb1c9ec3f49317f68d7d3b",
+    "databases": {
+      "california_schools": "986817d793479801ed55133e55aa27e335422c0cd3866b54a3d6317b7c5f09c1",
+      "card_games": "c98bdb57fe7474da798b407785544b9af0daaad5d61fd21e2a73309493bc1227",
+      "codebase_community": "92101be6d2a9f6adceea59d38f6d1c556087f9eea1432432a21268cb1348036d",
+      "debit_card_specializing": "b3d149ad05746dbbe5116e229e17e18f09c39db43cf117d9ef3441753608b691",
+      "european_football_2": "e4d361dbeec6591a4b315877c0c481da05c8ff5a3d389b34d6e17b6f15bee4e0",
+      "financial": "d15d89cdb068a202b6f2b99342af44dffc1d52545b39ceaf62efdc0ba570101e",
+      "formula_1": "17185981cd747f6cdc374cb02a6096db3130e6ec2ddc582fe1686a28fb4c4c8a",
+      "student_club": "eb89bcfe97eefa386a27904ec5aa15159811a7eac894ec659a36e48fa9f76b77",
+      "superhero": "75e94a2c3236ee3bb2c01fb97a1c4b4c1c269bcefd4eab1d04be323d2d0825b1",
+      "thrombosis_prediction": "e7e16d74b4731b4b8d33fdbe8c29cd5622620788ce8d1f335631f65fc7cf1db9",
+      "toxicology": "f5fa7f21af1ad878ff8fef1b0582b8cb2d7ed63dbac65ff16d2ba05667650c5b"
+    }
+  },
+  "methods": [
+    "D-ZS",
+    "D-FS",
+    "J-ZS",
+    "J-FS-common",
+    "S-FS-v2",
+    "MP-ZS",
+    "MP-FS",
+    "MP-FS-R-semi",
+    "Gold-MP"
+  ],
+  "primary_comparators": [
+    "D-FS",
+    "J-FS-common",
+    "S-FS-v2"
+  ],
+  "primary_method": "MP-FS",
+  "primary_metrics": [
+    "target_state_accuracy",
+    "strict_full_state_accuracy",
+    "execution_success",
+    "conflict_full_exact_accuracy",
+    "row_exact_match_accuracy",
+    "cell_value_f1"
+  ],
+  "required_slices": [
+    "batch_large",
+    "free_text",
+    "semi_structured",
+    "multi_table",
+    "do_nothing",
+    "do_update"
+  ],
+  "go_no_go": {
+    "all_runs_complete": true,
+    "gold_mp_strict_full_state_min": 0.99,
+    "mp_fs_target_state_max_absolute_gap_to_best_primary_comparator": 0.02,
+    "mp_fs_required_slice_improvement": {
+      "metric": "target_state_accuracy",
+      "slices": [
+        "batch_large",
+        "multi_table"
+      ],
+      "minimum_absolute_gain": 0.01,
+      "minimum_slices": 1
+    },
+    "input_truncation_rate_must_equal": 0.0,
+    "structured_method_output_limit_rate_must_equal": 0.0,
+    "direct_sql_output_limit_is_reported_as_method_failure": true,
+    "payload_copy_integrity_is_diagnostic_only": true,
+    "formal_significance_testing_on_dev": false,
+    "manual_error_review_required": true
+  },
+  "locked_test_policy": {
+    "allowed_only_after_go": true,
+    "single_run": true,
+    "immutable_model_revision_or_hash_required": true,
+    "immutable_prompt_and_config_hashes_required": true
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "experiment_id": "compiler_ablation",
+  "variants": [
+    "full",
+    "without_explicit_conflict",
+    "without_strict_atomic",
+    "without_semantic_type_preservation",
+    "without_dependency_ordering",
+    "without_verifier"
+  ]
+}
+

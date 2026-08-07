@@ -1,0 +1,18 @@
+{
+  "method_id": "J-FS-common",
+  "family": "record_json_common_v3_compiler",
+  "representation": "legacy_table_operation_values",
+  "role": "representation_ablation_with_common_compiler",
+  "demonstration_policy": "fixed_two_format_examples",
+  "demonstrations": [
+    {
+      "input": "Create major DS with name Data Science.",
+      "output": "{\"records\":[{\"table\":\"majors\",\"operation\":\"insert\",\"values\":{\"major_id\":\"DS\",\"major_name\":\"Data Science\"}}]}"
+    },
+    {
+      "input": "Upsert student S001 named Nguyen A.",
+      "output": "{\"records\":[{\"table\":\"students\",\"operation\":\"upsert\",\"values\":{\"student_id\":\"S001\",\"name\":\"Nguyen A\"}}]}"
+    }
+  ],
+  "builder": "common_v3_verifier_compiler"
+}

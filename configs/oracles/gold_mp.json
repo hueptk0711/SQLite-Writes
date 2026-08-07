@@ -1,0 +1,6 @@
+{
+  "method_id": "Gold-MP",
+  "representation": "gold_write_plan_oracle",
+  "generation_backend": "none",
+  "purpose": "deterministic_verifier_compiler_evaluator_oracle"
+}

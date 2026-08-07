@@ -1,0 +1,87 @@
+{
+  "analysis_class": "post_hoc_frozen_plan_downstream_ablation",
+  "analysis_id": "mp_fs_plus_downstream_deterministic_ablation_v1",
+  "database_execution_replayed_on_isolated_copies": true,
+  "model_inference_rerun": false,
+  "not_claimed": [
+    "full MP-FS+ component ablation",
+    "reference-grounding ablation",
+    "prompt or generation ablation"
+  ],
+  "predictions_modified": false,
+  "primary_anchor": {
+    "expected": {
+      "coverage": 0.5466666666666666,
+      "target_state_accuracy": 0.49333333333333335
+    },
+    "observed": {
+      "coverage": 0.5466666666666666,
+      "target_state_accuracy": 0.49333333333333335
+    },
+    "status": "pass"
+  },
+  "scope": "verification/provenance/preflight boundaries after deterministic materialization",
+  "status": "pass",
+  "variants": [
+    {
+      "abstention_rate": 0.2766666666666666,
+      "accepted_output_accuracy": 0.783410138248848,
+      "constraint_or_execution_failure_count": 29,
+      "coverage": 0.7233333333333334,
+      "false_accept_count": 47,
+      "false_accept_rate": 0.21658986175115208,
+      "invalid_program_rate": 0.2766666666666666,
+      "materialized_plan_coverage": 0.7233333333333334,
+      "off_target_modification_count": 0,
+      "program_build_rate": 0.7233333333333334,
+      "samples": 300,
+      "target_state_accuracy": 0.5666666666666667,
+      "variant": "V0_no_verifier_no_provenance_no_preflight"
+    },
+    {
+      "abstention_rate": 0.3466666666666667,
+      "accepted_output_accuracy": 0.8673469387755102,
+      "constraint_or_execution_failure_count": 8,
+      "coverage": 0.6533333333333333,
+      "false_accept_count": 26,
+      "false_accept_rate": 0.1326530612244898,
+      "invalid_program_rate": 0.3466666666666667,
+      "materialized_plan_coverage": 0.7233333333333334,
+      "off_target_modification_count": 0,
+      "program_build_rate": 0.6533333333333333,
+      "samples": 300,
+      "target_state_accuracy": 0.5666666666666667,
+      "variant": "V1_hard_verifier_only"
+    },
+    {
+      "abstention_rate": 0.43000000000000005,
+      "accepted_output_accuracy": 0.8654970760233918,
+      "constraint_or_execution_failure_count": 6,
+      "coverage": 0.57,
+      "false_accept_count": 23,
+      "false_accept_rate": 0.13450292397660818,
+      "invalid_program_rate": 0.43000000000000005,
+      "materialized_plan_coverage": 0.7233333333333334,
+      "off_target_modification_count": 0,
+      "program_build_rate": 0.57,
+      "samples": 300,
+      "target_state_accuracy": 0.49333333333333335,
+      "variant": "V2_hard_verifier_plus_provenance"
+    },
+    {
+      "abstention_rate": 0.45333333333333337,
+      "accepted_output_accuracy": 0.9024390243902439,
+      "constraint_or_execution_failure_count": 0,
+      "coverage": 0.5466666666666666,
+      "false_accept_count": 16,
+      "false_accept_rate": 0.0975609756097561,
+      "invalid_program_rate": 0.43000000000000005,
+      "materialized_plan_coverage": 0.7233333333333334,
+      "off_target_modification_count": 0,
+      "program_build_rate": 0.57,
+      "samples": 300,
+      "target_state_accuracy": 0.49333333333333335,
+      "variant": "V3_full_with_transactional_preflight"
+    }
+  ]
+}

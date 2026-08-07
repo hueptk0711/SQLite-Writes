@@ -1,0 +1,15 @@
+{
+  "method_id": "D-FS",
+  "family": "direct_sql",
+  "demonstration_policy": "fixed_schema_format_examples",
+  "demonstrations": [
+    {
+      "input": "Create major DS with name Data Science.",
+      "output": "INSERT INTO majors(major_id, major_name) VALUES ('DS', 'Data Science');"
+    },
+    {
+      "input": "Add student S001 named Nguyen A, or update only the name when S001 already exists.",
+      "output": "INSERT INTO students(student_id, name) VALUES ('S001', 'Nguyen A') ON CONFLICT(student_id) DO UPDATE SET name=excluded.name;"
+    }
+  ]
+}

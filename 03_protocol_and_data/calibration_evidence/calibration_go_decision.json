@@ -1,0 +1,201 @@
+{
+  "report_version": 1,
+  "protocol_id": "mp_fs_plus_calibration_v3_in28672_out4096_locked_20260729",
+  "status": "go",
+  "matrix_complete": true,
+  "gpu_run_complete": true,
+  "final_protocol_freeze_authorized": true,
+  "paper_result_eligible": false,
+  "methods": {
+    "d_fs_m": {
+      "method_id": "D-FS-M",
+      "backend": "gpu",
+      "samples": 60,
+      "parse_success": 0.9833333333333333,
+      "plan_validation_success": 0.0,
+      "build_success": 0.9833333333333333,
+      "execution_success": 0.8166666666666667,
+      "target_state_accuracy": 0.7666666666666667,
+      "strict_full_state_accuracy": 0.7666666666666667,
+      "accepted_output_accuracy": 0.7796610169491526,
+      "coverage": 0.9833333333333333,
+      "side_effect_rate": 0.0,
+      "input_truncated_count": 0,
+      "output_limit_hit_count": 0,
+      "generation_failure_count": 0,
+      "missing_prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "missing_evaluation_count": 0,
+      "invalid_source_selector_count": 0,
+      "unknown_column_count": 0,
+      "run_lock_sha256": "a583954d9929fbb5e1891f2d9af0db6df48e161c12c509fd45a53cc46d038c47"
+    },
+    "j_fs_m": {
+      "method_id": "J-FS-M",
+      "backend": "gpu",
+      "samples": 60,
+      "parse_success": 1.0,
+      "plan_validation_success": 0.9666666666666667,
+      "build_success": 0.9666666666666667,
+      "execution_success": 0.9,
+      "target_state_accuracy": 0.7833333333333333,
+      "strict_full_state_accuracy": 0.7833333333333333,
+      "accepted_output_accuracy": 0.8103448275862069,
+      "coverage": 0.9666666666666667,
+      "side_effect_rate": 0.0,
+      "input_truncated_count": 0,
+      "output_limit_hit_count": 0,
+      "generation_failure_count": 0,
+      "missing_prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "missing_evaluation_count": 0,
+      "invalid_source_selector_count": 0,
+      "unknown_column_count": 0,
+      "run_lock_sha256": "22d3ac73adaac87344de5f823181da20c949b8b58ede3d2072f66ebdf4701048"
+    },
+    "mp_fs_m": {
+      "method_id": "MP-FS-M",
+      "backend": "gpu",
+      "samples": 60,
+      "parse_success": 0.8333333333333334,
+      "plan_validation_success": 0.48333333333333334,
+      "build_success": 0.48333333333333334,
+      "execution_success": 0.31666666666666665,
+      "target_state_accuracy": 0.25,
+      "strict_full_state_accuracy": 0.25,
+      "accepted_output_accuracy": 0.5172413793103449,
+      "coverage": 0.48333333333333334,
+      "side_effect_rate": 0.0,
+      "input_truncated_count": 0,
+      "output_limit_hit_count": 0,
+      "generation_failure_count": 0,
+      "missing_prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "missing_evaluation_count": 0,
+      "invalid_source_selector_count": 16,
+      "unknown_column_count": 0,
+      "run_lock_sha256": "2f89116989b733eb3a7a5d2fdd82361015cb246a6bd12cfc8447d75a8be4a186"
+    },
+    "mp_fs_plus": {
+      "method_id": "MP-FS+",
+      "backend": "gpu",
+      "samples": 60,
+      "parse_success": 1.0,
+      "plan_validation_success": 0.85,
+      "build_success": 0.85,
+      "execution_success": 0.75,
+      "target_state_accuracy": 0.7333333333333333,
+      "strict_full_state_accuracy": 0.7333333333333333,
+      "accepted_output_accuracy": 0.9777777777777777,
+      "coverage": 0.75,
+      "side_effect_rate": 0.0,
+      "input_truncated_count": 0,
+      "output_limit_hit_count": 0,
+      "generation_failure_count": 0,
+      "missing_prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "missing_evaluation_count": 0,
+      "invalid_source_selector_count": 0,
+      "unknown_column_count": 0,
+      "run_lock_sha256": "3ec163801f0d39c808874a57659c687cf0685a3e372901165c2ae76397cedd05"
+    },
+    "gold_mp": {
+      "method_id": "Gold-MP",
+      "backend": "oracle",
+      "samples": 60,
+      "parse_success": 1.0,
+      "plan_validation_success": 1.0,
+      "build_success": 1.0,
+      "execution_success": 1.0,
+      "target_state_accuracy": 1.0,
+      "strict_full_state_accuracy": 1.0,
+      "accepted_output_accuracy": 1.0,
+      "coverage": 1.0,
+      "side_effect_rate": 0.0,
+      "input_truncated_count": 0,
+      "output_limit_hit_count": 0,
+      "generation_failure_count": 0,
+      "missing_prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "missing_evaluation_count": 0,
+      "invalid_source_selector_count": 0,
+      "unknown_column_count": 0,
+      "run_lock_sha256": "d12efc0f7d39daefbf4f3a0f1661ea2d4bf257fc6edb3dfadcc71836ff2ca3b9"
+    }
+  },
+  "checks": {
+    "gold_mp_accuracy": {
+      "actual": 1.0,
+      "operator": "==",
+      "expected": 1.0,
+      "pass": true
+    },
+    "mp_fs_plus_parse_success": {
+      "actual": 1.0,
+      "operator": ">=",
+      "expected": 0.98,
+      "pass": true
+    },
+    "mp_fs_plus_build_success": {
+      "actual": 0.85,
+      "operator": ">=",
+      "expected": 0.85,
+      "pass": true
+    },
+    "mp_fs_plus_execution_success": {
+      "actual": 0.75,
+      "operator": ">=",
+      "expected": 0.75,
+      "pass": true
+    },
+    "mp_fs_plus_accepted_output_accuracy": {
+      "actual": 0.9777777777777777,
+      "operator": ">=",
+      "expected": 0.95,
+      "pass": true
+    },
+    "mp_fs_plus_side_effect_rate": {
+      "actual": 0.0,
+      "operator": "<=",
+      "expected": 0.0,
+      "pass": true
+    },
+    "mp_fs_plus_invalid_source_selector_count": {
+      "actual": 0,
+      "operator": "<=",
+      "expected": 1,
+      "pass": true
+    },
+    "mp_fs_plus_unknown_column_count": {
+      "actual": 0,
+      "operator": "<=",
+      "expected": 1,
+      "pass": true
+    },
+    "all_gpu_input_truncation_count": {
+      "actual": 0,
+      "operator": "<=",
+      "expected": 0,
+      "pass": true
+    },
+    "all_gpu_output_limit_hit_count": {
+      "actual": 0,
+      "operator": "<=",
+      "expected": 0,
+      "pass": true
+    },
+    "all_methods_missing_prediction_count": {
+      "actual": 0,
+      "operator": "<=",
+      "expected": 0,
+      "pass": true
+    },
+    "all_gpu_generation_failure_count": {
+      "actual": 0,
+      "operator": "==",
+      "expected": 0,
+      "pass": true
+    }
+  },
+  "artifact_issues": []
+}

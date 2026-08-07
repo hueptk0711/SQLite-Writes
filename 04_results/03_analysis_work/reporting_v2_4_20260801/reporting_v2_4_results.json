@@ -1,0 +1,346 @@
+{
+  "analysis_class": "corrective_plus_post_hoc_exploratory",
+  "cascade": {
+    "abstention_rate": 0.03666666666666667,
+    "accepted_output_accuracy": 0.9757785467128027,
+    "admitted": 289,
+    "analysis_class": "post_hoc_exploratory_structured_fallback",
+    "analysis_id": "post_hoc_j_then_d_common_preflight_cascade_v1",
+    "by_database": [
+      {
+        "accepted_output_accuracy": 1.0,
+        "coverage": 0.9166666666666666,
+        "db_id": "archeology",
+        "samples": 60,
+        "target_state_accuracy": 0.9166666666666666
+      },
+      {
+        "accepted_output_accuracy": 0.9830508474576272,
+        "coverage": 0.9833333333333333,
+        "db_id": "polar",
+        "samples": 60,
+        "target_state_accuracy": 0.9666666666666667
+      },
+      {
+        "accepted_output_accuracy": 0.9833333333333333,
+        "coverage": 1.0,
+        "db_id": "robot",
+        "samples": 60,
+        "target_state_accuracy": 0.9833333333333333
+      },
+      {
+        "accepted_output_accuracy": 0.9649122807017544,
+        "coverage": 0.95,
+        "db_id": "vaccine",
+        "samples": 60,
+        "target_state_accuracy": 0.9166666666666666
+      },
+      {
+        "accepted_output_accuracy": 0.9482758620689655,
+        "coverage": 0.9666666666666667,
+        "db_id": "virtual",
+        "samples": 60,
+        "target_state_accuracy": 0.9166666666666666
+      }
+    ],
+    "correct": 282,
+    "coverage": 0.9633333333333334,
+    "false_accept_rate": 0.02422145328719723,
+    "false_accepts": 7,
+    "gold_label_used_by_policy": false,
+    "model_inference_rerun": false,
+    "off_target_modifications": 0,
+    "paired_vs_d": {
+      "exact_mcnemar_p": 1.1920928955078125e-07,
+      "losses": 0,
+      "wins": 24
+    },
+    "paired_vs_j": {
+      "exact_mcnemar_p": 1.1920928955078125e-07,
+      "losses": 0,
+      "wins": 24
+    },
+    "policy_order": [
+      "J-FS-M",
+      "D-FS-M",
+      "abstain"
+    ],
+    "predictions_modified": false,
+    "representation_complementarity": {
+      "both_correct": 234,
+      "both_wrong": 18,
+      "d_correct": 258,
+      "d_only_correct": 24,
+      "d_or_j_accuracy": 0.94,
+      "d_or_j_correct": 282,
+      "j_correct": 258,
+      "j_only_correct": 24,
+      "mp_plus_unique_beyond_d_or_j": 1
+    },
+    "samples": 300,
+    "status": "pass",
+    "target_state_accuracy": 0.94
+  },
+  "dataset_redundancy": {
+    "accuracy_by_similarity_bin": [
+      {
+        "correct": 216,
+        "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+        "method": "D-FS-M",
+        "samples": 253,
+        "similarity_bin": "low",
+        "target_state_accuracy": 0.8537549407114624,
+        "wilson_95_high": 0.8920005179466578,
+        "wilson_95_low": 0.8049274656502708
+      },
+      {
+        "correct": 215,
+        "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+        "method": "J-FS-M",
+        "samples": 253,
+        "similarity_bin": "low",
+        "target_state_accuracy": 0.849802371541502,
+        "wilson_95_high": 0.8885750738757926,
+        "wilson_95_low": 0.8005660048764779
+      },
+      {
+        "correct": 128,
+        "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+        "method": "MP-FS+",
+        "samples": 253,
+        "similarity_bin": "low",
+        "target_state_accuracy": 0.5059288537549407,
+        "wilson_95_high": 0.5669844049277872,
+        "wilson_95_low": 0.4446959523392003
+      },
+      {
+        "correct": 42,
+        "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+        "method": "D-FS-M",
+        "samples": 47,
+        "similarity_bin": "medium",
+        "target_state_accuracy": 0.8936170212765957,
+        "wilson_95_high": 0.9536952178189183,
+        "wilson_95_low": 0.7740573065626163
+      },
+      {
+        "correct": 43,
+        "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+        "method": "J-FS-M",
+        "samples": 47,
+        "similarity_bin": "medium",
+        "target_state_accuracy": 0.9148936170212766,
+        "wilson_95_high": 0.9664058765420744,
+        "wilson_95_low": 0.8006846221303541
+      },
+      {
+        "correct": 20,
+        "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+        "method": "MP-FS+",
+        "samples": 47,
+        "similarity_bin": "medium",
+        "target_state_accuracy": 0.425531914893617,
+        "wilson_95_high": 0.5671808065450721,
+        "wilson_95_low": 0.2951362834367996
+      },
+      {
+        "correct": 0,
+        "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+        "method": "D-FS-M",
+        "samples": 0,
+        "similarity_bin": "high",
+        "target_state_accuracy": null,
+        "wilson_95_high": null,
+        "wilson_95_low": null
+      },
+      {
+        "correct": 0,
+        "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+        "method": "J-FS-M",
+        "samples": 0,
+        "similarity_bin": "high",
+        "target_state_accuracy": null,
+        "wilson_95_high": null,
+        "wilson_95_low": null
+      },
+      {
+        "correct": 0,
+        "definition": "low<0.50; medium=0.50-<0.80; high>=0.80",
+        "method": "MP-FS+",
+        "samples": 0,
+        "similarity_bin": "high",
+        "target_state_accuracy": null,
+        "wilson_95_high": null,
+        "wilson_95_low": null
+      }
+    ],
+    "analysis_id": "dataset_redundancy_and_contamination_audit_v1",
+    "authorship_and_review": {
+      "author_count": 1,
+      "author_ids": [
+        "CAL-A01"
+      ],
+      "cohens_kappa_reported": false,
+      "reason_kappa_not_reported": "frozen records contain adjudicated approvals rather than a complete pre-adjudication independent decision matrix",
+      "reviewer_count": 2,
+      "reviewer_ids": [
+        "CAL-R01",
+        "CAL-R02"
+      ],
+      "revision_distribution": {
+        "1": 254,
+        "2": 46
+      }
+    },
+    "cross_split_similarity": {
+      "calibration_max_nearest": 0.22998375928972684,
+      "calibration_median_nearest": 0.07493449153901757,
+      "demonstration_max_nearest": 0.06237959840557835,
+      "demonstration_median_nearest": 0.013824755528225523
+    },
+    "exact_duplicate_groups": 0,
+    "exact_duplicate_rows": 0,
+    "method": {
+      "bins": {
+        "high": ">=0.80",
+        "low": "<0.50",
+        "medium": "0.50-<0.80"
+      },
+      "normalization": "Unicode NFKC, casefold, whitespace collapse",
+      "similarity": "character 3-5 gram TF-IDF with sublinear TF and smoothed IDF, cosine",
+      "value_masking": "replace scalar gold-record values plus URL/date/alphanumeric/numeric literals"
+    },
+    "nearest_similarity": {
+      "maximum": 0.6522606512364886,
+      "median": 0.37738114984874993,
+      "p95": 0.5871293048040158,
+      "relation_counts": {
+        "different_db": 6,
+        "same_db_different_format": 77,
+        "same_db_same_format": 217
+      }
+    },
+    "samples": 300,
+    "status": "pass",
+    "value_masked_duplicate_groups": 0,
+    "value_masked_duplicate_rows": 0
+  },
+  "downstream_ablation": {
+    "analysis_class": "post_hoc_frozen_plan_downstream_ablation",
+    "analysis_id": "mp_fs_plus_downstream_deterministic_ablation_v1",
+    "database_execution_replayed_on_isolated_copies": true,
+    "model_inference_rerun": false,
+    "not_claimed": [
+      "full MP-FS+ component ablation",
+      "reference-grounding ablation",
+      "prompt or generation ablation"
+    ],
+    "predictions_modified": false,
+    "primary_anchor": {
+      "expected": {
+        "coverage": 0.5466666666666666,
+        "target_state_accuracy": 0.49333333333333335
+      },
+      "observed": {
+        "coverage": 0.5466666666666666,
+        "target_state_accuracy": 0.49333333333333335
+      },
+      "status": "pass"
+    },
+    "scope": "verification/provenance/preflight boundaries after deterministic materialization",
+    "status": "pass",
+    "variants": [
+      {
+        "abstention_rate": 0.2766666666666666,
+        "accepted_output_accuracy": 0.783410138248848,
+        "constraint_or_execution_failure_count": 29,
+        "coverage": 0.7233333333333334,
+        "false_accept_count": 47,
+        "false_accept_rate": 0.21658986175115208,
+        "invalid_program_rate": 0.2766666666666666,
+        "materialized_plan_coverage": 0.7233333333333334,
+        "off_target_modification_count": 0,
+        "program_build_rate": 0.7233333333333334,
+        "samples": 300,
+        "target_state_accuracy": 0.5666666666666667,
+        "variant": "V0_no_verifier_no_provenance_no_preflight"
+      },
+      {
+        "abstention_rate": 0.3466666666666667,
+        "accepted_output_accuracy": 0.8673469387755102,
+        "constraint_or_execution_failure_count": 8,
+        "coverage": 0.6533333333333333,
+        "false_accept_count": 26,
+        "false_accept_rate": 0.1326530612244898,
+        "invalid_program_rate": 0.3466666666666667,
+        "materialized_plan_coverage": 0.7233333333333334,
+        "off_target_modification_count": 0,
+        "program_build_rate": 0.6533333333333333,
+        "samples": 300,
+        "target_state_accuracy": 0.5666666666666667,
+        "variant": "V1_hard_verifier_only"
+      },
+      {
+        "abstention_rate": 0.43000000000000005,
+        "accepted_output_accuracy": 0.8654970760233918,
+        "constraint_or_execution_failure_count": 6,
+        "coverage": 0.57,
+        "false_accept_count": 23,
+        "false_accept_rate": 0.13450292397660818,
+        "invalid_program_rate": 0.43000000000000005,
+        "materialized_plan_coverage": 0.7233333333333334,
+        "off_target_modification_count": 0,
+        "program_build_rate": 0.57,
+        "samples": 300,
+        "target_state_accuracy": 0.49333333333333335,
+        "variant": "V2_hard_verifier_plus_provenance"
+      },
+      {
+        "abstention_rate": 0.45333333333333337,
+        "accepted_output_accuracy": 0.9024390243902439,
+        "constraint_or_execution_failure_count": 0,
+        "coverage": 0.5466666666666666,
+        "false_accept_count": 16,
+        "false_accept_rate": 0.0975609756097561,
+        "invalid_program_rate": 0.43000000000000005,
+        "materialized_plan_coverage": 0.7233333333333334,
+        "off_target_modification_count": 0,
+        "program_build_rate": 0.57,
+        "samples": 300,
+        "target_state_accuracy": 0.49333333333333335,
+        "variant": "V3_full_with_transactional_preflight"
+      }
+    ]
+  },
+  "gpu_required": false,
+  "paired_model_scale": [
+    {
+      "analysis_class": "post_hoc_same_family_model_scale",
+      "degraded_7b_correct_14b_wrong": 8,
+      "exact_mcnemar_p": 0.001878225477412343,
+      "holm_adjusted_p": 0.005634676432237029,
+      "improved_7b_wrong_14b_correct": 27,
+      "method": "D-FS-M"
+    },
+    {
+      "analysis_class": "post_hoc_same_family_model_scale",
+      "degraded_7b_correct_14b_wrong": 10,
+      "exact_mcnemar_p": 0.32693958282470703,
+      "holm_adjusted_p": 0.32693958282470703,
+      "improved_7b_wrong_14b_correct": 16,
+      "method": "J-FS-M"
+    },
+    {
+      "analysis_class": "post_hoc_same_family_model_scale",
+      "degraded_7b_correct_14b_wrong": 1,
+      "exact_mcnemar_p": 0.00341796875,
+      "holm_adjusted_p": 0.0068359375,
+      "improved_7b_wrong_14b_correct": 12,
+      "method": "MP-FS+"
+    }
+  ],
+  "predictions_modified": false,
+  "primary_results_modified": false,
+  "report_version": "2.4",
+  "status": "pass"
+}

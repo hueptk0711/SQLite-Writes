@@ -1,0 +1,35 @@
+{
+  "status": "pass",
+  "definition": "any state mismatch on a table outside the Gold-MP target-table set",
+  "legacy_definition": "target state correct and at least one strict-state mismatch",
+  "counts": {
+    "D-FS-M": 1,
+    "J-FS-M": 0,
+    "S-FS-v2-M": 0,
+    "MP-FS-M": 1,
+    "MP-FS+": 0,
+    "Gold-MP": 0
+  },
+  "affected_samples": [
+    {
+      "method_id": "D-FS-M",
+      "sample_id": "final_archeology_047",
+      "db_id": "archeology",
+      "target_state_correct": false,
+      "target_mismatched_tables": "projects",
+      "off_target_mismatched_tables": "personnel",
+      "error_type": "wrong_state_with_off_target_change"
+    },
+    {
+      "method_id": "MP-FS-M",
+      "sample_id": "final_archeology_025",
+      "db_id": "archeology",
+      "target_state_correct": false,
+      "target_mismatched_tables": "personnel",
+      "off_target_mismatched_tables": "equipment",
+      "error_type": "wrong_state_with_off_target_change"
+    }
+  ],
+  "primary_target_state_metrics_changed": false,
+  "database_execution_repeated": false
+}

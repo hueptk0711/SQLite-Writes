@@ -1,0 +1,93 @@
+{
+  "report_version": 1,
+  "release_id": "mp_fs_plus_external_holdout_300_20260731",
+  "validated_at_utc": "2026-07-31T03:29:16.203288+00:00",
+  "status": "pass",
+  "issue_count": 0,
+  "issues_by_code": {},
+  "summaries": {
+    "core_invariants": {
+      "samples": 300,
+      "unique_sample_ids": 300,
+      "unique_input_texts": 300,
+      "approved_samples": 300,
+      "review_ledger_rows": 674,
+      "core_invariant_issue_count": 0,
+      "core_invariant_status": "valid"
+    },
+    "metadata": {
+      "samples": 300,
+      "unique_sample_ids": 300,
+      "unique_source_groups": 300,
+      "database_counts": {
+        "archeology": 60,
+        "polar": 60,
+        "robot": 60,
+        "vaccine": 60,
+        "virtual": 60
+      },
+      "operation_counts": {
+        "insert_ignore": 100,
+        "plain_insert": 100,
+        "upsert_update": 100
+      },
+      "input_format_counts": {
+        "csv_or_mixed": 60,
+        "free_text": 60,
+        "json": 60,
+        "key_value": 60,
+        "markdown": 60
+      },
+      "complexity_counts": {
+        "large_or_relational": 100,
+        "single_row": 100,
+        "small_batch": 100
+      },
+      "multi_table_samples": 80,
+      "conflict_sensitive_samples": 200,
+      "state_changing_samples": 270,
+      "independently_authored_samples": 300,
+      "reviewer_pair_count": 1,
+      "blocking_issue_count": 0,
+      "status": "valid"
+    },
+    "frozen_allocation": {
+      "frozen_sample_count": 300,
+      "frozen_issue_count": 0,
+      "frozen_status": "valid"
+    },
+    "review_ledger": {
+      "review_ledger_rows": 674,
+      "samples_with_two_current_approvals": 300,
+      "review_ledger_issue_count": 0,
+      "review_ledger_status": "valid"
+    },
+    "semantics": {
+      "samples": 300,
+      "parsed_plans": 300,
+      "schema_valid_plans": 300,
+      "gold_plan_matches_sql": 300,
+      "gold_records_match_sql": 300,
+      "state_changed_samples": 270,
+      "samples_without_unintended_side_effect": 300,
+      "semantic_issue_count": 0,
+      "semantic_issues_by_code": {},
+      "semantic_status": "valid"
+    },
+    "parser_modes": {
+      "parser_checked_samples": 300,
+      "detected_mode_counts": {
+        "free_text": 60,
+        "semi_structured": 240
+      },
+      "parser_mode_issue_count": 0,
+      "parser_mode_status": "valid"
+    },
+    "static_assets": {
+      "checked_static_assets": 25,
+      "static_asset_issue_count": 0,
+      "static_asset_status": "valid"
+    }
+  },
+  "issues": []
+}

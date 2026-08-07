@@ -1,0 +1,56 @@
+{
+  "manifest_version": 1,
+  "status": "gpu_ready",
+  "os": {
+    "platform": "Linux-6.11.0-29-generic-x86_64-with-glibc2.39",
+    "system": "Linux",
+    "release": "6.11.0-29-generic",
+    "machine": "x86_64"
+  },
+  "python": {
+    "version": "3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:27:36) [GCC 11.2.0]",
+    "executable": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_20260731/.venv_gpu/bin/python"
+  },
+  "packages": {
+    "torch": "2.6.0+cu124",
+    "transformers": "5.5.3",
+    "accelerate": "1.14.0",
+    "bitsandbytes": "0.47.0",
+    "sentencepiece": "0.2.1",
+    "protobuf": "6.33.5",
+    "safetensors": "0.5.3",
+    "tokenizers": "0.22.2"
+  },
+  "missing_packages": [],
+  "nvidia_smi": {
+    "available": true,
+    "returncode": 0,
+    "stderr": null,
+    "queried_device_id": "0",
+    "gpus": [
+      {
+        "name": "NVIDIA GeForce RTX 4090",
+        "memory_mib": 49140,
+        "driver_version": "570.124.04"
+      }
+    ]
+  },
+  "torch": {
+    "installed": true,
+    "cuda_available": true,
+    "cuda_runtime": "12.4",
+    "cudnn_version": 90100,
+    "gpu_count": 1,
+    "gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 4090",
+        "memory_bytes": 50875924480
+      }
+    ]
+  },
+  "dependency_lock": {
+    "path": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/requirements-inference.lock.txt",
+    "sha256": "861a24b179b5edd1245aba33109402dd4ab82a634098bd8d81fcb666f5bdf9f1"
+  }
+}

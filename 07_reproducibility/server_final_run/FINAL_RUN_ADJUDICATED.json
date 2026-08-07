@@ -1,0 +1,15 @@
+{
+  "status": "adjudicated_as_incorrect",
+  "method_id": "MP-FS+",
+  "base_protocol_sha256": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330",
+  "amendment_id": "conservative_failure_adjudication_v2_1",
+  "adjudication_record": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/artifacts/protocol_amendments/final_output_limit_adjudication_v2_1.json",
+  "adjudication_record_sha256": "d4527a35d58593ba2a2a5f4576e9ea0e7d62aaeb1eed482258afae48f4df1ac4",
+  "affected_sample_ids": [
+    "final_polar_048",
+    "final_vaccine_047"
+  ],
+  "prediction_artifacts_modified": false,
+  "score_policy": "retain_in_denominator_and_score_as_incorrect",
+  "original_invalid_marker_retained": true
+}

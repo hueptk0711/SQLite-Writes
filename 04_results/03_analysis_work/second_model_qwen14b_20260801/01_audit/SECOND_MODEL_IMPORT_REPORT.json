@@ -1,0 +1,581 @@
+{
+  "status": "pass",
+  "analysis_class": "post_hoc_cross_model_robustness",
+  "paper_primary_result": false,
+  "archive": "D:\\paper kltn\\text to sql\\paper_ready_workspace_20260731\\04_results\\00_incoming_from_server\\second_model_qwen14b\\mp_fs_plus_second_model_qwen25_coder_14b_v1_20260801T064530Z.tar.gz",
+  "archive_sha256": "554efdc84ef7e15d00fb0ebe7fc21b7f27a72457f534622f39c4d70966821d37",
+  "protocol_sha256": "449ddf102dc99ffe74add9048e4dc6254ca4ac622bf379d282855a7818876f40",
+  "primary_protocol_sha256": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330",
+  "model_sha256": "98f98af8ebc2d267dca72024625b872339bae458d23917283b804bb86a004847",
+  "methods": {
+    "D-FS-M": {
+      "samples": 300,
+      "target_state_accuracy": 0.9233333333333333,
+      "execution_success": 0.9533333333333334,
+      "coverage": 0.9966666666666667,
+      "accepted_output_accuracy": 0.9264214046822743,
+      "side_effect_rate": 0.0,
+      "input_truncation_rate": 0.0,
+      "output_limit_hit_rate": 0.0
+    },
+    "J-FS-M": {
+      "samples": 300,
+      "target_state_accuracy": 0.88,
+      "execution_success": 0.9033333333333333,
+      "coverage": 0.9033333333333333,
+      "accepted_output_accuracy": 0.974169741697417,
+      "side_effect_rate": 0.0,
+      "input_truncation_rate": 0.0,
+      "output_limit_hit_rate": 0.0
+    },
+    "MP-FS+": {
+      "samples": 300,
+      "target_state_accuracy": 0.53,
+      "execution_success": 0.59,
+      "coverage": 0.59,
+      "accepted_output_accuracy": 0.8983050847457628,
+      "side_effect_rate": 0.0,
+      "input_truncation_rate": 0.0,
+      "output_limit_hit_rate": 0.0
+    }
+  },
+  "cross_model_comparison": [
+    {
+      "method": "D-FS-M",
+      "qwen7b_target": 0.86,
+      "qwen14b_target": 0.9233333333333333,
+      "target_delta": 0.06333333333333335,
+      "qwen7b_coverage": 0.9966666666666667,
+      "qwen14b_coverage": 0.9966666666666667,
+      "coverage_delta": 0.0,
+      "qwen7b_accepted_accuracy": 0.862876254180602,
+      "qwen14b_accepted_accuracy": 0.9264214046822743,
+      "accepted_accuracy_delta": 0.06354515050167231
+    },
+    {
+      "method": "J-FS-M",
+      "qwen7b_target": 0.86,
+      "qwen14b_target": 0.88,
+      "target_delta": 0.020000000000000018,
+      "qwen7b_coverage": 0.8866666666666667,
+      "qwen14b_coverage": 0.9033333333333333,
+      "coverage_delta": 0.016666666666666607,
+      "qwen7b_accepted_accuracy": 0.9699248120300752,
+      "qwen14b_accepted_accuracy": 0.974169741697417,
+      "accepted_accuracy_delta": 0.004244929667341801
+    },
+    {
+      "method": "MP-FS+",
+      "qwen7b_target": 0.49333333333333335,
+      "qwen14b_target": 0.53,
+      "target_delta": 0.03666666666666668,
+      "qwen7b_coverage": 0.5466666666666666,
+      "qwen14b_coverage": 0.59,
+      "coverage_delta": 0.043333333333333335,
+      "qwen7b_accepted_accuracy": 0.9024390243902439,
+      "qwen14b_accepted_accuracy": 0.8983050847457628,
+      "accepted_accuracy_delta": -0.004133939644481166
+    }
+  ],
+  "checks": [
+    {
+      "name": "archive_checksum",
+      "pass": true,
+      "detail": "554efdc84ef7e15d00fb0ebe7fc21b7f27a72457f534622f39c4d70966821d37"
+    },
+    {
+      "name": "archive_paths_safe",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "server_report_status",
+      "pass": true,
+      "detail": "pass"
+    },
+    {
+      "name": "post_hoc_label",
+      "pass": true,
+      "detail": "post_hoc_cross_model_robustness"
+    },
+    {
+      "name": "not_primary",
+      "pass": true,
+      "detail": false
+    },
+    {
+      "name": "protocol_frozen",
+      "pass": true,
+      "detail": "frozen"
+    },
+    {
+      "name": "primary_protocol_link",
+      "pass": true,
+      "detail": "e6bb763334f0b7dcec77523794a20687087fe6f0f62f572cdd3e999b7b48a330"
+    },
+    {
+      "name": "authorized_methods",
+      "pass": true,
+      "detail": [
+        "D-FS-M",
+        "J-FS-M",
+        "MP-FS+"
+      ]
+    },
+    {
+      "name": "no_tuning_after_freeze",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "model_hash",
+      "pass": true,
+      "detail": "98f98af8ebc2d267dca72024625b872339bae458d23917283b804bb86a004847"
+    },
+    {
+      "name": "inference_model_hash",
+      "pass": true,
+      "detail": "98f98af8ebc2d267dca72024625b872339bae458d23917283b804bb86a004847"
+    },
+    {
+      "name": "deterministic_generation",
+      "pass": true,
+      "detail": {
+        "do_sample": false,
+        "seed": 42
+      }
+    },
+    {
+      "name": "capacity",
+      "pass": true,
+      "detail": {
+        "max_input_tokens": 28672,
+        "max_new_tokens": 8192
+      }
+    },
+    {
+      "name": "D-FS-M:evaluation_rows",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "D-FS-M:raw_rows",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "D-FS-M:unique_ids",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "D-FS-M:raw_eval_ids",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "D-FS-M:generation_success",
+      "pass": true,
+      "detail": {
+        "raw_non_success": 0,
+        "eval_non_success": 0
+      }
+    },
+    {
+      "name": "D-FS-M:no_truncation",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "D-FS-M:no_output_limit",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "D-FS-M:consumed_marker",
+      "pass": true,
+      "detail": {
+        "status": "consumed",
+        "stage": "second-model",
+        "method_id": "D-FS-M",
+        "output_dir": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/second_model/qwen25_coder_14b_final300_posthoc_v1/d_fs_m",
+        "run_lock_sha256": "4ff79a82702a1734105d170815b6454e0f6e166c0cb21abffa507a0a9a589791",
+        "final_protocol_sha256": "449ddf102dc99ffe74add9048e4dc6254ca4ac622bf379d282855a7818876f40",
+        "global_marker": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/FINAL_RUN_CONSUMED/449ddf102dc99ffe74add9048e4dc6254ca4ac622bf379d282855a7818876f40_second-model_D-FS-M.json"
+      }
+    },
+    {
+      "name": "D-FS-M:protocol_sha",
+      "pass": true,
+      "detail": "449ddf102dc99ffe74add9048e4dc6254ca4ac622bf379d282855a7818876f40"
+    },
+    {
+      "name": "D-FS-M:model_manifest",
+      "pass": true,
+      "detail": "98f98af8ebc2d267dca72024625b872339bae458d23917283b804bb86a004847"
+    },
+    {
+      "name": "D-FS-M:dataset_hash",
+      "pass": true,
+      "detail": "da2e281419cd368dc10f366dab703012c3a8ac16a3afb8a0c3abba715706566a"
+    },
+    {
+      "name": "D-FS-M:recompute:samples",
+      "pass": true,
+      "detail": {
+        "recomputed": 300,
+        "metrics": 300,
+        "server_report": 300
+      }
+    },
+    {
+      "name": "D-FS-M:recompute:target_state_accuracy",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.9233333333333333,
+        "metrics": 0.9233333333333333,
+        "server_report": 0.9233333333333333
+      }
+    },
+    {
+      "name": "D-FS-M:recompute:execution_success",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.9533333333333334,
+        "metrics": 0.9533333333333334,
+        "server_report": 0.9533333333333334
+      }
+    },
+    {
+      "name": "D-FS-M:recompute:coverage",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.9966666666666667,
+        "metrics": 0.9966666666666667,
+        "server_report": 0.9966666666666667
+      }
+    },
+    {
+      "name": "D-FS-M:recompute:accepted_output_accuracy",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.9264214046822743,
+        "metrics": 0.9264214046822743,
+        "server_report": 0.9264214046822743
+      }
+    },
+    {
+      "name": "D-FS-M:recompute:side_effect_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.0,
+        "metrics": 0.0,
+        "server_report": 0.0
+      }
+    },
+    {
+      "name": "D-FS-M:recompute:input_truncation_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.0,
+        "metrics": 0.0,
+        "server_report": 0.0
+      }
+    },
+    {
+      "name": "D-FS-M:recompute:output_limit_hit_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.0,
+        "metrics": 0.0,
+        "server_report": 0.0
+      }
+    },
+    {
+      "name": "J-FS-M:evaluation_rows",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "J-FS-M:raw_rows",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "J-FS-M:unique_ids",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "J-FS-M:raw_eval_ids",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "J-FS-M:generation_success",
+      "pass": true,
+      "detail": {
+        "raw_non_success": 0,
+        "eval_non_success": 0
+      }
+    },
+    {
+      "name": "J-FS-M:no_truncation",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "J-FS-M:no_output_limit",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "J-FS-M:consumed_marker",
+      "pass": true,
+      "detail": {
+        "status": "consumed",
+        "stage": "second-model",
+        "method_id": "J-FS-M",
+        "output_dir": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/second_model/qwen25_coder_14b_final300_posthoc_v1/j_fs_m",
+        "run_lock_sha256": "1ce18a24d5e184d274cf5f9e6bf6de9c33b15da7711ec654d18c42e27bc41062",
+        "final_protocol_sha256": "449ddf102dc99ffe74add9048e4dc6254ca4ac622bf379d282855a7818876f40",
+        "global_marker": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/FINAL_RUN_CONSUMED/449ddf102dc99ffe74add9048e4dc6254ca4ac622bf379d282855a7818876f40_second-model_J-FS-M.json"
+      }
+    },
+    {
+      "name": "J-FS-M:protocol_sha",
+      "pass": true,
+      "detail": "449ddf102dc99ffe74add9048e4dc6254ca4ac622bf379d282855a7818876f40"
+    },
+    {
+      "name": "J-FS-M:model_manifest",
+      "pass": true,
+      "detail": "98f98af8ebc2d267dca72024625b872339bae458d23917283b804bb86a004847"
+    },
+    {
+      "name": "J-FS-M:dataset_hash",
+      "pass": true,
+      "detail": "da2e281419cd368dc10f366dab703012c3a8ac16a3afb8a0c3abba715706566a"
+    },
+    {
+      "name": "J-FS-M:same_sample_order",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "J-FS-M:recompute:samples",
+      "pass": true,
+      "detail": {
+        "recomputed": 300,
+        "metrics": 300,
+        "server_report": 300
+      }
+    },
+    {
+      "name": "J-FS-M:recompute:target_state_accuracy",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.88,
+        "metrics": 0.88,
+        "server_report": 0.88
+      }
+    },
+    {
+      "name": "J-FS-M:recompute:execution_success",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.9033333333333333,
+        "metrics": 0.9033333333333333,
+        "server_report": 0.9033333333333333
+      }
+    },
+    {
+      "name": "J-FS-M:recompute:coverage",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.9033333333333333,
+        "metrics": 0.9033333333333333,
+        "server_report": 0.9033333333333333
+      }
+    },
+    {
+      "name": "J-FS-M:recompute:accepted_output_accuracy",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.974169741697417,
+        "metrics": 0.974169741697417,
+        "server_report": 0.974169741697417
+      }
+    },
+    {
+      "name": "J-FS-M:recompute:side_effect_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.0,
+        "metrics": 0.0,
+        "server_report": 0.0
+      }
+    },
+    {
+      "name": "J-FS-M:recompute:input_truncation_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.0,
+        "metrics": 0.0,
+        "server_report": 0.0
+      }
+    },
+    {
+      "name": "J-FS-M:recompute:output_limit_hit_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.0,
+        "metrics": 0.0,
+        "server_report": 0.0
+      }
+    },
+    {
+      "name": "MP-FS+:evaluation_rows",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "MP-FS+:raw_rows",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "MP-FS+:unique_ids",
+      "pass": true,
+      "detail": 300
+    },
+    {
+      "name": "MP-FS+:raw_eval_ids",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "MP-FS+:generation_success",
+      "pass": true,
+      "detail": {
+        "raw_non_success": 0,
+        "eval_non_success": 0
+      }
+    },
+    {
+      "name": "MP-FS+:no_truncation",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "MP-FS+:no_output_limit",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "MP-FS+:consumed_marker",
+      "pass": true,
+      "detail": {
+        "status": "consumed",
+        "stage": "second-model",
+        "method_id": "MP-FS+",
+        "output_dir": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/second_model/qwen25_coder_14b_final300_posthoc_v1/mp_fs_plus",
+        "run_lock_sha256": "e0c307a638f2556fcff776d881a39a82a6a64ce1ad22c5fd0b70c157aa7ffeee",
+        "final_protocol_sha256": "449ddf102dc99ffe74add9048e4dc6254ca4ac622bf379d282855a7818876f40",
+        "global_marker": "/home/uet/hue_ptk/mp_fs_plus_final_gpu_v2_out8192_20260731/experiments/external_holdout/FINAL_RUN_CONSUMED/449ddf102dc99ffe74add9048e4dc6254ca4ac622bf379d282855a7818876f40_second-model_MP-FS+.json"
+      }
+    },
+    {
+      "name": "MP-FS+:protocol_sha",
+      "pass": true,
+      "detail": "449ddf102dc99ffe74add9048e4dc6254ca4ac622bf379d282855a7818876f40"
+    },
+    {
+      "name": "MP-FS+:model_manifest",
+      "pass": true,
+      "detail": "98f98af8ebc2d267dca72024625b872339bae458d23917283b804bb86a004847"
+    },
+    {
+      "name": "MP-FS+:dataset_hash",
+      "pass": true,
+      "detail": "da2e281419cd368dc10f366dab703012c3a8ac16a3afb8a0c3abba715706566a"
+    },
+    {
+      "name": "MP-FS+:same_sample_order",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "MP-FS+:recompute:samples",
+      "pass": true,
+      "detail": {
+        "recomputed": 300,
+        "metrics": 300,
+        "server_report": 300
+      }
+    },
+    {
+      "name": "MP-FS+:recompute:target_state_accuracy",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.53,
+        "metrics": 0.53,
+        "server_report": 0.53
+      }
+    },
+    {
+      "name": "MP-FS+:recompute:execution_success",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.59,
+        "metrics": 0.59,
+        "server_report": 0.59
+      }
+    },
+    {
+      "name": "MP-FS+:recompute:coverage",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.59,
+        "metrics": 0.59,
+        "server_report": 0.59
+      }
+    },
+    {
+      "name": "MP-FS+:recompute:accepted_output_accuracy",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.8983050847457628,
+        "metrics": 0.8983050847457628,
+        "server_report": 0.8983050847457628
+      }
+    },
+    {
+      "name": "MP-FS+:recompute:side_effect_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.0,
+        "metrics": 0.0,
+        "server_report": 0.0
+      }
+    },
+    {
+      "name": "MP-FS+:recompute:input_truncation_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.0,
+        "metrics": 0.0,
+        "server_report": 0.0
+      }
+    },
+    {
+      "name": "MP-FS+:recompute:output_limit_hit_rate",
+      "pass": true,
+      "detail": {
+        "recomputed": 0.0,
+        "metrics": 0.0,
+        "server_report": 0.0
+      }
+    }
+  ]
+}

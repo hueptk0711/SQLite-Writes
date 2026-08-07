@@ -1,0 +1,4 @@
+method_id,samples,transactional_preflight_coverage,target_state_accuracy_after_common_preflight,accuracy_conditional_on_common_preflight,false_accept_rate_conditional_on_common_preflight,false_accept_count
+D-FS-M,300,0.89,0.86,0.9662921348314607,0.033707865168539325,9
+J-FS-M,300,0.88,0.86,0.9772727272727273,0.022727272727272728,6
+MP-FS+,300,0.5466666666666666,0.49333333333333335,0.9024390243902439,0.0975609756097561,16

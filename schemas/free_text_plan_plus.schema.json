@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/nldbwrite-v4/free-text-plan-plus.schema.json",
+  "title": "MP-FS+ Reference Free-Text Plan",
+  "type": "object",
+  "required": [
+    "version",
+    "plan_kind",
+    "write_groups",
+    "dependencies",
+    "unresolved_fields"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {"const": "4.0"},
+    "plan_kind": {"const": "reference_write_plan"},
+    "write_groups": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "group_id",
+          "table_id",
+          "rows",
+          "write_semantics",
+          "conflict_target_id",
+          "update_column_ids"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "group_id": {"type": "string", "minLength": 1},
+          "table_id": {"type": "string", "minLength": 1},
+          "rows": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": {
+                "type": "object",
+                "required": ["value_from", "normalization"],
+                "additionalProperties": false,
+                "properties": {
+                  "value_from": {"type": "string", "minLength": 1},
+                  "normalization": {
+                    "enum": [
+                      "identity",
+                      "lossless_integer_parsing",
+                      "decimal_parsing",
+                      "remove_thousands_separator",
+                      "iso_date_normalization",
+                      "boolean_mapping",
+                      "trim_surrounding_quotes"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "write_semantics": {
+            "enum": [
+              "plain_insert",
+              "insert_ignore",
+              "upsert_update",
+              "needs_clarification"
+            ]
+          },
+          "conflict_target_id": {"type": ["string", "null"]},
+          "update_column_ids": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "dependencies": {"type": "array"},
+    "unresolved_fields": {"type": "array"}
+  }
+}
