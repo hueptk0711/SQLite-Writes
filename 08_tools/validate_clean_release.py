@@ -4,6 +4,7 @@ import argparse
 from contextlib import contextmanager
 import hashlib
 import json
+import math
 import os
 import shutil
 import subprocess
@@ -161,6 +162,49 @@ def validate_clean_release(archive_path: Path) -> dict[str, object]:
             / "REPRODUCTION_V2_4_PASS.json"
         )
         record = json.loads(record_path.read_text(encoding="utf-8"))
+        downstream_path = (
+            output_root
+            / "reporting_v2_4_20260801"
+            / "downstream_ablation_results.json"
+        )
+        if not downstream_path.is_file():
+            raise FileNotFoundError(downstream_path)
+        downstream = json.loads(
+            downstream_path.read_text(encoding="utf-8")
+        )
+        variants = {
+            row["variant"]: row
+            for row in downstream.get("variants", [])
+        }
+
+        def variant_matches(
+            name: str,
+            *,
+            admitted: int,
+            correct: int,
+            false_accepts: int,
+        ) -> bool:
+            row = variants.get(name)
+            if row is None:
+                return False
+            samples = int(row.get("samples", 0))
+            if samples != 300:
+                return False
+            return (
+                math.isclose(
+                    float(row.get("coverage", -1)),
+                    admitted / 300,
+                    abs_tol=1e-12,
+                )
+                and math.isclose(
+                    float(row.get("target_state_accuracy", -1)),
+                    correct / 300,
+                    abs_tol=1e-12,
+                )
+                and int(row.get("false_accept_count", -1))
+                == false_accepts
+            )
+
         started = stage(5, "anchors", "Checking primary anchors...")
         checks = {
             "exit_code_zero": completed.returncode == 0,
@@ -187,10 +231,40 @@ def validate_clean_release(archive_path: Path) -> dict[str, object]:
                 - 0.94
             )
             < 1e-12,
-            "downstream_variants_4": record.get("exploratory_v2_4", {}).get(
+            "downstream_variants_5": record.get("exploratory_v2_4", {}).get(
                 "downstream_ablation_variants"
             )
-            == 4,
+            == 5,
+            "downstream_v0_anchor": variant_matches(
+                "V0_no_verifier_no_provenance_no_semantic_gate_no_preflight",
+                admitted=217,
+                correct=170,
+                false_accepts=47,
+            ),
+            "downstream_v1_anchor": variant_matches(
+                "V1_hard_verifier_only",
+                admitted=196,
+                correct=170,
+                false_accepts=26,
+            ),
+            "downstream_v2_anchor": variant_matches(
+                "V2_hard_verifier_plus_provenance",
+                admitted=171,
+                correct=148,
+                false_accepts=23,
+            ),
+            "downstream_v2_5_anchor": variant_matches(
+                "V2_5_plus_semantic_risk_gate",
+                admitted=170,
+                correct=148,
+                false_accepts=22,
+            ),
+            "downstream_v3_anchor": variant_matches(
+                "V3_full_with_transactional_preflight",
+                admitted=164,
+                correct=148,
+                false_accepts=16,
+            ),
         }
         if not all(checks.values()):
             raise ValueError(f"Clean-release anchors failed: {checks}")
