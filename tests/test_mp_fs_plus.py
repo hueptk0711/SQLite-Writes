@@ -6,6 +6,7 @@ import unittest
 
 from nldbwrite_v3.compiler import (
     apply_declared_normalization,
+    check_semantic_risk_gate,
     compile_write_plan,
     preflight_program,
 )
@@ -355,19 +356,15 @@ class ReferencePlanningTests(unittest.TestCase):
                 for warning in result.program.warnings
             },
         )
-        connection = sqlite3.connect(":memory:")
-        try:
-            connection.execute(
-                "CREATE TABLE parent("
-                "id TEXT PRIMARY KEY, name TEXT NOT NULL, count INTEGER)"
-            )
-            preflight = preflight_program(connection, result.program)
-        finally:
-            connection.close()
-        self.assertFalse(preflight["accepted"])
+        semantic_gate = check_semantic_risk_gate(result.program)
+        self.assertFalse(semantic_gate["accepted"])
         self.assertEqual(
-            preflight["error_class"],
+            semantic_gate["error_class"],
             "semantic_grounding_risk",
+        )
+        self.assertIn(
+            "EVIDENCE_COLUMN_TABLE_MISMATCH",
+            semantic_gate["error_codes"],
         )
 
     def test_free_text_evidence_enumerates_boolean_literals(self):

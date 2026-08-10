@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import sqlite3
 import unittest
 
 from nldbwrite_v3.compiler import (
+    check_semantic_risk_gate,
     compile_write_plan,
     normalize_value,
     preflight_program,
@@ -76,7 +76,7 @@ class VerifierCompilerTests(unittest.TestCase):
         self.assertIn('"name" = excluded."name"', sql)
         self.assertNotIn('"count" = excluded."count"', sql)
 
-    def test_do_update_column_without_row_value_fails_preflight(self):
+    def test_do_update_column_without_row_value_fails_semantic_risk_gate(self):
         candidate = plan(
             [
                 group(
@@ -98,19 +98,15 @@ class VerifierCompilerTests(unittest.TestCase):
         )
         program = compile_write_plan(candidate, self.profile)
         self.assertEqual(program.status, "success")
-        connection = sqlite3.connect(":memory:")
-        try:
-            connection.execute(
-                "CREATE TABLE parent("
-                "id TEXT PRIMARY KEY, name TEXT NOT NULL, count INTEGER)"
-            )
-            preflight = preflight_program(connection, program)
-        finally:
-            connection.close()
-        self.assertFalse(preflight["accepted"])
+        semantic_gate = check_semantic_risk_gate(program)
+        self.assertFalse(semantic_gate["accepted"])
         self.assertEqual(
-            preflight["error_class"],
+            semantic_gate["error_class"],
             "semantic_grounding_risk",
+        )
+        self.assertIn(
+            "UPDATE_COLUMN_MISSING_VALUE",
+            semantic_gate["error_codes"],
         )
 
     def test_key_only_upsert_becomes_do_nothing(self):
