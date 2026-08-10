@@ -109,6 +109,16 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def remove_legacy_side_effect_rate(value: Any) -> None:
+    if isinstance(value, dict):
+        value.pop("side_effect_rate", None)
+        for nested in value.values():
+            remove_legacy_side_effect_rate(nested)
+    elif isinstance(value, list):
+        for nested in value:
+            remove_legacy_side_effect_rate(nested)
+
+
 def write_csv(path: Path, rows: list[dict[str, Any]], fields: Iterable[str]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fieldnames = list(fields)
@@ -981,8 +991,9 @@ def reproduce(workspace: Path, output_dir: Path) -> dict[str, Any]:
             "error_type",
         ],
     )
+    audit_path = output_dir / "off_target_metric_audit.json"
     dump_json(
-        output_dir / "off_target_metric_audit.json",
+        audit_path,
         {
             "status": "pass",
             "definition": "any state mismatch on a table outside the Gold-MP target-table set",
@@ -993,6 +1004,77 @@ def reproduce(workspace: Path, output_dir: Path) -> dict[str, Any]:
             "database_execution_repeated": False,
         },
     )
+    canonical_copy = json.loads(json.dumps(canonical_report))
+    remove_legacy_side_effect_rate(canonical_copy)
+    corrected_matrix = {
+        "report_version": 4,
+        "status": "pass",
+        "canonical_for_off_target_reporting": True,
+        "supersedes_for_off_target_reporting": "final_matrix_results.json",
+        "correction_type": "off_target_metric_definition_correction",
+        "primary_target_state_metrics_modified": False,
+        "database_execution_repeated": False,
+        "legacy_metric": (
+            "side_effect_rate based on target-correct-with-side-effect "
+            "was deprecated"
+        ),
+        "off_target_metric_definition": (
+            "any state mismatch on a table outside "
+            "the Gold-MP target-table set"
+        ),
+        "historical_base_source": {
+            "path": (
+                "04_results/02_paper_ready/reports/"
+                "final_matrix_results.json"
+            ),
+            "sha256": sha256_file(canonical_report_path),
+        },
+        "off_target_correction_source": {
+            "path": (
+                "04_results/03_analysis_work/"
+                "reporting_v2_3_20260801/"
+                "off_target_metric_audit.json"
+            ),
+            "sha256": sha256_file(audit_path),
+        },
+    }
+    corrected_matrix.update(
+        {
+            key: value
+            for key, value in canonical_copy.items()
+            if key not in {"report_version", "status"}
+        }
+    )
+    for _slug, method_id, _applicable in METHODS:
+        method_record = corrected_matrix["methods"][method_id]
+        rows = corrected_by_method[method_id]
+        if len(rows) != 300:
+            raise ValueError(f"{method_id}: expected 300 evaluation rows")
+        target_correct_count = sum(
+            bool(row.get("target_state_correct")) for row in rows
+        )
+        off_target_count = sum(
+            bool(row.get("any_off_target_change")) for row in rows
+        )
+        if off_target_count != EXPECTED_OFF_TARGET_COUNTS[method_id]:
+            raise ValueError(
+                f"{method_id}: unexpected off-target count {off_target_count}"
+            )
+        if not _float_equal(
+            target_correct_count / len(rows),
+            method_record.get("target_state_accuracy"),
+        ):
+            raise ValueError(
+                f"{method_id}: corrected target-state accuracy changed"
+            )
+        method_record.pop("side_effect_rate", None)
+        method_record["target_state_correct_count"] = target_correct_count
+        method_record["off_target_event_count"] = off_target_count
+        method_record["off_target_modification_rate"] = (
+            off_target_count / len(rows)
+        )
+    corrected_matrix_path = output_dir / "final_matrix_results_corrected.json"
+    dump_json(corrected_matrix_path, corrected_matrix)
     efficiency_fields = [
         "method_id",
         "samples",
@@ -1091,6 +1173,7 @@ def reproduce(workspace: Path, output_dir: Path) -> dict[str, Any]:
         "reporting_v2_3_summary.md",
         "off_target_changes.csv",
         "off_target_metric_audit.json",
+        "final_matrix_results_corrected.json",
         "efficiency_summary.csv",
         "efficiency_by_format.csv",
         "independent_primary_audit.json",
