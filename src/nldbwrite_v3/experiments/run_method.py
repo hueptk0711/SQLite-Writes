@@ -22,7 +22,11 @@ from nldbwrite_v3.common import (
     sha256_file,
     write_jsonl,
 )
-from nldbwrite_v3.compiler import compile_verified_plan, preflight_program
+from nldbwrite_v3.compiler import (
+    check_semantic_risk_gate,
+    compile_verified_plan,
+    preflight_program,
+)
 from nldbwrite_v3.data.gold_sql import parse_gold_sql
 from nldbwrite_v3.evaluator import evaluate_candidate_sample, find_database
 from nldbwrite_v3.experiments.metrics import error_taxonomy_row, summarize_run
@@ -1039,6 +1043,7 @@ def run_method(
         program = None
         direct_sql: list[str] | None = None
         repair_artifact: dict[str, Any] | None = None
+        semantic_risk_gate_artifact: dict[str, Any] | None = None
         preflight_artifact: dict[str, Any] | None = None
 
         if method in DIRECT_METHODS:
@@ -1306,10 +1311,28 @@ def run_method(
         )
         if method in PREFLIGHT_METHODS:
             if program is not None and program.status == "success":
-                preflight_artifact = preflight_program(
-                    find_database(db_root, str(sample["db_id"])),
-                    program,
+                semantic_risk_gate_artifact = check_semantic_risk_gate(
+                    program
                 )
+                if semantic_risk_gate_artifact["accepted"]:
+                    preflight_artifact = preflight_program(
+                        find_database(db_root, str(sample["db_id"])),
+                        program,
+                    )
+                else:
+                    preflight_artifact = {
+                        "status": "not_run",
+                        "accepted": False,
+                        "action": "abstain",
+                        "deterministic_repair_applied": False,
+                        "error_class": "blocked_by_semantic_risk_gate",
+                        "error": (
+                            "Candidate was rejected by the semantic-risk gate "
+                            "before transactional preflight."
+                        ),
+                        "executed_statements": 0,
+                        "latency_sec": 0.0,
+                    }
             else:
                 preflight_artifact = {
                     "status": "abstained",
@@ -1330,6 +1353,7 @@ def run_method(
             build_status=build_status,
             preflight=preflight_artifact,
         )
+        evaluation["semantic_risk_gate"] = semantic_risk_gate_artifact
         first_error, first_message = _first_verifier_error(verification_dict)
         if evaluation.get("error_type") in {None, "builder_error"} and first_error:
             evaluation["error_type"] = first_error
