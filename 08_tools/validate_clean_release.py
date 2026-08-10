@@ -15,12 +15,30 @@ import zipfile
 from pathlib import Path, PurePosixPath
 
 
+EXPECTED_CORRECTED_MATRIX_SHA256 = (
+    "d3e3f2b9a8358de4b2c79190d69aadc97d9a6b3a2d087e80b8b5caf1ad101f60"
+)
+EXPECTED_OFF_TARGET_AUDIT_SHA256 = (
+    "ca15c4e9a55cd7bc2c36e42a2e669f369911b3c48bb11ccb33e3399df1e9a3ba"
+)
+
+
 def _sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def contains_key(value: object, key: str) -> bool:
+    if isinstance(value, dict):
+        if key in value:
+            return True
+        return any(contains_key(nested, key) for nested in value.values())
+    if isinstance(value, list):
+        return any(contains_key(nested, key) for nested in value)
+    return False
 
 
 def _safe_members(archive: zipfile.ZipFile) -> list[zipfile.ZipInfo]:
@@ -162,6 +180,16 @@ def validate_clean_release(archive_path: Path) -> dict[str, object]:
             / "REPRODUCTION_V2_4_PASS.json"
         )
         record = json.loads(record_path.read_text(encoding="utf-8"))
+        corrected_matrix_path = (
+            output_root
+            / "reporting_v2_3_20260801"
+            / "final_matrix_results_corrected.json"
+        )
+        if not corrected_matrix_path.is_file():
+            raise FileNotFoundError(corrected_matrix_path)
+        corrected_matrix = json.loads(
+            corrected_matrix_path.read_text(encoding="utf-8")
+        )
         downstream_path = (
             output_root
             / "reporting_v2_4_20260801"
@@ -205,6 +233,26 @@ def validate_clean_release(archive_path: Path) -> dict[str, object]:
                 == false_accepts
             )
 
+        def corrected_method_matches(
+            method_id: str,
+            *,
+            correct: int,
+            off_target: int,
+        ) -> bool:
+            methods = corrected_matrix.get("methods", {})
+            row = methods.get(method_id)
+            if not isinstance(row, dict):
+                return False
+            return (
+                int(row.get("target_state_correct_count", -1)) == correct
+                and int(row.get("off_target_event_count", -1)) == off_target
+                and math.isclose(
+                    float(row.get("off_target_modification_rate", -1)),
+                    off_target / 300,
+                    abs_tol=1e-12,
+                )
+            )
+
         started = stage(5, "anchors", "Checking primary anchors...")
         checks = {
             "exit_code_zero": completed.returncode == 0,
@@ -226,6 +274,63 @@ def validate_clean_release(archive_path: Path) -> dict[str, object]:
             ),
             "no_gpu": record.get("gpu_required") is False,
             "no_model_inference": record.get("model_inference_rerun") is False,
+            "corrected_matrix_sha256": (
+                _sha256_file(corrected_matrix_path)
+                == EXPECTED_CORRECTED_MATRIX_SHA256
+            ),
+            "corrected_matrix_status_pass": (
+                corrected_matrix.get("status") == "pass"
+            ),
+            "corrected_matrix_canonical": (
+                corrected_matrix.get("canonical_for_off_target_reporting")
+                is True
+            ),
+            "corrected_matrix_primary_unchanged": (
+                corrected_matrix.get("primary_target_state_metrics_modified")
+                is False
+            ),
+            "corrected_matrix_no_db_rerun": (
+                corrected_matrix.get("database_execution_repeated") is False
+            ),
+            "corrected_matrix_no_side_effect_rate": (
+                not contains_key(corrected_matrix, "side_effect_rate")
+            ),
+            "corrected_matrix_audit_provenance": (
+                corrected_matrix
+                .get("off_target_correction_source", {})
+                .get("sha256")
+                == EXPECTED_OFF_TARGET_AUDIT_SHA256
+            ),
+            "corrected_d_fs_m_anchor": corrected_method_matches(
+                "D-FS-M",
+                correct=258,
+                off_target=1,
+            ),
+            "corrected_j_fs_m_anchor": corrected_method_matches(
+                "J-FS-M",
+                correct=258,
+                off_target=0,
+            ),
+            "corrected_s_fs_v2_m_anchor": corrected_method_matches(
+                "S-FS-v2-M",
+                correct=78,
+                off_target=0,
+            ),
+            "corrected_mp_fs_m_anchor": corrected_method_matches(
+                "MP-FS-M",
+                correct=34,
+                off_target=1,
+            ),
+            "corrected_mp_fs_plus_anchor": corrected_method_matches(
+                "MP-FS+",
+                correct=148,
+                off_target=0,
+            ),
+            "corrected_gold_mp_anchor": corrected_method_matches(
+                "Gold-MP",
+                correct=300,
+                off_target=0,
+            ),
             "cascade_accuracy_0_94": abs(
                 float(record.get("exploratory_v2_4", {}).get("cascade_accuracy", -1))
                 - 0.94
