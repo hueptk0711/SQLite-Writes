@@ -13,7 +13,11 @@ from collections import Counter, defaultdict
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable
 
-from nldbwrite_v3.compiler import compile_verified_plan, preflight_program
+from nldbwrite_v3.compiler import (
+    check_semantic_risk_gate,
+    compile_verified_plan,
+    preflight_program,
+)
 from nldbwrite_v3.evaluator import evaluate_candidate_sample, find_database
 from nldbwrite_v3.verifier import verify_write_plan
 
@@ -640,10 +644,36 @@ def downstream_ablation(
         for row in _load_jsonl(mp_root / "materialized_write_plans.jsonl")
     }
     variants = {
-        "V0_no_verifier_no_provenance_no_preflight": {"hard": False, "provenance": False, "preflight": False},
-        "V1_hard_verifier_only": {"hard": True, "provenance": False, "preflight": False},
-        "V2_hard_verifier_plus_provenance": {"hard": True, "provenance": True, "preflight": False},
-        "V3_full_with_transactional_preflight": {"hard": True, "provenance": True, "preflight": True},
+        "V0_no_verifier_no_provenance_no_semantic_gate_no_preflight": {
+            "hard": False,
+            "provenance": False,
+            "semantic_gate": False,
+            "preflight": False,
+        },
+        "V1_hard_verifier_only": {
+            "hard": True,
+            "provenance": False,
+            "semantic_gate": False,
+            "preflight": False,
+        },
+        "V2_hard_verifier_plus_provenance": {
+            "hard": True,
+            "provenance": True,
+            "semantic_gate": False,
+            "preflight": False,
+        },
+        "V2_5_plus_semantic_risk_gate": {
+            "hard": True,
+            "provenance": True,
+            "semantic_gate": True,
+            "preflight": False,
+        },
+        "V3_full_with_transactional_preflight": {
+            "hard": True,
+            "provenance": True,
+            "semantic_gate": True,
+            "preflight": True,
+        },
     }
     rows: list[dict[str, Any]] = []
     for sample_id in sorted(samples):
@@ -671,21 +701,45 @@ def downstream_ablation(
                         profile,
                         normalization_mode="lossless",
                     )
-                    # Production MP-FS+ carries verifier/grounding warnings
-                    # into preflight, where designated semantic-risk warnings
-                    # are fail-closed. Preserve that boundary for V3 so the
-                    # ablation anchor exactly reproduces primary admission.
+                    # Production MP-FS+ applies the semantic-risk gate after
+                    # successful compilation and before transactional preflight.
+                    # Preserve the same boundary ordering in this downstream replay
+                    # so that the final V3 variant reproduces primary admission.
                     if flags["hard"]:
                         program.warnings.extend(verification.warnings)
             build_success = bool(program is not None and program.status == "success")
+            semantic_gate = None
+            if build_success and flags["semantic_gate"]:
+                semantic_gate = check_semantic_risk_gate(program)
+            semantic_gate_accepted = bool(
+                build_success
+                and (
+                    not flags["semantic_gate"]
+                    or (
+                        semantic_gate is not None
+                        and semantic_gate.get("accepted")
+                    )
+                )
+            )
             preflight = (
                 preflight_program(db_path, program)
-                if build_success and flags["preflight"]
+                if (
+                    build_success
+                    and semantic_gate_accepted
+                    and flags["preflight"]
+                )
                 else None
             )
             admitted = bool(
                 build_success
-                and (not flags["preflight"] or preflight.get("accepted"))
+                and semantic_gate_accepted
+                and (
+                    not flags["preflight"]
+                    or (
+                        preflight is not None
+                        and preflight.get("accepted")
+                    )
+                )
             )
             evaluation = evaluate_candidate_sample(
                 sample,
@@ -704,6 +758,17 @@ def downstream_ablation(
                     "materialized_plan_available": plan is not None,
                     "verification_status": verification_status,
                     "build_success": build_success,
+                    "semantic_gate_applied": bool(flags["semantic_gate"]),
+                    "semantic_gate_accepted": (
+                        bool(semantic_gate.get("accepted"))
+                        if semantic_gate is not None
+                        else None
+                    ),
+                    "semantic_gate_error_class": (
+                        semantic_gate.get("error_class")
+                        if semantic_gate is not None
+                        else None
+                    ),
                     "preflight_accepted": bool(preflight.get("accepted")) if preflight else None,
                     "admitted": admitted,
                     "execution_success": bool(evaluation["execution_success"]),
