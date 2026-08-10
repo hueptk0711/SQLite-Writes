@@ -84,12 +84,8 @@ def execute_program(
             conn.close()
 
 
-def preflight_program(
-    connection_or_path: sqlite3.Connection | str | Path,
-    program: CompiledProgram,
-) -> dict[str, Any]:
-    """Execute and roll back the complete program; accept or abstain."""
-    started = time.perf_counter()
+def check_semantic_risk_gate(program: CompiledProgram) -> dict[str, Any]:
+    """Reject compiled programs carrying a blocking semantic-risk warning."""
     blocking_warning_codes = {
         "AMBIGUOUS_EXACT_EVIDENCE_COLUMN_GROUNDING",
         "EVIDENCE_COLUMN_TABLE_MISMATCH",
@@ -105,18 +101,30 @@ def preflight_program(
             {warning.error_code for warning in blocking_warnings}
         )
         return {
-            "status": "abstained",
+            "status": "rejected",
             "accepted": False,
-            "action": "abstain",
-            "deterministic_repair_applied": False,
             "error_class": "semantic_grounding_risk",
-            "error": (
-                "Fail-closed semantic grounding warning: "
-                + ", ".join(codes)
-            ),
-            "executed_statements": 0,
-            "latency_sec": time.perf_counter() - started,
+            "error_codes": codes,
         }
+    return {
+        "status": "accepted",
+        "accepted": True,
+        "error_class": None,
+        "error_codes": [],
+    }
+
+
+def preflight_program(
+    connection_or_path: sqlite3.Connection | str | Path,
+    program: CompiledProgram,
+) -> dict[str, Any]:
+    """Execute the complete program in SQLite and roll back every write.
+
+    This stage evaluates transactional executability and active SQLite
+    constraints only. Semantic-risk filtering is handled separately by
+    :func:`check_semantic_risk_gate` and is not performed here.
+    """
+    started = time.perf_counter()
     preflight_connection: sqlite3.Connection | None = None
     target: sqlite3.Connection | str | Path = connection_or_path
     if not isinstance(connection_or_path, sqlite3.Connection):
