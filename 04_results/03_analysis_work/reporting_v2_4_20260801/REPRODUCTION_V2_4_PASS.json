@@ -4,6 +4,9 @@
   "gpu_required": false,
   "model_inference_rerun": false,
   "primary_results_modified": false,
+  "requested_stage": "all",
+  "release_config": "release_config.json",
+  "keep_temp_on_failure": false,
   "corrective_v2_3": {
     "status": "pass",
     "artifact": "final_release",
@@ -24,12 +27,12 @@
       "Gold-MP": 0
     },
     "independent_primary_audit_status": "pass",
-    "reporting_amendment_sha256": "19365b4a80cf526b604e002d2fe8e2871472344ddda86226953ec645aae2ef2f"
+    "reporting_amendment_sha256": "c77769525844b16a085598398481c968cc202b509aaed6e9bc2cd6a1a19d4f55"
   },
   "exploratory_v2_4": {
     "status": "pass",
     "samples": 300,
     "cascade_accuracy": 0.94,
-    "downstream_ablation_variants": 4
+    "downstream_ablation_variants": 5
   }
 }
