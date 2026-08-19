@@ -470,10 +470,15 @@ def load_manual_audit_decisions() -> dict[str, dict[str, str]]:
                     f"invalid conflict_ambiguity_gold_label={conflict_label!r} for {sample_id}"
                 )
             row["conflict_ambiguity_gold_label"] = conflict_label
-            if status == "COMPLETED" and not row.get("manual_review_notes"):
-                raise ValueError(
-                    f"completed manual audit for {sample_id} requires non-empty manual_review_notes"
-                )
+            if status == "COMPLETED":
+                if not row.get("manual_review_notes"):
+                    raise ValueError(
+                        f"completed manual audit for {sample_id} requires non-empty manual_review_notes"
+                    )
+                if not row.get("reviewer_root_cause"):
+                    raise ValueError(
+                        f"completed manual audit for {sample_id} requires non-empty reviewer_root_cause"
+                    )
             output[sample_id] = row
     return output
 
@@ -662,17 +667,43 @@ def build_stage_failure_summary(rows: list[dict[str, Any]]) -> list[dict[str, An
     return counter_rows(counter, total, incorrect, "First failure stage")
 
 
-def build_root_cause_summary(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    incorrect_rows = [row for row in rows if not row["target_state_correct"]]
-    counter = Counter(row["root_cause"] for row in incorrect_rows)
+def _format_root_cause_summary(counter: Counter[str], incorrect_count: int) -> list[dict[str, Any]]:
     return [
         {
             "Root cause": key,
             "N incorrect": value,
-            "%": format_percent(value, len(incorrect_rows)),
+            "%": format_percent(value, incorrect_count),
         }
         for key, value in sorted(counter.items())
     ]
+
+
+def build_root_cause_summary_auto(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Summarize the automatic, pre-manual root-cause diagnosis."""
+    incorrect_rows = [row for row in rows if not row["target_state_correct"]]
+    counter = Counter(row["root_cause"] for row in incorrect_rows)
+    return _format_root_cause_summary(counter, len(incorrect_rows))
+
+
+def reviewed_root_cause(row: dict[str, Any]) -> str:
+    """Use the completed manual decision when available; otherwise retain automatic diagnosis."""
+    manual_status = str(row.get("manual_review_status") or "").strip().upper()
+    reviewer_root = str(row.get("reviewer_root_cause") or "").strip()
+    if manual_status == "COMPLETED" and reviewer_root:
+        return reviewer_root
+    return str(row.get("root_cause") or "UNKNOWN")
+
+
+def build_reviewed_root_cause_summary(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Final Stage-1.1 root-cause summary with manual decisions overriding automatic labels."""
+    incorrect_rows = [row for row in rows if not row["target_state_correct"]]
+    counter = Counter(reviewed_root_cause(row) for row in incorrect_rows)
+    return _format_root_cause_summary(counter, len(incorrect_rows))
+
+
+def build_root_cause_summary(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Backward-compatible alias for the final reviewed root-cause summary."""
+    return build_reviewed_root_cause_summary(rows)
 
 
 def build_performance_by_input_type(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -1089,6 +1120,20 @@ def build_survival(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+TRACE_TO_FAILURE_STAGE = {
+    "generation": "generation",
+    "parsing": "parse",
+    "reference_resolution": "reference_resolution",
+    "materialization": "materialization",
+    "hard_verification": "verification",
+    "deterministic_compilation": "compilation",
+    "semantic_risk_gate": "semantic_gate",
+    "transactional_preflight": "preflight",
+    "execution": "execution",
+    "state_comparison": "state_mismatch",
+}
+
+
 def build_diagnostic_traces(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     stage_key = {
         "generation": "generation_ok",
@@ -1110,7 +1155,12 @@ def build_diagnostic_traces(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             value = row[column]
             status = "not_run" if value == "NA" else ("pass" if value == "1" else "fail")
             record = {"status": status}
-            if status == "fail" and row["first_failure_stage"] in {name, name.replace("hard_", "").replace("deterministic_", "").replace("transactional_", "").replace("semantic_risk_gate", "semantic_gate")}:
+            expected_failure_stage = TRACE_TO_FAILURE_STAGE.get(name)
+            if (
+                status == "fail"
+                and expected_failure_stage is not None
+                and row["first_failure_stage"] == expected_failure_stage
+            ):
                 record["code"] = row["failure_reason_code"]
             stages[name] = record
         traces.append(
@@ -1403,10 +1453,14 @@ def build_report(
         "## 5. First-failure distribution",
         markdown_table(stage_summary),
         "",
-        "## 6. Root-cause labels",
+        "## 6. Final reviewed root-cause labels",
         (
-            "These labels are deliberately non-causal where the available ablation is not component-isolated. "
-            "In particular, recoverability under V0 is labeled `BYPASS_RECOVERABLE_*` rather than verifier over-rejection."
+            "For samples with completed manual review, this table uses `reviewer_root_cause`; "
+            "all other incorrect samples retain the automatic diagnosis. The automatic-only "
+            "summary is exported separately as `root_cause_summary_auto.csv`, while the final "
+            "manual-overridden table is exported as `reviewed_root_cause_summary.csv`. "
+            "V0 recoverability remains a system-level downstream-bypass observation rather than "
+            "a component-isolated verifier causal claim."
         ),
         "",
         markdown_table(root_summary),
@@ -1501,7 +1555,8 @@ def build_all(output_dir: Path = OUTPUT_DIR) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     rows, artifacts = build_master()
     stage_summary = build_stage_failure_summary(rows)
-    root_summary = build_root_cause_summary(rows)
+    root_summary_auto = build_root_cause_summary_auto(rows)
+    reviewed_root_summary = build_reviewed_root_cause_summary(rows)
     perf_input = build_performance_by_input_type(rows)
     perf_dependency = build_performance_by_dependency_sensitivity(rows)
     perf_operation = build_performance_by_operation_type(rows)
@@ -1573,7 +1628,10 @@ def build_all(output_dir: Path = OUTPUT_DIR) -> dict[str, Any]:
     write_csv(output_dir / "mp_fs_plus_sample_level_analysis.csv", rows, master_fields)
     write_jsonl(output_dir / "diagnostic_traces.jsonl", traces)
     write_csv(output_dir / "stage_failure_summary.csv", stage_summary)
-    write_csv(output_dir / "root_cause_summary.csv", root_summary)
+    write_csv(output_dir / "root_cause_summary_auto.csv", root_summary_auto)
+    write_csv(output_dir / "reviewed_root_cause_summary.csv", reviewed_root_summary)
+    # Backward-compatible alias: root_cause_summary.csv now represents the final reviewed summary.
+    write_csv(output_dir / "root_cause_summary.csv", reviewed_root_summary)
     write_csv(output_dir / "performance_by_input_type.csv", perf_input)
     write_csv(output_dir / "performance_by_dependency_sensitivity.csv", perf_dependency)
     write_csv(output_dir / "performance_by_operation_type.csv", perf_operation)
@@ -1601,7 +1659,7 @@ def build_all(output_dir: Path = OUTPUT_DIR) -> dict[str, Any]:
         build_report(
             rows,
             stage_summary,
-            root_summary,
+            reviewed_root_summary,
             perf_input,
             perf_db,
             perf_dependency,
@@ -1627,7 +1685,8 @@ def build_all(output_dir: Path = OUTPUT_DIR) -> dict[str, Any]:
         ),
         "state_diff_replay_errors": sum(bool(row.get("state_diff_error")) for row in rows),
         "stage_summary": stage_summary,
-        "root_summary": root_summary,
+        "root_summary": reviewed_root_summary,
+        "root_summary_auto": root_summary_auto,
     }
 
 

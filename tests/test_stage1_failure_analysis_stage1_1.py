@@ -188,3 +188,149 @@ def test_manual_audit_loader_accepts_utf8_bom(tmp_path: Path, monkeypatch: pytes
     loaded = analysis.load_manual_audit_decisions()
     assert list(loaded) == ["s1"]
     assert loaded["s1"]["manual_review_status"] == "COMPLETED"
+
+
+def test_completed_manual_audit_requires_root_cause(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    analysis = _load_module(
+        "stage1_failure_analysis_test_manual_root",
+        "stage1_failure_analysis.py",
+    )
+    decisions = tmp_path / "manual_missing_root.csv"
+    with decisions.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=[
+                "sample_id",
+                "manual_review_status",
+                "reviewer_root_cause",
+                "conflict_ambiguity_gold_label",
+                "manual_review_notes",
+            ],
+        )
+        writer.writeheader()
+        writer.writerow(
+            {
+                "sample_id": "s1",
+                "manual_review_status": "COMPLETED",
+                "reviewer_root_cause": "",
+                "conflict_ambiguity_gold_label": "",
+                "manual_review_notes": "Reviewed with evidence.",
+            }
+        )
+    monkeypatch.setattr(analysis, "MANUAL_AUDIT_DECISIONS", decisions)
+    with pytest.raises(ValueError, match="requires non-empty reviewer_root_cause"):
+        analysis.load_manual_audit_decisions()
+
+
+def test_reviewed_root_cause_summary_uses_manual_override() -> None:
+    analysis = _load_module(
+        "stage1_failure_analysis_test_reviewed_root_summary",
+        "stage1_failure_analysis.py",
+    )
+    rows = [
+        {
+            "target_state_correct": 0,
+            "root_cause": "REPRESENTATION_LIMITATION",
+            "manual_review_status": "COMPLETED",
+            "reviewer_root_cause": "CONFLICT_SEMANTICS_PLANNING_ERROR",
+        },
+        {
+            "target_state_correct": 0,
+            "root_cause": "GROUNDING_ERROR",
+            "manual_review_status": "NOT_REQUIRED",
+            "reviewer_root_cause": "",
+        },
+        {
+            "target_state_correct": 1,
+            "root_cause": "NONE",
+            "manual_review_status": "NOT_REQUIRED",
+            "reviewer_root_cause": "",
+        },
+    ]
+    summary = analysis.build_reviewed_root_cause_summary(rows)
+    keyed = {row["Root cause"]: row["N incorrect"] for row in summary}
+    assert keyed == {
+        "CONFLICT_SEMANTICS_PLANNING_ERROR": 1,
+        "GROUNDING_ERROR": 1,
+    }
+
+    auto = analysis.build_root_cause_summary_auto(rows)
+    auto_keyed = {row["Root cause"]: row["N incorrect"] for row in auto}
+    assert auto_keyed == {
+        "GROUNDING_ERROR": 1,
+        "REPRESENTATION_LIMITATION": 1,
+    }
+
+
+def _trace_row(first_failure_stage: str, failure_reason_code: str) -> dict[str, object]:
+    stages = {
+        "generation_ok": "1",
+        "parse_ok": "1",
+        "reference_resolution_ok": "1",
+        "materialization_ok": "1",
+        "verification_ok": "1",
+        "compilation_ok": "1",
+        "semantic_gate_ok": "1",
+        "preflight_ok": "1",
+        "admission_ok": "1",
+        "execution_ok": "1",
+        "state_correct": "1",
+    }
+    ordered_failure_columns = {
+        "generation": "generation_ok",
+        "parse": "parse_ok",
+        "reference_resolution": "reference_resolution_ok",
+        "materialization": "materialization_ok",
+        "verification": "verification_ok",
+        "compilation": "compilation_ok",
+        "semantic_gate": "semantic_gate_ok",
+        "preflight": "preflight_ok",
+        "execution": "execution_ok",
+        "state_mismatch": "state_correct",
+    }
+    failure_column = ordered_failure_columns[first_failure_stage]
+    stages[failure_column] = "0"
+
+    # Downstream stages are not run for pre-execution failures.
+    ordered_columns = list(ordered_failure_columns.values())
+    if first_failure_stage != "state_mismatch":
+        failure_index = ordered_columns.index(failure_column)
+        for column in ordered_columns[failure_index + 1 :]:
+            stages[column] = "NA"
+        if first_failure_stage not in {"preflight", "execution"}:
+            stages["admission_ok"] = "NA"
+
+    return {
+        "sample_id": f"sample_{first_failure_stage}",
+        **stages,
+        "first_failure_stage": first_failure_stage,
+        "failure_reason_code": failure_reason_code,
+        "admitted": 1 if first_failure_stage == "state_mismatch" else 0,
+        "target_state_correct": 0,
+    }
+
+
+def test_parse_trace_has_failure_code() -> None:
+    analysis = _load_module(
+        "stage1_failure_analysis_test_parse_trace",
+        "stage1_failure_analysis.py",
+    )
+    [trace] = analysis.build_diagnostic_traces(
+        [_trace_row("parse", "GEN_UNPARSEABLE_OUTPUT")]
+    )
+    assert trace["stages"]["parsing"]["status"] == "fail"
+    assert trace["stages"]["parsing"]["code"] == "GEN_UNPARSEABLE_OUTPUT"
+
+
+def test_state_mismatch_trace_has_failure_code() -> None:
+    analysis = _load_module(
+        "stage1_failure_analysis_test_state_trace",
+        "stage1_failure_analysis.py",
+    )
+    [trace] = analysis.build_diagnostic_traces(
+        [_trace_row("state_mismatch", "STATE_WRONG_VALUE")]
+    )
+    assert trace["stages"]["state_comparison"]["status"] == "fail"
+    assert trace["stages"]["state_comparison"]["code"] == "STATE_WRONG_VALUE"

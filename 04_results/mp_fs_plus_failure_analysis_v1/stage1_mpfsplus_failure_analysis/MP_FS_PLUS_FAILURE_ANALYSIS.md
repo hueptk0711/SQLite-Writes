@@ -35,18 +35,29 @@ MP-FS+ target-state accuracy: 148/300 = 49.33%. Coverage/admission: 164/300 = 54
 | preflight | 6 | 2.00 | 3.95 |
 | state_mismatch | 16 | 5.33 | 10.53 |
 
-## 6. Root-cause labels
-These labels are deliberately non-causal where the available ablation is not component-isolated. In particular, recoverability under V0 is labeled `BYPASS_RECOVERABLE_*` rather than verifier over-rejection.
+## 6. Final reviewed root-cause labels
+For samples with completed manual review, this table uses `reviewer_root_cause`; all other incorrect samples retain the automatic diagnosis. The automatic-only summary is exported separately as `root_cause_summary_auto.csv`, while the final manual-overridden table is exported as `reviewed_root_cause_summary.csv`. V0 recoverability remains a system-level downstream-bypass observation rather than a component-isolated verifier causal claim.
 
 | Root cause | N incorrect | % |
 | --- | --- | --- |
-| BYPASS_RECOVERABLE_MATERIALIZATION | 22 | 14.47 |
-| FINAL_STATE_MISMATCH | 16 | 10.53 |
+| CONFLICT_SEMANTICS_PLANNING_ERROR | 20 | 13.16 |
+| CONTROL_FIELD_POLICY_ERROR | 22 | 14.47 |
+| DATE_NORMALIZATION_AND_EVIDENCE_SPAN_ERROR | 1 | 0.66 |
+| DATE_NORMALIZATION_POLICY_ERROR | 9 | 5.92 |
+| EVIDENCE_SPAN_BOUNDARY_ERROR | 1 | 0.66 |
+| EVIDENCE_SPAN_SELECTION_ERROR | 2 | 1.32 |
+| FREE_TEXT_COLUMN_MAPPING_ERROR | 1 | 0.66 |
+| FREE_TEXT_EVIDENCE_AND_GROUP_PLANNING_ERROR | 1 | 0.66 |
+| FREE_TEXT_TARGET_GROUP_OMISSION_ERROR | 1 | 0.66 |
 | GROUNDING_ERROR | 35 | 23.03 |
 | LLM_SEMANTIC_ERROR | 27 | 17.76 |
-| MATERIALIZATION_ERROR | 22 | 14.47 |
+| MATERIALIZATION_ERROR | 11 | 7.24 |
 | PREFLIGHT_ERROR | 7 | 4.61 |
-| REPRESENTATION_LIMITATION | 23 | 15.13 |
+| REPRESENTATION_LIMITATION | 3 | 1.97 |
+| SOURCE_PARSER_CONTROL_ROW_SEGMENTATION_ERROR | 2 | 1.32 |
+| SOURCE_PARSER_NULL_LITERAL_COERCION_ERROR | 2 | 1.32 |
+| SOURCE_PARSER_ROW_SEGMENTATION_ERROR | 3 | 1.97 |
+| UPDATE_COLUMN_OMISSION_PLANNING_ERROR | 4 | 2.63 |
 
 ## 7. Free-text vs semi-structured
 | Input type | N | Correct | Accuracy | Coverage | Accepted accuracy |
