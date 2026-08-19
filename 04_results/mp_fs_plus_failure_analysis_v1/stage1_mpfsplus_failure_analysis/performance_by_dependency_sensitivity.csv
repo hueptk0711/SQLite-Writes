@@ -1,0 +1,3 @@
+Dependency-sensitive,N,Correct,Accuracy,Coverage,Accepted accuracy
+no,160,98,61.25,66.88,91.59
+yes,140,50,35.71,40.71,87.72

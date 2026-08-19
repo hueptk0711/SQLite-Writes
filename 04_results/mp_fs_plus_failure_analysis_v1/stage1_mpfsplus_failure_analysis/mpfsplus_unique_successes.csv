@@ -1,22 +1,22 @@
-sample_id,what_mpfsplus_did_correctly,why_direct_failed,why_jfs_failed,feature_responsible
-final_archeology_060,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
-final_polar_005,passed structured checks and matched target state,wrong_state_or_execution_failure,,conflict identification
-final_polar_009,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
-final_polar_018,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
-final_polar_021,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
-final_polar_030,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
-final_polar_035,passed structured checks and matched target state,wrong_state_or_execution_failure,,conflict identification
-final_polar_036,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
-final_polar_038,passed structured checks and matched target state,wrong_state_or_execution_failure,wrong_state_or_verification_failure,conflict identification
-final_polar_039,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
-final_polar_050,passed structured checks and matched target state,wrong_state_or_execution_failure,,conflict identification
-final_polar_051,passed structured checks and matched target state,wrong_state_or_execution_failure,,conflict identification
-final_polar_054,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
-final_polar_060,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
-final_robot_038,passed structured checks and matched target state,wrong_state_or_execution_failure,,conflict identification
-final_vaccine_015,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
-final_vaccine_038,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
-final_vaccine_039,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
-final_vaccine_044,passed structured checks and matched target state,wrong_state_or_execution_failure,,conflict identification
-final_vaccine_054,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
-final_virtual_038,passed structured checks and matched target state,wrong_state_or_execution_failure,,conflict identification
+sample_id,direct_correct,jfs_correct,mpfsplus_correct,conflict_sensitive,dependency_sensitive,input_type,operation_type,observed_result,feature_attribution_status
+final_archeology_060,1,0,1,1,0,semi_structured,upsert_update,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_polar_005,0,1,1,1,1,semi_structured,insert_ignore,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_polar_009,1,0,1,1,0,semi_structured,upsert_update,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_polar_018,1,0,1,1,0,free_text,upsert_update,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_polar_021,1,0,1,1,1,semi_structured,upsert_update,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_polar_030,1,0,1,1,0,semi_structured,upsert_update,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_polar_035,0,1,1,1,1,semi_structured,insert_ignore,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_polar_036,1,0,1,1,1,semi_structured,upsert_update,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_polar_038,0,0,1,1,1,semi_structured,insert_ignore,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_polar_039,1,0,1,1,0,semi_structured,upsert_update,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_polar_050,0,1,1,1,1,semi_structured,insert_ignore,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_polar_051,0,1,1,1,0,semi_structured,upsert_update,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_polar_054,1,0,1,1,0,semi_structured,upsert_update,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_polar_060,1,0,1,1,0,semi_structured,upsert_update,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_robot_038,0,1,1,1,1,semi_structured,insert_ignore,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_vaccine_015,1,0,1,1,0,semi_structured,upsert_update,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_vaccine_038,1,0,1,1,1,semi_structured,insert_ignore,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_vaccine_039,1,0,1,1,0,semi_structured,upsert_update,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_vaccine_044,0,1,1,1,0,semi_structured,insert_ignore,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_vaccine_054,1,0,1,1,0,semi_structured,upsert_update,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED
+final_virtual_038,0,1,1,1,1,semi_structured,insert_ignore,MP-FS+ matched target state while at least one baseline did not,NOT_CAUSALLY_ESTABLISHED

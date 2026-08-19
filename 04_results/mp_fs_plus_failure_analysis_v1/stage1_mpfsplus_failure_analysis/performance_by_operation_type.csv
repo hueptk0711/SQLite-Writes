@@ -1,0 +1,4 @@
+Operation,N,Correct,Accuracy,Coverage,Accepted accuracy
+insert_ignore,100,46,46.00,51.00,90.20
+plain_insert,100,53,53.00,60.00,88.33
+upsert_update,100,49,49.00,53.00,92.45
