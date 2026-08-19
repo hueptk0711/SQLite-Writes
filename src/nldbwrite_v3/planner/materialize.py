@@ -4,12 +4,7 @@ from copy import deepcopy
 from typing import Any
 
 from nldbwrite_v3.ir import Diagnostic, SourcePayload
-from nldbwrite_v3.vnext import (
-    PAYLOAD_VALUE,
-    classify_source_field_role,
-    control_consumed_by,
-    row_has_instruction_context,
-)
+from nldbwrite_v3.vnext import PAYLOAD_VALUE, classify_source_field_role
 
 
 class MaterializationError(ValueError):
@@ -222,6 +217,21 @@ def materialize_mapping_plan(
             }
         )
 
+    # A-C Patch 2 accepts only source references that a semantic component
+    # explicitly proved it consumed.  Field-name heuristics alone are never
+    # sufficient to suppress provenance errors.
+    raw_consumed_refs = mapping_plan.get("consumed_control_refs") or []
+    consumed_control_index: dict[tuple[str, int, str], dict[str, Any]] = {}
+    if isinstance(raw_consumed_refs, list):
+        for item in raw_consumed_refs:
+            if not isinstance(item, dict):
+                continue
+            collection_id = str(item.get("source_collection") or "")
+            field = str(item.get("source_field") or "")
+            row_index = item.get("source_row_index")
+            if collection_id and field and isinstance(row_index, int):
+                consumed_control_index[(collection_id, row_index, field)] = item
+
     unresolved_fields: list[dict[str, Any]] = []
     for collection in payload.collections:
         for row_index, row in enumerate(collection.rows):
@@ -242,25 +252,20 @@ def materialize_mapping_plan(
                     if not reason:
                         reason = str(ignored_fields.get(field) or "")
                 role = classify_source_field_role(str(field))
-                instruction_context = row_has_instruction_context(row)
-                consumed_by = (
-                    control_consumed_by(
-                        str(field),
-                        row.get(field),
-                        instruction_context=instruction_context,
-                    )
-                    if control_field_roles and role != PAYLOAD_VALUE
-                    else None
+                consumed_ref = consumed_control_index.get(
+                    (collection.collection_id, row_index, str(field))
                 )
-                if consumed_by:
+                if consumed_ref is not None:
                     unresolved_fields.append(
                         {
                             "source_collection": collection.collection_id,
                             "source_row_index": row_index,
                             "field": field,
-                            "role": role,
-                            "consumed_by": consumed_by,
-                            "reason": "typed control/instruction semantic",
+                            "source_field_ref": consumed_ref.get("source_field_ref"),
+                            "role": str(consumed_ref.get("role") or role),
+                            "consumed_by": str(consumed_ref.get("consumed_by") or ""),
+                            "resolved_value": deepcopy(consumed_ref.get("resolved_value")),
+                            "reason": "semantic component consumed this exact source reference",
                             "status": "consumed_control",
                         }
                     )

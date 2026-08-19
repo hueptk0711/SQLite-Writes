@@ -4,6 +4,7 @@ from copy import deepcopy
 
 from nldbwrite_v3.ir import SourceCollection, SourcePayload
 from nldbwrite_v3.planner.materialize import materialize_mapping_plan
+from nldbwrite_v3.planner.references import resolve_reference_mapping_plan
 from nldbwrite_v3.schema import ensure_reference_ids
 from nldbwrite_v3.verifier import verify_write_plan
 from nldbwrite_v3.vnext import (
@@ -60,30 +61,53 @@ def test_control_role_classifier_is_typed_not_operation_only():
 
 
 def test_v1_control_field_is_consumed_and_baseline_remains_fail_closed():
-    profile, parent, *_ = _profile_and_ids()
+    profile, parent, columns, *_ = _profile_and_ids()
     payload = _payload({"operation": "plain_insert", "id": "p1", "name": "One"})
-    mapping = {
+    collection = payload.collections[0]
+    plan = {
         "target_groups": [
             {
                 "group_id": "g1",
-                "source_collection": "records",
-                "source_rows": "$[*]",
-                "field_mapping": {"id": "id", "name": "name"},
+                "source_collection_id": collection.reference_id,
+                "source_selector_id": collection.selector_id,
+                "table_id": parent["table_id"],
+                "field_mapping": {
+                    collection.field_ids["id"]: columns["id"],
+                    collection.field_ids["name"]: columns["name"],
+                },
                 "constants": {},
-                "table": parent["name"],
-                "conflict": {"action": "error", "target": [], "update_columns": []},
+                "write_semantics": "plain_insert",
+                "conflict_target_id": None,
+                "update_column_ids": [],
             }
         ],
         "ignored_fields": {},
         "dependencies": [],
     }
 
-    baseline = materialize_mapping_plan(mapping, payload)
+    baseline_ref, _ = apply_reference_interventions(
+        plan, payload, profile, Stage2InterventionConfig()
+    )
+    baseline_grounded, baseline_errors = resolve_reference_mapping_plan(
+        baseline_ref, payload, profile
+    )
+    assert not baseline_errors
+    baseline = materialize_mapping_plan(baseline_grounded, payload)
     baseline_result = verify_write_plan(baseline, profile)
     assert not baseline_result.valid
     assert "UNRESOLVED_SOURCE_FIELD" in {item.error_code for item in baseline_result.errors}
 
-    v1 = materialize_mapping_plan(mapping, payload, control_field_roles=True)
+    v1_ref, _ = apply_reference_interventions(
+        plan,
+        payload,
+        profile,
+        Stage2InterventionConfig(control_field_roles=True),
+    )
+    v1_grounded, v1_errors = resolve_reference_mapping_plan(
+        v1_ref, payload, profile
+    )
+    assert not v1_errors
+    v1 = materialize_mapping_plan(v1_grounded, payload, control_field_roles=True)
     operation_record = next(item for item in v1["unresolved_fields"] if item["field"] == "operation")
     assert operation_record["status"] == "consumed_control"
     assert operation_record["role"] == OPERATION_CONTROL
@@ -291,28 +315,55 @@ def test_v2_v3_free_text_preserves_explicit_conflict_and_update_set():
     assert any(item.error_code == "REQUIRED_UPDATE_COLUMNS_DROPPED" for item in diagnostics)
 
 
-def test_stage2_config_chain_exposes_independent_abc_flags():
-    from nldbwrite_v3.experiments.run_method import _load_method_config
+def test_stage2_configs_dispatch_as_mpfsplus_and_inherit_frozen_config():
+    from nldbwrite_v3.experiments.run_method import (
+        MAPPING_METHODS,
+        PREFLIGHT_METHODS,
+        SUPPORTED_METHODS,
+        _load_method_config,
+    )
 
-    original, _ = _load_method_config("configs/stage2/original.json")
-    v1, _ = _load_method_config("configs/stage2/v1_control.json")
-    v2, _ = _load_method_config("configs/stage2/v2_conflict.json")
-    v3, _ = _load_method_config("configs/stage2/v3_update.json")
+    paths = [
+        "configs/stage2/original.json",
+        "configs/stage2/v1_control.json",
+        "configs/stage2/v2_conflict.json",
+        "configs/stage2/v3_update.json",
+    ]
+    configs = [_load_method_config(path)[0] for path in paths]
+    original, v1, v2, v3 = configs
+    for config in configs:
+        assert config["method_id"] == "MP-FS+"
+        assert config["method_id"] in MAPPING_METHODS
+        assert config["method_id"] in PREFLIGHT_METHODS
+        assert config["method_id"] in SUPPORTED_METHODS
+        assert config.get("reference_planning") is True
+
+    allowed_differences = {
+        "base_config", "method_variant", "method_version", "stage2_interventions"
+    }
+    frozen_keys = set(original) - allowed_differences
+    for candidate in (v1, v2, v3):
+        for key in frozen_keys:
+            assert candidate.get(key) == original.get(key), key
+
     assert original["stage2_interventions"] == {
         "control_field_roles": False,
         "explicit_conflict_preservation": False,
         "update_column_consistency": False,
     }
+    assert v1["method_variant"] == "vnext-v1-control"
     assert v1["stage2_interventions"] == {
         "control_field_roles": True,
         "explicit_conflict_preservation": False,
         "update_column_consistency": False,
     }
+    assert v2["method_variant"] == "vnext-v2-conflict"
     assert v2["stage2_interventions"] == {
         "control_field_roles": True,
         "explicit_conflict_preservation": True,
         "update_column_consistency": False,
     }
+    assert v3["method_variant"] == "vnext-v3-update"
     assert v3["stage2_interventions"] == {
         "control_field_roles": True,
         "explicit_conflict_preservation": True,
@@ -322,25 +373,36 @@ def test_stage2_config_chain_exposes_independent_abc_flags():
 
 def test_consumed_control_requires_role_and_consumed_by_for_verification():
     profile, parent, *_ = _profile_and_ids()
-    payload = _payload({"operation": "plain_insert", "id": "p1", "name": "One"})
-    mapping = {
-        "target_groups": [
+    plan = {
+        "version": "3.0",
+        "source": {
+            "mode": "semi_structured",
+            "format": "json_array",
+            "row_count": 1,
+            "collections": [{"collection_id": "records", "row_count": 1}],
+        },
+        "write_groups": [
             {
                 "group_id": "g1",
-                "source_collection": "records",
-                "source_rows": "$[*]",
-                "field_mapping": {"id": "id", "name": "name"},
-                "constants": {},
                 "table": parent["name"],
+                "action": "insert",
+                "rows": [{"id": "p1", "name": "One"}],
                 "conflict": {"action": "error", "target": [], "update_columns": []},
+                "provenance": [],
             }
         ],
-        "ignored_fields": {},
         "dependencies": [],
+        "unresolved_fields": [
+            {
+                "source_collection": "records",
+                "source_row_index": 0,
+                "field": "operation",
+                "role": OPERATION_CONTROL,
+                "status": "consumed_control",
+                "consumed_by": "",
+            }
+        ],
     }
-    plan = materialize_mapping_plan(mapping, payload, control_field_roles=True)
-    control = next(item for item in plan["unresolved_fields"] if item["field"] == "operation")
-    control["consumed_by"] = ""
     result = verify_write_plan(plan, profile)
     assert not result.valid
     assert "UNRESOLVED_SOURCE_FIELD" in {item.error_code for item in result.errors}
@@ -429,44 +491,71 @@ def test_v3_unresolvable_explicit_update_column_fails_closed():
     assert any(item.error_code == "REQUIRED_UPDATE_COLUMNS_UNRESOLVED" for item in errors)
 
 
-def test_v1_consumes_typed_control_block_but_not_payload_like_action_value():
-    profile, parent, *_ = _profile_and_ids()
+def test_v1_consumes_only_typed_operation_control_not_b_or_c_controls():
+    profile, parent, columns, *_ = _profile_and_ids()
     payload = _payload(
         {
             "operation": "upsert_update",
             "table": "parent",
             "conflict_target": "id",
             "update_columns": "name",
+            "policy": "premium",
             "id": "p1",
             "name": "One",
         }
     )
-    mapping = {
+    collection = payload.collections[0]
+    plan = {
         "target_groups": [
             {
                 "group_id": "g1",
-                "source_collection": "records",
-                "source_rows": "$[*]",
-                "field_mapping": {"id": "id", "name": "name"},
+                "source_collection_id": collection.reference_id,
+                "source_selector_id": collection.selector_id,
+                "table_id": parent["table_id"],
+                "field_mapping": {
+                    collection.field_ids["id"]: columns["id"],
+                    collection.field_ids["name"]: columns["name"],
+                },
                 "constants": {},
-                "table": parent["name"],
-                "conflict": {"action": "error", "target": [], "update_columns": []},
+                "write_semantics": "upsert_update",
+                "conflict_target_id": None,
+                "update_column_ids": [columns["name"]],
             }
         ],
         "ignored_fields": {},
         "dependencies": [],
     }
-    materialized = materialize_mapping_plan(mapping, payload, control_field_roles=True)
-    controls = {
-        item["field"]: item
-        for item in materialized["unresolved_fields"]
-        if item.get("status") == "consumed_control"
-    }
-    assert set(controls) == {"operation", "table", "conflict_target", "update_columns"}
+    revised, _ = apply_reference_interventions(
+        plan, payload, profile, Stage2InterventionConfig(control_field_roles=True)
+    )
+    consumed = revised.get("consumed_control_refs") or []
+    assert {item["source_field"] for item in consumed} == {"operation"}
 
-    ambiguous_payload = _payload({"action": "click", "id": "p1", "name": "One"})
-    materialized2 = materialize_mapping_plan(mapping, ambiguous_payload, control_field_roles=True)
-    action = next(item for item in materialized2["unresolved_fields"] if item["field"] == "action")
+    grounded, errors = resolve_reference_mapping_plan(revised, payload, profile)
+    # conflict target is intentionally not fixed by V1, so policy resolution may
+    # still fail.  The provenance claim itself must nevertheless stay isolated.
+    assert any(item.error_code == "UNKNOWN_CONSTRAINT_ID" for item in errors)
+
+
+def test_payload_like_action_insert_is_not_operation_control():
+    assert classify_source_field_role("action") == PAYLOAD_VALUE
+    profile, parent, *_ = _profile_and_ids()
+    payload = _payload({"action": "insert", "id": "p1", "name": "One"})
+    mapping = {
+        "target_groups": [{
+            "group_id": "g1",
+            "source_collection": "records",
+            "source_rows": "$[*]",
+            "field_mapping": {"id": "id", "name": "name"},
+            "constants": {},
+            "table": parent["name"],
+            "conflict": {"action": "error", "target": [], "update_columns": []},
+        }],
+        "ignored_fields": {},
+        "dependencies": [],
+    }
+    materialized = materialize_mapping_plan(mapping, payload, control_field_roles=True)
+    action = next(item for item in materialized["unresolved_fields"] if item["field"] == "action")
     assert action["status"] == "unresolved"
 
 
@@ -519,3 +608,256 @@ def test_compiler_logs_compiled_update_columns_only_for_stage2_trace():
     baseline = compile_verified_plan(baseline_plan, profile)
     statement_dict = baseline.statements[0].to_dict()
     assert "semantic_trace" not in statement_dict
+
+
+def test_v2_v3_consume_controls_only_after_semantic_resolution():
+    profile, parent, columns, pk, *_ = _profile_and_ids()
+    payload = _payload({
+        "operation": "upsert_update",
+        "conflict_target": "id",
+        "update_columns": "name,count",
+        "id": "p1",
+        "name": "One",
+        "count": 2,
+    })
+    collection = payload.collections[0]
+    plan = {
+        "target_groups": [{
+            "group_id": "g1",
+            "source_collection_id": collection.reference_id,
+            "source_selector_id": collection.selector_id,
+            "table_id": parent["table_id"],
+            "field_mapping": {
+                collection.field_ids["id"]: columns["id"],
+                collection.field_ids["name"]: columns["name"],
+                collection.field_ids["count"]: columns["count"],
+            },
+            "constants": {},
+            "write_semantics": "needs_clarification",
+            "conflict_target_id": None,
+            "update_column_ids": [columns["name"]],
+        }],
+        "ignored_fields": {},
+        "dependencies": [],
+    }
+    revised, diagnostics = apply_reference_interventions(
+        plan,
+        payload,
+        profile,
+        Stage2InterventionConfig(
+            control_field_roles=True,
+            explicit_conflict_preservation=True,
+            update_column_consistency=True,
+        ),
+    )
+    assert not [item for item in diagnostics if item.severity == "error"]
+    consumed = {item["source_field"]: item for item in revised["consumed_control_refs"]}
+    assert set(consumed) == {"operation", "conflict_target", "update_columns"}
+    assert consumed["operation"]["consumed_by"] == "instruction_semantics.operation"
+    assert consumed["conflict_target"]["consumed_by"] == "explicit_conflict_preservation.target"
+    assert consumed["update_columns"]["consumed_by"] == "update_column_consistency.requested"
+    group = revised["target_groups"][0]
+    assert group["conflict_target_id"] == pk["constraint_id"]
+    assert group["update_column_ids"] == [columns["name"], columns["count"]]
+
+
+def test_free_text_conflict_preservation_is_group_scoped():
+    profile, parent, parent_cols, parent_pk, child, child_cols, child_pk = _profile_and_ids()
+    plan = {
+        "version": "4.0",
+        "plan_kind": "reference_write_plan",
+        "write_groups": [
+            {
+                "group_id": "g_parent",
+                "table_id": parent["table_id"],
+                "rows": [],
+                "write_semantics": "needs_clarification",
+                "conflict_target_id": None,
+                "update_column_ids": [parent_cols["name"]],
+            },
+            {
+                "group_id": "g_child",
+                "table_id": child["table_id"],
+                "rows": [],
+                "write_semantics": "needs_clarification",
+                "conflict_target_id": None,
+                "update_column_ids": [],
+            },
+        ],
+        "dependencies": [],
+        "unresolved_fields": [],
+    }
+    request = (
+        "For parent, ON CONFLICT(id) DO NOTHING. "
+        "For child, ON CONFLICT(id) DO UPDATE SET note = excluded.note;"
+    )
+    revised, diagnostics = apply_free_text_reference_interventions(
+        plan,
+        request,
+        profile,
+        Stage2InterventionConfig(
+            explicit_conflict_preservation=True,
+            update_column_consistency=True,
+        ),
+    )
+    assert not [item for item in diagnostics if item.severity == "error"]
+    parent_group, child_group = revised["write_groups"]
+    assert parent_group["write_semantics"] == "insert_ignore"
+    assert parent_group["conflict_target_id"] == parent_pk["constraint_id"]
+    assert parent_group["update_column_ids"] == []
+    assert child_group["write_semantics"] == "upsert_update"
+    assert child_group["conflict_target_id"] == child_pk["constraint_id"]
+    assert child_group["update_column_ids"] == [child_cols["note"]]
+    assert parent_group["stage2_intervention_trace"]["request_scope"] == "group_local"
+    assert child_group["stage2_intervention_trace"]["request_scope"] == "group_local"
+
+
+def test_free_text_unknown_update_column_fails_closed_even_when_one_name_is_valid():
+    profile, parent, columns, pk, *_ = _profile_and_ids()
+    plan = {
+        "version": "4.0",
+        "plan_kind": "reference_write_plan",
+        "write_groups": [{
+            "group_id": "g1",
+            "table_id": parent["table_id"],
+            "rows": [],
+            "write_semantics": "upsert_update",
+            "conflict_target_id": pk["constraint_id"],
+            "update_column_ids": [columns["name"]],
+        }],
+        "dependencies": [],
+        "unresolved_fields": [],
+    }
+    request = (
+        "For parent, ON CONFLICT(id) DO UPDATE SET "
+        "name = excluded.name, not_a_real_column = 1;"
+    )
+    _, diagnostics = apply_free_text_reference_interventions(
+        plan,
+        request,
+        profile,
+        Stage2InterventionConfig(update_column_consistency=True),
+    )
+    errors = [item for item in diagnostics if item.severity == "error"]
+    error = next(item for item in errors if item.error_code == "REQUIRED_UPDATE_COLUMNS_UNRESOLVED")
+    assert "not_a_real_column" in error.details["unresolved_column_names"]
+
+
+def test_free_text_set_parser_uses_assignment_lhs_not_rhs_mentions():
+    profile, parent, columns, pk, *_ = _profile_and_ids()
+    plan = {
+        "version": "4.0",
+        "plan_kind": "reference_write_plan",
+        "write_groups": [{
+            "group_id": "g1",
+            "table_id": parent["table_id"],
+            "rows": [],
+            "write_semantics": "upsert_update",
+            "conflict_target_id": pk["constraint_id"],
+            "update_column_ids": [columns["name"]],
+        }],
+        "dependencies": [],
+        "unresolved_fields": [],
+    }
+    request = (
+        "For parent, ON CONFLICT(id) DO UPDATE SET "
+        "name = CASE WHEN id = 'p1' THEN excluded.name ELSE name END, "
+        "count = count + 1;"
+    )
+    revised, diagnostics = apply_free_text_reference_interventions(
+        plan,
+        request,
+        profile,
+        Stage2InterventionConfig(update_column_consistency=True),
+    )
+    assert not [item for item in diagnostics if item.severity == "error"]
+    assert revised["write_groups"][0]["update_column_ids"] == [
+        columns["name"], columns["count"]
+    ]
+    assert columns["id"] not in revised["write_groups"][0]["update_column_ids"]
+
+
+def test_contradictory_requested_and_excluded_update_controls_fail_closed():
+    profile, _, _, _, child, columns, pk = _profile_and_ids()
+    payload = _payload({
+        "operation": "upsert_update",
+        "conflict_target": "id",
+        "update_columns": "note,parent_id",
+        "relationship_columns_not_updated": "parent_id",
+        "id": 10,
+        "parent_id": "p1",
+        "note": "N",
+    })
+    collection = payload.collections[0]
+    plan = {
+        "target_groups": [{
+            "group_id": "g1",
+            "source_collection_id": collection.reference_id,
+            "source_selector_id": collection.selector_id,
+            "table_id": child["table_id"],
+            "field_mapping": {
+                collection.field_ids["id"]: columns["id"],
+                collection.field_ids["parent_id"]: columns["parent_id"],
+                collection.field_ids["note"]: columns["note"],
+            },
+            "constants": {},
+            "write_semantics": "upsert_update",
+            "conflict_target_id": pk["constraint_id"],
+            "update_column_ids": [columns["note"], columns["parent_id"]],
+        }],
+        "ignored_fields": {},
+        "dependencies": [],
+    }
+    _, diagnostics = apply_reference_interventions(
+        plan,
+        payload,
+        profile,
+        Stage2InterventionConfig(update_column_consistency=True),
+    )
+    errors = [item for item in diagnostics if item.severity == "error"]
+    assert any(item.error_code == "CONTRADICTORY_UPDATE_CONTROL" for item in errors)
+
+
+def test_semi_structured_intervention_warnings_propagate_to_warning_sink():
+    profile, parent, columns, pk, *_ = _profile_and_ids()
+    payload = _payload({
+        "operation": "insert_ignore",
+        "conflict_target": "id",
+        "id": "p1",
+        "name": "One",
+    })
+    collection = payload.collections[0]
+    plan = {
+        "target_groups": [{
+            "group_id": "g1",
+            "source_collection_id": collection.reference_id,
+            "source_selector_id": collection.selector_id,
+            "table_id": parent["table_id"],
+            "field_mapping": {
+                collection.field_ids["id"]: columns["id"],
+                collection.field_ids["name"]: columns["name"],
+            },
+            "constants": {},
+            "write_semantics": "needs_clarification",
+            "conflict_target_id": None,
+            "update_column_ids": [],
+        }],
+        "ignored_fields": {},
+        "dependencies": [],
+    }
+    warnings = []
+    grounded, errors = resolve_reference_mapping_plan(
+        plan,
+        payload,
+        profile,
+        stage2_interventions={
+            "control_field_roles": True,
+            "explicit_conflict_preservation": True,
+            "update_column_consistency": False,
+        },
+        warning_sink=warnings,
+    )
+    assert not errors
+    assert grounded["target_groups"][0]["conflict"]["action"] == "do_nothing"
+    assert any(item.error_code == "EXPLICIT_CONFLICT_SEMANTICS_DROPPED" for item in warnings)
+    assert any(item.error_code == "EXPLICIT_CONFLICT_TARGET_PRESERVED" for item in warnings)

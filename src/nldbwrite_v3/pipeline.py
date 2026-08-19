@@ -119,6 +119,7 @@ class MappingFirstPipeline:
                 payload,
                 self.profile,
                 stage2_interventions=self.stage2_interventions.to_dict(),
+                warning_sink=grounding_warnings,
             )
             if reference_errors:
                 verification = VerificationResult(

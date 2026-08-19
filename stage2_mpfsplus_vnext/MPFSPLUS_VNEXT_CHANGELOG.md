@@ -1,34 +1,30 @@
-# MP-FS+ vNext Changelog — Checkpoint A–C
+# MP-FS+ vNext Changelog — A–C Patch 2
 
-## Added
+## Fixed reviewer blockers
 
-- `nldbwrite_v3.vnext.interventions` with typed field roles and Stage-2 feature configuration.
-- A: typed control/instruction provenance (`consumed_control`, `role`, `consumed_by`).
-- B: deterministic preservation of explicit conflict operation/target semantics.
-- C: deterministic preservation of explicit update-column sets and explicit exclusions.
-- Fail-closed diagnostics:
-  - `EXPLICIT_CONFLICT_SEMANTICS_DROPPED`
-  - `REQUIRED_UPDATE_COLUMNS_DROPPED`
-  - `REQUIRED_UPDATE_COLUMNS_UNRESOLVED`
-- Stage-2 semantic traces carried through reference materialization and, when present, compilation.
-- Four cumulative configs (`original`, `v1_control`, `v2_conflict`, `v3_update`).
-- Intervention registry.
-- Dedicated A–C regression tests.
+- Stage-2 V0/V1/V2/V3 now keep `method_id="MP-FS+"` and use `method_variant` for ablation identity.
+- Every Stage-2 config inherits directly from `configs/final/mp_fs_plus.json`, preventing one-level inheritance loss.
+- V1 is isolated to typed operation controls; it no longer auto-consumes conflict/update/metadata controls.
+- Materialization uses exact `consumed_control_refs` emitted by semantic components instead of field-name/context suppression.
+- Free-text conflict preservation is group/table scoped for multi-group requests.
+- Free-text update parsing resolves explicit names after parsing and preserves unknown names as fail-closed errors.
+- SQL-like `DO UPDATE SET` parsing uses assignment LHS only.
+- Contradictory requested/excluded update controls emit `CONTRADICTORY_UPDATE_CONTROL`.
+- Semi-structured intervention warnings propagate through the pipeline warning stream.
 
-## Changed
+## Preserved from checkpoint 1
 
-- `MappingFirstPipeline` accepts `stage2_interventions`; default is all disabled.
-- Reference and free-text paths apply only enabled deterministic interventions before final materialization/verification.
-- `materialize_mapping_plan` can distinguish typed consumed controls from payload provenance when A is enabled.
-- Verifier recognizes only well-formed typed `consumed_control` records; arbitrary unresolved fields remain errors.
-- `CompiledStatement` can expose a Stage-2 semantic trace, but omits the field entirely from serialization when absent so baseline output shape is preserved.
+- exact conflict target resolution;
+- exact update-column closed-set restoration;
+- compiler semantic trace;
+- fail-closed verifier/preflight behavior;
+- no fuzzy repair and no LLM repair in A–C.
 
-## Not changed in this checkpoint
+## Still out of scope
 
-- Structured parser row segmentation / NULL semantics.
-- Date/time normalization.
-- Reference repair.
-- Diagnostic-driven LLM repair.
-- LLM prompt/model/decoding.
-- Verifier thresholds or preflight rules.
-- Stage-1 frozen results.
+- D structured parser / NULL handling;
+- E free-text/date normalization;
+- F constrained reference repair;
+- G diagnostic-driven targeted repair;
+- causal replay experiment;
+- 7B end-to-end development run.

@@ -1,42 +1,29 @@
-# Stage 2 Checkpoint A–C Report
+# Stage 2 Checkpoint A–C Patch 2 Report
 
-## Status
+## Reviewer-blocking issues addressed
 
-Implementation checkpoint only. No new model inference and no confirmatory accuracy claim is made.
+1. Config dispatch fixed: all variants dispatch as `MP-FS+` and retain MP-FS+ preflight.
+2. Config inheritance fixed: V0/V1/V2/V3 inherit directly from the frozen final MP-FS+ config.
+3. A isolated: V1 consumes only typed operation controls.
+4. Free-text B made group/table scoped.
+5. Free-text C parses explicit requested names and SET LHS; mixed unknown names fail closed.
+6. Requested/excluded update contradictions fail closed.
+7. Semi-structured intervention warnings are propagated.
+8. Regression/integration CPU tests added for all of the above.
 
-## Stage-1 hypotheses addressed
+## Validation
 
-| Intervention | Stage-1 evidence | Intended boundary |
-|---|---|---|
-| A — control semantics | 22 materialization-bound operation/control cases | source provenance/materialization |
-| B — conflict preservation | 20/20 conflict audits resolvable from input | upstream semantic planning |
-| C — update columns | 4 executed-but-wrong omission cases plus latent expansion cases | plan/materialization/compilation semantic consistency |
+- A–C Patch-2 regression suite: **20/20 passed**.
+- Compatibility subset (`test_source_and_planner.py`, `test_mp_fs_plus.py`, Patch-2 A–C tests): **100%, no failures**.
+- Full fast suite (`pytest -q -m "not integration"`): **100%, no failures**.
+- No GPU/model inference performed.
 
-A is not claimed to recover 22/22. Stage 1 showed only a subset were clean single blockers. The purpose of this checkpoint is to make the interventions explicit and ablatable before causal replay.
+## Ablation interpretation after Patch 2
 
-## Validation performed
+- V0→V1: typed operation-control provenance only.
+- V1→V2: conflict-semantic/action/target preservation.
+- V2→V3: update-column closed-set preservation and contradiction/unknown safety.
 
-- Dedicated Stage-2 A–C regression suite: 13 tests passed.
-- Existing source/planner + MP-FS+ compatibility tests plus A–C tests: 53 passed.
-- Full repository fast suite (`pytest -q -m "not integration"`): passed at 100% on the full code state matching branch HEAD `34ef629b4b0e49ba88dc37c783d500d94a925f7e`.
+## Decision requested
 
-## Baseline preservation checks
-
-- all flags default to `false`;
-- `original.json` explicitly disables A/B/C;
-- intervention functions return without semantic rewrites when their flags are disabled;
-- baseline unresolved fields remain fail-closed;
-- compiled statement serialization omits Stage-2 semantic trace when no trace is present.
-
-## Safety checks
-
-- a control-like payload field is not consumed solely because of its name;
-- a `consumed_control` record without `consumed_by` remains invalid;
-- unresolvable explicit conflict target remains an error;
-- unresolvable explicit update column remains an error;
-- explicit update exclusions remove forbidden relationship columns;
-- no fuzzy reference matching or LLM repair was added.
-
-## Next checkpoint
-
-Do not run 7B yet. Submit A–C for review first. If accepted, proceed to D–G (parser/value fixes, free-text/date normalization, constrained reference repair, targeted repair), then causal replay and only later one controlled 7B development run.
+Review whether A–C can now be frozen before proceeding to D–G. Do not assess 7B/scaling performance at this checkpoint.

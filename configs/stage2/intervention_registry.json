@@ -1,25 +1,26 @@
 {
-  "stage": "2-A-C",
+  "stage": "2-A-C-patch2",
   "baseline": "configs/stage2/original.json",
+  "dispatch_family": "MP-FS+",
   "interventions": [
     {
       "id": "A_control_field_roles",
       "flag": "control_field_roles",
-      "hypothesis": "Control/instruction fields must be consumed by typed semantics rather than mapped as payload or rejected as unresolved.",
-      "stage1_evidence": "22 materialization-bound operation/control-field cases",
+      "hypothesis": "High-confidence operation controls must be consumed by typed operation semantics rather than treated as payload or silently ignored.",
+      "stage1_evidence": "22 materialization-bound cases whose first blocker involved source field 'operation'",
       "config": "configs/stage2/v1_control.json"
     },
     {
       "id": "B_explicit_conflict_preservation",
       "flag": "explicit_conflict_preservation",
-      "hypothesis": "Explicit conflict semantics in the request must not be degraded to needs_clarification or a contradictory action.",
+      "hypothesis": "Explicit group-local conflict semantics in the request must not be degraded to needs_clarification or a contradictory action/target.",
       "stage1_evidence": "20/20 conflict-audit cases were RESOLVABLE_FROM_INPUT",
       "config": "configs/stage2/v2_conflict.json"
     },
     {
       "id": "C_update_column_consistency",
       "flag": "update_column_consistency",
-      "hypothesis": "Explicit requested update columns define a closed update set and must survive planning/materialization without omission or relationship-column expansion.",
+      "hypothesis": "Explicit requested update columns define a closed update set and must survive planning/materialization without omission, silent unknown-column loss, or contradiction with exclusions.",
       "stage1_evidence": "4 executed-but-wrong update-column omission cases plus latent relationship-column expansion cases",
       "config": "configs/stage2/v3_update.json"
     }

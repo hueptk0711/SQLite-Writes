@@ -719,6 +719,7 @@ def resolve_reference_mapping_plan(
     profile: dict[str, Any],
     *,
     stage2_interventions: dict[str, Any] | None = None,
+    warning_sink: list[Diagnostic] | None = None,
 ) -> tuple[dict[str, Any], list[Diagnostic]]:
     """Resolve an MP-FS+ ID-only Mapping Plan into materializer input.
 
@@ -734,6 +735,11 @@ def resolve_reference_mapping_plan(
     errors: list[Diagnostic] = [
         item for item in intervention_diagnostics if item.severity == "error"
     ]
+    intervention_warnings = [
+        item for item in intervention_diagnostics if item.severity == "warning"
+    ]
+    if warning_sink is not None:
+        warning_sink.extend(intervention_warnings)
     tables = table_reference_map(profile)
     collections = _source_reference_map(payload)
     selector_ids = {
@@ -941,6 +947,7 @@ def resolve_reference_mapping_plan(
         "target_groups": output_groups,
         "dependencies": deepcopy(plan.get("dependencies") or []),
         "ignored_fields": ignored_fields,
+        "consumed_control_refs": deepcopy(plan.get("consumed_control_refs") or []),
         "reference_contract": "mp-fs-plus-v1",
     }, errors
 
