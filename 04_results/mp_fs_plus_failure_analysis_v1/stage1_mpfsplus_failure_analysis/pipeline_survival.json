@@ -1,0 +1,13 @@
+{
+  "compilation_pass": 171,
+  "executed": 164,
+  "generation_pass": 300,
+  "materialization_pass": 215,
+  "parse_pass": 294,
+  "preflight_pass": 164,
+  "reference_pass": 259,
+  "semantic_gate_pass": 170,
+  "target_correct": 148,
+  "total": 300,
+  "verification_pass": 171
+}

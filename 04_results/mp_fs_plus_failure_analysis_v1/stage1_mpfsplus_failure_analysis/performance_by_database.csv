@@ -1,0 +1,6 @@
+DB,N,MP-FS+ accuracy,Coverage,Main failure
+archeology,60,50.00,53.33,verification
+polar,60,61.67,66.67,materialization
+robot,60,45.00,48.33,materialization
+vaccine,60,41.67,46.67,verification
+virtual,60,48.33,58.33,reference_resolution

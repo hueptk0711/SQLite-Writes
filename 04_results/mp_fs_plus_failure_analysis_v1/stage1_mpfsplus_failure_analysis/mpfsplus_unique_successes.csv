@@ -1,0 +1,22 @@
+sample_id,what_mpfsplus_did_correctly,why_direct_failed,why_jfs_failed,feature_responsible
+final_archeology_060,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
+final_polar_005,passed structured checks and matched target state,wrong_state_or_execution_failure,,conflict identification
+final_polar_009,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
+final_polar_018,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
+final_polar_021,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
+final_polar_030,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
+final_polar_035,passed structured checks and matched target state,wrong_state_or_execution_failure,,conflict identification
+final_polar_036,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
+final_polar_038,passed structured checks and matched target state,wrong_state_or_execution_failure,wrong_state_or_verification_failure,conflict identification
+final_polar_039,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
+final_polar_050,passed structured checks and matched target state,wrong_state_or_execution_failure,,conflict identification
+final_polar_051,passed structured checks and matched target state,wrong_state_or_execution_failure,,conflict identification
+final_polar_054,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
+final_polar_060,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
+final_robot_038,passed structured checks and matched target state,wrong_state_or_execution_failure,,conflict identification
+final_vaccine_015,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
+final_vaccine_038,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
+final_vaccine_039,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
+final_vaccine_044,passed structured checks and matched target state,wrong_state_or_execution_failure,,conflict identification
+final_vaccine_054,passed structured checks and matched target state,,wrong_state_or_verification_failure,conflict identification
+final_virtual_038,passed structured checks and matched target state,wrong_state_or_execution_failure,,conflict identification

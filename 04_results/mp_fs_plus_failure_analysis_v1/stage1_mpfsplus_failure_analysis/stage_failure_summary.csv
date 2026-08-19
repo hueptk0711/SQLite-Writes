@@ -1,0 +1,8 @@
+First failure stage,N,% of 300,% of incorrect
+parse,6,2.00,3.95
+reference_resolution,35,11.67,23.03
+materialization,44,14.67,28.95
+verification,44,14.67,28.95
+semantic_gate,1,0.33,0.66
+preflight,6,2.00,3.95
+state_mismatch,16,5.33,10.53

@@ -1,0 +1,6 @@
+DB,N,generation,parse,reference_resolution,materialization,verification,compilation,semantic_gate,preflight,execution,state_mismatch
+archeology,60,0,0,10,7,10,0,1,0,0,2
+polar,60,0,1,2,11,4,0,0,2,0,3
+robot,60,0,1,9,11,9,0,0,1,0,2
+vaccine,60,0,1,5,10,14,0,0,2,0,3
+virtual,60,0,3,9,5,7,0,0,1,0,6
