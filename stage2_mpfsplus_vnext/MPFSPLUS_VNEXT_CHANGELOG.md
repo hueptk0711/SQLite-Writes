@@ -1,17 +1,23 @@
-# MP-FS+ vNext Changelog — A–C Patch 3
+# MP-FS+ vNext Changelog — A–C Patch 4
 
-## Patch 3 — exactness and semantic false-positive hardening
+## Patch 4 — unified free-text instruction/payload boundary
 
-- separated loose control-alias canonicalization from exact database-identifier resolution;
-- preserved underscores/punctuation in DB identifier keys and retained candidate lists to prevent silent dictionary overwrite;
-- added fail-closed `AMBIGUOUS_IDENTIFIER`;
-- split `CONFLICT_ACTION_CONTROL` from `CONFLICT_TARGET_CONTROL`;
-- restricted structured operation parsing to exact aliases;
-- masked quoted payload literals before free-text conflict-semantic detection;
-- restricted free-text restoration to high-confidence instructional syntax;
-- preserved V0 materialization artifact shape when Stage-2 roles are disabled;
-- propagated `method_variant` / `method_version` through experiment provenance;
-- added adversarial tests for identifier collision, semantic fabrication, quoted payload false positives, V0 artifact identity, and run provenance.
+- introduced a shared payload-literal masking boundary for free-text operation, conflict-target, and update-column extraction;
+- masks quoted payload RHS literals such as `description='conflict_target=other'` and `note='update_columns=other'`;
+- preserves quoted SQL identifiers in `ON CONFLICT("user_id")` and assignment LHS/RHS such as `"name" = excluded."name"`;
+- preserves explicit quoted control values such as `conflict_target: "id"`;
+- prevents quoted payload text such as `note='ON CONFLICT(other) DO NOTHING'` from creating deterministic conflict semantics;
+- added six adversarial tests for target/update payload isolation and quoted-identifier/control preservation.
+
+## Patch 3 retained
+
+- exact database-identifier resolution separate from loose control aliases;
+- ambiguous exact identifier fail-closed behavior;
+- conflict action / conflict target separation;
+- strict structured operation aliases;
+- high-confidence free-text operation semantics;
+- V0 materialization artifact compatibility;
+- `method_variant` / `method_version` experiment provenance.
 
 ## Patch 2 retained
 

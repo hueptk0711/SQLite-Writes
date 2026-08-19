@@ -1114,6 +1114,140 @@ def test_free_text_payload_literal_do_nothing_does_not_change_operation():
     assert not diagnostics
 
 
+
+def _free_text_profile_with_other_unique():
+    profile = test_profile()
+    parent = next(table for table in profile["tables"] if table["name"] == "parent")
+    parent["columns"].append(
+        {"name": "other", "type": "TEXT", "is_insertable": True}
+    )
+    parent["unique_indexes"].append(
+        {"name": "uq_other", "columns": ["other"], "origin": "u", "is_primary_key": False}
+    )
+    ensure_reference_ids(profile)
+    return profile, parent
+
+
+def test_quoted_payload_conflict_target_does_not_override_target():
+    profile, parent = _free_text_profile_with_other_unique()
+    constraints = {item["name"]: item["constraint_id"] for item in parent["unique_indexes"]}
+    _, plan = _plain_parent_free_text_plan(profile)
+    revised, diagnostics = apply_free_text_reference_interventions(
+        plan,
+        "For parent, operation: insert_ignore; "
+        "description='conflict_target=other'; conflict_target: id; id='p1'.",
+        profile,
+        Stage2InterventionConfig(explicit_conflict_preservation=True),
+    )
+    group = revised["write_groups"][0]
+    assert group["write_semantics"] == "insert_ignore"
+    assert group["conflict_target_id"] == constraints["PRIMARY_KEY"]
+    assert group["conflict_target_id"] != constraints["uq_other"]
+    assert not any(item.severity == "error" for item in diagnostics)
+
+
+def test_quoted_payload_update_columns_does_not_add_columns():
+    profile, parent = _free_text_profile_with_other_unique()
+    cols = {column["name"]: column["column_id"] for column in parent["columns"]}
+    pk = next(item for item in parent["unique_indexes"] if item.get("is_primary_key"))
+    _, plan = _plain_parent_free_text_plan(profile)
+    plan["write_groups"][0].update({
+        "write_semantics": "upsert_update",
+        "conflict_target_id": pk["constraint_id"],
+        "update_column_ids": [cols["name"]],
+    })
+    revised, diagnostics = apply_free_text_reference_interventions(
+        plan,
+        "For parent, operation: upsert_update; conflict_target: id; "
+        "description='update_columns=other'; update_columns: name; id='p1'.",
+        profile,
+        Stage2InterventionConfig(
+            explicit_conflict_preservation=True,
+            update_column_consistency=True,
+        ),
+    )
+    group = revised["write_groups"][0]
+    assert group["update_column_ids"] == [cols["name"]]
+    assert cols["other"] not in group["update_column_ids"]
+    assert not any(item.severity == "error" for item in diagnostics)
+
+
+def test_quoted_identifier_in_on_conflict_still_resolves():
+    profile = test_profile()
+    parent = next(table for table in profile["tables"] if table["name"] == "parent")
+    parent["columns"].append(
+        {"name": "user_id", "type": "TEXT", "is_insertable": True}
+    )
+    parent["unique_indexes"].append(
+        {"name": "uq_user_id", "columns": ["user_id"], "origin": "u", "is_primary_key": False}
+    )
+    ensure_reference_ids(profile)
+    constraints = {item["name"]: item["constraint_id"] for item in parent["unique_indexes"]}
+    _, plan = _plain_parent_free_text_plan(profile)
+    revised, diagnostics = apply_free_text_reference_interventions(
+        plan,
+        'For parent, ON CONFLICT("user_id") DO NOTHING; id="p1"; user_id="u1".',
+        profile,
+        Stage2InterventionConfig(explicit_conflict_preservation=True),
+    )
+    group = revised["write_groups"][0]
+    assert group["write_semantics"] == "insert_ignore"
+    assert group["conflict_target_id"] == constraints["uq_user_id"]
+    assert not any(item.severity == "error" for item in diagnostics)
+
+
+def test_quoted_identifier_set_lhs_still_resolves():
+    profile = test_profile()
+    ensure_reference_ids(profile)
+    parent = next(table for table in profile["tables"] if table["name"] == "parent")
+    cols = {column["name"]: column["column_id"] for column in parent["columns"]}
+    _, plan = _plain_parent_free_text_plan(profile)
+    revised, diagnostics = apply_free_text_reference_interventions(
+        plan,
+        'For parent, operation: upsert_update; conflict_target: id; '
+        'DO UPDATE SET "name" = excluded."name"; id="p1".',
+        profile,
+        Stage2InterventionConfig(
+            explicit_conflict_preservation=True,
+            update_column_consistency=True,
+        ),
+    )
+    group = revised["write_groups"][0]
+    assert group["update_column_ids"] == [cols["name"]]
+    assert not any(item.severity == "error" for item in diagnostics)
+
+
+def test_payload_literal_on_conflict_text_is_not_instruction():
+    profile = test_profile()
+    _, plan = _plain_parent_free_text_plan(profile)
+    revised, diagnostics = apply_free_text_reference_interventions(
+        plan,
+        "For parent, insert a row with id='p1' and "
+        "name='ON CONFLICT(id) DO NOTHING'.",
+        profile,
+        Stage2InterventionConfig(explicit_conflict_preservation=True),
+    )
+    assert revised["write_groups"][0]["write_semantics"] == "plain_insert"
+    assert revised["write_groups"][0]["conflict_target_id"] is None
+    assert not diagnostics
+
+
+def test_quoted_control_conflict_target_value_still_resolves():
+    profile = test_profile()
+    ensure_reference_ids(profile)
+    parent = next(table for table in profile["tables"] if table["name"] == "parent")
+    pk = next(item for item in parent["unique_indexes"] if item.get("is_primary_key"))
+    _, plan = _plain_parent_free_text_plan(profile)
+    revised, diagnostics = apply_free_text_reference_interventions(
+        plan,
+        'For parent, operation: insert_ignore; conflict_target: "id"; id="p1".',
+        profile,
+        Stage2InterventionConfig(explicit_conflict_preservation=True),
+    )
+    assert revised["write_groups"][0]["conflict_target_id"] == pk["constraint_id"]
+    assert not any(item.severity == "error" for item in diagnostics)
+
+
 def test_v0_materialization_matches_frozen_fixture():
     import json
     from pathlib import Path

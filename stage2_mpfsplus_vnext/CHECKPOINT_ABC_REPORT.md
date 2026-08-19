@@ -1,24 +1,46 @@
-# Stage 2 Checkpoint A–C Patch 3 Report
+# Stage 2 Checkpoint A–C Patch 4 Report
 
 ## Scope
 
-Patch 3 is a deterministic hardening pass over A–C only. It does not implement D–G, causal replay, prompt changes, or model inference.
+Patch 4 is a narrow deterministic trust-boundary hardening pass over A–C only. It does not change feature flags, planner architecture, compiler, verifier, prompts, repair logic, D–G, or model inference.
 
-## Reviewer blockers addressed
+## Reviewer blocker addressed
 
-1. **Exact DB identifier boundary.** Control aliases still use loose canonicalization, but schema identifiers now use quote-stripped, case-insensitive exact keys that preserve underscores and punctuation. `user_id` and `userid` remain distinct. Candidate maps retain all exact candidates and ambiguous identifiers fail closed with `AMBIGUOUS_IDENTIFIER`.
-2. **Conflict action/target separation.** `CONFLICT_ACTION_CONTROL` and `CONFLICT_TARGET_CONTROL` are distinct. Target/key values are never passed to the operation/action parser.
-3. **Strict structured operation aliases.** Structured control values use exact alias sets; substring values such as `skip_validation` do not become `insert_ignore`.
-4. **High-confidence free-text B.** Quoted literals are masked before instruction parsing. Deterministic restoration requires explicit syntax such as `ON CONFLICT ... DO ...`, `INSERT OR IGNORE/UPDATE`, typed `operation:` assignments, or an explicit conditional conflict/duplicate cue with a nearby action. Bare payload words do not change semantics.
-5. **V0 artifact compatibility.** When Stage-2 control roles are off and there is no deterministic consumption, unresolved-field records do not gain Stage-2-only `role` metadata. A frozen materialization fixture checks full-structure equality.
-6. **Experiment provenance.** `method_variant` and `method_version` are recorded in run lock, manifest, sample-level processed artifacts, summary metadata, and final-consumed identity.
+Patch 3 protected free-text operation detection from quoted payload literals, but conflict-target and update-column extraction still scanned raw request text.
+
+Patch 4 applies one shared rule:
+
+> Quoted payload content must never become deterministic instruction semantics.
+
+The implementation masks quoted literal spans when they are RHS values of ordinary payload assignments, while preserving:
+
+- explicit quoted control values such as `conflict_target: "id"`;
+- quoted conflict identifiers such as `ON CONFLICT("user_id")`;
+- quoted update LHS/RHS identifiers such as `"name" = excluded."name"`.
+
+This boundary is now used consistently before:
+
+1. free-text operation extraction;
+2. free-text conflict-target extraction;
+3. free-text update-column extraction.
+
+## Adversarial invariants
+
+Patch 4 verifies that:
+
+- `description='conflict_target=other'` cannot override an explicit conflict target;
+- `description='update_columns=other'` cannot add an update column;
+- `ON CONFLICT("user_id") DO NOTHING` still resolves the quoted identifier;
+- `DO UPDATE SET "name" = excluded."name"` still resolves `name` from assignment LHS;
+- `note='ON CONFLICT(other) DO NOTHING'` cannot create conflict semantics;
+- `conflict_target: "id"` remains a valid quoted control value.
 
 ## Validation
 
-- Stage-2 A–C adversarial/integration suite: **30/30 passed**.
+- Stage-2 A–C adversarial/integration suite: **36/36 passed**.
 - Compatibility subset: **100%, no failures**.
 - Full fast suite (`-m "not integration"`): **100%, no failures**.
-- CPU smoke: **PASS** using the mock backend on one synthetic sample; run lock, manifest, summary metadata, and evaluation sample all carried the expected variant/version.
+- CPU smoke: **PASS** using the existing mock-backend smoke path; provenance remained valid.
 - No GPU/model inference performed.
 
 ## Decision requested

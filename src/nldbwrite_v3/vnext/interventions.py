@@ -486,36 +486,103 @@ def _conflict_target_resolution(
     return target_id, [], [], refs
 
 
-def _mask_quoted_literals(value: str) -> str:
-    """Mask quoted payload literals before deterministic instruction parsing."""
-    output: list[str] = []
-    quote: str | None = None
-    escape = False
-    for char in str(value):
-        if quote is not None:
+def _assignment_lhs_before_quote(value: str, quote_index: int) -> str | None:
+    """Return the simple assignment LHS when a quote starts directly after ``=``."""
+    prefix = value[:quote_index]
+    match = re.search(
+        r'(?is)(?P<lhs>(?:"[^"]+"|`[^`]+`|\[[^\]]+\]|[A-Za-z_][A-Za-z0-9_]*))\s*=\s*$',
+        prefix,
+    )
+    if not match:
+        return None
+    return _strip_sql_identifier_quotes(match.group("lhs"))
+
+
+def _quoted_control_value_context(value: str, quote_index: int) -> bool:
+    """Return true when a quoted span is the explicit value of a known control."""
+    prefix = value[:quote_index]
+    match = re.search(
+        r"(?is)(?P<field>[A-Za-z_][A-Za-z0-9_ -]{0,50})\s*[:=]\s*$",
+        prefix,
+    )
+    if not match:
+        return False
+    return classify_source_field_role(match.group("field")) != PAYLOAD_VALUE
+
+
+def _quoted_identifier_context(value: str, start: int, end: int, quote: str) -> bool:
+    """Preserve quoted SQL identifiers while masking quoted payload content."""
+    if quote not in {'"', "`"}:
+        return False
+    content = value[start + 1:end]
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", content):
+        return False
+
+    prefix = value[:start]
+    suffix = value[end + 1:]
+    if re.search(r"\.\s*$", prefix):
+        return True
+    if re.match(r"\s*=", suffix):
+        return True
+    if re.search(r"(?is)\bon\s+conflict\s*\([^)]*$", prefix):
+        return True
+    return False
+
+
+def _mask_payload_literals(value: str) -> str:
+    """Mask payload literal spans without destroying quoted SQL/control identifiers.
+
+    Patch 4 applies one instruction/payload boundary to operation, conflict-target,
+    and update-column extraction. Quoted RHS values of ordinary payload assignments
+    are masked. Explicit quoted control values and quoted SQL identifiers remain
+    visible to the deterministic control parsers.
+    """
+    text = str(value)
+    output = list(text)
+    index = 0
+    while index < len(text):
+        char = text[index]
+        if char not in {"'", '"', "`"}:
+            index += 1
+            continue
+
+        quote = char
+        end = index + 1
+        escape = False
+        while end < len(text):
+            current = text[end]
             if escape:
                 escape = False
-                output.append(" ")
-            elif char == "\\":
+            elif current == "\\":
                 escape = True
-                output.append(" ")
-            elif char == quote:
-                quote = None
-                output.append(char)
-            else:
-                output.append(" ")
-            continue
-        if char in {"'", '"', "`"}:
-            quote = char
-            output.append(char)
-        else:
-            output.append(char)
+            elif current == quote:
+                break
+            end += 1
+        if end >= len(text):
+            for pos in range(index + 1, len(text)):
+                output[pos] = " "
+            break
+
+        lhs = _assignment_lhs_before_quote(text, index)
+        payload_assignment = (
+            lhs is not None
+            and classify_source_field_role(lhs) == PAYLOAD_VALUE
+        )
+        preserve = (
+            (lhs is not None and not payload_assignment)
+            or _quoted_control_value_context(text, index)
+            or _quoted_identifier_context(text, index, end, quote)
+        )
+        if not preserve:
+            for pos in range(index + 1, end):
+                output[pos] = " "
+        index = end + 1
     return "".join(output)
 
 
 def _operation_from_request_text(request: str) -> str | None:
     """Restore only explicit high-confidence conflict/operation instructions."""
-    text = " ".join(_mask_quoted_literals(str(request)).split()).casefold()
+    text = " ".join(_mask_payload_literals(str(request)).split()).casefold()
 
     # SQL-like conflict syntax is the highest-confidence signal.
     on_conflict = re.search(r"\bon\s+conflict(?:\s*\([^)]*\))?\s+do\s+(?P<action>nothing|update)\b", text)
@@ -553,6 +620,7 @@ def _operation_from_request_text(request: str) -> str | None:
 
 
 def _request_conflict_target_id(request: str, table: dict[str, Any]) -> tuple[str | None, list[str], list[str]]:
+    request = _mask_payload_literals(request)
     names: list[str] = []
     patterns = (
         r"(?is)on\s+conflict\s*\((?P<value>[^)]+)\)",
@@ -617,6 +685,7 @@ def _identifier_name(value: str) -> str | None:
 
 def _request_update_names(request: str) -> tuple[list[str], list[str]]:
     """Parse explicit update controls; SET clauses use assignment LHS only."""
+    request = _mask_payload_literals(request)
     cleaned = re.sub(r"[`*]", "", request)
     requested: list[str] = []
     excluded: list[str] = []

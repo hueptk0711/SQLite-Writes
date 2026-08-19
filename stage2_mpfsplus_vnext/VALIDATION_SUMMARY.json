@@ -1,22 +1,21 @@
 {
-  "checkpoint": "Stage2-A-C-Patch3",
-  "base_commit": "b8c8812",
+  "checkpoint": "Stage2-A-C-Patch4",
+  "base_commit": "97885c0c4383059f76392bf6291d1df34ede113c",
   "scope": [
     "A_control_operation_semantics",
     "B_conflict_semantic_preservation",
     "C_update_column_preservation"
   ],
-  "hardening": [
-    "exact_identifier_resolution",
-    "conflict_action_target_separation",
-    "strict_structured_operation_aliases",
-    "high_confidence_free_text_semantics",
-    "v0_artifact_identity",
-    "experiment_variant_provenance"
+  "patch4_hardening": [
+    "shared_free_text_instruction_payload_boundary",
+    "quoted_payload_conflict_target_isolation",
+    "quoted_payload_update_column_isolation",
+    "quoted_sql_identifier_preservation",
+    "quoted_control_value_preservation"
   ],
   "tests": {
     "stage2_vnext_abc": {
-      "passed": 30,
+      "passed": 36,
       "failed": 0
     },
     "compatibility_subset": {

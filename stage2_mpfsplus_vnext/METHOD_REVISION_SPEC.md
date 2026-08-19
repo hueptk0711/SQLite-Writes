@@ -63,3 +63,14 @@ Historical configs without variant/version do not gain these fields in the run l
 6. unresolved or ambiguous explicit identifiers fail closed;
 7. V0 retains frozen materialization artifact semantics;
 8. verifier/preflight behavior remains fail closed.
+
+
+## Patch 4 free-text instruction/payload boundary
+
+All deterministic free-text control extractors share one trust-boundary invariant:
+
+> quoted payload content must not become deterministic instruction semantics.
+
+The lexical boundary masks quoted RHS literals of ordinary payload assignments while preserving explicit quoted control values and SQL identifier contexts such as `ON CONFLICT("id")` and `SET "name" = excluded."name"`.
+
+This boundary is applied consistently before operation, conflict-target, and update-column extraction. It does not change A/B/C feature flags or semantic restoration policy.
