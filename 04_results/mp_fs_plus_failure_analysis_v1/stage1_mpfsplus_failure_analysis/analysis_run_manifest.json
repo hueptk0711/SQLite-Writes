@@ -1,7 +1,7 @@
 {
-  "analysis_id": "mp_fs_plus_failure_analysis_v1",
-  "commit_hash": "aeb3ca0899503c0c6401eea1253b31059f7d97ed",
-  "created_for_phase": "stage_1_error_failure_analysis",
+  "analysis_id": "mp_fs_plus_failure_analysis_v1_1",
+  "commit_hash": "86949c4a87fd4cee0eda3e63282935fd5edec366",
+  "created_for_phase": "stage_1_1_manual_causal_correction",
   "dataset_archive": "03_protocol_and_data\\final_holdout_release\\mp_fs_plus_external_holdout_300_20260731.zip",
   "dataset_archive_sha256": "525cdd7006ea32a8ab8d81f842332ac9b403dce2472cde608efb4e6962d456df",
   "dataset_manifest_hashes": {
@@ -12,10 +12,41 @@
   "evaluation_config": {
     "protocol_id": "mp_fs_plus_external_holdout_v2_out8192",
     "reporting_policy": "retain output-limit adjudicated samples in denominator",
-    "state_scope": "all_user_tables"
+    "state_mismatch_audit": "gold/prediction replay on isolated SQLite copies",
+    "state_scope": "all_user_tables",
+    "v0_causal_scope": "system-level bypass; not a single-component verifier intervention"
   },
-  "generation_config": {},
+  "generation_config": {
+    "do_sample": {
+      "source": "config.json:inference.do_sample",
+      "status": "recorded",
+      "value": false
+    },
+    "max_input_tokens": {
+      "source": "config.json:inference.max_input_tokens",
+      "status": "recorded",
+      "value": 28672
+    },
+    "max_new_tokens": {
+      "source": "config.json:inference.max_new_tokens",
+      "status": "recorded",
+      "value": 8192
+    },
+    "temperature": {
+      "source": null,
+      "status": "not_recorded_in_frozen_artifact",
+      "value": null
+    },
+    "top_p": {
+      "source": null,
+      "status": "not_recorded_in_frozen_artifact",
+      "value": null
+    }
+  },
   "gpu_required": false,
+  "manual_audit_decisions_file": "04_results\\mp_fs_plus_failure_analysis_v1\\stage1_manual_audit_decisions.csv",
+  "manual_review_pending": 0,
+  "manual_review_required": 69,
   "model": "MP-FS+",
   "model_aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
   "model_inference_rerun": false,
@@ -24,11 +55,19 @@
   "mpfsplus_correct": 148,
   "mpfsplus_incorrect": 152,
   "predictions_modified": false,
-  "prompt_version": null,
+  "prompt_version": {
+    "source": null,
+    "status": "not_recorded_in_frozen_artifact",
+    "value": null
+  },
   "result_archive": "04_results\\00_incoming_from_server\\mp_fs_plus_final300_protocol_v2_1_rev2_adjudicated_20260731T121531Z.tar.gz",
   "result_archive_sha256": "e456037422281d56e03dd7766baf1cc9efa78a95061234444c452f3c04810911",
   "sample_count": 300,
-  "seed": null,
+  "seed": {
+    "source": "config.json:inference.seed",
+    "status": "recorded",
+    "value": 42
+  },
   "test_ids": [
     "final_archeology_001",
     "final_archeology_002",

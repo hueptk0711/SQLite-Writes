@@ -1,9 +1,0 @@
-metric,value
-A_pass_correct,148
-B_false_accept_pass_wrong,23
-C_false_reject_reject_correct,22
-D_reject_wrong,101
-precision,86.55
-recall_of_bad_candidates,81.45
-false_accept_rate,13.45
-false_reject_rate,17.89

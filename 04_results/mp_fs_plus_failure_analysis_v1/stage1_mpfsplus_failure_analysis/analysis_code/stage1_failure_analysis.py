@@ -9,8 +9,25 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Iterable
 
+try:
+    from .state_diff_audit import load_database_schema_ddl, replay_state_diff
+except ImportError:  # Direct script execution.
+    from state_diff_audit import load_database_schema_ddl, replay_state_diff
 
-WORKSPACE = Path(__file__).resolve().parents[3]
+
+def discover_workspace(start: Path | None = None) -> Path:
+    """Find the repository root without relying on a fragile fixed parent index."""
+    anchor = (start or Path(__file__).resolve()).resolve()
+    for candidate in [anchor.parent, *anchor.parents]:
+        if (candidate / "04_results").is_dir() and (candidate / "03_protocol_and_data").is_dir():
+            return candidate
+    raise RuntimeError(
+        "Cannot locate SQLite-Writes repository root. Run this analysis from inside a full "
+        "checkout containing 03_protocol_and_data/ and 04_results/."
+    )
+
+
+WORKSPACE = discover_workspace()
 RESULT_ARCHIVE = (
     WORKSPACE
     / "04_results"
@@ -32,6 +49,7 @@ ABLATION_JSONL = (
 )
 OUTPUT_ROOT = WORKSPACE / "04_results" / "mp_fs_plus_failure_analysis_v1"
 OUTPUT_DIR = OUTPUT_ROOT / "stage1_mpfsplus_failure_analysis"
+MANUAL_AUDIT_DECISIONS = OUTPUT_ROOT / "stage1_manual_audit_decisions.csv"
 
 RUN_PREFIX = (
     "experiments/external_holdout/"
@@ -265,7 +283,12 @@ def classify_first_failure(
     return "state_mismatch"
 
 
-def reason_code_for(stage: str, verification: dict[str, Any], evaluation: dict[str, Any]) -> str:
+def reason_code_for(
+    stage: str,
+    verification: dict[str, Any],
+    evaluation: dict[str, Any],
+    state_diff_primary: str | None = None,
+) -> str:
     raw_code = first_error_code(verification, evaluation)
     if stage == "semantic_gate":
         return "RISK_TRUE_REJECT"
@@ -279,7 +302,7 @@ def reason_code_for(stage: str, verification: dict[str, Any], evaluation: dict[s
             return "PREFLIGHT_NOT_NULL"
         return "PREFLIGHT_CONSTRAINT"
     if stage == "state_mismatch":
-        return "STATE_WRONG_VALUE"
+        return state_diff_primary or "STATE_DIFF_AUDIT_REQUIRED"
     if stage == "compilation":
         return "COMPILER_ERROR"
     return REASON_MAP.get(str(raw_code), str(raw_code or "UNKNOWN"))
@@ -300,16 +323,23 @@ def root_cause_for(
     oracle_correct: bool | None,
 ) -> str:
     raw_code = first_error_code(verification, evaluation)
-    if stage in {"reference_resolution", "materialization", "verification"} and oracle_correct:
-        return "VERIFIER_OVER_REJECTION"
+    # V0 removes verifier, provenance, semantic gate, and preflight together.
+    # Therefore a V0 recovery is evidence of system-level bypass recoverability,
+    # not proof that the hard verifier caused the rejection.
+    if stage == "reference_resolution" and oracle_correct:
+        return "BYPASS_RECOVERABLE_REFERENCE_RESOLUTION"
+    if stage == "materialization" and oracle_correct:
+        return "BYPASS_RECOVERABLE_MATERIALIZATION"
+    if stage == "verification" and oracle_correct:
+        return "BYPASS_RECOVERABLE_VERIFICATION"
     if stage == "semantic_gate" and oracle_correct:
-        return "RISK_GATE_OVER_REJECTION"
+        return "BYPASS_RECOVERABLE_SEMANTIC_GATE"
     if stage == "preflight":
         return "PREFLIGHT_ERROR"
     if stage == "compilation":
         return "COMPILER_ERROR"
     if stage == "state_mismatch":
-        return "LLM_SEMANTIC_ERROR"
+        return "FINAL_STATE_MISMATCH"
     return ROOT_CAUSE_MAP.get(str(raw_code), "UNKNOWN")
 
 
@@ -404,42 +434,90 @@ def pair_category(direct_correct: bool, jfs_correct: bool, mp_correct: bool) -> 
     return "ALL_WRONG"
 
 
-def why_mp_failed(stage: str, reason_code: str) -> str:
-    if stage == "reference_resolution":
-        return "grounding_failure"
-    if stage == "materialization":
-        return "evidence_failure"
-    if stage in {"verification", "semantic_gate", "preflight"}:
-        if "RISK" in reason_code or "VERIFY" in reason_code:
-            return "over_rejection"
-        return "extra_representation_constraint"
-    if reason_code.startswith("CONFLICT"):
-        return "dependency_failure"
-    return "wrong_plan"
-
-
-def unique_success_feature(sample: dict[str, Any], evaluation: dict[str, Any]) -> str:
-    if sample.get("conflict_sensitive"):
-        return "conflict identification"
-    if sample.get("multi_table") or "relational" in str(sample.get("complexity") or ""):
-        return "dependency ordering"
-    if evaluation.get("preflight_accepted"):
-        return "transactional preflight"
-    if sample.get("input_mode") == "free_text":
-        return "provenance grounding"
-    return "deterministic compilation"
-
-
 def format_percent(numerator: int, denominator: int) -> str:
     if denominator == 0:
         return ""
     return f"{100.0 * numerator / denominator:.2f}"
 
 
+def load_manual_audit_decisions() -> dict[str, dict[str, str]]:
+    if not MANUAL_AUDIT_DECISIONS.exists():
+        return {}
+    allowed_status = {"PENDING", "COMPLETED"}
+    allowed_conflict_labels = {
+        "",
+        "TRULY_AMBIGUOUS",
+        "RESOLVABLE_FROM_INPUT",
+        "RESOLVABLE_FROM_SCHEMA",
+        "UNKNOWN",
+    }
+    output: dict[str, dict[str, str]] = {}
+    with MANUAL_AUDIT_DECISIONS.open("r", encoding="utf-8-sig", newline="") as handle:
+        for raw in csv.DictReader(handle):
+            sample_id = str(raw.get("sample_id") or "").strip()
+            if not sample_id:
+                raise ValueError("manual audit row has an empty sample_id")
+            if sample_id in output:
+                raise ValueError(f"duplicate manual audit decision for sample {sample_id}")
+            row = {key: str(value or "").strip() for key, value in raw.items()}
+            status = row.get("manual_review_status", "PENDING").upper() or "PENDING"
+            if status not in allowed_status:
+                raise ValueError(f"invalid manual_review_status={status!r} for {sample_id}")
+            row["manual_review_status"] = status
+            conflict_label = row.get("conflict_ambiguity_gold_label", "").upper()
+            if conflict_label not in allowed_conflict_labels:
+                raise ValueError(
+                    f"invalid conflict_ambiguity_gold_label={conflict_label!r} for {sample_id}"
+                )
+            row["conflict_ambiguity_gold_label"] = conflict_label
+            if status == "COMPLETED" and not row.get("manual_review_notes"):
+                raise ValueError(
+                    f"completed manual audit for {sample_id} requires non-empty manual_review_notes"
+                )
+            output[sample_id] = row
+    return output
+
+
+def systematic_audit_tags(stage: str, reason_code: str, detail: str) -> list[str]:
+    lowered = detail.lower()
+    tags: list[str] = []
+    if "source field 'operation' is neither mapped nor justified" in lowered:
+        tags.append("CONTROL_FIELD_OPERATION")
+    if reason_code == "VALUE_NORMALIZATION_ERROR" and "date" in lowered:
+        tags.append("DATE_NORMALIZATION")
+    if reason_code == "CONFLICT_MISSING":
+        tags.append("CONFLICT_AMBIGUITY")
+    if stage == "state_mismatch":
+        tags.append("STATE_MISMATCH")
+    return tags
+
+
+def manual_review_categories(
+    *,
+    stage: str,
+    root_cause: str,
+    reason_code: str,
+    systematic_tags: list[str],
+) -> list[str]:
+    categories: list[str] = []
+    if stage == "state_mismatch":
+        categories.append("EXECUTED_BUT_WRONG")
+    if stage == "execution":
+        categories.append("EXECUTION_FAILURE")
+    if root_cause.startswith("BYPASS_RECOVERABLE_"):
+        categories.append("BYPASS_RECOVERABLE")
+    if reason_code == "UNKNOWN":
+        categories.append("UNKNOWN_REASON")
+    categories.extend(systematic_tags)
+    # Preserve order while removing duplicates.
+    return list(dict.fromkeys(categories))
+
+
 def build_master() -> tuple[list[dict[str, Any]], dict[str, Any]]:
     samples = load_holdout_samples()
     artifacts = load_run_artifacts()
     oracle = oracle_lookup()
+    manual_decisions = load_manual_audit_decisions()
     mp = artifacts["mpfsplus"]
     indexes = {
         key: by_sample(mp[key])
@@ -448,6 +526,8 @@ def build_master() -> tuple[list[dict[str, Any]], dict[str, Any]]:
     direct_eval = by_sample(artifacts["direct"]["evaluation"])
     jfs_eval = by_sample(artifacts["jfs"]["evaluation"])
     rows: list[dict[str, Any]] = []
+    state_diff_records: dict[str, dict[str, Any]] = {}
+
     for sample_id in sorted(samples):
         sample = samples[sample_id]
         evaluation = indexes["evaluation"][sample_id]
@@ -457,7 +537,32 @@ def build_master() -> tuple[list[dict[str, Any]], dict[str, Any]]:
         compiled = indexes["compiled"].get(sample_id, {})
         execution = indexes["execution"].get(sample_id, {})
         stage = classify_first_failure(evaluation, raw, parsed, verification, compiled, execution)
-        reason = reason_code_for(stage, verification, evaluation) if stage != "none" else "NONE"
+
+        state_diff: dict[str, Any] = {}
+        state_diff_error = ""
+        if stage == "state_mismatch":
+            try:
+                state_diff = replay_state_diff(sample, compiled, HOLDOUT_ZIP)
+            except Exception as exc:  # Keep the audit package buildable and expose the failure explicitly.
+                state_diff_error = f"{type(exc).__name__}: {exc}"
+                state_diff = {
+                    "sample_id": sample_id,
+                    "database": sample.get("db_id"),
+                    "state_diff_classes": ["STATE_DIFF_AUDIT_ERROR"],
+                    "primary_class": "STATE_DIFF_AUDIT_ERROR",
+                    "gold_delta": {},
+                    "predicted_delta": {},
+                    "difference": {},
+                    "error": state_diff_error,
+                }
+            state_diff_records[sample_id] = state_diff
+
+        state_diff_primary = str(state_diff.get("primary_class") or "") or None
+        reason = (
+            reason_code_for(stage, verification, evaluation, state_diff_primary)
+            if stage != "none"
+            else "NONE"
+        )
         oracle_correct = oracle_correct_for(sample_id, stage, oracle)
         root_cause = (
             "NONE"
@@ -469,11 +574,26 @@ def build_master() -> tuple[list[dict[str, Any]], dict[str, Any]]:
         jfs_correct = bool(jfs_eval[sample_id].get("target_state_correct"))
         mp_correct = bool(evaluation.get("target_state_correct"))
         preflight = execution.get("preflight") or evaluation.get("preflight") or {}
-        manual_required = bool(
-            stage in {"state_mismatch", "execution"}
-            or root_cause in {"VERIFIER_OVER_REJECTION", "RISK_GATE_OVER_REJECTION"}
-            or reason == "UNKNOWN"
+        detail = "" if stage == "none" else reason_detail(verification, evaluation)
+        systematic_tags = systematic_audit_tags(stage, reason, detail)
+        review_categories = manual_review_categories(
+            stage=stage,
+            root_cause=root_cause,
+            reason_code=reason,
+            systematic_tags=systematic_tags,
         )
+        manual_required = bool(review_categories)
+        decision = manual_decisions.get(sample_id, {})
+        manual_status = str(decision.get("manual_review_status") or "").strip()
+        if not manual_status:
+            manual_status = "PENDING" if manual_required else "NOT_REQUIRED"
+        manual_notes = str(decision.get("manual_review_notes") or "").strip()
+        if manual_required and not manual_notes:
+            manual_notes = "PENDING_MANUAL_AUDIT: " + ";".join(review_categories)
+        conflict_label = str(decision.get("conflict_ambiguity_gold_label") or "").strip()
+        if reason == "CONFLICT_MISSING" and not conflict_label:
+            conflict_label = "UNKNOWN"
+
         row = {
             "sample_id": sample_id,
             "database": sample.get("db_id"),
@@ -481,7 +601,9 @@ def build_master() -> tuple[list[dict[str, Any]], dict[str, Any]]:
             "operation_type": sample.get("operation_semantics"),
             "difficulty": sample.get("difficulty", ""),
             "conflict_sensitive": int(bool(sample.get("conflict_sensitive"))),
-            "dependency_sensitive": int(bool(sample.get("multi_table") or "relational" in str(sample.get("complexity") or ""))),
+            "dependency_sensitive": int(
+                bool(sample.get("multi_table") or "relational" in str(sample.get("complexity") or "").lower())
+            ),
             "target_state_correct": int(mp_correct),
             "strict_state_correct": int(bool(evaluation.get("strict_full_state_correct"))),
             "execution_success": int(bool(evaluation.get("execution_success"))),
@@ -493,11 +615,20 @@ def build_master() -> tuple[list[dict[str, Any]], dict[str, Any]]:
             **statuses,
             "first_failure_stage": stage,
             "failure_reason_code": reason,
-            "failure_reason_detail": "" if stage == "none" else reason_detail(verification, evaluation),
+            "failure_reason_detail": detail,
             "root_cause": root_cause,
+            "systematic_audit_tags": ";".join(systematic_tags),
+            "state_diff_classes": ";".join(state_diff.get("state_diff_classes") or []),
+            "state_diff_error": state_diff_error,
+            "state_diff_gold_delta": json.dumps(state_diff.get("gold_delta") or {}, ensure_ascii=False, sort_keys=True),
+            "state_diff_predicted_delta": json.dumps(state_diff.get("predicted_delta") or {}, ensure_ascii=False, sort_keys=True),
+            "state_diff_difference": json.dumps(state_diff.get("difference") or {}, ensure_ascii=False, sort_keys=True),
             "manual_review_required": int(manual_required),
-            "manual_review_label": "executed_but_wrong" if stage == "state_mismatch" else ("over_reject_candidate" if "OVER_REJECTION" in root_cause else ""),
-            "manual_review_notes": "",
+            "manual_review_label": ";".join(review_categories),
+            "manual_review_status": manual_status,
+            "reviewer_root_cause": str(decision.get("reviewer_root_cause") or "").strip(),
+            "conflict_ambiguity_gold_label": conflict_label,
+            "manual_review_notes": manual_notes,
             "oracle_if_bypassed_correct": "" if oracle_correct is None else int(oracle_correct),
             "abstention_reason": "" if evaluation.get("accepted_output") else ABSTENTION_REASON_BY_STAGE.get(stage, "unsupported"),
             "direct_correct": int(direct_correct),
@@ -506,6 +637,8 @@ def build_master() -> tuple[list[dict[str, Any]], dict[str, Any]]:
             "paired_category": pair_category(direct_correct, jfs_correct, mp_correct),
         }
         rows.append(row)
+
+    artifacts["state_diff_records"] = state_diff_records
     return rows, artifacts
 
 
@@ -561,6 +694,44 @@ def build_performance_by_input_type(rows: list[dict[str, Any]]) -> list[dict[str
     return output
 
 
+def build_performance_by_dependency_sensitivity(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    output: list[dict[str, Any]] = []
+    for value in [0, 1]:
+        subset = [row for row in rows if int(row["dependency_sensitive"]) == value]
+        admitted = sum(row["admitted"] for row in subset)
+        correct = sum(row["target_state_correct"] for row in subset)
+        output.append(
+            {
+                "Dependency-sensitive": "yes" if value else "no",
+                "N": len(subset),
+                "Correct": correct,
+                "Accuracy": format_percent(correct, len(subset)),
+                "Coverage": format_percent(admitted, len(subset)),
+                "Accepted accuracy": format_percent(correct, admitted),
+            }
+        )
+    return output
+
+
+def build_performance_by_operation_type(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    output: list[dict[str, Any]] = []
+    for operation_type in sorted({str(row["operation_type"]) for row in rows}):
+        subset = [row for row in rows if str(row["operation_type"]) == operation_type]
+        admitted = sum(row["admitted"] for row in subset)
+        correct = sum(row["target_state_correct"] for row in subset)
+        output.append(
+            {
+                "Operation": operation_type,
+                "N": len(subset),
+                "Correct": correct,
+                "Accuracy": format_percent(correct, len(subset)),
+                "Coverage": format_percent(admitted, len(subset)),
+                "Accepted accuracy": format_percent(correct, admitted),
+            }
+        )
+    return output
+
+
 def build_performance_by_database(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     output = []
     for database in sorted({row["database"] for row in rows}):
@@ -605,34 +776,34 @@ def build_paired(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "jfs_correct": row["jfs_correct"],
                 "mpfsplus_correct": row["mpfsplus_correct"],
                 "paired_category": row["paired_category"],
-                "why_baseline_succeeded": (
-                    "less_constrained_generation" if baseline_success and mp_failed else ""
-                ),
-                "why_mpfsplus_failed": (
-                    why_mp_failed(row["first_failure_stage"], row["failure_reason_code"])
-                    if baseline_success and mp_failed
-                    else ""
-                ),
+                "observed_mpfsplus_failure_stage": row["first_failure_stage"] if baseline_success and mp_failed else "",
+                "observed_mpfsplus_failure_reason": row["failure_reason_code"] if baseline_success and mp_failed else "",
+                # Deliberately blank: an automatic causal explanation is not evidence.
+                "hypothesized_baseline_advantage": "",
+                "baseline_advantage_requires_manual_audit": int(baseline_success and mp_failed),
             }
         )
     return output
 
 
 def build_unique_successes(rows: list[dict[str, Any]], artifacts: dict[str, Any]) -> list[dict[str, Any]]:
-    samples = load_holdout_samples()
-    evals = by_sample(artifacts["mpfsplus"]["evaluation"])
     output = []
     for row in rows:
         if not row["mpfsplus_correct"] or (row["direct_correct"] and row["jfs_correct"]):
             continue
-        sample = samples[row["sample_id"]]
         output.append(
             {
                 "sample_id": row["sample_id"],
-                "what_mpfsplus_did_correctly": "passed structured checks and matched target state",
-                "why_direct_failed": "wrong_state_or_execution_failure" if not row["direct_correct"] else "",
-                "why_jfs_failed": "wrong_state_or_verification_failure" if not row["jfs_correct"] else "",
-                "feature_responsible": unique_success_feature(sample, evals[row["sample_id"]]),
+                "direct_correct": row["direct_correct"],
+                "jfs_correct": row["jfs_correct"],
+                "mpfsplus_correct": row["mpfsplus_correct"],
+                "conflict_sensitive": row["conflict_sensitive"],
+                "dependency_sensitive": row["dependency_sensitive"],
+                "input_type": row["input_type"],
+                "operation_type": row["operation_type"],
+                "observed_result": "MP-FS+ matched target state while at least one baseline did not",
+                # No feature_responsible field: causality requires manual/component-level evidence.
+                "feature_attribution_status": "NOT_CAUSALLY_ESTABLISHED",
             }
         )
     return output
@@ -647,56 +818,53 @@ def build_oracle(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         output.append(
             {
                 "sample_id": row["sample_id"],
-                "rejected_at_stage": stage,
+                "first_failure_stage": stage,
                 "failure_reason_code": row["failure_reason_code"],
                 "oracle_variant": bypass_variant(stage) or "",
                 "oracle_if_bypassed_correct": row["oracle_if_bypassed_correct"],
-                "false_rejection": int(str(row["oracle_if_bypassed_correct"]) == "1"),
+                "system_bypass_recoverable": int(str(row["oracle_if_bypassed_correct"]) == "1"),
+                "causal_interpretation": (
+                    "SYSTEM_LEVEL_BYPASS_ONLY"
+                    if stage in {"reference_resolution", "materialization", "verification"}
+                    else "STAGE_PAIRED_ABLATION"
+                ),
                 "abstention_reason": row["abstention_reason"],
             }
         )
     return output
 
 
-def build_verifier_confusion() -> list[dict[str, Any]]:
-    oracle = oracle_lookup()
-    artifacts = load_run_artifacts()
-    production_verdicts = by_sample(artifacts["mpfsplus"]["verification"])
-    rows: list[dict[str, Any]] = []
-    for sample_id, production in sorted(production_verdicts.items()):
-        if production.get("status") == "not_available":
-            continue
-        verdict = "PASS" if production.get("status") == "valid" else "REJECT"
-        if verdict == "REJECT":
-            bypass = oracle.get(
-                (
-                    sample_id,
-                    "V0_no_verifier_no_provenance_no_semantic_gate_no_preflight",
-                ),
-                {},
-            )
-            candidate_correct = bool(bypass.get("target_state_correct"))
-        else:
-            replay = oracle.get((sample_id, "V2_hard_verifier_plus_provenance"), {})
-            candidate_correct = bool(replay.get("target_state_correct"))
-        rows.append(
+def build_downstream_bypass_analysis(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    relevant = [
+        row
+        for row in rows
+        if row["first_failure_stage"] in {"reference_resolution", "materialization", "verification"}
+    ]
+    detail_rows = [
+        {
+            "sample_id": row["sample_id"],
+            "first_failure_stage": row["first_failure_stage"],
+            "failure_reason_code": row["failure_reason_code"],
+            "oracle_variant": bypass_variant(row["first_failure_stage"]) or "",
+            "downstream_bypass_correct": row["oracle_if_bypassed_correct"],
+            "interpretation": "system-level bypass; not a single-component verifier intervention",
+        }
+        for row in relevant
+    ]
+    summary_rows: list[dict[str, Any]] = []
+    for stage in ["reference_resolution", "materialization", "verification"]:
+        subset = [row for row in relevant if row["first_failure_stage"] == stage]
+        recoverable = sum(str(row["oracle_if_bypassed_correct"]) == "1" for row in subset)
+        summary_rows.append(
             {
-                "gate": "hard_verifier",
-                "sample_id": sample_id,
-                "verdict": verdict,
-                "candidate_correct": int(candidate_correct),
-                "cell": (
-                    "A_pass_correct"
-                    if verdict == "PASS" and candidate_correct
-                    else "B_pass_wrong"
-                    if verdict == "PASS"
-                    else "C_reject_correct"
-                    if candidate_correct
-                    else "D_reject_wrong"
-                ),
+                "First failure stage": stage,
+                "Rejects": len(subset),
+                "Bypass-correct": recoverable,
+                "Bypass-recoverable rate": format_percent(recoverable, len(subset)),
+                "Causal scope": "system-level V0 bypass",
             }
         )
-    return rows
+    return detail_rows, summary_rows
 
 
 def build_semantic_gate_confusion() -> list[dict[str, Any]]:
@@ -762,6 +930,146 @@ def summarize_confusion(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
+def build_manual_audit_queue(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    output: list[dict[str, Any]] = []
+    for row in rows:
+        if not row["manual_review_required"]:
+            continue
+        output.append(
+            {
+                "sample_id": row["sample_id"],
+                "database": row["database"],
+                "input_type": row["input_type"],
+                "operation_type": row["operation_type"],
+                "review_categories": row["manual_review_label"],
+                "first_failure_stage": row["first_failure_stage"],
+                "failure_reason_code": row["failure_reason_code"],
+                "failure_reason_detail": row["failure_reason_detail"],
+                "root_cause_auto_noncausal": row["root_cause"],
+                "oracle_if_bypassed_correct": row["oracle_if_bypassed_correct"],
+                "state_diff_classes": row["state_diff_classes"],
+                "state_diff_gold_delta": row["state_diff_gold_delta"],
+                "state_diff_predicted_delta": row["state_diff_predicted_delta"],
+                "state_diff_difference": row["state_diff_difference"],
+                "manual_review_status": row["manual_review_status"],
+                "reviewer_root_cause": row["reviewer_root_cause"],
+                "conflict_ambiguity_gold_label": row["conflict_ambiguity_gold_label"],
+                "manual_review_notes": row["manual_review_notes"],
+            }
+        )
+    return output
+
+
+def build_manual_audit_evidence(
+    rows: list[dict[str, Any]],
+    artifacts: dict[str, Any],
+) -> list[dict[str, Any]]:
+    samples = load_holdout_samples()
+    mp = artifacts["mpfsplus"]
+    indexes = {
+        key: by_sample(mp[key])
+        for key in [
+            "evaluation",
+            "raw",
+            "parsed",
+            "materialized",
+            "verification",
+            "compiled",
+            "execution",
+        ]
+    }
+    schema_cache: dict[str, list[dict[str, Any]]] = {}
+    output: list[dict[str, Any]] = []
+    for row in rows:
+        if not row["manual_review_required"]:
+            continue
+        sample_id = str(row["sample_id"])
+        sample = samples[sample_id]
+        db_id = str(row["database"])
+        if db_id not in schema_cache:
+            schema_cache[db_id] = load_database_schema_ddl(HOLDOUT_ZIP, db_id)
+        output.append(
+            {
+                "sample_id": sample_id,
+                "review_categories": str(row["manual_review_label"]).split(";"),
+                "first_failure_stage": row["first_failure_stage"],
+                "failure_reason_code": row["failure_reason_code"],
+                "failure_reason_detail": row["failure_reason_detail"],
+                "oracle_if_bypassed_correct": row["oracle_if_bypassed_correct"],
+                "sample": sample,
+                "database_schema_ddl": schema_cache[db_id],
+                "raw_generation": indexes["raw"].get(sample_id, {}),
+                "parsed_plan": indexes["parsed"].get(sample_id, {}),
+                "materialized_plan": indexes["materialized"].get(sample_id, {}),
+                "verification": indexes["verification"].get(sample_id, {}),
+                "compiled_program": indexes["compiled"].get(sample_id, {}),
+                "execution": indexes["execution"].get(sample_id, {}),
+                "evaluation": indexes["evaluation"].get(sample_id, {}),
+                "state_diff": (artifacts.get("state_diff_records") or {}).get(sample_id, {}),
+                "manual_decision": {
+                    "status": row["manual_review_status"],
+                    "reviewer_root_cause": row["reviewer_root_cause"],
+                    "conflict_ambiguity_gold_label": row["conflict_ambiguity_gold_label"],
+                    "notes": row["manual_review_notes"],
+                },
+            }
+        )
+    return output
+
+
+def build_manual_audit_template(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    output: list[dict[str, Any]] = []
+    for row in rows:
+        if not row["manual_review_required"]:
+            continue
+        output.append(
+            {
+                "sample_id": row["sample_id"],
+                "manual_review_status": "PENDING",
+                "reviewer_root_cause": "",
+                "conflict_ambiguity_gold_label": (
+                    "UNKNOWN" if row["failure_reason_code"] == "CONFLICT_MISSING" else ""
+                ),
+                "manual_review_notes": "",
+            }
+        )
+    return output
+
+
+def build_state_mismatch_audit(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            "sample_id": row["sample_id"],
+            "database": row["database"],
+            "state_diff_classes": row["state_diff_classes"],
+            "state_diff_error": row["state_diff_error"],
+            "gold_delta": row["state_diff_gold_delta"],
+            "predicted_delta": row["state_diff_predicted_delta"],
+            "difference": row["state_diff_difference"],
+            "manual_review_status": row["manual_review_status"],
+            "manual_review_notes": row["manual_review_notes"],
+        }
+        for row in rows
+        if row["first_failure_stage"] == "state_mismatch"
+    ]
+
+
+def build_systematic_audit_summary(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    tags = ["CONTROL_FIELD_OPERATION", "DATE_NORMALIZATION", "CONFLICT_AMBIGUITY", "STATE_MISMATCH"]
+    return [
+        {
+            "Audit group": tag,
+            "N": sum(tag in str(row.get("systematic_audit_tags") or "").split(";") for row in rows),
+            "Completed": sum(
+                tag in str(row.get("systematic_audit_tags") or "").split(";")
+                and row.get("manual_review_status") == "COMPLETED"
+                for row in rows
+            ),
+        }
+        for tag in tags
+    ]
+
+
 def build_survival(rows: list[dict[str, Any]]) -> dict[str, Any]:
     def passed(column: str) -> int:
         return sum(row[column] == "1" for row in rows)
@@ -820,12 +1128,71 @@ def build_diagnostic_traces(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return traces
 
 
-def build_manifest(artifacts: dict[str, Any], rows: list[dict[str, Any]]) -> dict[str, Any]:
-    protocol = artifacts["mpfsplus"]["run_lock"]
-    model_manifest = artifacts["mpfsplus"]["model_manifest"]
+def _find_nested_key(value: Any, wanted_keys: set[str], path: str = "") -> tuple[Any, str] | None:
+    if isinstance(value, dict):
+        for key, item in value.items():
+            current = f"{path}.{key}" if path else str(key)
+            if str(key).lower() in wanted_keys and item not in (None, "", {}, []):
+                return item, current
+        for key, item in value.items():
+            current = f"{path}.{key}" if path else str(key)
+            found = _find_nested_key(item, wanted_keys, current)
+            if found is not None:
+                return found
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            found = _find_nested_key(item, wanted_keys, f"{path}[{index}]")
+            if found is not None:
+                return found
+    return None
+
+
+def _recorded_field(
+    named_sources: list[tuple[str, Any]],
+    keys: Iterable[str],
+) -> dict[str, Any]:
+    wanted = {str(key).lower() for key in keys}
+    for source_name, source in named_sources:
+        found = _find_nested_key(source, wanted)
+        if found is not None:
+            value, path = found
+            return {
+                "value": value,
+                "status": "recorded",
+                "source": f"{source_name}:{path}",
+            }
     return {
-        "analysis_id": "mp_fs_plus_failure_analysis_v1",
-        "created_for_phase": "stage_1_error_failure_analysis",
+        "value": None,
+        "status": "not_recorded_in_frozen_artifact",
+        "source": None,
+    }
+
+
+def build_manifest(artifacts: dict[str, Any], rows: list[dict[str, Any]]) -> dict[str, Any]:
+    mp = artifacts["mpfsplus"]
+    model_manifest = mp["model_manifest"]
+    sources = [
+        ("config.json", mp.get("config") or {}),
+        ("manifest.json", mp.get("manifest") or {}),
+        ("run_lock.json", mp.get("run_lock") or {}),
+        ("model_manifest.json", model_manifest or {}),
+        ("final_protocol.json", artifacts.get("protocol") or {}),
+    ]
+    prompt_version = _recorded_field(
+        sources,
+        ["prompt_version", "prompt_template_version", "prompt_id", "prompt_revision"],
+    )
+    seed = _recorded_field(sources, ["seed", "random_seed", "generation_seed"])
+    generation_config = {
+        "max_input_tokens": _recorded_field(sources, ["max_input_tokens", "max_prompt_tokens"]),
+        "max_new_tokens": _recorded_field(sources, ["max_new_tokens", "max_output_tokens"]),
+        "temperature": _recorded_field(sources, ["temperature"]),
+        "top_p": _recorded_field(sources, ["top_p"]),
+        "do_sample": _recorded_field(sources, ["do_sample"]),
+    }
+    return {
+        "analysis_id": "mp_fs_plus_failure_analysis_v1_1",
+        "created_for_phase": "stage_1_1_manual_causal_correction",
         "predictions_modified": False,
         "model_inference_rerun": False,
         "gpu_required": False,
@@ -834,27 +1201,31 @@ def build_manifest(artifacts: dict[str, Any], rows: list[dict[str, Any]]) -> dic
         "result_archive_sha256": sha256_file(RESULT_ARCHIVE),
         "dataset_archive": str(HOLDOUT_ZIP.relative_to(WORKSPACE)),
         "dataset_archive_sha256": sha256_file(HOLDOUT_ZIP),
-        "model": artifacts["mpfsplus"]["config"].get("method_id", "MP-FS+"),
+        "model": mp["config"].get("method_id", "MP-FS+"),
         "model_path": model_manifest.get("model_path"),
         "model_revision": str(model_manifest.get("model_path", "")).rstrip("/").split("/")[-1],
         "model_aggregate_sha256": model_manifest.get("aggregate_sha256"),
         "dataset_manifest_hashes": (artifacts["protocol"].get("authorized_hashes") or {}),
         "test_ids": [row["sample_id"] for row in rows],
-        "prompt_version": artifacts["mpfsplus"]["config"].get("prompt_version") or artifacts["mpfsplus"]["config"].get("family"),
-        "seed": protocol.get("seed") or artifacts["mpfsplus"]["manifest"].get("seed"),
-        "generation_config": {
-            key: artifacts["mpfsplus"]["config"].get(key)
-            for key in ["max_input_tokens", "max_new_tokens", "temperature", "top_p"]
-            if key in artifacts["mpfsplus"]["config"]
-        },
+        "prompt_version": prompt_version,
+        "seed": seed,
+        "generation_config": generation_config,
         "evaluation_config": {
             "state_scope": "all_user_tables",
             "protocol_id": artifacts["protocol"].get("protocol_id"),
             "reporting_policy": "retain output-limit adjudicated samples in denominator",
+            "state_mismatch_audit": "gold/prediction replay on isolated SQLite copies",
+            "v0_causal_scope": "system-level bypass; not a single-component verifier intervention",
         },
+        "manual_audit_decisions_file": str(MANUAL_AUDIT_DECISIONS.relative_to(WORKSPACE)),
         "sample_count": len(rows),
         "mpfsplus_correct": sum(row["target_state_correct"] for row in rows),
         "mpfsplus_incorrect": sum(not row["target_state_correct"] for row in rows),
+        "manual_review_required": sum(row["manual_review_required"] for row in rows),
+        "manual_review_pending": sum(
+            row["manual_review_required"] and row["manual_review_status"] != "COMPLETED"
+            for row in rows
+        ),
     }
 
 
@@ -870,58 +1241,104 @@ def git_commit_hash() -> str | None:
 
 
 def build_candidate_fixes(rows: list[dict[str, Any]]) -> str:
-    groups = Counter(row["failure_reason_code"] for row in rows if not row["target_state_correct"])
-    templates = [
-        (
-            "MPF-ERR-001",
-            "reference_resolution",
-            "REF_UNKNOWN_COLUMN",
-            "LLM emits non-existent enumerated target-column IDs.",
-            "Strengthen schema-ID constraints and add a repair pass for nearest valid column IDs.",
-        ),
-        (
-            "MPF-ERR-002",
-            "materialization",
-            "VALUE_MISSING",
-            "Source fields remain unmapped or invalid source-field references are produced.",
-            "Separate control/instruction fields from payload fields before materialization.",
-        ),
-        (
-            "MPF-ERR-003",
-            "verification",
-            "TARGET_MISSING_COLUMN",
-            "Plans omit required target columns after grounding.",
-            "Add planner repair for required-column coverage using available evidence.",
-        ),
-        (
-            "MPF-ERR-004",
-            "execution/state_comparison",
-            "STATE_WRONG_VALUE",
-            "Candidates pass checks but produce target-state mismatch.",
-            "Introduce post-execution semantic repair candidates in Stage 2.",
-        ),
-        (
-            "MPF-ERR-005",
-            "semantic_gate/preflight",
-            "PREFLIGHT_CONSTRAINT",
-            "Candidate is rejected after compilation by semantic or SQLite safety gate.",
-            "Use oracle-bypass evidence to decide relax-vs-repair policy.",
-        ),
+    incorrect = [row for row in rows if not row["target_state_correct"]]
+
+    def count_reason(code: str) -> int:
+        return sum(row["failure_reason_code"] == code for row in incorrect)
+
+    def count_stage(stages: set[str]) -> int:
+        return sum(row["first_failure_stage"] in stages for row in incorrect)
+
+    def count_tag(tag: str) -> int:
+        return sum(tag in str(row.get("systematic_audit_tags") or "").split(";") for row in incorrect)
+
+    issues = [
+        {
+            "id": "MPF-ERR-001",
+            "stage": "reference_resolution",
+            "affected": count_reason("REF_UNKNOWN_COLUMN"),
+            "observed": "LLM emits target-column references that are not members of the enumerated legal inventory.",
+            "next": (
+                "Detect the invalid reference, present only legal IDs plus relevant schema meanings, and run a targeted constrained repair. "
+                "Do not auto-map to the nearest name because that can turn a fail-safe error into silent semantic corruption."
+            ),
+        },
+        {
+            "id": "MPF-ERR-002",
+            "stage": "materialization/provenance",
+            "affected": count_tag("CONTROL_FIELD_OPERATION"),
+            "observed": "The recurring `operation` source field is treated as an unmapped payload field even when it functions as control/instruction metadata.",
+            "next": (
+                "Audit the affected samples, then introduce an explicit control-field versus payload-field policy only if the audit confirms that `operation` is non-payload metadata."
+            ),
+        },
+        {
+            "id": "MPF-ERR-003",
+            "stage": "verification",
+            "affected": count_reason("TARGET_MISSING_COLUMN"),
+            "observed": "Plans omit required target columns after grounding.",
+            "next": "After causal audit, test a constrained required-column coverage repair using only grounded evidence.",
+        },
+        {
+            "id": "MPF-ERR-004",
+            "stage": "execution/state_comparison",
+            "affected": count_stage({"state_mismatch"}),
+            "observed": "Candidates execute successfully but do not match the gold target state.",
+            "next": (
+                "Use `state_mismatch_audit.csv` to inspect gold delta, predicted delta, and the deterministic state-diff class. "
+                "Do not prescribe a post-execution repair until these mismatch subtypes have been manually reviewed."
+            ),
+        },
+        {
+            "id": "MPF-ERR-005",
+            "stage": "semantic_gate/preflight",
+            "affected": count_stage({"semantic_gate", "preflight"}),
+            "observed": "Candidates are rejected after compilation by the semantic-risk gate or SQLite preflight.",
+            "next": (
+                "Analyze semantic-gate and preflight failures separately. Use stage-matched ablations where available; do not infer verifier causality from V0."
+            ),
+        },
+        {
+            "id": "MPF-ERR-006",
+            "stage": "free_text/materialization",
+            "affected": count_tag("DATE_NORMALIZATION"),
+            "observed": "Date normalization failures form a systematic free-text subgroup.",
+            "next": "Manually distinguish genuinely ambiguous dates, unsupported-but-valid formats, and incorrect evidence spans before changing the normalizer.",
+        },
+        {
+            "id": "MPF-ERR-007",
+            "stage": "conflict_planning",
+            "affected": count_tag("CONFLICT_AMBIGUITY"),
+            "observed": "Conflict behavior is marked ambiguous and the fail-closed policy abstains.",
+            "next": (
+                "Populate `conflict_ambiguity_gold_label` as TRULY_AMBIGUOUS, RESOLVABLE_FROM_INPUT, RESOLVABLE_FROM_SCHEMA, or UNKNOWN before treating these cases as representation failures."
+            ),
+        },
     ]
-    parts = ["# Candidate Fixes\n"]
-    for issue, stage, code, observed, fix in templates:
-        affected = groups.get(code, 0)
-        parts.append(
-            f"## Issue ID: {issue}\n\n"
-            f"Affected stage: {stage}\n\n"
-            f"Affected samples: {affected}\n\n"
-            f"Observed behavior: {observed}\n\n"
-            f"Likely cause: frozen v2.1 output shows this as a recurring first-order failure class.\n\n"
-            f"Possible fix: {fix}\n\n"
-            f"Expected benefit: bounded by {affected} currently affected incorrect samples before interaction with other fixes.\n\n"
-            "Risk: changes planner/repair behavior and therefore requires a fresh Stage 2 evaluation.\n"
+    parts = [
+        "# Candidate Fixes",
+        "",
+        "These are Stage-2 candidates, not established causal fixes. Stage 1.1 must finish the manual audit first.",
+        "",
+    ]
+    for issue in issues:
+        parts.extend(
+            [
+                f"## Issue ID: {issue['id']}",
+                "",
+                f"Affected stage: {issue['stage']}",
+                "",
+                f"Affected samples: {issue['affected']}",
+                "",
+                f"Observed behavior: {issue['observed']}",
+                "",
+                f"Stage-2 candidate action: {issue['next']}",
+                "",
+                "Risk: any method change requires a fresh Stage-2 evaluation on frozen predictions/protocol boundaries as appropriate.",
+                "",
+            ]
         )
-    return "\n".join(parts)
+    return "\n".join(parts).rstrip() + "\n"
 
 
 def build_report(
@@ -930,31 +1347,49 @@ def build_report(
     root_summary: list[dict[str, Any]],
     perf_input: list[dict[str, Any]],
     perf_db: list[dict[str, Any]],
-    oracle_rows: list[dict[str, Any]],
+    perf_dependency: list[dict[str, Any]],
+    perf_operation: list[dict[str, Any]],
     paired_rows: list[dict[str, Any]],
     unique_rows: list[dict[str, Any]],
-    verifier_confusion_summary: list[dict[str, Any]],
+    downstream_bypass_summary: list[dict[str, Any]],
     semantic_confusion_summary: list[dict[str, Any]],
+    systematic_audit_summary: list[dict[str, Any]],
 ) -> str:
     total = len(rows)
     correct = sum(row["target_state_correct"] for row in rows)
     admitted = sum(row["admitted"] for row in rows)
     incorrect = total - correct
     executed_wrong = [row for row in rows if row["first_failure_stage"] == "state_mismatch"]
-    verifier_boundary_rejects = [
-        row
+    state_diff_errors = sum(
+        row["first_failure_stage"] == "state_mismatch" and bool(row.get("state_diff_error"))
         for row in rows
-        if row["first_failure_stage"] in {"reference_resolution", "materialization", "verification"}
-    ]
-    verifier_false = sum(str(row["oracle_if_bypassed_correct"]) == "1" for row in verifier_boundary_rejects)
+    )
     abstained = [row for row in rows if row["abstained"]]
-    abstained_oracle = sum(str(row["oracle_if_bypassed_correct"]) == "1" for row in abstained)
+    abstained_bypass = sum(str(row["oracle_if_bypassed_correct"]) == "1" for row in abstained)
     paired_counter = Counter(row["paired_category"] for row in paired_rows)
+    manual_required = sum(row["manual_review_required"] for row in rows)
+    manual_completed = sum(
+        row["manual_review_required"] and row["manual_review_status"] == "COMPLETED"
+        for row in rows
+    )
+    manual_pending = manual_required - manual_completed
+    state_class_counter: Counter[str] = Counter()
+    for row in executed_wrong:
+        for code in str(row.get("state_diff_classes") or "").split(";"):
+            if code:
+                state_class_counter[code] += 1
+    unique_conflict = sum(row.get("conflict_sensitive") for row in unique_rows)
+    unique_dependency = sum(row.get("dependency_sensitive") for row in unique_rows)
+    stage11_complete = manual_pending == 0 and state_diff_errors == 0
+
     lines = [
-        "# MP-FS+ Failure Analysis",
+        "# MP-FS+ Failure Analysis — Stage 1.1 causal/manual correction",
         "",
         "## 1. Analysis protocol",
-        "Frozen prediction artifacts were read without rerunning model inference. Downstream oracle-bypass uses the existing isolated replay ablation outputs; no production database is modified.",
+        (
+            "Frozen prediction artifacts are read without rerunning model inference. State-mismatch cases are replayed on isolated SQLite copies to obtain gold/predicted database deltas. "
+            "V0 is treated only as a system-level downstream bypass because it removes multiple components together; it is not interpreted as a single-component verifier intervention."
+        ),
         "",
         "## 2. Dataset/run identity",
         f"Samples: {total}. Result archive: `{RESULT_ARCHIVE.name}`. Dataset archive: `{HOLDOUT_ZIP.name}`.",
@@ -968,43 +1403,83 @@ def build_report(
         "## 5. First-failure distribution",
         markdown_table(stage_summary),
         "",
-        "## 6. Root-cause distribution",
+        "## 6. Root-cause labels",
+        (
+            "These labels are deliberately non-causal where the available ablation is not component-isolated. "
+            "In particular, recoverability under V0 is labeled `BYPASS_RECOVERABLE_*` rather than verifier over-rejection."
+        ),
+        "",
         markdown_table(root_summary),
         "",
         "## 7. Free-text vs semi-structured",
         markdown_table(perf_input),
         "",
-        "## 8. Database-level analysis",
+        "## 8. Dependency-sensitive analysis",
+        markdown_table(perf_dependency),
+        "",
+        "## 9. Operation-type analysis",
+        markdown_table(perf_operation),
+        "",
+        "## 10. Database-level analysis",
         markdown_table(perf_db),
         "",
-        "## 9. Verification false rejection analysis",
-        f"Verifier-boundary rejects: {len(verifier_boundary_rejects)}. Oracle-correct if bypassed: {verifier_false}. False rejection rate: {format_percent(verifier_false, len(verifier_boundary_rejects))}%.",
+        "## 11. Downstream bypass analysis (system-level, non-causal)",
+        (
+            "For reference-resolution, materialization, and verification first failures, the available V0 comparison removes hard verification, provenance, semantic gating, and preflight together. "
+            "Therefore the table below reports bypass recoverability only; verifier precision/FNR are not computed."
+        ),
         "",
-        markdown_table(verifier_confusion_summary),
+        markdown_table(downstream_bypass_summary),
         "",
-        "## 10. Semantic gate analysis",
+        "## 12. Semantic-risk gate diagnostic",
         f"Semantic-gate first failures: {sum(row['first_failure_stage'] == 'semantic_gate' for row in rows)}.",
         "",
         markdown_table(semantic_confusion_summary),
         "",
-        "## 11. Executed-but-wrong cases",
-        f"Executed successfully but target state wrong: {len(executed_wrong)}. These are all marked `manual_review_required=1`.",
+        "## 13. Executed-but-wrong state-diff audit",
+        f"Executed successfully but target state wrong: {len(executed_wrong)}. State-diff replay errors: {state_diff_errors}.",
         "",
-        "## 12. MP-FS+ vs Direct/J paired analysis",
+        markdown_table([{"State-diff class": key, "N": value} for key, value in state_class_counter.items()]),
+        "",
+        "Detailed gold delta, predicted delta, and final difference are written to `state_mismatch_audit.csv`.",
+        "",
+        "## 14. Systematic manual-audit groups",
+        markdown_table(systematic_audit_summary),
+        "",
+        (
+            f"Manual review required: {manual_required}. Completed: {manual_completed}. Pending: {manual_pending}. "
+            "`manual_review_notes` is never silently blank for required rows; pending rows are explicitly marked `PENDING_MANUAL_AUDIT`."
+        ),
+        "",
+        "`manual_audit_evidence.jsonl` contains the source sample, schema DDL, raw/parsed/materialized plan, verification, compiled program, execution, evaluation, and state-diff evidence needed for the audit.",
+        "",
+        "Use `manual_audit_decisions.template.csv` as the review worksheet. Save completed decisions as "
+        f"`{MANUAL_AUDIT_DECISIONS.relative_to(WORKSPACE)}` and rerun the analysis.",
+        "",
+        "## 15. MP-FS+ vs Direct/J paired analysis",
         markdown_table([{"paired_category": k, "N": v} for k, v in sorted(paired_counter.items())]),
         "",
-        "## 13. Unique MP-FS+ successes",
-        f"Unique or partial unique MP-FS+ successes: {len(unique_rows)}.",
+        (
+            "No automatic `why_baseline_succeeded` claim is emitted. For baseline-correct/MP-FS+-wrong samples, the output records only the observed MP-FS+ failure stage/reason; causal explanation requires audit."
+        ),
         "",
-        "## 14. Candidate issues for method revision",
-        "See `candidate_fixes.md` for issue-level notes. Acceptance questions: "
-        f"planning/parse={sum(row['first_failure_stage'] in {'generation', 'parse'} for row in rows)}, "
-        f"grounding={sum(row['first_failure_stage'] == 'reference_resolution' for row in rows)}, "
-        f"materialization={sum(row['first_failure_stage'] == 'materialization' for row in rows)}, "
-        f"verifier_boundary={len(verifier_boundary_rejects)}, verifier_oracle_correct={verifier_false}, "
-        f"semantic_or_preflight={sum(row['first_failure_stage'] in {'semantic_gate', 'preflight'} for row in rows)}, "
-        f"executed_wrong={len(executed_wrong)}, "
-        f"abstained={len(abstained)}, abstained_oracle_correct={abstained_oracle}.",
+        "## 16. MP-FS+ partial/unique successes",
+        (
+            f"Cases where MP-FS+ is correct while at least one baseline is wrong: {len(unique_rows)}. "
+            f"Conflict-sensitive among these: {unique_conflict}/{len(unique_rows) if unique_rows else 0}; "
+            f"dependency-sensitive: {unique_dependency}/{len(unique_rows) if unique_rows else 0}. "
+            "The analysis does not attribute these wins to a specific MP-FS+ feature without component-level evidence."
+        ),
+        "",
+        "## 17. Stage 1.1 completion status",
+        (
+            "COMPLETE" if stage11_complete else "NOT COMPLETE"
+        )
+        + f" — manual audits pending={manual_pending}, state-diff replay errors={state_diff_errors}.",
+        "",
+        "See `candidate_fixes.md` for Stage-2 candidates. They are hypotheses/actions to test after Stage 1.1 audit closure, not established causal fixes.",
+        "",
+        f"Abstained samples: {len(abstained)}; system/stage bypass-correct among abstentions where an ablation is available: {abstained_bypass}.",
     ]
     return "\n".join(lines) + "\n"
 
@@ -1028,18 +1503,24 @@ def build_all(output_dir: Path = OUTPUT_DIR) -> dict[str, Any]:
     stage_summary = build_stage_failure_summary(rows)
     root_summary = build_root_cause_summary(rows)
     perf_input = build_performance_by_input_type(rows)
+    perf_dependency = build_performance_by_dependency_sensitivity(rows)
+    perf_operation = build_performance_by_operation_type(rows)
     perf_db = build_performance_by_database(rows)
     failure_db = build_failure_by_database(rows)
     paired = build_paired(rows)
     unique = build_unique_successes(rows, artifacts)
     oracle = build_oracle(rows)
-    verifier_confusion = build_verifier_confusion()
+    downstream_bypass, downstream_bypass_summary = build_downstream_bypass_analysis(rows)
     semantic_confusion = build_semantic_gate_confusion()
-    verifier_confusion_summary = summarize_confusion(verifier_confusion)
     semantic_confusion_summary = summarize_confusion(semantic_confusion)
     traces = build_diagnostic_traces(rows)
     survival = build_survival(rows)
     manifest = build_manifest(artifacts, rows)
+    manual_audit_queue = build_manual_audit_queue(rows)
+    manual_audit_evidence = build_manual_audit_evidence(rows, artifacts)
+    manual_audit_template = build_manual_audit_template(rows)
+    state_mismatch_audit = build_state_mismatch_audit(rows)
+    systematic_audit_summary = build_systematic_audit_summary(rows)
 
     master_fields = [
         "sample_id",
@@ -1062,8 +1543,17 @@ def build_all(output_dir: Path = OUTPUT_DIR) -> dict[str, Any]:
         "failure_reason_code",
         "failure_reason_detail",
         "root_cause",
+        "systematic_audit_tags",
+        "state_diff_classes",
+        "state_diff_error",
+        "state_diff_gold_delta",
+        "state_diff_predicted_delta",
+        "state_diff_difference",
         "manual_review_required",
         "manual_review_label",
+        "manual_review_status",
+        "reviewer_root_cause",
+        "conflict_ambiguity_gold_label",
         "manual_review_notes",
         "oracle_if_bypassed_correct",
         "abstention_reason",
@@ -1072,21 +1562,35 @@ def build_all(output_dir: Path = OUTPUT_DIR) -> dict[str, Any]:
         "mpfsplus_correct",
         "paired_category",
     ]
+
+    # Remove misleading legacy files if this directory was generated by Stage 1.0.
+    for legacy_name in ["verifier_confusion.csv", "verifier_confusion_summary.csv"]:
+        legacy_path = output_dir / legacy_name
+        if legacy_path.exists():
+            legacy_path.unlink()
+
     write_json(output_dir / "analysis_run_manifest.json", manifest)
     write_csv(output_dir / "mp_fs_plus_sample_level_analysis.csv", rows, master_fields)
     write_jsonl(output_dir / "diagnostic_traces.jsonl", traces)
     write_csv(output_dir / "stage_failure_summary.csv", stage_summary)
     write_csv(output_dir / "root_cause_summary.csv", root_summary)
     write_csv(output_dir / "performance_by_input_type.csv", perf_input)
+    write_csv(output_dir / "performance_by_dependency_sensitivity.csv", perf_dependency)
+    write_csv(output_dir / "performance_by_operation_type.csv", perf_operation)
     write_csv(output_dir / "performance_by_database.csv", perf_db)
     write_csv(output_dir / "failure_by_database.csv", failure_db)
     write_csv(output_dir / "paired_method_analysis.csv", paired)
     write_csv(output_dir / "mpfsplus_unique_successes.csv", unique)
     write_csv(output_dir / "oracle_rejection_analysis.csv", oracle)
-    write_csv(output_dir / "verifier_confusion.csv", verifier_confusion)
-    write_csv(output_dir / "verifier_confusion_summary.csv", verifier_confusion_summary)
+    write_csv(output_dir / "downstream_bypass_analysis.csv", downstream_bypass)
+    write_csv(output_dir / "downstream_bypass_summary.csv", downstream_bypass_summary)
     write_csv(output_dir / "semantic_gate_confusion.csv", semantic_confusion)
     write_csv(output_dir / "semantic_gate_confusion_summary.csv", semantic_confusion_summary)
+    write_csv(output_dir / "manual_audit_queue.csv", manual_audit_queue)
+    write_jsonl(output_dir / "manual_audit_evidence.jsonl", manual_audit_evidence)
+    write_csv(output_dir / "manual_audit_decisions.template.csv", manual_audit_template)
+    write_csv(output_dir / "state_mismatch_audit.csv", state_mismatch_audit)
+    write_csv(output_dir / "systematic_audit_summary.csv", systematic_audit_summary)
     write_json(output_dir / "pipeline_survival.json", survival)
     (output_dir / "candidate_fixes.md").write_text(
         build_candidate_fixes(rows),
@@ -1100,11 +1604,13 @@ def build_all(output_dir: Path = OUTPUT_DIR) -> dict[str, Any]:
             root_summary,
             perf_input,
             perf_db,
-            oracle,
+            perf_dependency,
+            perf_operation,
             paired,
             unique,
-            verifier_confusion_summary,
+            downstream_bypass_summary,
             semantic_confusion_summary,
+            systematic_audit_summary,
         ),
         encoding="utf-8",
         newline="\n",
@@ -1114,6 +1620,12 @@ def build_all(output_dir: Path = OUTPUT_DIR) -> dict[str, Any]:
         "sample_count": len(rows),
         "correct": sum(row["target_state_correct"] for row in rows),
         "incorrect": sum(not row["target_state_correct"] for row in rows),
+        "manual_review_required": sum(row["manual_review_required"] for row in rows),
+        "manual_review_pending": sum(
+            row["manual_review_required"] and row["manual_review_status"] != "COMPLETED"
+            for row in rows
+        ),
+        "state_diff_replay_errors": sum(bool(row.get("state_diff_error")) for row in rows),
         "stage_summary": stage_summary,
         "root_summary": root_summary,
     }

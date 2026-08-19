@@ -1,36 +1,30 @@
 # Candidate Fixes
 
+These are Stage-2 candidates, not established causal fixes. Stage 1.1 must finish the manual audit first.
+
 ## Issue ID: MPF-ERR-001
 
 Affected stage: reference_resolution
 
 Affected samples: 28
 
-Observed behavior: LLM emits non-existent enumerated target-column IDs.
+Observed behavior: LLM emits target-column references that are not members of the enumerated legal inventory.
 
-Likely cause: frozen v2.1 output shows this as a recurring first-order failure class.
+Stage-2 candidate action: Detect the invalid reference, present only legal IDs plus relevant schema meanings, and run a targeted constrained repair. Do not auto-map to the nearest name because that can turn a fail-safe error into silent semantic corruption.
 
-Possible fix: Strengthen schema-ID constraints and add a repair pass for nearest valid column IDs.
-
-Expected benefit: bounded by 28 currently affected incorrect samples before interaction with other fixes.
-
-Risk: changes planner/repair behavior and therefore requires a fresh Stage 2 evaluation.
+Risk: any method change requires a fresh Stage-2 evaluation on frozen predictions/protocol boundaries as appropriate.
 
 ## Issue ID: MPF-ERR-002
 
-Affected stage: materialization
+Affected stage: materialization/provenance
 
-Affected samples: 27
+Affected samples: 22
 
-Observed behavior: Source fields remain unmapped or invalid source-field references are produced.
+Observed behavior: The recurring `operation` source field is treated as an unmapped payload field even when it functions as control/instruction metadata.
 
-Likely cause: frozen v2.1 output shows this as a recurring first-order failure class.
+Stage-2 candidate action: Audit the affected samples, then introduce an explicit control-field versus payload-field policy only if the audit confirms that `operation` is non-payload metadata.
 
-Possible fix: Separate control/instruction fields from payload fields before materialization.
-
-Expected benefit: bounded by 27 currently affected incorrect samples before interaction with other fixes.
-
-Risk: changes planner/repair behavior and therefore requires a fresh Stage 2 evaluation.
+Risk: any method change requires a fresh Stage-2 evaluation on frozen predictions/protocol boundaries as appropriate.
 
 ## Issue ID: MPF-ERR-003
 
@@ -40,13 +34,9 @@ Affected samples: 21
 
 Observed behavior: Plans omit required target columns after grounding.
 
-Likely cause: frozen v2.1 output shows this as a recurring first-order failure class.
+Stage-2 candidate action: After causal audit, test a constrained required-column coverage repair using only grounded evidence.
 
-Possible fix: Add planner repair for required-column coverage using available evidence.
-
-Expected benefit: bounded by 21 currently affected incorrect samples before interaction with other fixes.
-
-Risk: changes planner/repair behavior and therefore requires a fresh Stage 2 evaluation.
+Risk: any method change requires a fresh Stage-2 evaluation on frozen predictions/protocol boundaries as appropriate.
 
 ## Issue ID: MPF-ERR-004
 
@@ -54,28 +44,44 @@ Affected stage: execution/state_comparison
 
 Affected samples: 16
 
-Observed behavior: Candidates pass checks but produce target-state mismatch.
+Observed behavior: Candidates execute successfully but do not match the gold target state.
 
-Likely cause: frozen v2.1 output shows this as a recurring first-order failure class.
+Stage-2 candidate action: Use `state_mismatch_audit.csv` to inspect gold delta, predicted delta, and the deterministic state-diff class. Do not prescribe a post-execution repair until these mismatch subtypes have been manually reviewed.
 
-Possible fix: Introduce post-execution semantic repair candidates in Stage 2.
-
-Expected benefit: bounded by 16 currently affected incorrect samples before interaction with other fixes.
-
-Risk: changes planner/repair behavior and therefore requires a fresh Stage 2 evaluation.
+Risk: any method change requires a fresh Stage-2 evaluation on frozen predictions/protocol boundaries as appropriate.
 
 ## Issue ID: MPF-ERR-005
 
 Affected stage: semantic_gate/preflight
 
-Affected samples: 0
+Affected samples: 7
 
-Observed behavior: Candidate is rejected after compilation by semantic or SQLite safety gate.
+Observed behavior: Candidates are rejected after compilation by the semantic-risk gate or SQLite preflight.
 
-Likely cause: frozen v2.1 output shows this as a recurring first-order failure class.
+Stage-2 candidate action: Analyze semantic-gate and preflight failures separately. Use stage-matched ablations where available; do not infer verifier causality from V0.
 
-Possible fix: Use oracle-bypass evidence to decide relax-vs-repair policy.
+Risk: any method change requires a fresh Stage-2 evaluation on frozen predictions/protocol boundaries as appropriate.
 
-Expected benefit: bounded by 0 currently affected incorrect samples before interaction with other fixes.
+## Issue ID: MPF-ERR-006
 
-Risk: changes planner/repair behavior and therefore requires a fresh Stage 2 evaluation.
+Affected stage: free_text/materialization
+
+Affected samples: 11
+
+Observed behavior: Date normalization failures form a systematic free-text subgroup.
+
+Stage-2 candidate action: Manually distinguish genuinely ambiguous dates, unsupported-but-valid formats, and incorrect evidence spans before changing the normalizer.
+
+Risk: any method change requires a fresh Stage-2 evaluation on frozen predictions/protocol boundaries as appropriate.
+
+## Issue ID: MPF-ERR-007
+
+Affected stage: conflict_planning
+
+Affected samples: 20
+
+Observed behavior: Conflict behavior is marked ambiguous and the fail-closed policy abstains.
+
+Stage-2 candidate action: Populate `conflict_ambiguity_gold_label` as TRULY_AMBIGUOUS, RESOLVABLE_FROM_INPUT, RESOLVABLE_FROM_SCHEMA, or UNKNOWN before treating these cases as representation failures.
+
+Risk: any method change requires a fresh Stage-2 evaluation on frozen predictions/protocol boundaries as appropriate.
