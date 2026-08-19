@@ -1,5 +1,7 @@
 from .interventions import (
+    CONFLICT_ACTION_CONTROL,
     CONFLICT_CONTROL,
+    CONFLICT_TARGET_CONTROL,
     METADATA,
     OPERATION_CONTROL,
     PAYLOAD_VALUE,
@@ -16,6 +18,8 @@ __all__ = [
     "PAYLOAD_VALUE",
     "OPERATION_CONTROL",
     "CONFLICT_CONTROL",
+    "CONFLICT_ACTION_CONTROL",
+    "CONFLICT_TARGET_CONTROL",
     "UPDATE_CONTROL",
     "METADATA",
     "Stage2InterventionConfig",

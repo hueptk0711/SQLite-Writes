@@ -1,5 +1,5 @@
 {
-  "stage": "2-A-C-patch2",
+  "stage": "2-A-C-patch3-exactness-hardening",
   "baseline": "configs/stage2/original.json",
   "dispatch_family": "MP-FS+",
   "interventions": [
@@ -31,5 +31,13 @@
     "reference_repair",
     "semantic_targeted_repair",
     "7B_end_to_end_run"
+  ],
+  "hardening_invariants": [
+    "database identifiers use quote-stripped casefold exact keys; underscores/punctuation are preserved",
+    "conflict action controls are distinct from conflict target controls",
+    "structured operation controls use exact alias matching only",
+    "free-text conflict restoration requires high-confidence instruction syntax after quoted literals are masked",
+    "V0 materialization omits Stage-2-only role metadata when control_field_roles is false",
+    "method_variant and method_version are recorded in run lock, manifest, sample-level artifacts, and summary metadata"
   ]
 }

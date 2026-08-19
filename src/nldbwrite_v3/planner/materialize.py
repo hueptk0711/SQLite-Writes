@@ -270,16 +270,18 @@ def materialize_mapping_plan(
                         }
                     )
                     continue
-                unresolved_fields.append(
-                    {
-                        "source_collection": collection.collection_id,
-                        "source_row_index": row_index,
-                        "field": field,
-                        "role": role,
-                        "reason": reason,
-                        "status": "ignored" if reason else "unresolved",
-                    }
-                )
+                unresolved_record = {
+                    "source_collection": collection.collection_id,
+                    "source_row_index": row_index,
+                    "field": field,
+                    "reason": reason,
+                    "status": "ignored" if reason else "unresolved",
+                }
+                # Preserve frozen MP-FS+ V0 artifacts when Stage-2 control roles
+                # are disabled. Role metadata is Stage-2 observability only.
+                if control_field_roles:
+                    unresolved_record["role"] = role
+                unresolved_fields.append(unresolved_record)
     if diagnostics:
         raise MaterializationError(diagnostics)
     return {

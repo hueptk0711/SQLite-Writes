@@ -1,14 +1,22 @@
 {
-  "checkpoint": "Stage2-A-C-Patch2",
-  "base_commit": "082d76f",
+  "checkpoint": "Stage2-A-C-Patch3",
+  "base_commit": "b8c8812",
   "scope": [
     "A_control_operation_semantics",
-    "B_group_scoped_conflict_preservation",
+    "B_conflict_semantic_preservation",
     "C_update_column_preservation"
+  ],
+  "hardening": [
+    "exact_identifier_resolution",
+    "conflict_action_target_separation",
+    "strict_structured_operation_aliases",
+    "high_confidence_free_text_semantics",
+    "v0_artifact_identity",
+    "experiment_variant_provenance"
   ],
   "tests": {
     "stage2_vnext_abc": {
-      "passed": 20,
+      "passed": 30,
       "failed": 0
     },
     "compatibility_subset": {
@@ -18,6 +26,11 @@
     "fast_not_integration": {
       "failed": 0,
       "completed_100_percent": true
+    },
+    "cpu_smoke": {
+      "status": "PASS",
+      "backend": "mock",
+      "sample_count": 1
     }
   },
   "gpu_or_model_run": false,

@@ -67,6 +67,8 @@ def build_run_lock(
     environment_manifest_path: str | Path | None,
     v2_source_path: str | Path | None = None,
     final_protocol_path: str | Path | None = None,
+    method_variant: str | None = None,
+    method_version: str | None = None,
 ) -> dict[str, Any]:
     root = Path(project_root).resolve()
     db_ids = sorted(set(str(item) for item in selected_db_ids))
@@ -137,6 +139,8 @@ def build_run_lock(
         "lock_version": 1,
         "stage": stage,
         "method_id": method_id,
+        **({"method_variant": method_variant} if method_variant is not None else {}),
+        **({"method_version": method_version} if method_version is not None else {}),
         "hashes": {
             "method_config_sha256": sha256_file(method_config_path),
             "inference_config_sha256": (

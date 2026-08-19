@@ -11,13 +11,43 @@ from nldbwrite_v3.schema import ensure_reference_ids
 
 PAYLOAD_VALUE = "PAYLOAD_VALUE"
 OPERATION_CONTROL = "OPERATION_CONTROL"
+# Compatibility umbrella retained for external imports.  Patch 3 deliberately
+# classifies conflict action and target controls into distinct roles.
 CONFLICT_CONTROL = "CONFLICT_CONTROL"
+CONFLICT_ACTION_CONTROL = "CONFLICT_ACTION_CONTROL"
+CONFLICT_TARGET_CONTROL = "CONFLICT_TARGET_CONTROL"
 UPDATE_CONTROL = "UPDATE_CONTROL"
 METADATA = "METADATA"
 
 
 def _canonical(value: Any) -> str:
+    """Loose key used only for control-field aliases, never DB identifiers."""
     return re.sub(r"[\W_]+", "", str(value), flags=re.UNICODE).casefold()
+
+
+def _strip_sql_identifier_quotes(value: Any) -> str:
+    text = str(value).strip()
+    pairs = (("[", "]"), ('"', '"'), ("`", "`"))
+    changed = True
+    while changed and len(text) >= 2:
+        changed = False
+        for left, right in pairs:
+            if text.startswith(left) and text.endswith(right):
+                text = text[1:-1].strip()
+                changed = True
+                break
+    return text
+
+
+def _identifier_key(value: Any) -> str:
+    """SQLite identifier key: case-insensitive, punctuation-preserving."""
+    return _strip_sql_identifier_quotes(value).casefold()
+
+
+def _operation_alias_key(value: Any) -> str:
+    text = str(value).strip().casefold()
+    text = re.sub(r"[\s-]+", "_", text)
+    return re.sub(r"_+", "_", text).strip("_")
 
 
 # A intentionally uses only high-confidence operation-control field names.
@@ -26,10 +56,12 @@ def _canonical(value: Any) -> str:
 _OPERATION_FIELDS = {
     "operation", "writeoperation", "operationtype",
 }
-_CONFLICT_FIELDS = {
-    "conflict", "conflictaction", "conflictbehavior", "conflictkey",
-    "conflicttarget", "conflicttargets", "conflictpolicy", "duplicatepolicy",
-    "onconflict", "onduplicate", "knownconflictwitness",
+_CONFLICT_ACTION_FIELDS = {
+    "conflict", "conflictaction", "conflictbehavior", "conflictpolicy",
+    "duplicatepolicy", "onconflict", "onduplicate",
+}
+_CONFLICT_TARGET_FIELDS = {
+    "conflictkey", "conflicttarget", "conflicttargets", "uniquekey",
 }
 _UPDATE_FIELDS = {
     "update", "updates", "updatecolumns", "requestedupdatecolumns",
@@ -39,17 +71,23 @@ _UPDATE_FIELDS = {
 _METADATA_FIELDS = {
     "table", "targettable", "instruction", "requirement", "ordering",
     "processingorder", "relationshiporder", "keystatus", "registrystate",
-    "newkeys", "policy",
+    "newkeys", "policy", "knownconflictwitness",
 }
 
 
 def classify_source_field_role(field: str) -> str:
-    """Classify a field name, without claiming that it was semantically consumed."""
+    """Classify a control alias without claiming semantic consumption."""
     canonical = _canonical(field)
     if canonical in _OPERATION_FIELDS:
         return OPERATION_CONTROL
-    if canonical in _CONFLICT_FIELDS or canonical.endswith("conflictkey") or canonical.endswith("conflicttarget"):
-        return CONFLICT_CONTROL
+    if canonical in _CONFLICT_ACTION_FIELDS:
+        return CONFLICT_ACTION_CONTROL
+    if (
+        canonical in _CONFLICT_TARGET_FIELDS
+        or canonical.endswith("conflictkey")
+        or canonical.endswith("conflicttarget")
+    ):
+        return CONFLICT_TARGET_CONTROL
     if canonical in _UPDATE_FIELDS or canonical.endswith("updatecolumns"):
         return UPDATE_CONTROL
     if canonical in _METADATA_FIELDS:
@@ -57,19 +95,27 @@ def classify_source_field_role(field: str) -> str:
     return PAYLOAD_VALUE
 
 
+_OPERATION_ALIASES = {
+    "upsert_update": "upsert_update",
+    "upsert": "upsert_update",
+    "insert_or_update": "upsert_update",
+    "insert_update": "upsert_update",
+    "do_update": "upsert_update",
+    "insert_ignore": "insert_ignore",
+    "insert_or_ignore": "insert_ignore",
+    "do_nothing": "insert_ignore",
+    "plain_insert": "plain_insert",
+    "insert": "plain_insert",
+    "error_on_conflict": "plain_insert",
+    "raise_on_conflict": "plain_insert",
+    "fail_on_conflict": "plain_insert",
+}
+
+
 def _operation_from_value(value: Any) -> str | None:
-    text = " ".join(str(value).strip().casefold().replace("_", " ").replace("-", " ").split())
-    if not text:
-        return None
-    if any(token in text for token in ("upsert", "do update", "insert or update", "insert update")):
-        return "upsert_update"
-    if any(token in text for token in ("insert ignore", "do nothing", "ignore", "skip")):
-        return "insert_ignore"
-    if any(token in text for token in ("plain insert", "error on conflict", "raise on conflict", "fail on conflict")):
-        return "plain_insert"
-    if text in {"insert", "error", "fail", "raise"}:
-        return "plain_insert"
-    return None
+    """Parse a structured control value by exact aliases only."""
+    key = _operation_alias_key(value)
+    return _OPERATION_ALIASES.get(key)
 
 
 def control_consumed_by(
@@ -225,7 +271,7 @@ def _typed_operation_signal(
     signals: list[tuple[str, str, int | None, str | None, str | None]] = []
     for row_index, field, value, role in _row_control_entries(collection):
         parsed = _operation_from_value(value)
-        if parsed and role in {OPERATION_CONTROL, CONFLICT_CONTROL}:
+        if parsed and role in {OPERATION_CONTROL, CONFLICT_ACTION_CONTROL}:
             signals.append((parsed, role, row_index, field, str(value)))
     # Collection-level control metadata can establish semantics but has no row
     # provenance record to suppress in materialization.
@@ -233,7 +279,7 @@ def _typed_operation_signal(
         for field, value in controls.items():
             role = classify_source_field_role(str(field))
             parsed = _operation_from_value(value)
-            if parsed and role in {OPERATION_CONTROL, CONFLICT_CONTROL}:
+            if parsed and role in {OPERATION_CONTROL, CONFLICT_ACTION_CONTROL}:
                 signals.append((parsed, role, None, None, str(value)))
 
     semantics = {item[0] for item in signals}
@@ -257,13 +303,11 @@ def _typed_operation_signal(
                 collection, row_index, field, role,
                 "instruction_semantics.operation", resolved_value=semantic,
             ))
-        elif role == CONFLICT_CONTROL:
-            canonical = _canonical(field)
-            if any(token in canonical for token in ("action", "policy")) or canonical in {"conflict", "onconflict", "onduplicate"}:
-                conflict_refs.append(_control_ref(
-                    collection, row_index, field, role,
-                    "explicit_conflict_preservation.action", resolved_value=semantic,
-                ))
+        elif role == CONFLICT_ACTION_CONTROL:
+            conflict_refs.append(_control_ref(
+                collection, row_index, field, role,
+                "explicit_conflict_preservation.action", resolved_value=semantic,
+            ))
     return semantic, operation_refs, conflict_refs
 
 
@@ -280,32 +324,53 @@ def _split_names(value: Any) -> list[str]:
     return []
 
 
-def _column_ids_by_name(table: dict[str, Any]) -> dict[str, str]:
-    return {
-        _canonical(column.get("name")): str(column.get("column_id"))
-        for column in table.get("columns", [])
-        if isinstance(column, dict) and column.get("name") and column.get("column_id")
-    }
+def _column_candidates_by_name(table: dict[str, Any]) -> dict[str, list[str]]:
+    """Map exact identifier keys to all matching column IDs without overwrite."""
+    output: dict[str, list[str]] = {}
+    for column in table.get("columns", []):
+        if not isinstance(column, dict) or not column.get("name") or not column.get("column_id"):
+            continue
+        output.setdefault(_identifier_key(column.get("name")), []).append(str(column.get("column_id")))
+    return output
 
 
-def _exact_column_ids(names: list[str], table: dict[str, Any]) -> tuple[list[str], list[str]]:
-    by_name = _column_ids_by_name(table)
+def _exact_column_ids(
+    names: list[str],
+    table: dict[str, Any],
+) -> tuple[list[str], list[str], list[str]]:
+    by_name = _column_candidates_by_name(table)
     resolved: list[str] = []
     unresolved: list[str] = []
+    ambiguous: list[str] = []
     for name in names:
-        column_id = by_name.get(_canonical(name))
-        if column_id:
-            if column_id not in resolved:
-                resolved.append(column_id)
-        elif name:
+        if not name:
+            continue
+        candidates = by_name.get(_identifier_key(name), [])
+        if len(candidates) == 1:
+            if candidates[0] not in resolved:
+                resolved.append(candidates[0])
+        elif len(candidates) > 1:
+            ambiguous.append(name)
+        else:
             unresolved.append(name)
-    return resolved, unresolved
+    return resolved, unresolved, ambiguous
+
+
+def _constraint_column_ids(
+    constraint: dict[str, Any],
+    table: dict[str, Any],
+) -> set[str] | None:
+    names = [str(value) for value in constraint.get("columns") or []]
+    ids, unresolved, ambiguous = _exact_column_ids(names, table)
+    if unresolved or ambiguous or len(ids) != len(names):
+        return None
+    return set(ids)
 
 
 def _update_control_resolution(
     collection: SourceCollection,
     table: dict[str, Any],
-) -> tuple[list[str], list[str], list[str], list[str], list[dict[str, Any]]]:
+) -> tuple[list[str], list[str], list[str], list[str], list[str], list[dict[str, Any]]]:
     requested_names: list[str] = []
     excluded_names: list[str] = []
     requested_refs: list[tuple[int, str]] = []
@@ -344,13 +409,14 @@ def _update_control_resolution(
             ) else requested_names
             target.extend(_split_names(value))
 
-    requested, unresolved_requested = _exact_column_ids(requested_names, table)
-    excluded, unresolved_excluded = _exact_column_ids(excluded_names, table)
+    requested, unresolved_requested, ambiguous_requested = _exact_column_ids(requested_names, table)
+    excluded, unresolved_excluded, ambiguous_excluded = _exact_column_ids(excluded_names, table)
     overlap = set(requested) & set(excluded)
+    excluded_keys = {_identifier_key(value) for value in excluded_names}
     contradiction_names = sorted({
         name
         for name in requested_names
-        if _canonical(name) in {_canonical(value) for value in excluded_names}
+        if _identifier_key(name) in excluded_keys
     })
     if overlap and not contradiction_names:
         by_id = {
@@ -361,8 +427,9 @@ def _update_control_resolution(
         contradiction_names = sorted(by_id.get(item, item) for item in overlap)
 
     unresolved = list(dict.fromkeys(unresolved_requested + unresolved_excluded))
+    ambiguous = list(dict.fromkeys(ambiguous_requested + ambiguous_excluded))
     refs: list[dict[str, Any]] = []
-    if not unresolved and not contradiction_names:
+    if not unresolved and not ambiguous and not contradiction_names:
         for row_index, field in requested_refs:
             refs.append(_control_ref(
                 collection, row_index, field, UPDATE_CONTROL,
@@ -373,81 +440,119 @@ def _update_control_resolution(
                 collection, row_index, field, UPDATE_CONTROL,
                 "update_column_consistency.excluded", resolved_value=excluded,
             ))
-    return requested, excluded, unresolved, contradiction_names, refs
+    return requested, excluded, unresolved, ambiguous, contradiction_names, refs
 
 
 def _conflict_target_resolution(
     collection: SourceCollection,
     table: dict[str, Any],
-) -> tuple[str | None, list[str], list[dict[str, Any]]]:
+) -> tuple[str | None, list[str], list[str], list[dict[str, Any]]]:
     names: list[str] = []
     row_refs: list[tuple[int, str]] = []
     for row_index, field, value, role in _row_control_entries(collection):
         canonical = _canonical(field)
-        if role == CONFLICT_CONTROL and ("target" in canonical or "key" in canonical):
+        if role == CONFLICT_TARGET_CONTROL:
             names.extend(_split_names(value))
             row_refs.append((row_index, field))
     for controls in _iter_control_objects(collection):
         for field, value in controls.items():
             canonical = _canonical(field)
-            if classify_source_field_role(str(field)) == CONFLICT_CONTROL and ("target" in canonical or "key" in canonical):
+            if classify_source_field_role(str(field)) == CONFLICT_TARGET_CONTROL:
                 names.extend(_split_names(value))
     names = list(dict.fromkeys(names))
     if not names:
-        return None, [], []
-    column_ids, unresolved = _exact_column_ids(names, table)
-    if unresolved:
-        return None, unresolved, []
+        return None, [], [], []
+    column_ids, unresolved, ambiguous = _exact_column_ids(names, table)
+    if unresolved or ambiguous:
+        return None, unresolved, ambiguous, []
     column_id_set = set(column_ids)
     matches = []
-    by_name = _column_ids_by_name(table)
     for constraint in table.get("unique_indexes", []):
         if not isinstance(constraint, dict) or not constraint.get("constraint_id"):
             continue
-        constraint_ids = {
-            by_name.get(_canonical(name), "")
-            for name in constraint.get("columns") or []
-        }
-        constraint_ids.discard("")
+        constraint_ids = _constraint_column_ids(constraint, table)
         if constraint_ids and constraint_ids == column_id_set:
             matches.append(str(constraint["constraint_id"]))
     if len(matches) != 1:
-        return None, names, []
+        return None, names, [], []
     target_id = matches[0]
     refs = [
         _control_ref(
-            collection, row_index, field, CONFLICT_CONTROL,
+            collection, row_index, field, CONFLICT_TARGET_CONTROL,
             "explicit_conflict_preservation.target", resolved_value=target_id,
         )
         for row_index, field in row_refs
     ]
-    return target_id, [], refs
+    return target_id, [], [], refs
+
+
+def _mask_quoted_literals(value: str) -> str:
+    """Mask quoted payload literals before deterministic instruction parsing."""
+    output: list[str] = []
+    quote: str | None = None
+    escape = False
+    for char in str(value):
+        if quote is not None:
+            if escape:
+                escape = False
+                output.append(" ")
+            elif char == "\\":
+                escape = True
+                output.append(" ")
+            elif char == quote:
+                quote = None
+                output.append(char)
+            else:
+                output.append(" ")
+            continue
+        if char in {"'", '"', "`"}:
+            quote = char
+            output.append(char)
+        else:
+            output.append(char)
+    return "".join(output)
 
 
 def _operation_from_request_text(request: str) -> str | None:
-    text = " ".join(str(request).split()).casefold()
-    if re.search(r"\b(?:upsert_update|upsert|insert[- ]or[- ]update)\b", text):
-        return "upsert_update"
-    if re.search(r"\b(?:insert_ignore|insert[- ]or[- ]ignore|do\s+nothing)\b", text):
+    """Restore only explicit high-confidence conflict/operation instructions."""
+    text = " ".join(_mask_quoted_literals(str(request)).split()).casefold()
+
+    # SQL-like conflict syntax is the highest-confidence signal.
+    on_conflict = re.search(r"\bon\s+conflict(?:\s*\([^)]*\))?\s+do\s+(?P<action>nothing|update)\b", text)
+    if on_conflict:
+        return "insert_ignore" if on_conflict.group("action") == "nothing" else "upsert_update"
+    if re.search(r"\binsert\s+or\s+ignore\b", text):
         return "insert_ignore"
-    if re.search(r"\bon\s+conflict\b", text):
-        if re.search(r"\bdo\s+update\b", text):
-            return "upsert_update"
-        if re.search(r"\bdo\s+nothing\b", text):
-            return "insert_ignore"
-    conflict_cue = re.search(r"\b(?:conflict|duplicate|already\s+exists?|existing\s+(?:row|record|key))\b", text)
-    if conflict_cue and re.search(r"\b(?:ignore|skip|keep\s+(?:the\s+)?existing|leave[^.;]{0,40}unchanged)\b", text):
-        return "insert_ignore"
-    if conflict_cue and re.search(r"\b(?:update|overwrite|replace|merge)\b", text):
+    if re.search(r"\binsert\s+or\s+update\b", text):
         return "upsert_update"
-    if re.search(r"\b(?:plain[_ -]?insert)\b", text):
+
+    # Explicit typed assignment, e.g. ``operation: upsert_update``.
+    match = re.search(
+        r"\b(?:operation|write[_ -]?operation|operation[_ -]?type)\s*[:=]\s*"
+        r"(?P<value>[a-z][a-z0-9_ -]{0,40})",
+        text,
+    )
+    if match:
+        token = re.split(r"[.;,]", match.group("value"), maxsplit=1)[0].strip()
+        parsed = _operation_from_value(token)
+        if parsed:
+            return parsed
+
+    # Natural-language restoration requires an explicit conflict/duplicate cue
+    # and a nearby action. Bare words such as payload value 'upsert' are ignored.
+    conflict_cue = r"(?:conflict|duplicate|already\s+exists?|existing\s+(?:row|record|key))"
+    if re.search(rf"\b(?:if|when|on)\b[^.;]{{0,80}}\b{conflict_cue}\b[^.;]{{0,80}}\b(?:ignore|skip|keep\s+(?:the\s+)?existing|leave[^.;]{{0,30}}unchanged)\b", text):
+        return "insert_ignore"
+    if re.search(rf"\b(?:if|when|on)\b[^.;]{{0,80}}\b{conflict_cue}\b[^.;]{{0,80}}\b(?:update|overwrite|replace|merge)\b", text):
+        return "upsert_update"
+    if re.search(rf"\b(?:if|when|on)\b[^.;]{{0,80}}\b{conflict_cue}\b[^.;]{{0,80}}\b(?:error|fail|raise|reject)\b", text):
         return "plain_insert"
-    if conflict_cue and re.search(r"\b(?:error|fail|raise|reject)\b", text):
+    if re.search(r"\bplain[_ -]?insert\b", text):
         return "plain_insert"
     return None
 
 
-def _request_conflict_target_id(request: str, table: dict[str, Any]) -> tuple[str | None, list[str]]:
+def _request_conflict_target_id(request: str, table: dict[str, Any]) -> tuple[str | None, list[str], list[str]]:
     names: list[str] = []
     patterns = (
         r"(?is)on\s+conflict\s*\((?P<value>[^)]+)\)",
@@ -460,21 +565,19 @@ def _request_conflict_target_id(request: str, table: dict[str, Any]) -> tuple[st
             names = _split_names(match.group("value"))
             break
     if not names:
-        return None, []
-    column_ids, unresolved = _exact_column_ids(names, table)
-    if unresolved:
-        return None, unresolved
-    by_name = _column_ids_by_name(table)
+        return None, [], []
+    column_ids, unresolved, ambiguous = _exact_column_ids(names, table)
+    if unresolved or ambiguous:
+        return None, unresolved, ambiguous
     target_set = set(column_ids)
     matches = []
     for constraint in table.get("unique_indexes", []):
         if not isinstance(constraint, dict) or not constraint.get("constraint_id"):
             continue
-        ids = {by_name.get(_canonical(name), "") for name in constraint.get("columns") or []}
-        ids.discard("")
+        ids = _constraint_column_ids(constraint, table)
         if ids and ids == target_set:
             matches.append(str(constraint["constraint_id"]))
-    return (matches[0] if len(matches) == 1 else None), ([] if len(matches) == 1 else names)
+    return (matches[0] if len(matches) == 1 else None), ([] if len(matches) == 1 else names), []
 
 
 def _split_top_level_commas(value: str) -> list[str]:
@@ -564,16 +667,18 @@ def _request_update_names(request: str) -> tuple[list[str], list[str]]:
 def _request_update_resolution(
     request: str,
     table: dict[str, Any],
-) -> tuple[list[str], list[str], list[str], list[str]]:
+) -> tuple[list[str], list[str], list[str], list[str], list[str]]:
     requested_names, excluded_names = _request_update_names(request)
-    requested, unresolved_requested = _exact_column_ids(requested_names, table)
-    excluded, unresolved_excluded = _exact_column_ids(excluded_names, table)
+    requested, unresolved_requested, ambiguous_requested = _exact_column_ids(requested_names, table)
+    excluded, unresolved_excluded, ambiguous_excluded = _exact_column_ids(excluded_names, table)
+    excluded_keys = {_identifier_key(item) for item in excluded_names}
     contradictions = sorted({
         name for name in requested_names
-        if _canonical(name) in {_canonical(item) for item in excluded_names}
+        if _identifier_key(name) in excluded_keys
     })
     unresolved = list(dict.fromkeys(unresolved_requested + unresolved_excluded))
-    return requested, excluded, unresolved, contradictions
+    ambiguous = list(dict.fromkeys(ambiguous_requested + ambiguous_excluded))
+    return requested, excluded, unresolved, ambiguous, contradictions
 
 
 def _table_anchor(request: str, table_name: str) -> list[int]:
@@ -683,8 +788,15 @@ def apply_free_text_reference_interventions(
                 group["conflict_target_id"] = None
                 group["update_column_ids"] = []
             else:
-                target_id, unresolved = _request_conflict_target_id(segment, table)
-                if unresolved:
+                target_id, unresolved, ambiguous = _request_conflict_target_id(segment, table)
+                if ambiguous:
+                    diagnostics.append(Diagnostic(
+                        "AMBIGUOUS_IDENTIFIER",
+                        "Explicit group-scoped free-text conflict target matches more than one exact identifier candidate.",
+                        path=f"{path}/conflict_target_id", group_id=group_id,
+                        details={"ambiguous_identifier_names": ambiguous},
+                    ))
+                elif unresolved:
                     diagnostics.append(Diagnostic(
                         "EXPLICIT_CONFLICT_SEMANTICS_DROPPED",
                         "Explicit group-scoped free-text conflict target cannot be resolved exactly to one unique constraint.",
@@ -698,12 +810,19 @@ def apply_free_text_reference_interventions(
                     group["update_column_ids"] = []
 
         if config.update_column_consistency and str(group.get("write_semantics") or "") == "upsert_update":
-            requested, excluded, unresolved, contradictions = _request_update_resolution(segment, table)
+            requested, excluded, unresolved, ambiguous, contradictions = _request_update_resolution(segment, table)
             trace["requested_update_column_ids"] = requested
             trace["excluded_update_column_ids"] = excluded
             current = [str(value) for value in group.get("update_column_ids") or []]
             trace["planned_update_column_ids_before"] = current
-            if contradictions:
+            if ambiguous:
+                diagnostics.append(Diagnostic(
+                    "AMBIGUOUS_IDENTIFIER",
+                    "Explicit free-text update control matches more than one exact identifier candidate.",
+                    path=f"{path}/update_column_ids", group_id=group_id,
+                    details={"ambiguous_identifier_names": ambiguous},
+                ))
+            elif contradictions:
                 diagnostics.append(Diagnostic(
                     "CONTRADICTORY_UPDATE_CONTROL",
                     "The free-text request both requires and excludes the same update column(s).",
@@ -824,8 +943,16 @@ def apply_reference_interventions(
                 group["conflict_target_id"] = None
                 group["update_column_ids"] = []
             elif explicit_operation in {"insert_ignore", "upsert_update"}:
-                explicit_target, unresolved_target, target_refs = _conflict_target_resolution(collection, table)
-                if unresolved_target:
+                explicit_target, unresolved_target, ambiguous_target, target_refs = _conflict_target_resolution(collection, table)
+                if ambiguous_target:
+                    diagnostics.append(Diagnostic(
+                        "AMBIGUOUS_IDENTIFIER",
+                        "The request contains a conflict target matching more than one exact identifier candidate.",
+                        path=f"{path}/conflict_target_id",
+                        group_id=group_id,
+                        details={"ambiguous_identifier_names": ambiguous_target},
+                    ))
+                elif unresolved_target:
                     diagnostics.append(Diagnostic(
                         "EXPLICIT_CONFLICT_SEMANTICS_DROPPED",
                         "The request contains an explicit conflict target that cannot be resolved exactly to one enumerated unique constraint.",
@@ -851,12 +978,20 @@ def apply_reference_interventions(
                     group["update_column_ids"] = []
 
         if config.update_column_consistency and str(group.get("write_semantics") or "") == "upsert_update":
-            requested, excluded, unresolved, contradictions, update_refs = _update_control_resolution(collection, table)
+            requested, excluded, unresolved, ambiguous, contradictions, update_refs = _update_control_resolution(collection, table)
             trace["requested_update_column_ids"] = requested
             trace["excluded_update_column_ids"] = excluded
             current = [str(value) for value in group.get("update_column_ids") or []]
             trace["planned_update_column_ids_before"] = current
-            if contradictions:
+            if ambiguous:
+                diagnostics.append(Diagnostic(
+                    "AMBIGUOUS_IDENTIFIER",
+                    "Explicit update control matches more than one exact identifier candidate.",
+                    path=f"{path}/update_column_ids",
+                    group_id=group_id,
+                    details={"ambiguous_identifier_names": ambiguous},
+                ))
+            elif contradictions:
                 diagnostics.append(Diagnostic(
                     "CONTRADICTORY_UPDATE_CONTROL",
                     "The request both requires and excludes the same update column(s).",

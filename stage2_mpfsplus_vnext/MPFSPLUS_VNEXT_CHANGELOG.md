@@ -1,30 +1,34 @@
-# MP-FS+ vNext Changelog — A–C Patch 2
+# MP-FS+ vNext Changelog — A–C Patch 3
 
-## Fixed reviewer blockers
+## Patch 3 — exactness and semantic false-positive hardening
 
-- Stage-2 V0/V1/V2/V3 now keep `method_id="MP-FS+"` and use `method_variant` for ablation identity.
-- Every Stage-2 config inherits directly from `configs/final/mp_fs_plus.json`, preventing one-level inheritance loss.
-- V1 is isolated to typed operation controls; it no longer auto-consumes conflict/update/metadata controls.
-- Materialization uses exact `consumed_control_refs` emitted by semantic components instead of field-name/context suppression.
-- Free-text conflict preservation is group/table scoped for multi-group requests.
-- Free-text update parsing resolves explicit names after parsing and preserves unknown names as fail-closed errors.
-- SQL-like `DO UPDATE SET` parsing uses assignment LHS only.
-- Contradictory requested/excluded update controls emit `CONTRADICTORY_UPDATE_CONTROL`.
-- Semi-structured intervention warnings propagate through the pipeline warning stream.
+- separated loose control-alias canonicalization from exact database-identifier resolution;
+- preserved underscores/punctuation in DB identifier keys and retained candidate lists to prevent silent dictionary overwrite;
+- added fail-closed `AMBIGUOUS_IDENTIFIER`;
+- split `CONFLICT_ACTION_CONTROL` from `CONFLICT_TARGET_CONTROL`;
+- restricted structured operation parsing to exact aliases;
+- masked quoted payload literals before free-text conflict-semantic detection;
+- restricted free-text restoration to high-confidence instructional syntax;
+- preserved V0 materialization artifact shape when Stage-2 roles are disabled;
+- propagated `method_variant` / `method_version` through experiment provenance;
+- added adversarial tests for identifier collision, semantic fabrication, quoted payload false positives, V0 artifact identity, and run provenance.
 
-## Preserved from checkpoint 1
+## Patch 2 retained
 
-- exact conflict target resolution;
-- exact update-column closed-set restoration;
-- compiler semantic trace;
-- fail-closed verifier/preflight behavior;
-- no fuzzy repair and no LLM repair in A–C.
+- valid `method_id="MP-FS+"` dispatch with separate ablation variants;
+- direct inheritance from frozen MP-FS+ config;
+- V1 isolation from B/C controls;
+- group/table-scoped free-text B;
+- unknown update-column fail-closed handling;
+- SET-LHS update parsing;
+- contradictory update-control error;
+- semi-structured warning propagation.
 
 ## Still out of scope
 
 - D structured parser / NULL handling;
 - E free-text/date normalization;
 - F constrained reference repair;
-- G diagnostic-driven targeted repair;
+- G targeted diagnostic-driven repair;
 - causal replay experiment;
-- 7B end-to-end development run.
+- 3B/7B/14B end-to-end runs.

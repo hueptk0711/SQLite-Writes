@@ -1,102 +1,65 @@
-# MP-FS+ vNext — Stage 2 A–C Patch 2 Method Revision Specification
+# MP-FS+ vNext — Stage 2 A–C Patch 3 Method Revision Specification
 
 ## Scope
 
-Patch 2 fixes the reviewer-blocking integration, ablation-isolation, and safety issues in checkpoint A–C. It still does **not** implement D–G, causal replay, or any new LLM inference.
+Patch 3 hardens the already-isolated A–C interventions. No new intervention family is introduced.
 
-## Configuration / dispatch contract
+## Identifier-resolution contract
 
-All Stage-2 configs inherit **directly** from `configs/final/mp_fs_plus.json` because the current loader resolves one base level. All configs retain:
-
-```text
-method_id = MP-FS+
-```
-
-so they use the existing MP-FS+ mapping dispatch and preflight path. Ablations are identified separately by `method_variant` and `method_version`:
-
-- original → `stage2-original`
-- V1 → `vnext-v1-control`
-- V2 → `vnext-v2-conflict`
-- V3 → `vnext-v3-update`
-
-The only intended config differences from the frozen MP-FS+ config are variant/version metadata and `stage2_interventions`.
-
-## A — isolated typed operation-control semantics
-
-Feature flag: `control_field_roles`.
-
-Patch 2 narrows A deliberately. V1 does **not** consume `conflict_target`, `update_columns`, `table`, `policy`, or generic metadata merely because an operation field is present.
-
-A consumes only high-confidence operation-control source references whose **own values** parse into a supported typed write operation. Generic payload-like names such as `action` are not treated as operation controls.
-
-Successful semantic consumption is represented as an exact provenance record:
-
-```json
-{
-  "source_collection": "...",
-  "source_row_index": 0,
-  "source_field": "operation",
-  "source_field_ref": "...",
-  "role": "OPERATION_CONTROL",
-  "consumed_by": "instruction_semantics.operation",
-  "resolved_value": "upsert_update"
-}
-```
-
-Materialization accepts `consumed_control` only when the exact source reference appears in `consumed_control_refs`. Field-name heuristics alone cannot suppress provenance errors.
-
-## B — group-local conflict-semantic preservation
-
-Feature flag: `explicit_conflict_preservation`.
-
-For semi-structured input, B consumes conflict action/target controls only after the semantic action or target resolves successfully.
-
-For free text, B is **group/table scoped**. In multi-table requests the method first finds a reliable table-local segment, then extracts conflict semantics for that group only. If group scoping is ambiguous, B does not deterministically rewrite the group.
-
-Explicit conflict targets still require exact resolution to one enumerated unique constraint. No fuzzy matching is used. Unresolvable explicit targets remain fail-closed errors.
-
-Semi-structured deterministic-restoration warnings are propagated into the pipeline warning stream for later causal-replay accounting.
-
-## C — update-column preservation with fail-closed parsing
-
-Feature flag: `update_column_consistency`.
-
-C parses **requested names first**, then exact-resolves them to enumerated columns. Unknown names are retained as unresolved evidence and emit:
+Control-field aliases may use loose normalization so spellings such as `conflict-target` and `ConflictTarget` can identify the same control role. Database identifiers use a different key:
 
 ```text
-REQUIRED_UPDATE_COLUMNS_UNRESOLVED
+strip SQL identifier quotes
+→ casefold
+→ preserve underscore and other identifier characters
 ```
 
-For SQL-like `DO UPDATE SET`, only assignment **LHS** names are treated as updated columns. Column mentions on RHS/conditions do not expand the update set.
+Therefore `USER_ID == user_id`, while `user_id != userid`. Resolution stores all candidates for an exact identifier key; more than one candidate produces `AMBIGUOUS_IDENTIFIER` and fails closed. The same exact boundary is used by conflict-target lookup, update-column lookup, requested/excluded intersection, and unique-key matching.
 
-If the request both requires and excludes the same column, C emits:
+## A — typed operation control
+
+A consumes only fields classified as `OPERATION_CONTROL` whose own value exactly matches an approved typed alias. Substring inference is prohibited. A value such as `skip_validation` is unresolved, not `insert_ignore`.
+
+## B — conflict semantics
+
+Conflict controls are split into:
 
 ```text
-CONTRADICTORY_UPDATE_CONTROL
+CONFLICT_ACTION_CONTROL
+CONFLICT_TARGET_CONTROL
 ```
 
-as an error. It does not silently choose one policy.
+Only action controls may produce an operation/action signal. Target/key values can only participate in exact conflict-target resolution.
 
-B and C own their own provenance: conflict controls are consumed only after B resolves them; update controls are consumed only after C resolves them without unresolved or contradictory controls.
+For free text, quoted payload literals are masked before deterministic semantic detection. Restoration requires high-confidence instruction syntax (SQL-like conflict clauses, typed operation assignment, or explicit conditional conflict/duplicate wording with a nearby action). Bare tokens such as a payload value `"upsert"` or `"do nothing"` are not signals.
 
-## Ablation configurations
+## C — update columns
 
-- V0 `original.json`: A=off, B=off, C=off
-- V1 `v1_control.json`: A=on, B=off, C=off
-- V2 `v2_conflict.json`: A=on, B=on, C=off
-- V3 `v3_update.json`: A=on, B=on, C=on
+Patch-2 closed-set, SET-LHS, unknown-name, and contradiction rules remain. All column comparisons now use the exact DB identifier boundary, so `user_id` and `userid` cannot collide or create false contradictions.
 
-This makes V0→V1 measure operation-control provenance, V1→V2 measure conflict-semantic preservation, and V2→V3 measure update-column preservation.
+## V0 compatibility
+
+With all Stage-2 flags off, materialization does not add Stage-2-only role metadata to unresolved-field records. A frozen fixture compares the complete materialized structure.
+
+## Experiment identity
+
+`method_id` remains the dispatch family. `method_variant` and `method_version` identify the ablation and are persisted in:
+
+- run lock;
+- manifest;
+- processed sample-level artifact rows;
+- `summary_metadata.json`;
+- final consumed marker metadata.
+
+Historical configs without variant/version do not gain these fields in the run lock or sample-level artifacts.
 
 ## Safety invariants
 
-1. No fuzzy reference or column correction.
-2. No gold/post-state information in interventions.
-3. V1 does not consume B/C controls.
-4. Generic payload-like `action` remains payload.
-5. Multi-group free-text rewriting requires a reliable group-local scope.
-6. Unknown explicit update columns fail closed.
-7. Contradictory update controls fail closed.
-8. `consumed_control` requires an exact source reference, role, and `consumed_by`.
-9. Existing verifier/preflight behavior remains fail-closed.
-10. Baseline compiled serialization still omits Stage-2 trace when no trace exists.
+1. no fuzzy DB identifier correction;
+2. no silent identifier collision;
+3. conflict targets cannot define conflict actions;
+4. structured operations use exact alias sets;
+5. quoted/bare payload lexical values cannot trigger free-text conflict restoration;
+6. unresolved or ambiguous explicit identifiers fail closed;
+7. V0 retains frozen materialization artifact semantics;
+8. verifier/preflight behavior remains fail closed.

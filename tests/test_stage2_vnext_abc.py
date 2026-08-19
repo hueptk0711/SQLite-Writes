@@ -8,7 +8,8 @@ from nldbwrite_v3.planner.references import resolve_reference_mapping_plan
 from nldbwrite_v3.schema import ensure_reference_ids
 from nldbwrite_v3.verifier import verify_write_plan
 from nldbwrite_v3.vnext import (
-    CONFLICT_CONTROL,
+    CONFLICT_ACTION_CONTROL,
+    CONFLICT_TARGET_CONTROL,
     OPERATION_CONTROL,
     PAYLOAD_VALUE,
     UPDATE_CONTROL,
@@ -55,7 +56,8 @@ def _payload(row: dict[str, object], collection_id: str = "records") -> SourcePa
 
 def test_control_role_classifier_is_typed_not_operation_only():
     assert classify_source_field_role("operation") == OPERATION_CONTROL
-    assert classify_source_field_role("conflict_target") == CONFLICT_CONTROL
+    assert classify_source_field_role("conflict_target") == CONFLICT_TARGET_CONTROL
+    assert classify_source_field_role("conflict_action") == CONFLICT_ACTION_CONTROL
     assert classify_source_field_role("relationship_columns_not_updated") == UPDATE_CONTROL
     assert classify_source_field_role("customer_name") == PAYLOAD_VALUE
 
@@ -861,3 +863,452 @@ def test_semi_structured_intervention_warnings_propagate_to_warning_sink():
     assert grounded["target_groups"][0]["conflict"]["action"] == "do_nothing"
     assert any(item.error_code == "EXPLICIT_CONFLICT_SEMANTICS_DROPPED" for item in warnings)
     assert any(item.error_code == "EXPLICIT_CONFLICT_TARGET_PRESERVED" for item in warnings)
+
+
+
+def _identifier_collision_profile():
+    profile = test_profile()
+    parent = next(table for table in profile["tables"] if table["name"] == "parent")
+    parent["columns"].extend(
+        [
+            {
+                "name": "user_id",
+                "type": "TEXT",
+                "is_insertable": True,
+                "semantic_type": "identifier",
+                "preserve_as_text": True,
+            },
+            {
+                "name": "userid",
+                "type": "TEXT",
+                "is_insertable": True,
+                "semantic_type": "identifier",
+                "preserve_as_text": True,
+            },
+            {
+                "name": "ignore",
+                "type": "TEXT",
+                "is_insertable": True,
+                "semantic_type": "identifier",
+                "preserve_as_text": True,
+            },
+        ]
+    )
+    parent["unique_indexes"].extend(
+        [
+            {"name": "uq_user_id", "columns": ["user_id"], "origin": "u", "is_primary_key": False},
+            {"name": "uq_userid", "columns": ["userid"], "origin": "u", "is_primary_key": False},
+            {"name": "uq_ignore", "columns": ["ignore"], "origin": "u", "is_primary_key": False},
+        ]
+    )
+    ensure_reference_ids(profile)
+    return profile, parent
+
+
+def test_exact_identifier_does_not_collapse_user_id_and_userid():
+    profile, parent = _identifier_collision_profile()
+    cols = {column["name"]: column["column_id"] for column in parent["columns"]}
+    constraints = {item["name"]: item["constraint_id"] for item in parent["unique_indexes"]}
+    payload = _payload(
+        {
+            "operation": "insert_ignore",
+            "conflict_target": "user_id",
+            "id": "p1",
+            "name": "One",
+            "user_id": "U-1",
+            "userid": "U-2",
+        }
+    )
+    collection = payload.collections[0]
+    plan = {
+        "target_groups": [{
+            "group_id": "g1",
+            "source_collection_id": collection.reference_id,
+            "source_selector_id": collection.selector_id,
+            "table_id": parent["table_id"],
+            "field_mapping": {
+                collection.field_ids["id"]: cols["id"],
+                collection.field_ids["name"]: cols["name"],
+                collection.field_ids["user_id"]: cols["user_id"],
+                collection.field_ids["userid"]: cols["userid"],
+            },
+            "constants": {},
+            "write_semantics": "needs_clarification",
+            "conflict_target_id": None,
+            "update_column_ids": [],
+        }],
+        "dependencies": [],
+        "ignored_fields": {},
+    }
+    revised, diagnostics = apply_reference_interventions(
+        plan, payload, profile,
+        Stage2InterventionConfig(explicit_conflict_preservation=True),
+    )
+    errors = [item for item in diagnostics if item.severity == "error"]
+    assert not errors
+    assert revised["target_groups"][0]["conflict_target_id"] == constraints["uq_user_id"]
+    assert revised["target_groups"][0]["conflict_target_id"] != constraints["uq_userid"]
+
+
+def test_requested_user_id_and_excluded_userid_are_not_contradictory():
+    profile, parent = _identifier_collision_profile()
+    cols = {column["name"]: column["column_id"] for column in parent["columns"]}
+    pk = next(item for item in parent["unique_indexes"] if item.get("is_primary_key"))
+    payload = _payload(
+        {
+            "operation": "upsert_update",
+            "conflict_target": "id",
+            "update_columns": "user_id",
+            "relationship_columns_not_updated": "userid",
+            "id": "p1",
+            "name": "One",
+            "user_id": "U-1",
+            "userid": "U-2",
+        }
+    )
+    collection = payload.collections[0]
+    plan = {
+        "target_groups": [{
+            "group_id": "g1",
+            "source_collection_id": collection.reference_id,
+            "source_selector_id": collection.selector_id,
+            "table_id": parent["table_id"],
+            "field_mapping": {
+                collection.field_ids["id"]: cols["id"],
+                collection.field_ids["name"]: cols["name"],
+                collection.field_ids["user_id"]: cols["user_id"],
+                collection.field_ids["userid"]: cols["userid"],
+            },
+            "constants": {},
+            "write_semantics": "upsert_update",
+            "conflict_target_id": pk["constraint_id"],
+            "update_column_ids": [cols["userid"]],
+        }],
+        "dependencies": [],
+        "ignored_fields": {},
+    }
+    revised, diagnostics = apply_reference_interventions(
+        plan, payload, profile,
+        Stage2InterventionConfig(update_column_consistency=True),
+    )
+    assert not any(item.error_code == "CONTRADICTORY_UPDATE_CONTROL" for item in diagnostics)
+    assert revised["target_groups"][0]["update_column_ids"] == [cols["user_id"]]
+
+
+def test_conflict_target_value_cannot_define_conflict_action():
+    profile, parent = _identifier_collision_profile()
+    cols = {column["name"]: column["column_id"] for column in parent["columns"]}
+    payload = _payload(
+        {
+            "conflict_target": "ignore",
+            "id": "p1",
+            "name": "One",
+            "ignore": "K1",
+        }
+    )
+    collection = payload.collections[0]
+    plan = {
+        "target_groups": [{
+            "group_id": "g1",
+            "source_collection_id": collection.reference_id,
+            "source_selector_id": collection.selector_id,
+            "table_id": parent["table_id"],
+            "field_mapping": {
+                collection.field_ids["id"]: cols["id"],
+                collection.field_ids["name"]: cols["name"],
+                collection.field_ids["ignore"]: cols["ignore"],
+            },
+            "constants": {},
+            "write_semantics": "plain_insert",
+            "conflict_target_id": None,
+            "update_column_ids": [],
+        }],
+        "dependencies": [],
+        "ignored_fields": {},
+    }
+    revised, diagnostics = apply_reference_interventions(
+        plan, payload, profile,
+        Stage2InterventionConfig(explicit_conflict_preservation=True),
+    )
+    assert revised["target_groups"][0]["write_semantics"] == "plain_insert"
+    assert revised["target_groups"][0]["conflict_target_id"] is None
+    assert not any(item.error_code == "EXPLICIT_CONFLICT_SEMANTICS_DROPPED" for item in diagnostics)
+
+
+def test_structured_operation_skip_validation_is_not_insert_ignore():
+    profile, parent, cols, *_ = _profile_and_ids()
+    payload = _payload({"operation": "skip_validation", "id": "p1", "name": "One"})
+    collection = payload.collections[0]
+    plan = {
+        "target_groups": [{
+            "group_id": "g1",
+            "source_collection_id": collection.reference_id,
+            "source_selector_id": collection.selector_id,
+            "table_id": parent["table_id"],
+            "field_mapping": {
+                collection.field_ids["id"]: cols["id"],
+                collection.field_ids["name"]: cols["name"],
+            },
+            "constants": {},
+            "write_semantics": "plain_insert",
+            "conflict_target_id": None,
+            "update_column_ids": [],
+        }],
+        "dependencies": [],
+        "ignored_fields": {},
+    }
+    revised, _ = apply_reference_interventions(
+        plan, payload, profile,
+        Stage2InterventionConfig(control_field_roles=True),
+    )
+    grounded, errors = resolve_reference_mapping_plan(revised, payload, profile)
+    assert not errors
+    materialized = materialize_mapping_plan(grounded, payload, control_field_roles=True)
+    operation_record = next(item for item in materialized["unresolved_fields"] if item["field"] == "operation")
+    assert operation_record["status"] == "unresolved"
+    assert not verify_write_plan(materialized, profile).valid
+
+
+def _plain_parent_free_text_plan(profile):
+    ensure_reference_ids(profile)
+    parent = next(table for table in profile["tables"] if table["name"] == "parent")
+    return parent, {
+        "version": "4.0",
+        "plan_kind": "reference_write_plan",
+        "write_groups": [{
+            "group_id": "g1",
+            "table_id": parent["table_id"],
+            "rows": [],
+            "write_semantics": "plain_insert",
+            "conflict_target_id": None,
+            "update_column_ids": [],
+        }],
+        "dependencies": [],
+        "unresolved_fields": [],
+    }
+
+
+def test_free_text_payload_literal_upsert_does_not_change_operation():
+    profile = test_profile()
+    _, plan = _plain_parent_free_text_plan(profile)
+    revised, diagnostics = apply_free_text_reference_interventions(
+        plan,
+        "For parent, insert a row with id = 'p1' and name = 'upsert'.",
+        profile,
+        Stage2InterventionConfig(explicit_conflict_preservation=True),
+    )
+    assert revised["write_groups"][0]["write_semantics"] == "plain_insert"
+    assert not diagnostics
+
+
+def test_free_text_payload_literal_do_nothing_does_not_change_operation():
+    profile = test_profile()
+    _, plan = _plain_parent_free_text_plan(profile)
+    revised, diagnostics = apply_free_text_reference_interventions(
+        plan,
+        'For parent, insert a row with id = "p1" and name = "do nothing".',
+        profile,
+        Stage2InterventionConfig(explicit_conflict_preservation=True),
+    )
+    assert revised["write_groups"][0]["write_semantics"] == "plain_insert"
+    assert not diagnostics
+
+
+def test_v0_materialization_matches_frozen_fixture():
+    import json
+    from pathlib import Path
+
+    profile, parent, cols, *_ = _profile_and_ids()
+    payload = _payload({"operation": "plain_insert", "id": "p1", "name": "One"})
+    collection = payload.collections[0]
+    plan = {
+        "target_groups": [{
+            "group_id": "g1",
+            "source_collection_id": collection.reference_id,
+            "source_selector_id": collection.selector_id,
+            "table_id": parent["table_id"],
+            "field_mapping": {
+                collection.field_ids["id"]: cols["id"],
+                collection.field_ids["name"]: cols["name"],
+            },
+            "constants": {},
+            "write_semantics": "plain_insert",
+            "conflict_target_id": None,
+            "update_column_ids": [],
+        }],
+        "ignored_fields": {},
+        "dependencies": [],
+    }
+    grounded, errors = resolve_reference_mapping_plan(plan, payload, profile)
+    assert not errors
+    actual = materialize_mapping_plan(grounded, payload, control_field_roles=False)
+    expected = json.loads(
+        (Path(__file__).parent / "fixtures" / "stage2_v0_materialization_frozen.json").read_text(encoding="utf-8")
+    )
+    assert actual == expected
+    operation_record = next(item for item in actual["unresolved_fields"] if item["field"] == "operation")
+    assert "role" not in operation_record
+
+
+def test_run_lock_records_method_variant_and_version(tmp_path):
+    import sqlite3
+    from nldbwrite_v3.experiments.run_lock import build_run_lock
+
+    project = tmp_path / "project"
+    (project / "src").mkdir(parents=True)
+    (project / "src" / "placeholder.py").write_text("x = 1\n", encoding="utf-8")
+    dataset = project / "dataset.json"
+    split = project / "split.txt"
+    config = project / "config.json"
+    profile_dir = project / "profiles"
+    profile_dir.mkdir()
+    db_root = project / "databases"
+    (db_root / "test").mkdir(parents=True)
+    db_path = db_root / "test" / "test.sqlite"
+    sqlite3.connect(db_path).close()
+    dataset.write_text("[]\n", encoding="utf-8")
+    split.write_text("s1\n", encoding="utf-8")
+    config.write_text("{}\n", encoding="utf-8")
+    (profile_dir / "test.json").write_text("{}\n", encoding="utf-8")
+
+    lock = build_run_lock(
+        project_root=project,
+        stage="dev",
+        method_id="MP-FS+",
+        method_variant="vnext-v3-update",
+        method_version="stage2-v3-control-conflict-update",
+        method_config_path=config,
+        inference_config_path=None,
+        base_config_path=None,
+        resolved_config_sha256="resolved",
+        dataset_path=dataset,
+        split_path=split,
+        gold_plans_path=None,
+        profile_dir=profile_dir,
+        db_root=db_root,
+        selected_db_ids=["test"],
+        prompt_set_sha256="prompt",
+        model_metadata={"backend": "mock"},
+        dependency_lock_path=None,
+        environment_manifest_path=None,
+    )
+    assert lock["method_id"] == "MP-FS+"
+    assert lock["method_variant"] == "vnext-v3-update"
+    assert lock["method_version"] == "stage2-v3-control-conflict-update"
+
+
+def test_case_only_identifier_collision_is_ambiguous_and_fails_closed():
+    profile = test_profile()
+    parent = next(table for table in profile["tables"] if table["name"] == "parent")
+    parent["columns"].extend([
+        {"name": "user_id", "type": "TEXT", "is_insertable": True},
+        {"name": "USER_ID", "type": "TEXT", "is_insertable": True},
+    ])
+    parent["unique_indexes"].append(
+        {"name": "uq_user_id", "columns": ["user_id"], "origin": "u", "is_primary_key": False}
+    )
+    ensure_reference_ids(profile)
+    cols = {column["name"]: column["column_id"] for column in parent["columns"]}
+    payload = _payload({
+        "operation": "insert_ignore",
+        "conflict_target": "user_id",
+        "id": "p1",
+        "name": "One",
+    })
+    collection = payload.collections[0]
+    plan = {
+        "target_groups": [{
+            "group_id": "g1",
+            "source_collection_id": collection.reference_id,
+            "source_selector_id": collection.selector_id,
+            "table_id": parent["table_id"],
+            "field_mapping": {
+                collection.field_ids["id"]: cols["id"],
+                collection.field_ids["name"]: cols["name"],
+            },
+            "constants": {},
+            "write_semantics": "needs_clarification",
+            "conflict_target_id": None,
+            "update_column_ids": [],
+        }],
+        "dependencies": [],
+        "ignored_fields": {},
+    }
+    _, diagnostics = apply_reference_interventions(
+        plan, payload, profile,
+        Stage2InterventionConfig(explicit_conflict_preservation=True),
+    )
+    errors = [item for item in diagnostics if item.severity == "error"]
+    assert any(item.error_code == "AMBIGUOUS_IDENTIFIER" for item in errors)
+
+
+def test_run_manifest_records_method_variant_and_version(tmp_path):
+    import json
+    import sqlite3
+    from nldbwrite_v3.experiments.run_method import run_method
+
+    dataset = [{
+        "id": "s1",
+        "sample_id": "s1",
+        "db_id": "test",
+        "input_text": "For parent, insert id='p1' and name='One'.",
+        "input_mode": "free_text",
+        "input_format": "free_text",
+        "gold_sql": ["INSERT INTO parent (id,name) VALUES ('p1','One');"],
+        "operation_semantics": "plain_insert",
+        "conflict_sensitive": False,
+        "state_changing": True,
+    }]
+    data_path = tmp_path / "dataset.json"
+    ids_path = tmp_path / "ids.txt"
+    profile_dir = tmp_path / "profiles"
+    db_root = tmp_path / "databases"
+    inference_path = tmp_path / "mock.json"
+    output_dir = tmp_path / "out"
+    data_path.write_text(json.dumps(dataset), encoding="utf-8")
+    ids_path.write_text("s1\n", encoding="utf-8")
+    profile_dir.mkdir()
+    (profile_dir / "test.json").write_text(
+        json.dumps(test_profile()), encoding="utf-8"
+    )
+    (db_root / "test").mkdir(parents=True)
+    connection = sqlite3.connect(db_root / "test" / "test.sqlite")
+    connection.executescript(
+        "CREATE TABLE parent(id TEXT PRIMARY KEY, name TEXT NOT NULL, count INTEGER);"
+        "CREATE TABLE child(id INTEGER PRIMARY KEY,parent_id TEXT NOT NULL,note TEXT NOT NULL,"
+        " FOREIGN KEY(parent_id) REFERENCES parent(id));"
+        "CREATE TABLE pair(a TEXT,b TEXT,value TEXT NOT NULL, PRIMARY KEY(a,b));"
+    )
+    connection.close()
+    inference_path.write_text(
+        json.dumps({"backend": "mock", "batch_size": 1, "mock_default_response": "{}"}),
+        encoding="utf-8",
+    )
+
+    run_method(
+        "configs/stage2/v3_update.json",
+        data_path,
+        ids_path,
+        profile_dir,
+        db_root,
+        output_dir,
+        inference_config_path=inference_path,
+        resume=False,
+        stage="dev",
+    )
+
+    expected = {
+        "method_id": "MP-FS+",
+        "method_variant": "vnext-v3-update",
+        "method_version": "stage2-v3-control-conflict-update",
+    }
+    for artifact in ("run_lock.json", "manifest.json", "summary_metadata.json"):
+        value = json.loads((output_dir / artifact).read_text(encoding="utf-8"))
+        for key, expected_value in expected.items():
+            assert value[key] == expected_value
+
+    evaluation = json.loads(
+        (output_dir / "evaluation.jsonl").read_text(encoding="utf-8").splitlines()[0]
+    )
+    for key, expected_value in expected.items():
+        assert evaluation[key] == expected_value

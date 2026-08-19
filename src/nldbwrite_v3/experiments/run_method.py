@@ -720,6 +720,16 @@ def run_method(
             "inference": load_json(inference_config_path),
         }
     method = str(config.get("method_id") or "")
+    method_variant = (
+        str(config.get("method_variant"))
+        if config.get("method_variant") is not None
+        else None
+    )
+    method_version = (
+        str(config.get("method_version"))
+        if config.get("method_version") is not None
+        else None
+    )
     if method not in SUPPORTED_METHODS:
         raise ValueError(
             f"Unsupported method_id {method!r}; expected {sorted(SUPPORTED_METHODS)}"
@@ -794,12 +804,13 @@ def run_method(
         if locked_config_sha256 is not None
         else None
     )
+    final_method_identity = method_variant or method
     final_consumed_marker = (
         project_root
         / "experiments"
         / "external_holdout"
         / "FINAL_RUN_CONSUMED"
-        / f"{final_protocol_sha256}_{stage}_{method}.json"
+        / f"{final_protocol_sha256}_{stage}_{final_method_identity}.json"
         if final_protocol_sha256 is not None
         else None
     )
@@ -910,6 +921,8 @@ def run_method(
         project_root=project_root,
         stage=stage,
         method_id=method,
+        method_variant=method_variant,
+        method_version=method_version,
         method_config_path=config_path,
         inference_config_path=inference_config_path,
         base_config_path=base_config_path,
@@ -1556,6 +1569,27 @@ def run_method(
             [existing[sample_id] for sample_id in selected_ids],
             raw_path,
         )
+
+    # Stage-2 experiment identity is attached to sample-level artifacts only
+    # when a variant/version is explicitly configured. Historical configs that
+    # do not define these fields retain their prior artifact shape.
+    sample_method_identity = {
+        "method_id": method,
+        **({"method_variant": method_variant} if method_variant is not None else {}),
+        **({"method_version": method_version} if method_version is not None else {}),
+    }
+    if method_variant is not None or method_version is not None:
+        for rows in (
+            parsed_rows,
+            materialized_rows,
+            verification_rows,
+            compiled_rows,
+            execution_rows,
+            evaluation_rows,
+        ):
+            for row in rows:
+                row.update(sample_method_identity)
+
     write_jsonl(parsed_rows, target / "parsed_mapping_plans.jsonl")
     write_jsonl(
         materialized_rows,
@@ -1567,6 +1601,15 @@ def run_method(
     write_jsonl(evaluation_rows, target / "evaluation.jsonl")
     metrics = summarize_run(evaluation_rows)
     dump_json(metrics, target / "metrics.json")
+    summary_metadata = {
+        "method_id": method,
+        "method_variant": method_variant,
+        "method_version": method_version,
+        "stage": stage,
+        "sample_count": len(selected_ids),
+        "run_lock_sha256": run_lock["run_lock_sha256"],
+    }
+    dump_json(summary_metadata, target / "summary_metadata.json")
     _write_error_csv(evaluation_rows, target / "error_analysis.csv")
 
     inference_manifest_metadata = {
@@ -1576,6 +1619,8 @@ def run_method(
     }
     manifest = {
         "method_id": method,
+        "method_variant": method_variant,
+        "method_version": method_version,
         "stage": stage,
         "created_at_unix": time.time(),
         "elapsed_sec": time.time() - started,
@@ -1621,6 +1666,7 @@ def run_method(
             "execution_logs.jsonl",
             "evaluation.jsonl",
             "metrics.json",
+            "summary_metadata.json",
             "error_analysis.csv",
         ],
     }
@@ -1650,6 +1696,8 @@ def run_method(
         marker_payload = {
             "status": "consumed",
             "method_id": method,
+            "method_variant": method_variant,
+            "method_version": method_version,
             "output_dir": str(target.resolve()),
             "run_lock_sha256": run_lock["run_lock_sha256"],
             "locked_config_sha256": locked_config_sha256,
@@ -1698,6 +1746,8 @@ def run_method(
             "status": "consumed",
             "stage": stage,
             "method_id": method,
+            "method_variant": method_variant,
+            "method_version": method_version,
             "output_dir": str(target.resolve()),
             "run_lock_sha256": run_lock["run_lock_sha256"],
             "final_protocol_sha256": final_protocol_sha256,
