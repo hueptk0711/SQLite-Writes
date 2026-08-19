@@ -4,6 +4,12 @@ from copy import deepcopy
 from typing import Any
 
 from nldbwrite_v3.ir import Diagnostic, SourcePayload
+from nldbwrite_v3.vnext import (
+    PAYLOAD_VALUE,
+    classify_source_field_role,
+    control_consumed_by,
+    row_has_instruction_context,
+)
 
 
 class MaterializationError(ValueError):
@@ -73,6 +79,8 @@ def _selected_rows(
 def materialize_mapping_plan(
     mapping_plan: dict[str, Any],
     payload: SourcePayload,
+    *,
+    control_field_roles: bool = False,
 ) -> dict[str, Any]:
     """Apply one predicted mapping to every source row deterministically."""
     diagnostics: list[Diagnostic] = []
@@ -233,11 +241,36 @@ def materialize_mapping_plan(
                         reason = str(collection_ignored.get(field) or "")
                     if not reason:
                         reason = str(ignored_fields.get(field) or "")
+                role = classify_source_field_role(str(field))
+                instruction_context = row_has_instruction_context(row)
+                consumed_by = (
+                    control_consumed_by(
+                        str(field),
+                        row.get(field),
+                        instruction_context=instruction_context,
+                    )
+                    if control_field_roles and role != PAYLOAD_VALUE
+                    else None
+                )
+                if consumed_by:
+                    unresolved_fields.append(
+                        {
+                            "source_collection": collection.collection_id,
+                            "source_row_index": row_index,
+                            "field": field,
+                            "role": role,
+                            "consumed_by": consumed_by,
+                            "reason": "typed control/instruction semantic",
+                            "status": "consumed_control",
+                        }
+                    )
+                    continue
                 unresolved_fields.append(
                     {
                         "source_collection": collection.collection_id,
                         "source_row_index": row_index,
                         "field": field,
+                        "role": role,
                         "reason": reason,
                         "status": "ignored" if reason else "unresolved",
                     }

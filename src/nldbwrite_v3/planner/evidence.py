@@ -607,6 +607,9 @@ def materialize_reference_free_text_plan(
                     "update_column_ids": deepcopy(
                         policy_group.get("update_column_ids") or []
                     ),
+                    "stage2_intervention_trace": deepcopy(
+                        policy_group.get("stage2_intervention_trace") or {}
+                    ),
                     "evidence_column_groundings": (
                         evidence_column_groundings
                     ),

@@ -1,0 +1,10 @@
+{
+  "base_config": "configs/stage2/original.json",
+  "method_id": "MP-FS+ vNext V2",
+  "method_version": "stage2-v2-control-conflict",
+  "stage2_interventions": {
+    "control_field_roles": true,
+    "explicit_conflict_preservation": true,
+    "update_column_consistency": false
+  }
+}

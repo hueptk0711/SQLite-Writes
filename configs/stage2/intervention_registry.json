@@ -1,0 +1,34 @@
+{
+  "stage": "2-A-C",
+  "baseline": "configs/stage2/original.json",
+  "interventions": [
+    {
+      "id": "A_control_field_roles",
+      "flag": "control_field_roles",
+      "hypothesis": "Control/instruction fields must be consumed by typed semantics rather than mapped as payload or rejected as unresolved.",
+      "stage1_evidence": "22 materialization-bound operation/control-field cases",
+      "config": "configs/stage2/v1_control.json"
+    },
+    {
+      "id": "B_explicit_conflict_preservation",
+      "flag": "explicit_conflict_preservation",
+      "hypothesis": "Explicit conflict semantics in the request must not be degraded to needs_clarification or a contradictory action.",
+      "stage1_evidence": "20/20 conflict-audit cases were RESOLVABLE_FROM_INPUT",
+      "config": "configs/stage2/v2_conflict.json"
+    },
+    {
+      "id": "C_update_column_consistency",
+      "flag": "update_column_consistency",
+      "hypothesis": "Explicit requested update columns define a closed update set and must survive planning/materialization without omission or relationship-column expansion.",
+      "stage1_evidence": "4 executed-but-wrong update-column omission cases plus latent relationship-column expansion cases",
+      "config": "configs/stage2/v3_update.json"
+    }
+  ],
+  "not_in_scope": [
+    "structured_parser_v2",
+    "typed_normalization_v2",
+    "reference_repair",
+    "semantic_targeted_repair",
+    "7B_end_to_end_run"
+  ]
+}

@@ -1140,6 +1140,7 @@ def run_method(
                         config.get("normalization_mode") or "legacy"
                     ),
                     reference_planning=reference_planning,
+                    stage2_interventions=config.get("stage2_interventions"),
                 ).run(
                     str(sample.get("input_text") or ""),
                     parsed.plan,

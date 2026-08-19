@@ -1,0 +1,37 @@
+{
+  "checkpoint": "stage2-A-C",
+  "new_model_inference": false,
+  "implemented_interventions": [
+    "A_control_field_roles",
+    "B_explicit_conflict_preservation",
+    "C_update_column_consistency"
+  ],
+  "dedicated_regression_tests_passed": 13,
+  "compatibility_test_group": "passed",
+  "full_fast_test_suite": "passed_100_percent",
+  "causal_replay_run": false,
+  "seven_b_run": false,
+  "confirmatory_claim": false,
+  "source_branch": "stage2/mpfsplus-vnext",
+  "source_head": "34ef629b4b0e49ba88dc37c783d500d94a925f7e",
+  "snapshot_hash_match_relevant_files": "8/8",
+  "stage2_abc_regression_tests": {
+    "passed": 13,
+    "failed": 0
+  },
+  "compatibility_subset": {
+    "passed": 53,
+    "failed": 0,
+    "tests": [
+      "tests/test_source_and_planner.py",
+      "tests/test_mp_fs_plus.py",
+      "tests/test_stage2_vnext_abc.py"
+    ]
+  },
+  "fast_suite": {
+    "status": "PASS",
+    "failed": 0,
+    "command": "python -m pytest -q -m \"not integration\""
+  },
+  "new_llm_run": false
+}
