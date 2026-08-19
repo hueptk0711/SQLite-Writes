@@ -63,6 +63,7 @@ class MappingFirstPipeline:
         normalization_mode: str = "legacy",
         reference_planning: bool = False,
         stage2_interventions: Mapping[str, Any] | None = None,
+        structured_source_parser: Mapping[str, Any] | None = None,
     ):
         self.profile = profile
         self.strict_atomic = strict_atomic
@@ -72,13 +73,17 @@ class MappingFirstPipeline:
         self.stage2_interventions = Stage2InterventionConfig.from_mapping(
             stage2_interventions
         )
+        self.structured_source_parser = dict(structured_source_parser or {})
 
     def run(
         self,
         request: str,
         predicted_plan: dict[str, Any],
     ) -> PipelineResult:
-        payload = parse_source_payload(request)
+        payload = parse_source_payload(
+            request,
+            structured_parser=self.structured_source_parser,
+        )
         grounding_warnings: list[Diagnostic] = []
         reference_plan = self.reference_planning or (
             predicted_plan.get("plan_kind") == "reference_write_plan"

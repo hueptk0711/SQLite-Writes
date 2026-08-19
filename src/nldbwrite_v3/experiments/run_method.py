@@ -188,7 +188,10 @@ def _prompt_for_sample(
     config: dict[str, Any],
 ) -> tuple[str, Any]:
     request = str(sample.get("input_text") or "")
-    payload = parse_source_payload(request)
+    payload = parse_source_payload(
+        request,
+        structured_parser=config.get("structured_source_parser"),
+    )
     prompt_config = config
     demonstrations = config.get("demonstrations")
     if isinstance(demonstrations, dict):
@@ -1154,6 +1157,9 @@ def run_method(
                     ),
                     reference_planning=reference_planning,
                     stage2_interventions=config.get("stage2_interventions"),
+                    structured_source_parser=config.get(
+                        "structured_source_parser"
+                    ),
                 ).run(
                     str(sample.get("input_text") or ""),
                     parsed.plan,

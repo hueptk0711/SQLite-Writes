@@ -1,0 +1,36 @@
+{
+  "checkpoint": "Stage2-D-structured-parser-null",
+  "base_tag": "Stage2-A-C-FINAL",
+  "base_commit": "f1fa49ddb8e6b920fb5a4237e088b6603579ae23",
+  "config": "configs/stage2/v4_structured_parser.json",
+  "stage1_diagnostic_scope": {
+    "SOURCE_PARSER_ROW_SEGMENTATION_ERROR": 3,
+    "SOURCE_PARSER_CONTROL_ROW_SEGMENTATION_ERROR": 2,
+    "SOURCE_PARSER_NULL_LITERAL_COERCION_ERROR": 2,
+    "total": 7
+  },
+  "validation": {
+    "dedicated_d_tests": "12/12 PASS",
+    "stage1_exact_parser_fixtures": "7/7 parser-level PASS",
+    "compatibility_subset": "PASS; no failures",
+    "full_fast_suite": "PASS; no failures",
+    "cpu_smoke": "PASS",
+    "prompt_pipeline_parser_consistency": "PASS"
+  },
+  "claims": {
+    "parser_regression_evidence": true,
+    "causal_rescue_claim": false,
+    "confirmatory_accuracy_claim": false
+  },
+  "not_run": [
+    "E_free_text_date_normalization",
+    "F_constrained_reference_repair",
+    "G_diagnostic_targeted_repair",
+    "full_stage2_causal_replay",
+    "3B",
+    "7B",
+    "14B",
+    "token_limit_experiments",
+    "public_benchmarks"
+  ]
+}

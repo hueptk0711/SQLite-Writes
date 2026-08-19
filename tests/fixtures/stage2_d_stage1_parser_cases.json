@@ -1,0 +1,57 @@
+{
+  "source": "Stage1.1 final manual audit diagnostic fixtures",
+  "purpose": "Stage2 D parser-only regression; not confirmatory evaluation",
+  "cases": [
+    {
+      "sample_id": "final_polar_014",
+      "root_cause": "SOURCE_PARSER_NULL_LITERAL_COERCION_ERROR",
+      "collection_id": "table_1",
+      "row_count": 8,
+      "text_none_count": 2,
+      "input_text": "For weatherandstructure, use conflict target weatherregistry and skip conflicting rows without updates. Registry 1 is the pristine conflict witness; registries 3014 through 3020 are new and must be inserted.\n\nweatherregistry,weatherlocref,externaltemperaturec,windspeedms,precipitationtype,structuralintegritystatus\n1,1,29.3,17.79,Blowing Snow,Normal\n3014,2,-35.0,8.0,Snow,Normal\n3015,3,-32.5,9.2,Ice,Warning\n3016,4,-30.0,10.4,None,Normal\n3017,5,-27.5,11.6,Snow,Critical\n3018,6,-25.0,12.8,None,Normal\n3019,7,-22.5,14.0,Ice,Warning\n3020,8,-20.0,15.2,Snow,Normal"
+    },
+    {
+      "sample_id": "final_polar_058",
+      "root_cause": "SOURCE_PARSER_NULL_LITERAL_COERCION_ERROR",
+      "collection_id": "table_1",
+      "row_count": 3,
+      "text_none_count": 1,
+      "input_text": "Plain-insert these three new weatherandstructure rows. Weather registries 5058, 5059, and 5060 are new; use no conflict target and no update columns, and raise an error on conflict.\n\nweatherregistry,weatherlocref,externaltemperaturec,windspeedms,winddirectiondegrees,barometricpressurehpa,precipitationtype,structuralintegritystatus,weatheropmaintref\n5058,58,-24,14,125.5,965.25,Snow,Normal,58\n5059,59,-31,19,210.0,948.75,Blowing Snow,Warning,59\n5060,60,-18,9,47.5,982.5,None,Normal,60"
+    },
+    {
+      "sample_id": "final_robot_026",
+      "root_cause": "SOURCE_PARSER_CONTROL_ROW_SEGMENTATION_ERROR",
+      "collection_id": "robot_record",
+      "row_count": 8,
+      "input_text": "operation=insert_ignore\ntable=robot_record\nconflict_target=recreg\nupdate_columns=none\npolicy=RF109148 is the existing witness and must be skipped unchanged; the seven RB2REC026 keys are new and must be inserted\nrow_1.recreg=RF109148\nrow_1.rects=2025-02-18 14:10:50.287377\nrow_1.botcode=RB2624\nrow_2.recreg=RB2REC026A\nrow_2.rects=2026-07-30 17:26:01\nrow_2.botcode=RB2-026-A\nrow_3.recreg=RB2REC026B\nrow_3.rects=2026-07-30 17:26:02\nrow_3.botcode=RB2-026-B\nrow_4.recreg=RB2REC026C\nrow_4.rects=2026-07-30 17:26:03\nrow_4.botcode=RB2-026-C\nrow_5.recreg=RB2REC026D\nrow_5.rects=2026-07-30 17:26:04\nrow_5.botcode=RB2-026-D\nrow_6.recreg=RB2REC026E\nrow_6.rects=2026-07-30 17:26:05\nrow_6.botcode=RB2-026-E\nrow_7.recreg=RB2REC026F\nrow_7.rects=2026-07-30 17:26:06\nrow_7.botcode=RB2-026-F\nrow_8.recreg=RB2REC026G\nrow_8.rects=2026-07-30 17:26:07\nrow_8.botcode=RB2-026-G"
+    },
+    {
+      "sample_id": "final_vaccine_040",
+      "root_cause": "SOURCE_PARSER_ROW_SEGMENTATION_ERROR",
+      "collection_id": "shipments",
+      "row_count": 8,
+      "input_text": "operation = plain_insert\npolicy = all eight shipmentregistry values are new; use no conflict target or update columns and raise an error on any unexpected conflict\n\ntable = shipments\nrow = 1\nshipmentregistry = VSVAC20401\ntimemark = 2026-07-21 09:40:00\nroutealign = Compliant\ncustomsflag = Cleared\nqualcheck = Passed\nintegritymark = Intact\ncontamlevel = Low\nsterilemark = Maintained\npackagestate = Excellent\nsealflag = Intact\nhandlingguide = Standard\nstoragepose = Upright\nrow = 2\nshipmentregistry = VSVAC20402\ntimemark = 2026-07-22 10:40:00\nroutealign = Under Review\ncustomsflag = Pending\nqualcheck = Pending\nintegritymark = Under Investigation\ncontamlevel = Medium\nsterilemark = Unknown\npackagestate = Fair\nsealflag = Missing\nhandlingguide = Special Care\nstoragepose = Horizontal\nrow = 3\nshipmentregistry = VSVAC20403\ntimemark = 2026-07-23 11:40:00\nroutealign = Deviation\ncustomsflag = In Process\nqualcheck = Failed\nintegritymark = Intact\ncontamlevel = High\nsterilemark = Compromised\npackagestate = Poor\nsealflag = Broken\nhandlingguide = Urgent\nstoragepose = Not Specified\nrow = 4\nshipmentregistry = VSVAC20404\ntimemark = 2026-07-24 12:40:00\nroutealign = Compliant\ncustomsflag = Cleared\nqualcheck = Passed\nintegritymark = Under Investigation\ncontamlevel = Low\nsterilemark = Maintained\npackagestate = Excellent\nsealflag = Intact\nhandlingguide = Standard\nstoragepose = Upright\nrow = 5\nshipmentregistry = VSVAC20405\ntimemark = 2026-07-25 13:40:00\nroutealign = Under Review\ncustomsflag = Pending\nqualcheck = Pending\nintegritymark = Intact\ncontamlevel = Medium\nsterilemark = Unknown\npackagestate = Fair\nsealflag = Missing\nhandlingguide = Special Care\nstoragepose = Horizontal\nrow = 6\nshipmentregistry = VSVAC20406\ntimemark = 2026-07-26 14:40:00\nroutealign = Deviation\ncustomsflag = In Process\nqualcheck = Failed\nintegritymark = Under Investigation\ncontamlevel = High\nsterilemark = Compromised\npackagestate = Poor\nsealflag = Broken\nhandlingguide = Urgent\nstoragepose = Not Specified\nrow = 7\nshipmentregistry = VSVAC20407\ntimemark = 2026-07-27 15:40:00\nroutealign = Compliant\ncustomsflag = Cleared\nqualcheck = Passed\nintegritymark = Intact\ncontamlevel = Low\nsterilemark = Maintained\npackagestate = Excellent\nsealflag = Intact\nhandlingguide = Standard\nstoragepose = Upright\nrow = 8\nshipmentregistry = VSVAC20408\ntimemark = 2026-07-28 16:40:00\nroutealign = Under Review\ncustomsflag = Pending\nqualcheck = Pending\nintegritymark = Under Investigation\ncontamlevel = Medium\nsterilemark = Unknown\npackagestate = Fair\nsealflag = Missing\nhandlingguide = Special Care\nstoragepose = Horizontal"
+    },
+    {
+      "sample_id": "final_virtual_010",
+      "root_cause": "SOURCE_PARSER_CONTROL_ROW_SEGMENTATION_ERROR",
+      "collection_id": "additionalnotes",
+      "row_count": 1,
+      "input_text": "operation: plain_insert\ntable: additionalnotes\n\nnotesreg: VIRA1NOTE010\nnotesretainpivot: RET_M9GTT\nnoteinfo: Review the July fan-retention campaign after the next virtual concert."
+    },
+    {
+      "sample_id": "final_virtual_025",
+      "root_cause": "SOURCE_PARSER_ROW_SEGMENTATION_ERROR",
+      "collection_id": "eventsandclub",
+      "row_count": 3,
+      "input_text": "operation=plain_insert\ntable=eventsandclub\nconflict_policy=error\nrow1:\n  eventsreg=VIR2EVT025A\n  eventssocialpivot=SOC_GIW1H\n  eventsmemberpivot=MEM_KGCEJ\n  clubjdate=2026-07-12\n  participation_summary=Joined a creator workshop and one evening showcase.\nrow2:\n  eventsreg=VIR2EVT025B\n  eventssocialpivot=SOC_8ILAQ\n  eventsmemberpivot=MEM_P91DJ\n  clubjdate=2026-07-19\n  participation_summary=Attended two online panels and submitted a community vote.\nrow3:\n  eventsreg=VIR2EVT025C\n  eventssocialpivot=SOC_U32T0\n  eventsmemberpivot=MEM_HVZ7O\n  clubjdate=2026-07-26\n  participation_summary=Participated in the weekly club stream and fan-art review."
+    },
+    {
+      "sample_id": "final_virtual_040",
+      "root_cause": "SOURCE_PARSER_ROW_SEGMENTATION_ERROR",
+      "collection_id": "additionalnotes",
+      "row_count": 8,
+      "input_text": "operation=plain_insert\ntable=additionalnotes\nconflict_policy=error\nrow1:\n  notesreg=VIR2NOTE0401\n  notesretainpivot=RET_4S9OK\n  noteinfo=Schedule a translated-content survey in August.\nrow2:\n  notesreg=VIR2NOTE0402\n  notesretainpivot=RET_XZTG5\n  noteinfo=Review the high-risk cohort after the next campaign.\nrow3:\n  notesreg=VIR2NOTE0403\n  notesretainpivot=RET_DYDVF\n  noteinfo=Invite the member to the creator feedback session.\nrow4:\n  notesreg=VIR2NOTE0404\n  notesretainpivot=RET_2HHJ6\n  noteinfo=Track referral growth during the seasonal launch.\nrow5:\n  notesreg=VIR2NOTE0405\n  notesretainpivot=RET_ICC8O\n  noteinfo=Record the next reactivation source in the follow-up log.\nrow6:\n  notesreg=VIR2NOTE0406\n  notesretainpivot=RET_736UE\n  noteinfo=Compare weekend and weekday retention patterns.\nrow7:\n  notesreg=VIR2NOTE0407\n  notesretainpivot=RET_ZZ9WK\n  noteinfo=Check hashtag reach after the collaboration event.\nrow8:\n  notesreg=VIR2NOTE0408\n  notesretainpivot=RET_ARN6A\n  noteinfo=Revisit churn indicators after the membership renewal."
+    }
+  ]
+}

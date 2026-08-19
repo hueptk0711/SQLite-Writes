@@ -1,4 +1,4 @@
-# MP-FS+ vNext Changelog — A–C Patch 4
+# MP-FS+ vNext Changelog — Stage 2 D
 
 ## Patch 4 — unified free-text instruction/payload boundary
 
@@ -30,9 +30,22 @@
 - contradictory update-control error;
 - semi-structured warning propagation.
 
+## A–C frozen checkpoint
+
+A–C are frozen at `Stage2-A-C-FINAL` (`f1fa49ddb8e6b920fb5a4237e088b6603579ae23`). D uses their existing interfaces and does not tune their logic.
+
+## D — structured parser / NULL handling
+
+- added independently ablatable `structured_source_parser` config and V4 variant;
+- preserves explicit repeated row boundaries for `rowN:`, `row = N`, and `row_N.field=value`;
+- separates strong control-only blocks from payload rows;
+- preserves ambiguous textual `None`/`nil` while keeping explicit unquoted `NULL` as null;
+- records value coercion provenance and stable `SRC_ROW_*` row IDs;
+- propagates the same parser config through prompt-time and pipeline-time parsing;
+- added exact regression fixtures for the seven Stage-1 manually audited parser failures.
+
 ## Still out of scope
 
-- D structured parser / NULL handling;
 - E free-text/date normalization;
 - F constrained reference repair;
 - G targeted diagnostic-driven repair;
