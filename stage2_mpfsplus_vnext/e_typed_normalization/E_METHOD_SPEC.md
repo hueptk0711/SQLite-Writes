@@ -99,9 +99,34 @@ semantics, UUID-like semantics, URLs, emails, and blobs.
 This still permits benchmark temporal values stored in SQLite `TEXT` columns when their
 semantic type is `text`.
 
-Declared numeric/blob/boolean/JSON-like storage types fail with
-`TEMPORAL_TARGET_TYPE_MISMATCH`. DATE/TIME and text-like declared types remain compatible.
-Unknown custom declared types are not silently treated as temporal storage.
+Declared storage is classified without substring `DATE`/`TIME` guessing.
+
+Recognized exact temporal declarations are:
+
+```text
+DATE                 -> date candidate only
+DATETIME             -> datetime candidate only
+TIMESTAMP            -> datetime candidate only
+TIME                 -> unsupported at Stage E; fail closed
+```
+
+SQLite text-affinity declarations containing `CHAR`, `CLOB`, or `TEXT` remain
+storage-compatible and defer temporal subtype choice to semantic metadata. This preserves
+`TEXT`/`VARCHAR` benchmark storage without treating arbitrary custom declarations such as
+`CANDIDATE`, `RUNTIME`, `SOMEDATECODE`, `DATELIKE`, or `TIMELIKE` as temporal.
+
+Unknown/custom declared types fail with `TEMPORAL_TARGET_TYPE_MISMATCH`.
+
+Target semantic subtype is also enforced when explicit:
+
+```text
+semantic_type=date/date_key     -> date candidate only
+semantic_type=datetime/timestamp -> datetime candidate only
+semantic_type=text/temporal/empty -> date or datetime, subject to declared storage
+```
+
+A target/evidence temporal subtype disagreement fails with
+`TEMPORAL_TARGET_SUBTYPE_MISMATCH`.
 
 ## Allowed deterministic temporal grammar
 

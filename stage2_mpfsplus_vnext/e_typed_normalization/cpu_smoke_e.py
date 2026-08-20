@@ -192,6 +192,58 @@ def main() -> None:
     assert identifier_target.error_code == "TEMPORAL_TARGET_SEMANTIC_MISMATCH"
     typed_checks["target_semantic_guard"] = "PASS"
 
+    custom_date_type = normalize_free_text_typed_candidate(
+        "2026-08-19",
+        {"name": "observed_at", "type": "CANDIDATE", "semantic_type": "text"},
+        requested_rule="iso_date_normalization",
+        candidate_type="date",
+        config=e_config,
+    )
+    custom_time_type = normalize_free_text_typed_candidate(
+        "2026-08-19 12:30:00",
+        {"name": "observed_at", "type": "RUNTIME", "semantic_type": "text"},
+        requested_rule="iso_date_normalization",
+        candidate_type="datetime",
+        config=e_config,
+    )
+    assert custom_date_type.error_code == "TEMPORAL_TARGET_TYPE_MISMATCH"
+    assert custom_time_type.error_code == "TEMPORAL_TARGET_TYPE_MISMATCH"
+    typed_checks["declared_type_classification"] = "PASS"
+
+    semantic_date_mismatch = normalize_free_text_typed_candidate(
+        "2026-08-19 12:30:00",
+        {"name": "observed_at", "type": "TEXT", "semantic_type": "date"},
+        requested_rule="iso_date_normalization",
+        candidate_type="datetime",
+        config=e_config,
+    )
+    semantic_datetime_mismatch = normalize_free_text_typed_candidate(
+        "2026-08-19",
+        {"name": "observed_at", "type": "TEXT", "semantic_type": "datetime"},
+        requested_rule="iso_date_normalization",
+        candidate_type="date",
+        config=e_config,
+    )
+    declared_date_mismatch = normalize_free_text_typed_candidate(
+        "2026-08-19 12:30:00",
+        {"name": "observed_at", "type": "DATE", "semantic_type": "text"},
+        requested_rule="iso_date_normalization",
+        candidate_type="datetime",
+        config=e_config,
+    )
+    declared_datetime_mismatch = normalize_free_text_typed_candidate(
+        "2026-08-19",
+        {"name": "observed_at", "type": "DATETIME", "semantic_type": "text"},
+        requested_rule="iso_date_normalization",
+        candidate_type="date",
+        config=e_config,
+    )
+    assert semantic_date_mismatch.error_code == "TEMPORAL_TARGET_SUBTYPE_MISMATCH"
+    assert semantic_datetime_mismatch.error_code == "TEMPORAL_TARGET_SUBTYPE_MISMATCH"
+    assert declared_date_mismatch.error_code == "TEMPORAL_TARGET_SUBTYPE_MISMATCH"
+    assert declared_datetime_mismatch.error_code == "TEMPORAL_TARGET_SUBTYPE_MISMATCH"
+    typed_checks["target_subtype_guard"] = "PASS"
+
     unchanged_datetime = normalize_free_text_typed_candidate(
         "2026-07-30 14:47:00",
         {"name": "observed_at", "type": "TEXT", "semantic_type": "text"},

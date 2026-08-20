@@ -461,3 +461,92 @@ def test_e_v5_prompt_is_identical_to_v4_prompt() -> None:
     prompt5, payload5 = _prompt_for_sample("MP-FS+", sample, profile, v5)
     assert prompt5 == prompt4
     assert payload5.to_dict() == payload4.to_dict()
+
+def test_e_unknown_custom_type_containing_date_is_rejected() -> None:
+    result = _typed(
+        "2026-08-19",
+        column_type="CANDIDATE",
+        semantic_type="text",
+        candidate_type="date",
+    )
+    assert result.handled
+    assert result.error_code == "TEMPORAL_TARGET_TYPE_MISMATCH"
+    assert result.audit["accepted"] is False
+
+
+def test_e_unknown_custom_type_containing_time_is_rejected() -> None:
+    result = _typed(
+        "2026-08-19 12:30:00",
+        column_type="RUNTIME",
+        semantic_type="text",
+        candidate_type="datetime",
+    )
+    assert result.handled
+    assert result.error_code == "TEMPORAL_TARGET_TYPE_MISMATCH"
+    assert result.audit["accepted"] is False
+
+
+def test_e_date_semantic_rejects_datetime_candidate() -> None:
+    result = _typed(
+        "2026-08-19 12:30:00",
+        column_type="TEXT",
+        semantic_type="date",
+        candidate_type="datetime",
+    )
+    assert result.handled
+    assert result.error_code == "TEMPORAL_TARGET_SUBTYPE_MISMATCH"
+
+
+def test_e_datetime_semantic_rejects_date_candidate() -> None:
+    result = _typed(
+        "2026-08-19",
+        column_type="TEXT",
+        semantic_type="datetime",
+        candidate_type="date",
+    )
+    assert result.handled
+    assert result.error_code == "TEMPORAL_TARGET_SUBTYPE_MISMATCH"
+
+
+def test_e_date_key_rejects_datetime_candidate() -> None:
+    result = _typed(
+        "2026-08-19 12:30:00",
+        column_type="TEXT",
+        semantic_type="date_key",
+        candidate_type="datetime",
+    )
+    assert result.handled
+    assert result.error_code == "TEMPORAL_TARGET_SUBTYPE_MISMATCH"
+
+
+def test_e_timestamp_rejects_date_candidate() -> None:
+    result = _typed(
+        "2026-08-19",
+        column_type="TEXT",
+        semantic_type="timestamp",
+        candidate_type="date",
+    )
+    assert result.handled
+    assert result.error_code == "TEMPORAL_TARGET_SUBTYPE_MISMATCH"
+
+
+def test_e_declared_date_rejects_datetime_candidate() -> None:
+    result = _typed(
+        "2026-08-19 12:30:00",
+        column_type="DATE",
+        semantic_type="text",
+        candidate_type="datetime",
+    )
+    assert result.handled
+    assert result.error_code == "TEMPORAL_TARGET_SUBTYPE_MISMATCH"
+
+
+def test_e_declared_datetime_rejects_date_candidate() -> None:
+    result = _typed(
+        "2026-08-19",
+        column_type="DATETIME",
+        semantic_type="text",
+        candidate_type="date",
+    )
+    assert result.handled
+    assert result.error_code == "TEMPORAL_TARGET_SUBTYPE_MISMATCH"

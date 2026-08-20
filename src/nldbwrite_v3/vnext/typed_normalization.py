@@ -24,8 +24,12 @@ _TEMPORAL_COMPATIBLE_SEMANTICS = {
     "temporal",
     "date_key",
 }
-_TEXT_DECLARED_TOKENS = ("CHAR", "CLOB", "TEXT", "VARCHAR")
-_TEMPORAL_DECLARED_TOKENS = ("DATE", "TIME")
+_DATE_ONLY_SEMANTICS = {"date", "date_key"}
+_DATETIME_SEMANTICS = {"datetime", "timestamp"}
+_TEXT_AFFINITY_TOKENS = ("CHAR", "CLOB", "TEXT")
+_EXACT_DATE_DECLARED_TYPES = {"DATE"}
+_EXACT_DATETIME_DECLARED_TYPES = {"DATETIME", "TIMESTAMP"}
+_EXACT_UNSUPPORTED_TEMPORAL_DECLARED_TYPES = {"TIME"}
 _INCOMPATIBLE_DECLARED_TOKENS = (
     "INT",
     "REAL",
@@ -94,28 +98,62 @@ def _normalized_semantic_type(column: Mapping[str, Any]) -> str:
     return str(column.get("semantic_type") or "").strip().casefold().replace("-", "_")
 
 
-def _target_temporal_compatibility(column: Mapping[str, Any]) -> tuple[bool, str | None]:
-    """Fail closed on target semantics/types incompatible with temporal text.
+def _normalized_declared_type(column: Mapping[str, Any]) -> str:
+    """Normalize a declared type for exact/structured Stage-E classification."""
+    return " ".join(str(column.get("type") or "").strip().upper().split())
+
+
+def _declared_storage_class(declared: str) -> str:
+    """Classify declared storage without DATE/TIME substring guessing.
+
+    SQLite text-affinity declarations remain text-compatible via CHAR/CLOB/TEXT
+    tokens. Temporal declarations are recognized only by exact Stage-E types.
+    Unknown/custom declarations fail closed.
+    """
+    if not declared:
+        return "unspecified"
+    if declared in _EXACT_DATE_DECLARED_TYPES:
+        return "date"
+    if declared in _EXACT_DATETIME_DECLARED_TYPES:
+        return "datetime"
+    if declared in _EXACT_UNSUPPORTED_TEMPORAL_DECLARED_TYPES:
+        return "unsupported_temporal"
+    if any(token in declared for token in _INCOMPATIBLE_DECLARED_TOKENS):
+        return "incompatible"
+    if any(token in declared for token in _TEXT_AFFINITY_TOKENS):
+        return "text"
+    return "unknown"
+
+
+def _target_temporal_compatibility(
+    column: Mapping[str, Any],
+    candidate_kind: str,
+) -> tuple[bool, str | None]:
+    """Require semantic, storage, and temporal-subtype compatibility.
 
     Existing benchmark temporal values may be stored in SQLite TEXT columns, so
-    semantic ``text`` remains compatible. A known non-temporal semantic is not
-    allowed to become temporal merely because the plan requested normalization.
+    semantic ``text`` and text-affinity declarations remain compatible. Explicit
+    DATE/DATE_KEY semantics accept only DATE evidence; DATETIME/TIMESTAMP semantics
+    accept only DATETIME evidence. Unknown/custom declared types fail closed.
     """
     semantic_type = _normalized_semantic_type(column)
     if semantic_type not in _TEMPORAL_COMPATIBLE_SEMANTICS:
         return False, "TEMPORAL_TARGET_SEMANTIC_MISMATCH"
 
-    declared = str(column.get("type") or "").strip().upper()
-    if any(token in declared for token in _INCOMPATIBLE_DECLARED_TOKENS):
+    if semantic_type in _DATE_ONLY_SEMANTICS and candidate_kind != "date":
+        return False, "TEMPORAL_TARGET_SUBTYPE_MISMATCH"
+    if semantic_type in _DATETIME_SEMANTICS and candidate_kind != "datetime":
+        return False, "TEMPORAL_TARGET_SUBTYPE_MISMATCH"
+
+    declared = _normalized_declared_type(column)
+    storage_class = _declared_storage_class(declared)
+    if storage_class in {"unknown", "incompatible", "unsupported_temporal"}:
         return False, "TEMPORAL_TARGET_TYPE_MISMATCH"
-    if not declared:
-        return True, None
-    if any(token in declared for token in _TEMPORAL_DECLARED_TOKENS):
-        return True, None
-    if any(token in declared for token in _TEXT_DECLARED_TOKENS):
-        return True, None
-    # Unknown/custom declared types are not silently treated as temporal storage.
-    return False, "TEMPORAL_TARGET_TYPE_MISMATCH"
+    if storage_class == "date" and candidate_kind != "date":
+        return False, "TEMPORAL_TARGET_SUBTYPE_MISMATCH"
+    if storage_class == "datetime" and candidate_kind != "datetime":
+        return False, "TEMPORAL_TARGET_SUBTYPE_MISMATCH"
+    return True, None
 
 
 def _single_sentence_boundary(value: str) -> tuple[str, str | None]:
@@ -271,14 +309,24 @@ def normalize_free_text_typed_candidate(
             "TEMPORAL_EVIDENCE_TYPE_MISMATCH",
         )
 
-    compatible, target_error_code = _target_temporal_compatibility(column)
+    compatible, target_error_code = _target_temporal_compatibility(column, candidate_kind)
     if not compatible:
         audit = _mark_handled({**base_audit, "lossless": False}, accepted=False)
-        message = (
-            "Temporal normalization is incompatible with the resolved target column semantic type."
-            if target_error_code == "TEMPORAL_TARGET_SEMANTIC_MISMATCH"
-            else "Temporal normalization is incompatible with the resolved target column declared type."
-        )
+        if target_error_code == "TEMPORAL_TARGET_SEMANTIC_MISMATCH":
+            message = (
+                "Temporal normalization is incompatible with the resolved target "
+                "column semantic type."
+            )
+        elif target_error_code == "TEMPORAL_TARGET_SUBTYPE_MISMATCH":
+            message = (
+                "The deterministically typed temporal evidence subtype is incompatible "
+                "with the resolved target temporal subtype."
+            )
+        else:
+            message = (
+                "Temporal normalization is incompatible with the resolved target "
+                "column declared type."
+            )
         return TypedNormalizationResult(
             True,
             value,

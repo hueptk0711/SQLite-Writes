@@ -1,5 +1,5 @@
 {
-  "checkpoint": "Stage2-E-Patch2-candidate",
+  "checkpoint": "Stage2-E-Patch3-candidate",
   "base_tag": "Stage2-D-FINAL",
   "base_commit": "0eba16b297100966d3635172456086db872166d6",
   "patch1_commit": "5d1575728abcfde209ba3e2c4ef1a1bf5843f9c2",
@@ -7,11 +7,10 @@
   "method_variant": "vnext-v5-typed-normalization",
   "method_version": "stage2-v5-abcd-typed-normalization",
   "scope": [
-    "target_semantic_compatibility_hardening",
-    "causal_activation_provenance",
-    "candidate_type_and_subtype_invariant",
-    "ascii_temporal_grammar",
-    "mandatory_raw_evidence_provenance"
+    "exact_declared_temporal_type_classification",
+    "unknown_custom_declared_type_fail_closed",
+    "target_semantic_subtype_consistency",
+    "declared_temporal_subtype_consistency"
   ],
   "stage1_diagnostic_fixture": {
     "samples": 11,
@@ -22,7 +21,7 @@
     "claim": "diagnostic/regression only; no end-to-end rescue claim"
   },
   "expected_validation": {
-    "dedicated_e_tests": "28 pytest cases; PENDING_REAL_REPOSITORY",
+    "dedicated_e_tests": "36 pytest cases; PENDING_REAL_REPOSITORY",
     "d_regression_tests": "PENDING_REAL_REPOSITORY",
     "compatibility_subset": "PENDING_REAL_REPOSITORY",
     "full_fast_suite": "PENDING_REAL_REPOSITORY",
@@ -31,5 +30,6 @@
   },
   "gpu_or_model_run": false,
   "causal_replay": false,
-  "F_or_G_implemented": false
+  "F_or_G_implemented": false,
+  "patch2_commit": "a132f37a2173b36eab65683cc6799f948bf7eac4"
 }

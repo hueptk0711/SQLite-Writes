@@ -112,3 +112,14 @@ A–C are frozen at `Stage2-A-C-FINAL` (`f1fa49ddb8e6b920fb5a4237e088b6603579ae2
 - makes raw evidence preservation mandatory when E is enabled;
 - updates the 14 Stage-1 diagnostic cells with typed evidence metadata and adds reviewer-requested adversarial regression coverage;
 - does not modify A–D, evidence/reference repair, F/G, prompts, verifier policy, or model execution.
+
+## E Patch 3 — target storage/subtype compatibility hardening
+
+- removes `DATE` / `TIME` substring matching from target declared-type compatibility;
+- recognizes exact `DATE`, `DATETIME`, and `TIMESTAMP` temporal declarations and treats `TIME` as unsupported at this checkpoint;
+- preserves SQLite text-affinity temporal storage through `CHAR` / `CLOB` / `TEXT` classification;
+- fails closed on unknown custom declared types such as `CANDIDATE`, `RUNTIME`, `SOMEDATECODE`, `DATELIKE`, and `TIMELIKE`;
+- enforces target semantic subtype consistency: `date` / `date_key` require date evidence, while `datetime` / `timestamp` require datetime evidence;
+- enforces declared temporal subtype consistency: `DATE` requires date evidence; `DATETIME` / `TIMESTAMP` require datetime evidence;
+- adds `TEMPORAL_TARGET_SUBTYPE_MISMATCH` for deterministic target/evidence subtype disagreement;
+- keeps Patch-2 candidate typing, ASCII grammar, causal provenance, raw-evidence invariant, E3 fail-closed ambiguity, E5 ablation, and all frozen A–D behavior unchanged.
