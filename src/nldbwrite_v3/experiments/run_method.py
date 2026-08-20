@@ -1160,6 +1160,9 @@ def run_method(
                     structured_source_parser=config.get(
                         "structured_source_parser"
                     ),
+                    free_text_typed_normalization=config.get(
+                        "free_text_typed_normalization"
+                    ),
                 ).run(
                     str(sample.get("input_text") or ""),
                     parsed.plan,

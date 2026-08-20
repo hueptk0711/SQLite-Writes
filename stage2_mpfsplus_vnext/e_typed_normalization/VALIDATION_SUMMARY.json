@@ -1,0 +1,31 @@
+{
+  "checkpoint": "Stage2-E-Patch1-candidate",
+  "base_tag": "Stage2-D-FINAL",
+  "base_commit": "0eba16b297100966d3635172456086db872166d6",
+  "method_id": "MP-FS+",
+  "method_variant": "vnext-v5-typed-normalization",
+  "method_version": "stage2-v5-abcd-typed-normalization",
+  "scope": [
+    "free_text_typed_date_datetime_normalization",
+    "semantic_guard_and_fail_closed_ambiguity",
+    "raw_normalized_provenance",
+    "V5_ablation"
+  ],
+  "stage1_diagnostic_fixture": {
+    "samples": 11,
+    "cell_cases": 14,
+    "expected_valid_temporal": 12,
+    "expected_rejected_wrong_evidence": 2,
+    "claim": "diagnostic/regression only; no end-to-end rescue claim"
+  },
+  "validation": {
+    "dedicated_e_tests": "PENDING_REAL_REPOSITORY",
+    "d_regression_tests": "PENDING_REAL_REPOSITORY",
+    "compatibility_subset": "PENDING_REAL_REPOSITORY",
+    "full_fast_suite": "PENDING_REAL_REPOSITORY",
+    "cpu_smoke_e": "PENDING_REAL_REPOSITORY"
+  },
+  "gpu_or_model_run": false,
+  "causal_replay": false,
+  "F_or_G_implemented": false
+}

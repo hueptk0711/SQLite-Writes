@@ -1,4 +1,4 @@
-# MP-FS+ vNext Changelog — Stage 2 D
+# MP-FS+ vNext Changelog — Stage 2 E
 
 ## Patch 4 — unified free-text instruction/payload boundary
 
@@ -75,3 +75,27 @@ A–C are frozen at `Stage2-A-C-FINAL` (`f1fa49ddb8e6b920fb5a4237e088b6603579ae2
 - G targeted diagnostic-driven repair;
 - causal replay experiment;
 - 3B/7B/14B end-to-end runs.
+
+
+## E Patch 1 — free-text typed temporal normalization
+
+- starts from frozen `Stage2-D-FINAL` (`0eba16b297100966d3635172456086db872166d6`);
+- adds independently ablatable V5 `free_text_typed_normalization`;
+- runs only after free-text evidence and target-column references are resolved;
+- accepts strict unambiguous year-first DATE/DATETIME values under an explicit `iso_date_normalization` request;
+- extends the date-only rule to Stage-1-style datetimes, including up to six fractional-second digits;
+- canonicalizes year-first date separators and datetime `T` deterministically;
+- removes at most one sentence-boundary `.`/`,` only when the remaining temporal value is strictly valid;
+- rejects ambiguous/invalid temporal forms and wrong evidence tokens instead of guessing or repairing;
+- records raw evidence, offsets, semantic type, normalized value, rule, confidence, and requested normalization;
+- preserves V4 prompt identity and all frozen A–D behavior when E is disabled;
+- adds 14 Stage-1 diagnostic temporal-cell fixtures (12 expected accepts, 2 expected rejects), dedicated adversarial tests, and CPU smoke.
+
+## E still out of scope
+
+- evidence-span repair;
+- column/group mapping repair;
+- F constrained reference repair;
+- G diagnostic-driven targeted repair;
+- full causal replay;
+- GPU / 3B / 5B / 7B / 14B runs.

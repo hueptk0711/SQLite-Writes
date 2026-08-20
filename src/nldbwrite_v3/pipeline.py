@@ -64,6 +64,7 @@ class MappingFirstPipeline:
         reference_planning: bool = False,
         stage2_interventions: Mapping[str, Any] | None = None,
         structured_source_parser: Mapping[str, Any] | None = None,
+        free_text_typed_normalization: Mapping[str, Any] | None = None,
     ):
         self.profile = profile
         self.strict_atomic = strict_atomic
@@ -74,6 +75,9 @@ class MappingFirstPipeline:
             stage2_interventions
         )
         self.structured_source_parser = dict(structured_source_parser or {})
+        self.free_text_typed_normalization = dict(
+            free_text_typed_normalization or {}
+        )
 
     def run(
         self,
@@ -198,6 +202,9 @@ class MappingFirstPipeline:
                     predicted_plan,
                     request,
                     self.profile,
+                    free_text_typed_normalization=(
+                        self.free_text_typed_normalization
+                    ),
                 )
             except MaterializationError as exc:
                 verification = VerificationResult(

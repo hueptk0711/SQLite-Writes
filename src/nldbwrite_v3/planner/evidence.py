@@ -6,6 +6,10 @@ from typing import Any
 
 from nldbwrite_v3.compiler import apply_declared_normalization
 from nldbwrite_v3.ir import Diagnostic
+from nldbwrite_v3.vnext.typed_normalization import (
+    FreeTextTypedNormalizationConfig,
+    normalize_free_text_typed_candidate,
+)
 from nldbwrite_v3.schema import (
     column_reference_map,
     ensure_reference_ids,
@@ -325,9 +329,14 @@ def materialize_reference_free_text_plan(
     reference_plan: dict[str, Any],
     request: str,
     profile: dict[str, Any],
+    *,
+    free_text_typed_normalization: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Resolve evidence/schema IDs and copy verbatim spans into a Write Plan."""
     ensure_reference_ids(profile)
+    typed_normalization_config = FreeTextTypedNormalizationConfig.from_mapping(
+        free_text_typed_normalization
+    )
     errors: list[Diagnostic] = []
     tables = table_reference_map(profile)
     candidates = extract_evidence_candidates(request)
@@ -531,26 +540,58 @@ def materialize_reference_free_text_plan(
                             column = explicit_column
                 rule = str(value_spec.get("normalization") or "identity")
                 raw_value = candidate["text"]
-                normalized, audit, error = apply_declared_normalization(
+                typed_result = normalize_free_text_typed_candidate(
                     raw_value,
                     column,
-                    rule,
+                    requested_rule=rule,
+                    candidate_type=str(candidate.get("candidate_type") or ""),
+                    config=typed_normalization_config,
+                    evidence_id=evidence_id,
+                    evidence_start=candidate.get("start"),
+                    evidence_end=candidate.get("end"),
                 )
-                if error is not None:
-                    errors.append(
-                        Diagnostic(
-                            "LOSSY_NORMALIZATION_REJECTED",
-                            error,
-                            path=f"{row_path}/{column_id}/normalization",
-                            group_id=group_id,
-                            details={
-                                "evidence_id": evidence_id,
-                                "normalization_rule": rule,
-                                "raw_value": raw_value,
-                            },
+                if typed_result.handled:
+                    normalized = typed_result.value
+                    audit = deepcopy(typed_result.audit)
+                    error = typed_result.error
+                    if error is not None:
+                        errors.append(
+                            Diagnostic(
+                                "TYPED_NORMALIZATION_REJECTED",
+                                error,
+                                path=f"{row_path}/{column_id}/normalization",
+                                group_id=group_id,
+                                details={
+                                    "evidence_id": evidence_id,
+                                    "normalization_rule": rule,
+                                    "raw_value": raw_value,
+                                    "typed_error_code": typed_result.error_code,
+                                    "candidate_type": candidate.get("candidate_type"),
+                                },
+                            )
                         )
+                        continue
+                else:
+                    normalized, audit, error = apply_declared_normalization(
+                        raw_value,
+                        column,
+                        rule,
                     )
-                    continue
+                    if error is not None:
+                        errors.append(
+                            Diagnostic(
+                                "LOSSY_NORMALIZATION_REJECTED",
+                                error,
+                                path=f"{row_path}/{column_id}/normalization",
+                                group_id=group_id,
+                                details={
+                                    "evidence_id": evidence_id,
+                                    "normalization_rule": rule,
+                                    "raw_value": raw_value,
+                                },
+                            )
+                        )
+                        continue
                 column_name = str(column["name"])
                 if column_name in output_row:
                     errors.append(

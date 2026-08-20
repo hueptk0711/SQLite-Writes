@@ -1,5 +1,5 @@
 {
-  "stage": "2-D-structured-parser-null",
+  "stage": "2-E-free-text-typed-normalization",
   "baseline": "configs/stage2/original.json",
   "dispatch_family": "MP-FS+",
   "interventions": [
@@ -30,11 +30,20 @@
       "hypothesis": "Explicit row boundaries and conservative textual-null semantics prevent deterministic source-parser row collapse, control-row fabrication, and TEXT-to-NULL corruption.",
       "stage1_evidence": "3 SOURCE_PARSER_ROW_SEGMENTATION_ERROR + 2 SOURCE_PARSER_CONTROL_ROW_SEGMENTATION_ERROR + 2 SOURCE_PARSER_NULL_LITERAL_COERCION_ERROR",
       "config": "configs/stage2/v4_structured_parser.json",
+      "status": "frozen",
+      "frozen_tag": "Stage2-D-FINAL",
+      "frozen_commit": "0eba16b297100966d3635172456086db872166d6"
+    },
+    {
+      "id": "E_free_text_typed_normalization",
+      "config_block": "free_text_typed_normalization",
+      "hypothesis": "A free-text cell whose reference plan explicitly requests date normalization can be normalized safely only when its verbatim evidence is a strict, unambiguous year-first DATE/DATETIME; unsupported or ambiguous temporal surfaces must fail closed and retain raw-span provenance.",
+      "stage1_evidence": "9 DATE_NORMALIZATION_POLICY_ERROR + 1 DATE_NORMALIZATION_AND_EVIDENCE_SPAN_ERROR; manual audit found 12 valid explicit datetime values rejected by iso_date_normalization and two wrong non-date evidence values (Attempt/For) that must remain rejected.",
+      "config": "configs/stage2/v5_free_text_typed_normalization.json",
       "status": "in_review"
     }
   ],
   "not_in_scope": [
-    "typed_normalization_v2",
     "reference_repair",
     "semantic_targeted_repair",
     "7B_end_to_end_run"
@@ -56,5 +65,15 @@
     "unquoted textual NULL is explicit null; ambiguous text None/nil is preserved as text",
     "quoted textual null markers are preserved as text",
     "A-C logic remains frozen and is only consumed through existing interfaces"
+  ],
+  "d_frozen_tag": "Stage2-D-FINAL",
+  "d_frozen_commit": "0eba16b297100966d3635172456086db872166d6",
+  "e_invariants": [
+    "E is independently ablatable through free_text_typed_normalization.enabled",
+    "E runs only on the free-text evidence-materialization path after evidence and target-column resolution",
+    "E never changes structured-source D3 NULL semantics",
+    "E handles only explicit iso_date_normalization requests with strict unambiguous year-first DATE/DATETIME evidence",
+    "unsupported or ambiguous temporal evidence fails closed; evidence/column repair remains out of scope",
+    "raw evidence text and offsets remain unchanged and are recorded alongside the normalized value"
   ]
 }

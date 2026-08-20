@@ -1,3 +1,9 @@
+from .typed_normalization import (
+    FreeTextTypedNormalizationConfig,
+    TypedNormalizationResult,
+    normalize_free_text_typed_candidate,
+)
+
 from .interventions import (
     CONFLICT_ACTION_CONTROL,
     CONFLICT_CONTROL,
@@ -28,4 +34,7 @@ __all__ = [
     "classify_source_field_role",
     "control_consumed_by",
     "row_has_instruction_context",
+    "FreeTextTypedNormalizationConfig",
+    "TypedNormalizationResult",
+    "normalize_free_text_typed_candidate",
 ]
