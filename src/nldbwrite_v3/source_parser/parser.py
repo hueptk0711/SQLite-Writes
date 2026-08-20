@@ -1328,8 +1328,10 @@ def _detect_explicit_equals_rows(
     current_label: str | None = None
     unknown_pre_row_assignment = False
     dotted_prefixes: set[str] = set()
-    row_namespaces: set[str] = set()
-    unprefixed_namespace = "__UNPREFIXED__"
+    # Tagged namespaces prevent any source/user-provided prefix from colliding
+    # with the internal representation of an unprefixed row namespace.
+    row_namespaces: set[tuple[str, str]] = set()
+    unprefixed_namespace = ("unprefixed", "")
 
     def ensure_row(label: str) -> dict[str, Any]:
         normalized_label = _canonical_field_name(label)
@@ -1395,7 +1397,7 @@ def _detect_explicit_equals_rows(
             if dotted is not None:
                 label = dotted.group("label")
                 prefix = str(dotted.group("prefix") or "").strip(". ")
-                row_namespaces.add(prefix or unprefixed_namespace)
+                row_namespaces.add(("named", prefix) if prefix else unprefixed_namespace)
                 if prefix:
                     dotted_prefixes.add(prefix)
                 add_value(

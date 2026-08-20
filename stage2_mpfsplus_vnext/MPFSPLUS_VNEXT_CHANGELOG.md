@@ -34,6 +34,14 @@
 
 A–C are frozen at `Stage2-A-C-FINAL` (`f1fa49ddb8e6b920fb5a4237e088b6603579ae23`). D uses their existing interfaces and does not tune their logic.
 
+## D Patch 4 — internal namespace representation hardening
+
+- replaces the user-representable string sentinel `"__UNPREFIXED__"` with tagged row namespaces;
+- represents named prefixes as `("named", prefix)` and unprefixed syntax as `("unprefixed", "")`;
+- prevents a real source prefix named `__UNPREFIXED__` from colliding with the internal unprefixed namespace;
+- adds one adversarial regression test and CPU-smoke assertion for the sentinel-collision case;
+- does not modify D2 control separation, D3 NULL handling, D4 provenance, A–C, or V4 integration.
+
 ## D Patch 3 — mixed row-namespace hardening
 
 - treats the empty/unprefixed dotted-row namespace as a real row namespace;

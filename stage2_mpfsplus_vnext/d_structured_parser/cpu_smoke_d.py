@@ -273,6 +273,31 @@ def main() -> None:
         {"id": "P2", "name": "Beta"},
     ]
 
+    sentinel_collision_request = (
+        "operation=plain_insert\n"
+        "__UNPREFIXED__.row_1.id=P1\n"
+        "row_1.name=Alpha\n"
+        "__UNPREFIXED__.row_2.id=P2\n"
+        "row_2.name=Beta\n"
+    )
+    legacy_sentinel_collision = parse_source_payload(sentinel_collision_request)
+    d_sentinel_collision = parse_source_payload(
+        sentinel_collision_request,
+        structured_parser=parser_config,
+    )
+    assert [
+        (collection.collection_id, collection.rows)
+        for collection in d_sentinel_collision.collections
+    ] == [
+        (collection.collection_id, collection.rows)
+        for collection in legacy_sentinel_collision.collections
+    ]
+    assert all(
+        not ({"id", "name"} <= set(row))
+        for collection in d_sentinel_collision.collections
+        for row in collection.rows
+    )
+
     request = (
         "operation=insert_ignore\n"
         "table=parent\n"
@@ -332,6 +357,10 @@ def main() -> None:
                     "structured_source_parser": parser_config,
                 },
                 "stage1_diagnostic_cases": case_results,
+                "d4_namespace_representation": {
+                    "named_sentinel_like_prefix_cannot_collide": "PASS",
+                    "namespace_representation": "tagged_tuple",
+                },
                 "d3_row_namespace": {
                     "prefixed_plus_unprefixed_dotted_deferred": "PASS",
                     "prefixed_dotted_plus_row_heading_marker_deferred": "PASS",

@@ -121,6 +121,29 @@ This makes NULL coercion auditable and keeps normalization separate from the sou
 
 Reviewer inspection of the first D checkpoint identified three parser-boundary issues. Patch 2 changes only these points.
 
+### D1.3 — Tagged internal row namespaces
+
+Patch 4 removes the user-representable string sentinel previously used for unprefixed rows. Internal row namespaces are now tagged values:
+
+```text
+("named", prefix)
+("unprefixed", "")
+```
+
+Thus a legitimate source prefix named `__UNPREFIXED__` is represented as:
+
+```text
+("named", "__UNPREFIXED__")
+```
+
+and remains distinct from the truly unprefixed namespace:
+
+```text
+("unprefixed", "")
+```
+
+This makes the row-namespace safety invariant independent of any source-representable identifier string.
+
 ### D1.2 — One unambiguous row namespace per explicit D result
 
 Patch 3 closes the remaining mixed-namespace case. The empty prefix is treated as a real `__UNPREFIXED__` namespace.

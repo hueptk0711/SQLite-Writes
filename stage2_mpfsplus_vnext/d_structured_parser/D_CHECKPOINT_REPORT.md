@@ -1,4 +1,4 @@
-# Stage 2 D Patch 3 Checkpoint Report
+# Stage 2 D Patch 4 Checkpoint Report
 
 ## Baseline
 
@@ -62,15 +62,24 @@ This preserves both supported single-namespace forms:
 - one named prefix such as `robot_record.row_N.field=value`.
 
 
+
+## Reviewer Patch-4 hardening
+
+The Patch-3 review accepted the mixed named-prefix/unprefixed defer logic but found one final implementation collision: the internal string `"__UNPREFIXED__"` was itself representable as a real source prefix. That could make a named prefix and a truly unprefixed row appear to be the same namespace.
+
+Patch 4 changes only the internal namespace representation. Named prefixes are stored as tagged tuples `("named", prefix)` and unprefixed syntax as `("unprefixed", "")`. User-provided strings can therefore never equal the internal unprefixed namespace representation.
+
+One adversarial regression test covers a real prefix named `__UNPREFIXED__` mixed with unprefixed rows and requires D to defer without synthesizing `{id, name}` rows.
+
 ## Regression coverage
 
-The dedicated D suite now contains 19 test functions. Patch 2 retains its four trust-boundary tests, and Patch 3 adds three D1 namespace regressions:
+The dedicated D suite now contains 20 test functions. Patch 2 retains its four trust-boundary tests, and Patch 3 adds three D1 namespace regressions:
 
 17. named-prefix + unprefixed dotted rows defer without synthesis;
 18. named-prefix dotted rows mixed with unprefixed `rowN:` headings defer;
 19. all-unprefixed dotted rows remain supported.
 
-Patch-2 regressions for multi-prefix safety, single-prefix retention, invalid operation aliases, and provenance completeness remain unchanged.
+Patch-2 regressions for multi-prefix safety, single-prefix retention, invalid operation aliases, and provenance completeness remain unchanged. Patch 4 adds test 20: a named prefix equal to the former string sentinel cannot collide with the internal unprefixed namespace.
 
 ## Acceptance criteria
 

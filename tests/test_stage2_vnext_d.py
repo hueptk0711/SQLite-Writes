@@ -386,3 +386,23 @@ def test_d_all_unprefixed_dotted_rows_still_work() -> None:
         {"id": "P2", "name": "Beta"},
     ]
     assert collection.metadata["explicit_row_segmentation"] is True
+
+
+def test_d_named_prefix_cannot_collide_with_unprefixed_namespace() -> None:
+    request = (
+        "operation=plain_insert\n"
+        "__UNPREFIXED__.row_1.id=P1\n"
+        "row_1.name=Alpha\n"
+        "__UNPREFIXED__.row_2.id=P2\n"
+        "row_2.name=Beta\n"
+    )
+    legacy = parse_source_payload(request)
+    payload = _d(request)
+    assert [(c.collection_id, c.rows) for c in payload.collections] == [
+        (c.collection_id, c.rows) for c in legacy.collections
+    ]
+    assert all(
+        not ({"id", "name"} <= set(row))
+        for collection in payload.collections
+        for row in collection.rows
+    )
