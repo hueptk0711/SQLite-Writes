@@ -34,6 +34,15 @@
 
 A–C are frozen at `Stage2-A-C-FINAL` (`f1fa49ddb8e6b920fb5a4237e088b6603579ae23`). D uses their existing interfaces and does not tune their logic.
 
+## D Patch 3 — mixed row-namespace hardening
+
+- treats the empty/unprefixed dotted-row namespace as a real row namespace;
+- explicit D row segmentation now commits only when all row fields belong to one unambiguous namespace;
+- named-prefix + unprefixed dotted rows defer instead of merging by row label;
+- named-prefix dotted rows mixed with unprefixed row-heading/row-marker syntax also defer;
+- all-unprefixed dotted rows and single named-prefix dotted rows remain supported;
+- adds three targeted regression tests and CPU-smoke assertions for the final D1 namespace blocker.
+
 ## D Patch 2 — parser trust-boundary hardening
 
 - multi-prefix dotted repeated rows now defer to the historical path instead of grouping across prefixes by row label;

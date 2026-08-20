@@ -1,5 +1,5 @@
 {
-  "checkpoint": "Stage2-D-Patch2-candidate",
+  "checkpoint": "Stage2-D-Patch3-candidate",
   "base_tag": "Stage2-A-C-FINAL",
   "base_commit": "f1fa49ddb8e6b920fb5a4237e088b6603579ae23",
   "config": "configs/stage2/v4_structured_parser.json",
@@ -10,10 +10,10 @@
     "total": 7
   },
   "validation": {
-    "patch2_isolated_adversarial_checks": "PASS",
+    "patch3_isolated_adversarial_checks": "PASS",
     "stage1_exact_parser_fixtures": "7/7 parser-level PASS",
-    "d3_null_policy_regression": "PASS",
-    "dedicated_d_suite_after_user_apply": "PENDING (16 test functions)",
+    "d2_d3_d4_regression": "PASS",
+    "dedicated_d_suite_after_user_apply": "PENDING (19 test functions)",
     "compatibility_subset_after_user_apply": "PENDING",
     "full_fast_suite_after_user_apply": "PENDING",
     "cpu_smoke_after_user_apply": "PENDING"
@@ -39,5 +39,12 @@
     "multi_prefix_dotted_rows_defer_without_merge",
     "semantic_validity_for_strong_control_context",
     "textual_value_provenance_completeness"
+  ],
+  "base_d_patch2_commit": "9a423ccee1a0675e5aa7a9588dce1aa84e055e9a",
+  "patch3_hardening": [
+    "treat_unprefixed_as_real_row_namespace",
+    "mixed_prefixed_unprefixed_dotted_rows_defer",
+    "prefixed_dotted_plus_unprefixed_heading_marker_defer",
+    "all_unprefixed_dotted_rows_remain_supported"
   ]
 }

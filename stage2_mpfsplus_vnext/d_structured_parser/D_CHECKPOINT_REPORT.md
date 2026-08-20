@@ -1,4 +1,4 @@
-# Stage 2 D Patch 2 Checkpoint Report
+# Stage 2 D Patch 3 Checkpoint Report
 
 ## Baseline
 
@@ -46,14 +46,31 @@ The first D review accepted the NULL policy and core integration but identified 
 
 The original 7 Stage-1 fixtures and D3 NULL policy are unchanged.
 
+
+## Reviewer Patch-3 hardening
+
+The Patch-2 review accepted D2 control separation, D3 NULL handling, and D4 provenance, but found one remaining D1 namespace case: a named dotted prefix could still be merged with unprefixed dotted rows or unprefixed row-heading/row-marker syntax because the empty prefix was not represented as a namespace.
+
+Patch 3 therefore applies one invariant:
+
+> An explicit D repeated-row result is committed only when all row fields belong to one unambiguous row namespace.
+
+The parser treats unprefixed dotted rows and unprefixed row-heading/row-marker syntax as `__UNPREFIXED__`. If a named dotted prefix appears together with that namespace, or if multiple named prefixes appear, D defers to the historical parser path.
+
+This preserves both supported single-namespace forms:
+- all-unprefixed `row_N.field=value`;
+- one named prefix such as `robot_record.row_N.field=value`.
+
+
 ## Regression coverage
 
-The dedicated D suite now contains 16 test functions. In addition to the original 12 contracts, Patch 2 adds:
+The dedicated D suite now contains 19 test functions. Patch 2 retains its four trust-boundary tests, and Patch 3 adds three D1 namespace regressions:
 
-13. multi-prefix `parent.row_N.* + child.row_N.*` defers without cross-collection row merging;
-14. single-prefix `robot_record.row_N.*` remains supported;
-15. invalid `operation=login` does not reclassify `table=audit` as metadata;
-16. provenance completeness is checked across CSV, markdown, colon KV, equals KV, numbered, and bulleted textual formats.
+17. named-prefix + unprefixed dotted rows defer without synthesis;
+18. named-prefix dotted rows mixed with unprefixed `rowN:` headings defer;
+19. all-unprefixed dotted rows remain supported.
+
+Patch-2 regressions for multi-prefix safety, single-prefix retention, invalid operation aliases, and provenance completeness remain unchanged.
 
 ## Acceptance criteria
 

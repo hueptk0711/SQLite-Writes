@@ -121,6 +121,34 @@ This makes NULL coercion auditable and keeps normalization separate from the sou
 
 Reviewer inspection of the first D checkpoint identified three parser-boundary issues. Patch 2 changes only these points.
 
+### D1.2 — One unambiguous row namespace per explicit D result
+
+Patch 3 closes the remaining mixed-namespace case. The empty prefix is treated as a real `__UNPREFIXED__` namespace.
+
+Therefore:
+
+```text
+row_1.id + row_1.name
+```
+
+remains supported, and:
+
+```text
+parent.row_1.id + parent.row_1.name
+```
+
+remains supported, but:
+
+```text
+parent.row_1.id + row_1.name
+```
+
+defers.
+
+Likewise, a named dotted prefix mixed with unprefixed `rowN:` or `row=N` syntax defers rather than being merged by row label.
+
+The parser does not attempt to infer whether the two namespaces refer to the same logical collection. It preserves the checkpoint policy: ambiguous mixed namespaces are handled by the historical parser path.
+
 ### D1.1 — Multi-prefix dotted rows fail/defer conservatively
 
 The explicit D repeated-row detector supports a single dotted collection prefix, for example:

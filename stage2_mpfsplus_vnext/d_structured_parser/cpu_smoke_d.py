@@ -179,6 +179,100 @@ def main() -> None:
             "status": "PASS",
         }
 
+    mixed_prefixed_unprefixed_request = (
+        "operation=plain_insert\n"
+        "parent.row_1.id=P1\n"
+        "row_1.name=Alpha\n"
+        "parent.row_2.id=P2\n"
+        "row_2.name=Beta\n"
+    )
+    legacy_mixed_dotted = parse_source_payload(mixed_prefixed_unprefixed_request)
+    d_mixed_dotted = parse_source_payload(
+        mixed_prefixed_unprefixed_request,
+        structured_parser=parser_config,
+    )
+    assert [
+        (collection.collection_id, collection.rows)
+        for collection in d_mixed_dotted.collections
+    ] == [
+        (collection.collection_id, collection.rows)
+        for collection in legacy_mixed_dotted.collections
+    ]
+    assert all(
+        not ({"id", "name"} <= set(row))
+        for collection in d_mixed_dotted.collections
+        for row in collection.rows
+    )
+
+    mixed_heading_request = (
+        "operation=plain_insert\n"
+        "parent.row_1.id=P1\n"
+        "row1:\n"
+        "name=Alpha\n"
+        "parent.row_2.id=P2\n"
+        "row2:\n"
+        "name=Beta\n"
+    )
+    legacy_mixed_heading = parse_source_payload(mixed_heading_request)
+    d_mixed_heading = parse_source_payload(
+        mixed_heading_request,
+        structured_parser=parser_config,
+    )
+    assert [
+        (collection.collection_id, collection.rows)
+        for collection in d_mixed_heading.collections
+    ] == [
+        (collection.collection_id, collection.rows)
+        for collection in legacy_mixed_heading.collections
+    ]
+    assert all(
+        not ({"id", "name"} <= set(row))
+        for collection in d_mixed_heading.collections
+        for row in collection.rows
+    )
+
+    mixed_marker_request = (
+        "operation=plain_insert\n"
+        "parent.row_1.id=P1\n"
+        "row=1\n"
+        "name=Alpha\n"
+        "parent.row_2.id=P2\n"
+        "row=2\n"
+        "name=Beta\n"
+    )
+    legacy_mixed_marker = parse_source_payload(mixed_marker_request)
+    d_mixed_marker = parse_source_payload(
+        mixed_marker_request,
+        structured_parser=parser_config,
+    )
+    assert [
+        (collection.collection_id, collection.rows)
+        for collection in d_mixed_marker.collections
+    ] == [
+        (collection.collection_id, collection.rows)
+        for collection in legacy_mixed_marker.collections
+    ]
+    assert all(
+        not ({"id", "name"} <= set(row))
+        for collection in d_mixed_marker.collections
+        for row in collection.rows
+    )
+
+    unprefixed_dotted = parse_source_payload(
+        (
+            "operation=plain_insert\n"
+            "row_1.id=P1\n"
+            "row_1.name=Alpha\n"
+            "row_2.id=P2\n"
+            "row_2.name=Beta\n"
+        ),
+        structured_parser=parser_config,
+    )
+    assert unprefixed_dotted.rows == [
+        {"id": "P1", "name": "Alpha"},
+        {"id": "P2", "name": "Beta"},
+    ]
+
     request = (
         "operation=insert_ignore\n"
         "table=parent\n"
@@ -238,6 +332,11 @@ def main() -> None:
                     "structured_source_parser": parser_config,
                 },
                 "stage1_diagnostic_cases": case_results,
+                "d3_row_namespace": {
+                    "prefixed_plus_unprefixed_dotted_deferred": "PASS",
+                    "prefixed_dotted_plus_row_heading_marker_deferred": "PASS",
+                    "all_unprefixed_dotted_rows_supported": "PASS",
+                },
                 "d2_trust_boundary": {
                     "multi_prefix_deferred_without_merge": "PASS",
                     "invalid_operation_preserves_table_payload": "PASS",

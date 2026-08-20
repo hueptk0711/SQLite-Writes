@@ -316,3 +316,73 @@ def test_d_value_provenance_is_complete_across_textual_parser_forms() -> None:
             assert sorted(observed_cells) == sorted(expected_cells), case_name
             assert len(observed_cells) == len(set(observed_cells)), case_name
             assert all(trace.get("row_id") for trace in traces), case_name
+
+def test_d_prefixed_and_unprefixed_dotted_rows_do_not_merge() -> None:
+    request = (
+        "operation=plain_insert\n"
+        "parent.row_1.id=P1\n"
+        "row_1.name=Alpha\n"
+        "parent.row_2.id=P2\n"
+        "row_2.name=Beta\n"
+    )
+    legacy = parse_source_payload(request)
+    payload = _d(request)
+    assert [(c.collection_id, c.rows) for c in payload.collections] == [
+        (c.collection_id, c.rows) for c in legacy.collections
+    ]
+    assert all(
+        not ({"id", "name"} <= set(row))
+        for collection in payload.collections
+        for row in collection.rows
+    )
+
+
+def test_d_prefixed_dotted_and_row_heading_do_not_merge() -> None:
+    requests = {
+        "heading": (
+            "operation=plain_insert\n"
+            "parent.row_1.id=P1\n"
+            "row1:\n"
+            "name=Alpha\n"
+            "parent.row_2.id=P2\n"
+            "row2:\n"
+            "name=Beta\n"
+        ),
+        "row_marker": (
+            "operation=plain_insert\n"
+            "parent.row_1.id=P1\n"
+            "row=1\n"
+            "name=Alpha\n"
+            "parent.row_2.id=P2\n"
+            "row=2\n"
+            "name=Beta\n"
+        ),
+    }
+    for syntax, request in requests.items():
+        legacy = parse_source_payload(request)
+        payload = _d(request)
+        assert [(c.collection_id, c.rows) for c in payload.collections] == [
+            (c.collection_id, c.rows) for c in legacy.collections
+        ], syntax
+        assert all(
+            not ({"id", "name"} <= set(row))
+            for collection in payload.collections
+            for row in collection.rows
+        ), syntax
+
+
+def test_d_all_unprefixed_dotted_rows_still_work() -> None:
+    payload = _d(
+        "operation=plain_insert\n"
+        "row_1.id=P1\n"
+        "row_1.name=Alpha\n"
+        "row_2.id=P2\n"
+        "row_2.name=Beta\n"
+    )
+    assert len(payload.collections) == 1
+    collection = payload.collections[0]
+    assert collection.rows == [
+        {"id": "P1", "name": "Alpha"},
+        {"id": "P2", "name": "Beta"},
+    ]
+    assert collection.metadata["explicit_row_segmentation"] is True

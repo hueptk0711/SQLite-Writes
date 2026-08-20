@@ -1328,6 +1328,8 @@ def _detect_explicit_equals_rows(
     current_label: str | None = None
     unknown_pre_row_assignment = False
     dotted_prefixes: set[str] = set()
+    row_namespaces: set[str] = set()
+    unprefixed_namespace = "__UNPREFIXED__"
 
     def ensure_row(label: str) -> dict[str, Any]:
         normalized_label = _canonical_field_name(label)
@@ -1375,6 +1377,7 @@ def _detect_explicit_equals_rows(
             heading = _ROW_HEADING.fullmatch(line)
             if heading is not None:
                 current_label = heading.group("label")
+                row_namespaces.add(unprefixed_namespace)
                 ensure_row(current_label)
                 row_spans.append(span)
                 continue
@@ -1392,6 +1395,7 @@ def _detect_explicit_equals_rows(
             if dotted is not None:
                 label = dotted.group("label")
                 prefix = str(dotted.group("prefix") or "").strip(". ")
+                row_namespaces.add(prefix or unprefixed_namespace)
                 if prefix:
                     dotted_prefixes.add(prefix)
                 add_value(
@@ -1407,6 +1411,7 @@ def _detect_explicit_equals_rows(
                 if quoted or not re.fullmatch(r"\d+", str(marker).strip()):
                     return _Detected([], [])
                 current_label = f"row_{str(marker).strip()}"
+                row_namespaces.add(unprefixed_namespace)
                 ensure_row(current_label)
                 row_spans.append(span)
                 continue
@@ -1429,11 +1434,12 @@ def _detect_explicit_equals_rows(
     except ValueError:
         return _Detected([], [])
 
-    # A dotted explicit-row grammar is only supported for one collection
-    # prefix at this checkpoint.  Multiple prefixes (for example parent/child)
-    # must never be merged by row label.  Defer to the historical parser path
-    # instead of inventing a multi-collection interpretation here.
-    if len(dotted_prefixes) > 1:
+    # Commit an explicit-row result only when every row field belongs to one
+    # unambiguous row namespace.  Unprefixed dotted rows, row headings, and
+    # row-marker syntax share the explicit unprefixed namespace.  Mixing that
+    # namespace with a named dotted prefix (or mixing multiple named prefixes)
+    # must defer to the historical parser path rather than merging by row label.
+    if len(row_namespaces) > 1:
         return _Detected([], [])
 
     rows = [rows_by_label[label] for label in row_order if rows_by_label[label]]
