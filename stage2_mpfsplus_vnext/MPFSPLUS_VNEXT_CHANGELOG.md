@@ -99,3 +99,16 @@ A–C are frozen at `Stage2-A-C-FINAL` (`f1fa49ddb8e6b920fb5a4237e088b6603579ae2
 - G diagnostic-driven targeted repair;
 - full causal replay;
 - GPU / 3B / 5B / 7B / 14B runs.
+
+## E Patch 2 — typed trust-boundary and causal-provenance hardening
+
+- replaces permissive target compatibility with a fail-closed semantic allowlist while preserving TEXT-backed temporal storage;
+- rejects explicit identifier, boolean, JSON, numeric/blob-like and unknown incompatible target semantics/types;
+- requires non-empty enumerated `candidate_type` and accepts only exact `date` / `datetime` typing;
+- enforces candidate subtype-to-grammar consistency instead of reinterpreting DATE as DATETIME or vice versa;
+- changes `applied` semantics to mean Stage-E intervention handling/activation and adds independent `value_changed`, `accepted`, and `outcome` audit fields;
+- records target semantic/declared type in normalization audit for later causal replay;
+- replaces Unicode `\\d` temporal grammar with ASCII `[0-9]` grammar;
+- makes raw evidence preservation mandatory when E is enabled;
+- updates the 14 Stage-1 diagnostic cells with typed evidence metadata and adds reviewer-requested adversarial regression coverage;
+- does not modify A–D, evidence/reference repair, F/G, prompts, verifier policy, or model execution.

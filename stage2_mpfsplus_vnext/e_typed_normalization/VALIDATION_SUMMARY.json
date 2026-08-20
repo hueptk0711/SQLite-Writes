@@ -1,29 +1,33 @@
 {
-  "checkpoint": "Stage2-E-Patch1-candidate",
+  "checkpoint": "Stage2-E-Patch2-candidate",
   "base_tag": "Stage2-D-FINAL",
   "base_commit": "0eba16b297100966d3635172456086db872166d6",
+  "patch1_commit": "5d1575728abcfde209ba3e2c4ef1a1bf5843f9c2",
   "method_id": "MP-FS+",
   "method_variant": "vnext-v5-typed-normalization",
   "method_version": "stage2-v5-abcd-typed-normalization",
   "scope": [
-    "free_text_typed_date_datetime_normalization",
-    "semantic_guard_and_fail_closed_ambiguity",
-    "raw_normalized_provenance",
-    "V5_ablation"
+    "target_semantic_compatibility_hardening",
+    "causal_activation_provenance",
+    "candidate_type_and_subtype_invariant",
+    "ascii_temporal_grammar",
+    "mandatory_raw_evidence_provenance"
   ],
   "stage1_diagnostic_fixture": {
     "samples": 11,
     "cell_cases": 14,
     "expected_valid_temporal": 12,
     "expected_rejected_wrong_evidence": 2,
+    "typed_metadata_added": true,
     "claim": "diagnostic/regression only; no end-to-end rescue claim"
   },
-  "validation": {
-    "dedicated_e_tests": "PENDING_REAL_REPOSITORY",
+  "expected_validation": {
+    "dedicated_e_tests": "28 pytest cases; PENDING_REAL_REPOSITORY",
     "d_regression_tests": "PENDING_REAL_REPOSITORY",
     "compatibility_subset": "PENDING_REAL_REPOSITORY",
     "full_fast_suite": "PENDING_REAL_REPOSITORY",
-    "cpu_smoke_e": "PENDING_REAL_REPOSITORY"
+    "cpu_smoke_e": "PENDING_REAL_REPOSITORY",
+    "cpu_smoke_d": "PENDING_REAL_REPOSITORY"
   },
   "gpu_or_model_run": false,
   "causal_replay": false,

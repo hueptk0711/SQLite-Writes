@@ -13,6 +13,7 @@ from nldbwrite_v3.planner.evidence import (
 from nldbwrite_v3.planner.materialize import MaterializationError
 from nldbwrite_v3.schema import ensure_reference_ids
 from nldbwrite_v3.vnext.typed_normalization import (
+    FreeTextTypedNormalizationConfig,
     normalize_free_text_typed_candidate,
 )
 
@@ -26,11 +27,15 @@ E_CONFIG = {
 }
 
 
-def _temporal_column(*, column_type: str = "TEXT") -> dict:
+def _temporal_column(
+    *,
+    column_type: str = "TEXT",
+    semantic_type: str = "text",
+) -> dict:
     return {
         "name": "observed_at",
         "type": column_type,
-        "semantic_type": "text",
+        "semantic_type": semantic_type,
         "preserve_as_text": True,
         "is_insertable": True,
     }
@@ -141,12 +146,22 @@ def _plan_for(
     }
 
 
-def _typed(value: str, *, rule: str = "iso_date_normalization", column_type: str = "TEXT"):
+def _typed(
+    value: str,
+    *,
+    rule: str = "iso_date_normalization",
+    column_type: str = "TEXT",
+    semantic_type: str = "text",
+    candidate_type: str | None = None,
+):
+    selected_candidate_type = candidate_type
+    if selected_candidate_type is None:
+        selected_candidate_type = "datetime" if " " in value or "T" in value else "date"
     return normalize_free_text_typed_candidate(
         value,
-        _temporal_column(column_type=column_type),
+        _temporal_column(column_type=column_type, semantic_type=semantic_type),
         requested_rule=rule,
-        candidate_type="datetime" if " " in value or "T" in value else "date",
+        candidate_type=selected_candidate_type,
         config=E_CONFIG,
         evidence_id="e1",
         evidence_start=10,
@@ -175,6 +190,11 @@ def test_e_accepts_stage1_style_datetime_without_mutating_surface() -> None:
     assert result.audit["normalization_confidence"] == "high"
     assert result.audit["raw_evidence_span"] == "2026-07-30 14:47:00"
     assert result.audit["evidence_start"] == 10
+    assert result.audit["intervention_applied"] is True
+    assert result.audit["applied"] is True
+    assert result.audit["value_changed"] is False
+    assert result.audit["accepted"] is True
+    assert result.audit["outcome"] == "ACCEPT"
 
 
 def test_e_accepts_fractional_datetime_precision_used_by_stage1() -> None:
@@ -206,23 +226,26 @@ def test_e_identity_text_does_not_trigger_typed_normalization_or_punctuation_str
 
 
 @pytest.mark.parametrize(
-    "value",
+    "value,candidate_type",
     [
-        "01/02/2026",
-        "01/02/03",
-        "2026-13-40",
-        "2026-08-19..",
-        "Attempt",
-        "For",
-        "'2026-08-19.'",
+        ("01/02/2026", "date"),
+        ("01/02/03", "date"),
+        ("2026-13-40", "date"),
+        ("2026-08-19..", "date"),
     ],
 )
-def test_e_ambiguous_or_non_temporal_value_fails_closed(value: str) -> None:
-    result = _typed(value)
+def test_e_ambiguous_or_invalid_temporal_value_fails_closed(
+    value: str,
+    candidate_type: str,
+) -> None:
+    result = _typed(value, candidate_type=candidate_type)
     assert result.handled is True
     assert result.error_code == "AMBIGUOUS_OR_UNSUPPORTED_TEMPORAL_FORMAT"
     assert result.value == value
     assert result.audit["lossless"] is False
+    assert result.audit["intervention_applied"] is True
+    assert result.audit["accepted"] is False
+
 
 
 def test_e_rejects_temporal_rule_for_clearly_numeric_target() -> None:
@@ -312,9 +335,12 @@ def test_e_stage1_date_audit_is_regression_fixture_not_rescue_claim() -> None:
     for case in fixture["cases"]:
         result = normalize_free_text_typed_candidate(
             case["raw_value"],
-            _temporal_column(column_type=case["target_column_type"]),
+            _temporal_column(
+                column_type=case["target_column_type"],
+                semantic_type=case["target_semantic_type"],
+            ),
             requested_rule=case["requested_rule"],
-            candidate_type="",
+            candidate_type=case["candidate_type"],
             config=E_CONFIG,
         )
         if case["expected_status"] == "pass":
@@ -322,9 +348,106 @@ def test_e_stage1_date_audit_is_regression_fixture_not_rescue_claim() -> None:
             assert result.value == case["expected_normalized_value"], case["case_id"]
             passed += 1
         else:
-            assert result.error_code == "AMBIGUOUS_OR_UNSUPPORTED_TEMPORAL_FORMAT", case["case_id"]
+            assert result.error_code == "TEMPORAL_EVIDENCE_TYPE_MISMATCH", case["case_id"]
             rejected += 1
     assert (passed, rejected) == (12, 2)
+
+
+def test_e_rejects_identifier_semantic_target() -> None:
+    result = _typed("2026-08-19", semantic_type="identifier", candidate_type="date")
+    assert result.handled
+    assert result.error_code == "TEMPORAL_TARGET_SEMANTIC_MISMATCH"
+    assert result.audit["accepted"] is False
+
+
+def test_e_rejects_boolean_semantic_target() -> None:
+    result = _typed(
+        "2026-08-19",
+        column_type="BOOLEAN",
+        semantic_type="boolean",
+        candidate_type="date",
+    )
+    assert result.handled
+    assert result.error_code == "TEMPORAL_TARGET_SEMANTIC_MISMATCH"
+
+
+def test_e_rejects_json_semantic_target() -> None:
+    result = _typed(
+        "2026-08-19",
+        column_type="JSON",
+        semantic_type="json",
+        candidate_type="date",
+    )
+    assert result.handled
+    assert result.error_code == "TEMPORAL_TARGET_SEMANTIC_MISMATCH"
+
+
+def test_e_allows_text_temporal_storage() -> None:
+    result = _typed(
+        "2026-08-19",
+        column_type="TEXT",
+        semantic_type="text",
+        candidate_type="date",
+    )
+    assert result.handled and result.error is None
+    assert result.value == "2026-08-19"
+
+
+def test_e_datetime_acceptance_marks_intervention_applied_even_when_value_unchanged() -> None:
+    result = _typed("2026-07-30 14:47:00", candidate_type="datetime")
+    assert result.error is None
+    assert result.audit["intervention_applied"] is True
+    assert result.audit["applied"] is True
+    assert result.audit["value_changed"] is False
+    assert result.audit["accepted"] is True
+    assert result.audit["outcome"] == "ACCEPT"
+
+
+def test_e_slash_date_marks_value_changed() -> None:
+    result = _typed("2026/08/19", candidate_type="date")
+    assert result.error is None
+    assert result.value == "2026-08-19"
+    assert result.audit["applied"] is True
+    assert result.audit["value_changed"] is True
+
+
+def test_e_missing_candidate_type_fails_closed() -> None:
+    result = _typed("2026-08-19", candidate_type="")
+    assert result.handled
+    assert result.error_code == "TEMPORAL_EVIDENCE_TYPE_MISSING"
+    assert result.audit["applied"] is True
+    assert result.audit["accepted"] is False
+
+
+def test_e_date_candidate_cannot_normalize_datetime() -> None:
+    result = _typed("2026-08-19 12:30:00", candidate_type="date")
+    assert result.handled
+    assert result.error_code == "TEMPORAL_EVIDENCE_SUBTYPE_MISMATCH"
+
+
+def test_e_datetime_candidate_cannot_normalize_date() -> None:
+    result = _typed("2026-08-19", candidate_type="datetime")
+    assert result.handled
+    assert result.error_code == "TEMPORAL_EVIDENCE_SUBTYPE_MISMATCH"
+
+
+def test_e_quoted_text_candidate_is_not_temporal() -> None:
+    result = _typed("2026-08-19", candidate_type="quoted_text")
+    assert result.handled
+    assert result.error_code == "TEMPORAL_EVIDENCE_TYPE_MISMATCH"
+
+
+def test_e_fullwidth_digits_are_not_accepted_as_canonical_temporal() -> None:
+    result = _typed("２０２６-０８-１９", candidate_type="date")
+    assert result.handled
+    assert result.error_code == "AMBIGUOUS_OR_UNSUPPORTED_TEMPORAL_FORMAT"
+
+
+def test_e_raw_evidence_preservation_cannot_be_disabled() -> None:
+    with pytest.raises(ValueError, match="preserve_raw_evidence=true"):
+        FreeTextTypedNormalizationConfig.from_mapping(
+            {"enabled": True, "preserve_raw_evidence": False}
+        )
 
 
 def test_e_v5_prompt_is_identical_to_v4_prompt() -> None:

@@ -148,6 +148,11 @@ def main() -> None:
             value,
             {"name": "observed_at", "type": "TEXT", "semantic_type": "text"},
             requested_rule=rule,
+            candidate_type=(
+                "datetime" if " " in value or "T" in value
+                else "date" if rule == "iso_date_normalization"
+                else "text"
+            ),
             config=e_config,
         )
         assert result.error is None
@@ -160,6 +165,7 @@ def main() -> None:
         "01/02/2026",
         {"name": "observed_at", "type": "TEXT", "semantic_type": "text"},
         requested_rule="iso_date_normalization",
+        candidate_type="date",
         config=e_config,
     )
     assert ambiguous.handled and ambiguous.error is not None
@@ -170,10 +176,62 @@ def main() -> None:
         "For",
         {"name": "observed_at", "type": "TEXT", "semantic_type": "text"},
         requested_rule="iso_date_normalization",
+        candidate_type="text",
         config=e_config,
     )
-    assert wrong_evidence.error_code == "AMBIGUOUS_OR_UNSUPPORTED_TEMPORAL_FORMAT"
+    assert wrong_evidence.error_code == "TEMPORAL_EVIDENCE_TYPE_MISMATCH"
     typed_checks["wrong_evidence_not_repaired"] = "PASS"
+
+    identifier_target = normalize_free_text_typed_candidate(
+        "2026-08-19",
+        {"name": "event_id", "type": "TEXT", "semantic_type": "identifier"},
+        requested_rule="iso_date_normalization",
+        candidate_type="date",
+        config=e_config,
+    )
+    assert identifier_target.error_code == "TEMPORAL_TARGET_SEMANTIC_MISMATCH"
+    typed_checks["target_semantic_guard"] = "PASS"
+
+    unchanged_datetime = normalize_free_text_typed_candidate(
+        "2026-07-30 14:47:00",
+        {"name": "observed_at", "type": "TEXT", "semantic_type": "text"},
+        requested_rule="iso_date_normalization",
+        candidate_type="datetime",
+        config=e_config,
+    )
+    assert unchanged_datetime.error is None
+    assert unchanged_datetime.audit["applied"] is True
+    assert unchanged_datetime.audit["intervention_applied"] is True
+    assert unchanged_datetime.audit["value_changed"] is False
+    typed_checks["causal_activation_provenance"] = "PASS"
+
+    missing_type = normalize_free_text_typed_candidate(
+        "2026-08-19",
+        {"name": "observed_at", "type": "TEXT", "semantic_type": "text"},
+        requested_rule="iso_date_normalization",
+        candidate_type="",
+        config=e_config,
+    )
+    assert missing_type.error_code == "TEMPORAL_EVIDENCE_TYPE_MISSING"
+    subtype_mismatch = normalize_free_text_typed_candidate(
+        "2026-08-19 12:30:00",
+        {"name": "observed_at", "type": "TEXT", "semantic_type": "text"},
+        requested_rule="iso_date_normalization",
+        candidate_type="date",
+        config=e_config,
+    )
+    assert subtype_mismatch.error_code == "TEMPORAL_EVIDENCE_SUBTYPE_MISMATCH"
+    typed_checks["candidate_type_invariant"] = "PASS"
+
+    fullwidth = normalize_free_text_typed_candidate(
+        "２０２６-０８-１９",
+        {"name": "observed_at", "type": "TEXT", "semantic_type": "text"},
+        requested_rule="iso_date_normalization",
+        candidate_type="date",
+        config=e_config,
+    )
+    assert fullwidth.error_code == "AMBIGUOUS_OR_UNSUPPORTED_TEMPORAL_FORMAT"
+    typed_checks["ascii_temporal_grammar"] = "PASS"
 
     fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
     fixture_results = []
@@ -183,9 +241,10 @@ def main() -> None:
             {
                 "name": "observed_at",
                 "type": case["target_column_type"],
-                "semantic_type": "text",
+                "semantic_type": case["target_semantic_type"],
             },
             requested_rule=case["requested_rule"],
+            candidate_type=case["candidate_type"],
             config=e_config,
         )
         if case["expected_status"] == "pass":
@@ -193,7 +252,7 @@ def main() -> None:
             assert result.value == case["expected_normalized_value"], case["case_id"]
             status = "PASS"
         else:
-            assert result.error_code == "AMBIGUOUS_OR_UNSUPPORTED_TEMPORAL_FORMAT", case["case_id"]
+            assert result.error_code == "TEMPORAL_EVIDENCE_TYPE_MISMATCH", case["case_id"]
             status = "EXPECTED_REJECT"
         fixture_results.append({"case_id": case["case_id"], "status": status})
 
@@ -225,6 +284,9 @@ def main() -> None:
     audit = result.write_plan["write_groups"][0]["normalization_audit"][0]["observed_at"]
     assert audit["raw_evidence_span"] == "2026-07-30 14:47:00"
     assert audit["semantic_type"] == "datetime"
+    assert audit["intervention_applied"] is True
+    assert audit["applied"] is True
+    assert audit["value_changed"] is False
     assert result.program is not None
     assert "2026-07-30 14:47:00" in result.program.statements[0].params
 
@@ -245,6 +307,8 @@ def main() -> None:
                     "normalized_value": row["observed_at"],
                     "raw_evidence_span": audit["raw_evidence_span"],
                     "semantic_type": audit["semantic_type"],
+                    "intervention_applied": audit["intervention_applied"],
+                    "value_changed": audit["value_changed"],
                     "compiled_params": result.program.statements[0].params,
                     "status": "PASS",
                 },

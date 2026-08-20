@@ -1,69 +1,63 @@
-# Stage 2 E Checkpoint Report — Patch 1 Candidate
+# Stage 2 E Checkpoint Report — Patch 2 Candidate
 
 ## Base
 
 ```text
-Stage2-D-FINAL
-0eba16b297100966d3635172456086db872166d6
+Stage2 E Patch 1 commit
+5d1575728abcfde209ba3e2c4ef1a1bf5843f9c2
 ```
 
-## What E changes
+Frozen parent remains `Stage2-D-FINAL` (`0eba16b297100966d3635172456086db872166d6`).
 
-E adds an independently ablatable free-text typed temporal normalizer at the evidence
-materialization boundary. It extends the old `iso_date_normalization` path only when the
-reference-plan rule, resolved target type, and strict evidence surface agree.
+## Reviewer issues addressed
 
-## Stage-1 diagnostic evidence
+Patch 2 is intentionally narrow and addresses four review items:
 
-The Stage-1 DATE_NORMALIZATION audit found:
+1. **Target semantic guard** — explicit incompatible semantics such as identifier,
+   boolean, JSON, numeric/blob-like targets now fail closed. TEXT storage with semantic
+   `text` remains supported.
+2. **Causal provenance activation** — `applied`/`intervention_applied` now represent E
+   handling, while `value_changed` independently records byte/string mutation.
+3. **Candidate-type invariant** — missing type is rejected; only `date`/`datetime` are
+   accepted; subtype must match the grammar.
+4. **ASCII grammar** — temporal regexes use `[0-9]`, rejecting full-width/Unicode digits.
 
-- 11 reviewed date-tagged samples;
-- 12 valid explicit datetime values rejected by the old date-only rule;
-- two wrong evidence tokens (`Attempt`, `For`) that must continue to fail;
-- three clean normalization-only samples;
-- seven samples with additional non-date failures.
+`preserve_raw_evidence=false` is also rejected when E is enabled because provenance
+preservation is mandatory rather than an optional behavioral toggle.
 
-The encoded fixture therefore tests 14 cell-level diagnostic cases. Passing these fixtures
-is normalization-level regression evidence, not evidence that 12 samples are rescued
-end-to-end.
+## Stage-1 diagnostic fixture
 
-## Safety policy
-
-E requires:
+The 14 cell-level fixtures now carry typed metadata:
 
 ```text
-explicit iso_date_normalization request
-+ strict year-first temporal surface
-+ compatible resolved target storage type
+12 valid temporal cells -> candidate_type=datetime -> expected normalization accept
+Attempt / For           -> candidate_type=text     -> expected typed-evidence reject
 ```
 
-Otherwise it fails closed or leaves non-E normalization untouched.
+This is still diagnostic/regression evidence only.
 
-Key negative invariants:
+## Regression coverage
 
-- no global punctuation stripping;
-- no DD/MM versus MM/DD guessing;
-- no evidence repair;
-- no quoted-text reinterpretation;
-- no structured-source D3 changes.
+Dedicated E coverage is expanded from 19 to an expected **28 pytest cases**, including:
 
-## Ablation identity
-
-```text
-V4: vnext-v4-structured-parser
-V5: vnext-v5-typed-normalization
-```
-
-V5 retains the exact V4 A–D blocks and adds only `free_text_typed_normalization`.
+- identifier / boolean / JSON target semantic rejection;
+- TEXT temporal storage acceptance;
+- intervention activation with unchanged DATETIME surface;
+- value-changed provenance for slash-date canonicalization;
+- missing candidate type rejection;
+- date-vs-datetime subtype mismatch rejection in both directions;
+- quoted text candidate rejection;
+- full-width digit rejection;
+- mandatory raw-evidence provenance config.
 
 ## Required validation before reviewer freeze
 
-- dedicated `tests/test_stage2_vnext_e.py` 100%;
+- dedicated E suite 100%;
 - frozen D suite 100%;
-- A–D compatibility subset no failures;
+- A–E compatibility subset no failures;
 - full fast suite no failures;
-- V4/V5 prompt identity PASS;
-- E-disabled behavior equals V4 PASS;
-- E CPU smoke PASS;
-- Stage-1 diagnostic temporal fixture 12 expected accepts + 2 expected rejects;
-- no GPU/model run.
+- CPU smoke E PASS;
+- CPU smoke D PASS;
+- 14 typed Stage-1 diagnostic cells behave as declared;
+- no GPU/model run;
+- no F/G/causal replay.
