@@ -1,0 +1,11 @@
+{
+  "base_config": "configs/final/mp_fs_plus.json",
+  "method_id": "MP-FS+",
+  "method_variant": "vnext-v3-update",
+  "method_version": "stage2-v3-control-conflict-update",
+  "stage2_interventions": {
+    "control_field_roles": true,
+    "explicit_conflict_preservation": true,
+    "update_column_consistency": true
+  }
+}

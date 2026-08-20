@@ -1,0 +1,37 @@
+{
+  "checkpoint": "Stage2-A-C-Patch4",
+  "base_commit": "97885c0c4383059f76392bf6291d1df34ede113c",
+  "scope": [
+    "A_control_operation_semantics",
+    "B_conflict_semantic_preservation",
+    "C_update_column_preservation"
+  ],
+  "patch4_hardening": [
+    "shared_free_text_instruction_payload_boundary",
+    "quoted_payload_conflict_target_isolation",
+    "quoted_payload_update_column_isolation",
+    "quoted_sql_identifier_preservation",
+    "quoted_control_value_preservation"
+  ],
+  "tests": {
+    "stage2_vnext_abc": {
+      "passed": 36,
+      "failed": 0
+    },
+    "compatibility_subset": {
+      "failed": 0,
+      "completed_100_percent": true
+    },
+    "fast_not_integration": {
+      "failed": 0,
+      "completed_100_percent": true
+    },
+    "cpu_smoke": {
+      "status": "PASS",
+      "backend": "mock",
+      "sample_count": 1
+    }
+  },
+  "gpu_or_model_run": false,
+  "D_to_G_implemented": false
+}

@@ -1,0 +1,56 @@
+{
+  "checkpoint": "Stage2-D-Patch4-candidate",
+  "base_tag": "Stage2-A-C-FINAL",
+  "base_commit": "f1fa49ddb8e6b920fb5a4237e088b6603579ae23",
+  "config": "configs/stage2/v4_structured_parser.json",
+  "stage1_diagnostic_scope": {
+    "SOURCE_PARSER_ROW_SEGMENTATION_ERROR": 3,
+    "SOURCE_PARSER_CONTROL_ROW_SEGMENTATION_ERROR": 2,
+    "SOURCE_PARSER_NULL_LITERAL_COERCION_ERROR": 2,
+    "total": 7
+  },
+  "validation": {
+    "patch3_isolated_adversarial_checks": "PASS",
+    "stage1_exact_parser_fixtures": "7/7 parser-level PASS",
+    "d2_d3_d4_regression": "PASS",
+    "dedicated_d_suite_after_user_apply": "PENDING (20 test functions)",
+    "compatibility_subset_after_user_apply": "PENDING",
+    "full_fast_suite_after_user_apply": "PENDING",
+    "cpu_smoke_after_user_apply": "PENDING",
+    "patch4_isolated_adversarial_checks": "PASS"
+  },
+  "claims": {
+    "parser_regression_evidence": true,
+    "causal_rescue_claim": false,
+    "confirmatory_accuracy_claim": false
+  },
+  "not_run": [
+    "E_free_text_date_normalization",
+    "F_constrained_reference_repair",
+    "G_diagnostic_targeted_repair",
+    "full_stage2_causal_replay",
+    "3B",
+    "7B",
+    "14B",
+    "token_limit_experiments",
+    "public_benchmarks"
+  ],
+  "base_d_commit": "23f3249703301eeadf8d83d1814a59d48a410326",
+  "patch2_hardening": [
+    "multi_prefix_dotted_rows_defer_without_merge",
+    "semantic_validity_for_strong_control_context",
+    "textual_value_provenance_completeness"
+  ],
+  "base_d_patch2_commit": "9a423ccee1a0675e5aa7a9588dce1aa84e055e9a",
+  "patch3_hardening": [
+    "treat_unprefixed_as_real_row_namespace",
+    "mixed_prefixed_unprefixed_dotted_rows_defer",
+    "prefixed_dotted_plus_unprefixed_heading_marker_defer",
+    "all_unprefixed_dotted_rows_remain_supported"
+  ],
+  "base_d_patch3_commit": "200a2ef910bdd4abbb88e8aa3a844bc368584e12",
+  "patch4_hardening": [
+    "replace_user_representable_unprefixed_string_sentinel_with_tagged_namespace",
+    "named_sentinel_like_prefix_cannot_collide_with_unprefixed_namespace"
+  ]
+}

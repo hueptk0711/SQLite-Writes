@@ -1,0 +1,87 @@
+{
+  "version": "3.0",
+  "plan_kind": "materialized_write_plan",
+  "source": {
+    "mode": "semi_structured",
+    "format": "json_array",
+    "instruction_text": "",
+    "row_count": 1,
+    "collections": [
+      {
+        "collection_id": "records",
+        "reference_id": "c1",
+        "selector_id": "s1",
+        "source_path": "$[*]",
+        "format": "json_array",
+        "row_count": 1,
+        "fields": [
+          "operation",
+          "id",
+          "name"
+        ],
+        "field_ids": {
+          "operation": "c1.f1",
+          "id": "c1.f2",
+          "name": "c1.f3"
+        }
+      }
+    ]
+  },
+  "write_groups": [
+    {
+      "group_id": "g1",
+      "table": "parent",
+      "action": "insert",
+      "rows": [
+        {
+          "id": "p1",
+          "name": "One"
+        }
+      ],
+      "conflict": {
+        "action": "error",
+        "target": [],
+        "update_columns": []
+      },
+      "provenance": [
+        {
+          "source_collection": "records",
+          "source_row_index": 0,
+          "value_sources": {
+            "id": {
+              "kind": "source",
+              "source_collection": "records",
+              "source_row_index": 0,
+              "source_field": "id"
+            },
+            "name": {
+              "kind": "source",
+              "source_collection": "records",
+              "source_row_index": 0,
+              "source_field": "name"
+            }
+          }
+        }
+      ],
+      "reference_trace": {
+        "source_collection_id": "c1",
+        "source_selector_id": "s1",
+        "table_id": "t3",
+        "write_semantics": "plain_insert",
+        "conflict_target_id": null,
+        "update_column_ids": [],
+        "stage2_intervention_trace": {}
+      }
+    }
+  ],
+  "dependencies": [],
+  "unresolved_fields": [
+    {
+      "source_collection": "records",
+      "source_row_index": 0,
+      "field": "operation",
+      "reason": "",
+      "status": "unresolved"
+    }
+  ]
+}

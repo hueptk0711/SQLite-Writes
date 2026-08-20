@@ -864,16 +864,25 @@ def verify_write_plan(
                     f"/unresolved_fields/{index}",
                 )
                 continue
-            if item.get("status") != "ignored" or not str(
-                item.get("reason") or ""
-            ).strip():
+            status = str(item.get("status") or "")
+            ignored_ok = status == "ignored" and bool(
+                str(item.get("reason") or "").strip()
+            )
+            consumed_control_ok = (
+                status == "consumed_control"
+                and bool(str(item.get("role") or "").strip())
+                and bool(str(item.get("consumed_by") or "").strip())
+            )
+            if not (ignored_ok or consumed_control_ok):
                 _diagnostic(
                     errors,
                     "UNRESOLVED_SOURCE_FIELD",
-                    f"Source field {item.get('field')!r} is neither mapped nor justified.",
+                    f"Source field {item.get('field')!r} is neither mapped, justified, nor consumed as typed control semantics.",
                     f"/unresolved_fields/{index}",
                     source_collection=item.get("source_collection"),
                     source_row_index=item.get("source_row_index"),
+                    role=item.get("role"),
+                    consumed_by=item.get("consumed_by"),
                 )
 
     source_collections = source.get("collections")

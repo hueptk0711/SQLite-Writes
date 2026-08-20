@@ -127,9 +127,14 @@ class CompiledStatement:
     table: str
     row_count: int
     normalizations: list[dict[str, Any]] = field(default_factory=list)
+    semantic_trace: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        output = asdict(self)
+        # Preserve baseline serialization when Stage-2 tracing is absent.
+        if output.get("semantic_trace") is None:
+            output.pop("semantic_trace", None)
+        return output
 
 
 @dataclass(slots=True)

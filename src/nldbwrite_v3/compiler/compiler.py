@@ -125,6 +125,20 @@ def _compile_group(
                         if normalize_values
                         else value
                     )
+        stage2_trace = (
+            (group.get("reference_trace") or {}).get("stage2_intervention_trace")
+            if isinstance(group.get("reference_trace"), dict)
+            else None
+        )
+        statement_trace = None
+        if isinstance(stage2_trace, dict) and stage2_trace:
+            statement_trace = dict(stage2_trace)
+            statement_trace["materialized_update_columns"] = list(
+                group.get("conflict", {}).get("update_columns") or []
+            )
+            statement_trace["compiled_update_columns"] = list(
+                group.get("conflict", {}).get("update_columns") or []
+            )
         statements.append(
             CompiledStatement(
                 sql=(
@@ -136,6 +150,7 @@ def _compile_group(
                 table=table,
                 row_count=len(rows),
                 normalizations=normalization_audit,
+                semantic_trace=statement_trace,
             )
         )
     return statements

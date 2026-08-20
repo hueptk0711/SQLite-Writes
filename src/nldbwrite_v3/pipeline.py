@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from copy import deepcopy
-from typing import Any
+from typing import Any, Mapping
 
 from nldbwrite_v3.compiler import compile_verified_plan
 from nldbwrite_v3.ir import (
@@ -22,6 +22,10 @@ from nldbwrite_v3.planner import (
 )
 from nldbwrite_v3.source_parser import parse_source_payload
 from nldbwrite_v3.verifier import verify_write_plan
+from nldbwrite_v3.vnext import (
+    Stage2InterventionConfig,
+    apply_free_text_reference_interventions,
+)
 
 
 @dataclass(slots=True)
@@ -58,19 +62,28 @@ class MappingFirstPipeline:
         normalize_values: bool = False,
         normalization_mode: str = "legacy",
         reference_planning: bool = False,
+        stage2_interventions: Mapping[str, Any] | None = None,
+        structured_source_parser: Mapping[str, Any] | None = None,
     ):
         self.profile = profile
         self.strict_atomic = strict_atomic
         self.normalize_values = normalize_values
         self.normalization_mode = normalization_mode
         self.reference_planning = reference_planning
+        self.stage2_interventions = Stage2InterventionConfig.from_mapping(
+            stage2_interventions
+        )
+        self.structured_source_parser = dict(structured_source_parser or {})
 
     def run(
         self,
         request: str,
         predicted_plan: dict[str, Any],
     ) -> PipelineResult:
-        payload = parse_source_payload(request)
+        payload = parse_source_payload(
+            request,
+            structured_parser=self.structured_source_parser,
+        )
         grounding_warnings: list[Diagnostic] = []
         reference_plan = self.reference_planning or (
             predicted_plan.get("plan_kind") == "reference_write_plan"
@@ -110,6 +123,8 @@ class MappingFirstPipeline:
                 predicted_plan,
                 payload,
                 self.profile,
+                stage2_interventions=self.stage2_interventions.to_dict(),
+                warning_sink=grounding_warnings,
             )
             if reference_errors:
                 verification = VerificationResult(
@@ -126,7 +141,11 @@ class MappingFirstPipeline:
                     "reference_resolution",
                 )
             try:
-                write_plan = materialize_mapping_plan(grounded_plan, payload)
+                write_plan = materialize_mapping_plan(
+                    grounded_plan,
+                    payload,
+                    control_field_roles=self.stage2_interventions.control_field_roles,
+                )
             except MaterializationError as exc:
                 verification = VerificationResult(
                     "invalid",
@@ -142,6 +161,38 @@ class MappingFirstPipeline:
                     "materialization",
                 )
         elif reference_plan and payload.mode == "free_text":
+            predicted_plan, intervention_diagnostics = (
+                apply_free_text_reference_interventions(
+                    predicted_plan,
+                    request,
+                    self.profile,
+                    self.stage2_interventions,
+                )
+            )
+            intervention_errors = [
+                item
+                for item in intervention_diagnostics
+                if item.severity == "error"
+            ]
+            grounding_warnings.extend(
+                item
+                for item in intervention_diagnostics
+                if item.severity == "warning"
+            )
+            if intervention_errors:
+                verification = VerificationResult(
+                    "invalid",
+                    None,
+                    intervention_errors,
+                    grounding_warnings,
+                )
+                return PipelineResult(
+                    payload,
+                    None,
+                    verification,
+                    None,
+                    "semantic_preservation",
+                )
             try:
                 write_plan = materialize_reference_free_text_plan(
                     predicted_plan,
@@ -169,7 +220,11 @@ class MappingFirstPipeline:
                 self.profile,
             )
             try:
-                write_plan = materialize_mapping_plan(grounded_plan, payload)
+                write_plan = materialize_mapping_plan(
+                    grounded_plan,
+                    payload,
+                    control_field_roles=self.stage2_interventions.control_field_roles,
+                )
             except MaterializationError as exc:
                 verification = VerificationResult(
                     "invalid",

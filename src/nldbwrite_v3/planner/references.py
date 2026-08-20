@@ -5,6 +5,7 @@ from copy import deepcopy
 from typing import Any
 
 from nldbwrite_v3.ir import Diagnostic, SourceCollection, SourcePayload
+from nldbwrite_v3.vnext import Stage2InterventionConfig, apply_reference_interventions
 from nldbwrite_v3.schema import (
     column_reference_map,
     constraint_reference_map,
@@ -716,11 +717,29 @@ def resolve_reference_mapping_plan(
     mapping_plan: dict[str, Any],
     payload: SourcePayload,
     profile: dict[str, Any],
+    *,
+    stage2_interventions: dict[str, Any] | None = None,
+    warning_sink: list[Diagnostic] | None = None,
 ) -> tuple[dict[str, Any], list[Diagnostic]]:
-    """Resolve an MP-FS+ ID-only Mapping Plan into materializer input."""
+    """Resolve an MP-FS+ ID-only Mapping Plan into materializer input.
+
+    Stage-2 interventions are opt-in. With no flags this function preserves
+    the frozen Stage-1.1 behavior.
+    """
     ensure_reference_ids(profile)
     plan = deepcopy(mapping_plan)
-    errors: list[Diagnostic] = []
+    vnext_config = Stage2InterventionConfig.from_mapping(stage2_interventions)
+    plan, intervention_diagnostics = apply_reference_interventions(
+        plan, payload, profile, vnext_config
+    )
+    errors: list[Diagnostic] = [
+        item for item in intervention_diagnostics if item.severity == "error"
+    ]
+    intervention_warnings = [
+        item for item in intervention_diagnostics if item.severity == "warning"
+    ]
+    if warning_sink is not None:
+        warning_sink.extend(intervention_warnings)
     tables = table_reference_map(profile)
     collections = _source_reference_map(payload)
     selector_ids = {
@@ -900,6 +919,9 @@ def resolve_reference_mapping_plan(
                     "update_column_ids": deepcopy(
                         group.get("update_column_ids") or []
                     ),
+                    "stage2_intervention_trace": deepcopy(
+                        group.get("stage2_intervention_trace") or {}
+                    ),
                 },
             }
         )
@@ -925,6 +947,7 @@ def resolve_reference_mapping_plan(
         "target_groups": output_groups,
         "dependencies": deepcopy(plan.get("dependencies") or []),
         "ignored_fields": ignored_fields,
+        "consumed_control_refs": deepcopy(plan.get("consumed_control_refs") or []),
         "reference_contract": "mp-fs-plus-v1",
     }, errors
 
