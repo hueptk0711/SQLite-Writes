@@ -107,6 +107,78 @@ def main() -> None:
             }
         )
 
+    multi_prefix_request = (
+        "operation=plain_insert\n"
+        "parent.row_1.id=P1\n"
+        "child.row_1.name=C1\n"
+        "parent.row_2.id=P2\n"
+        "child.row_2.name=C2\n"
+    )
+    legacy_multi_prefix = parse_source_payload(multi_prefix_request)
+    d_multi_prefix = parse_source_payload(
+        multi_prefix_request,
+        structured_parser=parser_config,
+    )
+    assert [
+        (collection.collection_id, collection.rows)
+        for collection in d_multi_prefix.collections
+    ] == [
+        (collection.collection_id, collection.rows)
+        for collection in legacy_multi_prefix.collections
+    ]
+    assert all(
+        not ({"id", "name"} <= set(row))
+        for collection in d_multi_prefix.collections
+        for row in collection.rows
+    )
+
+    invalid_operation_payload = parse_source_payload(
+        "operation=login\ntable=audit\nname=Alice",
+        structured_parser=parser_config,
+    )
+    assert invalid_operation_payload.rows == [
+        {"table": "audit", "name": "Alice"}
+    ]
+
+    provenance_cases = {
+        "csv": "id,name\n1,Alpha\n2,Beta",
+        "markdown": "| id | name |\n|---|---|\n|1|Alpha|\n|2|Beta|",
+        "colon_kv": "id: 1\nname: Alpha",
+        "equals_kv": "id=1\nname=Alpha",
+        "numbered": "1. id: 1, name: Alpha 2. id: 2, name: Beta",
+        "bulleted": "- id: 1, name: Alpha; - id: 2, name: Beta",
+    }
+    provenance_results = {}
+    for name, provenance_request in provenance_cases.items():
+        provenance_payload = parse_source_payload(
+            provenance_request,
+            structured_parser=parser_config,
+        )
+        assert provenance_payload.collections
+        total_cells = 0
+        total_traces = 0
+        for collection in provenance_payload.collections:
+            expected_cells = [
+                (row_index, field)
+                for row_index, row in enumerate(collection.rows)
+                for field in row
+            ]
+            traces = collection.metadata.get("value_provenance") or []
+            observed_cells = [
+                (trace["row_index"], trace["field"])
+                for trace in traces
+            ]
+            assert sorted(observed_cells) == sorted(expected_cells)
+            assert len(observed_cells) == len(set(observed_cells))
+            assert all(trace.get("row_id") for trace in traces)
+            total_cells += len(expected_cells)
+            total_traces += len(traces)
+        provenance_results[name] = {
+            "cells": total_cells,
+            "traces": total_traces,
+            "status": "PASS",
+        }
+
     request = (
         "operation=insert_ignore\n"
         "table=parent\n"
@@ -166,6 +238,11 @@ def main() -> None:
                     "structured_source_parser": parser_config,
                 },
                 "stage1_diagnostic_cases": case_results,
+                "d2_trust_boundary": {
+                    "multi_prefix_deferred_without_merge": "PASS",
+                    "invalid_operation_preserves_table_payload": "PASS",
+                    "provenance_formats": provenance_results,
+                },
                 "prompt_row_count": len(prompt_payload.rows),
                 "pipeline_row_count": len(result.source_payload.rows),
                 "compiled_params": result.program.statements[0].params,

@@ -1,4 +1,4 @@
-# Stage 2 D Checkpoint Report
+# Stage 2 D Patch 2 Checkpoint Report
 
 ## Baseline
 
@@ -36,22 +36,24 @@ On the seven diagnostic fixtures:
 
 All parser-level assertions pass. These observations do **not** claim that seven end-to-end examples are rescued. Full causal replay remains a later Stage-2 step.
 
+## Reviewer Patch-2 hardening
+
+The first D review accepted the NULL policy and core integration but identified three trust-boundary gaps. Patch 2 therefore adds no new feature family; it only hardens:
+
+1. multi-prefix dotted rows: `>1` distinct dotted collection prefix makes the explicit D detector defer instead of merging by row label;
+2. control context: `operation=login` is not a high-confidence write-operation signal and cannot reclassify a neighboring `table` payload field;
+3. provenance: numbered, bulleted, and equals key-value paths now emit the same payload-cell trace contract as CSV/markdown/colon/explicit-row paths.
+
+The original 7 Stage-1 fixtures and D3 NULL policy are unchanged.
+
 ## Regression coverage
 
-Dedicated D tests cover:
+The dedicated D suite now contains 16 test functions. In addition to the original 12 contracts, Patch 2 adds:
 
-1. V4 config inheritance/dispatch and A–C preservation;
-2. D-off legacy behavior;
-3. `rowN:` segmentation;
-4. repeated `row = N` segmentation;
-5. dotted `row_N.field=value` segmentation;
-6. colon control-row separation;
-7. conservative `None`/`NULL`/`nil` policy and provenance;
-8. quoted textual null preservation;
-9. typed JSON/Python null preservation;
-10. prompt-time parser config propagation;
-11. all seven exact Stage-1 parser diagnostic fixtures;
-12. context-only `table` payload fields remain payload without a strong control signal.
+13. multi-prefix `parent.row_N.* + child.row_N.*` defers without cross-collection row merging;
+14. single-prefix `robot_record.row_N.*` remains supported;
+15. invalid `operation=login` does not reclassify `table=audit` as metadata;
+16. provenance completeness is checked across CSV, markdown, colon KV, equals KV, numbered, and bulleted textual formats.
 
 ## Acceptance criteria
 

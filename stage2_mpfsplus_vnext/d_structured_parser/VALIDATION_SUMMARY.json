@@ -1,5 +1,5 @@
 {
-  "checkpoint": "Stage2-D-structured-parser-null",
+  "checkpoint": "Stage2-D-Patch2-candidate",
   "base_tag": "Stage2-A-C-FINAL",
   "base_commit": "f1fa49ddb8e6b920fb5a4237e088b6603579ae23",
   "config": "configs/stage2/v4_structured_parser.json",
@@ -10,12 +10,13 @@
     "total": 7
   },
   "validation": {
-    "dedicated_d_tests": "12/12 PASS",
+    "patch2_isolated_adversarial_checks": "PASS",
     "stage1_exact_parser_fixtures": "7/7 parser-level PASS",
-    "compatibility_subset": "PASS; no failures",
-    "full_fast_suite": "PASS; no failures",
-    "cpu_smoke": "PASS",
-    "prompt_pipeline_parser_consistency": "PASS"
+    "d3_null_policy_regression": "PASS",
+    "dedicated_d_suite_after_user_apply": "PENDING (16 test functions)",
+    "compatibility_subset_after_user_apply": "PENDING",
+    "full_fast_suite_after_user_apply": "PENDING",
+    "cpu_smoke_after_user_apply": "PENDING"
   },
   "claims": {
     "parser_regression_evidence": true,
@@ -32,5 +33,11 @@
     "14B",
     "token_limit_experiments",
     "public_benchmarks"
+  ],
+  "base_d_commit": "23f3249703301eeadf8d83d1814a59d48a410326",
+  "patch2_hardening": [
+    "multi_prefix_dotted_rows_defer_without_merge",
+    "semantic_validity_for_strong_control_context",
+    "textual_value_provenance_completeness"
   ]
 }

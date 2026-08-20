@@ -243,3 +243,76 @@ def test_d_context_only_table_name_is_not_control_without_strong_signal() -> Non
     payload = _d("table=literal_payload_value\nname=Alpha")
     assert payload.rows == [{"table": "literal_payload_value", "name": "Alpha"}]
     assert payload.collections[0].metadata.get("control_metadata") in (None, [])
+
+
+def test_d_multi_prefix_dotted_rows_defer_without_cross_collection_merge() -> None:
+    request = (
+        "operation=plain_insert\n"
+        "parent.row_1.id=P1\n"
+        "child.row_1.name=C1\n"
+        "parent.row_2.id=P2\n"
+        "child.row_2.name=C2\n"
+    )
+    legacy = parse_source_payload(request)
+    payload = _d(request)
+    assert [(c.collection_id, c.rows) for c in payload.collections] == [
+        (c.collection_id, c.rows) for c in legacy.collections
+    ]
+    assert all(
+        not ({"id", "name"} <= set(row))
+        for collection in payload.collections
+        for row in collection.rows
+    )
+
+
+def test_d_single_prefix_dotted_rows_still_segment_into_one_collection() -> None:
+    payload = _d(
+        "operation=plain_insert\n"
+        "robot_record.row_1.id=R1\n"
+        "robot_record.row_1.name=Alpha\n"
+        "robot_record.row_2.id=R2\n"
+        "robot_record.row_2.name=Beta\n"
+    )
+    assert len(payload.collections) == 1
+    collection = payload.collections[0]
+    assert collection.collection_id == "robot_record"
+    assert collection.rows == [
+        {"id": "R1", "name": "Alpha"},
+        {"id": "R2", "name": "Beta"},
+    ]
+
+
+def test_d_invalid_operation_alias_does_not_reclassify_table_payload() -> None:
+    payload = _d("operation=login\ntable=audit\nname=Alice")
+    assert payload.rows == [{"table": "audit", "name": "Alice"}]
+    assert payload.collections[0].metadata["control_metadata"] == [
+        {"operation": "login"}
+    ]
+
+
+def test_d_value_provenance_is_complete_across_textual_parser_forms() -> None:
+    cases = {
+        "csv": "id,name\n1,Alpha\n2,Beta",
+        "markdown": "| id | name |\n|---|---|\n|1|Alpha|\n|2|Beta|",
+        "colon_kv": "id: 1\nname: Alpha",
+        "equals_kv": "id=1\nname=Alpha",
+        "numbered": "1. id: 1, name: Alpha 2. id: 2, name: Beta",
+        "bulleted": "- id: 1, name: Alpha; - id: 2, name: Beta",
+    }
+    for case_name, request in cases.items():
+        payload = _d(request)
+        assert payload.collections, case_name
+        for collection in payload.collections:
+            traces = collection.metadata.get("value_provenance") or []
+            expected_cells = [
+                (row_index, field)
+                for row_index, row in enumerate(collection.rows)
+                for field in row
+            ]
+            observed_cells = [
+                (trace["row_index"], trace["field"])
+                for trace in traces
+            ]
+            assert sorted(observed_cells) == sorted(expected_cells), case_name
+            assert len(observed_cells) == len(set(observed_cells)), case_name
+            assert all(trace.get("row_id") for trace in traces), case_name

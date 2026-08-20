@@ -71,6 +71,51 @@ _D_CONTROL_METADATA_FIELDS = _CONTROL_METADATA_FIELDS | {
     "updatecolumns",
 }
 _D_STRONG_CONTROL_FIELDS = _D_CONTROL_METADATA_FIELDS - {"policy", "table"}
+
+# Stage-2 D must not infer a strong control context from a reserved-looking
+# field name alone.  These aliases mirror the frozen A control semantics and
+# are intentionally conservative.
+_D_OPERATION_VALUE_ALIASES = {
+    "upsert_update",
+    "upsert",
+    "insert_or_update",
+    "insert_update",
+    "do_update",
+    "insert_ignore",
+    "insert_or_ignore",
+    "do_nothing",
+    "plain_insert",
+    "insert",
+    "error_on_conflict",
+    "raise_on_conflict",
+    "fail_on_conflict",
+}
+_D_OPERATION_SEMANTIC_FIELDS = {"operation", "writeoperation", "operationtype"}
+_D_CONFLICT_ACTION_SEMANTIC_FIELDS = {
+    "conflict",
+    "conflictaction",
+    "conflictbehavior",
+    "conflictpolicy",
+    "duplicatepolicy",
+    "onconflict",
+    "onduplicate",
+}
+_D_CONFLICT_TARGET_SEMANTIC_FIELDS = {
+    "conflictkey",
+    "conflicttarget",
+    "conflicttargets",
+    "uniquekey",
+}
+_D_UPDATE_SEMANTIC_FIELDS = {
+    "update",
+    "updates",
+    "updatecolumns",
+    "requestedupdatecolumns",
+    "allowedupdates",
+    "excludedupdatecolumns",
+    "donotupdate",
+    "donotupdatecolumns",
+}
 _ROW_MARKER_KEY = re.compile(r"^(?:row|record)(?:[_ -]?id)?$", re.IGNORECASE)
 _ROW_HEADING = re.compile(
     r"^\s*(?P<label>(?:row|record)[ _-]?\d+)\s*:\s*$",
@@ -305,13 +350,63 @@ def _is_d_strong_control_field(raw: str) -> bool:
     )
 
 
+def _d_control_value_key(value: Any) -> str:
+    text, _ = _strip_matching_literal_quotes(str(value))
+    text = text.strip().casefold()
+    text = re.sub(r"[\s-]+", "_", text)
+    return re.sub(r"_+", "_", text).strip("_")
+
+
+def _looks_like_d_identifier_list(value: Any) -> bool:
+    text, _ = _strip_matching_literal_quotes(str(value))
+    text = text.strip()
+    if not text:
+        return False
+    parts = [part.strip() for part in re.split(r"[,;]", text) if part.strip()]
+    if not parts:
+        return False
+    return all(
+        re.fullmatch(
+            r"(?:[A-Za-z_][A-Za-z0-9_]*)(?:\.(?:[A-Za-z_][A-Za-z0-9_]*))*",
+            part,
+        )
+        is not None
+        for part in parts
+    )
+
+
+def _is_high_confidence_d_control_signal(field: str, value: Any) -> bool:
+    """Return whether a field/value pair proves D control context.
+
+    Context-only names such as ``table`` and ``policy`` are deliberately not
+    sufficient.  In particular, ``operation=login`` must not reclassify a
+    neighboring payload field named ``table``.
+    """
+    canonical = _canonical_field_name(field)
+    if canonical in _D_OPERATION_SEMANTIC_FIELDS:
+        return _d_control_value_key(value) in _D_OPERATION_VALUE_ALIASES
+    if canonical in _D_CONFLICT_ACTION_SEMANTIC_FIELDS:
+        return _d_control_value_key(value) in _D_OPERATION_VALUE_ALIASES
+    if (
+        canonical in _D_CONFLICT_TARGET_SEMANTIC_FIELDS
+        or canonical.endswith("conflictkey")
+        or canonical.endswith("conflicttarget")
+    ):
+        return _looks_like_d_identifier_list(value)
+    if canonical in _D_UPDATE_SEMANTIC_FIELDS or canonical.endswith("updatecolumns"):
+        return _looks_like_d_identifier_list(value)
+    return False
+
+
 def _is_d_control_metadata_row(row: dict[str, Any]) -> bool:
     if not row:
         return False
-    fields = list(row)
     return (
-        all(_is_d_control_metadata_field(field) for field in fields)
-        and any(_is_d_strong_control_field(field) for field in fields)
+        all(_is_d_control_metadata_field(field) for field in row)
+        and any(
+            _is_high_confidence_d_control_signal(field, value)
+            for field, value in row.items()
+        )
     )
 
 
@@ -1044,6 +1139,7 @@ def _detect_numbered_key_value_records(
     spans: list[tuple[int, int]] = []
     for sequence, run in enumerate(runs, start=1):
         grouped_rows: dict[str, list[dict[str, Any]]] = {}
+        grouped_traces: dict[str, list[dict[str, Any]]] = {}
         record_spans: list[tuple[int, int]] = []
         for marker_index, marker in enumerate(run):
             start = marker.end()
@@ -1054,6 +1150,7 @@ def _detect_numbered_key_value_records(
             )
             body, record_end = _record_body(text, start, end)
             row: dict[str, Any] = {}
+            row_traces: list[dict[str, Any]] = []
             section_id: str | None = None
             section_match = re.match(
                 r"([^:,\n]{1,80})\s*:\s*(.*)\Z",
@@ -1074,7 +1171,14 @@ def _detect_numbered_key_value_records(
                     key = field_match.group(1).strip()
                     value = field_match.group(2).strip().rstrip(",")
                     if key and value:
-                        _store_colon_field(row, key, value, parser_config)
+                        _store_colon_field(
+                            row,
+                            key,
+                            value,
+                            parser_config,
+                            traces=row_traces,
+                            row_index=0,
+                        )
             else:
                 for field_match in re.finditer(
                     r"(?:^|,\s*)([^,:;\n]{1,80})\s*:\s*"
@@ -1085,11 +1189,23 @@ def _detect_numbered_key_value_records(
                     key = field_match.group(1).strip()
                     value = field_match.group(2).strip().rstrip(",")
                     if key and value:
-                        _store_colon_field(row, key, value, parser_config)
+                        _store_colon_field(
+                            row,
+                            key,
+                            value,
+                            parser_config,
+                            traces=row_traces,
+                            row_index=0,
+                        )
             minimum_fields = 1 if section_id else 2
             if len(row) >= minimum_fields:
                 group_key = section_id or f"section_{sequence}"
-                grouped_rows.setdefault(group_key, []).append(row)
+                group_rows = grouped_rows.setdefault(group_key, [])
+                row_index = len(group_rows)
+                group_rows.append(row)
+                for trace in row_traces:
+                    trace["row_index"] = row_index
+                grouped_traces.setdefault(group_key, []).extend(row_traces)
                 record_spans.append((marker.start(), record_end))
         if sum(len(rows) for rows in grouped_rows.values()) >= 2:
             for group_index, (group_key, rows) in enumerate(
@@ -1105,6 +1221,11 @@ def _detect_numbered_key_value_records(
                         source_format="key_value",
                         rows=rows,
                         fields=_field_order(rows),
+                        metadata=(
+                            {"value_provenance": grouped_traces[group_key]}
+                            if grouped_traces.get(group_key)
+                            else {}
+                        ),
                     )
                 )
             spans.append(
@@ -1131,6 +1252,7 @@ def _detect_bulleted_key_value_records(
     if len(markers) < 2:
         return _Detected([], [])
     rows: list[dict[str, Any]] = []
+    value_traces: list[dict[str, Any]] = []
     for marker_index, marker in enumerate(markers):
         start = marker.end()
         end = (
@@ -1141,6 +1263,7 @@ def _detect_bulleted_key_value_records(
         body, record_end = _record_body(text, start, end)
         body = body.rstrip(";")
         row: dict[str, Any] = {}
+        row_traces: list[dict[str, Any]] = []
         for field_match in re.finditer(
             r"(?:^|,\s*)([^,:;\n]{1,80})\s*:\s*"
             r"(.*?)(?=,\s*[^,:;\n]{1,80}\s*:|\Z)",
@@ -1150,9 +1273,17 @@ def _detect_bulleted_key_value_records(
             key = field_match.group(1).strip()
             value = field_match.group(2).strip().rstrip(",")
             if key and value:
-                _store_colon_field(row, key, value, parser_config)
+                _store_colon_field(
+                    row,
+                    key,
+                    value,
+                    parser_config,
+                    traces=row_traces,
+                    row_index=len(rows),
+                )
         if len(row) >= 2:
             rows.append(row)
+            value_traces.extend(row_traces)
             end = record_end
     if len(rows) < 2:
         return _Detected([], [])
@@ -1164,6 +1295,11 @@ def _detect_bulleted_key_value_records(
                 source_format="key_value",
                 rows=rows,
                 fields=_field_order(rows),
+                metadata=(
+                    {"value_provenance": value_traces}
+                    if value_traces
+                    else {}
+                ),
             )
         ],
         [(markers[0].start(), end)],
@@ -1293,6 +1429,13 @@ def _detect_explicit_equals_rows(
     except ValueError:
         return _Detected([], [])
 
+    # A dotted explicit-row grammar is only supported for one collection
+    # prefix at this checkpoint.  Multiple prefixes (for example parent/child)
+    # must never be merged by row label.  Defer to the historical parser path
+    # instead of inventing a multi-collection interpretation here.
+    if len(dotted_prefixes) > 1:
+        return _Detected([], [])
+
     rows = [rows_by_label[label] for label in row_order if rows_by_label[label]]
     if unknown_pre_row_assignment or len(rows) < 2:
         return _Detected([], [])
@@ -1418,16 +1561,19 @@ def _detect_equals_key_value_records(
     controls: dict[str, Any] = {}
     target_table = ""
     d_strong_control_context = parser_config.enabled and any(
-        _is_d_strong_control_field(match.group(1).strip())
+        _is_high_confidence_d_control_signal(
+            match.group(1).strip(),
+            match.group(2),
+        )
         for match in matches
     )
     data_items: list[
-        tuple[re.Match[str], str, str, str, Any]
+        tuple[re.Match[str], str, str, str, Any, dict[str, Any] | None]
     ] = []
     for match in matches:
         raw_key, raw_value = match.groups()
         key = raw_key.strip()
-        value, _ = _normalize_source_text_value(
+        value, trace = _normalize_source_text_value(
             raw_value,
             parser_config,
         )
@@ -1464,16 +1610,28 @@ def _detect_equals_key_value_records(
             controls[key] = value
             continue
         data_items.append(
-            (match, collection_name, record_id, field, value)
+            (match, collection_name, record_id, field, value, trace)
         )
 
     if not data_items:
         return _Detected([], [])
     grouped: dict[str, dict[str, dict[str, Any]]] = {}
     group_spans: dict[str, list[tuple[int, int]]] = {}
-    for match, collection_name, record_id, field, value in data_items:
+    group_traces: dict[str, list[dict[str, Any]]] = {}
+    record_indexes: dict[str, dict[str, int]] = {}
+    for match, collection_name, record_id, field, value, trace in data_items:
         rows = grouped.setdefault(collection_name, {})
-        rows.setdefault(record_id, {})[field] = value
+        indexes = record_indexes.setdefault(collection_name, {})
+        if record_id not in rows:
+            rows[record_id] = {}
+            indexes[record_id] = len(indexes)
+        rows[record_id][field] = value
+        _append_value_trace(
+            group_traces.setdefault(collection_name, []),
+            row_index=indexes[record_id],
+            field=field,
+            trace=trace,
+        )
         group_spans.setdefault(collection_name, []).append(match.span())
 
     collections: list[SourceCollection] = []
@@ -1499,6 +1657,11 @@ def _detect_equals_key_value_records(
                     "control_metadata": [dict(controls)]
                     if controls
                     else [],
+                    **(
+                        {"value_provenance": group_traces[collection_name]}
+                        if group_traces.get(collection_name)
+                        else {}
+                    ),
                 },
             )
         )

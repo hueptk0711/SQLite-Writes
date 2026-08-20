@@ -2,7 +2,7 @@
 
 ## Status
 
-Checkpoint implementation for reviewer inspection. A–C are frozen at tag `Stage2-A-C-FINAL` and are not modified by this intervention.
+Patch-2 hardening candidate after reviewer inspection. A–C remain frozen at tag `Stage2-A-C-FINAL` and are not modified by this intervention. D3 NULL semantics, V4 config, row IDs, and prompt/pipeline integration remain unchanged.
 
 ## Failure hypothesis
 
@@ -116,6 +116,54 @@ field
 ```
 
 This makes NULL coercion auditable and keeps normalization separate from the source token.
+
+## D Patch 2 — trust-boundary hardening
+
+Reviewer inspection of the first D checkpoint identified three parser-boundary issues. Patch 2 changes only these points.
+
+### D1.1 — Multi-prefix dotted rows fail/defer conservatively
+
+The explicit D repeated-row detector supports a single dotted collection prefix, for example:
+
+```text
+robot_record.row_1.id=R1
+robot_record.row_2.id=R2
+```
+
+If more than one distinct prefix appears in the same explicit dotted-row request, for example `parent.row_N.*` and `child.row_N.*`, the D detector does not group rows by the row label alone. It returns no D-specific parse and defers to the historical parser path. The checkpoint deliberately does not add a new multi-collection grammar.
+
+This invariant prevents:
+
+```text
+parent.row_1.id + child.row_1.name -> one fabricated row
+```
+
+### D2.1 — Strong control context requires semantic validity
+
+D no longer treats the presence of a strong-looking field name as sufficient evidence for broad metadata reclassification. A neighboring context-only name such as `table`/`policy` is reclassified only when at least one field/value pair carries a high-confidence control signal.
+
+For `operation`, Patch 2 mirrors the frozen A exact-alias contract. Thus:
+
+```text
+operation=plain_insert -> strong control signal
+operation=login        -> not a strong control signal
+```
+
+The second case therefore cannot cause `table=audit` to be removed from payload merely because the field is named `operation`.
+
+### D4.1 — Provenance completeness across textual parser forms
+
+When `emit_value_provenance=true`, every payload cell emitted by the supported textual parsers now has exactly one value-provenance trace for:
+
+- CSV/TSV;
+- markdown tables;
+- colon key-value sections;
+- equals key-value sections;
+- numbered key-value records;
+- bulleted key-value records;
+- explicit D repeated rows.
+
+The trace is finalized with `row_id` after collection row IDs are assigned.
 
 ## Integration boundary
 

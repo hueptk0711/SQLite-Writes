@@ -34,6 +34,13 @@
 
 A–C are frozen at `Stage2-A-C-FINAL` (`f1fa49ddb8e6b920fb5a4237e088b6603579ae23`). D uses their existing interfaces and does not tune their logic.
 
+## D Patch 2 — parser trust-boundary hardening
+
+- multi-prefix dotted repeated rows now defer to the historical path instead of grouping across prefixes by row label;
+- strong D control context now requires a high-confidence field/value semantic signal, so invalid `operation=login` cannot reclassify `table=audit`;
+- numbered, bulleted, and equals key-value parser paths now retain payload-cell value provenance;
+- added adversarial regression coverage for multi-prefix safety, single-prefix retention, invalid operation aliases, and provenance completeness across textual parser forms.
+
 ## D — structured parser / NULL handling
 
 - added independently ablatable `structured_source_parser` config and V4 variant;
