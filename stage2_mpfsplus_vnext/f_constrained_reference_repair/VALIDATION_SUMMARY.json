@@ -1,5 +1,5 @@
 {
-  "checkpoint": "Stage2-F-Patch1-candidate",
+  "checkpoint": "Stage2-F-Patch2-candidate",
   "branch": "stage2/f-constrained-reference-repair",
   "frozen_parent_tag": "Stage2-E-FINAL",
   "frozen_parent_commit": "7b9c4ef616fc2414fccba2cbe6b22016a3ed39b4",
@@ -15,16 +15,22 @@
     "REF_UNKNOWN_COLUMN": 28,
     "REF_INVALID_SOURCE_REF": 7,
     "classification": {
-      "REPAIRABLE_REFERENCE_ONLY": 14,
+      "REPAIRABLE_REFERENCE_ONLY": 13,
       "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE": 10,
-      "NON_REPAIRABLE_REFERENCE": 11
+      "NON_REPAIRABLE_REFERENCE": 12
     },
-    "claim_scope": "development_diagnostic_regression_only"
+    "claim_scope": "development_diagnostic_regression_only",
+    "f_eligible_repair_rule_counts": {
+      "unique_exact_identifier_name": 70,
+      "unique_closed_set_candidate": 0
+    }
   },
   "isolated_validation": {
-    "dedicated_f": "35/35 PASS",
-    "frozen_e_plus_d": "56/56 PASS",
-    "cpu_smoke_f": "PASS"
+    "replacement_slot_collision_guards": "PASS",
+    "two_invalid_refs_atomic_rollback": "PASS",
+    "non_collision_reference_repair": "PASS",
+    "stage1_f_eligibility_reclassification": "PASS",
+    "dedicated_f": "PENDING_REAL_REPOSITORY; expected 39 pytest cases"
   },
   "real_repository_validation": {
     "dedicated_f": "PENDING",
@@ -48,7 +54,8 @@
     "single boundary retry only; newly surfaced reference failures are not recursively repaired",
     "non-reference semantics are preserved",
     "repair_succeeded is finalized only after revalidation",
-    "repair provenance is mandatory"
+    "repair provenance is mandatory",
+    "replacement-key collision fails closed before mutation and rolls back the repair batch atomically"
   ],
   "not_run": [
     "G",
@@ -59,5 +66,6 @@
     "7B",
     "14B"
   ],
-  "resulting_commit": "TO_BE_RECORDED_AFTER_USER_COMMIT"
+  "resulting_commit": "TO_BE_RECORDED_AFTER_USER_COMMIT",
+  "patch1_base_commit": "bfc77d5d5710791a29859db903e3b89c8d7d2057"
 }

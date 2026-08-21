@@ -59,7 +59,9 @@ F never cross-repairs between reference kinds.
 
 ## F4 — Non-reference semantic invariance
 
-Repair changes only the invalid reference token in a deep-copied generated plan. It must not modify:
+Repair changes only the invalid reference token in a deep-copied generated plan. Before any dictionary-key mutation, F must verify that the replacement key does not already exist in the same structural container. If it does, the entire repair batch fails closed and the copied plan is rolled back to its pre-repair state. F never overwrites, merges, or chooses a winner between colliding assignments.
+
+It must not modify:
 
 - source/evidence value;
 - raw evidence span or offsets;
@@ -138,15 +140,15 @@ REF_UNKNOWN_COLUMN       28
 REF_INVALID_SOURCE_REF    7
 ```
 
-Diagnostic classification used for regression design:
+Diagnostic classification used for regression design is computed under the actual F eligibility whitelist (table, target column excluding `update_column_ids`, source collection/selector/field; excluding conflict target, evidence, and update-column semantics):
 
 ```text
-REPAIRABLE_REFERENCE_ONLY                     14
+REPAIRABLE_REFERENCE_ONLY                     13
 REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE  10
-NON_REPAIRABLE_REFERENCE                      11
+NON_REPAIRABLE_REFERENCE                      12
 ```
 
-These counts are development evidence only. `REPAIRABLE_REFERENCE_ONLY=14` must **not** be reported as 14 rescued samples. Whole-pipeline target-state correctness has not been established at this checkpoint.
+The 70 F-eligible proposed repairs in this diagnostic set use `unique_exact_identifier_name`; none use the singleton fallback. These are development counts only. `REPAIRABLE_REFERENCE_ONLY=13` must **not** be reported as 13 rescued samples. Whole-pipeline target-state correctness has not been established at this checkpoint.
 
 ## Explicitly out of scope
 
@@ -158,3 +160,13 @@ These counts are development evidence only. `REPAIRABLE_REFERENCE_ONLY=14` must 
 - G diagnostic-driven targeted repair;
 - full A-G causal replay;
 - GPU / 3B / 5B / 7B / 14B runs.
+
+## Patch 2 — replacement-slot collision invariant
+
+Patch 2 hardens key-based repairs in three structural containers:
+
+- semi-structured source-field keys;
+- semi-structured constant target-column keys;
+- free-text row target-column keys.
+
+If the selected replacement key already exists and differs from the invalid key, F records `replacement_slot_collision`, leaves `repair_applied=false`, returns `FAIL_CLOSED`, and rolls back any earlier mutations from the same repair batch. This also prevents two invalid references from collapsing onto the same valid key.

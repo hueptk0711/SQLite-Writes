@@ -1,98 +1,65 @@
-# Stage 2-F Patch 1 Checkpoint Report
+# Stage 2-F Patch 2 Checkpoint Report
 
 ## Objective
 
-Implement constrained reference repair on top of frozen `Stage2-E-FINAL` without reopening A-E.
+Close the final Patch-1 safety blocker without changing F architecture: a reference repair must never overwrite an already-existing structural slot. Regenerate Stage-1 diagnostic classification using the actual F eligibility whitelist.
 
-## Frozen base
-
-```text
-Stage2-E-FINAL
-7b9c4ef616fc2414fccba2cbe6b22016a3ed39b4
-```
-
-## Final Patch-1 architecture
-
-F is a pipeline-level retry wrapper. It does not add F parameters to frozen planner/reference/materializer functions.
+## Git base
 
 ```text
-normal V5 reference/materialization boundary
-        ↓ invalid diagnostic
-F repairs eligible reference on a deep copy
-        ↓
-normal V5 boundary rerun exactly once
-        ↓
-pass or fail closed
+Stage2-F Patch 1
+bfc77d5d5710791a29859db903e3b89c8d7d2057
 ```
 
-## Implemented
+Frozen parent remains `Stage2-E-FINAL` (`7b9c4ef616fc2414fccba2cbe6b22016a3ed39b4`).
 
-- independent V6 `constrained_reference_repair` configuration;
-- one closed-set deterministic repair helper;
-- valid-reference and missing-slot trust boundaries;
-- exact identifier-name anchor without fuzzy matching;
-- singleton closed-set fallback;
-- eligible structural kinds: table, column, source collection/selector/field;
-- protected non-F semantics: evidence selection, conflict target, update columns;
-- mandatory repair provenance finalized only after revalidation;
-- no recursive second repair when retry exposes a new reference failure;
-- V5/V6 disabled identity and prompt identity checks;
-- Stage-1 reference-failure diagnostic classification fixture;
-- dedicated/adversarial tests and CPU smoke.
+## Patch-2 changes
 
-## Diagnostic evidence
+1. Adds pre-mutation replacement-key collision guards for source-field keys, constants keys, and free-text row column keys.
+2. Collision is fail-closed: no overwrite, no merge, no first/second-wins policy.
+3. If a later diagnostic in the same repair batch collides after an earlier safe mutation, the whole copied-plan repair batch is rolled back atomically.
+4. Adds four reviewer-requested adversarial collision tests.
+5. Regenerates the 35-case Stage-1 F classification under the implementation whitelist.
+6. Separately records exact-name vs singleton diagnostic repair-rule counts.
 
-35 Stage-1 first reference failures were classified before treating them as regression targets:
-
-| Class | Count | Interpretation |
-|---|---:|---|
-| `REPAIRABLE_REFERENCE_ONLY` | 14 | all audited blockers are reference errors classified as locally repairable under the F contract |
-| `REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE` | 10 | at least one reference error is locally repairable but other blockers remain; no sample-level rescue claim is permitted |
-| `NON_REPAIRABLE_REFERENCE` | 11 | current F contract must fail closed |
-
-This classification is diagnostic/development evidence only.
-
-## Isolated/cumulative validation before release
+## Updated Stage-1 diagnostic classification
 
 ```text
-Dedicated F pytest cases: 35/35 PASS
-Frozen E + D regression:   56/56 PASS
-CPU smoke F:               PASS
+REPAIRABLE_REFERENCE_ONLY                     13
+REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE  10
+NON_REPAIRABLE_REFERENCE                      12
 ```
 
-CPU smoke verifies:
+Specific corrections:
 
-- unique exact identifier-name selection;
-- singleton closed-set selection;
-- ambiguous closed-set fail-closed behavior;
-- valid references never repaired;
-- missing references not auto-filled or counted as attempts;
-- no fuzzy similarity;
-- protected evidence semantics;
-- non-reference semantics preserved;
-- repair success finalized only after revalidation;
-- one-retry/no-recursion contract;
-- V5/V6 prompt identity;
-- free-text pipeline repair;
-- 35-case Stage-1 classification manifest.
+- `final_vaccine_018`: `NON_REPAIRABLE_REFERENCE`, because `conflict_target_id` is protected by F.
+- `final_vaccine_033`: remains partial, but F-eligible repair count is 8 rather than 12 because four `update_column_ids` repairs are protected.
 
-## Real-repository validation required before commit
+F-eligible proposed repair rules in the diagnostic set:
 
-The user's actual branch must still run:
+```text
+unique_exact_identifier_name  70
+unique_closed_set_candidate    0
+```
 
-1. `tests/test_stage2_vnext_f.py`;
-2. frozen E and D suites;
-3. A-F compatibility subset;
-4. full fast suite;
-5. CPU smoke F;
-6. CPU smoke E and D.
+These are diagnostic/development counts only and are not an end-to-end rescue rate.
 
-Only results from the user's real branch may be used as final reviewer evidence.
+## Isolated Patch-2 validation
 
-## Claims not made
+- Python syntax: PASS.
+- Existing non-collision exact-name repair: PASS.
+- free-text existing-valid-key collision: PASS / fail closed.
+- source-field key collision: PASS / fail closed.
+- constants key collision: PASS / fail closed.
+- two-invalid-refs-to-one-replacement atomic rollback: PASS / fail closed.
+- regenerated classification contract: PASS.
 
-- no Stage-1 end-to-end rescue rate;
-- no causal effect estimate;
-- no fresh development result;
-- no GPU/model result;
-- no 7B result.
+Full F/E/D, A-F compatibility, full-fast, and CPU smoke must be rerun on the user's real repository before commit.
+
+## Not changed
+
+V5→V6 isolation, prompt identity, deep-copy architecture, evidence/conflict/update protection, no-fuzzy rule, missing-slot policy, one-retry contract, and revalidation semantics remain unchanged.
+
+## Not run
+
+No G, no causal replay, no GPU, no 7B/model run.

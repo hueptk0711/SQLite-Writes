@@ -1,15 +1,15 @@
 {
   "source": "Stage1 final diagnostic replay/manual audit-derived reference classification",
   "evidence_scope": "development_diagnostic_regression_only",
-  "warning": "These labels define regression expectations only. REPAIRABLE_REFERENCE_ONLY does not mean end-to-end rescue.",
+  "warning": "These labels define regression expectations under the actual Stage2-F eligibility whitelist only. REPAIRABLE_REFERENCE_ONLY does not mean end-to-end rescue.",
   "first_failure_counts": {
     "REF_UNKNOWN_COLUMN": 28,
     "REF_INVALID_SOURCE_REF": 7
   },
   "counts": {
-    "NON_REPAIRABLE_REFERENCE": 11,
+    "NON_REPAIRABLE_REFERENCE": 12,
     "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE": 10,
-    "REPAIRABLE_REFERENCE_ONLY": 14
+    "REPAIRABLE_REFERENCE_ONLY": 13
   },
   "cases": [
     {
@@ -243,9 +243,9 @@
       "sample_id": "final_vaccine_018",
       "first_failure_code": "REF_INVALID_SOURCE_REF",
       "plan_kind": "free_text",
-      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "classification": "NON_REPAIRABLE_REFERENCE",
       "reference_error_count": 1,
-      "repairable_reference_error_count": 1,
+      "repairable_reference_error_count": 0,
       "other_error_codes": []
     },
     {
@@ -254,7 +254,7 @@
       "plan_kind": "free_text",
       "classification": "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE",
       "reference_error_count": 12,
-      "repairable_reference_error_count": 12,
+      "repairable_reference_error_count": 8,
       "other_error_codes": [
         "MISSING_UPDATE_COLUMN_IDS"
       ]
@@ -353,5 +353,23 @@
       "repairable_reference_error_count": 1,
       "other_error_codes": []
     }
-  ]
+  ],
+  "f_eligible_repair_rule_counts": {
+    "unique_exact_identifier_name": 70,
+    "unique_closed_set_candidate": 0
+  },
+  "eligibility_contract": {
+    "eligible_reference_kinds": [
+      "table",
+      "column_excluding_update_column_ids",
+      "source_collection",
+      "source_selector",
+      "source_field"
+    ],
+    "protected_non_repairable": [
+      "conflict_target",
+      "evidence",
+      "update_columns"
+    ]
+  }
 }

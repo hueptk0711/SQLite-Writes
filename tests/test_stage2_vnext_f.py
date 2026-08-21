@@ -683,9 +683,13 @@ def test_f_stage1_classification_fixture_is_diagnostic_only_and_locked() -> None
     )
     assert fixture["evidence_scope"] == "development_diagnostic_regression_only"
     assert fixture["counts"] == {
-        "REPAIRABLE_REFERENCE_ONLY": 14,
+        "NON_REPAIRABLE_REFERENCE": 12,
         "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE": 10,
-        "NON_REPAIRABLE_REFERENCE": 11,
+        "REPAIRABLE_REFERENCE_ONLY": 13,
+    }
+    assert fixture["f_eligible_repair_rule_counts"] == {
+        "unique_exact_identifier_name": 70,
+        "unique_closed_set_candidate": 0,
     }
     assert len(fixture["cases"]) == 35
     assert sum(case["reference_error_count"] for case in fixture["cases"]) > 35
@@ -699,3 +703,123 @@ def test_f_stage1_known_examples_keep_expected_classification() -> None:
     assert rows["final_archeology_027"]["classification"] == "REPAIRABLE_REFERENCE_ONLY"
     assert rows["final_archeology_016"]["classification"] == "NON_REPAIRABLE_REFERENCE"
     assert rows["final_archeology_021"]["classification"] == "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE"
+    assert rows["final_vaccine_018"]["classification"] == "NON_REPAIRABLE_REFERENCE"
+    assert rows["final_vaccine_018"]["repairable_reference_error_count"] == 0
+    assert rows["final_vaccine_033"]["classification"] == "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE"
+    assert rows["final_vaccine_033"]["repairable_reference_error_count"] == 8
+
+
+def test_f_free_text_repair_does_not_overwrite_existing_valid_column_key() -> None:
+    profile = _free_text_profile()
+    table = profile["tables"][0]
+    columns = {c["name"]: c["column_id"] for c in table["columns"]}
+    raw = f"{table['table_id']}.event_id"
+    plan = _free_text_plan("Insert value Z9", profile)
+    row = plan["write_groups"][0]["rows"][0]
+    row[raw] = {"value_from": "e2", "normalization": "identity"}
+    original = deepcopy(plan)
+    diagnostic = _diag(
+        "UNKNOWN_COLUMN_ID",
+        f"/write_groups/0/rows/0/{raw}",
+        list(columns.values()),
+    )
+    outcome = repair_free_text_plan_after_diagnostics(
+        plan, profile, [diagnostic], _config()
+    )
+    assert plan == original
+    assert outcome.plan == original
+    assert not outcome.applied
+    assert len(outcome.traces) == 1
+    trace = outcome.traces[0]
+    assert trace["repair_attempted"] is True
+    assert trace["repair_applied"] is False
+    assert trace["repair_succeeded"] is False
+    assert trace["replacement_reference"] == columns["event_id"]
+    assert trace["repair_rule"] == "replacement_slot_collision"
+    assert trace["validation_after"] == "FAIL_CLOSED"
+
+
+def test_f_mapping_source_field_repair_does_not_overwrite_existing_source_key() -> None:
+    profile, payload, plan, _, columns = _semi_profile_and_plan()
+    group = plan["target_groups"][0]
+    group["field_mapping"]["c9.id"] = columns["name"]
+    original = deepcopy(plan)
+    collection = payload.collections[0]
+    diagnostic = _diag(
+        "UNKNOWN_SOURCE_FIELD_ID",
+        "/target_groups/0/field_mapping/c9.id",
+        list(collection.field_ids.values()),
+    )
+    outcome = repair_mapping_plan_after_diagnostics(
+        plan, payload, profile, [diagnostic], _config()
+    )
+    assert plan == original
+    assert outcome.plan == original
+    assert not outcome.applied
+    trace = outcome.traces[0]
+    assert trace["repair_applied"] is False
+    assert trace["replacement_reference"] == collection.field_ids["id"]
+    assert trace["repair_rule"] == "replacement_slot_collision"
+    assert trace["validation_after"] == "FAIL_CLOSED"
+
+
+def test_f_mapping_constant_repair_does_not_overwrite_existing_column_key() -> None:
+    profile, payload, plan, parent, columns = _semi_profile_and_plan()
+    group = plan["target_groups"][0]
+    raw = f"{parent['table_id']}.id"
+    group["constants"] = {
+        columns["id"]: "Alice",
+        raw: "Bob",
+    }
+    original = deepcopy(plan)
+    diagnostic = _diag(
+        "UNKNOWN_COLUMN_ID",
+        f"/target_groups/0/constants/{raw}",
+        list(columns.values()),
+        details={"predicted_column_id": raw},
+    )
+    outcome = repair_mapping_plan_after_diagnostics(
+        plan, payload, profile, [diagnostic], _config()
+    )
+    assert plan == original
+    assert outcome.plan == original
+    assert not outcome.applied
+    trace = outcome.traces[0]
+    assert trace["repair_applied"] is False
+    assert trace["replacement_reference"] == columns["id"]
+    assert trace["repair_rule"] == "replacement_slot_collision"
+    assert trace["validation_after"] == "FAIL_CLOSED"
+
+
+def test_f_two_invalid_references_cannot_collapse_to_same_replacement() -> None:
+    profile = _free_text_profile()
+    table = profile["tables"][0]
+    columns = {c["name"]: c["column_id"] for c in table["columns"]}
+    raw_a = f"{table['table_id']}.event_id"
+    raw_b = f"{table['table_id']}.EVENT_ID"
+    plan = _free_text_plan("Insert value Z9", profile, raw_column=raw_a)
+    row = plan["write_groups"][0]["rows"][0]
+    row[raw_b] = {"value_from": "e2", "normalization": "identity"}
+    original = deepcopy(plan)
+    diagnostics = [
+        _diag(
+            "UNKNOWN_COLUMN_ID",
+            f"/write_groups/0/rows/0/{raw_a}",
+            list(columns.values()),
+        ),
+        _diag(
+            "UNKNOWN_COLUMN_ID",
+            f"/write_groups/0/rows/0/{raw_b}",
+            list(columns.values()),
+        ),
+    ]
+    outcome = repair_free_text_plan_after_diagnostics(
+        plan, profile, diagnostics, _config()
+    )
+    assert plan == original
+    assert outcome.plan == original
+    assert not outcome.applied
+    assert len(outcome.traces) == 2
+    assert all(trace["repair_applied"] is False for trace in outcome.traces)
+    assert outcome.traces[-1]["repair_rule"] == "replacement_slot_collision"
+    assert all(trace["validation_after"] == "FAIL_CLOSED" for trace in outcome.traces)

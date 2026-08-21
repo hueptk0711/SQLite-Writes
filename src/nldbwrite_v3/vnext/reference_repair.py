@@ -277,14 +277,44 @@ def _table_for_group(
     return table_reference_map(profile).get(str(group.get("table_id") or ""))
 
 
-def _append_result(
+def _replacement_slot_collision_trace(
     result: ReferenceRepairResult,
-    traces: list[dict[str, Any]],
-) -> str | None:
-    traces.append(deepcopy(result.trace))
-    if result.applied and result.replacement is not None:
-        return result.replacement
-    return None
+) -> dict[str, Any]:
+    trace = deepcopy(result.trace)
+    trace.update(
+        repair_applied=False,
+        repair_succeeded=False,
+        repair_rule="replacement_slot_collision",
+        repair_reason=(
+            "replacement reference already exists in the same structural container; "
+            "Stage2-F fails closed instead of overwriting or merging assignments"
+        ),
+        validation_after="FAIL_CLOSED",
+    )
+    return trace
+
+
+def _rollback_batch_after_collision(
+    traces: Sequence[Mapping[str, Any]],
+    collision_trace: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    output: list[dict[str, Any]] = []
+    for raw_trace in traces:
+        trace = deepcopy(dict(raw_trace))
+        if trace.get("repair_applied"):
+            trace["repair_applied"] = False
+            trace["repair_succeeded"] = False
+            trace["validation_after"] = "FAIL_CLOSED"
+            prior_reason = str(trace.get("repair_reason") or "").rstrip()
+            trace["repair_reason"] = (
+                prior_reason
+                + ("; " if prior_reason else "")
+                + "repair batch rolled back because another replacement would collide "
+                "with an existing structural slot"
+            )
+        output.append(trace)
+    output.append(deepcopy(dict(collision_trace)))
+    return output
 
 
 def repair_mapping_plan_after_diagnostics(
@@ -315,6 +345,7 @@ def repair_mapping_plan_after_diagnostics(
         group = groups[index]
         result: ReferenceRepairResult | None = None
         apply = None
+        collision_check = None
 
         if diagnostic.error_code == "UNKNOWN_SOURCE_COLLECTION_ID":
             raw = str(group.get("source_collection_id") or "")
@@ -380,6 +411,10 @@ def repair_mapping_plan_after_diagnostics(
                 validation_before=diagnostic.error_code,
             )
 
+            def collision_check(value: str, *, old=raw_key, target=group) -> bool:
+                field_mapping = target.get("field_mapping") or {}
+                return value != old and value in field_mapping
+
             def apply(value: str, *, old=raw_key, target=group) -> None:
                 field_mapping = target.get("field_mapping") or {}
                 if old in field_mapping:
@@ -427,6 +462,10 @@ def repair_mapping_plan_after_diagnostics(
             elif "/constants/" in diagnostic.path:
                 old_key = diagnostic.path.split("/constants/", 1)[1]
 
+                def collision_check(value: str, *, old=old_key, target=group) -> bool:
+                    constants = target.get("constants") or {}
+                    return value != old and value in constants
+
                 def apply(value: str, *, old=old_key, target=group) -> None:
                     constants = target.get("constants") or {}
                     if old in constants:
@@ -452,7 +491,18 @@ def repair_mapping_plan_after_diagnostics(
 
         if result is None:
             continue
-        replacement = _append_result(result, traces)
+        replacement = result.replacement if result.applied else None
+        if (
+            replacement is not None
+            and collision_check is not None
+            and collision_check(replacement)
+        ):
+            collision_trace = _replacement_slot_collision_trace(result)
+            return ReferencePlanRepairOutcome(
+                deepcopy(mapping_plan),
+                _rollback_batch_after_collision(traces, collision_trace),
+            )
+        traces.append(deepcopy(result.trace))
         if replacement is not None and apply is not None:
             apply(replacement)
 
@@ -486,6 +536,7 @@ def repair_free_text_plan_after_diagnostics(
         group = groups[group_index]
         result: ReferenceRepairResult | None = None
         apply = None
+        collision_check = None
 
         if diagnostic.error_code == "UNKNOWN_TABLE_ID":
             raw = str(group.get("table_id") or "")
@@ -531,6 +582,9 @@ def repair_free_text_plan_after_diagnostics(
                 },
                 validation_before=diagnostic.error_code,
             )
+
+            def collision_check(value: str, *, row=rows[row_index], old=raw_key) -> bool:
+                return value != old and value in row
 
             def apply(value: str, *, row=rows[row_index], old=raw_key) -> None:
                 value_spec = row.pop(old)
@@ -581,7 +635,18 @@ def repair_free_text_plan_after_diagnostics(
 
         if result is None:
             continue
-        replacement = _append_result(result, traces)
+        replacement = result.replacement if result.applied else None
+        if (
+            replacement is not None
+            and collision_check is not None
+            and collision_check(replacement)
+        ):
+            collision_trace = _replacement_slot_collision_trace(result)
+            return ReferencePlanRepairOutcome(
+                deepcopy(reference_plan),
+                _rollback_batch_after_collision(traces, collision_trace),
+            )
+        traces.append(deepcopy(result.trace))
         if replacement is not None and apply is not None:
             apply(replacement)
 

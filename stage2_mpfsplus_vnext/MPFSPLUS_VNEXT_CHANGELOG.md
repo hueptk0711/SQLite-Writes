@@ -137,3 +137,15 @@ A–C are frozen at `Stage2-A-C-FINAL` (`f1fa49ddb8e6b920fb5a4237e088b6603579ae2
 - classifies 35 Stage-1 reference-resolution first failures into 14 reference-only repairable, 10 partial-but-not-sample-safe, and 11 non-repairable diagnostic cases without claiming end-to-end rescue;
 - adds dedicated/adversarial tests, V5/V6 identity checks, and CPU smoke;
 - leaves G, causal replay, and all GPU/model runs out of scope.
+
+## F Patch 2 — replacement-slot collision safety and F-scope diagnostic correction
+
+- fails closed before key mutation when a selected replacement already exists in the same structural container;
+- covers source-field keys, constants keys, and free-text row target-column keys;
+- atomically rolls back earlier repairs in the same batch when a later invalid reference would collapse onto an existing replacement key;
+- records `replacement_slot_collision` with `repair_applied=false` instead of overwriting or merging semantic assignments;
+- adds four adversarial collision regression tests;
+- regenerates Stage-1 F classification under the actual F eligibility whitelist: 13 reference-only repairable, 10 partial-but-not-sample-safe, 12 non-repairable;
+- reclassifies `final_vaccine_018` as non-repairable and excludes four protected update-column proposals from `final_vaccine_033`'s F-eligible count;
+- records F-eligible diagnostic rule counts separately: 70 exact-name proposals and 0 singleton proposals;
+- preserves all accepted Patch-1 architecture, V5/V6 isolation, protected semantic boundaries, one-retry behavior, and prompt identity.

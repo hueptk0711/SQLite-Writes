@@ -20,6 +20,7 @@ from nldbwrite_v3.vnext.reference_repair import (
     ConstrainedReferenceRepairConfig,
     attempt_constrained_reference_repair,
     mark_revalidation_outcome,
+    repair_free_text_plan_after_diagnostics,
     repair_mapping_plan_after_diagnostics,
 )
 
@@ -308,6 +309,33 @@ def main() -> None:
     assert len(warnings) == 1 and warnings[0].details["reference_kind"] == "table"
     checks["single_retry_no_recursive_repair"] = "PASS"
 
+    collision_plan = _free_plan(request, profile)
+    columns_by_name = {item["name"]: item["column_id"] for item in table["columns"]}
+    invalid_key = f"{table['table_id']}.event_id"
+    collision_plan["write_groups"][0]["rows"][0][invalid_key] = {
+        "value_from": "e2",
+        "normalization": "identity",
+    }
+    collision_original = deepcopy(collision_plan)
+    collision_outcome = repair_free_text_plan_after_diagnostics(
+        collision_plan,
+        profile,
+        [
+            _diag(
+                "UNKNOWN_COLUMN_ID",
+                f"/write_groups/0/rows/0/{invalid_key}",
+                list(columns_by_name.values()),
+            )
+        ],
+        config,
+    )
+    assert collision_plan == collision_original
+    assert collision_outcome.plan == collision_original
+    assert not collision_outcome.applied
+    assert collision_outcome.traces[0]["repair_rule"] == "replacement_slot_collision"
+    assert collision_outcome.traces[0]["repair_applied"] is False
+    checks["replacement_key_collision_fail_closed"] = "PASS"
+
     sample = {"input_text": request}
     prompt5, source5 = _prompt_for_sample("MP-FS+", sample, profile, v5)
     prompt6, source6 = _prompt_for_sample("MP-FS+", sample, profile, v6)
@@ -317,12 +345,20 @@ def main() -> None:
     fixture = json.loads(FIXTURE.read_text())
     assert fixture["evidence_scope"] == "development_diagnostic_regression_only"
     assert fixture["counts"] == {
-        "NON_REPAIRABLE_REFERENCE": 11,
+        "NON_REPAIRABLE_REFERENCE": 12,
         "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE": 10,
-        "REPAIRABLE_REFERENCE_ONLY": 14,
+        "REPAIRABLE_REFERENCE_ONLY": 13,
+    }
+    assert fixture["f_eligible_repair_rule_counts"] == {
+        "unique_exact_identifier_name": 70,
+        "unique_closed_set_candidate": 0,
     }
     assert len(fixture["cases"]) == 35
+    rows = {item["sample_id"]: item for item in fixture["cases"]}
+    assert rows["final_vaccine_018"]["classification"] == "NON_REPAIRABLE_REFERENCE"
+    assert rows["final_vaccine_033"]["repairable_reference_error_count"] == 8
     checks["stage1_reference_classification"] = "PASS"
+    checks["repair_rule_accounting"] = "PASS"
 
     print(
         json.dumps(
