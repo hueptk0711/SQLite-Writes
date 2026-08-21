@@ -279,19 +279,46 @@ def _table_for_group(
 
 def _replacement_slot_collision_trace(
     result: ReferenceRepairResult,
+    *,
+    semantic_alias: bool = False,
 ) -> dict[str, Any]:
     trace = deepcopy(result.trace)
+    if semantic_alias:
+        rule = "replacement_semantic_slot_collision"
+        reason = (
+            "replacement source-field reference resolves to a semantic source-field "
+            "identity already represented by another key in the same mapping; Stage2-F "
+            "fails closed instead of allowing resolver-level overwrite or alias collapse"
+        )
+    else:
+        rule = "replacement_slot_collision"
+        reason = (
+            "replacement reference already exists in the same structural container; "
+            "Stage2-F fails closed instead of overwriting or merging assignments"
+        )
     trace.update(
         repair_applied=False,
         repair_succeeded=False,
-        repair_rule="replacement_slot_collision",
-        repair_reason=(
-            "replacement reference already exists in the same structural container; "
-            "Stage2-F fails closed instead of overwriting or merging assignments"
-        ),
+        repair_rule=rule,
+        repair_reason=reason,
         validation_after="FAIL_CLOSED",
     )
     return trace
+
+
+def _source_field_identity(
+    reference: Any,
+    collection: SourceCollection,
+) -> str | None:
+    """Resolve a source-field name/ID exactly as the frozen resolver does."""
+    raw = str(reference or "")
+    fields_by_id = {
+        str(field_id): str(field_name)
+        for field_name, field_id in collection.field_ids.items()
+    }
+    candidate = fields_by_id.get(raw, raw)
+    valid_fields = {str(field_name) for field_name in collection.fields}
+    return candidate if candidate in valid_fields else None
 
 
 def _rollback_batch_after_collision(
@@ -346,6 +373,7 @@ def repair_mapping_plan_after_diagnostics(
         result: ReferenceRepairResult | None = None
         apply = None
         collision_check = None
+        semantic_collision_check = None
 
         if diagnostic.error_code == "UNKNOWN_SOURCE_COLLECTION_ID":
             raw = str(group.get("source_collection_id") or "")
@@ -414,6 +442,27 @@ def repair_mapping_plan_after_diagnostics(
             def collision_check(value: str, *, old=raw_key, target=group) -> bool:
                 field_mapping = target.get("field_mapping") or {}
                 return value != old and value in field_mapping
+
+            def semantic_collision_check(
+                value: str,
+                *,
+                old=raw_key,
+                target=group,
+                source_collection=collection,
+            ) -> bool:
+                replacement_identity = _source_field_identity(value, source_collection)
+                if replacement_identity is None:
+                    return False
+                field_mapping = target.get("field_mapping") or {}
+                for existing_key in field_mapping:
+                    if existing_key == old:
+                        continue
+                    if (
+                        _source_field_identity(existing_key, source_collection)
+                        == replacement_identity
+                    ):
+                        return True
+                return False
 
             def apply(value: str, *, old=raw_key, target=group) -> None:
                 field_mapping = target.get("field_mapping") or {}
@@ -498,6 +547,18 @@ def repair_mapping_plan_after_diagnostics(
             and collision_check(replacement)
         ):
             collision_trace = _replacement_slot_collision_trace(result)
+            return ReferencePlanRepairOutcome(
+                deepcopy(mapping_plan),
+                _rollback_batch_after_collision(traces, collision_trace),
+            )
+        if (
+            replacement is not None
+            and semantic_collision_check is not None
+            and semantic_collision_check(replacement)
+        ):
+            collision_trace = _replacement_slot_collision_trace(
+                result, semantic_alias=True
+            )
             return ReferencePlanRepairOutcome(
                 deepcopy(mapping_plan),
                 _rollback_batch_after_collision(traces, collision_trace),

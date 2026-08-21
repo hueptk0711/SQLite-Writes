@@ -170,3 +170,32 @@ Patch 2 hardens key-based repairs in three structural containers:
 - free-text row target-column keys.
 
 If the selected replacement key already exists and differs from the invalid key, F records `replacement_slot_collision`, leaves `repair_applied=false`, returns `FAIL_CLOSED`, and rolls back any earlier mutations from the same repair batch. This also prevents two invalid references from collapsing onto the same valid key.
+
+## Patch 3 — source-field semantic-alias collision invariant
+
+Source-field keys are special because the frozen resolver intentionally accepts both a
+source-field name and its enumerated field ID. Therefore raw dictionary-key inequality
+is not sufficient to establish that two source-field references denote distinct
+semantic slots.
+
+Before applying an `UNKNOWN_SOURCE_FIELD_ID` repair, F now resolves source-field
+identity exactly as the frozen resolver does:
+
+```text
+field ID -> field name
+field name -> same field name
+unknown reference -> no identity
+```
+
+If the selected replacement and any other existing `field_mapping` key resolve to the
+same source-field identity, F records `replacement_semantic_slot_collision`, leaves
+`repair_applied=false`, and fails closed before mutation. If this collision occurs after
+an earlier repair in the same batch, the existing Patch-2 atomic rollback contract
+restores the original plan and marks earlier applied traces as rolled back.
+
+This Patch-3 guard is restricted to source-field repair. Raw-key collision behavior for
+constants and free-text row target-column keys remains unchanged.
+
+Stage-1 diagnostic classification remains locked at 13 / 10 / 12 with 70 exact-name and
+0 singleton F-eligible proposals. Patch 3 changes runtime application safety only; it
+does not redefine F eligibility.

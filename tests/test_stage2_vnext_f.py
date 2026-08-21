@@ -823,3 +823,82 @@ def test_f_two_invalid_references_cannot_collapse_to_same_replacement() -> None:
     assert all(trace["repair_applied"] is False for trace in outcome.traces)
     assert outcome.traces[-1]["repair_rule"] == "replacement_slot_collision"
     assert all(trace["validation_after"] == "FAIL_CLOSED" for trace in outcome.traces)
+
+
+def test_f_source_field_alias_collision_fails_closed() -> None:
+    profile, payload, plan, _, columns = _semi_profile_and_plan()
+    collection = payload.collections[0]
+    group = plan["target_groups"][0]
+    # Frozen source-field resolution accepts either the semantic field name or
+    # the enumerated field ID. These two raw keys therefore denote one slot.
+    group["field_mapping"].pop(collection.field_ids["id"])
+    group["field_mapping"]["id"] = columns["id"]
+    group["field_mapping"]["c9.id"] = columns["name"]
+    original = deepcopy(plan)
+
+    diagnostic = _diag(
+        "UNKNOWN_SOURCE_FIELD_ID",
+        "/target_groups/0/field_mapping/c9.id",
+        list(collection.field_ids.values()),
+    )
+    outcome = repair_mapping_plan_after_diagnostics(
+        plan, payload, profile, [diagnostic], _config()
+    )
+
+    assert plan == original
+    assert outcome.plan == original
+    assert not outcome.applied
+    assert outcome.plan["target_groups"][0]["field_mapping"]["id"] == columns["id"]
+    assert "c1.f1" not in outcome.plan["target_groups"][0]["field_mapping"]
+    trace = outcome.traces[0]
+    assert trace["repair_attempted"] is True
+    assert trace["repair_applied"] is False
+    assert trace["repair_succeeded"] is False
+    assert trace["replacement_reference"] == collection.field_ids["id"]
+    assert trace["repair_rule"] == "replacement_semantic_slot_collision"
+    assert trace["validation_after"] == "FAIL_CLOSED"
+
+
+def test_f_source_field_alias_collision_rolls_back_earlier_safe_repair() -> None:
+    profile, payload, plan, table, columns = _semi_profile_and_plan()
+    collection = payload.collections[0]
+    group = plan["target_groups"][0]
+
+    # Diagnostic 1 is independently repairable and would normally be applied.
+    raw_target = f"{table['table_id']}.name"
+    group["field_mapping"][collection.field_ids["name"]] = raw_target
+
+    # Diagnostic 2 repairs c9.id -> c1.f1, but "id" already represents the
+    # same source-field identity. This must roll back the whole repair batch.
+    group["field_mapping"].pop(collection.field_ids["id"])
+    group["field_mapping"]["id"] = columns["id"]
+    group["field_mapping"]["c9.id"] = columns["name"]
+    original = deepcopy(plan)
+
+    diagnostics = [
+        _diag(
+            "UNKNOWN_COLUMN_ID",
+            f"/target_groups/0/field_mapping/{collection.field_ids['name']}",
+            list(columns.values()),
+            details={"predicted_column_id": raw_target},
+        ),
+        _diag(
+            "UNKNOWN_SOURCE_FIELD_ID",
+            "/target_groups/0/field_mapping/c9.id",
+            list(collection.field_ids.values()),
+        ),
+    ]
+    outcome = repair_mapping_plan_after_diagnostics(
+        plan, payload, profile, diagnostics, _config()
+    )
+
+    assert plan == original
+    assert outcome.plan == original
+    assert not outcome.applied
+    assert len(outcome.traces) == 2
+    assert outcome.traces[0]["repair_rule"] == "unique_exact_identifier_name"
+    assert outcome.traces[0]["repair_applied"] is False
+    assert outcome.traces[0]["repair_succeeded"] is False
+    assert outcome.traces[0]["validation_after"] == "FAIL_CLOSED"
+    assert outcome.traces[1]["repair_rule"] == "replacement_semantic_slot_collision"
+    assert outcome.traces[1]["repair_applied"] is False

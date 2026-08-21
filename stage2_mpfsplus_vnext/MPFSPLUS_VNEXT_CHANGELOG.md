@@ -149,3 +149,19 @@ A–C are frozen at `Stage2-A-C-FINAL` (`f1fa49ddb8e6b920fb5a4237e088b6603579ae2
 - reclassifies `final_vaccine_018` as non-repairable and excludes four protected update-column proposals from `final_vaccine_033`'s F-eligible count;
 - records F-eligible diagnostic rule counts separately: 70 exact-name proposals and 0 singleton proposals;
 - preserves all accepted Patch-1 architecture, V5/V6 isolation, protected semantic boundaries, one-retry behavior, and prompt identity.
+
+## F Patch 3 — source-field semantic-alias collision safety
+
+- adds frozen-resolver-equivalent source-field identity resolution for the dual valid
+  representations `field name` and enumerated `field ID`;
+- fails closed when an `UNKNOWN_SOURCE_FIELD_ID` replacement would create a second raw
+  key resolving to an already represented semantic source-field slot;
+- records `replacement_semantic_slot_collision` with `repair_applied=false` instead of
+  allowing resolver-level overwrite;
+- reuses Patch-2 atomic rollback when a later semantic-alias collision follows an
+  earlier repair in the same batch;
+- adds direct and batch alias-collision adversarial regression tests and CPU-smoke
+  coverage;
+- keeps F eligibility, 13/10/12 Stage-1 classification, 70/0 rule accounting, singleton
+  policy, one-retry behavior, protected semantics, V5/V6 isolation, and all frozen A-E
+  behavior unchanged.

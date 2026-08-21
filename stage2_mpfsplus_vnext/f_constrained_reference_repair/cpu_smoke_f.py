@@ -336,6 +336,36 @@ def main() -> None:
     assert collision_outcome.traces[0]["repair_applied"] is False
     checks["replacement_key_collision_fail_closed"] = "PASS"
 
+    alias_plan = deepcopy(semi_plan)
+    alias_group = alias_plan["target_groups"][0]
+    source_collection = payload.collections[0]
+    alias_group["field_mapping"].pop(source_collection.field_ids["id"])
+    alias_group["field_mapping"]["id"] = columns["id"]
+    alias_group["field_mapping"]["c9.id"] = columns["name"]
+    alias_original = deepcopy(alias_plan)
+    alias_outcome = repair_mapping_plan_after_diagnostics(
+        alias_plan,
+        payload,
+        semi_profile,
+        [
+            _diag(
+                "UNKNOWN_SOURCE_FIELD_ID",
+                "/target_groups/0/field_mapping/c9.id",
+                list(source_collection.field_ids.values()),
+            )
+        ],
+        config,
+    )
+    assert alias_plan == alias_original
+    assert alias_outcome.plan == alias_original
+    assert not alias_outcome.applied
+    assert (
+        alias_outcome.traces[0]["repair_rule"]
+        == "replacement_semantic_slot_collision"
+    )
+    assert alias_outcome.traces[0]["repair_applied"] is False
+    checks["source_field_semantic_alias_collision_fail_closed"] = "PASS"
+
     sample = {"input_text": request}
     prompt5, source5 = _prompt_for_sample("MP-FS+", sample, profile, v5)
     prompt6, source6 = _prompt_for_sample("MP-FS+", sample, profile, v6)
