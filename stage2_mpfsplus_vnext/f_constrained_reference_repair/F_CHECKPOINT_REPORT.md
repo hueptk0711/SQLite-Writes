@@ -1,58 +1,54 @@
-# Stage 2-F Patch 3 Checkpoint Report
+# Stage 2-F Patch 4 Checkpoint Report
 
 ## Objective
 
-Close the remaining F4 blocker without changing Stage2-F architecture: source-field
-repair must not create two raw references that resolve to the same semantic source-field
-identity under the frozen resolver.
+Close the final F4 target-assignment collision blocker without changing Stage2-F
+architecture: a repaired target-column reference must never create a second assignment
+to a target column already assigned by another source mapping or constant.
 
 ## Git base
 
 ```text
-Stage2-F Patch 2
-5c48c6b692b4158c48b372f2afc9182f6a6425de
+Stage2-F Patch 3
+fc49aed70cb7033678d7e81c973b20f28f5d28af
 ```
 
 Frozen parent remains `Stage2-E-FINAL`
 (`7b9c4ef616fc2414fccba2cbe6b22016a3ed39b4`).
 
-## Patch-3 changes
+## Patch-4 changes
 
-1. Adds resolver-equivalent source-field identity resolution: field ID aliases resolve
-   to their field name; valid field names retain the same identity.
-2. `UNKNOWN_SOURCE_FIELD_ID` repair checks semantic identity across all other keys in
-   the same `field_mapping`, in addition to Patch-2 raw-key collision checks.
-3. Semantic alias collision fails closed before mutation and records
-   `replacement_semantic_slot_collision` with `repair_applied=false`.
-4. Reuses Patch-2 atomic batch rollback if alias collision appears after an earlier safe
-   repair.
-5. Adds direct alias-collision and batch-rollback adversarial tests.
-6. Adds CPU-smoke coverage for the semantic-alias collision boundary.
+1. Defines semi-structured target assignment slots as `field_mapping.values()` plus
+   `constants.keys()`.
+2. Field-mapping target-column repair checks replacement against all other mapping
+   values and all constant keys before mutation.
+3. Constant-key repair checks replacement against all other constants and all mapping
+   values before mutation.
+4. Collision fails closed with `replacement_target_assignment_collision` and
+   `repair_applied=false`; no semantic winner is selected.
+5. Guard reads the current copied plan, so later collisions see slots created by earlier
+   repairs and reuse atomic batch rollback.
+6. Adds four adversarial tests: mapping→mapping, constant→mapping, mapping→constant,
+   and batch rollback.
+7. Adds CPU-smoke coverage for the target-assignment collision boundary.
 
 ## Unchanged
 
+- source-field semantic alias guard from Patch 3;
+- raw-key collision guards and atomic rollback from Patch 2;
 - V5 -> V6 isolation and prompt identity;
-- F eligibility and reference-kind whitelist;
+- F eligibility/reference-kind whitelist;
 - no-fuzzy and singleton policies;
 - evidence/conflict/update-column protection;
-- missing-slot fail-closed behavior;
-- one-retry boundary;
-- Patch-2 raw-key collision guards and atomic rollback;
+- missing-slot fail-closed and one-retry boundary;
 - Stage-1 classification 13 / 10 / 12;
-- repair-rule accounting 70 exact-name / 0 singleton.
+- repair-rule accounting 70 exact-name / 0 singleton;
+- A-E.
 
-## Isolated Patch-3 validation
+## Validation required
 
-Patch-3 exact artifact validation must show:
-
-- source-field name vs field-ID alias collision: fail closed;
-- original mapping preserved;
-- `repair_applied=false`;
-- `replacement_semantic_slot_collision` provenance;
-- earlier safe repair rolled back when a later alias collision occurs;
-- non-collision source-field repair remains unchanged.
-
-Full F/E/D, A-F compatibility, full-fast, and CPU smoke must be rerun on the user's real
+Dedicated F is expected to contain 45 pytest cases after Patch 4. Full F/E/D, A-F
+compatibility, full-fast, and CPU smoke F/E/D must be rerun on the user's real
 repository before commit.
 
 ## Not run

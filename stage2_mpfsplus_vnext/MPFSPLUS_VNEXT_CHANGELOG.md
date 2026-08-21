@@ -165,3 +165,12 @@ A–C are frozen at `Stage2-A-C-FINAL` (`f1fa49ddb8e6b920fb5a4237e088b6603579ae2
 - keeps F eligibility, 13/10/12 Stage-1 classification, 70/0 rule accounting, singleton
   policy, one-retry behavior, protected semantics, V5/V6 isolation, and all frozen A-E
   behavior unchanged.
+
+## F Patch 4 — target-assignment collision hardening
+
+- guards semi-structured target-column repairs against duplicate semantic assignment slots across `field_mapping.values()` and `constants.keys()`;
+- rejects mapping→mapping, constant→mapping, and mapping→constant collisions before mutation;
+- records `replacement_target_assignment_collision` with fail-closed provenance;
+- evaluates collision ownership on the current copied plan so later repairs see slots created earlier in the batch;
+- reuses atomic rollback when a later target-assignment collision follows an earlier safe repair;
+- preserves Patch-3 source-field alias safety, Patch-2 raw-key collision safety, 13/10/12 diagnostic classification, 70/0 rule accounting, and all frozen A–E behavior.

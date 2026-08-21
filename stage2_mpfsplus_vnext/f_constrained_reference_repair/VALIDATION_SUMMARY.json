@@ -1,5 +1,5 @@
 {
-  "checkpoint": "Stage2-F-Patch3-candidate",
+  "checkpoint": "Stage2-F-Patch4-candidate",
   "branch": "stage2/f-constrained-reference-repair",
   "frozen_parent_tag": "Stage2-E-FINAL",
   "frozen_parent_commit": "7b9c4ef616fc2414fccba2cbe6b22016a3ed39b4",
@@ -26,12 +26,13 @@
     }
   },
   "isolated_validation": {
-    "source_field_semantic_alias_collision": "PASS_EXPECTED_EXACT_PATCH",
-    "semantic_alias_batch_atomic_rollback": "PASS_EXPECTED_EXACT_PATCH",
-    "non_collision_source_field_repair": "PASS_EXPECTED_EXACT_PATCH",
+    "mapping_to_mapping_target_assignment_collision": "PASS_EXPECTED_EXACT_PATCH",
+    "constant_to_mapping_target_assignment_collision": "PASS_EXPECTED_EXACT_PATCH",
+    "mapping_to_constant_target_assignment_collision": "PASS_EXPECTED_EXACT_PATCH",
+    "target_assignment_batch_atomic_rollback": "PASS_EXPECTED_EXACT_PATCH",
     "stage1_classification_unchanged": "13/10/12",
     "repair_rule_accounting_unchanged": "70 exact-name / 0 singleton",
-    "dedicated_f": "PENDING_REAL_REPOSITORY; expected 41 pytest cases"
+    "dedicated_f": "PENDING_REAL_REPOSITORY; expected 45 pytest cases"
   },
   "real_repository_validation": {
     "dedicated_f": "PENDING",
@@ -57,7 +58,8 @@
     "repair_succeeded is finalized only after revalidation",
     "repair provenance is mandatory",
     "replacement-key collision fails closed before mutation and rolls back the repair batch atomically",
-    "source-field name/ID aliases are collision-checked by frozen-resolver semantic identity before mutation"
+    "source-field name/ID aliases are collision-checked by frozen-resolver semantic identity before mutation",
+    "semi-structured target-column replacements cannot duplicate an existing assignment in field_mapping values or constants keys"
   ],
   "not_run": [
     "G",
@@ -69,5 +71,6 @@
     "14B"
   ],
   "resulting_commit": "TO_BE_RECORDED_AFTER_USER_COMMIT",
-  "patch2_base_commit": "5c48c6b692b4158c48b372f2afc9182f6a6425de"
+  "patch2_base_commit": "5c48c6b692b4158c48b372f2afc9182f6a6425de",
+  "patch3_base_commit": "fc49aed70cb7033678d7e81c973b20f28f5d28af"
 }

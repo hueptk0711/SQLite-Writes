@@ -366,6 +366,36 @@ def main() -> None:
     assert alias_outcome.traces[0]["repair_applied"] is False
     checks["source_field_semantic_alias_collision_fail_closed"] = "PASS"
 
+    target_collision_plan = deepcopy(semi_plan)
+    target_group = target_collision_plan["target_groups"][0]
+    source_collection = payload.collections[0]
+    raw_target = f"{table['table_id']}.id"
+    target_group["field_mapping"][source_collection.field_ids["name"]] = raw_target
+    target_collision_original = deepcopy(target_collision_plan)
+    target_collision_outcome = repair_mapping_plan_after_diagnostics(
+        target_collision_plan,
+        payload,
+        semi_profile,
+        [
+            _diag(
+                "UNKNOWN_COLUMN_ID",
+                f"/target_groups/0/field_mapping/{source_collection.field_ids['name']}",
+                list(columns.values()),
+                details={"predicted_column_id": raw_target},
+            )
+        ],
+        config,
+    )
+    assert target_collision_plan == target_collision_original
+    assert target_collision_outcome.plan == target_collision_original
+    assert not target_collision_outcome.applied
+    assert (
+        target_collision_outcome.traces[0]["repair_rule"]
+        == "replacement_target_assignment_collision"
+    )
+    assert target_collision_outcome.traces[0]["repair_applied"] is False
+    checks["target_assignment_collision_fail_closed"] = "PASS"
+
     sample = {"input_text": request}
     prompt5, source5 = _prompt_for_sample("MP-FS+", sample, profile, v5)
     prompt6, source6 = _prompt_for_sample("MP-FS+", sample, profile, v6)

@@ -321,6 +321,49 @@ def _source_field_identity(
     return candidate if candidate in valid_fields else None
 
 
+def _target_assignment_collision(
+    group: Mapping[str, Any],
+    replacement: Any,
+    *,
+    current_mapping_source: str | None = None,
+    current_constant_key: str | None = None,
+) -> bool:
+    """Return true when a replacement would duplicate a semi-structured target slot."""
+    target = str(replacement or "")
+    field_mapping = group.get("field_mapping") or {}
+    for source_key, target_reference in field_mapping.items():
+        if current_mapping_source is not None and source_key == current_mapping_source:
+            continue
+        if str(target_reference or "") == target:
+            return True
+
+    constants = group.get("constants") or {}
+    for constant_key in constants:
+        if current_constant_key is not None and constant_key == current_constant_key:
+            continue
+        if str(constant_key or "") == target:
+            return True
+    return False
+
+
+def _target_assignment_collision_trace(
+    result: ReferenceRepairResult,
+) -> dict[str, Any]:
+    trace = deepcopy(result.trace)
+    trace.update(
+        repair_applied=False,
+        repair_succeeded=False,
+        repair_rule="replacement_target_assignment_collision",
+        repair_reason=(
+            "replacement target-column reference is already assigned by another "
+            "source mapping or constant in the same target group; Stage2-F fails "
+            "closed instead of allowing materialization-time overwrite"
+        ),
+        validation_after="FAIL_CLOSED",
+    )
+    return trace
+
+
 def _rollback_batch_after_collision(
     traces: Sequence[Mapping[str, Any]],
     collision_trace: Mapping[str, Any],
@@ -374,6 +417,7 @@ def repair_mapping_plan_after_diagnostics(
         apply = None
         collision_check = None
         semantic_collision_check = None
+        target_assignment_collision_check = None
 
         if diagnostic.error_code == "UNKNOWN_SOURCE_COLLECTION_ID":
             raw = str(group.get("source_collection_id") or "")
@@ -507,6 +551,19 @@ def repair_mapping_plan_after_diagnostics(
             )
             if "/field_mapping/" in diagnostic.path:
                 source_key = diagnostic.path.split("/field_mapping/", 1)[1]
+
+                def target_assignment_collision_check(
+                    value: str,
+                    *,
+                    key=source_key,
+                    target=group,
+                ) -> bool:
+                    return _target_assignment_collision(
+                        target,
+                        value,
+                        current_mapping_source=key,
+                    )
+
                 apply = lambda value, key=source_key: group["field_mapping"].__setitem__(key, value)
             elif "/constants/" in diagnostic.path:
                 old_key = diagnostic.path.split("/constants/", 1)[1]
@@ -514,6 +571,18 @@ def repair_mapping_plan_after_diagnostics(
                 def collision_check(value: str, *, old=old_key, target=group) -> bool:
                     constants = target.get("constants") or {}
                     return value != old and value in constants
+
+                def target_assignment_collision_check(
+                    value: str,
+                    *,
+                    old=old_key,
+                    target=group,
+                ) -> bool:
+                    return _target_assignment_collision(
+                        target,
+                        value,
+                        current_constant_key=old,
+                    )
 
                 def apply(value: str, *, old=old_key, target=group) -> None:
                     constants = target.get("constants") or {}
@@ -559,6 +628,16 @@ def repair_mapping_plan_after_diagnostics(
             collision_trace = _replacement_slot_collision_trace(
                 result, semantic_alias=True
             )
+            return ReferencePlanRepairOutcome(
+                deepcopy(mapping_plan),
+                _rollback_batch_after_collision(traces, collision_trace),
+            )
+        if (
+            replacement is not None
+            and target_assignment_collision_check is not None
+            and target_assignment_collision_check(replacement)
+        ):
+            collision_trace = _target_assignment_collision_trace(result)
             return ReferencePlanRepairOutcome(
                 deepcopy(mapping_plan),
                 _rollback_batch_after_collision(traces, collision_trace),

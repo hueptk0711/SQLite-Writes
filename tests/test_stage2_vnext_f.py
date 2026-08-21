@@ -865,7 +865,7 @@ def test_f_source_field_alias_collision_rolls_back_earlier_safe_repair() -> None
     group = plan["target_groups"][0]
 
     # Diagnostic 1 is independently repairable and would normally be applied.
-    raw_target = f"{table['table_id']}.name"
+    raw_target = f"{table['table_id']}.count"
     group["field_mapping"][collection.field_ids["name"]] = raw_target
 
     # Diagnostic 2 repairs c9.id -> c1.f1, but "id" already represents the
@@ -902,3 +902,121 @@ def test_f_source_field_alias_collision_rolls_back_earlier_safe_repair() -> None
     assert outcome.traces[0]["validation_after"] == "FAIL_CLOSED"
     assert outcome.traces[1]["repair_rule"] == "replacement_semantic_slot_collision"
     assert outcome.traces[1]["repair_applied"] is False
+
+
+def test_f_mapping_target_repair_does_not_duplicate_existing_mapping_target() -> None:
+    profile, payload, plan, table, columns = _semi_profile_and_plan()
+    collection = payload.collections[0]
+    group = plan["target_groups"][0]
+    raw = f"{table['table_id']}.id"
+    group["field_mapping"][collection.field_ids["name"]] = raw
+    original = deepcopy(plan)
+    diagnostic = _diag(
+        "UNKNOWN_COLUMN_ID",
+        f"/target_groups/0/field_mapping/{collection.field_ids['name']}",
+        list(columns.values()),
+        details={"predicted_column_id": raw},
+    )
+    outcome = repair_mapping_plan_after_diagnostics(
+        plan, payload, profile, [diagnostic], _config()
+    )
+    assert plan == original
+    assert outcome.plan == original
+    assert not outcome.applied
+    trace = outcome.traces[0]
+    assert trace["repair_applied"] is False
+    assert trace["replacement_reference"] == columns["id"]
+    assert trace["repair_rule"] == "replacement_target_assignment_collision"
+    assert trace["validation_after"] == "FAIL_CLOSED"
+
+
+def test_f_constant_target_repair_does_not_duplicate_existing_mapping_target() -> None:
+    profile, payload, plan, table, columns = _semi_profile_and_plan()
+    group = plan["target_groups"][0]
+    raw = f"{table['table_id']}.id"
+    group["constants"] = {raw: {"value": "CONST"}}
+    original = deepcopy(plan)
+    diagnostic = _diag(
+        "UNKNOWN_COLUMN_ID",
+        f"/target_groups/0/constants/{raw}",
+        list(columns.values()),
+        details={"predicted_column_id": raw},
+    )
+    outcome = repair_mapping_plan_after_diagnostics(
+        plan, payload, profile, [diagnostic], _config()
+    )
+    assert plan == original
+    assert outcome.plan == original
+    assert not outcome.applied
+    trace = outcome.traces[0]
+    assert trace["repair_applied"] is False
+    assert trace["replacement_reference"] == columns["id"]
+    assert trace["repair_rule"] == "replacement_target_assignment_collision"
+    assert trace["validation_after"] == "FAIL_CLOSED"
+
+
+def test_f_mapping_target_repair_does_not_duplicate_existing_constant_target() -> None:
+    profile, payload, plan, table, columns = _semi_profile_and_plan()
+    collection = payload.collections[0]
+    group = plan["target_groups"][0]
+    raw = f"{table['table_id']}.id"
+    group["field_mapping"].pop(collection.field_ids["id"])
+    group["field_mapping"][collection.field_ids["name"]] = raw
+    group["constants"] = {columns["id"]: {"value": "CONST"}}
+    original = deepcopy(plan)
+    diagnostic = _diag(
+        "UNKNOWN_COLUMN_ID",
+        f"/target_groups/0/field_mapping/{collection.field_ids['name']}",
+        list(columns.values()),
+        details={"predicted_column_id": raw},
+    )
+    outcome = repair_mapping_plan_after_diagnostics(
+        plan, payload, profile, [diagnostic], _config()
+    )
+    assert plan == original
+    assert outcome.plan == original
+    assert not outcome.applied
+    trace = outcome.traces[0]
+    assert trace["repair_applied"] is False
+    assert trace["replacement_reference"] == columns["id"]
+    assert trace["repair_rule"] == "replacement_target_assignment_collision"
+    assert trace["validation_after"] == "FAIL_CLOSED"
+
+
+def test_f_target_assignment_collision_rolls_back_earlier_safe_repair() -> None:
+    profile, payload, plan, table, columns = _semi_profile_and_plan()
+    collection = payload.collections[0]
+    group = plan["target_groups"][0]
+    raw_name = f"{table['table_id']}.name"
+    raw_id = f"{table['table_id']}.id"
+    group["field_mapping"][collection.field_ids["name"]] = raw_name
+    group["constants"] = {raw_id: {"value": "CONST"}}
+    original = deepcopy(plan)
+    diagnostics = [
+        _diag(
+            "UNKNOWN_COLUMN_ID",
+            f"/target_groups/0/field_mapping/{collection.field_ids['name']}",
+            list(columns.values()),
+            details={"predicted_column_id": raw_name},
+        ),
+        _diag(
+            "UNKNOWN_COLUMN_ID",
+            f"/target_groups/0/constants/{raw_id}",
+            list(columns.values()),
+            details={"predicted_column_id": raw_id},
+        ),
+    ]
+    outcome = repair_mapping_plan_after_diagnostics(
+        plan, payload, profile, diagnostics, _config()
+    )
+    assert plan == original
+    assert outcome.plan == original
+    assert not outcome.applied
+    assert len(outcome.traces) == 2
+    assert outcome.traces[0]["repair_rule"] == "unique_exact_identifier_name"
+    assert outcome.traces[0]["repair_applied"] is False
+    assert outcome.traces[0]["repair_succeeded"] is False
+    assert outcome.traces[0]["validation_after"] == "FAIL_CLOSED"
+    assert outcome.traces[1]["repair_rule"] == "replacement_target_assignment_collision"
+    assert outcome.traces[1]["repair_applied"] is False
+    assert outcome.traces[1]["validation_after"] == "FAIL_CLOSED"

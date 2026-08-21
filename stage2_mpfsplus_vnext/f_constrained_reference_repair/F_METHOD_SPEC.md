@@ -199,3 +199,32 @@ constants and free-text row target-column keys remains unchanged.
 Stage-1 diagnostic classification remains locked at 13 / 10 / 12 with 70 exact-name and
 0 singleton F-eligible proposals. Patch 3 changes runtime application safety only; it
 does not redefine F eligibility.
+
+## Patch 4 — semi-structured target-assignment collision invariant
+
+For semi-structured target groups, semantic assignment ownership is defined by the
+target-column slot, not only by dictionary keys. The assignment set is:
+
+```text
+all field_mapping values
++
+all constants keys
+```
+
+Before applying an `UNKNOWN_COLUMN_ID` repair in either `field_mapping` or `constants`,
+F checks the selected replacement against every other current assignment in the copied
+target group. The slot being repaired is excluded from the check.
+
+If another source mapping or constant already assigns the replacement target column, F
+records `replacement_target_assignment_collision`, leaves `repair_applied=false`, and
+fails closed before mutation. F does not choose first/last/source/constant precedence.
+
+The guard reads the current copied plan, so a target slot created by an earlier repair
+in the same batch is visible to later checks. A later collision reuses the Patch-2
+atomic rollback contract and restores the original plan.
+
+Free-text rows are unchanged because their target-column IDs are already dictionary
+keys and Patch-2 raw-key collision checks cover the equivalent same-row case.
+
+Stage-1 diagnostic classification remains 13 / 10 / 12 with 70 exact-name and 0
+singleton F-eligible proposals. Patch 4 changes runtime application safety only.
