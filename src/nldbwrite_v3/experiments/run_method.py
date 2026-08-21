@@ -1163,6 +1163,9 @@ def run_method(
                     free_text_typed_normalization=config.get(
                         "free_text_typed_normalization"
                     ),
+                    constrained_reference_repair=config.get(
+                        "constrained_reference_repair"
+                    ),
                 ).run(
                     str(sample.get("input_text") or ""),
                     parsed.plan,

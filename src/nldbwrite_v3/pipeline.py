@@ -23,8 +23,15 @@ from nldbwrite_v3.planner import (
 from nldbwrite_v3.source_parser import parse_source_payload
 from nldbwrite_v3.verifier import verify_write_plan
 from nldbwrite_v3.vnext import (
+    ConstrainedReferenceRepairConfig,
     Stage2InterventionConfig,
+    annotate_reference_diagnostics,
     apply_free_text_reference_interventions,
+    attach_repair_trace,
+    mark_revalidation_outcome,
+    repair_free_text_plan_after_diagnostics,
+    repair_mapping_plan_after_diagnostics,
+    repair_warnings_from_traces,
 )
 
 
@@ -65,6 +72,7 @@ class MappingFirstPipeline:
         stage2_interventions: Mapping[str, Any] | None = None,
         structured_source_parser: Mapping[str, Any] | None = None,
         free_text_typed_normalization: Mapping[str, Any] | None = None,
+        constrained_reference_repair: Mapping[str, Any] | None = None,
     ):
         self.profile = profile
         self.strict_atomic = strict_atomic
@@ -77,6 +85,11 @@ class MappingFirstPipeline:
         self.structured_source_parser = dict(structured_source_parser or {})
         self.free_text_typed_normalization = dict(
             free_text_typed_normalization or {}
+        )
+        self.constrained_reference_repair = (
+            ConstrainedReferenceRepairConfig.from_mapping(
+                constrained_reference_repair
+            )
         )
 
     def run(
@@ -123,13 +136,72 @@ class MappingFirstPipeline:
                     self.profile,
                 )
             )
+            resolution_warnings: list[Diagnostic] = []
             grounded_plan, reference_errors = resolve_reference_mapping_plan(
                 predicted_plan,
                 payload,
                 self.profile,
                 stage2_interventions=self.stage2_interventions.to_dict(),
-                warning_sink=grounding_warnings,
+                warning_sink=resolution_warnings,
             )
+            if reference_errors and self.constrained_reference_repair.enabled:
+                repair_outcome = repair_mapping_plan_after_diagnostics(
+                    predicted_plan,
+                    payload,
+                    self.profile,
+                    reference_errors,
+                    self.constrained_reference_repair,
+                )
+                if repair_outcome.applied:
+                    retry_warnings: list[Diagnostic] = []
+                    grounded_plan, retry_errors = resolve_reference_mapping_plan(
+                        repair_outcome.plan,
+                        payload,
+                        self.profile,
+                        stage2_interventions=self.stage2_interventions.to_dict(),
+                        warning_sink=retry_warnings,
+                    )
+                    final_traces = mark_revalidation_outcome(
+                        repair_outcome.traces,
+                        retry_errors,
+                    )
+                    repair_warnings = repair_warnings_from_traces(final_traces)
+                    if retry_errors:
+                        verification = VerificationResult(
+                            "invalid",
+                            None,
+                            annotate_reference_diagnostics(
+                                retry_errors,
+                                final_traces,
+                            ),
+                            [
+                                *grounding_warnings,
+                                *retry_warnings,
+                                *repair_warnings,
+                            ],
+                        )
+                        return PipelineResult(
+                            payload,
+                            None,
+                            verification,
+                            None,
+                            "reference_resolution",
+                        )
+                    grounded_plan = attach_repair_trace(
+                        grounded_plan,
+                        final_traces,
+                    )
+                    grounding_warnings.extend(retry_warnings)
+                    grounding_warnings.extend(repair_warnings)
+                    reference_errors = []
+                else:
+                    reference_errors = annotate_reference_diagnostics(
+                        reference_errors,
+                        repair_outcome.traces,
+                    )
+                    grounding_warnings.extend(resolution_warnings)
+            else:
+                grounding_warnings.extend(resolution_warnings)
             if reference_errors:
                 verification = VerificationResult(
                     "invalid",
@@ -207,18 +279,83 @@ class MappingFirstPipeline:
                     ),
                 )
             except MaterializationError as exc:
-                verification = VerificationResult(
-                    "invalid",
-                    None,
+                if not self.constrained_reference_repair.enabled:
+                    verification = VerificationResult(
+                        "invalid",
+                        None,
+                        exc.diagnostics,
+                        [],
+                    )
+                    return PipelineResult(
+                        payload,
+                        None,
+                        verification,
+                        None,
+                        "evidence_materialization",
+                    )
+                repair_outcome = repair_free_text_plan_after_diagnostics(
+                    predicted_plan,
+                    self.profile,
                     exc.diagnostics,
+                    self.constrained_reference_repair,
+                )
+                if not repair_outcome.applied:
+                    verification = VerificationResult(
+                        "invalid",
+                        None,
+                        annotate_reference_diagnostics(
+                            exc.diagnostics,
+                            repair_outcome.traces,
+                        ),
+                        [],
+                    )
+                    return PipelineResult(
+                        payload,
+                        None,
+                        verification,
+                        None,
+                        "evidence_materialization",
+                    )
+                try:
+                    write_plan = materialize_reference_free_text_plan(
+                        repair_outcome.plan,
+                        request,
+                        self.profile,
+                        free_text_typed_normalization=(
+                            self.free_text_typed_normalization
+                        ),
+                    )
+                except MaterializationError as retry_exc:
+                    final_traces = mark_revalidation_outcome(
+                        repair_outcome.traces,
+                        retry_exc.diagnostics,
+                    )
+                    verification = VerificationResult(
+                        "invalid",
+                        None,
+                        annotate_reference_diagnostics(
+                            retry_exc.diagnostics,
+                            final_traces,
+                        ),
+                        repair_warnings_from_traces(final_traces),
+                    )
+                    return PipelineResult(
+                        payload,
+                        None,
+                        verification,
+                        None,
+                        "evidence_materialization",
+                    )
+                final_traces = mark_revalidation_outcome(
+                    repair_outcome.traces,
                     [],
                 )
-                return PipelineResult(
-                    payload,
-                    None,
-                    verification,
-                    None,
-                    "evidence_materialization",
+                write_plan = attach_repair_trace(
+                    write_plan,
+                    final_traces,
+                )
+                grounding_warnings.extend(
+                    repair_warnings_from_traces(final_traces)
                 )
         elif payload.mode == "semi_structured" and "target_groups" in predicted_plan:
             grounded_plan, grounding_warnings = ground_mapping_plan(

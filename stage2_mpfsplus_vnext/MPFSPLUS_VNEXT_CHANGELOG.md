@@ -123,3 +123,17 @@ A–C are frozen at `Stage2-A-C-FINAL` (`f1fa49ddb8e6b920fb5a4237e088b6603579ae2
 - enforces declared temporal subtype consistency: `DATE` requires date evidence; `DATETIME` / `TIMESTAMP` require datetime evidence;
 - adds `TEMPORAL_TARGET_SUBTYPE_MISMATCH` for deterministic target/evidence subtype disagreement;
 - keeps Patch-2 candidate typing, ASCII grammar, causal provenance, raw-evidence invariant, E3 fail-closed ambiguity, E5 ablation, and all frozen A–D behavior unchanged.
+
+## F Patch 1 — constrained closed-set reference repair
+
+- starts from frozen `Stage2-E-FINAL` (`7b9c4ef616fc2414fccba2cbe6b22016a3ed39b4`);
+- adds independently ablatable V6 `constrained_reference_repair`;
+- repairs only non-empty references already found invalid at a deterministic reference boundary;
+- selects replacements only from a slot-local closed set using a unique exact identifier-name anchor or a singleton closed set;
+- forbids fuzzy/edit-distance repair, valid-reference rewriting, and missing-slot auto-fill;
+- limits repair to exactly one attempt per slot and fails closed on empty/ambiguous candidate sets;
+- preserves values, raw evidence, operation, conflict action, update semantics, prompt content, and frozen A-E behavior;
+- records mandatory repair provenance including original/replacement reference, full candidate set, rule, and validation before/after;
+- classifies 35 Stage-1 reference-resolution first failures into 14 reference-only repairable, 10 partial-but-not-sample-safe, and 11 non-repairable diagnostic cases without claiming end-to-end rescue;
+- adds dedicated/adversarial tests, V5/V6 identity checks, and CPU smoke;
+- leaves G, causal replay, and all GPU/model runs out of scope.

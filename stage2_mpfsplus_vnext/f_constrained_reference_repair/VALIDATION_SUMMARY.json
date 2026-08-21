@@ -1,0 +1,63 @@
+{
+  "checkpoint": "Stage2-F-Patch1-candidate",
+  "branch": "stage2/f-constrained-reference-repair",
+  "frozen_parent_tag": "Stage2-E-FINAL",
+  "frozen_parent_commit": "7b9c4ef616fc2414fccba2cbe6b22016a3ed39b4",
+  "architecture": "pipeline_level_single_retry_after_frozen_reference_diagnostic",
+  "ablation": {
+    "v5": "A+B+C+D+E",
+    "v6": "A+B+C+D+E+F",
+    "method_variant": "vnext-v6-constrained-reference-repair",
+    "method_version": "stage2-v6-abcdef-constrained-reference-repair"
+  },
+  "stage1_diagnostic_reference_failures": {
+    "first_failure_count": 35,
+    "REF_UNKNOWN_COLUMN": 28,
+    "REF_INVALID_SOURCE_REF": 7,
+    "classification": {
+      "REPAIRABLE_REFERENCE_ONLY": 14,
+      "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE": 10,
+      "NON_REPAIRABLE_REFERENCE": 11
+    },
+    "claim_scope": "development_diagnostic_regression_only"
+  },
+  "isolated_validation": {
+    "dedicated_f": "35/35 PASS",
+    "frozen_e_plus_d": "56/56 PASS",
+    "cpu_smoke_f": "PASS"
+  },
+  "real_repository_validation": {
+    "dedicated_f": "PENDING",
+    "frozen_e": "PENDING",
+    "frozen_d": "PENDING",
+    "a_to_f_compatibility": "PENDING",
+    "full_fast_suite": "PENDING",
+    "cpu_smoke_f": "PENDING",
+    "cpu_smoke_e": "PENDING",
+    "cpu_smoke_d": "PENDING"
+  },
+  "safety_invariants": [
+    "run frozen V5 reference/materialization boundary before F",
+    "repair only non-empty references already rejected by that boundary",
+    "closed-set candidates only",
+    "unique exact identifier-name anchor or singleton closed-set candidate only",
+    "no fuzzy or edit-distance matching",
+    "valid references are never repaired",
+    "missing reference slots are never auto-filled and are not counted as repair attempts",
+    "evidence selection, conflict-target semantics, and update-column semantics are protected",
+    "single boundary retry only; newly surfaced reference failures are not recursively repaired",
+    "non-reference semantics are preserved",
+    "repair_succeeded is finalized only after revalidation",
+    "repair provenance is mandatory"
+  ],
+  "not_run": [
+    "G",
+    "full_A-G_causal_replay",
+    "GPU",
+    "3B",
+    "5B",
+    "7B",
+    "14B"
+  ],
+  "resulting_commit": "TO_BE_RECORDED_AFTER_USER_COMMIT"
+}

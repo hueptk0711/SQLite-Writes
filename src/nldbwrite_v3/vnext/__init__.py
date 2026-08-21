@@ -1,3 +1,16 @@
+from .reference_repair import (
+    ConstrainedReferenceRepairConfig,
+    ReferencePlanRepairOutcome,
+    ReferenceRepairResult,
+    annotate_reference_diagnostics,
+    attach_repair_trace,
+    attempt_constrained_reference_repair,
+    mark_revalidation_outcome,
+    repair_free_text_plan_after_diagnostics,
+    repair_mapping_plan_after_diagnostics,
+    repair_warnings_from_traces,
+)
+
 from .typed_normalization import (
     FreeTextTypedNormalizationConfig,
     TypedNormalizationResult,
@@ -37,4 +50,14 @@ __all__ = [
     "FreeTextTypedNormalizationConfig",
     "TypedNormalizationResult",
     "normalize_free_text_typed_candidate",
+    "ConstrainedReferenceRepairConfig",
+    "ReferencePlanRepairOutcome",
+    "ReferenceRepairResult",
+    "annotate_reference_diagnostics",
+    "attach_repair_trace",
+    "attempt_constrained_reference_repair",
+    "mark_revalidation_outcome",
+    "repair_free_text_plan_after_diagnostics",
+    "repair_mapping_plan_after_diagnostics",
+    "repair_warnings_from_traces",
 ]

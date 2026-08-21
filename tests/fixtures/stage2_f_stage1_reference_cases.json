@@ -1,0 +1,357 @@
+{
+  "source": "Stage1 final diagnostic replay/manual audit-derived reference classification",
+  "evidence_scope": "development_diagnostic_regression_only",
+  "warning": "These labels define regression expectations only. REPAIRABLE_REFERENCE_ONLY does not mean end-to-end rescue.",
+  "first_failure_counts": {
+    "REF_UNKNOWN_COLUMN": 28,
+    "REF_INVALID_SOURCE_REF": 7
+  },
+  "counts": {
+    "NON_REPAIRABLE_REFERENCE": 11,
+    "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE": 10,
+    "REPAIRABLE_REFERENCE_ONLY": 14
+  },
+  "cases": [
+    {
+      "sample_id": "final_archeology_016",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "free_text",
+      "classification": "NON_REPAIRABLE_REFERENCE",
+      "reference_error_count": 2,
+      "repairable_reference_error_count": 0,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_archeology_021",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE",
+      "reference_error_count": 2,
+      "repairable_reference_error_count": 2,
+      "other_error_codes": [
+        "UNEXPECTED_CONSTRAINT_ID"
+      ]
+    },
+    {
+      "sample_id": "final_archeology_027",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 1,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_archeology_031",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "free_text",
+      "classification": "NON_REPAIRABLE_REFERENCE",
+      "reference_error_count": 63,
+      "repairable_reference_error_count": 0,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_archeology_035",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 1,
+      "other_error_codes": [
+        "UNEXPECTED_CONSTRAINT_ID"
+      ]
+    },
+    {
+      "sample_id": "final_archeology_036",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 1,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_archeology_041",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 1,
+      "other_error_codes": [
+        "UNEXPECTED_CONSTRAINT_ID"
+      ]
+    },
+    {
+      "sample_id": "final_archeology_049",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "reference_error_count": 2,
+      "repairable_reference_error_count": 2,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_archeology_050",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 1,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_archeology_055",
+      "first_failure_code": "REF_INVALID_SOURCE_REF",
+      "plan_kind": "mapping",
+      "classification": "NON_REPAIRABLE_REFERENCE",
+      "reference_error_count": 3,
+      "repairable_reference_error_count": 0,
+      "other_error_codes": [
+        "NEEDS_CLARIFICATION"
+      ]
+    },
+    {
+      "sample_id": "final_polar_003",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "free_text",
+      "classification": "NON_REPAIRABLE_REFERENCE",
+      "reference_error_count": 4,
+      "repairable_reference_error_count": 0,
+      "other_error_codes": [
+        "LOSSY_NORMALIZATION_REJECTED",
+        "DUPLICATE_TARGET_COLUMN_AFTER_EVIDENCE_GROUNDING",
+        "DUPLICATE_TARGET_COLUMN_AFTER_EVIDENCE_GROUNDING"
+      ]
+    },
+    {
+      "sample_id": "final_polar_031",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "free_text",
+      "classification": "NON_REPAIRABLE_REFERENCE",
+      "reference_error_count": 31,
+      "repairable_reference_error_count": 0,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_robot_010",
+      "first_failure_code": "REF_INVALID_SOURCE_REF",
+      "plan_kind": "mapping",
+      "classification": "NON_REPAIRABLE_REFERENCE",
+      "reference_error_count": 5,
+      "repairable_reference_error_count": 0,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_robot_017",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "free_text",
+      "classification": "NON_REPAIRABLE_REFERENCE",
+      "reference_error_count": 45,
+      "repairable_reference_error_count": 0,
+      "other_error_codes": [
+        "NEEDS_CLARIFICATION"
+      ]
+    },
+    {
+      "sample_id": "final_robot_020",
+      "first_failure_code": "REF_INVALID_SOURCE_REF",
+      "plan_kind": "mapping",
+      "classification": "NON_REPAIRABLE_REFERENCE",
+      "reference_error_count": 2,
+      "repairable_reference_error_count": 0,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_robot_021",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 1,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_robot_027",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE",
+      "reference_error_count": 3,
+      "repairable_reference_error_count": 3,
+      "other_error_codes": [
+        "NEEDS_CLARIFICATION"
+      ]
+    },
+    {
+      "sample_id": "final_robot_034",
+      "first_failure_code": "REF_INVALID_SOURCE_REF",
+      "plan_kind": "mapping",
+      "classification": "NON_REPAIRABLE_REFERENCE",
+      "reference_error_count": 2,
+      "repairable_reference_error_count": 0,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_robot_041",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE",
+      "reference_error_count": 3,
+      "repairable_reference_error_count": 3,
+      "other_error_codes": [
+        "NEEDS_CLARIFICATION"
+      ]
+    },
+    {
+      "sample_id": "final_robot_049",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 1,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_robot_055",
+      "first_failure_code": "REF_INVALID_SOURCE_REF",
+      "plan_kind": "mapping",
+      "classification": "NON_REPAIRABLE_REFERENCE",
+      "reference_error_count": 5,
+      "repairable_reference_error_count": 0,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_vaccine_006",
+      "first_failure_code": "REF_INVALID_SOURCE_REF",
+      "plan_kind": "mapping",
+      "classification": "NON_REPAIRABLE_REFERENCE",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 0,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_vaccine_010",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE",
+      "reference_error_count": 14,
+      "repairable_reference_error_count": 14,
+      "other_error_codes": [
+        "NEEDS_CLARIFICATION"
+      ]
+    },
+    {
+      "sample_id": "final_vaccine_018",
+      "first_failure_code": "REF_INVALID_SOURCE_REF",
+      "plan_kind": "free_text",
+      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 1,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_vaccine_033",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "free_text",
+      "classification": "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE",
+      "reference_error_count": 12,
+      "repairable_reference_error_count": 12,
+      "other_error_codes": [
+        "MISSING_UPDATE_COLUMN_IDS"
+      ]
+    },
+    {
+      "sample_id": "final_vaccine_056",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE",
+      "reference_error_count": 10,
+      "repairable_reference_error_count": 7,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_virtual_004",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 1,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_virtual_005",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 1,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_virtual_019",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 1,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_virtual_021",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 1,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_virtual_027",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "reference_error_count": 9,
+      "repairable_reference_error_count": 9,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_virtual_035",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 1,
+      "other_error_codes": [
+        "NEEDS_CLARIFICATION"
+      ]
+    },
+    {
+      "sample_id": "final_virtual_042",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REFERENCE_REPAIR_PARTIAL_BUT_SAMPLE_NOT_SAFE",
+      "reference_error_count": 7,
+      "repairable_reference_error_count": 7,
+      "other_error_codes": [
+        "NEEDS_CLARIFICATION"
+      ]
+    },
+    {
+      "sample_id": "final_virtual_049",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "reference_error_count": 2,
+      "repairable_reference_error_count": 2,
+      "other_error_codes": []
+    },
+    {
+      "sample_id": "final_virtual_050",
+      "first_failure_code": "REF_UNKNOWN_COLUMN",
+      "plan_kind": "mapping",
+      "classification": "REPAIRABLE_REFERENCE_ONLY",
+      "reference_error_count": 1,
+      "repairable_reference_error_count": 1,
+      "other_error_codes": []
+    }
+  ]
+}

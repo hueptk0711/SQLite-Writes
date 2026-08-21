@@ -1,5 +1,5 @@
 {
-  "stage": "2-E-free-text-typed-normalization",
+  "stage": "2-F-constrained-reference-repair",
   "baseline": "configs/stage2/original.json",
   "dispatch_family": "MP-FS+",
   "interventions": [
@@ -40,11 +40,23 @@
       "hypothesis": "A free-text cell whose reference plan explicitly requests date normalization can be normalized safely only when its verbatim evidence is a strict, unambiguous year-first DATE/DATETIME; unsupported or ambiguous temporal surfaces must fail closed and retain raw-span provenance.",
       "stage1_evidence": "9 DATE_NORMALIZATION_POLICY_ERROR + 1 DATE_NORMALIZATION_AND_EVIDENCE_SPAN_ERROR; manual audit found 12 valid explicit datetime values rejected by iso_date_normalization and two wrong non-date evidence values (Attempt/For) that must remain rejected.",
       "config": "configs/stage2/v5_free_text_typed_normalization.json",
+      "status": "frozen",
+      "frozen_tag": "Stage2-E-FINAL",
+      "frozen_commit": "7b9c4ef616fc2414fccba2cbe6b22016a3ed39b4"
+    },
+    {
+      "id": "F_constrained_reference_repair",
+      "config_block": "constrained_reference_repair",
+      "hypothesis": "A non-empty reference that has already failed a deterministic reference boundary may be repaired safely only from its slot-local closed valid set when one candidate is uniquely determined by an exact identifier-name anchor or by a singleton valid set; semantic evidence/conflict/update choices remain protected and all other cases fail closed.",
+      "stage1_evidence": "35 Stage-1 first failures at reference resolution (28 REF_UNKNOWN_COLUMN + 7 REF_INVALID_SOURCE_REF), manually classified as 14 reference-only repairable, 10 reference-repair-partial-but-sample-not-safe, and 11 non-repairable; diagnostic/regression evidence only.",
+      "config": "configs/stage2/v6_constrained_reference_repair.json",
       "status": "in_review"
     }
   ],
   "not_in_scope": [
-    "reference_repair",
+    "evidence_selection_repair",
+    "conflict_target_repair",
+    "update_column_semantic_repair",
     "semantic_targeted_repair",
     "7B_end_to_end_run"
   ],
@@ -75,5 +87,19 @@
     "E handles only explicit iso_date_normalization requests with strict unambiguous year-first DATE/DATETIME evidence",
     "unsupported or ambiguous temporal evidence fails closed; evidence/column repair remains out of scope",
     "raw evidence text and offsets remain unchanged and are recorded alongside the normalized value"
+  ],
+  "e_frozen_tag": "Stage2-E-FINAL",
+  "e_frozen_commit": "7b9c4ef616fc2414fccba2cbe6b22016a3ed39b4",
+  "f_invariants": [
+    "F is independently ablatable through constrained_reference_repair.enabled",
+    "the frozen V5 reference/materialization boundary runs before any F repair",
+    "F repairs only non-empty references explicitly rejected by that boundary",
+    "valid references and missing slots are never rewritten or auto-filled",
+    "repair candidates come only from the diagnostic-provided slot-local closed set",
+    "selection uses only a unique exact identifier-name anchor or a singleton closed set; no fuzzy/edit-distance matching is allowed",
+    "evidence selection, conflict-target semantics, and update-column semantics are protected and never repaired by F",
+    "the repaired plan is revalidated by the same frozen boundary exactly once; newly surfaced failures are not recursively repaired",
+    "repair provenance is mandatory and does not alter non-reference values or semantics",
+    "A-E remain frozen and are consumed only through existing interfaces"
   ]
 }
