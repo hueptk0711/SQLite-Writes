@@ -2,7 +2,7 @@
 
 ## Result
 
-Stage 2-G1 implements only deterministic evidence-span terminal-boundary repair. The implementation is independently ablatable, keeps the V6 prompt unchanged, deep-copies the reference plan, changes one diagnosed `value_from` slot, uses only the frozen pre-enumerated candidate set, and performs at most one revalidation.
+Stage 2-G1 implements only deterministic evidence-span terminal-boundary repair under a conservative policy; eligibility does not independently prove that punctuation is linguistically incorrect. The implementation is independently ablatable, keeps the V6 prompt unchanged, deep-copies the reference plan, changes one diagnosed `value_from` slot, uses only the frozen pre-enumerated candidate set, and performs at most one revalidation. Period is exercised by the frozen fixture; comma remains reserved compatibility behavior with no observed activation.
 
 ## Stage-1 diagnostic fixture
 

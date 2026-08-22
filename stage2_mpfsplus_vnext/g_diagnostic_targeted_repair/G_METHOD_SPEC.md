@@ -2,7 +2,7 @@
 
 ## Scope
 
-G1 is a deterministic, post-diagnostic repair for one narrow free-text evidence-boundary defect. It does not invoke a model, regenerate a plan, search request text, create evidence, select a semantically different span, or repair any A–F responsibility.
+G1 is a deterministic, post-diagnostic repair for one narrow free-text evidence-boundary defect. It implements a conservative boundary policy; eligibility does not independently prove that the terminal punctuation is linguistically incorrect. It does not invoke a model, regenerate a plan, search request text, create evidence, select a semantically different span, or repair any A–F responsibility.
 
 The only eligible transformation is:
 
@@ -54,6 +54,8 @@ G1 diagnoses a slot only when all conditions hold:
    - type `number_or_identifier`.
 
 No substring scan, regex search over the request, fuzzy match, edit distance, schema-value lookup, database-state lookup, or model call is permitted.
+
+The period rule is exercised by the Stage-1 fixture and dedicated tests. Comma is retained only as a reserved compatibility branch in the frozen G1 configuration; no observed Stage-1 fixture or dedicated regression activates it.
 
 ## Closed-set selection
 

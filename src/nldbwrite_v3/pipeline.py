@@ -32,9 +32,11 @@ from nldbwrite_v3.vnext import (
     attach_repair_trace,
     attach_targeted_repair_trace,
     diagnose_evidence_span_boundaries,
+    diagnose_temporal_evidence_selections,
     mark_revalidation_outcome,
     mark_targeted_revalidation,
     repair_evidence_span_boundary_after_diagnostic,
+    repair_temporal_evidence_selection_after_diagnostic,
     repair_free_text_plan_after_diagnostics,
     repair_mapping_plan_after_diagnostics,
     repair_warnings_from_traces,
@@ -296,88 +298,211 @@ class MappingFirstPipeline:
                     ),
                 )
             except MaterializationError as exc:
-                if not self.constrained_reference_repair.enabled:
-                    verification = VerificationResult(
-                        "invalid",
-                        None,
-                        exc.diagnostics,
-                        [],
-                    )
-                    return PipelineResult(
-                        payload,
-                        None,
-                        verification,
-                        None,
-                        "evidence_materialization",
-                    )
-                repair_outcome = repair_free_text_plan_after_diagnostics(
-                    predicted_plan,
-                    self.profile,
-                    exc.diagnostics,
-                    self.constrained_reference_repair,
-                )
-                if not repair_outcome.applied:
-                    verification = VerificationResult(
-                        "invalid",
-                        None,
-                        annotate_reference_diagnostics(
+                reference_repair_outcome = None
+                if self.constrained_reference_repair.enabled:
+                    reference_repair_outcome = (
+                        repair_free_text_plan_after_diagnostics(
+                            predicted_plan,
+                            self.profile,
                             exc.diagnostics,
-                            repair_outcome.traces,
-                        ),
+                            self.constrained_reference_repair,
+                        )
+                    )
+                if (
+                    reference_repair_outcome is not None
+                    and reference_repair_outcome.applied
+                ):
+                    try:
+                        materialized_reference_plan = (
+                            reference_repair_outcome.plan
+                        )
+                        write_plan = materialize_reference_free_text_plan(
+                            materialized_reference_plan,
+                            request,
+                            self.profile,
+                            free_text_typed_normalization=(
+                                self.free_text_typed_normalization
+                            ),
+                        )
+                    except MaterializationError as retry_exc:
+                        final_traces = mark_revalidation_outcome(
+                            reference_repair_outcome.traces,
+                            retry_exc.diagnostics,
+                        )
+                        verification = VerificationResult(
+                            "invalid",
+                            None,
+                            annotate_reference_diagnostics(
+                                retry_exc.diagnostics,
+                                final_traces,
+                            ),
+                            repair_warnings_from_traces(final_traces),
+                        )
+                        return PipelineResult(
+                            payload,
+                            None,
+                            verification,
+                            None,
+                            "evidence_materialization",
+                        )
+                    final_traces = mark_revalidation_outcome(
+                        reference_repair_outcome.traces,
                         [],
                     )
-                    return PipelineResult(
-                        payload,
-                        None,
-                        verification,
-                        None,
-                        "evidence_materialization",
+                    write_plan = attach_repair_trace(
+                        write_plan,
+                        final_traces,
                     )
-                try:
-                    materialized_reference_plan = repair_outcome.plan
-                    write_plan = materialize_reference_free_text_plan(
-                        materialized_reference_plan,
-                        request,
-                        self.profile,
-                        free_text_typed_normalization=(
-                            self.free_text_typed_normalization
-                        ),
+                    grounding_warnings.extend(
+                        repair_warnings_from_traces(final_traces)
                     )
-                except MaterializationError as retry_exc:
-                    final_traces = mark_revalidation_outcome(
-                        repair_outcome.traces,
-                        retry_exc.diagnostics,
+                    final_reference_traces = final_traces
+                else:
+                    evidence_candidates = extract_evidence_candidates(request)
+                    selection_diagnostics = (
+                        diagnose_temporal_evidence_selections(
+                            predicted_plan,
+                            request,
+                            evidence_candidates,
+                            self.profile,
+                            exc.diagnostics,
+                            self.free_text_typed_normalization,
+                            self.diagnostic_targeted_repair,
+                        )
                     )
-                    verification = VerificationResult(
-                        "invalid",
-                        None,
-                        annotate_reference_diagnostics(
-                            retry_exc.diagnostics,
-                            final_traces,
-                        ),
-                        repair_warnings_from_traces(final_traces),
+                    selection_outcome = (
+                        repair_temporal_evidence_selection_after_diagnostic(
+                            predicted_plan,
+                            selection_diagnostics,
+                            self.diagnostic_targeted_repair,
+                        )
                     )
-                    return PipelineResult(
-                        payload,
-                        None,
-                        verification,
-                        None,
-                        "evidence_materialization",
-                    )
-                final_traces = mark_revalidation_outcome(
-                    repair_outcome.traces,
-                    [],
-                )
-                write_plan = attach_repair_trace(
-                    write_plan,
-                    final_traces,
-                )
-                grounding_warnings.extend(
-                    repair_warnings_from_traces(final_traces)
-                )
-                final_reference_traces = final_traces
+                    if selection_diagnostics and not selection_outcome.applied:
+                        for index, diagnostic in enumerate(
+                            selection_diagnostics
+                        ):
+                            item = deepcopy(diagnostic)
+                            if index < len(selection_outcome.traces):
+                                item.details["targeted_repair"] = deepcopy(
+                                    selection_outcome.traces[index]
+                                )
+                            selection_diagnostics[index] = item
+                        verification = VerificationResult(
+                            "invalid",
+                            None,
+                            selection_diagnostics,
+                            grounding_warnings,
+                        )
+                        return PipelineResult(
+                            payload,
+                            None,
+                            verification,
+                            None,
+                            "diagnostic_targeted_repair",
+                        )
+                    if selection_outcome.applied:
+                        try:
+                            write_plan = materialize_reference_free_text_plan(
+                                selection_outcome.plan,
+                                request,
+                                self.profile,
+                                free_text_typed_normalization=(
+                                    self.free_text_typed_normalization
+                                ),
+                            )
+                        except MaterializationError as retry_exc:
+                            targeted_repair_traces = (
+                                mark_targeted_revalidation(
+                                    selection_outcome.traces,
+                                    passed=False,
+                                    error_codes=[
+                                        item.error_code
+                                        for item in retry_exc.diagnostics
+                                    ],
+                                )
+                            )
+                            verification = VerificationResult(
+                                "invalid",
+                                None,
+                                retry_exc.diagnostics,
+                                [
+                                    *grounding_warnings,
+                                    *targeted_repair_warnings(
+                                        targeted_repair_traces
+                                    ),
+                                ],
+                            )
+                            return PipelineResult(
+                                payload,
+                                None,
+                                verification,
+                                None,
+                                "diagnostic_targeted_revalidation",
+                            )
+                        residual_boundary_diagnostics = (
+                            diagnose_evidence_span_boundaries(
+                                selection_outcome.plan,
+                                evidence_candidates,
+                                self.diagnostic_targeted_repair,
+                            )
+                        )
+                        if residual_boundary_diagnostics:
+                            targeted_repair_traces = (
+                                mark_targeted_revalidation(
+                                    selection_outcome.traces,
+                                    passed=False,
+                                    error_codes=[
+                                        item.error_code
+                                        for item in residual_boundary_diagnostics
+                                    ],
+                                )
+                            )
+                            verification = VerificationResult(
+                                "invalid",
+                                None,
+                                residual_boundary_diagnostics,
+                                [
+                                    *grounding_warnings,
+                                    *targeted_repair_warnings(
+                                        targeted_repair_traces
+                                    ),
+                                ],
+                            )
+                            return PipelineResult(
+                                payload,
+                                None,
+                                verification,
+                                None,
+                                "diagnostic_targeted_revalidation",
+                            )
+                        materialized_reference_plan = selection_outcome.plan
+                        targeted_repair_traces = selection_outcome.traces
+                    else:
+                        if reference_repair_outcome is not None:
+                            errors = annotate_reference_diagnostics(
+                                exc.diagnostics,
+                                reference_repair_outcome.traces,
+                            )
+                        else:
+                            errors = exc.diagnostics
+                        verification = VerificationResult(
+                            "invalid",
+                            None,
+                            errors,
+                            [],
+                        )
+                        return PipelineResult(
+                            payload,
+                            None,
+                            verification,
+                            None,
+                            "evidence_materialization",
+                        )
 
-            if self.diagnostic_targeted_repair.enabled:
+            if (
+                self.diagnostic_targeted_repair.enabled
+                and not targeted_repair_traces
+            ):
                 evidence_candidates = extract_evidence_candidates(request)
                 targeted_diagnostics = diagnose_evidence_span_boundaries(
                     materialized_reference_plan,
@@ -571,13 +696,15 @@ class MappingFirstPipeline:
                 error_codes=[item.error_code for item in verification.errors],
             )
             trace_plan = (
-                write_plan
-                if verification.valid or targeted_rollback_plan is None
-                else targeted_rollback_plan
+                write_plan if verification.valid else targeted_rollback_plan
             )
-            write_plan = attach_targeted_repair_trace(
-                trace_plan,
-                targeted_repair_traces,
+            write_plan = (
+                attach_targeted_repair_trace(
+                    trace_plan,
+                    targeted_repair_traces,
+                )
+                if trace_plan is not None
+                else None
             )
             if verification.normalized_plan is not None:
                 verification.normalized_plan = attach_targeted_repair_trace(

@@ -183,3 +183,21 @@ A–C are frozen at `Stage2-A-C-FINAL` (`f1fa49ddb8e6b920fb5a4237e088b6603579ae2
 - keeps prompts and G1-disabled V6 behavior unchanged;
 - adds the manually audited `final_archeology_032` Stage-1 fixture as diagnostic/regression evidence only;
 - does not implement G2, regenerate plans, run a model, or change datasets/gold/metrics/protocols.
+
+Housekeeping after G1 review:
+
+- records G1 as frozen at `Stage2-G1-FINAL` (`b3d6e721b5d3c1ea9a5fd7e117692a807815dcb7`);
+- describes G1 as a conservative boundary policy rather than proof that punctuation is incorrect;
+- retains comma only as reserved compatibility behavior with no observed activation;
+- corrects the registry's stale F narrative count to the already-established final `13/10/12` classification without changing F code or artifacts.
+
+# Stage 2-G2 Patch 1 — bounded temporal evidence selection repair
+
+- starts from frozen G1 and consumes the same A–F materialization boundary;
+- activates only after the frozen Stage-E `TEMPORAL_EVIDENCE_TYPE_MISMATCH` diagnostic rejects one non-temporal `value_from` used with `iso_date_normalization`;
+- filters only pre-enumerated candidates by temporal type, Stage-E target compatibility, primary/maximal span, forward order, and the same deterministic sentence;
+- requires exactly one diagnosed slot and exactly one compatible candidate, otherwise fails closed without ranking;
+- deep-copies the plan and changes only the diagnosed `value_from`, with replacement-reference collision protection;
+- retries the frozen materializer once and then the frozen verifier; G2 cannot chain into G1 or a second G2 repair in the same invocation;
+- adds two eligible Stage-1 temporal diagnostic fixtures and one non-temporal out-of-scope control;
+- does not run a model, causal replay, or change datasets, gold labels, metrics, prompts, protocols, or frozen A–G1 semantics.

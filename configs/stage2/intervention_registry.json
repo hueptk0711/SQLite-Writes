@@ -1,5 +1,5 @@
 {
-  "stage": "2-F-constrained-reference-repair",
+  "stage": "2-G2-temporal-evidence-selection-repair",
   "baseline": "configs/stage2/original.json",
   "dispatch_family": "MP-FS+",
   "interventions": [
@@ -48,7 +48,7 @@
       "id": "F_constrained_reference_repair",
       "config_block": "constrained_reference_repair",
       "hypothesis": "A non-empty reference that has already failed a deterministic reference boundary may be repaired safely only from its slot-local closed valid set when one candidate is uniquely determined by an exact identifier-name anchor or by a singleton valid set; semantic evidence/conflict/update choices remain protected and all other cases fail closed.",
-      "stage1_evidence": "35 Stage-1 first failures at reference resolution (28 REF_UNKNOWN_COLUMN + 7 REF_INVALID_SOURCE_REF), manually classified as 14 reference-only repairable, 10 reference-repair-partial-but-sample-not-safe, and 11 non-repairable; diagnostic/regression evidence only.",
+      "stage1_evidence": "35 Stage-1 first failures at reference resolution (28 REF_UNKNOWN_COLUMN + 7 REF_INVALID_SOURCE_REF), manually classified under the final F eligibility whitelist as 13 reference-only repairable, 10 reference-repair-partial-but-sample-not-safe, and 12 non-repairable; diagnostic/regression evidence only.",
       "config": "configs/stage2/v6_constrained_reference_repair.json",
       "status": "frozen",
       "frozen_tag": "Stage2-F-FINAL",
@@ -57,14 +57,25 @@
     {
       "id": "G1_evidence_span_boundary_repair",
       "config_block": "diagnostic_targeted_repair",
-      "hypothesis": "A selected identifier evidence span with one terminal period or comma may be replaced only by the unique pre-enumerated candidate at the same start and end-minus-one boundary; the plan is deep-copied, only value_from changes, and the frozen boundary is retried once.",
+      "hypothesis": "Under the conservative G1 boundary policy, a selected identifier evidence span with one terminal period or comma may be replaced only by the unique pre-enumerated candidate at the same start and end-minus-one boundary; this does not independently prove the punctuation is linguistically incorrect. The plan is deep-copied, only value_from changes, and the frozen boundary is retried once.",
       "stage1_evidence": "One manually audited Stage-1 case, final_archeology_032, selected e3='SC9081.' while the frozen candidate set also contained e7='SC9081' at the exact bounded span; diagnostic/regression evidence only.",
       "config": "configs/stage2/v7_diagnostic_targeted_repair_g1.json",
+      "status": "frozen",
+      "frozen_tag": "Stage2-G1-FINAL",
+      "frozen_commit": "b3d6e721b5d3c1ea9a5fd7e117692a807815dcb7",
+      "compatibility_note": "Comma remains a reserved compatibility branch in the frozen G1 config; no observed Stage-1 fixture or dedicated regression activates it."
+    },
+    {
+      "id": "G2_temporal_evidence_selection_repair",
+      "config_block": "diagnostic_targeted_repair.evidence_span_selection",
+      "hypothesis": "When frozen Stage E rejects a non-temporal evidence reference with TEMPORAL_EVIDENCE_TYPE_MISMATCH for one iso_date_normalization slot, G2 may replace only that value_from with the exactly-one compatible maximal primary DATE/DATETIME candidate already enumerated after it in the same deterministic sentence.",
+      "stage1_evidence": "Two manually audited temporal Stage-1 cases (final_vaccine_002 and final_vaccine_048) are eligible diagnostic/regression fixtures; final_virtual_046 is retained as a non-temporal out-of-scope control. No end-to-end rescue claim is made.",
+      "config": "configs/stage2/v8_diagnostic_targeted_repair_g2.json",
       "status": "in_review"
     }
   ],
   "not_in_scope": [
-    "evidence_selection_repair",
+    "generic_or_non_temporal_evidence_selection_repair",
     "conflict_target_repair",
     "update_column_semantic_repair",
     "semantic_targeted_repair",
@@ -125,6 +136,22 @@
     "the same frozen materializer and verifier boundary is retried at most once; no recursive repair is permitted",
     "operation, conflict, update, table, column, group, dependency, value text, prompt, and all other evidence references are unchanged",
     "repair provenance records diagnostic, old value/reference, closed candidate set, selected repair, rule, application/success flags, and revalidation result",
-    "A-F remain frozen and are consumed only through existing interfaces"
+    "A-F remain frozen and are consumed only through existing interfaces",
+    "G1 is frozen at Stage2-G1-FINAL; comma is reserved compatibility behavior with no observed activation in the frozen Stage-1 fixture set"
+  ],
+  "g1_frozen_tag": "Stage2-G1-FINAL",
+  "g1_frozen_commit": "b3d6e721b5d3c1ea9a5fd7e117692a807815dcb7",
+  "g2_invariants": [
+    "G2 is independently ablatable through diagnostic_targeted_repair.evidence_span_selection",
+    "G2 runs only after the frozen materializer emits TYPED_NORMALIZATION_REJECTED with typed_error_code TEMPORAL_EVIDENCE_TYPE_MISMATCH for iso_date_normalization",
+    "exactly one diagnosed value_from slot is required; multiple diagnosed slots fail closed",
+    "replacement candidates come only from the pre-enumerated evidence candidate set and are filtered by temporal type, target-column compatibility, forward order, same deterministic sentence, primary role, and maximal temporal span",
+    "exactly one compatible candidate is required; zero or multiple candidates fail closed without ranking",
+    "the plan is deep-copied and only the diagnosed value_from reference may change",
+    "replacement evidence already assigned to another semantic slot causes fail-closed collision handling",
+    "the same frozen materializer and verifier boundary is retried exactly once after an applied repair",
+    "G2 does not chain with G1 or another G2 repair during the same invocation",
+    "provenance records the source diagnostic, old value/reference, candidate set, selected repair, rule, application/success flags, and revalidation result",
+    "A-F and frozen G1 remain unchanged and are consumed through existing interfaces"
   ]
 }

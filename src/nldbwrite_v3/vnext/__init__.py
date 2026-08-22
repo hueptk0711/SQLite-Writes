@@ -22,8 +22,10 @@ from .targeted_repair import (
     TargetedRepairOutcome,
     attach_targeted_repair_trace,
     diagnose_evidence_span_boundaries,
+    diagnose_temporal_evidence_selections,
     mark_targeted_revalidation,
     repair_evidence_span_boundary_after_diagnostic,
+    repair_temporal_evidence_selection_after_diagnostic,
     targeted_repair_warnings,
 )
 
@@ -74,7 +76,9 @@ __all__ = [
     "TargetedRepairOutcome",
     "attach_targeted_repair_trace",
     "diagnose_evidence_span_boundaries",
+    "diagnose_temporal_evidence_selections",
     "mark_targeted_revalidation",
     "repair_evidence_span_boundary_after_diagnostic",
+    "repair_temporal_evidence_selection_after_diagnostic",
     "targeted_repair_warnings",
 ]
