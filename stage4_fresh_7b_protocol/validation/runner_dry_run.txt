@@ -1,0 +1,75 @@
+{
+  "status": "DRY_RUN_PASS",
+  "stage": "Stage4_FRESH_7B",
+  "sample_count": 300,
+  "generation_arms": [
+    "direct",
+    "j_fs",
+    "mp_fs_plus_shared"
+  ],
+  "model_lock": {
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "snapshot_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+    "tokenizer_sha256": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468",
+    "model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357"
+  },
+  "raw_generation_policy": {
+    "completed_raw_output": "immutable_never_regenerate",
+    "infra_crash_before_output": "resume_same_config_only",
+    "semantic_retry": false,
+    "batch_size": 1,
+    "resume_key": "generation_arm+sample_id"
+  },
+  "generation_plan": [
+    {
+      "generation_arm": "direct",
+      "process_slug": "direct",
+      "config": "configs/stage4/direct.json",
+      "output_dir": "methods/direct",
+      "central_raw": "raw_generations/direct.jsonl"
+    },
+    {
+      "generation_arm": "j_fs",
+      "process_slug": "j_fs",
+      "config": "configs/stage4/j_fs.json",
+      "output_dir": "methods/j_fs",
+      "central_raw": "raw_generations/j_fs.jsonl"
+    },
+    {
+      "generation_arm": "mp_fs_plus_shared",
+      "process_slug": "original_mp_fs_plus",
+      "config": "configs/stage4/original_mp_fs_plus.json",
+      "output_dir": "methods/original_mp_fs_plus",
+      "central_raw": "raw_generations/mp_fs_plus_shared.jsonl"
+    }
+  ],
+  "deterministic_reprocess_plan": [
+    {
+      "process_slug": "d_g1_primary",
+      "config": "configs/stage4/d_g1_primary.json",
+      "output_dir": "methods/d_g1_primary",
+      "reuse_central_raw": "raw_generations/mp_fs_plus_shared.jsonl"
+    },
+    {
+      "process_slug": "d_only_secondary",
+      "config": "configs/stage4/d_only_secondary.json",
+      "output_dir": "methods/d_only_secondary",
+      "reuse_central_raw": "raw_generations/mp_fs_plus_shared.jsonl"
+    },
+    {
+      "process_slug": "full_secondary",
+      "config": "configs/stage4/full_secondary.json",
+      "output_dir": "methods/full_secondary",
+      "reuse_central_raw": "raw_generations/mp_fs_plus_shared.jsonl"
+    },
+    {
+      "process_slug": "no_c_secondary",
+      "config": "configs/stage4/no_c_secondary.json",
+      "output_dir": "methods/no_c_secondary",
+      "reuse_central_raw": "raw_generations/mp_fs_plus_shared.jsonl"
+    }
+  ],
+  "result_root": "D:\\paper kltn\\text to sql\\github_publish\\SQLite-Writes\\.tmp_stage4_runner_dry_run_log"
+}

@@ -3,3 +3,5 @@ platform=Windows-11-10.0.26200-SP0
 sqlite=3.50.4
 local_transformers_available=false
 exact_qwen_token_count_required_on_gpu_preflight=true
+gpu_environment_capture_required_before_generation=true
+required_gpu_packages=python,torch,transformers,accelerate,bitsandbytes,cuda,tokenizers,safetensors

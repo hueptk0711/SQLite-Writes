@@ -713,6 +713,7 @@ def run_method(
     final_protocol_path: str | Path | None = None,
     allow_locked_test_rerun: bool = False,
     v2_source_path: str | Path | None = None,
+    reuse_raw_generations_path: str | Path | None = None,
 ) -> dict[str, Any]:
     started = time.time()
     project_root = Path(__file__).resolve().parents[3]
@@ -886,7 +887,22 @@ def run_method(
     generator = None
     generator_metadata: dict[str, Any] = {"backend": "none"}
     inference_config = config.get("inference") or config
-    if method != "Gold-MP":
+    reuse_raw_path = (
+        Path(reuse_raw_generations_path)
+        if reuse_raw_generations_path is not None
+        else None
+    )
+    if method != "Gold-MP" and reuse_raw_path is not None:
+        if not reuse_raw_path.is_file():
+            raise ValueError(f"Reusable raw generation file not found: {reuse_raw_path}")
+        generator_metadata = {
+            "backend": "reused_raw_generation",
+            "source_raw_generations": str(reuse_raw_path.resolve()),
+            "source_raw_generations_sha256": sha256_file(reuse_raw_path),
+            "semantic_retry": False,
+            "prompt_hash_match_required": True,
+        }
+    elif method != "Gold-MP":
         backend = str(inference_config.get("backend") or "hf").casefold()
         if backend in {"hf", "huggingface"}:
             if dependency_lock_path is None:
@@ -970,7 +986,39 @@ def run_method(
         if resume and raw_path.exists()
         else {}
     )
-    if method != "Gold-MP":
+    if method != "Gold-MP" and reuse_raw_path is not None:
+        reusable = {str(row["sample_id"]): row for row in iter_jsonl(reuse_raw_path)}
+        missing_reusable = [sample_id for sample_id in selected_ids if sample_id not in reusable]
+        if missing_reusable:
+            raise ValueError(
+                "Reusable raw generation file is missing selected samples: "
+                f"{missing_reusable[:10]}"
+            )
+        prompt_mismatches = [
+            sample_id
+            for sample_id in selected_ids
+            if str(reusable[sample_id].get("prompt_sha256") or "")
+            != prompt_hashes[sample_id]
+        ]
+        if prompt_mismatches:
+            raise ValueError(
+                "Reusable raw generation prompt hashes do not match the "
+                f"current method prompts: {prompt_mismatches[:10]}"
+            )
+        existing = {
+            sample_id: {
+                **reusable[sample_id],
+                "reused_raw_generation": True,
+                "reused_raw_generation_source": str(reuse_raw_path.resolve()),
+                "semantic_retry": False,
+            }
+            for sample_id in selected_ids
+        }
+        write_jsonl(
+            [existing[sample_id] for sample_id in selected_ids],
+            raw_path,
+        )
+    elif method != "Gold-MP":
         missing_requests = [
             request for request in requests if request.sample_id not in existing
         ]

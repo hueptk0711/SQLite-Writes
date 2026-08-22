@@ -1,110 +1,34 @@
 {
-  "stage": "Stage4_FRESH_7B_PROTOCOL",
-  "created_at_unix": 1787397659.967816,
-  "elapsed_seconds": 18.652283906936646,
-  "model_called": false,
-  "run_lock_template": {
-    "stage": "Stage4_FRESH_7B_PROTOCOL",
-    "status": "template_pending_reviewer_acceptance",
-    "model_called": false,
-    "gpu_required_for_protocol": false,
-    "gpu_required_for_generation_after_acceptance": true,
-    "primary_method_slug": "d_g1_primary",
-    "primary_method_identity": "MP-FS+-vNext-D-G1-FINAL",
-    "primary_config_sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf",
-    "primary_config_expected_stage3b_sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf",
-    "generation_arms": [
-      "d_g1_primary",
-      "direct",
-      "j_fs",
-      "original_mp_fs_plus"
-    ],
-    "secondary_reprocesses_share_raw_generation_with": {
-      "d_only_secondary": "d_g1_primary",
-      "full_secondary": "d_g1_primary",
-      "no_c_secondary": "d_g1_primary"
-    },
-    "model_lock": {
-      "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
-      "snapshot_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
-      "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
-      "aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
-      "tokenizer_sha256": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468",
-      "model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357"
-    },
-    "inference_lock": {
-      "backend": "hf",
-      "framework": "transformers",
-      "batch_size": 1,
-      "context_length": 32768,
-      "max_input_tokens": 28672,
-      "max_new_tokens": 4096,
-      "input_truncation_policy": "error",
-      "quantization": "4bit",
-      "compute_dtype": "float16",
-      "device_map": "auto",
-      "do_sample": false,
-      "temperature": null,
-      "top_p": null,
-      "top_k": null,
-      "seed": 42,
-      "stop_sequences": [],
-      "trust_remote_code": false,
-      "batching_policy": "fixed batch_size=1; resume keyed by sample_id"
-    },
-    "token_budget_experiment": false,
-    "stopping_rule": "no tuning on fresh set; preserve raw outputs and report failures",
-    "repository_head": "d3884845a6903b6cb44553fd0d52d3e618aa9228",
-    "repository_branch": "stage2/g-diagnostic-targeted-repair",
-    "fresh_sample_ids_sha256": "5c8bd5cf2e5b79088322289f795beb95c33a1fa0de214f129eb0cf6680319a25",
-    "prompt_set_hashes": {
-      "direct": "e77dc83edd1c9bf3b7dd105b0293552c0a300238a12eb5fe70be3b4a5c192a69",
-      "j_fs": "ed4564f6768904d4f460df7d98d255a01f908e69bd02d5030cbfcd2e4129a2ff",
-      "original_mp_fs_plus": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
-      "d_g1_primary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
-      "d_only_secondary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
-      "full_secondary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
-      "no_c_secondary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf"
-    },
-    "config_hashes": {
-      "direct": {
-        "path": "configs/stage4/direct.json",
-        "sha256": "bc7c04f9daecc6706129ae06a04b612e339bd65e5bf722855e3f17b413b7f2f6"
-      },
-      "j_fs": {
-        "path": "configs/stage4/j_fs.json",
-        "sha256": "832665a5953f92e4ea66642b3e1f3dcfa9e9842518e98393dc5ffa7a23e49765"
-      },
-      "original_mp_fs_plus": {
-        "path": "configs/stage4/original_mp_fs_plus.json",
-        "sha256": "eed7feb1abdebdb5680e00922601135ea6f6ac809deaa9d548945569e7a5f206"
-      },
-      "d_g1_primary": {
-        "path": "configs/stage4/d_g1_primary.json",
-        "sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf"
-      },
-      "d_only_secondary": {
-        "path": "configs/stage4/d_only_secondary.json",
-        "sha256": "212a489e956e2164459a4b15b006d69da47e67bb4b09457114f7ef05534c93bb"
-      },
-      "full_secondary": {
-        "path": "configs/stage4/full_secondary.json",
-        "sha256": "ec935c92b0bc2eb4935db7635ca6fd238606fc1aac5d4159694b77bd95ea81f2"
-      },
-      "no_c_secondary": {
-        "path": "configs/stage4/no_c_secondary.json",
-        "sha256": "909adca682d619934bdbdc9042ef3987c684b4e9aae520a1774de3824a3c7ec3"
-      }
-    }
-  },
+  "created_at_unix": 1787400560.748382,
+  "elapsed_seconds": 13.707931995391846,
   "files": {
+    "README_REVIEWER.md": {
+      "sha256": "0e4f7754b660a706aa8cb0de293cb53627740bcd70509e8df1ac3c92727bea36",
+      "size_bytes": 598
+    },
+    "RUN_STAGE4_7B_AFTER_ACCEPTANCE.md": {
+      "sha256": "995794330f6f442a5b944c12057b766c90132f6ce3d57056158c1b614774b7ee",
+      "size_bytes": 2519
+    },
+    "STAGE4_PROTOCOL.md": {
+      "sha256": "2cf4b2548afd122940f4c00752a5e3ecb8e410946146eeb38cd4ea6b4b7f92dc",
+      "size_bytes": 1815
+    },
+    "VALIDATION_REPORT.md": {
+      "sha256": "b680dbc21c367820095bc34b1eb865f0224f06f5d3c2e2aca5bf4134ddb2aa17",
+      "size_bytes": 1265
+    },
+    "analysis/d_parser_opportunity_audit.csv": {
+      "sha256": "49b59d17d80f81d0c39e9e16322e8e5735c65b5a7d4c2f6493c30a26ea435d2b",
+      "size_bytes": 51820
+    },
     "analysis/metric_spec.md": {
       "sha256": "2a6447ed41f4887e84b3d99325a72b256c185ac27281155b9a1bb0fa7ae4070b",
       "size_bytes": 383
     },
     "analysis/statistical_analysis_plan.md": {
-      "sha256": "d0c8198be2915c4a8a1ad9e046ad7efa07209dd3c6ce1d6dacfabfdb3abed96a",
-      "size_bytes": 492
+      "sha256": "9f803919dea6eb5ba1a7269bdf847bb84e17d13d2d6693cc632297e7e78b826a",
+      "size_bytes": 848
     },
     "configs/d_g1_primary.json": {
       "sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf",
@@ -135,8 +59,8 @@
       "size_bytes": 703
     },
     "data/fresh_dataset_manifest.json": {
-      "sha256": "0146a315894b4c423db3831429efb3925a600ab6e4eaa073a4d69a384dd29fe4",
-      "size_bytes": 13037
+      "sha256": "d1850063af0a5b235cc4e8854d72b146fcca6e26bdebb5617ac3048abd4726ec",
+      "size_bytes": 13208
     },
     "data/fresh_sample_ids.txt": {
       "sha256": "5c8bd5cf2e5b79088322289f795beb95c33a1fa0de214f129eb0cf6680319a25",
@@ -146,69 +70,273 @@
       "sha256": "cca14bda5dd1591132b1882527b181fcf8c59fbb0785a91b07b65833d1cfa88d",
       "size_bytes": 807
     },
+    "data/source_group_audit.json": {
+      "sha256": "a0eefdb6c7919190750c853d259f59b69a19c1b4acd95c3469638e1277ac6199",
+      "size_bytes": 420
+    },
+    "inference/stage4_qwen25_7b_in28672_out4096.json": {
+      "sha256": "c7f43df89536ac412b73092c78d2cc251084f090dc0790cbe839a4248f6b5e16",
+      "size_bytes": 1134
+    },
     "prompt_audit/prompt_hash_validation.txt": {
       "sha256": "ab842f7e06e067b23b822e9bb38bdf09659b37c0fc135bc351978fc0f43674d3",
       "size_bytes": 219
     },
     "prompt_audit/prompt_manifest.csv": {
-      "sha256": "8568023998dbf251b00a5a7cbf028303e6f1e56dcc12de247056df9f7ee43819",
-      "size_bytes": 613525
+      "sha256": "76a03e5f3edd37cd7857e5c935676490530d2235506aa47f176f6166142e77d7",
+      "size_bytes": 700258
     },
     "prompt_audit/prompt_surface_summary.csv": {
       "sha256": "2132158c3d5966b4163db3f27fef360bb2d7f9c1a3863d084a8c28d26101cda4",
       "size_bytes": 427
     },
     "provenance/environment_lock.txt": {
-      "sha256": "86bab45a1768d3a132d900d7cc9d7589e52a34cca3c2118ac1daa5cfbea398da",
-      "size_bytes": 152
+      "sha256": "5f497c6038140cab3f3c93b3cb54f1ba13fc73de35217722f75a739910375af2",
+      "size_bytes": 308
     },
     "provenance/run_lock_TEMPLATE.json": {
-      "sha256": "faa8f2002966ed87e59cb0ff4ba6a422eadafc1cad4d9ba19a93b01fdf924028",
-      "size_bytes": 3984
-    },
-    "README_REVIEWER.md": {
-      "sha256": "90bb7de6f10f5dde412ccd5b6e341019cddf1ac69862d66b7cd5abe808c4e46d",
-      "size_bytes": 319
-    },
-    "RUN_STAGE4_7B_AFTER_ACCEPTANCE.md": {
-      "sha256": "6b7ede837525ae07aab7f563c8afd0a1386fc6555c476788584a5ce1c509c580",
-      "size_bytes": 780
-    },
-    "STAGE4_PROTOCOL.md": {
-      "sha256": "8e6123cfd12033a5b8ef33ed279aa4d8434cd0cf808f30e73ac1ec10edeb5db4",
-      "size_bytes": 1219
+      "sha256": "819d1be7d1a48603a3f3a8cad1696970234849fbd77bdf5ef194e4df5f9d9945",
+      "size_bytes": 7650
     },
     "tests/protocol_invariants.json": {
-      "sha256": "9cffeaa1759fe61dd03711cc7c721d542e9502e79656e12eba93f8efce429ab7",
-      "size_bytes": 189
+      "sha256": "947a9685eee596e5fe3a8e484eab7be3d4533d72be875da05ea80f144b0fad65",
+      "size_bytes": 167
     },
     "validation/compatibility_A_to_G2_stage3_stage3b_stage4.txt": {
-      "sha256": "ac227cad1f7f5a3e0d52c2c3a77f5b04d19c4f44de6e1a9dd0d3ba90242bc167",
-      "size_bytes": 345
+      "sha256": "88583cd151640d2dd9bee5a906a6631c882d1908bf53d18dec964e3cbceca1cc",
+      "size_bytes": 324
     },
     "validation/dedicated_stage4_tests.txt": {
-      "sha256": "7bd85a899ab6252c5c95c739b4af7356fab65e899aa15f35278db1f78eac2854",
-      "size_bytes": 100
+      "sha256": "55cf85556f9212aec3cf3688ddb048b901ad2536966113215358784c657a7532",
+      "size_bytes": 81
     },
     "validation/deterministic_repeat.txt": {
-      "sha256": "bc9aeeaa03bcbf058888b54d7e6fc67f55f0237ce5d87a50fd10d354128d858e",
-      "size_bytes": 57
+      "sha256": "9e77bb28b51c460bb50b265fefd7231b279acd9cca10278c482c5dbe8f513fc2",
+      "size_bytes": 1665
     },
     "validation/deterministic_repeat_run.txt": {
-      "sha256": "5bc58bb321a09fe1806100498fb2996ac545d9ddd4c14f03fb32f32aeacbd30f",
-      "size_bytes": 201
+      "sha256": "aa787ebf76420cbd30433e0ed3c2dfc686c0842282ac3eaf989fbbc94108786b",
+      "size_bytes": 178
     },
     "validation/full_fast_suite.txt": {
-      "sha256": "053de8de9ee199f81dce9efbffd891af0a2fcf847c3afa8f259c38d6f2bdf0cf",
-      "size_bytes": 517
+      "sha256": "acc58edf2ef695c97dc1f210898d39260ef421c19c26c6f1badc79a5b3c43f61",
+      "size_bytes": 465
     },
-    "VALIDATION_REPORT.md": {
-      "sha256": "e9e4412b79a5a0bb303cd471f034617844a27b247292183ee20fad7f71c1616c",
-      "size_bytes": 754
+    "validation/protocol_validator.txt": {
+      "sha256": "aa787ebf76420cbd30433e0ed3c2dfc686c0842282ac3eaf989fbbc94108786b",
+      "size_bytes": 178
+    },
+    "validation/runner_dry_run.txt": {
+      "sha256": "b93bdf0143f07df8e524f82da3e20df9b7aff96c69f080ff2ab03939026a2b2d",
+      "size_bytes": 2736
     }
   },
   "manifest_hash_exclusions": [
-    "provenance/run_manifest.json",
-    "validation/protocol_validator.txt"
-  ]
+    "provenance/run_manifest.json"
+  ],
+  "model_called": false,
+  "run_lock_template": {
+    "config_hashes": {
+      "d_g1_primary": {
+        "path": "configs/stage4/d_g1_primary.json",
+        "sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf"
+      },
+      "d_only_secondary": {
+        "path": "configs/stage4/d_only_secondary.json",
+        "sha256": "212a489e956e2164459a4b15b006d69da47e67bb4b09457114f7ef05534c93bb"
+      },
+      "direct": {
+        "path": "configs/stage4/direct.json",
+        "sha256": "bc7c04f9daecc6706129ae06a04b612e339bd65e5bf722855e3f17b413b7f2f6"
+      },
+      "full_secondary": {
+        "path": "configs/stage4/full_secondary.json",
+        "sha256": "ec935c92b0bc2eb4935db7635ca6fd238606fc1aac5d4159694b77bd95ea81f2"
+      },
+      "j_fs": {
+        "path": "configs/stage4/j_fs.json",
+        "sha256": "832665a5953f92e4ea66642b3e1f3dcfa9e9842518e98393dc5ffa7a23e49765"
+      },
+      "no_c_secondary": {
+        "path": "configs/stage4/no_c_secondary.json",
+        "sha256": "909adca682d619934bdbdc9042ef3987c684b4e9aae520a1774de3824a3c7ec3"
+      },
+      "original_mp_fs_plus": {
+        "path": "configs/stage4/original_mp_fs_plus.json",
+        "sha256": "eed7feb1abdebdb5680e00922601135ea6f6ac809deaa9d548945569e7a5f206"
+      }
+    },
+    "deterministic_reprocesses_share_raw_generation_with": {
+      "d_g1_primary": "mp_fs_plus_shared",
+      "d_only_secondary": "mp_fs_plus_shared",
+      "full_secondary": "mp_fs_plus_shared",
+      "no_c_secondary": "mp_fs_plus_shared",
+      "original_mp_fs_plus": "mp_fs_plus_shared"
+    },
+    "fresh_sample_ids_sha256": "5c8bd5cf2e5b79088322289f795beb95c33a1fa0de214f129eb0cf6680319a25",
+    "generation_arms": [
+      "direct",
+      "j_fs",
+      "mp_fs_plus_shared"
+    ],
+    "generation_graph": {
+      "direct": {
+        "generates_raw": "raw_generations/direct.jsonl",
+        "process_as": [
+          "direct"
+        ]
+      },
+      "j_fs": {
+        "generates_raw": "raw_generations/j_fs.jsonl",
+        "process_as": [
+          "j_fs"
+        ]
+      },
+      "mp_fs_plus_shared": {
+        "generates_raw": "raw_generations/mp_fs_plus_shared.jsonl",
+        "process_as": [
+          "original_mp_fs_plus",
+          "d_g1_primary",
+          "d_only_secondary",
+          "full_secondary",
+          "no_c_secondary"
+        ],
+        "required_preflight_invariant": "original_vs_dg1_final_input_equal == 300/300"
+      }
+    },
+    "gpu_environment_lock_required": [
+      "python",
+      "torch",
+      "transformers",
+      "accelerate",
+      "bitsandbytes",
+      "cuda_runtime",
+      "gpu_model",
+      "gpu_driver",
+      "tokenizers",
+      "safetensors"
+    ],
+    "gpu_required_for_generation_after_acceptance": true,
+    "gpu_required_for_protocol": false,
+    "inference_lock": {
+      "backend": "hf",
+      "batch_size": 1,
+      "batching_policy": "fixed batch_size=1; resume keyed by generation_arm+sample_id",
+      "bitsandbytes_config": {
+        "bnb_4bit_compute_dtype": "float16",
+        "bnb_4bit_quant_storage": "uint8",
+        "bnb_4bit_quant_type": "fp4",
+        "bnb_4bit_use_double_quant": false,
+        "load_in_4bit": true,
+        "source": "Explicit lock of the historical runner behavior: the previous HF runner passed only load_in_4bit=True and compute_dtype=float16, therefore BitsAndBytes defaults are fixed here instead of left implicit."
+      },
+      "bos_handling": "tokenizer(prompt, add_special_tokens=True)",
+      "chat_template_usage": {
+        "add_generation_prompt": true,
+        "messages": [
+          {
+            "content": "<production_prompt>",
+            "role": "user"
+          }
+        ],
+        "tokenize": false
+      },
+      "compute_dtype": "float16",
+      "context_length": 32768,
+      "device_map": "auto",
+      "do_sample": false,
+      "eos_token_id": "tokenizer.eos_token_id captured by GPU preflight",
+      "framework": "transformers",
+      "generation_kwargs": {
+        "do_sample": false,
+        "eos_token_id": "tokenizer.eos_token_id",
+        "max_new_tokens": 4096,
+        "pad_token_id": "tokenizer.pad_token_id",
+        "temperature": "omitted_when_do_sample_false",
+        "top_p": "omitted_when_do_sample_false"
+      },
+      "input_truncation_policy": "error",
+      "max_input_tokens": 28672,
+      "max_new_tokens": 4096,
+      "pad_token_id": "tokenizer.pad_token_id; if absent set to eos_token_id",
+      "padding_side": "left",
+      "quantization": "4bit",
+      "retry_policy": {
+        "attempt_log_required": true,
+        "completed_raw_output": "immutable_never_regenerate",
+        "infrastructure_crash_before_output": "resume_same_config_only",
+        "semantic_retry": false
+      },
+      "seed": 42,
+      "stop_sequences": [],
+      "temperature": null,
+      "top_k": null,
+      "top_p": null,
+      "trust_remote_code": false
+    },
+    "model_called": false,
+    "model_lock": {
+      "aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+      "model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357",
+      "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+      "snapshot_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "tokenizer_sha256": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468"
+    },
+    "primary_config_expected_stage3b_sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf",
+    "primary_config_sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf",
+    "primary_method_identity": "MP-FS+-vNext-D-G1-FINAL",
+    "primary_method_slug": "d_g1_primary",
+    "prompt_set_hashes": {
+      "d_g1_primary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
+      "d_only_secondary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
+      "direct": "e77dc83edd1c9bf3b7dd105b0293552c0a300238a12eb5fe70be3b4a5c192a69",
+      "full_secondary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
+      "j_fs": "ed4564f6768904d4f460df7d98d255a01f908e69bd02d5030cbfcd2e4129a2ff",
+      "no_c_secondary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
+      "original_mp_fs_plus": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf"
+    },
+    "protocol_builder_base_commit": "53d62cd02abca575a63ef126c537acf96a69a113",
+    "repository_branch": "stage2/g-diagnostic-targeted-repair",
+    "runtime_assertions": {
+      "execution_commit_equals_accepted_protocol_commit": true,
+      "generated_result_files_outside_git_allowed": true,
+      "git_rev_parse_head_equals_accepted_protocol_commit": true,
+      "working_tree_clean_before_generation": true
+    },
+    "source_group_audit": {
+      "group_size_distribution": {
+        "1": 107,
+        "2": 69,
+        "3": 17,
+        "4": 1
+      },
+      "max_group_size": 4,
+      "multi_sample_group_count": 87,
+      "policy": "Primary clustering key is official source_group/source_group_id; sample-ID root derivation is used only when official metadata is absent.",
+      "sample_count": 300,
+      "source_group_source_counts": {
+        "source_group_id": 300
+      },
+      "unique_source_groups": 194
+    },
+    "stage": "Stage4_FRESH_7B_PROTOCOL",
+    "stage4_inference_config": {
+      "path": "stage4_fresh_7b_protocol/inference/stage4_qwen25_7b_in28672_out4096.json",
+      "sha256": "c7f43df89536ac412b73092c78d2cc251084f090dc0790cbe839a4248f6b5e16"
+    },
+    "statistics": {
+      "accuracy_weighting": "sample_weighted",
+      "bootstrap_replicates": 10000,
+      "bootstrap_seed": 240822,
+      "cluster_key": "source_group",
+      "confidence_interval": "cluster_bootstrap_percentile_95",
+      "primary_paired_difference": "accuracy(d_g1_primary)-accuracy(original_mp_fs_plus)",
+      "secondary_mcnemar_exact": true
+    },
+    "status": "template_pending_reviewer_acceptance",
+    "stopping_rule": "no tuning on fresh set; preserve raw outputs and report failures",
+    "token_budget_experiment": false
+  },
+  "stage": "Stage4_FRESH_7B_PROTOCOL"
 }

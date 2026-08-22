@@ -345,6 +345,7 @@
     "upsert_update": 25
   },
   "dependency_sensitive_count": 41,
+  "source_group_policy": "Use official source_group when present, else official source_group_id when present; derive from sample ID only if no official metadata exists.",
   "selection_policy": {
     "seed": "stage4-fresh-7b-protocol-v1",
     "rule": "exclude diagnostic overlaps, then sort by sha256(seed|sample_id) and take first 300",

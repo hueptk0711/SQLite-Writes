@@ -1,0 +1,16 @@
+{
+  "sample_count": 300,
+  "unique_source_groups": 194,
+  "multi_sample_group_count": 87,
+  "max_group_size": 4,
+  "group_size_distribution": {
+    "1": 107,
+    "2": 69,
+    "3": 17,
+    "4": 1
+  },
+  "source_group_source_counts": {
+    "source_group_id": 300
+  },
+  "policy": "Primary clustering key is official source_group/source_group_id; sample-ID root derivation is used only when official metadata is absent."
+}

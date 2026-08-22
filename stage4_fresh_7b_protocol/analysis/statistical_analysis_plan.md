@@ -9,8 +9,17 @@ Report paired counts:
 - D_G1 only correct
 - both wrong
 
-Use McNemar exact test for the paired correctness table. Report a 95% paired
-accuracy-difference confidence interval by bootstrap over sample IDs.
+Accuracy remains sample-weighted. The primary 95% confidence interval for the
+paired accuracy difference uses a cluster bootstrap over source_group:
+
+- cluster key: official source_group if present, else official source_group_id;
+  sample-ID derivation only if no official metadata exists
+- bootstrap replicates: 10000
+- bootstrap RNG seed: 240822
+- interval: percentile 95% CI
+
+Report McNemar exact test as a secondary conventional paired test with a note
+that the dataset contains clustered variants.
 
 Predeclared subgroups:
 

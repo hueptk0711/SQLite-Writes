@@ -9,15 +9,41 @@
   "primary_config_sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf",
   "primary_config_expected_stage3b_sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf",
   "generation_arms": [
-    "d_g1_primary",
     "direct",
     "j_fs",
-    "original_mp_fs_plus"
+    "mp_fs_plus_shared"
   ],
-  "secondary_reprocesses_share_raw_generation_with": {
-    "d_only_secondary": "d_g1_primary",
-    "full_secondary": "d_g1_primary",
-    "no_c_secondary": "d_g1_primary"
+  "generation_graph": {
+    "direct": {
+      "generates_raw": "raw_generations/direct.jsonl",
+      "process_as": [
+        "direct"
+      ]
+    },
+    "j_fs": {
+      "generates_raw": "raw_generations/j_fs.jsonl",
+      "process_as": [
+        "j_fs"
+      ]
+    },
+    "mp_fs_plus_shared": {
+      "generates_raw": "raw_generations/mp_fs_plus_shared.jsonl",
+      "process_as": [
+        "original_mp_fs_plus",
+        "d_g1_primary",
+        "d_only_secondary",
+        "full_secondary",
+        "no_c_secondary"
+      ],
+      "required_preflight_invariant": "original_vs_dg1_final_input_equal == 300/300"
+    }
+  },
+  "deterministic_reprocesses_share_raw_generation_with": {
+    "original_mp_fs_plus": "mp_fs_plus_shared",
+    "d_g1_primary": "mp_fs_plus_shared",
+    "d_only_secondary": "mp_fs_plus_shared",
+    "full_secondary": "mp_fs_plus_shared",
+    "no_c_secondary": "mp_fs_plus_shared"
   },
   "model_lock": {
     "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
@@ -36,22 +62,105 @@
     "max_new_tokens": 4096,
     "input_truncation_policy": "error",
     "quantization": "4bit",
+    "bitsandbytes_config": {
+      "load_in_4bit": true,
+      "bnb_4bit_quant_type": "fp4",
+      "bnb_4bit_use_double_quant": false,
+      "bnb_4bit_compute_dtype": "float16",
+      "bnb_4bit_quant_storage": "uint8",
+      "source": "Explicit lock of the historical runner behavior: the previous HF runner passed only load_in_4bit=True and compute_dtype=float16, therefore BitsAndBytes defaults are fixed here instead of left implicit."
+    },
     "compute_dtype": "float16",
     "device_map": "auto",
     "do_sample": false,
     "temperature": null,
     "top_p": null,
     "top_k": null,
+    "eos_token_id": "tokenizer.eos_token_id captured by GPU preflight",
+    "pad_token_id": "tokenizer.pad_token_id; if absent set to eos_token_id",
+    "bos_handling": "tokenizer(prompt, add_special_tokens=True)",
+    "chat_template_usage": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "<production_prompt>"
+        }
+      ],
+      "tokenize": false,
+      "add_generation_prompt": true
+    },
+    "padding_side": "left",
+    "generation_kwargs": {
+      "max_new_tokens": 4096,
+      "do_sample": false,
+      "pad_token_id": "tokenizer.pad_token_id",
+      "eos_token_id": "tokenizer.eos_token_id",
+      "temperature": "omitted_when_do_sample_false",
+      "top_p": "omitted_when_do_sample_false"
+    },
     "seed": 42,
     "stop_sequences": [],
     "trust_remote_code": false,
-    "batching_policy": "fixed batch_size=1; resume keyed by sample_id"
+    "batching_policy": "fixed batch_size=1; resume keyed by generation_arm+sample_id",
+    "retry_policy": {
+      "completed_raw_output": "immutable_never_regenerate",
+      "infrastructure_crash_before_output": "resume_same_config_only",
+      "semantic_retry": false,
+      "attempt_log_required": true
+    }
+  },
+  "stage4_inference_config": {
+    "path": "stage4_fresh_7b_protocol/inference/stage4_qwen25_7b_in28672_out4096.json",
+    "sha256": "c7f43df89536ac412b73092c78d2cc251084f090dc0790cbe839a4248f6b5e16"
+  },
+  "gpu_environment_lock_required": [
+    "python",
+    "torch",
+    "transformers",
+    "accelerate",
+    "bitsandbytes",
+    "cuda_runtime",
+    "gpu_model",
+    "gpu_driver",
+    "tokenizers",
+    "safetensors"
+  ],
+  "runtime_assertions": {
+    "git_rev_parse_head_equals_accepted_protocol_commit": true,
+    "working_tree_clean_before_generation": true,
+    "execution_commit_equals_accepted_protocol_commit": true,
+    "generated_result_files_outside_git_allowed": true
   },
   "token_budget_experiment": false,
   "stopping_rule": "no tuning on fresh set; preserve raw outputs and report failures",
-  "repository_head": "d3884845a6903b6cb44553fd0d52d3e618aa9228",
+  "protocol_builder_base_commit": "53d62cd02abca575a63ef126c537acf96a69a113",
   "repository_branch": "stage2/g-diagnostic-targeted-repair",
   "fresh_sample_ids_sha256": "5c8bd5cf2e5b79088322289f795beb95c33a1fa0de214f129eb0cf6680319a25",
+  "source_group_audit": {
+    "sample_count": 300,
+    "unique_source_groups": 194,
+    "multi_sample_group_count": 87,
+    "max_group_size": 4,
+    "group_size_distribution": {
+      "1": 107,
+      "2": 69,
+      "3": 17,
+      "4": 1
+    },
+    "source_group_source_counts": {
+      "source_group_id": 300
+    },
+    "policy": "Primary clustering key is official source_group/source_group_id; sample-ID root derivation is used only when official metadata is absent."
+  },
+  "statistics": {
+    "accuracy_weighting": "sample_weighted",
+    "primary_paired_difference": "accuracy(d_g1_primary)-accuracy(original_mp_fs_plus)",
+    "confidence_interval": "cluster_bootstrap_percentile_95",
+    "cluster_key": "source_group",
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 240822,
+    "secondary_mcnemar_exact": true
+  },
   "prompt_set_hashes": {
     "direct": "e77dc83edd1c9bf3b7dd105b0293552c0a300238a12eb5fe70be3b4a5c192a69",
     "j_fs": "ed4564f6768904d4f460df7d98d255a01f908e69bd02d5030cbfcd2e4129a2ff",
