@@ -17,6 +17,16 @@ from .typed_normalization import (
     normalize_free_text_typed_candidate,
 )
 
+from .targeted_repair import (
+    DiagnosticTargetedRepairConfig,
+    TargetedRepairOutcome,
+    attach_targeted_repair_trace,
+    diagnose_evidence_span_boundaries,
+    mark_targeted_revalidation,
+    repair_evidence_span_boundary_after_diagnostic,
+    targeted_repair_warnings,
+)
+
 from .interventions import (
     CONFLICT_ACTION_CONTROL,
     CONFLICT_CONTROL,
@@ -60,4 +70,11 @@ __all__ = [
     "repair_free_text_plan_after_diagnostics",
     "repair_mapping_plan_after_diagnostics",
     "repair_warnings_from_traces",
+    "DiagnosticTargetedRepairConfig",
+    "TargetedRepairOutcome",
+    "attach_targeted_repair_trace",
+    "diagnose_evidence_span_boundaries",
+    "mark_targeted_revalidation",
+    "repair_evidence_span_boundary_after_diagnostic",
+    "targeted_repair_warnings",
 ]

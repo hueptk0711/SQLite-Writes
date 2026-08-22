@@ -1166,6 +1166,9 @@ def run_method(
                     constrained_reference_repair=config.get(
                         "constrained_reference_repair"
                     ),
+                    diagnostic_targeted_repair=config.get(
+                        "diagnostic_targeted_repair"
+                    ),
                 ).run(
                     str(sample.get("input_text") or ""),
                     parsed.plan,

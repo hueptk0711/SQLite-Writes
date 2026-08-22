@@ -174,3 +174,12 @@ A–C are frozen at `Stage2-A-C-FINAL` (`f1fa49ddb8e6b920fb5a4237e088b6603579ae2
 - evaluates collision ownership on the current copied plan so later repairs see slots created earlier in the batch;
 - reuses atomic rollback when a later target-assignment collision follows an earlier safe repair;
 - preserves Patch-3 source-field alias safety, Patch-2 raw-key collision safety, 13/10/12 diagnostic classification, 70/0 rule accounting, and all frozen A–E behavior.
+# Stage 2-G1 — diagnostic-driven evidence-span boundary repair
+
+- added deterministic G1 diagnostics for selected identifier evidence with one terminal `.`/`,` only when the frozen candidate set already contains the exact same-start, end-minus-one bounded candidate;
+- repairs exactly one diagnosed `value_from` slot on a deep copy and rejects multiple slots, non-unique candidates, and replacement evidence collisions;
+- reuses the frozen A–F materializer and verifier with one retry maximum and no recursive repair;
+- emits diagnostic, old value/reference, closed candidate set, selected repair, rule, applied/succeeded flags, and revalidation provenance;
+- keeps prompts and G1-disabled V6 behavior unchanged;
+- adds the manually audited `final_archeology_032` Stage-1 fixture as diagnostic/regression evidence only;
+- does not implement G2, regenerate plans, run a model, or change datasets/gold/metrics/protocols.
