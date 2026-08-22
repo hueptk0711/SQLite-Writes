@@ -1,0 +1,30 @@
+{
+  "base_config": "configs/final/mp_fs_plus.json",
+  "method_id": "MP-FS+",
+  "method_variant": "vnext-v6-constrained-reference-repair",
+  "method_version": "stage2-v6-abcdef-constrained-reference-repair",
+  "stage2_interventions": {
+    "control_field_roles": true,
+    "explicit_conflict_preservation": true,
+    "update_column_consistency": true
+  },
+  "structured_source_parser": {
+    "enabled": true,
+    "null_literal_policy": "explicit_only",
+    "emit_value_provenance": true
+  },
+  "free_text_typed_normalization": {
+    "enabled": true,
+    "date_normalization": true,
+    "datetime_normalization": true,
+    "preserve_raw_evidence": true,
+    "fail_closed_on_ambiguous_format": true
+  },
+  "constrained_reference_repair": {
+    "enabled": true,
+    "max_attempts_per_slot": 1,
+    "require_unique_candidate": true,
+    "preserve_non_reference_semantics": true,
+    "emit_repair_provenance": true
+  }
+}

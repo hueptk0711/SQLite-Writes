@@ -1,0 +1,9 @@
+﻿intervention,from_variant,to_variant,activated,activated_rescued,activated_regressed,activated_unchanged,effect_changed
+A,V0,V1,51,0,0,51,51
+B,V1,V2,85,0,0,85,73
+C,V2,V3,82,0,3,79,82
+D,V3,V4,43,33,0,10,43
+E,V4,V5,14,0,0,14,11
+F,V5,V6,34,0,0,34,19
+G1,V6,V7,1,1,0,0,1
+G2,V7,V8,1,0,0,1,1
