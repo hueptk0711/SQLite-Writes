@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "source_pool_count": 677,
+  "fresh_sample_count": 300,
+  "diagnostic_sample_count": 300,
+  "sample_id_overlap_count": 0,
+  "source_group_overlap_count": 0,
+  "input_text_hash_overlap_count": 0,
+  "canonical_content_hash_overlap_count": 0,
+  "database_overlap_count": 0,
+  "fresh_database_ids": [
+    "california_schools",
+    "card_games",
+    "codebase_community",
+    "debit_card_specializing",
+    "european_football_2",
+    "financial",
+    "formula_1",
+    "student_club",
+    "superhero",
+    "thrombosis_prediction",
+    "toxicology"
+  ],
+  "diagnostic_database_ids": [
+    "archeology",
+    "polar",
+    "robot",
+    "vaccine",
+    "virtual"
+  ],
+  "disclosure": "Fresh set is disjoint by sample ID, source group, input-text hash, canonical content hash, and database ID."
+}

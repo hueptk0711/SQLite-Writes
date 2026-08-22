@@ -1,0 +1,94 @@
+{
+  "stage": "Stage4_FRESH_7B_PROTOCOL",
+  "status": "template_pending_reviewer_acceptance",
+  "model_called": false,
+  "gpu_required_for_protocol": false,
+  "gpu_required_for_generation_after_acceptance": true,
+  "primary_method_slug": "d_g1_primary",
+  "primary_method_identity": "MP-FS+-vNext-D-G1-FINAL",
+  "primary_config_sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf",
+  "primary_config_expected_stage3b_sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf",
+  "generation_arms": [
+    "d_g1_primary",
+    "direct",
+    "j_fs",
+    "original_mp_fs_plus"
+  ],
+  "secondary_reprocesses_share_raw_generation_with": {
+    "d_only_secondary": "d_g1_primary",
+    "full_secondary": "d_g1_primary",
+    "no_c_secondary": "d_g1_primary"
+  },
+  "model_lock": {
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "snapshot_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+    "tokenizer_sha256": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468",
+    "model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357"
+  },
+  "inference_lock": {
+    "backend": "hf",
+    "framework": "transformers",
+    "batch_size": 1,
+    "context_length": 32768,
+    "max_input_tokens": 28672,
+    "max_new_tokens": 4096,
+    "input_truncation_policy": "error",
+    "quantization": "4bit",
+    "compute_dtype": "float16",
+    "device_map": "auto",
+    "do_sample": false,
+    "temperature": null,
+    "top_p": null,
+    "top_k": null,
+    "seed": 42,
+    "stop_sequences": [],
+    "trust_remote_code": false,
+    "batching_policy": "fixed batch_size=1; resume keyed by sample_id"
+  },
+  "token_budget_experiment": false,
+  "stopping_rule": "no tuning on fresh set; preserve raw outputs and report failures",
+  "repository_head": "d3884845a6903b6cb44553fd0d52d3e618aa9228",
+  "repository_branch": "stage2/g-diagnostic-targeted-repair",
+  "fresh_sample_ids_sha256": "5c8bd5cf2e5b79088322289f795beb95c33a1fa0de214f129eb0cf6680319a25",
+  "prompt_set_hashes": {
+    "direct": "e77dc83edd1c9bf3b7dd105b0293552c0a300238a12eb5fe70be3b4a5c192a69",
+    "j_fs": "ed4564f6768904d4f460df7d98d255a01f908e69bd02d5030cbfcd2e4129a2ff",
+    "original_mp_fs_plus": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
+    "d_g1_primary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
+    "d_only_secondary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
+    "full_secondary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
+    "no_c_secondary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf"
+  },
+  "config_hashes": {
+    "direct": {
+      "path": "configs/stage4/direct.json",
+      "sha256": "bc7c04f9daecc6706129ae06a04b612e339bd65e5bf722855e3f17b413b7f2f6"
+    },
+    "j_fs": {
+      "path": "configs/stage4/j_fs.json",
+      "sha256": "832665a5953f92e4ea66642b3e1f3dcfa9e9842518e98393dc5ffa7a23e49765"
+    },
+    "original_mp_fs_plus": {
+      "path": "configs/stage4/original_mp_fs_plus.json",
+      "sha256": "eed7feb1abdebdb5680e00922601135ea6f6ac809deaa9d548945569e7a5f206"
+    },
+    "d_g1_primary": {
+      "path": "configs/stage4/d_g1_primary.json",
+      "sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf"
+    },
+    "d_only_secondary": {
+      "path": "configs/stage4/d_only_secondary.json",
+      "sha256": "212a489e956e2164459a4b15b006d69da47e67bb4b09457114f7ef05534c93bb"
+    },
+    "full_secondary": {
+      "path": "configs/stage4/full_secondary.json",
+      "sha256": "ec935c92b0bc2eb4935db7635ca6fd238606fc1aac5d4159694b77bd95ea81f2"
+    },
+    "no_c_secondary": {
+      "path": "configs/stage4/no_c_secondary.json",
+      "sha256": "909adca682d619934bdbdc9042ef3987c684b4e9aae520a1774de3824a3c7ec3"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "base_config": "configs/final/mp_fs_plus.json",
+  "method_id": "MP-FS+",
+  "method_variant": "stage3b-d-g1",
+  "method_version": "stage3b-d-g1",
+  "stage2_interventions": {
+    "control_field_roles": false,
+    "explicit_conflict_preservation": false,
+    "update_column_consistency": false
+  },
+  "structured_source_parser": {
+    "enabled": true,
+    "null_literal_policy": "explicit_only",
+    "emit_value_provenance": true
+  },
+  "free_text_typed_normalization": {"enabled": false},
+  "constrained_reference_repair": {"enabled": false},
+  "diagnostic_targeted_repair": {
+    "enabled": true,
+    "evidence_span_boundary": true,
+    "evidence_span_selection": false,
+    "allowed_terminal_punctuation": [".", ","],
+    "max_revalidation_attempts": 1,
+    "require_deterministic_diagnostic": true,
+    "require_single_diagnosed_slot": true,
+    "require_unique_candidate": true,
+    "preserve_other_semantics": true,
+    "emit_repair_provenance": true
+  }
+}

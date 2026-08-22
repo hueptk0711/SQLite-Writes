@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "prompt_rows": 2100,
+  "sample_count": 300,
+  "generation_arms": [
+    "d_g1_primary",
+    "direct",
+    "j_fs",
+    "original_mp_fs_plus"
+  ],
+  "violations": []
+}

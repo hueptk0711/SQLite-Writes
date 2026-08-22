@@ -13,3 +13,4 @@
 # Keep Stage-3 replay artifacts byte-stable across Windows/Linux checkouts.
 stage3_full_causal_replay/** text eol=lf
 stage3b_final_component_selection/** text eol=lf
+stage4_fresh_7b_protocol/** text eol=lf
