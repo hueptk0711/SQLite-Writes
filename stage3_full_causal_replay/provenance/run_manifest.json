@@ -38,8 +38,8 @@
       "size_bytes": 1462
     },
     "provenance/run_lock.json": {
-      "sha256": "b20f14e7d5dce8ab299e24a7f9303d4315cc2b81a363b789afab66bdd1cf25e8",
-      "size_bytes": 3161
+      "sha256": "7ea6dd14ac637810d3d9754bdc8a87fc70e490d4b7f2a8b205191b4e8126195b",
+      "size_bytes": 3162
     },
     "results/causal_replay_sample_level.csv": {
       "sha256": "b194375a495c68bbe5d2aa973e14acbf40b835ad569b4cb3c15d1eb488a247d3",
@@ -78,7 +78,7 @@
       "size_bytes": 293
     },
     "validation/replay_invariants.json": {
-      "sha256": "04a720356722a155f33eb262ce0cb261d8a188917ff9e9df8251dcdb8ddf5472",
+      "sha256": "48221d2a17ff921a30fe567dbe5d34673dbf4dffed4319dfd4a9f6c4117291ed",
       "size_bytes": 423
     }
   }
