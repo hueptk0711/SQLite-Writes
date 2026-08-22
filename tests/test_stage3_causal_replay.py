@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from scripts.analysis.run_stage3_causal_replay import (
+    REPAIR_COMPONENTS,
     collect_repair_traces,
     first_failure,
     repair_flags,
@@ -15,6 +16,10 @@ from scripts.analysis.run_stage3_causal_replay import (
     write_csv,
     write_json,
 )
+
+
+def test_repair_component_order_is_frozen() -> None:
+    assert REPAIR_COMPONENTS == ("F", "G1", "G2")
 
 
 def _evaluation(**overrides):

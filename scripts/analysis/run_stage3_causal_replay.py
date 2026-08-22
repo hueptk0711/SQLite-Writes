@@ -58,7 +58,7 @@ VARIANTS = [
     ("V8", "G2", "configs/stage2/v8_diagnostic_targeted_repair_g2.json"),
 ]
 COMPONENTS = ["A", "B", "C", "D", "E", "F", "G1", "G2"]
-REPAIR_COMPONENTS = {"F", "G1", "G2"}
+REPAIR_COMPONENTS = ("F", "G1", "G2")
 
 
 def canonical(value: Any) -> str:
