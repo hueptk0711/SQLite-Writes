@@ -33,6 +33,7 @@ G2_CONFIG = {
     "require_single_diagnosed_slot": True,
     "require_unique_candidate": True,
     "preserve_other_semantics": True,
+    "preserve_effective_target_grounding": True,
     "emit_repair_provenance": True,
 }
 

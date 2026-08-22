@@ -325,6 +325,21 @@ def _explicit_column_before_candidate(
     return None, owners
 
 
+def resolve_explicit_column_grounding(
+    candidate: dict[str, Any],
+    profile: dict[str, Any],
+    table_profile: dict[str, Any],
+) -> tuple[dict[str, Any] | None, list[str]]:
+    """Read-only access to the frozen materializer's exact grounding rule.
+
+    Stage G2 uses this adapter only to predict whether a replacement evidence
+    span would preserve its diagnosed target column.  The materializer keeps
+    calling the original helper, so this public adapter cannot alter A--F
+    grounding behavior.
+    """
+    return _explicit_column_before_candidate(candidate, profile, table_profile)
+
+
 def materialize_reference_free_text_plan(
     reference_plan: dict[str, Any],
     request: str,

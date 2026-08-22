@@ -1,21 +1,22 @@
-# Stage 2-G2 Patch 1 Checkpoint Report
+# Stage 2-G2 Patch 2 Checkpoint Report
 
 ## Result
 
-G2 Patch 1 adds a tightly bounded temporal evidence-selection repair after the frozen Stage-E incompatibility diagnostic. It changes one `value_from` on a deep copy only when exactly one compatible candidate remains in the pre-enumerated, forward, same-sentence temporal set. It has no ranking or generative fallback.
+G2 Patch 2 closes the effective target-column grounding blocker found in Patch 1. Before a temporal candidate enters the compatible set, G2 now reuses the frozen materializer's exact-column grounding resolver through a read-only adapter. A different same-table target or an other-table-only target signal excludes the candidate; same-target and no-explicit-target candidates retain Patch-1 behavior.
 
 ## Frozen boundary
 
 ```text
 base tag:    Stage2-G1-FINAL
-base commit: b3d6e721b5d3c1ea9a5fd7e117692a807815dcb7
+frozen commit: b3d6e721b5d3c1ea9a5fd7e117692a807815dcb7
+Patch 2 base commit: 659c5c86125ccb3b5236cde148b73eb1dddcfd1e
 ```
 
 The resulting G2 commit and final validation counts are recorded in the reviewer package after commit creation.
 
 ## Diagnostic evidence
 
-The regression fixture contains two temporal Stage-1 cases eligible under the exact G2 Patch 1 contract and one generic-text control that remains out of scope. Fixture use is diagnostic only. It does not establish full-sample rescue, and other latent failures can remain after the repaired slot.
+The regression fixture contains two temporal Stage-1 cases eligible under the G2 contract and one generic-text control that remains out of scope. Fixture use is diagnostic only. It does not establish full-sample rescue, and other latent failures can remain after the repaired slot.
 
 ## Safety coverage
 
@@ -23,6 +24,11 @@ Dedicated tests cover:
 
 - exact Stage-E diagnostic gating;
 - target/type validation;
+- frozen grounding-helper reuse without materializer behavior changes;
+- different same-table explicit target exclusion;
+- same-target and no-explicit-target eligibility;
+- other-table-only explicit target exclusion;
+- end-to-end fail-closed behavior before a target-changing retry;
 - pre-enumerated candidates only;
 - maximal temporal span filtering;
 - forward and same-sentence constraints;

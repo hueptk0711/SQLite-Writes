@@ -201,3 +201,14 @@ Housekeeping after G1 review:
 - retries the frozen materializer once and then the frozen verifier; G2 cannot chain into G1 or a second G2 repair in the same invocation;
 - adds two eligible Stage-1 temporal diagnostic fixtures and one non-temporal out-of-scope control;
 - does not run a model, causal replay, or change datasets, gold labels, metrics, prompts, protocols, or frozen A–G1 semantics.
+
+## Stage 2-G2 Patch 2 — effective target-column grounding preservation
+
+- reuses a read-only adapter over the exact explicit-column grounding helper already used by the frozen materializer;
+- excludes a replacement candidate when its local exact-column signal resolves to a different same-table column;
+- excludes a replacement candidate when its exact-column signal belongs only to another table;
+- preserves candidates grounded to the diagnosed column or carrying no explicit-column signal;
+- records `candidate_target_grounding_mismatch` and `candidate_cross_table_grounding_conflict` rejection provenance;
+- makes `preserve_effective_target_grounding` a mandatory G2 safety invariant;
+- adds adversarial candidate-set tests, a frozen-helper/materializer equivalence regression, and an end-to-end test proving G2 fails closed before a target-changing retry;
+- preserves every accepted Patch-1 gate, closed-set/cardinality rule, one-slot mutation, collision guard, one-retry limit, G2→G1 prohibition, prompt, fixture, and experimental boundary.

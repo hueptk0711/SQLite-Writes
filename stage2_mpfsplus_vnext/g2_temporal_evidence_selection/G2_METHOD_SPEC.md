@@ -1,12 +1,13 @@
-# Stage 2-G2 Patch 1 Method Specification — Temporal Evidence Selection
+# Stage 2-G2 Patch 2 Method Specification — Temporal Evidence Selection
 
 ## Scope and frozen parent
 
-G2 Patch 1 is a deterministic, temporal-only evidence-reference repair. Its parent is frozen G1:
+G2 Patch 2 is a deterministic, temporal-only evidence-reference repair. Its frozen method parent and patch base are:
 
 ```text
 tag:    Stage2-G1-FINAL
 commit: b3d6e721b5d3c1ea9a5fd7e117692a807815dcb7
+Patch 1 base commit: 659c5c86125ccb3b5236cde148b73eb1dddcfd1e
 ```
 
 A–F and G1 are unchanged. G2 does not call a model, regenerate a plan, create evidence, scan the request for new spans, rank candidates, or repair generic text evidence.
@@ -18,6 +19,8 @@ frozen A–F materializer rejects one temporal-normalization slot
     ↓ exact deterministic Stage-E type-mismatch diagnostic
 G2 identifies exactly one diagnosed value_from slot
     ↓ filter the pre-enumerated evidence candidate set
+frozen exact-column grounding preserves diagnosed target
+    ↓ exactly one compatible candidate remains
 exactly one compatible temporal candidate
     ↓ deep copy
 change only that value_from
@@ -50,11 +53,27 @@ G2 starts only from `extract_evidence_candidates(request)`, the frozen enumerate
 - it is a maximal temporal span, excluding a date component contained by an enclosing datetime;
 - it starts after the rejected selection ends;
 - it stays inside the deterministic sentence containing the rejected selection;
+- the frozen exact-column grounding rule resolves no explicit column or resolves the same diagnosed column;
 - the existing frozen Stage-E target/type validator accepts it for the diagnosed column and normalization.
 
 Sentence boundaries are only newline or `.`, `!`, `?`, `;` followed by whitespace/end. Decimal and fractional-second dots are therefore not boundaries.
 
 Exactly one compatible candidate is required. Zero or multiple candidates produce `non_unique_compatible_candidate_set` and no mutation. G2 never breaks a tie by distance, order, score, embedding, fuzzy match, edit distance, schema contents, database state, or a model.
+
+## Effective target-column grounding preservation
+
+The frozen materializer may use a candidate's `left_context` to remap the predicted column when an immediately preceding exact schema identifier names a column. Patch 2 reuses that exact deterministic resolver through the read-only `resolve_explicit_column_grounding` adapter before candidate admission. It does not change the resolver or materializer.
+
+```text
+no explicit column signal             -> eligible for remaining filters
+explicit diagnosed column             -> eligible for remaining filters
+explicit different same-table column  -> exclude
+explicit other-table-only column       -> exclude
+```
+
+A different same-table target is recorded as `candidate_target_grounding_mismatch`. An other-table-only signal is recorded as `candidate_cross_table_grounding_conflict`. Both are retained under `target_grounding_rejections` provenance, and neither candidate enters the compatible closed set.
+
+This guard is conservative even when another row-level collision might later suppress the materializer remap. G2 admits only replacements whose standalone frozen grounding cannot change the diagnosed target column.
 
 ## One-slot mutation and collision safety
 
@@ -89,6 +108,7 @@ old_reference
 old_value
 old_candidate_type
 candidate_set
+target_grounding_rejections
 selected_repair
 repair_rule
 selection_policy
@@ -111,7 +131,7 @@ V7 = A+B+C+D+E+F+G1
 V8 = A+B+C+D+E+F+G1+G2
 ```
 
-G2 is controlled by `diagnostic_targeted_repair.evidence_span_selection`. With that flag disabled, the frozen G1 materialization failure behavior is preserved. V7 and V8 planner prompts are identical.
+G2 is controlled by `diagnostic_targeted_repair.evidence_span_selection`. The safety invariant `preserve_effective_target_grounding` is mandatory and cannot be disabled. With evidence-span selection disabled, the frozen G1 materialization failure behavior is preserved. V7 and V8 planner prompts are identical.
 
 ## Stage-1 diagnostic fixtures
 

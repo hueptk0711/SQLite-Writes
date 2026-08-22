@@ -40,6 +40,7 @@ class DiagnosticTargetedRepairConfig:
     require_single_diagnosed_slot: bool = True
     require_unique_candidate: bool = True
     preserve_other_semantics: bool = True
+    preserve_effective_target_grounding: bool = True
     emit_repair_provenance: bool = True
 
     @classmethod
@@ -83,6 +84,9 @@ class DiagnosticTargetedRepairConfig:
             preserve_other_semantics=bool(
                 value.get("preserve_other_semantics", True)
             ),
+            preserve_effective_target_grounding=bool(
+                value.get("preserve_effective_target_grounding", True)
+            ),
             emit_repair_provenance=bool(
                 value.get("emit_repair_provenance", True)
             ),
@@ -98,12 +102,15 @@ class DiagnosticTargetedRepairConfig:
                 ),
                 "require_unique_candidate": selected.require_unique_candidate,
                 "preserve_other_semantics": selected.preserve_other_semantics,
+                "preserve_effective_target_grounding": (
+                    selected.preserve_effective_target_grounding
+                ),
                 "emit_repair_provenance": selected.emit_repair_provenance,
             }
             relaxed = [name for name, enabled in required_true.items() if not enabled]
             if relaxed:
                 raise ValueError(
-                    "Stage G1 safety invariants cannot be disabled: "
+                    "Stage G safety invariants cannot be disabled: "
                     + ", ".join(relaxed)
                 )
             if selected.max_revalidation_attempts != 1:
@@ -140,6 +147,9 @@ class DiagnosticTargetedRepairConfig:
             "require_single_diagnosed_slot": self.require_single_diagnosed_slot,
             "require_unique_candidate": self.require_unique_candidate,
             "preserve_other_semantics": self.preserve_other_semantics,
+            "preserve_effective_target_grounding": (
+                self.preserve_effective_target_grounding
+            ),
             "emit_repair_provenance": self.emit_repair_provenance,
         }
 
@@ -510,6 +520,9 @@ def _selection_trace_from_diagnostic(
             details.get("old_candidate_type") or ""
         ),
         "candidate_set": deepcopy(details.get("candidate_set") or []),
+        "target_grounding_rejections": deepcopy(
+            details.get("target_grounding_rejections") or []
+        ),
         "selected_repair": selected_repair,
         "repair_rule": repair_rule,
         "repair_reason": reason,
@@ -536,13 +549,20 @@ def diagnose_temporal_evidence_selections(
 ) -> list[Diagnostic]:
     """Convert a frozen Stage-E type contradiction into a bounded G2 diagnostic.
 
-    G2 Patch 1 is deliberately temporal-only. Replacement candidates must be
+    G2 is deliberately temporal-only. Replacement candidates must be
     frozen primary evidence spans, occur after the invalid selection in the
     same deterministic sentence, and pass the existing Stage-E target/type
-    validator. No candidate text is generated and no scoring is performed.
+    validator without changing frozen explicit-column grounding. No candidate
+    text is generated and no scoring is performed.
     """
     if not config.enabled or not config.evidence_span_selection:
         return []
+    # Imported lazily to avoid a planner/vnext import cycle. This adapter
+    # delegates to the exact helper used by the frozen materializer.
+    from nldbwrite_v3.planner.evidence import (
+        resolve_explicit_column_grounding,
+    )
+
     ensure_reference_ids(profile)
     evidence = _candidate_index(candidates)
     tables = table_reference_map(profile)
@@ -610,6 +630,7 @@ def diagnose_temporal_evidence_selections(
             selected_end,
         )
         compatible: list[dict[str, Any]] = []
+        target_grounding_rejections: list[dict[str, Any]] = []
         for candidate in candidates:
             candidate_id = str(candidate.get("evidence_id") or "")
             candidate_start = candidate.get("start")
@@ -647,6 +668,45 @@ def diagnose_temporal_evidence_selections(
                 for other in candidates
             ):
                 continue
+            explicit_column, other_table_owners = (
+                resolve_explicit_column_grounding(
+                    dict(candidate),
+                    profile,
+                    table,
+                )
+            )
+            if other_table_owners:
+                target_grounding_rejections.append(
+                    {
+                        "evidence_id": candidate_id,
+                        "text": str(candidate.get("text") or ""),
+                        "reason": "candidate_cross_table_grounding_conflict",
+                        "diagnosed_column_id": column_id,
+                        "diagnosed_column": str(column.get("name") or ""),
+                        "explicit_column_tables": other_table_owners,
+                    }
+                )
+                continue
+            explicit_column_id = (
+                str(explicit_column.get("column_id") or "")
+                if explicit_column is not None
+                else ""
+            )
+            if explicit_column_id and explicit_column_id != column_id:
+                target_grounding_rejections.append(
+                    {
+                        "evidence_id": candidate_id,
+                        "text": str(candidate.get("text") or ""),
+                        "reason": "candidate_target_grounding_mismatch",
+                        "diagnosed_column_id": column_id,
+                        "diagnosed_column": str(column.get("name") or ""),
+                        "explicit_column_id": explicit_column_id,
+                        "explicit_column": str(
+                            explicit_column.get("name") or ""
+                        ),
+                    }
+                )
+                continue
             typed = normalize_free_text_typed_candidate(
                 candidate.get("text"),
                 column,
@@ -668,6 +728,17 @@ def diagnose_temporal_evidence_selections(
                     "candidate_type": candidate_type,
                     "candidate_role": "primary",
                     "normalized_value": deepcopy(typed.value),
+                    "effective_target_grounding": (
+                        {
+                            "kind": "same_diagnosed_column",
+                            "column_id": explicit_column_id,
+                            "column": str(
+                                explicit_column.get("name") or ""
+                            ),
+                        }
+                        if explicit_column is not None
+                        else {"kind": "no_explicit_column"}
+                    ),
                 }
             )
         compatible.sort(
@@ -708,6 +779,9 @@ def diagnose_temporal_evidence_selections(
                     "old_value": str(selected.get("text") or ""),
                     "old_candidate_type": old_candidate_type,
                     "candidate_set": compatible,
+                    "target_grounding_rejections": (
+                        target_grounding_rejections
+                    ),
                     "repair_rule": _SELECTION_REPAIR_RULE,
                     "selection_policy": _SELECTION_POLICY,
                     "context_window": {
@@ -804,6 +878,26 @@ def repair_temporal_evidence_selection_after_diagnostic(
         )
         return TargetedRepairOutcome(original, False, [trace])
     candidate = closed_set[0]
+    candidate_grounding = (
+        candidate.get("effective_target_grounding")
+        if isinstance(candidate, Mapping)
+        else None
+    )
+    target_column_reference = str(
+        diagnostic.details.get("target_column_reference") or ""
+    )
+    grounding_is_preserved = bool(
+        isinstance(candidate_grounding, Mapping)
+        and (
+            candidate_grounding.get("kind") == "no_explicit_column"
+            or (
+                candidate_grounding.get("kind")
+                == "same_diagnosed_column"
+                and str(candidate_grounding.get("column_id") or "")
+                == target_column_reference
+            )
+        )
+    )
     if (
         not isinstance(candidate, Mapping)
         or str(candidate.get("candidate_type") or "")
@@ -811,13 +905,16 @@ def repair_temporal_evidence_selection_after_diagnostic(
         or str(candidate.get("candidate_role") or "") != "primary"
         or not isinstance(candidate.get("start"), int)
         or not isinstance(candidate.get("end"), int)
+        or not grounding_is_preserved
+        or str(candidate.get("evidence_id") or "")
+        not in diagnostic.candidates
     ):
         trace = _selection_trace_from_diagnostic(
             diagnostic,
             repair_rule="invalid_closed_candidate",
             reason=(
                 "The compatible candidate is not a frozen primary temporal "
-                "span record."
+                "span record with preserved effective target grounding."
             ),
         )
         return TargetedRepairOutcome(original, False, [trace])

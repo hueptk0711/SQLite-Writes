@@ -68,7 +68,7 @@
     {
       "id": "G2_temporal_evidence_selection_repair",
       "config_block": "diagnostic_targeted_repair.evidence_span_selection",
-      "hypothesis": "When frozen Stage E rejects a non-temporal evidence reference with TEMPORAL_EVIDENCE_TYPE_MISMATCH for one iso_date_normalization slot, G2 may replace only that value_from with the exactly-one compatible maximal primary DATE/DATETIME candidate already enumerated after it in the same deterministic sentence.",
+      "hypothesis": "When frozen Stage E rejects a non-temporal evidence reference with TEMPORAL_EVIDENCE_TYPE_MISMATCH for one iso_date_normalization slot, G2 may replace only that value_from with the exactly-one compatible maximal primary DATE/DATETIME candidate already enumerated after it in the same deterministic sentence, and only when the frozen exact-column grounding rule resolves no explicit target or the same diagnosed target.",
       "stage1_evidence": "Two manually audited temporal Stage-1 cases (final_vaccine_002 and final_vaccine_048) are eligible diagnostic/regression fixtures; final_virtual_046 is retained as a non-temporal out-of-scope control. No end-to-end rescue claim is made.",
       "config": "configs/stage2/v8_diagnostic_targeted_repair_g2.json",
       "status": "in_review"
@@ -146,12 +146,15 @@
     "G2 runs only after the frozen materializer emits TYPED_NORMALIZATION_REJECTED with typed_error_code TEMPORAL_EVIDENCE_TYPE_MISMATCH for iso_date_normalization",
     "exactly one diagnosed value_from slot is required; multiple diagnosed slots fail closed",
     "replacement candidates come only from the pre-enumerated evidence candidate set and are filtered by temporal type, target-column compatibility, forward order, same deterministic sentence, primary role, and maximal temporal span",
+    "G2 reuses a read-only adapter over the exact frozen materializer grounding helper; it does not change materializer behavior",
+    "a candidate explicitly grounded to a different same-table column or only to another table is excluded before cardinality selection",
+    "preserve_effective_target_grounding is mandatory and cannot be disabled",
     "exactly one compatible candidate is required; zero or multiple candidates fail closed without ranking",
     "the plan is deep-copied and only the diagnosed value_from reference may change",
     "replacement evidence already assigned to another semantic slot causes fail-closed collision handling",
     "the same frozen materializer and verifier boundary is retried exactly once after an applied repair",
     "G2 does not chain with G1 or another G2 repair during the same invocation",
-    "provenance records the source diagnostic, old value/reference, candidate set, selected repair, rule, application/success flags, and revalidation result",
+    "provenance records the source diagnostic, old value/reference, candidate set, target-grounding rejections, selected repair, rule, application/success flags, and revalidation result",
     "A-F and frozen G1 remain unchanged and are consumed through existing interfaces"
   ]
 }

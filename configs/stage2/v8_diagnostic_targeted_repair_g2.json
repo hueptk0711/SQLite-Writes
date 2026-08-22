@@ -38,6 +38,7 @@
     "require_single_diagnosed_slot": true,
     "require_unique_candidate": true,
     "preserve_other_semantics": true,
+    "preserve_effective_target_grounding": true,
     "emit_repair_provenance": true
   }
 }
