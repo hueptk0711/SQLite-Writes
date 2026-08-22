@@ -635,6 +635,110 @@ def test_g2_pipeline_fails_closed_before_different_target_remap(
     ][0]["reason"] == "candidate_target_grounding_mismatch"
 
 
+def test_g2_excludes_old_evidence_grounded_to_different_column() -> None:
+    request = "Use end_date For 2024-07-17."
+    profile, plan, candidates, _ = _effective_grounding_case(request)
+    diagnostic = _diagnose(plan, request, candidates, profile)[0]
+    assert diagnostic.details["candidate_set"] == []
+    grounding = diagnostic.details[
+        "selected_evidence_effective_target_grounding"
+    ]
+    assert grounding == {
+        "kind": "different_same_table_column",
+        "diagnosed_column_id": _column_ids(profile)["start_date"],
+        "diagnosed_column": "start_date",
+        "explicit_column_id": _column_ids(profile)["end_date"],
+        "explicit_column": "end_date",
+        "reason": "source_evidence_effective_target_mismatch",
+    }
+    outcome = repair_temporal_evidence_selection_after_diagnostic(
+        plan, [diagnostic], _config()
+    )
+    assert not outcome.applied
+    assert outcome.plan == plan
+    assert outcome.traces[0]["repair_rule"] == (
+        "invalid_source_grounding_provenance"
+    )
+
+
+def test_g2_keeps_old_evidence_grounded_to_diagnosed_column() -> None:
+    request = "Use start_date For 2024-07-17."
+    profile, plan, candidates, _ = _effective_grounding_case(request)
+    diagnostic = _diagnose(plan, request, candidates, profile)[0]
+    grounding = diagnostic.details[
+        "selected_evidence_effective_target_grounding"
+    ]
+    assert grounding == {
+        "kind": "same_diagnosed_column",
+        "column_id": _column_ids(profile)["start_date"],
+        "column": "start_date",
+    }
+    assert len(diagnostic.details["candidate_set"]) == 1
+
+
+def test_g2_keeps_old_evidence_without_explicit_target() -> None:
+    request = "Marker For 2024-07-17."
+    profile, plan, candidates, _ = _effective_grounding_case(request)
+    diagnostic = _diagnose(plan, request, candidates, profile)[0]
+    assert diagnostic.details[
+        "selected_evidence_effective_target_grounding"
+    ] == {"kind": "no_explicit_column"}
+    assert len(diagnostic.details["candidate_set"]) == 1
+
+
+def test_g2_excludes_old_evidence_with_cross_table_target() -> None:
+    request = "Use archive_date For 2024-07-17."
+    profile, plan, candidates, _ = _effective_grounding_case(request)
+    diagnostic = _diagnose(plan, request, candidates, profile)[0]
+    assert diagnostic.details["candidate_set"] == []
+    grounding = diagnostic.details[
+        "selected_evidence_effective_target_grounding"
+    ]
+    assert grounding["kind"] == "cross_table_only_column"
+    assert grounding["explicit_column_tables"] == ["archive"]
+    assert grounding["reason"] == (
+        "selected_evidence_cross_table_grounding_conflict"
+    )
+
+
+def test_g2_pipeline_fails_before_retry_when_old_target_conflicts(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    request = "Use end_date For 2024-07-17."
+    profile, plan, _, _ = _effective_grounding_case(request)
+    original = pipeline_module.materialize_reference_free_text_plan
+    calls = 0
+
+    def counted(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(
+        pipeline_module,
+        "materialize_reference_free_text_plan",
+        counted,
+    )
+    result = MappingFirstPipeline(
+        profile,
+        reference_planning=True,
+        free_text_typed_normalization=E_CONFIG,
+        constrained_reference_repair=F_CONFIG,
+        diagnostic_targeted_repair=G2_CONFIG,
+    ).run(request, plan)
+    assert not result.success
+    assert result.stage == "diagnostic_targeted_repair"
+    assert result.write_plan is None
+    assert result.program is None
+    assert calls == 1
+    targeted = result.verification.errors[0].details["targeted_repair"]
+    assert targeted["repair_applied"] is False
+    assert targeted["repair_rule"] == "invalid_source_grounding_provenance"
+    assert targeted["selected_evidence_effective_target_grounding"][
+        "reason"
+    ] == "source_evidence_effective_target_mismatch"
+
+
 def test_g2_two_primary_temporal_candidates_fail_closed() -> None:
     request = (
         "Use timemark For 2024-07-17 11:50:00 and "
@@ -709,6 +813,26 @@ def test_g2_repair_rejects_forged_effective_target_grounding() -> None:
     assert not outcome.applied
     assert outcome.plan == plan
     assert outcome.traces[0]["repair_rule"] == "invalid_closed_candidate"
+
+
+def test_g2_repair_rejects_forged_old_evidence_grounding() -> None:
+    request = "Use timemark For 2024-07-17 11:50:00."
+    profile, plan, candidates, _ = _temporal_plan_for_request(request, "For")
+    diagnostic = _diagnose(plan, request, candidates, profile)[0]
+    diagnostic.details[
+        "selected_evidence_effective_target_grounding"
+    ] = {
+        "kind": "different_same_table_column",
+        "column_id": "different-column-id",
+    }
+    outcome = repair_temporal_evidence_selection_after_diagnostic(
+        plan, [diagnostic], _config()
+    )
+    assert not outcome.applied
+    assert outcome.plan == plan
+    assert outcome.traces[0]["repair_rule"] == (
+        "invalid_source_grounding_provenance"
+    )
 
 
 def test_g2_multiple_diagnosed_slots_fail_closed() -> None:
@@ -974,6 +1098,7 @@ def test_g2_trace_contains_reviewer_requested_provenance() -> None:
         "old_reference",
         "old_value",
         "old_candidate_type",
+        "selected_evidence_effective_target_grounding",
         "candidate_set",
         "selected_repair",
         "repair_rule",

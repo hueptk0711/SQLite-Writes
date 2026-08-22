@@ -519,6 +519,9 @@ def _selection_trace_from_diagnostic(
         "old_candidate_type": str(
             details.get("old_candidate_type") or ""
         ),
+        "selected_evidence_effective_target_grounding": deepcopy(
+            details.get("selected_evidence_effective_target_grounding") or {}
+        ),
         "candidate_set": deepcopy(details.get("candidate_set") or []),
         "target_grounding_rejections": deepcopy(
             details.get("target_grounding_rejections") or []
@@ -624,6 +627,52 @@ def diagnose_temporal_evidence_selections(
         column = column_reference_map(table).get(column_id)
         if column is None:
             continue
+        selected_explicit_column, selected_other_table_owners = (
+            resolve_explicit_column_grounding(
+                dict(selected),
+                profile,
+                table,
+            )
+        )
+        if selected_other_table_owners:
+            selected_grounding = {
+                "kind": "cross_table_only_column",
+                "diagnosed_column_id": column_id,
+                "diagnosed_column": str(column.get("name") or ""),
+                "explicit_column_tables": selected_other_table_owners,
+                "reason": (
+                    "selected_evidence_cross_table_grounding_conflict"
+                ),
+            }
+            selected_grounding_safe = False
+        elif selected_explicit_column is None:
+            selected_grounding = {"kind": "no_explicit_column"}
+            selected_grounding_safe = True
+        else:
+            selected_explicit_column_id = str(
+                selected_explicit_column.get("column_id") or ""
+            )
+            if selected_explicit_column_id == column_id:
+                selected_grounding = {
+                    "kind": "same_diagnosed_column",
+                    "column_id": selected_explicit_column_id,
+                    "column": str(
+                        selected_explicit_column.get("name") or ""
+                    ),
+                }
+                selected_grounding_safe = True
+            else:
+                selected_grounding = {
+                    "kind": "different_same_table_column",
+                    "diagnosed_column_id": column_id,
+                    "diagnosed_column": str(column.get("name") or ""),
+                    "explicit_column_id": selected_explicit_column_id,
+                    "explicit_column": str(
+                        selected_explicit_column.get("name") or ""
+                    ),
+                    "reason": "source_evidence_effective_target_mismatch",
+                }
+                selected_grounding_safe = False
         window_start, window_end = _sentence_window(
             request,
             selected_start,
@@ -631,7 +680,8 @@ def diagnose_temporal_evidence_selections(
         )
         compatible: list[dict[str, Any]] = []
         target_grounding_rejections: list[dict[str, Any]] = []
-        for candidate in candidates:
+        candidate_pool = candidates if selected_grounding_safe else ()
+        for candidate in candidate_pool:
             candidate_id = str(candidate.get("evidence_id") or "")
             candidate_start = candidate.get("start")
             candidate_end = candidate.get("end")
@@ -778,6 +828,9 @@ def diagnose_temporal_evidence_selections(
                     "old_reference": old_reference,
                     "old_value": str(selected.get("text") or ""),
                     "old_candidate_type": old_candidate_type,
+                    "selected_evidence_effective_target_grounding": (
+                        selected_grounding
+                    ),
                     "candidate_set": compatible,
                     "target_grounding_rejections": (
                         target_grounding_rejections
@@ -866,6 +919,33 @@ def repair_temporal_evidence_selection_after_diagnostic(
             ),
         )
         return TargetedRepairOutcome(original, False, [trace])
+    target_column_reference = str(
+        details.get("target_column_reference") or ""
+    )
+    source_grounding = details.get(
+        "selected_evidence_effective_target_grounding"
+    )
+    source_grounding_is_safe = bool(
+        isinstance(source_grounding, Mapping)
+        and (
+            source_grounding.get("kind") == "no_explicit_column"
+            or (
+                source_grounding.get("kind") == "same_diagnosed_column"
+                and str(source_grounding.get("column_id") or "")
+                == target_column_reference
+            )
+        )
+    )
+    if not source_grounding_is_safe:
+        trace = _selection_trace_from_diagnostic(
+            diagnostic,
+            repair_rule="invalid_source_grounding_provenance",
+            reason=(
+                "The rejected evidence does not prove that its frozen "
+                "effective target equals the diagnosed plan target."
+            ),
+        )
+        return TargetedRepairOutcome(original, False, [trace])
     closed_set = diagnostic.details.get("candidate_set") or []
     if not isinstance(closed_set, list) or len(closed_set) != 1:
         trace = _selection_trace_from_diagnostic(
@@ -882,9 +962,6 @@ def repair_temporal_evidence_selection_after_diagnostic(
         candidate.get("effective_target_grounding")
         if isinstance(candidate, Mapping)
         else None
-    )
-    target_column_reference = str(
-        diagnostic.details.get("target_column_reference") or ""
     )
     grounding_is_preserved = bool(
         isinstance(candidate_grounding, Mapping)

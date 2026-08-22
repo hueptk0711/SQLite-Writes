@@ -1,15 +1,15 @@
-# Stage 2-G2 Patch 2 Checkpoint Report
+# Stage 2-G2 Patch 3 Checkpoint Report
 
 ## Result
 
-G2 Patch 2 closes the effective target-column grounding blocker found in Patch 1. Before a temporal candidate enters the compatible set, G2 now reuses the frozen materializer's exact-column grounding resolver through a read-only adapter. A different same-table target or an other-table-only target signal excludes the candidate; same-target and no-explicit-target candidates retain Patch-1 behavior.
+G2 Patch 3 closes the old-evidence effective-target blocker found after Patch 2. G2 now applies the accepted read-only frozen grounding adapter to the rejected evidence before candidate selection. A different same-table target or an other-table-only signal fails closed before repair; same-target and no-explicit-target old evidence preserve current G2 behavior.
 
 ## Frozen boundary
 
 ```text
 base tag:    Stage2-G1-FINAL
 frozen commit: b3d6e721b5d3c1ea9a5fd7e117692a807815dcb7
-Patch 2 base commit: 659c5c86125ccb3b5236cde148b73eb1dddcfd1e
+Patch 3 base commit: 7b3a52e2ea0015f765eec825b1e5cdb6a9c7524d
 ```
 
 The resulting G2 commit and final validation counts are recorded in the reviewer package after commit creation.
@@ -25,6 +25,10 @@ Dedicated tests cover:
 - exact Stage-E diagnostic gating;
 - target/type validation;
 - frozen grounding-helper reuse without materializer behavior changes;
+- old evidence different-target and cross-table fail-closed gates;
+- old evidence same-target and no-explicit-target eligibility;
+- old-grounding provenance and secondary repair validation;
+- end-to-end stop before retry when old effective target conflicts;
 - different same-table explicit target exclusion;
 - same-target and no-explicit-target eligibility;
 - other-table-only explicit target exclusion;

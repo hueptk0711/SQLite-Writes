@@ -1,13 +1,13 @@
-# Stage 2-G2 Patch 2 Method Specification — Temporal Evidence Selection
+# Stage 2-G2 Patch 3 Method Specification — Temporal Evidence Selection
 
 ## Scope and frozen parent
 
-G2 Patch 2 is a deterministic, temporal-only evidence-reference repair. Its frozen method parent and patch base are:
+G2 Patch 3 is a deterministic, temporal-only evidence-reference repair. Its frozen method parent and patch base are:
 
 ```text
 tag:    Stage2-G1-FINAL
 commit: b3d6e721b5d3c1ea9a5fd7e117692a807815dcb7
-Patch 1 base commit: 659c5c86125ccb3b5236cde148b73eb1dddcfd1e
+Patch 3 base commit: 7b3a52e2ea0015f765eec825b1e5cdb6a9c7524d
 ```
 
 A–F and G1 are unchanged. G2 does not call a model, regenerate a plan, create evidence, scan the request for new spans, rank candidates, or repair generic text evidence.
@@ -18,6 +18,8 @@ A–F and G1 are unchanged. G2 does not call a model, regenerate a plan, create 
 frozen A–F materializer rejects one temporal-normalization slot
     ↓ exact deterministic Stage-E type-mismatch diagnostic
 G2 identifies exactly one diagnosed value_from slot
+    ↓ old evidence grounding is none or the diagnosed target
+old effective target is safe
     ↓ filter the pre-enumerated evidence candidate set
 frozen exact-column grounding preserves diagnosed target
     ↓ exactly one compatible candidate remains
@@ -40,7 +42,8 @@ G2 creates `TEMPORAL_EVIDENCE_SELECTION_INCOMPATIBLE` only from an existing mate
 4. the diagnostic path resolves to the current plan slot;
 5. its evidence ID and raw value still equal the selected frozen candidate;
 6. the selected candidate is non-temporal;
-7. the table and column references resolve exactly in the frozen profile.
+7. the table and column references resolve exactly in the frozen profile;
+8. frozen exact-column grounding for the rejected evidence resolves no explicit target or the same diagnosed target.
 
 No diagnosis is inferred from lexical similarity or a desired gold value.
 
@@ -60,7 +63,22 @@ Sentence boundaries are only newline or `.`, `!`, `?`, `;` followed by whitespac
 
 Exactly one compatible candidate is required. Zero or multiple candidates produce `non_unique_compatible_candidate_set` and no mutation. G2 never breaks a tie by distance, order, score, embedding, fuzzy match, edit distance, schema contents, database state, or a model.
 
-## Effective target-column grounding preservation
+## Rejected-evidence target grounding
+
+Frozen materialization performs exact-column grounding before Stage-E normalization, while its error path still names the original plan column. Patch 3 therefore grounds the rejected evidence itself before evaluating any replacement.
+
+```text
+old evidence: no explicit column       -> continue
+old evidence: diagnosed column         -> continue
+old evidence: different local column   -> FAIL CLOSED
+old evidence: other-table-only column  -> FAIL CLOSED
+```
+
+The diagnostic records `selected_evidence_effective_target_grounding` with one of `no_explicit_column`, `same_diagnosed_column`, `different_same_table_column`, or `cross_table_only_column`. Unsafe cases create an empty compatible set and the secondary repair guard returns `invalid_source_grounding_provenance`; the materializer is not retried.
+
+This policy is deliberately conservative instead of simulating row-level remap collision suppression.
+
+## Replacement target grounding
 
 The frozen materializer may use a candidate's `left_context` to remap the predicted column when an immediately preceding exact schema identifier names a column. Patch 2 reuses that exact deterministic resolver through the read-only `resolve_explicit_column_grounding` adapter before candidate admission. It does not change the resolver or materializer.
 
@@ -107,6 +125,7 @@ target table/column/type context
 old_reference
 old_value
 old_candidate_type
+selected_evidence_effective_target_grounding
 candidate_set
 target_grounding_rejections
 selected_repair

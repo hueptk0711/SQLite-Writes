@@ -212,3 +212,13 @@ Housekeeping after G1 review:
 - makes `preserve_effective_target_grounding` a mandatory G2 safety invariant;
 - adds adversarial candidate-set tests, a frozen-helper/materializer equivalence regression, and an end-to-end test proving G2 fails closed before a target-changing retry;
 - preserves every accepted Patch-1 gate, closed-set/cardinality rule, one-slot mutation, collision guard, one-retry limit, G2→G1 prohibition, prompt, fixture, and experimental boundary.
+
+## Stage 2-G2 Patch 3 — rejected-evidence target-grounding preservation
+
+- applies the accepted read-only frozen grounding adapter to the rejected evidence before replacement candidate selection;
+- permits old evidence with no explicit target or the same diagnosed target;
+- fails closed when old evidence resolves to a different same-table column or an other-table-only column signal;
+- records `selected_evidence_effective_target_grounding` in diagnostics and repair traces;
+- requires safe old-grounding provenance again in the repair function, preventing stale or modified diagnostics from bypassing the gate;
+- adds four old-evidence grounding cases, an end-to-end one-call/no-retry regression, and a forged-provenance rejection test;
+- leaves both accepted Stage-1 G2 fixtures eligible and preserves all Patch-1/Patch-2 replacement, cardinality, retry, rollback, prompt, and scope invariants.
