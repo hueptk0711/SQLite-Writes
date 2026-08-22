@@ -1,1 +1,1 @@
-COMPILE_OK
+compileall PASS

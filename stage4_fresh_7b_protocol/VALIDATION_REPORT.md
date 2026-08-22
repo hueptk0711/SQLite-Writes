@@ -24,9 +24,21 @@ Patch-2 execution-hardening validation:
 - authoritative runner dry-run: recorded in validation/runner_dry_run.txt after CPU validation
 - deterministic repeat build: recorded in validation/deterministic_repeat.txt after CPU validation
 
+Patch-3 frozen-analysis validation:
+
+- complete executable analysis implementation: locked
+- required method outputs: exact frozen sample-ID set, duplicates rejected, missing rows rejected
+- primary metrics separated: target-state accuracy and strict full-state accuracy
+- safety/selective metrics: coverage, accepted-output accuracy, false accept, execution success, constraint failure, off-target state change
+- paired Original MP-FS+ vs D_G1 analysis: cluster bootstrap and McNemar exact test for both primary metrics
+- subgroup outputs: input type, operation type, database, dependency-sensitive
+- diagnostic outputs: first failure stage, D activation, G1 attempt/application/revalidation/final-state after application
+- sample-level audit table: one sample × method row for all predeclared methods
+
 CPU validation logs:
 
 - `validation/protocol_validator.txt`
+- `validation/analysis_freeze_tests.txt`
 - `validation/dedicated_stage4_tests.txt`
 - `validation/compatibility_A_to_G2_stage3_stage3b_stage4.txt`
 - `validation/full_fast_suite.txt`
