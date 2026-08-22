@@ -704,6 +704,7 @@ def validate_replay_results(
                 violations.append({"variant": variant, "sample_id": sample_id, "rule": "no_g1_g2_chain"})
             for component in REPAIR_COMPONENTS:
                 applied_count = 0
+                applied_by_slot: Counter[str] = Counter()
                 for trace in repairs[component]:
                     attempted = bool(trace.get("repair_attempted"))
                     applied = bool(trace.get("repair_applied"))
@@ -712,14 +713,31 @@ def validate_replay_results(
                     repair_counts[component]["applied"] += int(applied)
                     repair_counts[component]["succeeded"] += int(succeeded)
                     applied_count += int(applied)
+                    if applied:
+                        applied_by_slot[
+                            str(
+                                trace.get("slot_path")
+                                or trace.get("diagnosed_slot")
+                                or ""
+                            )
+                        ] += 1
                     if applied and not attempted:
                         violations.append({"variant": variant, "sample_id": sample_id, "component": component, "rule": "applied_implies_attempted"})
                     if succeeded and not applied:
                         violations.append({"variant": variant, "sample_id": sample_id, "component": component, "rule": "succeeded_implies_applied"})
                     if int(trace.get("revalidation_attempts") or 0) > 1:
                         violations.append({"variant": variant, "sample_id": sample_id, "component": component, "rule": "one_revalidation_max"})
-                if applied_count > 1:
+                if component in {"G1", "G2"} and applied_count > 1:
                     violations.append({"variant": variant, "sample_id": sample_id, "component": component, "rule": "one_applied_repair_max"})
+                if component == "F" and any(
+                    count > 1 for count in applied_by_slot.values()
+                ):
+                    violations.append({
+                        "variant": variant,
+                        "sample_id": sample_id,
+                        "component": component,
+                        "rule": "one_applied_repair_per_slot_max",
+                    })
     report = {
         "status": "PASS" if not violations else "FAIL",
         "variants": len(VARIANTS),

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -140,3 +141,23 @@ def test_validate_replay_results_rejects_success_without_application() -> None:
     }
     with pytest.raises(ValueError, match="succeeded_implies_applied"):
         validate_replay_results(all_results, {"sample"})
+
+
+def test_validate_replay_results_allows_f_repairs_on_distinct_slots() -> None:
+    empty = {"F": [], "G1": [], "G2": []}
+    all_results = {
+        f"V{index}": {"sample": {"repair_traces": deepcopy(empty)}}
+        for index in range(9)
+    }
+    all_results["V6"]["sample"]["repair_traces"]["F"] = [
+        {
+            "repair_attempted": True,
+            "repair_applied": True,
+            "repair_succeeded": True,
+            "slot_path": slot,
+            "revalidation_attempts": 1,
+        }
+        for slot in ("/rows/0/a", "/rows/0/b")
+    ]
+    report = validate_replay_results(all_results, {"sample"})
+    assert report["status"] == "PASS"
