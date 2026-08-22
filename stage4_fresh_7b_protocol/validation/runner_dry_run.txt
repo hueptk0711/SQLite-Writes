@@ -20,7 +20,31 @@
     "infra_crash_before_output": "resume_same_config_only",
     "semantic_retry": false,
     "batch_size": 1,
-    "resume_key": "generation_arm+sample_id"
+    "resume_key": "generation_arm+sample_id",
+    "valid_completion_required": {
+      "selected_ids_present_once": true,
+      "status_equals_success": true,
+      "input_truncated_false": true,
+      "hit_max_new_tokens_success_is_immutable_model_behavior": true
+    },
+    "failed_generation_status_policy": {
+      "oom": "STOP_preserve_attempt_log_do_not_freeze_central_raw",
+      "generation_error": "STOP_preserve_attempt_log_do_not_freeze_central_raw",
+      "input_truncation_error": "STOP_protocol_inconsistency_after_preflight"
+    }
+  },
+  "resume_policy": {
+    "explicit_resume_flag_required": true,
+    "result_root_exists_without_resume": "STOP",
+    "result_root_exists_with_resume": "validate_stage4_execution_lock_then_continue",
+    "drift_checks": [
+      "accepted_protocol_commit",
+      "runner_plan_sha256",
+      "sample_ids_sha256",
+      "inference_config_sha256",
+      "dependency_lock_sha256",
+      "model_identity"
+    ]
   },
   "generation_plan": [
     {
@@ -71,5 +95,5 @@
       "reuse_central_raw": "raw_generations/mp_fs_plus_shared.jsonl"
     }
   ],
-  "result_root": "D:\\paper kltn\\text to sql\\github_publish\\SQLite-Writes\\.tmp_stage4_runner_dry_run_log"
+  "result_root": "D:\\paper kltn\\text to sql\\github_publish\\SQLite-Writes\\.tmp_stage4_runner_patch2_dry_run"
 }

@@ -32,9 +32,23 @@ budget experiment is part of Stage 4.
 
 Raw generation immutability: completed rows in raw_generations/direct.jsonl,
 raw_generations/j_fs.jsonl, and raw_generations/mp_fs_plus_shared.jsonl are
-never regenerated for semantic reasons. Samples with no completed raw output
-because of an infrastructure crash may resume once with the same locked config;
-attempt logs must be preserved.
+never regenerated for semantic reasons. A raw arm is complete only if all 300
+selected IDs occur exactly once, every row has `status == success`, and
+`input_truncated == false`. `hit_max_new_tokens == true` remains immutable model
+behavior when status is success. `oom`, `generation_error`, and
+`input_truncation_error` stop the run and are not frozen as benchmark
+predictions. Samples with no row because of an infrastructure crash may resume
+with explicit `--resume` and the same locked config; attempt logs must be
+preserved.
+
+Resume contract: `result_root` may be reused only with explicit `--resume`.
+Before resuming, the runner checks unchanged accepted commit, runner plan hash,
+sample-ID hash, inference-config hash, model identity, and dependency-lock hash.
+
+Environment contract: before first generation the runner compares installed
+Python/package versions against `requirements-inference.lock.txt` for torch,
+transformers, accelerate, bitsandbytes, tokenizers, and safetensors. Any mismatch
+stops the run.
 
 Stopping rule: if D_G1 shows systematic false acceptance, off-target state
 changes, truncation, or missing predictions, preserve raw outputs and report the

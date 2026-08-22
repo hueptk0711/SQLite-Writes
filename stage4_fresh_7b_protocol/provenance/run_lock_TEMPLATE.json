@@ -105,8 +105,32 @@
     "retry_policy": {
       "completed_raw_output": "immutable_never_regenerate",
       "infrastructure_crash_before_output": "resume_same_config_only",
+      "explicit_resume_flag_required": true,
+      "resume_lock_checks": [
+        "accepted_protocol_commit",
+        "runner_plan_sha256",
+        "sample_ids_sha256",
+        "inference_config_sha256",
+        "model_identity",
+        "dependency_lock_sha256"
+      ],
+      "valid_raw_completion_contract": "all selected IDs present exactly once, status == success, input_truncated == false",
+      "failed_generation_status_policy": "STOP; do not freeze central raw and do not count as SQL failure",
       "semantic_retry": false,
       "attempt_log_required": true
+    },
+    "expected_gpu_python_major_minor": "3.14",
+    "environment_version_enforcement": {
+      "source": "requirements-inference.lock.txt",
+      "packages": [
+        "torch",
+        "transformers",
+        "accelerate",
+        "bitsandbytes",
+        "tokenizers",
+        "safetensors"
+      ],
+      "exact_match_required_before_generation": true
     }
   },
   "stage4_inference_config": {
@@ -129,11 +153,21 @@
     "git_rev_parse_head_equals_accepted_protocol_commit": true,
     "working_tree_clean_before_generation": true,
     "execution_commit_equals_accepted_protocol_commit": true,
-    "generated_result_files_outside_git_allowed": true
+    "generated_result_files_outside_git_allowed": true,
+    "explicit_resume_required_when_result_root_exists": true,
+    "resume_rejects_lock_drift": true,
+    "raw_generation_status_success_required": true,
+    "environment_package_versions_match_requirements_lock": true
+  },
+  "frozen_analysis": {
+    "script": "scripts/analysis/analyze_stage4_fresh_7b.py",
+    "primary_ci": "cluster_bootstrap_over_source_group",
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 240822
   },
   "token_budget_experiment": false,
   "stopping_rule": "no tuning on fresh set; preserve raw outputs and report failures",
-  "protocol_builder_base_commit": "53d62cd02abca575a63ef126c537acf96a69a113",
+  "protocol_builder_base_commit": "d0beef28cc9869666e72b382e8248c89c1dc9680",
   "repository_branch": "stage2/g-diagnostic-targeted-repair",
   "fresh_sample_ids_sha256": "5c8bd5cf2e5b79088322289f795beb95c33a1fa0de214f129eb0cf6680319a25",
   "source_group_audit": {

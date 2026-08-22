@@ -107,8 +107,32 @@ INFERENCE_LOCK = {
     "retry_policy": {
         "completed_raw_output": "immutable_never_regenerate",
         "infrastructure_crash_before_output": "resume_same_config_only",
+        "explicit_resume_flag_required": True,
+        "resume_lock_checks": [
+            "accepted_protocol_commit",
+            "runner_plan_sha256",
+            "sample_ids_sha256",
+            "inference_config_sha256",
+            "model_identity",
+            "dependency_lock_sha256",
+        ],
+        "valid_raw_completion_contract": "all selected IDs present exactly once, status == success, input_truncated == false",
+        "failed_generation_status_policy": "STOP; do not freeze central raw and do not count as SQL failure",
         "semantic_retry": False,
         "attempt_log_required": True,
+    },
+    "expected_gpu_python_major_minor": "3.14",
+    "environment_version_enforcement": {
+        "source": "requirements-inference.lock.txt",
+        "packages": [
+            "torch",
+            "transformers",
+            "accelerate",
+            "bitsandbytes",
+            "tokenizers",
+            "safetensors",
+        ],
+        "exact_match_required_before_generation": True,
     },
 }
 CONFIGS = [
@@ -613,9 +637,23 @@ budget experiment is part of Stage 4.
 
 Raw generation immutability: completed rows in raw_generations/direct.jsonl,
 raw_generations/j_fs.jsonl, and raw_generations/mp_fs_plus_shared.jsonl are
-never regenerated for semantic reasons. Samples with no completed raw output
-because of an infrastructure crash may resume once with the same locked config;
-attempt logs must be preserved.
+never regenerated for semantic reasons. A raw arm is complete only if all 300
+selected IDs occur exactly once, every row has `status == success`, and
+`input_truncated == false`. `hit_max_new_tokens == true` remains immutable model
+behavior when status is success. `oom`, `generation_error`, and
+`input_truncation_error` stop the run and are not frozen as benchmark
+predictions. Samples with no row because of an infrastructure crash may resume
+with explicit `--resume` and the same locked config; attempt logs must be
+preserved.
+
+Resume contract: `result_root` may be reused only with explicit `--resume`.
+Before resuming, the runner checks unchanged accepted commit, runner plan hash,
+sample-ID hash, inference-config hash, model identity, and dependency-lock hash.
+
+Environment contract: before first generation the runner compares installed
+Python/package versions against `requirements-inference.lock.txt` for torch,
+transformers, accelerate, bitsandbytes, tokenizers, and safetensors. Any mismatch
+stops the run.
 
 Stopping rule: if D_G1 shows systematic false acceptance, off-target state
 changes, truncation, or missing predictions, preserve raw outputs and report the
@@ -714,18 +752,18 @@ cd /home/uet/hue_ptk
 Upload the accepted code/package from the local machine:
 
 ```powershell
-scp "D:\\paper kltn\\text to sql\\reviewer_packages\\Stage4_FRESH_7B_PROTOCOL_PATCH1_FINAL_REVIEWER_PACKAGE_20260822.zip" uet@222.255.250.24:/home/uet/hue_ptk/
+scp "D:\\paper kltn\\text to sql\\reviewer_packages\\Stage4_FRESH_7B_PROTOCOL_PATCH2_FINAL_REVIEWER_PACKAGE_20260822.zip" uet@222.255.250.24:/home/uet/hue_ptk/
 ```
 
 On the server, unpack only after protocol acceptance and use a clean git
-checkout at the accepted Patch-1 commit:
+checkout at the accepted Patch-2 commit:
 
 ```bash
 cd /home/uet/hue_ptk
-unzip Stage4_FRESH_7B_PROTOCOL_PATCH1_FINAL_REVIEWER_PACKAGE_20260822.zip -d Stage4_FRESH_7B_PROTOCOL_PATCH1_REVIEW
+unzip Stage4_FRESH_7B_PROTOCOL_PATCH2_FINAL_REVIEWER_PACKAGE_20260822.zip -d Stage4_FRESH_7B_PROTOCOL_PATCH2_REVIEW
 git clone https://github.com/hueptk0711/SQLite-Writes.git SQLite-Writes-stage4
 cd SQLite-Writes-stage4
-git checkout <PATCH1_COMMIT_AFTER_REVIEW>
+git checkout <PATCH2_COMMIT_AFTER_REVIEW>
 python -m venv .venv-stage4
 source .venv-stage4/bin/activate
 pip install -r requirements-inference.lock.txt
@@ -742,14 +780,15 @@ python scripts/server/run_stage4_gpu_preflight.py \
   --fresh-gold-plans /home/uet/hue_ptk/data/stage4/gold_plans.jsonl \
   --profile-dir /home/uet/hue_ptk/data/stage4/profiles \
   --model-name-or-path /home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242 \
-  --accepted-protocol-commit <PATCH1_COMMIT_AFTER_REVIEW> \
+  --accepted-protocol-commit <PATCH2_COMMIT_AFTER_REVIEW> \
   --output-dir /home/uet/hue_ptk/stage4_fresh_7b_gpu_preflight
 ```
 
 If any prompt overflows, or if Original-vs-D_G1 final input equality is not
 300/300, stop and send the preflight output for review.
 
-Only after preflight PASS, run the single authoritative Stage-4 runner:
+Only after preflight PASS, run the single authoritative Stage-4 runner. For a
+brand-new run, omit `--resume`:
 
 ```bash
 python scripts/server/run_stage4_fresh_7b.py \
@@ -759,8 +798,33 @@ python scripts/server/run_stage4_fresh_7b.py \
   --profile-dir /home/uet/hue_ptk/data/stage4/profiles \
   --db-root /home/uet/hue_ptk/data/stage4/databases \
   --model-name-or-path /home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242 \
-  --accepted-protocol-commit <PATCH1_COMMIT_AFTER_REVIEW> \
+  --accepted-protocol-commit <PATCH2_COMMIT_AFTER_REVIEW> \
   --result-root /home/uet/hue_ptk/stage4_fresh_7b_results
+```
+
+If the SSH/session crashes before all raw rows are written, resume the exact
+same result root explicitly:
+
+```bash
+python scripts/server/run_stage4_fresh_7b.py \
+  --resume \
+  --protocol-root stage4_fresh_7b_protocol \
+  --fresh-source-data /home/uet/hue_ptk/data/stage4/dataset_test_v3.json \
+  --fresh-gold-plans /home/uet/hue_ptk/data/stage4/gold_plans.jsonl \
+  --profile-dir /home/uet/hue_ptk/data/stage4/profiles \
+  --db-root /home/uet/hue_ptk/data/stage4/databases \
+  --model-name-or-path /home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242 \
+  --accepted-protocol-commit <PATCH2_COMMIT_AFTER_REVIEW> \
+  --result-root /home/uet/hue_ptk/stage4_fresh_7b_results
+```
+
+After generation completes, run the frozen analysis script:
+
+```bash
+python scripts/analysis/analyze_stage4_fresh_7b.py \
+  --protocol-root stage4_fresh_7b_protocol \
+  --result-root /home/uet/hue_ptk/stage4_fresh_7b_results \
+  --output-dir /home/uet/hue_ptk/stage4_fresh_7b_results/analysis
 ```
 """,
     )
@@ -1041,6 +1105,16 @@ def main() -> int:
             "working_tree_clean_before_generation": True,
             "execution_commit_equals_accepted_protocol_commit": True,
             "generated_result_files_outside_git_allowed": True,
+            "explicit_resume_required_when_result_root_exists": True,
+            "resume_rejects_lock_drift": True,
+            "raw_generation_status_success_required": True,
+            "environment_package_versions_match_requirements_lock": True,
+        },
+        "frozen_analysis": {
+            "script": "scripts/analysis/analyze_stage4_fresh_7b.py",
+            "primary_ci": "cluster_bootstrap_over_source_group",
+            "bootstrap_replicates": BOOTSTRAP_REPLICATES,
+            "bootstrap_seed": BOOTSTRAP_SEED,
         },
         "token_budget_experiment": False,
         "stopping_rule": "no tuning on fresh set; preserve raw outputs and report failures",
@@ -1085,7 +1159,7 @@ def main() -> int:
                 "GPU required for this protocol package: no",
                 "Exact tokenizer count: deferred to mandatory GPU preflight before generation",
                 "",
-                "Patch-1 execution-lock validation:",
+                "Patch-2 execution-hardening validation:",
                 "",
                 "- generation graph invariant: PASS (`direct`, `j_fs`, `mp_fs_plus_shared`)",
                 f"- frozen sample IDs SHA-256: `{fresh_manifest['sample_ids_sha256']}`",
@@ -1103,6 +1177,10 @@ def main() -> int:
                     f"{sum(int(row['changed']) for row in d_audit_rows)}/{len(d_audit_rows)} samples"
                 ),
                 "- exact 4-bit BitsAndBytes config: locked",
+                "- exact Python/package environment enforcement: locked",
+                "- strict raw generation completion: status==success and input_truncated==false for 300/300",
+                "- explicit resume with execution-lock drift rejection: locked",
+                "- frozen statistical analysis script: `scripts/analysis/analyze_stage4_fresh_7b.py`",
                 "- runtime provenance assertion: accepted protocol commit must equal execution commit and working tree must be clean",
                 "- authoritative runner dry-run: recorded in validation/runner_dry_run.txt after CPU validation",
                 "- deterministic repeat build: recorded in validation/deterministic_repeat.txt after CPU validation",

@@ -44,6 +44,17 @@ from scripts.analysis.run_stage4_fresh_7b_protocol import (  # noqa: E402
 )
 
 
+EXPECTED_GPU_PYTHON_MAJOR_MINOR = "3.14"
+REQUIRED_ENVIRONMENT_PACKAGES = (
+    "torch",
+    "transformers",
+    "accelerate",
+    "bitsandbytes",
+    "tokenizers",
+    "safetensors",
+)
+
+
 def read_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -74,6 +85,78 @@ def json_sha256(value: Any) -> str:
 
 def git_output(*args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=PROJECT_ROOT, text=True, encoding="utf-8").strip()
+
+
+def parse_locked_requirement_versions(path: Path) -> dict[str, str]:
+    versions: dict[str, str] = {}
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or line.startswith("--"):
+            continue
+        if "==" not in line:
+            continue
+        package, version = line.split("==", 1)
+        package = package.strip().lower().replace("_", "-")
+        version = version.strip().split(";", 1)[0].strip()
+        versions[package] = version
+    return versions
+
+
+def environment_version_audit(
+    *,
+    environment: Mapping[str, Any],
+    dependency_lock_path: Path,
+    expected_python_major_minor: str = EXPECTED_GPU_PYTHON_MAJOR_MINOR,
+) -> dict[str, Any]:
+    locked = parse_locked_requirement_versions(dependency_lock_path)
+    package_rows: list[dict[str, Any]] = []
+    for package_name in REQUIRED_ENVIRONMENT_PACKAGES:
+        expected = locked.get(package_name)
+        actual = environment.get(f"{package_name}_version")
+        package_rows.append(
+            {
+                "package": package_name,
+                "expected_version": expected,
+                "actual_version": actual,
+                "match": bool(expected is not None and actual == expected),
+            }
+        )
+    python_actual = str(environment.get("python") or "")
+    python_match = python_actual.startswith(expected_python_major_minor + ".")
+    return {
+        "dependency_lock": {
+            "path": str(dependency_lock_path.resolve()),
+            "sha256": hashlib.sha256(dependency_lock_path.read_bytes()).hexdigest(),
+        },
+        "expected_python_major_minor": expected_python_major_minor,
+        "actual_python": python_actual,
+        "python_match": python_match,
+        "packages": package_rows,
+        "status": (
+            "PASS"
+            if python_match and all(row["match"] for row in package_rows)
+            else "STOP"
+        ),
+    }
+
+
+def assert_environment_versions(
+    *,
+    environment: Mapping[str, Any],
+    dependency_lock_path: Path,
+    expected_python_major_minor: str = EXPECTED_GPU_PYTHON_MAJOR_MINOR,
+) -> dict[str, Any]:
+    audit = environment_version_audit(
+        environment=environment,
+        dependency_lock_path=dependency_lock_path,
+        expected_python_major_minor=expected_python_major_minor,
+    )
+    if audit["status"] != "PASS":
+        raise SystemExit(
+            "STOP: installed GPU environment does not match "
+            "requirements-inference.lock.txt exactly"
+        )
+    return audit
 
 
 def assert_git_execution_lock(accepted_protocol_commit: str) -> dict[str, str]:
@@ -230,6 +313,8 @@ def run_preflight(
     model_name_or_path: str,
     output_dir: Path,
     git_lock: Mapping[str, str] | None,
+    dependency_lock_path: Path | None = None,
+    expected_python_major_minor: str = EXPECTED_GPU_PYTHON_MAJOR_MINOR,
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     tokenizer = load_tokenizer(model_name_or_path)
@@ -307,6 +392,16 @@ def run_preflight(
         equality_rows,
         list(equality_rows[0]),
     )
+    environment = capture_environment(model_name_or_path, tokenizer)
+    environment_audit = (
+        assert_environment_versions(
+            environment=environment,
+            dependency_lock_path=dependency_lock_path,
+            expected_python_major_minor=expected_python_major_minor,
+        )
+        if dependency_lock_path is not None
+        else None
+    )
     summary = {
         "status": "PASS"
         if overflow_count == 0 and equality_count == EXPECTED_SAMPLE_COUNT
@@ -318,7 +413,8 @@ def run_preflight(
         "original_vs_dg1_final_input_equal": f"{equality_count}/{EXPECTED_SAMPLE_COUNT}",
         "exact_tokenizer_preflight": True,
         "inference_config": stage4_hf_inference_config(model_name_or_path),
-        "environment": capture_environment(model_name_or_path, tokenizer),
+        "environment": environment,
+        "environment_version_audit": environment_audit,
         "git": dict(git_lock or {}),
     }
     write_json(output_dir / "gpu_preflight_summary.json", summary)
@@ -335,6 +431,8 @@ def main() -> int:
     parser.add_argument("--profile-dir", required=True)
     parser.add_argument("--model-name-or-path", required=True)
     parser.add_argument("--accepted-protocol-commit", required=True)
+    parser.add_argument("--dependency-lock", default="requirements-inference.lock.txt")
+    parser.add_argument("--expected-python-major-minor", default=EXPECTED_GPU_PYTHON_MAJOR_MINOR)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument(
         "--skip-git-assertions-for-dry-run-tests",
@@ -359,6 +457,8 @@ def main() -> int:
         model_name_or_path=args.model_name_or_path,
         output_dir=Path(args.output_dir).resolve(),
         git_lock=git_lock,
+        dependency_lock_path=Path(args.dependency_lock).resolve(),
+        expected_python_major_minor=args.expected_python_major_minor,
     )
     print(json.dumps(summary, indent=2, ensure_ascii=False))
     return 0

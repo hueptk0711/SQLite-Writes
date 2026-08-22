@@ -1,22 +1,22 @@
 {
-  "created_at_unix": 1787400560.748382,
-  "elapsed_seconds": 13.707931995391846,
+  "created_at_unix": 1787402586.5187633,
+  "elapsed_seconds": 14.323237419128418,
   "files": {
     "README_REVIEWER.md": {
       "sha256": "0e4f7754b660a706aa8cb0de293cb53627740bcd70509e8df1ac3c92727bea36",
       "size_bytes": 598
     },
     "RUN_STAGE4_7B_AFTER_ACCEPTANCE.md": {
-      "sha256": "995794330f6f442a5b944c12057b766c90132f6ce3d57056158c1b614774b7ee",
-      "size_bytes": 2519
+      "sha256": "201bce463d7a80c4c398e347f68ae92c16ca506cdb50939d9d2aa8db6966756f",
+      "size_bytes": 3577
     },
     "STAGE4_PROTOCOL.md": {
-      "sha256": "2cf4b2548afd122940f4c00752a5e3ecb8e410946146eeb38cd4ea6b4b7f92dc",
-      "size_bytes": 1815
+      "sha256": "50e52bcd448e23fb99279ea4a6632ce7028436ad34775d3760d0c2daef69c4ed",
+      "size_bytes": 2644
     },
     "VALIDATION_REPORT.md": {
-      "sha256": "b680dbc21c367820095bc34b1eb865f0224f06f5d3c2e2aca5bf4134ddb2aa17",
-      "size_bytes": 1265
+      "sha256": "6bcefc6f4661e544268b167e192cb6b732d0c2e719121a32cc75cf9953a03911",
+      "size_bytes": 1680
     },
     "analysis/d_parser_opportunity_audit.csv": {
       "sha256": "49b59d17d80f81d0c39e9e16322e8e5735c65b5a7d4c2f6493c30a26ea435d2b",
@@ -95,23 +95,23 @@
       "size_bytes": 308
     },
     "provenance/run_lock_TEMPLATE.json": {
-      "sha256": "819d1be7d1a48603a3f3a8cad1696970234849fbd77bdf5ef194e4df5f9d9945",
-      "size_bytes": 7650
+      "sha256": "95adabaabfcab815a1373d6bfb82188405663fe7cece979ee2caa8daa079bfca",
+      "size_bytes": 8944
     },
     "tests/protocol_invariants.json": {
       "sha256": "947a9685eee596e5fe3a8e484eab7be3d4533d72be875da05ea80f144b0fad65",
       "size_bytes": 167
     },
     "validation/compatibility_A_to_G2_stage3_stage3b_stage4.txt": {
-      "sha256": "88583cd151640d2dd9bee5a906a6631c882d1908bf53d18dec964e3cbceca1cc",
+      "sha256": "dbf5ba339457e6be378884b93317ae437fdca816e494abb1204107185932f68b",
       "size_bytes": 324
     },
     "validation/dedicated_stage4_tests.txt": {
-      "sha256": "55cf85556f9212aec3cf3688ddb048b901ad2536966113215358784c657a7532",
+      "sha256": "dda0df2a5159d1af76b6e0acce4b10db8872d11cd8f72f1ac9177341e2a17886",
       "size_bytes": 81
     },
     "validation/deterministic_repeat.txt": {
-      "sha256": "9e77bb28b51c460bb50b265fefd7231b279acd9cca10278c482c5dbe8f513fc2",
+      "sha256": "58a007b3d9b1f88605a336be6748257fe639a2c9b1c8790de7e26d71bbbba696",
       "size_bytes": 1665
     },
     "validation/deterministic_repeat_run.txt": {
@@ -119,16 +119,20 @@
       "size_bytes": 178
     },
     "validation/full_fast_suite.txt": {
-      "sha256": "acc58edf2ef695c97dc1f210898d39260ef421c19c26c6f1badc79a5b3c43f61",
+      "sha256": "a05c191c80da7ed21cc990819fb3045d4f679f91d69202b53911d9855a1d7cdc",
       "size_bytes": 465
     },
     "validation/protocol_validator.txt": {
       "sha256": "aa787ebf76420cbd30433e0ed3c2dfc686c0842282ac3eaf989fbbc94108786b",
       "size_bytes": 178
     },
+    "validation/python_compile_overlay.txt": {
+      "sha256": "785edd0728aa8f04fc6df55b2ccc6f944ea9dbb589552ea79493bec6378f1d0b",
+      "size_bytes": 12
+    },
     "validation/runner_dry_run.txt": {
-      "sha256": "b93bdf0143f07df8e524f82da3e20df9b7aff96c69f080ff2ab03939026a2b2d",
-      "size_bytes": 2736
+      "sha256": "52d578af497430469f5a3e758df17081ee06b54eaf89cc82f3a2890149d79ea3",
+      "size_bytes": 3673
     }
   },
   "manifest_hash_exclusions": [
@@ -174,6 +178,12 @@
       "original_mp_fs_plus": "mp_fs_plus_shared"
     },
     "fresh_sample_ids_sha256": "5c8bd5cf2e5b79088322289f795beb95c33a1fa0de214f129eb0cf6680319a25",
+    "frozen_analysis": {
+      "bootstrap_replicates": 10000,
+      "bootstrap_seed": 240822,
+      "primary_ci": "cluster_bootstrap_over_source_group",
+      "script": "scripts/analysis/analyze_stage4_fresh_7b.py"
+    },
     "generation_arms": [
       "direct",
       "j_fs",
@@ -245,7 +255,20 @@
       "context_length": 32768,
       "device_map": "auto",
       "do_sample": false,
+      "environment_version_enforcement": {
+        "exact_match_required_before_generation": true,
+        "packages": [
+          "torch",
+          "transformers",
+          "accelerate",
+          "bitsandbytes",
+          "tokenizers",
+          "safetensors"
+        ],
+        "source": "requirements-inference.lock.txt"
+      },
       "eos_token_id": "tokenizer.eos_token_id captured by GPU preflight",
+      "expected_gpu_python_major_minor": "3.14",
       "framework": "transformers",
       "generation_kwargs": {
         "do_sample": false,
@@ -264,8 +287,19 @@
       "retry_policy": {
         "attempt_log_required": true,
         "completed_raw_output": "immutable_never_regenerate",
+        "explicit_resume_flag_required": true,
+        "failed_generation_status_policy": "STOP; do not freeze central raw and do not count as SQL failure",
         "infrastructure_crash_before_output": "resume_same_config_only",
-        "semantic_retry": false
+        "resume_lock_checks": [
+          "accepted_protocol_commit",
+          "runner_plan_sha256",
+          "sample_ids_sha256",
+          "inference_config_sha256",
+          "model_identity",
+          "dependency_lock_sha256"
+        ],
+        "semantic_retry": false,
+        "valid_raw_completion_contract": "all selected IDs present exactly once, status == success, input_truncated == false"
       },
       "seed": 42,
       "stop_sequences": [],
@@ -296,12 +330,16 @@
       "no_c_secondary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
       "original_mp_fs_plus": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf"
     },
-    "protocol_builder_base_commit": "53d62cd02abca575a63ef126c537acf96a69a113",
+    "protocol_builder_base_commit": "d0beef28cc9869666e72b382e8248c89c1dc9680",
     "repository_branch": "stage2/g-diagnostic-targeted-repair",
     "runtime_assertions": {
+      "environment_package_versions_match_requirements_lock": true,
       "execution_commit_equals_accepted_protocol_commit": true,
+      "explicit_resume_required_when_result_root_exists": true,
       "generated_result_files_outside_git_allowed": true,
       "git_rev_parse_head_equals_accepted_protocol_commit": true,
+      "raw_generation_status_success_required": true,
+      "resume_rejects_lock_drift": true,
       "working_tree_clean_before_generation": true
     },
     "source_group_audit": {
