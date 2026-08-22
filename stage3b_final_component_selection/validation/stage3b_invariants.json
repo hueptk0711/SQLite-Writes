@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "samples": 300,
+  "candidates": 4,
+  "candidate_evaluations": 1200,
+  "prompt_builds": 3900,
+  "full_v8_equivalence_mismatches": 0,
+  "violations": []
+}

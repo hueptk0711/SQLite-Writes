@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "sample_rows": 300,
+  "prompt_rows": 300,
+  "prompt_summary_rows": 24,
+  "candidates": 4,
+  "manifest_entries_verified": 14,
+  "violations": []
+}
