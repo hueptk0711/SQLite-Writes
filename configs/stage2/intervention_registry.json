@@ -71,7 +71,9 @@
       "hypothesis": "When frozen Stage E rejects a non-temporal evidence reference with TEMPORAL_EVIDENCE_TYPE_MISMATCH for one iso_date_normalization slot, G2 may replace only that value_from when both the rejected evidence and replacement preserve the diagnosed effective target under the frozen exact-column grounding rule, and exactly one compatible maximal primary DATE/DATETIME candidate remains after the forward same-sentence filters.",
       "stage1_evidence": "Two manually audited temporal Stage-1 cases (final_vaccine_002 and final_vaccine_048) are eligible diagnostic/regression fixtures; final_virtual_046 is retained as a non-temporal out-of-scope control. No end-to-end rescue claim is made.",
       "config": "configs/stage2/v8_diagnostic_targeted_repair_g2.json",
-      "status": "in_review"
+      "status": "frozen",
+      "frozen_tag": "Stage2-G2-FINAL",
+      "frozen_commit": "b752867312727e9932dcf48af99c02b4b2af36cf"
     }
   ],
   "not_in_scope": [
