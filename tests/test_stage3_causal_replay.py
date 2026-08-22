@@ -12,6 +12,8 @@ from scripts.analysis.run_stage3_causal_replay import (
     safe_extract_dataset,
     semantic_fingerprint,
     validate_replay_results,
+    write_csv,
+    write_json,
 )
 
 
@@ -161,3 +163,14 @@ def test_validate_replay_results_allows_f_repairs_on_distinct_slots() -> None:
     ]
     report = validate_replay_results(all_results, {"sample"})
     assert report["status"] == "PASS"
+
+
+def test_generated_json_and_csv_use_portable_lf(tmp_path: Path) -> None:
+    json_path = tmp_path / "value.json"
+    csv_path = tmp_path / "value.csv"
+    write_json(json_path, {"value": 1})
+    write_csv(csv_path, [{"value": 1}], ["value"])
+    assert b"\r\n" not in json_path.read_bytes()
+    assert b"\r\n" not in csv_path.read_bytes()
+    assert json_path.read_bytes().endswith(b"\n")
+    assert csv_path.read_bytes().endswith(b"\n")

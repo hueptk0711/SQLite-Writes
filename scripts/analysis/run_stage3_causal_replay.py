@@ -87,7 +87,8 @@ def jsonl_bytes(value: bytes) -> list[dict[str, Any]]:
 
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write(json.dumps(value, ensure_ascii=False, indent=2) + "\n")
 
 
 def write_jsonl(path: Path, rows: Iterable[Mapping[str, Any]]) -> None:
@@ -100,7 +101,12 @@ def write_jsonl(path: Path, rows: Iterable[Mapping[str, Any]]) -> None:
 def write_csv(path: Path, rows: list[dict[str, Any]], fields: list[str]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8-sig", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=fields,
+            extrasaction="ignore",
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
 
@@ -876,7 +882,8 @@ def main() -> int:
         source = repo_root / relative
         destination = output_dir / "configs" / f"{variant}_{source.name}"
         destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_bytes(source.read_bytes())
+        with destination.open("w", encoding="utf-8", newline="\n") as handle:
+            handle.write(source.read_text(encoding="utf-8"))
         config_hashes[variant] = {"path": relative, "sha256": sha256_file(source)}
     head = git_output(repo_root, "rev-parse", "HEAD")
     frozen_tag_commit = git_output(repo_root, "rev-list", "-n", "1", FROZEN_G2_TAG)

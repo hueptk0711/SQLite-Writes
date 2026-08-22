@@ -10,5 +10,5 @@
 *.jpeg binary
 *.pdf binary
 
-# Preserve byte-identical Stage-3 replay artifacts and their manifest hashes.
-stage3_full_causal_replay/** -text whitespace=cr-at-eol
+# Keep Stage-3 replay artifacts byte-stable across Windows/Linux checkouts.
+stage3_full_causal_replay/** text eol=lf
