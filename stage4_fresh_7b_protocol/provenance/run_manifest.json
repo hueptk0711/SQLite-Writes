@@ -75,20 +75,20 @@
       "size_bytes": 427
     },
     "provenance/environment_lock.txt": {
-      "sha256": "5f497c6038140cab3f3c93b3cb54f1ba13fc73de35217722f75a739910375af2",
-      "size_bytes": 308
+      "sha256": "474c55042187944d02a5bd4511858786195e0af962750097d405ce316e5c4f20",
+      "size_bytes": 529
     },
     "provenance/run_lock_TEMPLATE.json": {
-      "sha256": "95adabaabfcab815a1373d6bfb82188405663fe7cece979ee2caa8daa079bfca",
+      "sha256": "1b811aec647556fedb9f1e76f752377f3582a169a0e1fc8481d8bced9c265ff8",
       "size_bytes": 8944
     },
     "README_REVIEWER.md": {
-      "sha256": "9a16b0ed9a0335ab7729d3d7dcbac2bac549509a505e10ab5b31e9b633e5bb57",
-      "size_bytes": 780
+      "sha256": "f881154347013f8194b570a40cee9a66a9d251900203adee90085c8666f2994d",
+      "size_bytes": 1099
     },
     "RUN_STAGE4_7B_AFTER_ACCEPTANCE.md": {
-      "sha256": "201bce463d7a80c4c398e347f68ae92c16ca506cdb50939d9d2aa8db6966756f",
-      "size_bytes": 3577
+      "sha256": "889d77f6293e54dd7aa8eaf9f06f67bf9eca9e86183e81226b4ac68a34b731c0",
+      "size_bytes": 3896
     },
     "STAGE4_PROTOCOL.md": {
       "sha256": "50e52bcd448e23fb99279ea4a6632ce7028436ad34775d3760d0c2daef69c4ed",
@@ -135,8 +135,8 @@
       "size_bytes": 3673
     },
     "VALIDATION_REPORT.md": {
-      "sha256": "a57c4eac09874bba94d825c4da6a04ca1d9d8513a06b8f05fa808eee8bc62ca1",
-      "size_bytes": 2526
+      "sha256": "a3e3389fcaca2799b1886a7d7e82e16857004d13ec2bd22eefa44d58bd98424a",
+      "size_bytes": 3156
     }
   },
   "manifest_hash_exclusions": [
@@ -272,7 +272,7 @@
         "source": "requirements-inference.lock.txt"
       },
       "eos_token_id": "tokenizer.eos_token_id captured by GPU preflight",
-      "expected_gpu_python_major_minor": "3.14",
+      "expected_gpu_python_major_minor": "3.12",
       "framework": "transformers",
       "generation_kwargs": {
         "do_sample": false,

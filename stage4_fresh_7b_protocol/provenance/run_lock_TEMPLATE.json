@@ -119,7 +119,7 @@
       "semantic_retry": false,
       "attempt_log_required": true
     },
-    "expected_gpu_python_major_minor": "3.14",
+    "expected_gpu_python_major_minor": "3.12",
     "environment_version_enforcement": {
       "source": "requirements-inference.lock.txt",
       "packages": [

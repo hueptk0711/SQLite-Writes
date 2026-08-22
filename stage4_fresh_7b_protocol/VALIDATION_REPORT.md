@@ -35,6 +35,15 @@ Patch-3 frozen-analysis validation:
 - diagnostic outputs: first failure stage, D activation, G1 attempt/application/revalidation/final-state after application
 - sample-level audit table: one sample × method row for all predeclared methods
 
+Environment compatibility patch validation:
+
+- expected GPU Python major/minor corrected: `3.14` → `3.12`
+- historical verified GPU Python: `3.12.7`
+- historical verified environment manifest: `07_reproducibility/server_final_run/environment_manifest_final_server.json`
+- dependency lock unchanged; current SHA-256 equals historical lock SHA-256: `861a24b179b5edd1245aba33109402dd4ab82a634098bd8d81fcb666f5bdf9f1`
+- locked GPU packages unchanged: `torch==2.6.0+cu124`, `transformers==5.5.3`, `accelerate==1.14.0`, `bitsandbytes==0.47.0`, `tokenizers==0.22.2`, `safetensors==0.5.3`
+- model calls after environment correction: 0
+
 CPU validation logs:
 
 - `validation/protocol_validator.txt`

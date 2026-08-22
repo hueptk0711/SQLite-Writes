@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -163,6 +164,32 @@ def test_environment_mismatch_stops(tmp_path: Path) -> None:
     assert audit["status"] == "STOP"
     with pytest.raises(SystemExit):
         assert_environment_versions(environment=env, dependency_lock_path=lock)
+
+
+def test_stage4_gpu_python_expectation_matches_historical_verified_environment() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    manifest = json.loads(
+        (
+            repo_root
+            / "07_reproducibility"
+            / "server_final_run"
+            / "environment_manifest_final_server.json"
+        ).read_text(encoding="utf-8")
+    )
+    lock_path = repo_root / "requirements-inference.lock.txt"
+    lock_sha = hashlib.sha256(lock_path.read_bytes()).hexdigest()
+
+    assert EXPECTED_GPU_PYTHON_MAJOR_MINOR == "3.12"
+    assert str(manifest["python"]["version"]).startswith("3.12.")
+    assert manifest["dependency_lock"]["sha256"] == lock_sha
+    assert manifest["packages"]["torch"] == "2.6.0+cu124"
+    assert manifest["packages"]["transformers"] == "5.5.3"
+    assert manifest["packages"]["accelerate"] == "1.14.0"
+    assert manifest["packages"]["bitsandbytes"] == "0.47.0"
+    assert manifest["packages"]["tokenizers"] == "0.22.2"
+    assert manifest["packages"]["safetensors"] == "0.5.3"
+    assert manifest["torch"]["cuda_runtime"] == "12.4"
+    assert manifest["torch"]["cuda_available"] is True
 
 
 def test_cluster_bootstrap_is_seed_deterministic() -> None:

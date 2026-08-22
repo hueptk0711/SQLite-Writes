@@ -44,7 +44,7 @@ from scripts.analysis.run_stage4_fresh_7b_protocol import (  # noqa: E402
 )
 
 
-EXPECTED_GPU_PYTHON_MAJOR_MINOR = "3.14"
+EXPECTED_GPU_PYTHON_MAJOR_MINOR = "3.12"
 REQUIRED_ENVIRONMENT_PACKAGES = (
     "torch",
     "transformers",
