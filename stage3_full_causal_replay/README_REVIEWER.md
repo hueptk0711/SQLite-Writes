@@ -22,7 +22,7 @@ The 300 samples are development diagnostic data because they informed A–G2. Re
 
 - G2 tag: `Stage2-G2-FINAL`
 - G2 production commit: `b752867312727e9932dcf48af99c02b4b2af36cf`
-- Replay code commit: `4fcbc5f6078667bf8f57e9878b80a9ec162a3a86`
+- Replay code commit: `38c4f4d8941bfc7d3d3d27dd8819ed8dcde8262d`
 - Dataset archive SHA-256: `525cdd7006ea32a8ab8d81f842332ac9b403dce2472cde608efb4e6962d456df`
 - Original result archive SHA-256: `e456037422281d56e03dd7766baf1cc9efa78a95061234444c452f3c04810911`
 - V0 comparison against frozen evaluation: zero mismatches across target correctness, strict correctness, and execution success.
