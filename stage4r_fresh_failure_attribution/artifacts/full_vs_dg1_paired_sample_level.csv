@@ -1,0 +1,6 @@
+﻿sample_id,paired_outcome,d_g1_target_state_correct,full_target_state_correct,d_g1_first_failure_stage,full_first_failure_stage,d_g1_error_type,full_error_type,d_g1_accepted_output,full_accepted_output,full_false_accept
+seed_000110,rescue,0,1,build,none,UNKNOWN_COLUMN_ID,,0,1,0
+seed_000185,rescue,0,1,build,none,UNKNOWN_COLUMN_ID,,0,1,0
+seed_000235,rescue,0,1,build,none,UNKNOWN_COLUMN_ID,,0,1,0
+seed_000288,rescue,0,1,build,none,UNKNOWN_COLUMN_ID,,0,1,0
+seed_000334,rescue,0,1,build,none,UNKNOWN_COLUMN_ID,,0,1,0

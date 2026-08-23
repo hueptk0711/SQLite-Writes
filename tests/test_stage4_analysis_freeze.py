@@ -273,6 +273,42 @@ def test_subgroup_metrics_and_intervention_summary(tmp_path: Path) -> None:
     assert int(intervention["G1_applied"]) == 1
     assert int(intervention["G1_revalidation_success"]) == 1
     assert int(intervention["G1_final_state_incorrect_after_application"]) == 1
+    assert int(intervention["G1_trace_sample_count"]) == 1
+    assert intervention["G1_trace_sample_ids"] == "s2"
+
+
+def test_empty_g1_trace_rows_do_not_count_as_trace_samples(tmp_path: Path) -> None:
+    sample_ids = ["s1", "s2", "s3"]
+    protocol = tmp_path / "protocol"
+    results = tmp_path / "results"
+    output = tmp_path / "analysis"
+    write_protocol(protocol, sample_ids)
+    write_results(results, sample_ids)
+    write_jsonl(
+        results / "methods" / "d_g1_primary" / "materialized_write_plans.jsonl",
+        [
+            {
+                "sample_id": sample_id,
+                "write_plan": {
+                    "reference_trace": {
+                        "normalizer_events": [
+                            {"stage2_intervention": "not_G1", "repair_attempted": False}
+                        ]
+                    }
+                },
+            }
+            for sample_id in sample_ids
+        ],
+    )
+
+    analyze_result_root(protocol, results, output)
+
+    intervention = read_csv_rows(output / "intervention_summary.csv")[0]
+    assert int(intervention["G1_attempts"]) == 0
+    assert int(intervention["G1_applied"]) == 0
+    assert int(intervention["G1_revalidation_success"]) == 0
+    assert int(intervention["G1_trace_sample_count"]) == 0
+    assert intervention["G1_trace_sample_ids"] == ""
 
 
 def test_primary_paired_analysis_reports_both_metrics(tmp_path: Path) -> None:

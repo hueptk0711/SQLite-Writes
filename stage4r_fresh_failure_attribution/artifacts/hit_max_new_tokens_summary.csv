@@ -1,0 +1,8 @@
+﻿method_slug,n,hit_max_new_tokens_count,hit_max_new_tokens_rate,incorrect_after_hit_count,parse_failure_after_hit_count
+direct,300,15,0.05,15,0
+j_fs,300,33,0.11,33,1
+original_mp_fs_plus,300,9,0.03,9,9
+d_g1_primary,300,9,0.03,9,9
+d_only_secondary,300,9,0.03,9,9
+full_secondary,300,9,0.03,9,9
+no_c_secondary,300,9,0.03,9,9

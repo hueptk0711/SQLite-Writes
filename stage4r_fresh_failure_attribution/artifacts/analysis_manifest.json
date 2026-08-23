@@ -1,0 +1,48 @@
+{
+  "stage": "Stage4R_FRESH_FAILURE_ATTRIBUTION",
+  "model_called": false,
+  "raw_generations_modified": false,
+  "evaluations_modified": false,
+  "artifacts": {
+    "stage4r_summary.json": {
+      "exists": true,
+      "size_bytes": 745
+    },
+    "analysis_manifest.json": {
+      "exists": true,
+      "size_bytes": 1076
+    },
+    "f_activation_sample_level.csv": {
+      "exists": true,
+      "size_bytes": 1656
+    },
+    "f_exact_name_repairs.csv": {
+      "exists": true,
+      "size_bytes": 8913
+    },
+    "full_vs_dg1_paired_summary.csv": {
+      "exists": true,
+      "size_bytes": 108
+    },
+    "full_vs_dg1_paired_sample_level.csv": {
+      "exists": true,
+      "size_bytes": 517
+    },
+    "d_g1_failure_taxonomy.csv": {
+      "exists": true,
+      "size_bytes": 9484
+    },
+    "d_g1_failure_sample_level.csv": {
+      "exists": true,
+      "size_bytes": 30326
+    },
+    "hit_max_new_tokens_summary.csv": {
+      "exists": true,
+      "size_bytes": 323
+    },
+    "hit_max_new_tokens_samples.csv": {
+      "exists": true,
+      "size_bytes": 11276
+    }
+  }
+}

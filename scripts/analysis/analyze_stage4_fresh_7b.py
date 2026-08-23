@@ -481,7 +481,8 @@ def repair_traces_for_method(method_dir: Path) -> dict[str, list[dict[str, Any]]
                 and "repair_applied" in item
                 and "repair_succeeded" in item
             ]
-            traces[sample_id].extend(unique_dicts(candidates))
+            if candidates:
+                traces[sample_id].extend(unique_dicts(candidates))
     return {sample_id: unique_dicts(items) for sample_id, items in traces.items()}
 
 
