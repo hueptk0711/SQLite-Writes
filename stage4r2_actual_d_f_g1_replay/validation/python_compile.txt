@@ -1,0 +1,2 @@
+COMMAND: python -m py_compile scripts/analysis/run_stage4r2_actual_dfg1_replay.py tests/test_stage4r_fresh_failure_attribution.py
+EXIT: 0

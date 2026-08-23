@@ -1,1 +1,3 @@
-...........                                                              [100%]
+COMMAND: python -c <pytest temp ACL wrapper> tests/test_stage4r_fresh_failure_attribution.py -q
+EXIT: 0
+...                                                                      [100%]

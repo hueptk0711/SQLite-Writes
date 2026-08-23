@@ -56,6 +56,23 @@ COPIED_ACTUAL_ARTIFACTS = {
     "run_lock.json": "d_f_g1_actual_run_lock.json",
     "config.json": "d_f_g1_actual_config.json",
 }
+F_REPAIR_COLUMNS = [
+    "sample_id",
+    "source_artifact",
+    "trace_path",
+    "slot_path",
+    "reference_kind",
+    "repair_rule",
+    "repair_attempted",
+    "repair_applied",
+    "repair_succeeded",
+    "original_reference",
+    "replacement_reference",
+    "candidate_count",
+    "candidate_set",
+    "validation_before",
+    "validation_after",
+]
 
 
 def sha256_file(path: Path) -> str:
@@ -257,42 +274,123 @@ def build_sample_comparison_rows(
     return rows
 
 
-def build_f_repair_rows(actual_run_dir: Path) -> list[dict[str, Any]]:
+def repair_row_key(row: Mapping[str, Any]) -> tuple[Any, ...]:
+    return (
+        row.get("sample_id"),
+        row.get("slot_path"),
+        row.get("reference_kind"),
+        row.get("repair_rule"),
+        row.get("original_reference"),
+        row.get("replacement_reference"),
+        row.get("candidate_count"),
+        row.get("candidate_set"),
+        row.get("validation_before"),
+        row.get("validation_after"),
+        row.get("repair_applied"),
+        row.get("repair_succeeded"),
+    )
+
+
+def build_f_repair_rows_from_artifact(
+    actual_run_dir: Path,
+    *,
+    artifact_name: str,
+) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    for materialized in read_jsonl(actual_run_dir / "materialized_write_plans.jsonl"):
-        sample_id = str(materialized.get("sample_id") or "")
-        for item in walk_dicts(materialized):
-            if item.get("repair_rule") != "unique_exact_identifier_name":
-                continue
+    seen: set[tuple[Any, ...]] = set()
+    for artifact_row in read_jsonl(actual_run_dir / artifact_name):
+        sample_id = str(artifact_row.get("sample_id") or "")
+        for trace_path, item in walk_dicts(artifact_row):
             if not truthy(item.get("repair_attempted")):
                 continue
-            rows.append(
-                {
-                    "sample_id": sample_id,
-                    "slot_path": item.get("slot_path") or "",
-                    "reference_kind": item.get("reference_kind") or "",
-                    "repair_rule": item.get("repair_rule") or "",
-                    "repair_attempted": int(truthy(item.get("repair_attempted"))),
-                    "repair_applied": int(truthy(item.get("repair_applied"))),
-                    "repair_succeeded": int(truthy(item.get("repair_succeeded"))),
-                    "original_reference": item.get("original_reference") or "",
-                    "replacement_reference": item.get("replacement_reference") or "",
-                    "candidate_count": item.get("candidate_count") or "",
-                    "validation_before": item.get("validation_before") or "",
-                    "validation_after": item.get("validation_after") or "",
-                }
-            )
+            candidate_set = item.get("candidate_set")
+            row = {
+                "sample_id": sample_id,
+                "source_artifact": artifact_name,
+                "trace_path": trace_path,
+                "slot_path": item.get("slot_path") or "",
+                "reference_kind": item.get("reference_kind") or "",
+                "repair_rule": item.get("repair_rule") or "",
+                "repair_attempted": int(truthy(item.get("repair_attempted"))),
+                "repair_applied": int(truthy(item.get("repair_applied"))),
+                "repair_succeeded": int(truthy(item.get("repair_succeeded"))),
+                "original_reference": item.get("original_reference") or "",
+                "replacement_reference": item.get("replacement_reference") or "",
+                "candidate_count": item.get("candidate_count") or "",
+                "candidate_set": json.dumps(candidate_set, ensure_ascii=False, sort_keys=True)
+                if candidate_set is not None
+                else "",
+                "validation_before": item.get("validation_before") or "",
+                "validation_after": item.get("validation_after") or "",
+            }
+            key = repair_row_key(row)
+            if key in seen:
+                continue
+            seen.add(key)
+            rows.append(row)
     return rows
 
 
 def walk_dicts(value: Any):
     if isinstance(value, dict):
-        yield value
-        for nested in value.values():
-            yield from walk_dicts(nested)
+        yield "", value
+        for key, nested in value.items():
+            for nested_path, nested_item in walk_dicts(nested):
+                yield f"/{key}{nested_path}", nested_item
     elif isinstance(value, list):
-        for nested in value:
-            yield from walk_dicts(nested)
+        for index, nested in enumerate(value):
+            for nested_path, nested_item in walk_dicts(nested):
+                yield f"/{index}{nested_path}", nested_item
+
+
+def is_exact_name_repair(row: Mapping[str, Any]) -> bool:
+    return row.get("repair_rule") == "unique_exact_identifier_name"
+
+
+def is_applied_repair(row: Mapping[str, Any]) -> bool:
+    return truthy(row.get("repair_applied")) and truthy(row.get("repair_succeeded"))
+
+
+def build_f_sample_outcome_rows(
+    *,
+    f_attempt_rows: Sequence[Mapping[str, Any]],
+    f_applied_rows: Sequence[Mapping[str, Any]],
+    f_materialized_rows: Sequence[Mapping[str, Any]],
+    comparison_rows: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    by_sample = {str(row["sample_id"]): row for row in comparison_rows}
+    sample_ids = sorted({str(row["sample_id"]) for row in f_attempt_rows})
+    rows: list[dict[str, Any]] = []
+    for sample_id in sample_ids:
+        comparison = by_sample[sample_id]
+        sample_attempts = [row for row in f_attempt_rows if str(row["sample_id"]) == sample_id]
+        sample_applied = [row for row in f_applied_rows if str(row["sample_id"]) == sample_id]
+        sample_materialized = [
+            row for row in f_materialized_rows if str(row["sample_id"]) == sample_id
+        ]
+        rows.append(
+            {
+                "sample_id": sample_id,
+                "F_attempt_count": len(sample_attempts),
+                "F_exact_name_attempt_count": sum(
+                    is_exact_name_repair(row) for row in sample_attempts
+                ),
+                "F_applied_exact_name_repair_count": len(sample_applied),
+                "F_materialized_exact_name_repair_count": len(sample_materialized),
+                "D_G1_target_state_correct": comparison["D_G1_target_state_correct"],
+                "ACTUAL_D_F_G1_target_state_correct": comparison[
+                    "ACTUAL_D_F_G1_target_state_correct"
+                ],
+                "FULL_target_state_correct": comparison["FULL_target_state_correct"],
+                "D_G1_to_ACTUAL_D_F_G1": comparison["D_G1_to_ACTUAL_D_F_G1"],
+                "ACTUAL_D_F_G1_to_FULL": comparison["ACTUAL_D_F_G1_to_FULL"],
+                "ACTUAL_D_F_G1_first_failure_stage": comparison[
+                    "ACTUAL_D_F_G1_first_failure_stage"
+                ],
+                "ACTUAL_D_F_G1_error_type": comparison["ACTUAL_D_F_G1_error_type"],
+            }
+        )
+    return rows
 
 
 def run_stage4r2(
@@ -336,8 +434,35 @@ def run_stage4r2(
             method_rows=full_rows,
         ),
     ]
-    f_rows = build_f_repair_rows(actual_run_dir)
-    f_activation_ids = sorted({str(row["sample_id"]) for row in f_rows})
+    f_attempt_rows = build_f_repair_rows_from_artifact(
+        actual_run_dir,
+        artifact_name="verification.jsonl",
+    )
+    f_applied_rows = [
+        row
+        for row in f_attempt_rows
+        if is_exact_name_repair(row) and is_applied_repair(row)
+    ]
+    f_materialized_rows = [
+        row
+        for row in build_f_repair_rows_from_artifact(
+            actual_run_dir,
+            artifact_name="materialized_write_plans.jsonl",
+        )
+        if is_exact_name_repair(row)
+    ]
+    f_sample_rows = build_f_sample_outcome_rows(
+        f_attempt_rows=f_attempt_rows,
+        f_applied_rows=f_applied_rows,
+        f_materialized_rows=f_materialized_rows,
+        comparison_rows=comparison_rows,
+    )
+    f_attempt_ids = sorted({str(row["sample_id"]) for row in f_attempt_rows})
+    f_exact_attempt_ids = sorted(
+        {str(row["sample_id"]) for row in f_attempt_rows if is_exact_name_repair(row)}
+    )
+    f_applied_ids = sorted({str(row["sample_id"]) for row in f_applied_rows})
+    f_materialized_ids = sorted({str(row["sample_id"]) for row in f_materialized_rows})
     summary = {
         "stage": "Stage4R2_ACTUAL_D_F_G1_REPLAY",
         "model_called": False,
@@ -354,11 +479,24 @@ def run_stage4r2(
         "D_G1_to_ACTUAL_D_F_G1_regression": paired_rows[0]["regression"],
         "ACTUAL_D_F_G1_to_FULL_rescue": paired_rows[1]["rescue"],
         "ACTUAL_D_F_G1_to_FULL_regression": paired_rows[1]["regression"],
-        "F_activation_sample_count": len(f_activation_ids),
-        "F_exact_name_repair_count": sum(
-            row["repair_rule"] == "unique_exact_identifier_name" for row in f_rows
+        "F_attempt_sample_count": len(f_attempt_ids),
+        "F_attempt_count": len(f_attempt_rows),
+        "F_exact_name_attempt_sample_count": len(f_exact_attempt_ids),
+        "F_exact_name_attempt_count": sum(is_exact_name_repair(row) for row in f_attempt_rows),
+        "F_applied_sample_count": len(f_applied_ids),
+        "F_applied_exact_name_repair_count": len(f_applied_rows),
+        "F_materialized_sample_count": len(f_materialized_ids),
+        "F_materialized_exact_name_repair_count": len(f_materialized_rows),
+        "F_state_rescue_count": paired_rows[0]["rescue"],
+        "F_state_regression_count": paired_rows[0]["regression"],
+        "F_attempt_rule_counts": {
+            rule: sum(row["repair_rule"] == rule for row in f_attempt_rows)
+            for rule in sorted({str(row["repair_rule"]) for row in f_attempt_rows})
+        },
+        "deprecated_note": (
+            "F_activation_sample_count/F_repair_count were removed because they "
+            "undercounted repairs by reading only materialized_write_plans.jsonl."
         ),
-        "F_repair_count": len(f_rows),
     }
 
     copy_actual_artifacts(actual_run_dir, output_dir)
@@ -374,22 +512,42 @@ def run_stage4r2(
         list(paired_rows[0]),
     )
     write_csv(
-        output_dir / "d_f_g1_actual_f_repairs.csv",
-        f_rows,
-        list(f_rows[0]) if f_rows else [
+        output_dir / "f_attempts.csv",
+        f_attempt_rows,
+        F_REPAIR_COLUMNS,
+    )
+    write_csv(
+        output_dir / "f_applied_repairs.csv",
+        f_applied_rows,
+        F_REPAIR_COLUMNS,
+    )
+    write_csv(
+        output_dir / "f_materialized_repairs.csv",
+        f_materialized_rows,
+        F_REPAIR_COLUMNS,
+    )
+    write_csv(
+        output_dir / "f_sample_outcomes.csv",
+        f_sample_rows,
+        list(f_sample_rows[0]) if f_sample_rows else [
             "sample_id",
-            "slot_path",
-            "reference_kind",
-            "repair_rule",
-            "repair_attempted",
-            "repair_applied",
-            "repair_succeeded",
-            "original_reference",
-            "replacement_reference",
-            "candidate_count",
-            "validation_before",
-            "validation_after",
+            "F_attempt_count",
+            "F_exact_name_attempt_count",
+            "F_applied_exact_name_repair_count",
+            "F_materialized_exact_name_repair_count",
+            "D_G1_target_state_correct",
+            "ACTUAL_D_F_G1_target_state_correct",
+            "FULL_target_state_correct",
+            "D_G1_to_ACTUAL_D_F_G1",
+            "ACTUAL_D_F_G1_to_FULL",
+            "ACTUAL_D_F_G1_first_failure_stage",
+            "ACTUAL_D_F_G1_error_type",
         ],
+    )
+    write_csv(
+        output_dir / "d_f_g1_actual_f_repairs.csv",
+        f_materialized_rows,
+        F_REPAIR_COLUMNS,
     )
     write_json(output_dir / "stage4r2_actual_replay_summary.json", summary)
     return summary

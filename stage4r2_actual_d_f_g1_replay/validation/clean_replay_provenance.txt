@@ -1,0 +1,33 @@
+STAGE4R.2.1 CLEAN DETERMINISTIC REPLAY
+COMMAND: python scripts/analysis/run_stage4r2_actual_dfg1_replay.py --protocol-root stage4_fresh_7b_protocol --result-root <Stage4_FRESH_7B_ENVFINAL_RESULTS_FOR_REVIEW_20260823>\stage4_fresh_7b_results_envfinal --output-dir <clean_replay_artifacts> --actual-run-dir <clean_actual_run> --config configs/stage4/d_f_g1_diagnostic.json
+EXIT: 0
+WORKTREE_COMMIT: d92efb2
+STATUS: actual_replay_completed
+D_G1_correct: 99
+ACTUAL_D_F_G1_correct: 104
+FULL_correct: 104
+D_G1_to_ACTUAL_D_F_G1_rescue: 5
+D_G1_to_ACTUAL_D_F_G1_regression: 0
+ACTUAL_D_F_G1_to_FULL_rescue: 0
+ACTUAL_D_F_G1_to_FULL_regression: 0
+F_attempt_sample_count: 27
+F_attempt_count: 102
+F_applied_sample_count: 17
+F_applied_exact_name_repair_count: 62
+F_materialized_sample_count: 9
+F_materialized_exact_name_repair_count: 38
+source_code_tree_sha256: 0e49c394a91dc81faef89e2db97beb891d9c73ff396520d60928ea786bc1e669
+method_config_sha256: 3036949521b25ea6d5767500a13ce91206e73cf94dc3576497d96562e0cc48af
+raw_generation_source_sha256: b293f52dfb95acea23aa4a8d80a03a0cd1adea592de46908e346bd8b74fe5330
+
+Artifact equivalence:
+"artifact","identical","existing_sha256","clean_replay_sha256"
+"paired_summary","True","c3bbd2fdf4f2fd97cd16884dd559b203570990a3cee313aa0a1d2e437118aa28","c3bbd2fdf4f2fd97cd16884dd559b203570990a3cee313aa0a1d2e437118aa28"
+"sample_level","True","4f35aed339f2d8c09e51e1259b79762813262e08e93e9d026041e3ee2a6b8786","4f35aed339f2d8c09e51e1259b79762813262e08e93e9d026041e3ee2a6b8786"
+"f_attempts","True","02b48cc159a50bd9accf185a1738a8a62da9f82cdfd1c20659ba706b405ee1d3","02b48cc159a50bd9accf185a1738a8a62da9f82cdfd1c20659ba706b405ee1d3"
+"f_applied_repairs","True","f411a7fb325c0fe698647a3ed4c8014c466fa9a4b928fe230b50bf55831f77fa","f411a7fb325c0fe698647a3ed4c8014c466fa9a4b928fe230b50bf55831f77fa"
+"f_materialized_repairs","True","1412fec551dd552a250374aa9c4d6db8708c1862edc5d84ebb6d7f5f0c7d63ee","1412fec551dd552a250374aa9c4d6db8708c1862edc5d84ebb6d7f5f0c7d63ee"
+"f_sample_outcomes","True","fa6863bdfb72092a06b8a8be9f364ed42c887a78db7e6c9a883fd8d5d4097a84","fa6863bdfb72092a06b8a8be9f364ed42c887a78db7e6c9a883fd8d5d4097a84"
+"materialized_write_plans","True","492d82e73ff3579939c687e79e4e7bcdabf53d4a5275b6096f36ecfbad77a8b5","492d82e73ff3579939c687e79e4e7bcdabf53d4a5275b6096f36ecfbad77a8b5"
+"verification","True","1801acfdea874fec6347140657032352fccbc4daf8e021bcf88676df3e81d0a7","1801acfdea874fec6347140657032352fccbc4daf8e021bcf88676df3e81d0a7"
+

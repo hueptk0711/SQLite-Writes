@@ -1,2 +1,4 @@
-internal_checksum_entries=79
-internal_checksum_failures=0
+COMMAND: python -c <stage4r2 checksum verifier>
+EXIT: 0
+checked=56
+failures=0

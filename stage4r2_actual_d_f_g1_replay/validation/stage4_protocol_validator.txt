@@ -1,3 +1,5 @@
+COMMAND: python scripts/analysis/validate_stage4_fresh_7b_protocol.py --results-root stage4_fresh_7b_protocol
+EXIT: 0
 {
   "status": "PASS",
   "prompt_rows": 2100,

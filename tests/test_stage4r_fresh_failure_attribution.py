@@ -312,9 +312,55 @@ def write_actual_run(actual_run: Path, sample_ids: list[str]) -> None:
             },
         ],
     )
-    write_jsonl(actual_run / "verification.jsonl", [
-        {"sample_id": sample_id, "valid": sample_id != "s3"} for sample_id in sample_ids
-    ])
+    verification_rows = [{"sample_id": sample_id, "valid": sample_id != "s3"} for sample_id in sample_ids]
+    for row in verification_rows:
+        if row["sample_id"] == "s2":
+            row["warnings"] = [
+                {
+                    "error_code": "CONSTRAINED_REFERENCE_REPAIR_APPLIED",
+                    "details": {
+                        "repair_attempted": True,
+                        "repair_applied": True,
+                        "repair_succeeded": True,
+                        "reference_kind": "column",
+                        "slot_path": "/target_groups/0/field_mapping/c1.f1",
+                        "original_reference": "t1.amount",
+                        "replacement_reference": "t1.c2",
+                        "candidate_set": ["t1.c1", "t1.c2"],
+                        "candidate_count": 2,
+                        "repair_rule": "unique_exact_identifier_name",
+                        "validation_before": "UNKNOWN_COLUMN_ID",
+                        "validation_after": "PASS",
+                    },
+                }
+            ]
+        if row["sample_id"] == "s3":
+            row["errors"] = [
+                {
+                    "error_code": "NEEDS_CLARIFICATION",
+                    "message": "Downstream verifier error after successful F repair.",
+                }
+            ]
+            row["warnings"] = [
+                {
+                    "error_code": "CONSTRAINED_REFERENCE_REPAIR_APPLIED",
+                    "details": {
+                        "repair_attempted": True,
+                        "repair_applied": True,
+                        "repair_succeeded": True,
+                        "reference_kind": "column",
+                        "slot_path": "/target_groups/0/field_mapping/c9.f9",
+                        "original_reference": "t9.operation",
+                        "replacement_reference": "t9.c9",
+                        "candidate_set": ["t9.c9"],
+                        "candidate_count": 1,
+                        "repair_rule": "unique_exact_identifier_name",
+                        "validation_before": "UNKNOWN_COLUMN_ID",
+                        "validation_after": "PASS",
+                    },
+                }
+            ]
+    write_jsonl(actual_run / "verification.jsonl", verification_rows)
     write_jsonl(actual_run / "compiled_programs.jsonl", [
         {"sample_id": sample_id, "program": []} for sample_id in sample_ids
     ])
@@ -460,11 +506,31 @@ def test_stage4r2_actual_replay_comparison_from_existing_run(tmp_path: Path) -> 
     assert summary["D_G1_to_ACTUAL_D_F_G1_regression"] == 0
     assert summary["ACTUAL_D_F_G1_to_FULL_rescue"] == 0
     assert summary["ACTUAL_D_F_G1_to_FULL_regression"] == 0
-    assert summary["F_activation_sample_count"] == 1
+    assert summary["F_attempt_sample_count"] == 2
+    assert summary["F_attempt_count"] == 2
+    assert summary["F_exact_name_attempt_sample_count"] == 2
+    assert summary["F_exact_name_attempt_count"] == 2
+    assert summary["F_applied_sample_count"] == 2
+    assert summary["F_applied_exact_name_repair_count"] == 2
+    assert summary["F_materialized_sample_count"] == 1
+    assert summary["F_materialized_exact_name_repair_count"] == 1
+    assert summary["F_state_rescue_count"] == 1
+    assert summary["F_state_regression_count"] == 0
     assert (output / "d_f_g1_actual_evaluation.jsonl").is_file()
     assert (output / "d_f_g1_actual_preflight.jsonl").is_file()
+    attempt_rows = read_csv_rows(output / "f_attempts.csv")
+    assert {row["sample_id"] for row in attempt_rows} == {"s2", "s3"}
+    applied_rows = read_csv_rows(output / "f_applied_repairs.csv")
+    assert {row["sample_id"] for row in applied_rows} == {"s2", "s3"}
+    materialized_rows = read_csv_rows(output / "f_materialized_repairs.csv")
+    assert [row["sample_id"] for row in materialized_rows] == ["s2"]
+    sample_outcomes = read_csv_rows(output / "f_sample_outcomes.csv")
+    assert {
+        row["sample_id"]: row["D_G1_to_ACTUAL_D_F_G1"] for row in sample_outcomes
+    } == {"s2": "rescue", "s3": "both_wrong"}
     repair_rows = read_csv_rows(output / "d_f_g1_actual_f_repairs.csv")
     assert repair_rows[0]["repair_rule"] == "unique_exact_identifier_name"
+    assert [row["sample_id"] for row in repair_rows] == ["s2"]
     paired_rows = read_csv_rows(output / "d_g1_actual_full_paired_summary.csv")
     assert paired_rows[0]["comparison"] == "D_G1_to_ACTUAL_D_F_G1"
     assert paired_rows[0]["rescue"] == "1"
