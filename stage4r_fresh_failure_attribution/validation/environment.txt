@@ -1,0 +1,34 @@
+python: Python 3.14.3
+pytest: pytest 9.1.1
+git rev: 5e4e062fdc3bd72519da41fbab0b130d4166b319
+git branch: stage2/g-diagnostic-targeted-repair
+git status --short --branch:
+## stage2/g-diagnostic-targeted-repair...origin/stage2/g-diagnostic-targeted-repair
+ M scripts/analysis/run_stage4r_fresh_failure_attribution.py
+ M src/nldbwrite_v3/analysis/stage1_failure_analysis.py
+ M stage4r_fresh_failure_attribution/README_REVIEWER.md
+ M stage4r_fresh_failure_attribution/VALIDATION_REPORT.md
+ M stage4r_fresh_failure_attribution/artifacts/analysis_manifest.json
+ M stage4r_fresh_failure_attribution/artifacts/d_g1_failure_sample_level.csv
+ M stage4r_fresh_failure_attribution/artifacts/d_g1_failure_taxonomy.csv
+ M stage4r_fresh_failure_attribution/artifacts/f_activation_sample_level.csv
+ M stage4r_fresh_failure_attribution/artifacts/hit_max_new_tokens_summary.csv
+ M stage4r_fresh_failure_attribution/artifacts/stage4r_summary.json
+ M tests/test_stage4r_fresh_failure_attribution.py
+?? configs/stage4/d_f_g1_diagnostic.json
+?? stage1_1_manual_audit_packet.zip
+?? stage4r_fresh_failure_attribution/artifacts/component_activation_on_f_rescues.csv
+?? stage4r_fresh_failure_attribution/artifacts/d_f_g1_diagnostic_paired_summary.csv
+?? stage4r_fresh_failure_attribution/artifacts/d_f_g1_diagnostic_sample_level.csv
+?? stage4r_fresh_failure_attribution/artifacts/error_family_precedence.json
+?? stage4r_fresh_failure_attribution/artifacts/failure_by_database.csv
+?? stage4r_fresh_failure_attribution/artifacts/failure_by_dependency_sensitive.csv
+?? stage4r_fresh_failure_attribution/artifacts/failure_by_input_type.csv
+?? stage4r_fresh_failure_attribution/artifacts/failure_by_operation.csv
+?? stage4r_fresh_failure_attribution/artifacts/failure_family_summary.csv
+?? stage4r_fresh_failure_attribution/artifacts/failure_family_x_dependency.csv
+?? stage4r_fresh_failure_attribution/artifacts/failure_family_x_input_type.csv
+?? stage4r_fresh_failure_attribution/artifacts/failure_family_x_operation.csv
+?? stage4r_fresh_failure_attribution/artifacts/preflight_rejection_sample_level.csv
+?? stage4r_fresh_failure_attribution/artifacts/preflight_rejection_summary.csv
+?? "tage2)\357\200\272 harden A-C exactness and provenance\357\200\242"

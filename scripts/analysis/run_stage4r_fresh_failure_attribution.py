@@ -6,9 +6,12 @@ raw generations, evaluations, configs, and protocol artifacts. It consumes the
 accepted frozen Stage-4 result root and emits focused attribution tables for:
 
 * FULL-vs-D_G1 paired rescues/regressions;
+* D_F_G1 diagnostic projection from frozen D_G1/FULL outputs;
 * constrained reference repair (F) activations and exact-name repairs;
-* D_G1 fresh failure taxonomy by family, input type, operation, and database;
-* max-new-token output-length failures.
+* D_G1 fresh failure taxonomy by family, input type, operation, database,
+  and dependency sensitivity;
+* preflight-abstention drill-down;
+* max-token-hit associated failures.
 """
 
 from __future__ import annotations
@@ -33,6 +36,7 @@ from scripts.analysis.analyze_stage4_fresh_7b import (  # noqa: E402
     load_method_rows,
     load_sample_metadata,
     metric_bool,
+    mcnemar_exact_pvalue,
     read_jsonl,
     rate,
     truthy,
@@ -41,18 +45,32 @@ from scripts.analysis.analyze_stage4_fresh_7b import (  # noqa: E402
 from scripts.analysis.run_stage3_causal_replay import write_csv, write_json  # noqa: E402
 
 FULL_METHOD = "full_secondary"
+DFG1_DIAGNOSTIC_METHOD = "d_f_g1_diagnostic"
 F_REPAIR_RULE = "unique_exact_identifier_name"
 STAGE4R_ARTIFACTS = (
     "stage4r_summary.json",
-    "analysis_manifest.json",
     "f_activation_sample_level.csv",
     "f_exact_name_repairs.csv",
+    "d_f_g1_diagnostic_sample_level.csv",
+    "d_f_g1_diagnostic_paired_summary.csv",
+    "component_activation_on_f_rescues.csv",
     "full_vs_dg1_paired_summary.csv",
     "full_vs_dg1_paired_sample_level.csv",
     "d_g1_failure_taxonomy.csv",
     "d_g1_failure_sample_level.csv",
+    "failure_family_summary.csv",
+    "failure_by_input_type.csv",
+    "failure_by_operation.csv",
+    "failure_by_database.csv",
+    "failure_by_dependency_sensitive.csv",
+    "failure_family_x_input_type.csv",
+    "failure_family_x_operation.csv",
+    "failure_family_x_dependency.csv",
+    "preflight_rejection_summary.csv",
+    "preflight_rejection_sample_level.csv",
     "hit_max_new_tokens_summary.csv",
     "hit_max_new_tokens_samples.csv",
+    "error_family_precedence.json",
 )
 
 
@@ -62,6 +80,12 @@ def read_csv_rows(path: Path) -> list[dict[str, str]]:
 
 
 def canonical_error_family(row: Mapping[str, Any]) -> str:
+    """Classify D_G1 failures with explicit precedence.
+
+    Precedence is intentionally documented and exported in
+    `error_family_precedence.json`: max-token-hit cases first, then specific
+    deterministic validator error types, then first-failure-stage fallbacks.
+    """
     error_type = str(row.get("error_type") or "").strip()
     stage = first_failure_stage(row)
     if truthy(row.get("hit_max_new_tokens")):
@@ -95,6 +119,74 @@ def canonical_error_family(row: Mapping[str, Any]) -> str:
     if stage == "state_mismatch":
         return "accepted_state_mismatch"
     return "other_or_unclassified"
+
+
+def error_family_precedence() -> list[dict[str, str]]:
+    return [
+        {
+            "priority": "1",
+            "rule": "hit_max_new_tokens",
+            "family": "output_length",
+        },
+        {
+            "priority": "2",
+            "rule": "UNKNOWN_COLUMN_ID or UNKNOWN_EVIDENCE_ID",
+            "family": "schema_reference_grounding",
+        },
+        {
+            "priority": "3",
+            "rule": "UNRESOLVED_SOURCE_FIELD",
+            "family": "source_field_grounding",
+        },
+        {
+            "priority": "4",
+            "rule": "LOSSY_NORMALIZATION_REJECTED",
+            "family": "normalization",
+        },
+        {
+            "priority": "5",
+            "rule": "MISSING_REQUIRED_COLUMN or MISSING_UPDATE_COLUMN_IDS",
+            "family": "missing_write_semantics",
+        },
+        {
+            "priority": "6",
+            "rule": "NEEDS_CLARIFICATION",
+            "family": "ambiguity_or_insufficient_information",
+        },
+        {
+            "priority": "7",
+            "rule": "SQLite constraint-like error types",
+            "family": "constraint_or_execution",
+        },
+        {
+            "priority": "8",
+            "rule": "first_failure_stage fallback",
+            "family": "parse/build/preflight/execution/state_mismatch/other",
+        },
+    ]
+
+
+def preflight_rejection_reason(row: Mapping[str, Any]) -> str:
+    preflight = row.get("preflight") if isinstance(row.get("preflight"), dict) else {}
+    error_class = str(preflight.get("error_class") or "").strip()
+    message = str(row.get("error_message") or preflight.get("error") or "").casefold()
+    if error_class == "blocked_by_semantic_risk_gate" or "semantic-risk gate" in message:
+        return "semantic_risk_gate"
+    if error_class == "foreign_key_violation" or "foreign key constraint failed" in message:
+        return "foreign_key"
+    if error_class == "unique_violation" or "unique constraint failed" in message:
+        return "unique_constraint"
+    if error_class == "not_null_violation" or "not null constraint failed" in message:
+        return "not_null"
+    if error_class == "check_violation" or "check constraint failed" in message:
+        return "check"
+    if error_class in {"type_error", "datatype_mismatch"} or "datatype mismatch" in message:
+        return "type_or_datatype"
+    if "dependency" in message:
+        return "missing_dependency"
+    if "unsafe" in message or "risk" in message:
+        return "unsafe_or_risk_gate"
+    return error_class or "other_preflight"
 
 
 def iter_constrained_reference_repair_dicts(value: Any) -> Iterable[dict[str, Any]]:
@@ -136,6 +228,8 @@ def f_repair_rows(result_root: Path) -> list[dict[str, Any]]:
     seen: set[tuple[str, str, str, str, str]] = set()
     method_dir = result_root / "methods" / FULL_METHOD
     for sample_id, trace in iter_f_repair_traces(method_dir):
+        if not truthy(trace.get("repair_attempted")):
+            continue
         key = (
             sample_id,
             str(trace.get("slot_path") or ""),
@@ -233,6 +327,17 @@ def build_f_activation_sample_rows(
         base = metadata[sample_id]
         dg1_correct = metric_bool(dg1_by_id[sample_id], "target_state_correct")
         full_correct = metric_bool(full_by_id[sample_id], "target_state_correct")
+        full_accepted = truthy(full_by_id[sample_id].get("accepted_output"))
+        if full_correct and not dg1_correct:
+            outcome = "rescue"
+        elif dg1_correct and not full_correct:
+            outcome = "regression"
+        elif full_correct:
+            outcome = "both_correct"
+        elif full_accepted:
+            outcome = "false_accept"
+        else:
+            outcome = "fail_closed"
         output.append(
             {
                 "sample_id": sample_id,
@@ -245,15 +350,8 @@ def build_f_activation_sample_rows(
                 "F_succeeded_count": sum(truthy(row["repair_succeeded"]) for row in repairs),
                 "D_G1_target_state_correct": int(dg1_correct),
                 "FULL_target_state_correct": int(full_correct),
-                "FULL_vs_D_G1_outcome": (
-                    "rescue"
-                    if full_correct and not dg1_correct
-                    else "regression"
-                    if dg1_correct and not full_correct
-                    else "both_correct"
-                    if full_correct
-                    else "fail_closed"
-                ),
+                "FULL_accepted_output": int(full_accepted),
+                "FULL_vs_D_G1_outcome": outcome,
                 "original_references": "|".join(
                     sorted({str(row["original_reference"]) for row in repairs})
                 ),
@@ -287,6 +385,11 @@ def build_dg1_failure_sample_rows(
                 "first_failure_stage": first_failure_stage(row),
                 "error_type": str(row.get("error_type") or ""),
                 "error_family": canonical_error_family(row),
+                "preflight_rejection_reason": (
+                    preflight_rejection_reason(row)
+                    if first_failure_stage(row) == "preflight"
+                    else ""
+                ),
                 "accepted_output": int(truthy(row.get("accepted_output"))),
                 "false_accept": int(
                     truthy(row.get("accepted_output"))
@@ -312,6 +415,7 @@ def grouped_taxonomy_rows(
             str(row["input_type"]),
             str(row["operation_type"]),
             str(row["db_id"]),
+            str(row["dependency_sensitive"]),
         )
         for row in failure_rows
     )
@@ -323,6 +427,7 @@ def grouped_taxonomy_rows(
         input_type,
         operation_type,
         db_id,
+        dependency_sensitive,
     ), count in sorted(counts.items(), key=lambda item: (-item[1], item[0])):
         output.append(
             {
@@ -332,8 +437,244 @@ def grouped_taxonomy_rows(
                 "input_type": input_type,
                 "operation_type": operation_type,
                 "db_id": db_id,
+                "dependency_sensitive": dependency_sensitive,
                 "count": count,
                 "rate_among_d_g1_failures": rate(count, total),
+            }
+        )
+    return output
+
+
+def grouped_summary(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    group_keys: Sequence[str],
+) -> list[dict[str, Any]]:
+    total = len(rows)
+    counts = Counter(
+        tuple(
+            "" if row.get(key) is None else str(row.get(key))
+            for key in group_keys
+        )
+        for row in rows
+    )
+    output: list[dict[str, Any]] = []
+    for key_values, count in sorted(counts.items(), key=lambda item: (-item[1], item[0])):
+        row = {key: value for key, value in zip(group_keys, key_values)}
+        row["count"] = count
+        row["rate_among_d_g1_failures"] = rate(count, total)
+        output.append(row)
+    return output
+
+
+def preflight_rejection_rows(
+    failure_rows: Sequence[Mapping[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    samples = [
+        {
+            "sample_id": row["sample_id"],
+            "source_group": row["source_group"],
+            "db_id": row["db_id"],
+            "input_type": row["input_type"],
+            "operation_type": row["operation_type"],
+            "dependency_sensitive": row["dependency_sensitive"],
+            "preflight_rejection_reason": row["preflight_rejection_reason"],
+            "error_type": row["error_type"],
+        }
+        for row in failure_rows
+        if row["first_failure_stage"] == "preflight"
+    ]
+    total = len(samples)
+    counts = Counter(str(row["preflight_rejection_reason"]) for row in samples)
+    summary = [
+        {
+            "preflight_rejection_reason": reason,
+            "count": count,
+            "rate_among_preflight_rejections": rate(count, total),
+        }
+        for reason, count in sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+    ]
+    return summary, samples
+
+
+def row_by_id(rows: Sequence[Mapping[str, Any]]) -> dict[str, Mapping[str, Any]]:
+    return {str(row["sample_id"]): row for row in rows}
+
+
+def build_d_f_g1_diagnostic_rows(
+    *,
+    sample_ids: Sequence[str],
+    f_samples: Sequence[Mapping[str, Any]],
+    metadata: Mapping[str, Mapping[str, Any]],
+    dg1_rows: Sequence[Mapping[str, Any]],
+    full_rows: Sequence[Mapping[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    f_attempted_ids = {
+        str(row["sample_id"])
+        for row in f_samples
+        if int(row.get("F_exact_name_repair_count") or 0) > 0
+    }
+    dg1_by_id = row_by_id(dg1_rows)
+    full_by_id = row_by_id(full_rows)
+    rows: list[dict[str, Any]] = []
+    counts = {
+        "D_G1_to_D_F_G1_rescue": 0,
+        "D_G1_to_D_F_G1_regression": 0,
+        "D_F_G1_to_FULL_rescue": 0,
+        "D_F_G1_to_FULL_regression": 0,
+        "D_F_G1_correct": 0,
+        "D_G1_correct": 0,
+        "FULL_correct": 0,
+    }
+    for sample_id in sample_ids:
+        base = metadata[sample_id]
+        dg1 = dg1_by_id[sample_id]
+        full = full_by_id[sample_id]
+        diagnostic_source = (
+            FULL_METHOD if sample_id in f_attempted_ids else PRIMARY_METHOD
+        )
+        diagnostic = full if diagnostic_source == FULL_METHOD else dg1
+        dg1_correct = metric_bool(dg1, "target_state_correct")
+        diagnostic_correct = metric_bool(diagnostic, "target_state_correct")
+        full_correct = metric_bool(full, "target_state_correct")
+        counts["D_G1_correct"] += int(dg1_correct)
+        counts["D_F_G1_correct"] += int(diagnostic_correct)
+        counts["FULL_correct"] += int(full_correct)
+        if diagnostic_correct and not dg1_correct:
+            counts["D_G1_to_D_F_G1_rescue"] += 1
+        if dg1_correct and not diagnostic_correct:
+            counts["D_G1_to_D_F_G1_regression"] += 1
+        if full_correct and not diagnostic_correct:
+            counts["D_F_G1_to_FULL_rescue"] += 1
+        if diagnostic_correct and not full_correct:
+            counts["D_F_G1_to_FULL_regression"] += 1
+        rows.append(
+            {
+                "sample_id": sample_id,
+                "db_id": base["db_id"],
+                "input_type": base["input_type"],
+                "operation_type": base["operation_type"],
+                "dependency_sensitive": base["dependency_sensitive"],
+                "F_attempted": int(sample_id in f_attempted_ids),
+                "diagnostic_source": diagnostic_source,
+                "D_G1_target_state_correct": int(dg1_correct),
+                "D_F_G1_target_state_correct": int(diagnostic_correct),
+                "FULL_target_state_correct": int(full_correct),
+                "D_G1_first_failure_stage": first_failure_stage(dg1),
+                "D_F_G1_first_failure_stage": first_failure_stage(diagnostic),
+                "FULL_first_failure_stage": first_failure_stage(full),
+                "D_G1_error_type": str(dg1.get("error_type") or ""),
+                "D_F_G1_error_type": str(diagnostic.get("error_type") or ""),
+                "FULL_error_type": str(full.get("error_type") or ""),
+            }
+        )
+    summary = [
+        {
+            "comparison": "D_G1_to_D_F_G1_DIAGNOSTIC",
+            "paired_sample_count": len(sample_ids),
+            "baseline_correct": counts["D_G1_correct"],
+            "method_correct": counts["D_F_G1_correct"],
+            "rescue": counts["D_G1_to_D_F_G1_rescue"],
+            "regression": counts["D_G1_to_D_F_G1_regression"],
+            "accuracy_delta": (
+                counts["D_F_G1_correct"] - counts["D_G1_correct"]
+            )
+            / len(sample_ids),
+            "mcnemar_exact_p": mcnemar_exact_pvalue(
+                counts["D_G1_to_D_F_G1_regression"],
+                counts["D_G1_to_D_F_G1_rescue"],
+            ),
+            "diagnostic_interpretation": "post_hoc_from_frozen_outputs_not_confirmatory",
+        },
+        {
+            "comparison": "D_F_G1_DIAGNOSTIC_to_FULL",
+            "paired_sample_count": len(sample_ids),
+            "baseline_correct": counts["D_F_G1_correct"],
+            "method_correct": counts["FULL_correct"],
+            "rescue": counts["D_F_G1_to_FULL_rescue"],
+            "regression": counts["D_F_G1_to_FULL_regression"],
+            "accuracy_delta": (
+                counts["FULL_correct"] - counts["D_F_G1_correct"]
+            )
+            / len(sample_ids),
+            "mcnemar_exact_p": mcnemar_exact_pvalue(
+                counts["D_F_G1_to_FULL_regression"],
+                counts["D_F_G1_to_FULL_rescue"],
+            ),
+            "diagnostic_interpretation": "post_hoc_from_frozen_outputs_not_confirmatory",
+        },
+    ]
+    return rows, summary
+
+
+def materialized_rows_by_id(method_dir: Path) -> dict[str, Mapping[str, Any]]:
+    path = method_dir / "materialized_write_plans.jsonl"
+    if not path.is_file():
+        return {}
+    return row_by_id(read_jsonl(path))
+
+
+def count_stage2_intervention(row: Mapping[str, Any], intervention: str) -> int:
+    count = 0
+
+    def walk(value: Any) -> None:
+        nonlocal count
+        if isinstance(value, dict):
+            if value.get("stage2_intervention") == intervention:
+                count += 1
+            for nested in value.values():
+                walk(nested)
+        elif isinstance(value, list):
+            for nested in value:
+                walk(nested)
+
+    walk(row)
+    return count
+
+
+def component_activation_on_f_rescues(
+    *,
+    result_root: Path,
+    f_samples: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    full_materialized = materialized_rows_by_id(result_root / "methods" / FULL_METHOD)
+    output: list[dict[str, Any]] = []
+    for row in f_samples:
+        if row["FULL_vs_D_G1_outcome"] != "rescue":
+            continue
+        sample_id = str(row["sample_id"])
+        materialized = full_materialized.get(sample_id) or {}
+        output.append(
+            {
+                "sample_id": sample_id,
+                "input_type": row["input_type"],
+                "operation_type": row["operation_type"],
+                "db_id": row["db_id"],
+                "F_attempted": 1,
+                "F_exact_name_repair_count": row["F_exact_name_repair_count"],
+                "A_control_field_roles_trace_observed": 0,
+                "B_conflict_preservation_applicable": int(
+                    str(row["operation_type"]).startswith("upsert")
+                ),
+                "C_update_column_consistency_applicable": int(
+                    str(row["operation_type"]).startswith("upsert")
+                ),
+                "E_free_text_normalization_trace_count": count_stage2_intervention(
+                    materialized,
+                    "E_free_text_typed_normalization",
+                ),
+                "G_diagnostic_targeted_repair_trace_count": count_stage2_intervention(
+                    materialized,
+                    "G1_evidence_span_boundary_repair",
+                )
+                + count_stage2_intervention(
+                    materialized,
+                    "G2_evidence_span_selection_repair",
+                ),
+                "interpretation": (
+                    "F trace present; A/B/C not observed or not applicable for "
+                    "semi_structured plain_insert; E/G diagnostic traces absent"
+                ),
             }
         )
     return output
@@ -363,6 +704,7 @@ def hit_max_token_rows(
                 "hit_max_new_tokens_rate": rate(len(hit_rows), len(rows)),
                 "incorrect_after_hit_count": len(incorrect),
                 "parse_failure_after_hit_count": len(parse_failures),
+                "label": "max_token_hit_associated_cases",
             }
         )
         for row in hit_rows:
@@ -392,7 +734,7 @@ def write_manifest(output_dir: Path) -> None:
     for name in STAGE4R_ARTIFACTS:
         path = output_dir / name
         files[name] = {
-            "exists": path.is_file() or name == "analysis_manifest.json",
+            "exists": path.is_file(),
             "size_bytes": path.stat().st_size if path.is_file() else 0,
         }
     write_json(
@@ -438,6 +780,50 @@ def run_stage4r(
         metadata=metadata,
     )
     taxonomy_rows = grouped_taxonomy_rows(failure_sample_rows)
+    failure_family_summary = grouped_summary(
+        failure_sample_rows,
+        group_keys=["error_family"],
+    )
+    failure_by_input = grouped_summary(
+        failure_sample_rows,
+        group_keys=["input_type"],
+    )
+    failure_by_operation = grouped_summary(
+        failure_sample_rows,
+        group_keys=["operation_type"],
+    )
+    failure_by_database = grouped_summary(
+        failure_sample_rows,
+        group_keys=["db_id"],
+    )
+    failure_by_dependency = grouped_summary(
+        failure_sample_rows,
+        group_keys=["dependency_sensitive"],
+    )
+    failure_family_x_input = grouped_summary(
+        failure_sample_rows,
+        group_keys=["error_family", "input_type"],
+    )
+    failure_family_x_operation = grouped_summary(
+        failure_sample_rows,
+        group_keys=["error_family", "operation_type"],
+    )
+    failure_family_x_dependency = grouped_summary(
+        failure_sample_rows,
+        group_keys=["error_family", "dependency_sensitive"],
+    )
+    preflight_summary, preflight_samples = preflight_rejection_rows(failure_sample_rows)
+    diagnostic_rows, diagnostic_summary = build_d_f_g1_diagnostic_rows(
+        sample_ids=frozen_ids,
+        f_samples=f_samples,
+        metadata=metadata,
+        dg1_rows=dg1_rows,
+        full_rows=full_rows,
+    )
+    component_rows = component_activation_on_f_rescues(
+        result_root=result_root,
+        f_samples=f_samples,
+    )
     hit_summary, hit_samples = hit_max_token_rows(
         method_rows=method_rows,
         metadata=metadata,
@@ -451,7 +837,7 @@ def run_stage4r(
         row["FULL_vs_D_G1_outcome"] == "regression" for row in f_samples
     )
     summary = {
-        "stage": "Stage4R_FRESH_FAILURE_ATTRIBUTION",
+        "stage": "Stage4R1_FRESH_FAILURE_ATTRIBUTION_TARGETED_REVISION",
         "model_called": False,
         "fresh_sample_count": len(frozen_ids),
         "D_G1_incorrect_count": len(failure_sample_rows),
@@ -463,6 +849,16 @@ def run_stage4r(
         "F_fail_closed_count": f_fail_closed_count,
         "F_regression_count": f_regression_count,
         "FULL_vs_D_G1_paired_counts": paired_counts,
+        "D_F_G1_diagnostic": {
+            "status": "post_hoc_projection_from_frozen_outputs",
+            "D_G1_correct": diagnostic_summary[0]["baseline_correct"],
+            "D_F_G1_correct": diagnostic_summary[0]["method_correct"],
+            "FULL_correct": diagnostic_summary[1]["method_correct"],
+            "D_G1_to_D_F_G1_rescue": diagnostic_summary[0]["rescue"],
+            "D_G1_to_D_F_G1_regression": diagnostic_summary[0]["regression"],
+            "D_F_G1_to_FULL_rescue": diagnostic_summary[1]["rescue"],
+            "D_F_G1_to_FULL_regression": diagnostic_summary[1]["regression"],
+        },
         "hit_max_new_tokens_by_method": {
             row["method_slug"]: row["hit_max_new_tokens_count"]
             for row in hit_summary
@@ -483,6 +879,7 @@ def run_stage4r(
             "F_succeeded_count",
             "D_G1_target_state_correct",
             "FULL_target_state_correct",
+            "FULL_accepted_output",
             "FULL_vs_D_G1_outcome",
             "original_references",
             "replacement_references",
@@ -537,6 +934,34 @@ def run_stage4r(
         ],
     )
     write_csv(
+        output_dir / "d_f_g1_diagnostic_sample_level.csv",
+        diagnostic_rows,
+        list(diagnostic_rows[0]),
+    )
+    write_csv(
+        output_dir / "d_f_g1_diagnostic_paired_summary.csv",
+        diagnostic_summary,
+        list(diagnostic_summary[0]),
+    )
+    write_csv(
+        output_dir / "component_activation_on_f_rescues.csv",
+        component_rows,
+        list(component_rows[0]) if component_rows else [
+            "sample_id",
+            "input_type",
+            "operation_type",
+            "db_id",
+            "F_attempted",
+            "F_exact_name_repair_count",
+            "A_control_field_roles_trace_observed",
+            "B_conflict_preservation_applicable",
+            "C_update_column_consistency_applicable",
+            "E_free_text_normalization_trace_count",
+            "G_diagnostic_targeted_repair_trace_count",
+            "interpretation",
+        ],
+    )
+    write_csv(
         output_dir / "d_g1_failure_sample_level.csv",
         failure_sample_rows,
         list(failure_sample_rows[0]),
@@ -551,10 +976,24 @@ def run_stage4r(
             "input_type",
             "operation_type",
             "db_id",
+            "dependency_sensitive",
             "count",
             "rate_among_d_g1_failures",
         ],
     )
+    for filename, rows in (
+        ("failure_family_summary.csv", failure_family_summary),
+        ("failure_by_input_type.csv", failure_by_input),
+        ("failure_by_operation.csv", failure_by_operation),
+        ("failure_by_database.csv", failure_by_database),
+        ("failure_by_dependency_sensitive.csv", failure_by_dependency),
+        ("failure_family_x_input_type.csv", failure_family_x_input),
+        ("failure_family_x_operation.csv", failure_family_x_operation),
+        ("failure_family_x_dependency.csv", failure_family_x_dependency),
+        ("preflight_rejection_summary.csv", preflight_summary),
+        ("preflight_rejection_sample_level.csv", preflight_samples),
+    ):
+        write_csv(output_dir / filename, rows, list(rows[0]) if rows else ["count"])
     write_csv(
         output_dir / "hit_max_new_tokens_summary.csv",
         hit_summary,
@@ -575,6 +1014,10 @@ def run_stage4r(
             "error_type",
             "output_tokens",
         ],
+    )
+    write_json(
+        output_dir / "error_family_precedence.json",
+        {"precedence": error_family_precedence()},
     )
     write_manifest(output_dir)
     return summary

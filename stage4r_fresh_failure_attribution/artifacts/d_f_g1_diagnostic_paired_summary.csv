@@ -1,0 +1,3 @@
+﻿comparison,paired_sample_count,baseline_correct,method_correct,rescue,regression,accuracy_delta,mcnemar_exact_p,diagnostic_interpretation
+D_G1_to_D_F_G1_DIAGNOSTIC,300,99,104,5,0,0.016666666666666666,0.0625,post_hoc_from_frozen_outputs_not_confirmatory
+D_F_G1_DIAGNOSTIC_to_FULL,300,104,104,0,0,0.0,1.0,post_hoc_from_frozen_outputs_not_confirmatory

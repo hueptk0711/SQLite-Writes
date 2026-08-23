@@ -6,19 +6,27 @@
   "artifacts": {
     "stage4r_summary.json": {
       "exists": true,
-      "size_bytes": 745
-    },
-    "analysis_manifest.json": {
-      "exists": true,
-      "size_bytes": 1076
+      "size_bytes": 1062
     },
     "f_activation_sample_level.csv": {
       "exists": true,
-      "size_bytes": 1656
+      "size_bytes": 1695
     },
     "f_exact_name_repairs.csv": {
       "exists": true,
       "size_bytes": 8913
+    },
+    "d_f_g1_diagnostic_sample_level.csv": {
+      "exists": true,
+      "size_bytes": 47755
+    },
+    "d_f_g1_diagnostic_paired_summary.csv": {
+      "exists": true,
+      "size_bytes": 352
+    },
+    "component_activation_on_f_rescues.csv": {
+      "exists": true,
+      "size_bytes": 1201
     },
     "full_vs_dg1_paired_summary.csv": {
       "exists": true,
@@ -30,19 +38,63 @@
     },
     "d_g1_failure_taxonomy.csv": {
       "exists": true,
-      "size_bytes": 9484
+      "size_bytes": 10607
     },
     "d_g1_failure_sample_level.csv": {
       "exists": true,
-      "size_bytes": 30326
+      "size_bytes": 31671
+    },
+    "failure_family_summary.csv": {
+      "exists": true,
+      "size_bytes": 499
+    },
+    "failure_by_input_type.csv": {
+      "exists": true,
+      "size_bytes": 116
+    },
+    "failure_by_operation.csv": {
+      "exists": true,
+      "size_bytes": 158
+    },
+    "failure_by_database.csv": {
+      "exists": true,
+      "size_bytes": 461
+    },
+    "failure_by_dependency_sensitive.csv": {
+      "exists": true,
+      "size_bytes": 105
+    },
+    "failure_family_x_input_type.csv": {
+      "exists": true,
+      "size_bytes": 948
+    },
+    "failure_family_x_operation.csv": {
+      "exists": true,
+      "size_bytes": 1451
+    },
+    "failure_family_x_dependency.csv": {
+      "exists": true,
+      "size_bytes": 924
+    },
+    "preflight_rejection_summary.csv": {
+      "exists": true,
+      "size_bytes": 224
+    },
+    "preflight_rejection_sample_level.csv": {
+      "exists": true,
+      "size_bytes": 8499
     },
     "hit_max_new_tokens_summary.csv": {
       "exists": true,
-      "size_bytes": 323
+      "size_bytes": 546
     },
     "hit_max_new_tokens_samples.csv": {
       "exists": true,
       "size_bytes": 11276
+    },
+    "error_family_precedence.json": {
+      "exists": true,
+      "size_bytes": 1060
     }
   }
 }

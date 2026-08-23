@@ -1,0 +1,6 @@
+﻿sample_id,input_type,operation_type,db_id,F_attempted,F_exact_name_repair_count,A_control_field_roles_trace_observed,B_conflict_preservation_applicable,C_update_column_consistency_applicable,E_free_text_normalization_trace_count,G_diagnostic_targeted_repair_trace_count,interpretation
+seed_000110,semi_structured,plain_insert,financial,1,4,0,0,0,0,0,F trace present; A/B/C not observed or not applicable for semi_structured plain_insert; E/G diagnostic traces absent
+seed_000185,semi_structured,plain_insert,student_club,1,4,0,0,0,0,0,F trace present; A/B/C not observed or not applicable for semi_structured plain_insert; E/G diagnostic traces absent
+seed_000235,semi_structured,plain_insert,financial,1,7,0,0,0,0,0,F trace present; A/B/C not observed or not applicable for semi_structured plain_insert; E/G diagnostic traces absent
+seed_000288,semi_structured,plain_insert,financial,1,4,0,0,0,0,0,F trace present; A/B/C not observed or not applicable for semi_structured plain_insert; E/G diagnostic traces absent
+seed_000334,semi_structured,plain_insert,financial,1,4,0,0,0,0,0,F trace present; A/B/C not observed or not applicable for semi_structured plain_insert; E/G diagnostic traces absent

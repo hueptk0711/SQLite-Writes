@@ -58,7 +58,7 @@ def write_protocol(protocol_root: Path, sample_ids: list[str]) -> None:
                         "db_id": "db_alpha" if sample_id != "s3" else "db_beta",
                         "method_slug": method_slug,
                         "detected_mode": "semi_structured"
-                        if sample_id == "s2"
+                        if sample_id in {"s2", "s4"}
                         else "free_text",
                         "operation_type": "plain_insert"
                         if sample_id != "s3"
@@ -105,6 +105,15 @@ def write_results(result_root: Path, sample_ids: list[str]) -> None:
                         "error_type": "UNKNOWN_COLUMN_ID",
                     }
                 )
+            if method_slug == "d_g1_primary" and sample_id in {"s2", "s4"}:
+                row.update(
+                    {
+                        "target_state_correct": False,
+                        "strict_full_state_correct": False,
+                        "build_success": False,
+                        "error_type": "UNKNOWN_COLUMN_ID",
+                    }
+                )
             if method_slug == "d_g1_primary" and sample_id == "s3":
                 row.update(
                     {
@@ -114,6 +123,22 @@ def write_results(result_root: Path, sample_ids: list[str]) -> None:
                         "hit_max_new_tokens": True,
                         "output_tokens": 4096,
                         "error_type": "PARSE_ERROR",
+                    }
+                )
+            if method_slug == "d_g1_primary" and sample_id == "s5":
+                row.update(
+                    {
+                        "target_state_correct": False,
+                        "strict_full_state_correct": False,
+                        "accepted_output": False,
+                        "execution_success": False,
+                        "preflight_accepted": False,
+                        "error_type": "preflight_abstention",
+                        "error_message": "UNIQUE constraint failed: db_alpha.items.id",
+                        "preflight": {
+                            "error_class": "unique_violation",
+                            "error": "UNIQUE constraint failed: db_alpha.items.id",
+                        },
                     }
                 )
             if method_slug == "full_secondary" and sample_id == "s3":
@@ -127,10 +152,58 @@ def write_results(result_root: Path, sample_ids: list[str]) -> None:
                         "error_type": "PARSE_ERROR",
                     }
                 )
+            if method_slug == "full_secondary" and sample_id == "s4":
+                row.update(
+                    {
+                        "target_state_correct": False,
+                        "strict_full_state_correct": False,
+                        "accepted_output": True,
+                        "error_type": "STATE_MISMATCH",
+                    }
+                )
+            if method_slug == "full_secondary" and sample_id == "s5":
+                row.update(
+                    {
+                        "target_state_correct": False,
+                        "strict_full_state_correct": False,
+                        "accepted_output": False,
+                        "execution_success": False,
+                        "preflight_accepted": False,
+                        "error_type": "preflight_abstention",
+                        "error_message": "UNIQUE constraint failed: db_alpha.items.id",
+                        "preflight": {
+                            "error_class": "unique_violation",
+                            "error": "UNIQUE constraint failed: db_alpha.items.id",
+                        },
+                    }
+                )
         write_jsonl(result_root / "methods" / method_slug / "evaluation.jsonl", rows)
     write_jsonl(
         result_root / "methods" / "full_secondary" / "materialized_write_plans.jsonl",
         [
+            {
+                "sample_id": "s1",
+                "write_plan": {
+                    "reference_trace": {
+                        "constrained_reference_repairs": [
+                            {
+                                "repair_attempted": False,
+                                "repair_applied": False,
+                                "repair_succeeded": False,
+                                "reference_kind": "column",
+                                "slot_path": "/target_groups/0/field_mapping/c0.f0",
+                                "original_reference": "t1.ignored",
+                                "replacement_reference": "t1.ignored",
+                                "candidate_set": ["t1.ignored"],
+                                "candidate_count": 1,
+                                "repair_rule": "unique_exact_identifier_name",
+                                "validation_before": "PASS",
+                                "validation_after": "PASS",
+                            }
+                        ]
+                    }
+                },
+            },
             {
                 "sample_id": "s2",
                 "write_plan": {
@@ -153,13 +226,36 @@ def write_results(result_root: Path, sample_ids: list[str]) -> None:
                         ]
                     }
                 },
+            },
+            {
+                "sample_id": "s4",
+                "write_plan": {
+                    "reference_trace": {
+                        "constrained_reference_repairs": [
+                            {
+                                "repair_attempted": True,
+                                "repair_applied": True,
+                                "repair_succeeded": True,
+                                "reference_kind": "column",
+                                "slot_path": "/target_groups/0/field_mapping/c3.f3",
+                                "original_reference": "t1.price",
+                                "replacement_reference": "t1.c4",
+                                "candidate_set": ["t1.c4"],
+                                "candidate_count": 1,
+                                "repair_rule": "unique_exact_identifier_name",
+                                "validation_before": "UNKNOWN_COLUMN_ID",
+                                "validation_after": "PASS",
+                            }
+                        ]
+                    }
+                },
             }
         ],
     )
 
 
 def test_stage4r_outputs_f_repair_and_failure_attribution(tmp_path: Path) -> None:
-    sample_ids = ["s1", "s2", "s3"]
+    sample_ids = ["s1", "s2", "s3", "s4", "s5"]
     protocol = tmp_path / "protocol"
     results = tmp_path / "results"
     output = tmp_path / "stage4r"
@@ -173,21 +269,76 @@ def test_stage4r_outputs_f_repair_and_failure_attribution(tmp_path: Path) -> Non
     )
 
     assert summary["model_called"] is False
-    assert summary["F_activation_sample_count"] == 1
-    assert summary["F_exact_name_repair_count"] == 1
+    assert summary["F_activation_sample_count"] == 2
+    assert summary["F_exact_name_repair_count"] == 2
     assert summary["F_rescue_count"] == 1
     assert summary["FULL_vs_D_G1_paired_counts"]["rescue"] == 1
+    assert summary["D_F_G1_diagnostic"]["D_G1_correct"] == 1
+    assert summary["D_F_G1_diagnostic"]["D_F_G1_correct"] == 2
+    assert summary["D_F_G1_diagnostic"]["FULL_correct"] == 2
+    assert summary["D_F_G1_diagnostic"]["D_G1_to_D_F_G1_rescue"] == 1
+    assert summary["D_F_G1_diagnostic"]["D_G1_to_D_F_G1_regression"] == 0
+    assert summary["D_F_G1_diagnostic"]["D_F_G1_to_FULL_rescue"] == 0
+    assert summary["D_F_G1_diagnostic"]["D_F_G1_to_FULL_regression"] == 0
     assert summary["hit_max_new_tokens_by_method"]["d_g1_primary"] == 1
     f_rows = read_csv_rows(output / "f_activation_sample_level.csv")
-    assert f_rows[0]["sample_id"] == "s2"
-    assert f_rows[0]["FULL_vs_D_G1_outcome"] == "rescue"
+    assert "FULL_accepted_output" in f_rows[0]
+    outcomes = {row["sample_id"]: row["FULL_vs_D_G1_outcome"] for row in f_rows}
+    assert outcomes == {"s2": "rescue", "s4": "false_accept"}
     failure_rows = read_csv_rows(output / "d_g1_failure_sample_level.csv")
-    assert {row["sample_id"] for row in failure_rows} == {"s2", "s3"}
+    assert {row["sample_id"] for row in failure_rows} == {"s2", "s3", "s4", "s5"}
+    assert "dependency_sensitive" in failure_rows[0]
     assert {
         row["error_family"] for row in failure_rows
-    } == {"schema_reference_grounding", "output_length"}
+    } == {"schema_reference_grounding", "output_length", "preflight_rejection"}
+    assert any(
+        row["sample_id"] == "s5"
+        and row["preflight_rejection_reason"] == "unique_constraint"
+        for row in failure_rows
+    )
+    manifest = json.loads((output / "analysis_manifest.json").read_text())
+    assert "analysis_manifest.json" not in manifest["artifacts"]
+    dependency_rows = read_csv_rows(output / "failure_by_dependency_sensitive.csv")
+    assert {row["dependency_sensitive"] for row in dependency_rows} == {"0", "1"}
+    family_input_rows = read_csv_rows(output / "failure_family_x_input_type.csv")
+    assert any(
+        row["error_family"] == "schema_reference_grounding"
+        and row["input_type"] == "semi_structured"
+        for row in family_input_rows
+    )
+    preflight_rows = read_csv_rows(output / "preflight_rejection_summary.csv")
+    assert preflight_rows == [
+        {
+            "preflight_rejection_reason": "unique_constraint",
+            "count": "1",
+            "rate_among_preflight_rejections": "1.0",
+        }
+    ]
+    hit_summary = read_csv_rows(output / "hit_max_new_tokens_summary.csv")
+    assert {
+        row["label"] for row in hit_summary
+    } == {"max_token_hit_associated_cases"}
     hit_rows = read_csv_rows(output / "hit_max_new_tokens_samples.csv")
     assert any(
         row["method_slug"] == "d_g1_primary" and row["sample_id"] == "s3"
         for row in hit_rows
     )
+
+
+def test_stage4r_d_f_g1_diagnostic_config_is_narrow() -> None:
+    config = json.loads(
+        Path("configs/stage4/d_f_g1_diagnostic.json").read_text(encoding="utf-8")
+    )
+
+    assert config["stage2_interventions"] == {
+        "control_field_roles": False,
+        "explicit_conflict_preservation": False,
+        "update_column_consistency": False,
+    }
+    assert config["structured_source_parser"]["enabled"] is True
+    assert config["free_text_typed_normalization"]["enabled"] is False
+    assert config["constrained_reference_repair"]["enabled"] is True
+    assert config["diagnostic_targeted_repair"]["enabled"] is True
+    assert config["diagnostic_targeted_repair"]["evidence_span_boundary"] is True
+    assert config["diagnostic_targeted_repair"]["evidence_span_selection"] is False
+    assert config["diagnostic_targeted_repair"]["max_revalidation_attempts"] == 1

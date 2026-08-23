@@ -1,0 +1,16 @@
+﻿error_family,input_type,count,rate_among_d_g1_failures
+preflight_rejection,semi_structured,44,0.21890547263681592
+preflight_rejection,free_text,23,0.11442786069651742
+source_field_grounding,semi_structured,23,0.11442786069651742
+schema_reference_grounding,semi_structured,22,0.10945273631840796
+normalization,free_text,18,0.08955223880597014
+missing_write_semantics,free_text,16,0.07960199004975124
+missing_write_semantics,semi_structured,9,0.04477611940298507
+output_length,free_text,9,0.04477611940298507
+accepted_state_mismatch,semi_structured,8,0.03980099502487562
+ambiguity_or_insufficient_information,semi_structured,8,0.03980099502487562
+schema_reference_grounding,free_text,7,0.03482587064676617
+accepted_state_mismatch,free_text,6,0.029850746268656716
+build_or_materialization,free_text,6,0.029850746268656716
+ambiguity_or_insufficient_information,free_text,1,0.004975124378109453
+parse_or_format,semi_structured,1,0.004975124378109453

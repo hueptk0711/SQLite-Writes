@@ -1,5 +1,5 @@
 {
-  "stage": "Stage4R_FRESH_FAILURE_ATTRIBUTION",
+  "stage": "Stage4R1_FRESH_FAILURE_ATTRIBUTION_TARGETED_REVISION",
   "model_called": false,
   "fresh_sample_count": 300,
   "D_G1_incorrect_count": 201,
@@ -16,6 +16,16 @@
     "rescue": 5,
     "regression": 0,
     "paired_sample_count": 300
+  },
+  "D_F_G1_diagnostic": {
+    "status": "post_hoc_projection_from_frozen_outputs",
+    "D_G1_correct": 99,
+    "D_F_G1_correct": 104,
+    "FULL_correct": 104,
+    "D_G1_to_D_F_G1_rescue": 5,
+    "D_G1_to_D_F_G1_regression": 0,
+    "D_F_G1_to_FULL_rescue": 0,
+    "D_F_G1_to_FULL_regression": 0
   },
   "hit_max_new_tokens_by_method": {
     "direct": 15,

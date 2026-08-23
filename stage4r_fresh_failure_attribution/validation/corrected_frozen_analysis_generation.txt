@@ -1,0 +1,61 @@
+{
+  "status": "PASS",
+  "frozen_sample_count": 300,
+  "methods_analyzed": [
+    "direct",
+    "j_fs",
+    "original_mp_fs_plus",
+    "d_g1_primary",
+    "d_only_secondary",
+    "full_secondary",
+    "no_c_secondary"
+  ],
+  "artifacts": [
+    "variant_metrics.csv",
+    "primary_paired_analysis.json",
+    "subgroup_metrics.csv",
+    "failure_stage_summary.csv",
+    "intervention_summary.csv",
+    "sample_level_analysis.csv"
+  ],
+  "primary": {
+    "baseline": "original_mp_fs_plus",
+    "method": "d_g1_primary",
+    "bootstrap_seed": 240822,
+    "bootstrap_replicates": 10000,
+    "metrics": {
+      "target_state_correct": {
+        "both_correct": 99,
+        "original_only_correct": 0,
+        "D_G1_only_correct": 0,
+        "both_wrong": 201,
+        "paired_sample_count": 300,
+        "accuracy_difference": 0.0,
+        "cluster_bootstrap_95ci": {
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "replicates": 10000,
+          "seed": 240822,
+          "cluster_count": 194
+        },
+        "mcnemar_exact_p": 1.0
+      },
+      "strict_full_state_correct": {
+        "both_correct": 99,
+        "original_only_correct": 0,
+        "D_G1_only_correct": 0,
+        "both_wrong": 201,
+        "paired_sample_count": 300,
+        "accuracy_difference": 0.0,
+        "cluster_bootstrap_95ci": {
+          "ci_low": 0.0,
+          "ci_high": 0.0,
+          "replicates": 10000,
+          "seed": 240822,
+          "cluster_count": 194
+        },
+        "mcnemar_exact_p": 1.0
+      }
+    }
+  }
+}

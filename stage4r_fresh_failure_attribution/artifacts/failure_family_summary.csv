@@ -1,0 +1,11 @@
+﻿error_family,count,rate_among_d_g1_failures
+preflight_rejection,67,0.3333333333333333
+schema_reference_grounding,29,0.14427860696517414
+missing_write_semantics,25,0.12437810945273632
+source_field_grounding,23,0.11442786069651742
+normalization,18,0.08955223880597014
+accepted_state_mismatch,14,0.06965174129353234
+ambiguity_or_insufficient_information,9,0.04477611940298507
+output_length,9,0.04477611940298507
+build_or_materialization,6,0.029850746268656716
+parse_or_format,1,0.004975124378109453
