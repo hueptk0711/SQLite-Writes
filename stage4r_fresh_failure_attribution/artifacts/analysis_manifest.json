@@ -38,15 +38,15 @@
     },
     "d_g1_failure_taxonomy.csv": {
       "exists": true,
-      "size_bytes": 10607
+      "size_bytes": 10684
     },
     "d_g1_failure_sample_level.csv": {
       "exists": true,
-      "size_bytes": 31671
+      "size_bytes": 31770
     },
     "failure_family_summary.csv": {
       "exists": true,
-      "size_bytes": 499
+      "size_bytes": 510
     },
     "failure_by_input_type.csv": {
       "exists": true,
@@ -66,15 +66,15 @@
     },
     "failure_family_x_input_type.csv": {
       "exists": true,
-      "size_bytes": 948
+      "size_bytes": 959
     },
     "failure_family_x_operation.csv": {
       "exists": true,
-      "size_bytes": 1451
+      "size_bytes": 1462
     },
     "failure_family_x_dependency.csv": {
       "exists": true,
-      "size_bytes": 924
+      "size_bytes": 946
     },
     "preflight_rejection_summary.csv": {
       "exists": true,
@@ -94,7 +94,7 @@
     },
     "error_family_precedence.json": {
       "exists": true,
-      "size_bytes": 1060
+      "size_bytes": 1071
     }
   }
 }

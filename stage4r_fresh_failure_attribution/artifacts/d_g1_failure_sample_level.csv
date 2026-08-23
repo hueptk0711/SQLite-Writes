@@ -38,14 +38,14 @@ aug_seed_000254_single_row_subset_001,seed_000254,debit_card_specializing,free_t
 aug_seed_000166_single_row_subset_001,seed_000166,financial,semi_structured,insert_ignore,0,state_mismatch,wrong_state,accepted_state_mismatch,,1,1,0,226,3963
 seed_000356,seed_000356,financial,semi_structured,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,unique_constraint,0,0,0,302,4474
 aug_seed_000187_single_row_subset_001,seed_000187,student_club,free_text,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,foreign_key,0,0,0,310,5143
-aug_seed_000153_relational_format_variant_001,seed_000153,toxicology,free_text,insert_ignore,1,parse,parse_error,output_length,,0,0,1,4096,12007
+aug_seed_000153_relational_format_variant_001,seed_000153,toxicology,free_text,insert_ignore,1,parse,parse_error,max_token_hit_associated,,0,0,1,4096,12007
 seed_000037,seed_000037,california_schools,semi_structured,upsert_update,0,build,MISSING_REQUIRED_COLUMN,missing_write_semantics,,0,0,0,205,6458
 seed_000319,seed_000319,superhero,semi_structured,plain_insert,0,build,UNKNOWN_COLUMN_ID,schema_reference_grounding,,0,0,0,121,3801
 seed_000259,seed_000259,financial,semi_structured,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,unique_constraint,0,0,0,301,4468
 aug_seed_000065_single_row_subset_002,seed_000065,formula_1,semi_structured,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,unique_constraint,0,0,0,197,3069
 aug_seed_000215_small_batch_subset_001,seed_000215,student_club,free_text,insert_ignore,0,build,MISSING_REQUIRED_COLUMN,missing_write_semantics,,0,0,0,280,4300
 aug_seed_000014_single_row_subset_002,seed_000014,student_club,free_text,insert_ignore,0,build,LOSSY_NORMALIZATION_REJECTED,normalization,,0,0,0,336,5776
-aug_seed_000088_relational_format_variant_001,seed_000088,thrombosis_prediction,free_text,insert_ignore,1,parse,parse_error,output_length,,0,0,1,4096,14033
+aug_seed_000088_relational_format_variant_001,seed_000088,thrombosis_prediction,free_text,insert_ignore,1,parse,parse_error,max_token_hit_associated,,0,0,1,4096,14033
 aug_seed_000321_small_batch_subset_001,seed_000321,debit_card_specializing,semi_structured,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,unique_constraint,0,0,0,174,2303
 seed_000191,seed_000191,debit_card_specializing,semi_structured,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,unique_constraint,0,0,0,173,2362
 seed_000159,seed_000159,student_club,semi_structured,plain_insert,0,build,UNKNOWN_COLUMN_ID,schema_reference_grounding,,0,0,0,155,4319
@@ -65,11 +65,11 @@ seed_000166,seed_000166,financial,semi_structured,plain_insert,0,build,UNKNOWN_C
 aug_seed_000048_single_row_subset_002,seed_000048,formula_1,free_text,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,semantic_risk_gate,0,0,0,179,6473
 aug_seed_000335_small_batch_subset_001,seed_000335,debit_card_specializing,free_text,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,semantic_risk_gate,0,0,0,316,3499
 aug_seed_000108_single_row_subset_002,seed_000108,student_club,free_text,insert_ignore,0,build,LOSSY_NORMALIZATION_REJECTED,normalization,,0,0,0,275,4867
-aug_seed_000020_relational_format_variant_001,seed_000020,european_football_2,free_text,insert_ignore,1,parse,parse_error,output_length,,0,0,1,4096,21147
+aug_seed_000020_relational_format_variant_001,seed_000020,european_football_2,free_text,insert_ignore,1,parse,parse_error,max_token_hit_associated,,0,0,1,4096,21147
 seed_000245,seed_000245,financial,semi_structured,plain_insert,0,build,NEEDS_CLARIFICATION,ambiguity_or_insufficient_information,,0,0,0,152,4575
 seed_000263,seed_000263,california_schools,semi_structured,upsert_update,0,build,UNKNOWN_COLUMN_ID,schema_reference_grounding,,0,0,0,273,7051
 seed_000069,seed_000069,financial,semi_structured,plain_insert,0,build,UNKNOWN_COLUMN_ID,schema_reference_grounding,,0,0,0,149,4847
-seed_000099,seed_000099,formula_1,free_text,insert_ignore,0,parse,parse_error,output_length,,0,0,1,4096,15474
+seed_000099,seed_000099,formula_1,free_text,insert_ignore,0,parse,parse_error,max_token_hit_associated,,0,0,1,4096,15474
 seed_000010,seed_000010,california_schools,semi_structured,upsert_update,0,build,UNKNOWN_COLUMN_ID,schema_reference_grounding,,0,0,0,246,6799
 aug_seed_000017_single_row_subset_001,seed_000017,student_club,free_text,insert_ignore,0,build,LOSSY_NORMALIZATION_REJECTED,normalization,,0,0,0,247,5217
 aug_seed_000095_single_row_subset_002,seed_000095,superhero,free_text,insert_ignore,0,build,MISSING_UPDATE_COLUMN_IDS,missing_write_semantics,,0,0,0,406,3746
@@ -80,7 +80,7 @@ aug_seed_000202_relational_format_variant_003,seed_000202,student_club,semi_stru
 aug_seed_000261_small_batch_subset_001,seed_000261,debit_card_specializing,free_text,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,semantic_risk_gate,0,0,0,293,3111
 aug_seed_000137_small_batch_subset_001,seed_000137,debit_card_specializing,semi_structured,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,unique_constraint,0,0,0,174,2232
 aug_seed_000025_single_row_subset_001,seed_000025,financial,free_text,insert_ignore,0,build,MISSING_REQUIRED_COLUMN,missing_write_semantics,,0,0,0,451,6777
-aug_seed_000002_relational_format_variant_001,seed_000002,debit_card_specializing,free_text,insert_ignore,1,parse,parse_error,output_length,,0,0,1,4096,12069
+aug_seed_000002_relational_format_variant_001,seed_000002,debit_card_specializing,free_text,insert_ignore,1,parse,parse_error,max_token_hit_associated,,0,0,1,4096,12069
 aug_seed_000031_small_batch_subset_001,seed_000031,student_club,semi_structured,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,unique_constraint,0,0,0,186,2244
 seed_000061,seed_000061,financial,semi_structured,plain_insert,0,build,NEEDS_CLARIFICATION,ambiguity_or_insufficient_information,,0,0,0,150,4578
 aug_seed_000311_single_row_subset_001,seed_000311,card_games,free_text,insert_ignore,0,build,MISSING_UPDATE_COLUMN_IDS,missing_write_semantics,,0,0,0,644,8578
@@ -95,7 +95,7 @@ aug_seed_000356_single_row_subset_001,seed_000356,financial,semi_structured,inse
 seed_000217,seed_000217,codebase_community,semi_structured,upsert_update,0,build,UNRESOLVED_SOURCE_FIELD,source_field_grounding,,0,0,0,130,18190
 aug_seed_000179_single_row_subset_001,seed_000179,financial,free_text,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,semantic_risk_gate,0,0,0,220,4454
 seed_000088,seed_000088,thrombosis_prediction,semi_structured,insert_ignore,1,state_mismatch,wrong_state,accepted_state_mismatch,,1,1,0,163,5012
-aug_seed_000351_relational_format_variant_001,seed_000351,toxicology,free_text,insert_ignore,1,parse,parse_error,output_length,,0,0,1,4096,10948
+aug_seed_000351_relational_format_variant_001,seed_000351,toxicology,free_text,insert_ignore,1,parse,parse_error,max_token_hit_associated,,0,0,1,4096,10948
 aug_seed_000013_small_batch_subset_001,seed_000013,european_football_2,free_text,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,semantic_risk_gate,0,0,0,465,12108
 seed_000335,seed_000335,debit_card_specializing,semi_structured,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,unique_constraint,0,0,0,161,2440
 aug_seed_000080_single_row_subset_002,seed_000080,student_club,free_text,insert_ignore,0,build,UNKNOWN_EVIDENCE_ID,schema_reference_grounding,,0,0,0,282,4939
@@ -140,7 +140,7 @@ seed_000079,seed_000079,debit_card_specializing,semi_structured,plain_insert,0,b
 seed_000253,seed_000253,formula_1,free_text,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,semantic_risk_gate,0,0,0,159,14908
 aug_seed_000343_single_row_subset_001,seed_000343,financial,free_text,insert_ignore,0,build,LOSSY_NORMALIZATION_REJECTED,normalization,,0,0,0,514,6901
 aug_seed_000309_relational_format_variant_002,seed_000309,toxicology,semi_structured,insert_ignore,1,preflight,preflight_abstention,preflight_rejection,unique_constraint,0,0,0,153,2937
-aug_seed_000072_relational_format_variant_001,seed_000072,toxicology,free_text,insert_ignore,1,parse,parse_error,output_length,,0,0,1,4096,12495
+aug_seed_000072_relational_format_variant_001,seed_000072,toxicology,free_text,insert_ignore,1,parse,parse_error,max_token_hit_associated,,0,0,1,4096,12495
 aug_seed_000154_single_row_subset_001,seed_000154,european_football_2,free_text,insert_ignore,0,build,UNKNOWN_CONSTRAINT_ID,build_or_materialization,,0,0,0,253,11230
 seed_000206,seed_000206,california_schools,semi_structured,upsert_update,0,build,MISSING_REQUIRED_COLUMN,missing_write_semantics,,0,0,0,338,7474
 seed_000254,seed_000254,debit_card_specializing,semi_structured,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,unique_constraint,0,0,0,154,2292
@@ -151,7 +151,7 @@ aug_seed_000066_single_row_subset_002,seed_000066,student_club,free_text,insert_
 aug_seed_000022_single_row_subset_002,seed_000022,superhero,free_text,insert_ignore,0,build,UNKNOWN_CONSTRAINT_ID,build_or_materialization,,0,0,0,163,3276
 seed_000150,seed_000150,superhero,semi_structured,plain_insert,1,build,UNKNOWN_COLUMN_ID,schema_reference_grounding,,0,0,0,189,4328
 aug_seed_000181_single_row_subset_001,seed_000181,financial,free_text,insert_ignore,0,build,DUPLICATE_TARGET_COLUMN_AFTER_EVIDENCE_GROUNDING,build_or_materialization,,0,0,0,1072,7044
-aug_seed_000004_relational_format_variant_001,seed_000004,debit_card_specializing,free_text,insert_ignore,0,parse,parse_error,output_length,,0,0,1,4096,11226
+aug_seed_000004_relational_format_variant_001,seed_000004,debit_card_specializing,free_text,insert_ignore,0,parse,parse_error,max_token_hit_associated,,0,0,1,4096,11226
 aug_seed_000169_single_row_subset_001,seed_000169,debit_card_specializing,free_text,insert_ignore,0,state_mismatch,wrong_state,accepted_state_mismatch,,1,1,0,169,3059
 seed_000299,seed_000299,formula_1,semi_structured,plain_insert,0,build,UNRESOLVED_SOURCE_FIELD,source_field_grounding,,0,0,0,120,6943
 aug_seed_000274_single_row_subset_001,seed_000274,formula_1,semi_structured,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,unique_constraint,0,0,0,136,2343
@@ -176,7 +176,7 @@ seed_000094,seed_000094,european_football_2,semi_structured,plain_insert,0,build
 seed_000101,seed_000101,formula_1,semi_structured,insert_ignore,0,preflight,preflight_abstention,preflight_rejection,unique_constraint,0,0,0,136,2191
 seed_000106,seed_000106,california_schools,semi_structured,upsert_update,0,build,MISSING_REQUIRED_COLUMN,missing_write_semantics,,0,0,0,248,6783
 seed_000212,seed_000212,superhero,semi_structured,plain_insert,0,build,UNRESOLVED_SOURCE_FIELD,source_field_grounding,,0,0,0,120,4042
-aug_seed_000346_relational_format_variant_001,seed_000346,codebase_community,free_text,insert_ignore,1,parse,parse_error,output_length,,0,0,1,4096,14591
+aug_seed_000346_relational_format_variant_001,seed_000346,codebase_community,free_text,insert_ignore,1,parse,parse_error,max_token_hit_associated,,0,0,1,4096,14591
 seed_000288,seed_000288,financial,semi_structured,plain_insert,0,build,UNKNOWN_COLUMN_ID,schema_reference_grounding,,0,0,0,187,4525
 aug_seed_000222_small_batch_subset_001,seed_000222,financial,free_text,insert_ignore,0,build,MISSING_REQUIRED_COLUMN,missing_write_semantics,,0,0,0,326,5489
 seed_000182,seed_000182,student_club,semi_structured,upsert_update,0,state_mismatch,wrong_state,accepted_state_mismatch,,1,1,0,190,2368

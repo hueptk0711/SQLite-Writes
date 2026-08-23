@@ -8,11 +8,11 @@ accepted_state_mismatch,0,13,0.06467661691542288
 preflight_rejection,1,13,0.06467661691542288
 source_field_grounding,1,8,0.03980099502487562
 ambiguity_or_insufficient_information,0,7,0.03482587064676617
-output_length,1,7,0.03482587064676617
+max_token_hit_associated,1,7,0.03482587064676617
 build_or_materialization,0,6,0.029850746268656716
 ambiguity_or_insufficient_information,1,2,0.009950248756218905
+max_token_hit_associated,0,2,0.009950248756218905
 normalization,1,2,0.009950248756218905
-output_length,0,2,0.009950248756218905
 accepted_state_mismatch,1,1,0.004975124378109453
 missing_write_semantics,1,1,0.004975124378109453
 parse_or_format,0,1,0.004975124378109453

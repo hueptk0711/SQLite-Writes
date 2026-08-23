@@ -6,6 +6,7 @@ from pathlib import Path
 
 from scripts.analysis.analyze_stage4_fresh_7b import METHOD_SLUGS
 from scripts.analysis.run_stage4r_fresh_failure_attribution import run_stage4r
+from scripts.analysis.run_stage4r2_actual_dfg1_replay import run_stage4r2
 
 
 def write_jsonl(path: Path, rows: list[dict[str, object]]) -> None:
@@ -254,6 +255,84 @@ def write_results(result_root: Path, sample_ids: list[str]) -> None:
     )
 
 
+def write_actual_run(actual_run: Path, sample_ids: list[str]) -> None:
+    rows = base_rows(sample_ids)
+    for row in rows:
+        if row["sample_id"] == "s3":
+            row.update(
+                {
+                    "target_state_correct": False,
+                    "strict_full_state_correct": False,
+                    "parse_success": False,
+                    "hit_max_new_tokens": True,
+                    "output_tokens": 4096,
+                    "error_type": "PARSE_ERROR",
+                }
+            )
+    write_jsonl(actual_run / "evaluation.jsonl", rows)
+    write_jsonl(actual_run / "raw_generations.jsonl", [
+        {"sample_id": sample_id, "text": "{}"} for sample_id in sample_ids
+    ])
+    write_jsonl(actual_run / "parsed_mapping_plans.jsonl", [
+        {"sample_id": sample_id, "parsed": True} for sample_id in sample_ids
+    ])
+    write_jsonl(
+        actual_run / "materialized_write_plans.jsonl",
+        [
+            {
+                "sample_id": "s1",
+                "write_plan": {},
+            },
+            {
+                "sample_id": "s2",
+                "write_plan": {
+                    "reference_trace": {
+                        "constrained_reference_repairs": [
+                            {
+                                "repair_attempted": True,
+                                "repair_applied": True,
+                                "repair_succeeded": True,
+                                "reference_kind": "column",
+                                "slot_path": "/target_groups/0/field_mapping/c1.f1",
+                                "original_reference": "t1.amount",
+                                "replacement_reference": "t1.c2",
+                                "candidate_set": ["t1.c1", "t1.c2"],
+                                "candidate_count": 2,
+                                "repair_rule": "unique_exact_identifier_name",
+                                "validation_before": "UNKNOWN_COLUMN_ID",
+                                "validation_after": "PASS",
+                            }
+                        ]
+                    }
+                },
+            },
+            {
+                "sample_id": "s3",
+                "write_plan": {},
+            },
+        ],
+    )
+    write_jsonl(actual_run / "verification.jsonl", [
+        {"sample_id": sample_id, "valid": sample_id != "s3"} for sample_id in sample_ids
+    ])
+    write_jsonl(actual_run / "compiled_programs.jsonl", [
+        {"sample_id": sample_id, "program": []} for sample_id in sample_ids
+    ])
+    write_jsonl(actual_run / "execution_logs.jsonl", [
+        {
+            "sample_id": sample_id,
+            "preflight": {"accepted": sample_id != "s3", "error_class": None},
+        }
+        for sample_id in sample_ids
+    ])
+    for name in ("metrics.json", "manifest.json", "run_lock.json", "config.json"):
+        (actual_run / name).write_text(
+            json.dumps({"sample_count": len(sample_ids)}, sort_keys=True),
+            encoding="utf-8",
+            newline="\n",
+        )
+
+
 def test_stage4r_outputs_f_repair_and_failure_attribution(tmp_path: Path) -> None:
     sample_ids = ["s1", "s2", "s3", "s4", "s5"]
     protocol = tmp_path / "protocol"
@@ -290,7 +369,11 @@ def test_stage4r_outputs_f_repair_and_failure_attribution(tmp_path: Path) -> Non
     assert "dependency_sensitive" in failure_rows[0]
     assert {
         row["error_family"] for row in failure_rows
-    } == {"schema_reference_grounding", "output_length", "preflight_rejection"}
+    } == {
+        "schema_reference_grounding",
+        "max_token_hit_associated",
+        "preflight_rejection",
+    }
     assert any(
         row["sample_id"] == "s5"
         and row["preflight_rejection_reason"] == "unique_constraint"
@@ -342,3 +425,46 @@ def test_stage4r_d_f_g1_diagnostic_config_is_narrow() -> None:
     assert config["diagnostic_targeted_repair"]["evidence_span_boundary"] is True
     assert config["diagnostic_targeted_repair"]["evidence_span_selection"] is False
     assert config["diagnostic_targeted_repair"]["max_revalidation_attempts"] == 1
+
+
+def test_stage4r2_actual_replay_comparison_from_existing_run(tmp_path: Path) -> None:
+    sample_ids = ["s1", "s2", "s3"]
+    protocol = tmp_path / "protocol"
+    results = tmp_path / "results"
+    actual_run = tmp_path / "actual_run"
+    output = tmp_path / "stage4r2"
+    config = tmp_path / "d_f_g1_config.json"
+    write_protocol(protocol, sample_ids)
+    write_results(results, sample_ids)
+    write_actual_run(actual_run, sample_ids)
+    config.write_text(
+        json.dumps({"method_id": "MP-FS+"}, sort_keys=True),
+        encoding="utf-8",
+        newline="\n",
+    )
+
+    summary = run_stage4r2(
+        protocol_root=protocol,
+        result_root=results,
+        config_path=config,
+        output_dir=output,
+        actual_run_dir=actual_run,
+        skip_replay=True,
+    )
+
+    assert summary["model_called"] is False
+    assert summary["D_G1_correct"] == 1
+    assert summary["ACTUAL_D_F_G1_correct"] == 2
+    assert summary["FULL_correct"] == 2
+    assert summary["D_G1_to_ACTUAL_D_F_G1_rescue"] == 1
+    assert summary["D_G1_to_ACTUAL_D_F_G1_regression"] == 0
+    assert summary["ACTUAL_D_F_G1_to_FULL_rescue"] == 0
+    assert summary["ACTUAL_D_F_G1_to_FULL_regression"] == 0
+    assert summary["F_activation_sample_count"] == 1
+    assert (output / "d_f_g1_actual_evaluation.jsonl").is_file()
+    assert (output / "d_f_g1_actual_preflight.jsonl").is_file()
+    repair_rows = read_csv_rows(output / "d_f_g1_actual_f_repairs.csv")
+    assert repair_rows[0]["repair_rule"] == "unique_exact_identifier_name"
+    paired_rows = read_csv_rows(output / "d_g1_actual_full_paired_summary.csv")
+    assert paired_rows[0]["comparison"] == "D_G1_to_ACTUAL_D_F_G1"
+    assert paired_rows[0]["rescue"] == "1"

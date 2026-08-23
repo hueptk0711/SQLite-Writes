@@ -1,0 +1,300 @@
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000068_single_row_subset_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000231"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000005"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.09438210001098923, "sample_id": "aug_seed_000049_relational_format_variant_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000292_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000349_relational_format_variant_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.21811449999222532, "sample_id": "seed_000110"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0011081000266131014, "sample_id": "aug_seed_000073_relational_format_variant_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000054_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000302"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.018273300025612116, "sample_id": "aug_seed_000237_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.006501700001535937, "sample_id": "aug_seed_000285_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000356_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000190"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.10198040000977926, "sample_id": "aug_seed_000143_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000346_relational_format_variant_002"}
+{"accepted": false, "error": "UNIQUE constraint failed: schools.CDSCode", "error_class": "unique_violation", "latency_sec": 0.06860129997949116, "sample_id": "seed_000291"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000017_small_batch_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: customers.CustomerID", "error_class": "unique_violation", "latency_sec": 0.09158740000566468, "sample_id": "seed_000261"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.19484880001982674, "sample_id": "aug_seed_000246_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000194_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0007921000069472939, "sample_id": "aug_seed_000068_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000183_small_batch_subset_001"}
+{"accepted": false, "error": "datatype mismatch", "error_class": "type_error", "latency_sec": 0.07801989998552017, "sample_id": "seed_000201"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000044"}
+{"accepted": false, "error": "UNIQUE constraint failed: status.statusId", "error_class": "unique_violation", "latency_sec": 0.046272599982330576, "sample_id": "aug_seed_000253_small_batch_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: drivers.driverId", "error_class": "unique_violation", "latency_sec": 0.06817740001133643, "sample_id": "seed_000243"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 3.03225069999462, "sample_id": "aug_seed_000211_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.009088999999221414, "sample_id": "seed_000189"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "aug_seed_000253_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.12235300001339056, "sample_id": "aug_seed_000255_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000095"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.01096250000409782, "sample_id": "aug_seed_000031_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000192"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000241_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.006679599988274276, "sample_id": "aug_seed_000353_single_row_subset_001"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "aug_seed_000013_single_row_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: zip_code.zip_code", "error_class": "unique_violation", "latency_sec": 0.012189300003228709, "sample_id": "aug_seed_000316_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000338_relational_format_variant_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.002659599995240569, "sample_id": "aug_seed_000199_small_batch_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.008988299989141524, "sample_id": "aug_seed_000285_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.009098899987293407, "sample_id": "seed_000269"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000202_relational_format_variant_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: account.account_id", "error_class": "unique_violation", "latency_sec": 0.1632699999900069, "sample_id": "seed_000146"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000073"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000014_small_batch_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: customers.CustomerID", "error_class": "unique_violation", "latency_sec": 0.11062289998517372, "sample_id": "aug_seed_000254_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.10154580001835711, "sample_id": "aug_seed_000166_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 2.910885799996322, "sample_id": "seed_000100"}
+{"accepted": false, "error": "UNIQUE constraint failed: district.district_id", "error_class": "unique_violation", "latency_sec": 0.1307088999892585, "sample_id": "seed_000356"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.08717530002468266, "sample_id": "aug_seed_000167_single_row_subset_001"}
+{"accepted": false, "error": "FOREIGN KEY constraint failed", "error_class": "foreign_key_violation", "latency_sec": 0.004790299979504198, "sample_id": "aug_seed_000187_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000153_relational_format_variant_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000037"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000319"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.007862400001613423, "sample_id": "seed_000168"}
+{"accepted": false, "error": "UNIQUE constraint failed: district.district_id", "error_class": "unique_violation", "latency_sec": 0.16056119999848306, "sample_id": "seed_000259"}
+{"accepted": false, "error": "UNIQUE constraint failed: driverStandings.driverStandingsId", "error_class": "unique_violation", "latency_sec": 0.08207970001967624, "sample_id": "aug_seed_000065_single_row_subset_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000215_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000014_single_row_subset_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000088_relational_format_variant_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: transactions_1k.TransactionID", "error_class": "unique_violation", "latency_sec": 0.06701550001162104, "sample_id": "aug_seed_000321_small_batch_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: gasstations.GasStationID", "error_class": "unique_violation", "latency_sec": 0.07438030000776052, "sample_id": "seed_000191"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000159"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.002997000003233552, "sample_id": "aug_seed_000144_small_batch_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.1063560999755282, "sample_id": "seed_000235"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000312_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000048"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.05834279998089187, "sample_id": "seed_000289"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0032842000073287636, "sample_id": "aug_seed_000159_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000107"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 2.7602430999977514, "sample_id": "aug_seed_000282_small_batch_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.008257300010882318, "sample_id": "aug_seed_000194_small_batch_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 3.3376438999839593, "sample_id": "seed_000076"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000002_relational_format_variant_003"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.06425779999699444, "sample_id": "aug_seed_000331_single_row_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: zip_code.zip_code", "error_class": "unique_violation", "latency_sec": 0.0035019000060856342, "sample_id": "aug_seed_000275_relational_format_variant_003"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 1.2670469999720808, "sample_id": "seed_000344"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.005547300010221079, "sample_id": "seed_000194"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.004548800003249198, "sample_id": "seed_000108"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000044_single_row_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.5454532000003383, "sample_id": "seed_000224"}
+{"accepted": false, "error": "UNIQUE constraint failed: driverStandings.driverStandingsId", "error_class": "unique_violation", "latency_sec": 0.0542591999983415, "sample_id": "seed_000065"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "aug_seed_000203_small_batch_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: users.Id", "error_class": "unique_violation", "latency_sec": 2.3090293999994174, "sample_id": "aug_seed_000162_relational_format_variant_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000072_relational_format_variant_003"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000166"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "aug_seed_000048_single_row_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.06527759999153204, "sample_id": "aug_seed_000079_single_row_subset_002"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "aug_seed_000335_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000108_single_row_subset_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000020_relational_format_variant_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.036252799996873364, "sample_id": "seed_000169"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000245"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000263"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.13014740002108738, "sample_id": "aug_seed_000091_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 2.7443106999853626, "sample_id": "seed_000308"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000069"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000099"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000010"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000017_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.12996029999339953, "sample_id": "aug_seed_000027_single_row_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.017335699987597764, "sample_id": "aug_seed_000145_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000095_single_row_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.037848300009500235, "sample_id": "seed_000056"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000311"}
+{"accepted": false, "error": "UNIQUE constraint failed: customers.CustomerID", "error_class": "unique_violation", "latency_sec": 0.09854410000843927, "sample_id": "aug_seed_000238_small_batch_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0038973000191617757, "sample_id": "aug_seed_000119_single_row_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.004999799974029884, "sample_id": "aug_seed_000089_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 3.306542600010289, "sample_id": "aug_seed_000282_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 4.939658100018278, "sample_id": "aug_seed_000020_relational_format_variant_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000219"}
+{"accepted": false, "error": "UNIQUE constraint failed: zip_code.zip_code", "error_class": "unique_violation", "latency_sec": 0.018442500004312024, "sample_id": "aug_seed_000202_relational_format_variant_003"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.004262000002199784, "sample_id": "aug_seed_000044_single_row_subset_001"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "aug_seed_000261_small_batch_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.1853558000002522, "sample_id": "aug_seed_000069_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 3.7044499999901745, "sample_id": "aug_seed_000139_small_batch_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: gasstations.GasStationID", "error_class": "unique_violation", "latency_sec": 0.10546389999217354, "sample_id": "aug_seed_000137_small_batch_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.002497499983292073, "sample_id": "aug_seed_000218_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000025_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000002_relational_format_variant_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.056028899998636916, "sample_id": "aug_seed_000049_relational_format_variant_003"}
+{"accepted": false, "error": "UNIQUE constraint failed: zip_code.zip_code", "error_class": "unique_violation", "latency_sec": 0.011516899976413697, "sample_id": "aug_seed_000031_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000061"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000311_single_row_subset_001"}
+{"accepted": false, "error": "FOREIGN KEY constraint failed", "error_class": "foreign_key_violation", "latency_sec": 0.01729610000620596, "sample_id": "aug_seed_000309_relational_format_variant_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: zip_code.zip_code", "error_class": "unique_violation", "latency_sec": 0.007319299998925999, "sample_id": "aug_seed_000316_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.006300300010479987, "sample_id": "seed_000312"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000130_single_row_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: connected.atom_id, connected.atom_id2", "error_class": "unique_violation", "latency_sec": 0.006016999977873638, "sample_id": "seed_000072"}
+{"accepted": false, "error": "UNIQUE constraint failed: district.district_id", "error_class": "unique_violation", "latency_sec": 0.13208539999322966, "sample_id": "aug_seed_000343_small_batch_subset_001"}
+{"accepted": false, "error": "FOREIGN KEY constraint failed", "error_class": "foreign_key_violation", "latency_sec": 0.004839200002606958, "sample_id": "aug_seed_000293_relational_format_variant_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000325"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.004806800017831847, "sample_id": "aug_seed_000301_single_row_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: district.district_id", "error_class": "unique_violation", "latency_sec": 0.1407566999841947, "sample_id": "aug_seed_000356_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0031451000249944627, "sample_id": "seed_000121"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000217"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.5049939000164159, "sample_id": "aug_seed_000061_single_row_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.005286799976602197, "sample_id": "seed_000052"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "aug_seed_000179_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.022316599992336705, "sample_id": "seed_000088"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000351_relational_format_variant_001"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "aug_seed_000013_small_batch_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: customers.CustomerID", "error_class": "unique_violation", "latency_sec": 0.1390045000007376, "sample_id": "seed_000335"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000080_single_row_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.4362762999953702, "sample_id": "aug_seed_000235_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000019_single_row_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.06844959998852573, "sample_id": "seed_000174"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 3.6545348999788985, "sample_id": "aug_seed_000280_single_row_subset_001"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "seed_000067"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000171_small_batch_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: client.client_id", "error_class": "unique_violation", "latency_sec": 0.10778730001766235, "sample_id": "seed_000051"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "seed_000040"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.06101870001293719, "sample_id": "aug_seed_000035_relational_format_variant_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000148_small_batch_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.026574899995466694, "sample_id": "aug_seed_000303_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000119_single_row_subset_001"}
+{"accepted": false, "error": "FOREIGN KEY constraint failed", "error_class": "foreign_key_violation", "latency_sec": 0.0172411999956239, "sample_id": "seed_000193"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000161_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000165"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.12739909999072552, "sample_id": "aug_seed_000110_single_row_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0009537999867461622, "sample_id": "aug_seed_000062_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000307"}
+{"accepted": false, "error": "UNIQUE constraint failed: posts.Id", "error_class": "unique_violation", "latency_sec": 1.8001872999884654, "sample_id": "aug_seed_000177_relational_format_variant_003"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.09079259997815825, "sample_id": "aug_seed_000085_single_row_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 1.2413370000140276, "sample_id": "aug_seed_000272_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000299_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000196"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "aug_seed_000101_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000300"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 3.8076653000025544, "sample_id": "aug_seed_000076_single_row_subset_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000175"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 1.4162217999983113, "sample_id": "aug_seed_000054_single_row_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: qualifying.qualifyId", "error_class": "unique_violation", "latency_sec": 0.09117299999343231, "sample_id": "aug_seed_000178_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 1.4978441999992356, "sample_id": "aug_seed_000251_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0027289999998174608, "sample_id": "aug_seed_000221_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.01274169998941943, "sample_id": "seed_000030"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000272"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0038185000012163073, "sample_id": "aug_seed_000175_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000004_relational_format_variant_002"}
+{"accepted": false, "error": "UNIQUE constraint failed: customers.CustomerID", "error_class": "unique_violation", "latency_sec": 0.05319080001208931, "sample_id": "seed_000328"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000148"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.043645900004776195, "sample_id": "seed_000313"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "aug_seed_000172_relational_format_variant_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: zip_code.zip_code", "error_class": "unique_violation", "latency_sec": 0.010058500018203631, "sample_id": "aug_seed_000202_relational_format_variant_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.4299505999952089, "sample_id": "aug_seed_000005_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000289_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.1215659000154119, "sample_id": "aug_seed_000051_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000131"}
+{"accepted": false, "error": "UNIQUE constraint failed: customers.CustomerID", "error_class": "unique_violation", "latency_sec": 0.05267879998427816, "sample_id": "aug_seed_000328_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000084"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.004476200003409758, "sample_id": "seed_000276"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.05778569998801686, "sample_id": "aug_seed_000321_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000112_relational_format_variant_003"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000128_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000092"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "aug_seed_000334_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0030758999928366393, "sample_id": "seed_000353"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000271"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.009924200014211237, "sample_id": "aug_seed_000293_relational_format_variant_003"}
+{"accepted": false, "error": "UNIQUE constraint failed: trans.trans_id", "error_class": "unique_violation", "latency_sec": 0.14328580000437796, "sample_id": "seed_000264"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000079"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.07160860000294633, "sample_id": "aug_seed_000314_single_row_subset_001"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "seed_000253"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000343_single_row_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: atom.atom_id", "error_class": "unique_violation", "latency_sec": 0.004913500015391037, "sample_id": "aug_seed_000309_relational_format_variant_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000072_relational_format_variant_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 1.9167299999971874, "sample_id": "seed_000266"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000154_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.013340799981961027, "sample_id": "seed_000273"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.003719400003319606, "sample_id": "aug_seed_000353_small_batch_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 2.846553400013363, "sample_id": "aug_seed_000307_small_batch_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 1.9062891000066884, "sample_id": "aug_seed_000257_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000206"}
+{"accepted": false, "error": "UNIQUE constraint failed: customers.CustomerID", "error_class": "unique_violation", "latency_sec": 0.11727849999442697, "sample_id": "seed_000254"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000171_single_row_subset_001"}
+{"accepted": false, "error": "Candidate was rejected by the semantic-risk gate before transactional preflight.", "error_class": "blocked_by_semantic_risk_gate", "latency_sec": 0.0, "sample_id": "aug_seed_000042_single_row_subset_001"}
+{"accepted": false, "error": "FOREIGN KEY constraint failed", "error_class": "foreign_key_violation", "latency_sec": 0.11415019998094067, "sample_id": "aug_seed_000208_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 2.4635649000119884, "sample_id": "seed_000154"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.43861799998558126, "sample_id": "aug_seed_000347_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000066_single_row_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0034297000092919916, "sample_id": "seed_000187"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.003971300000557676, "sample_id": "aug_seed_000252_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000022_single_row_subset_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000150"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000181_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000004_relational_format_variant_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.07162329999846406, "sample_id": "aug_seed_000169_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000299"}
+{"accepted": false, "error": "UNIQUE constraint failed: seasons.url", "error_class": "unique_violation", "latency_sec": 0.026563999999780208, "sample_id": "aug_seed_000274_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0026553000207059085, "sample_id": "aug_seed_000052_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000274"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.06898939999518916, "sample_id": "aug_seed_000135_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 2.698389099998167, "sample_id": "aug_seed_000013_small_batch_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.015221399982692674, "sample_id": "aug_seed_000121_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000208"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000190_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.006612800003495067, "sample_id": "seed_000185"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 1.3030539999890607, "sample_id": "seed_000337"}
+{"accepted": false, "error": "UNIQUE constraint failed: constructors.constructorId", "error_class": "unique_violation", "latency_sec": 0.08274879999225959, "sample_id": "seed_000059"}
+{"accepted": false, "error": "UNIQUE constraint failed: client.client_id", "error_class": "unique_violation", "latency_sec": 0.11694500001613051, "sample_id": "aug_seed_000203_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000121_single_row_subset_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000005_single_row_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.006177999981446192, "sample_id": "seed_000066"}
+{"accepted": false, "error": "UNIQUE constraint failed: Match.id", "error_class": "unique_violation", "latency_sec": 3.052416799997445, "sample_id": "aug_seed_000094_small_batch_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 2.9855628999939654, "sample_id": "aug_seed_000127_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000145"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.013589000009233132, "sample_id": "seed_000226"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000002_relational_format_variant_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000287_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 3.804300999996485, "sample_id": "seed_000127"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000296"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000042"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000116_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0024144999915733933, "sample_id": "aug_seed_000260_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000229"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.011447199998656288, "sample_id": "aug_seed_000189_small_batch_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 3.136698999995133, "sample_id": "aug_seed_000139_single_row_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000094"}
+{"accepted": false, "error": "UNIQUE constraint failed: status.statusId", "error_class": "unique_violation", "latency_sec": 0.06963829998858273, "sample_id": "seed_000101"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000106"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000212"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.4461502000049222, "sample_id": "aug_seed_000092_single_row_subset_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000346_relational_format_variant_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.13266080000903457, "sample_id": "aug_seed_000248_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0825433999998495, "sample_id": "seed_000288"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.012127399997552857, "sample_id": "seed_000301"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000222_small_batch_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0038939999940339476, "sample_id": "seed_000182"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.09063990000868216, "sample_id": "seed_000085"}
+{"accepted": false, "error": "UNIQUE constraint failed: district.district_id", "error_class": "unique_violation", "latency_sec": 0.12694850002299063, "sample_id": "seed_000343"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.08294069999828935, "sample_id": "aug_seed_000245_single_row_subset_001"}
+{"accepted": false, "error": "FOREIGN KEY constraint failed", "error_class": "foreign_key_violation", "latency_sec": 2.4512169000227004, "sample_id": "seed_000020"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.10753760000807233, "sample_id": "aug_seed_000216_single_row_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: zip_code.zip_code", "error_class": "unique_violation", "latency_sec": 0.012449600006220862, "sample_id": "aug_seed_000275_relational_format_variant_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.0034144999808631837, "sample_id": "seed_000151"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000267"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000241_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000078_relational_format_variant_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000252"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000234_relational_format_variant_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000218"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 2.3887872000050265, "sample_id": "aug_seed_000127_small_batch_subset_001"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000346"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.46871529999771155, "sample_id": "aug_seed_000222_single_row_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: gasstations.GasStationID", "error_class": "unique_violation", "latency_sec": 0.05846610001754016, "sample_id": "aug_seed_000191_single_row_subset_001"}
+{"accepted": false, "error": "UNIQUE constraint failed: client.client_id", "error_class": "unique_violation", "latency_sec": 0.13735360000282526, "sample_id": "aug_seed_000051_small_batch_subset_002"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "aug_seed_000165_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.11479410002357326, "sample_id": "aug_seed_000091_single_row_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.12342230000649579, "sample_id": "seed_000334"}
+{"accepted": false, "error": "Plan did not reach successful compilation.", "error_class": "upstream_rejection", "latency_sec": 0.0, "sample_id": "seed_000003"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 2.517406500002835, "sample_id": "seed_000211"}
+{"accepted": false, "error": "UNIQUE constraint failed: transactions_1k.TransactionID", "error_class": "unique_violation", "latency_sec": 0.08364450000226498, "sample_id": "aug_seed_000009_small_batch_subset_002"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 1.3087115999951493, "sample_id": "seed_000011"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.43894839999848045, "sample_id": "aug_seed_000061_single_row_subset_001"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.005953799991402775, "sample_id": "seed_000176"}
+{"accepted": true, "error": null, "error_class": null, "latency_sec": 0.027256599976681173, "sample_id": "seed_000303"}
+{"accepted": false, "error": "UNIQUE constraint failed: client.client_id", "error_class": "unique_violation", "latency_sec": 0.08875349999289028, "sample_id": "seed_000203"}
+{"accepted": false, "error": "UNIQUE constraint failed: connected.atom_id, connected.atom_id2", "error_class": "unique_violation", "latency_sec": 0.020637699984945357, "sample_id": "seed_000134"}

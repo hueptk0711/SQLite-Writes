@@ -1,0 +1,8 @@
+{
+  "method_id": "MP-FS+",
+  "method_variant": "stage4r1-d-f-g1-diagnostic",
+  "method_version": "stage4r1-d-f-g1-diagnostic",
+  "stage": "dev",
+  "sample_count": 300,
+  "run_lock_sha256": "183a60137b8e0759573d8b0a348e222efff3f291d4fc476692d881575c07cdd0"
+}

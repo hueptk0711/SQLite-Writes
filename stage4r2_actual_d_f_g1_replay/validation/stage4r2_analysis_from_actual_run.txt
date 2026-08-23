@@ -1,0 +1,23 @@
+{
+  "ACTUAL_D_F_G1_correct": 104,
+  "ACTUAL_D_F_G1_to_FULL_regression": 0,
+  "ACTUAL_D_F_G1_to_FULL_rescue": 0,
+  "D_G1_correct": 99,
+  "D_G1_to_ACTUAL_D_F_G1_regression": 0,
+  "D_G1_to_ACTUAL_D_F_G1_rescue": 5,
+  "FULL_correct": 104,
+  "F_activation_sample_count": 9,
+  "F_exact_name_repair_count": 38,
+  "F_repair_count": 38,
+  "actual_config": "configs\\stage4\\d_f_g1_diagnostic.json",
+  "actual_config_sha256": "3036949521b25ea6d5767500a13ce91206e73cf94dc3576497d96562e0cc48af",
+  "actual_method": "d_f_g1_diagnostic_actual",
+  "fresh_sample_count": 300,
+  "gpu_called": false,
+  "model_called": false,
+  "replay": {
+    "actual_run_dir": "stage4r2_actual_d_f_g1_replay\\actual_run",
+    "status": "reused_existing_actual_run"
+  },
+  "stage": "Stage4R2_ACTUAL_D_F_G1_REPLAY"
+}

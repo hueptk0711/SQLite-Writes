@@ -48,9 +48,11 @@ D_G1 → D_F_G1_DIAGNOSTIC: 5 rescues, 0 regressions
 D_F_G1_DIAGNOSTIC → FULL: 0 rescues, 0 regressions
 ```
 
-Conservative conclusion: F alone was sufficient to account for the five
-FULL-vs-D_G1 discordant rescues within the frozen Stage 4 outputs. This remains
-post-hoc diagnostic evidence, not a new primary method claim.
+Conservative Stage4R.1 conclusion: all five FULL-vs-D_G1 discordant rescues
+fall inside the F-activated sample set. Stage4R.1 alone is a frozen-output
+projection and does not prove that F alone causally produced those rescues.
+Stage4R.2 adds the actual deterministic D+F+G1 replay needed for that causal
+isolation check.
 
 ## F attribution details
 

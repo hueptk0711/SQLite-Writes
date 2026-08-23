@@ -3,7 +3,7 @@
     {
       "priority": "1",
       "rule": "hit_max_new_tokens",
-      "family": "output_length"
+      "family": "max_token_hit_associated"
     },
     {
       "priority": "2",

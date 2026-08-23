@@ -1,0 +1,53 @@
+{
+  "method_id": "MP-FS+",
+  "method_variant": "stage4r1-d-f-g1-diagnostic",
+  "method_version": "stage4r1-d-f-g1-diagnostic",
+  "stage": "dev",
+  "created_at_unix": 1787466148.1116705,
+  "elapsed_sec": 698.4971213340759,
+  "sample_count": 300,
+  "resume_enabled": false,
+  "generation_checkpoint": "completed_batch_rows_keyed_by_sample_id",
+  "run_lock_sha256": "183a60137b8e0759573d8b0a348e222efff3f291d4fc476692d881575c07cdd0",
+  "locked_config_sha256": null,
+  "final_protocol_sha256": null,
+  "locked_test_rerun_override": false,
+  "hashes": {
+    "method_config_sha256": "3036949521b25ea6d5767500a13ce91206e73cf94dc3576497d96562e0cc48af",
+    "inference_config_sha256": null,
+    "dataset_sha256": "70d8a38552f46f81fee9abe04f0ebf96a862405965aeaff9958455dad08ebfb4",
+    "split_sha256": "5c8bd5cf2e5b79088322289f795beb95c33a1fa0de214f129eb0cf6680319a25",
+    "gold_plans_sha256": "6dac027bedfcd785c25e30bfa660d768d7c5beabe4d5a413518e3af238ec6f5c",
+    "base_config_sha256": "eed7feb1abdebdb5680e00922601135ea6f6ac809deaa9d548945569e7a5f206",
+    "resolved_config_sha256": "cdc05b9d8cefb82193029224d066a6e748a0132b909753d0fb4473a9a14bc998",
+    "prompt_set_sha256": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf"
+  },
+  "inference": {
+    "backend": "reused_raw_generation",
+    "source_raw_generations": "D:\\paper kltn\\text to sql\\reviewer_packages\\_inspect_stage4_envfinal_results_20260823\\stage4_fresh_7b_results_envfinal\\raw_generations\\mp_fs_plus_shared.jsonl",
+    "source_raw_generations_sha256": "b293f52dfb95acea23aa4a8d80a03a0cd1adea592de46908e346bd8b74fe5330",
+    "semantic_retry": false,
+    "prompt_hash_match_required": true
+  },
+  "generation": {},
+  "environment": {
+    "python": "3.14.3 (tags/v3.14.3:323c59a, Feb  3 2026, 16:04:56) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0"
+  },
+  "artifacts": [
+    "config.json",
+    "run_lock.json",
+    "manifest.json",
+    "prompts.jsonl",
+    "raw_generations.jsonl",
+    "parsed_mapping_plans.jsonl",
+    "materialized_write_plans.jsonl",
+    "verification.jsonl",
+    "compiled_programs.jsonl",
+    "execution_logs.jsonl",
+    "evaluation.jsonl",
+    "metrics.json",
+    "summary_metadata.json",
+    "error_analysis.csv"
+  ]
+}

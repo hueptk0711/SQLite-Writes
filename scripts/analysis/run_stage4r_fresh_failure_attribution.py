@@ -89,7 +89,7 @@ def canonical_error_family(row: Mapping[str, Any]) -> str:
     error_type = str(row.get("error_type") or "").strip()
     stage = first_failure_stage(row)
     if truthy(row.get("hit_max_new_tokens")):
-        return "output_length"
+        return "max_token_hit_associated"
     if error_type in {"UNKNOWN_COLUMN_ID", "UNKNOWN_EVIDENCE_ID"}:
         return "schema_reference_grounding"
     if error_type == "UNRESOLVED_SOURCE_FIELD":
@@ -126,7 +126,7 @@ def error_family_precedence() -> list[dict[str, str]]:
         {
             "priority": "1",
             "rule": "hit_max_new_tokens",
-            "family": "output_length",
+            "family": "max_token_hit_associated",
         },
         {
             "priority": "2",
