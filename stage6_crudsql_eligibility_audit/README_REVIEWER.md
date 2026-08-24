@@ -1,4 +1,4 @@
-# Stage 6A PATCH1 CRUDSQL Eligibility Audit
+# Stage 6A PATCH2 CRUDSQL Eligibility Audit
 
 Status: PASS for eligibility audit; not registered as the final confirmation
 dataset in this package.
@@ -8,11 +8,10 @@ does not translate or paraphrase Chinese questions, and does not create new
 data. It audits whether the public CRUDSQL official test split is eligible for
 Stage 6B confirmation-dataset registration.
 
-PATCH1 hardens the PATCH0 audit. It uses stable upstream sample locators based
-on the original official test-file index, loads a fail-closed prior-evidence
-registry, fingerprints real table/schema/state content, derives 125 isolated
-single-table SQLite databases, and validates each candidate INSERT from a fresh
-per-sample database state.
+PATCH2 hardens the PATCH1 overlap registry. It includes prior `input_text`
+fields in text-hash extraction, enforces the registry self-hash, clarifies DB
+fingerprint coverage, and deduplicates the McNemar threshold sensitivity rows.
+It keeps the 500 CRUDSQL samples, 125 isolated DBs, and gold adapter unchanged.
 
 ## Source Pin
 
@@ -45,18 +44,19 @@ test:  2000 total;  500 Create /  500 Delete /  500 Update /  500 Read
 ```
 
 Stage 6A only considers official test `type=0` examples. All 500 test `type=0`
-examples compile into deterministic SQLite INSERT operations. PATCH1 executes
+examples compile into deterministic SQLite INSERT operations. PATCH2 executes
 each sample from a fresh isolated single-table SQLite database, verifies the
 exact inserted row with SQLite type affinity and NULL unspecified columns, and
 hashes the resulting post-state.
 
-PATCH1 generated:
+PATCH2 generated:
 
 ```text
 125 isolated table databases
 500 stable upstream sample locators
 500 gold adapter audit rows
 500 post-state hashes
+965 prior input-text hashes
 ```
 
 Recommendation after reviewer acceptance:
@@ -104,7 +104,7 @@ python scripts/data/audit_crudsql_stage6a.py \
   --out-dir stage6_crudsql_eligibility_audit
 PYTHONPATH=tests/support/windows_py314_pytest_tempdir \
 python -m pytest -q tests/test_stage6_crudsql_eligibility.py \
-  --basetemp pytest_tmp_stage6a_fresh
+  --basetemp pytest_tmp_stage6a_patch2_tests
 ```
 
 The rerun above uses the packaged `artifacts/stage6_seen_reference_registry.json`.
@@ -123,5 +123,5 @@ On Windows PowerShell, use:
 
 ```powershell
 $env:PYTHONPATH = "tests\support\windows_py314_pytest_tempdir"
-python -m pytest -q tests\test_stage6_crudsql_eligibility.py --basetemp pytest_tmp_stage6a_fresh
+python -m pytest -q tests\test_stage6_crudsql_eligibility.py --basetemp pytest_tmp_stage6a_patch2_tests
 ```

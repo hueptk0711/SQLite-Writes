@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CPU-only Stage 6A PATCH1 eligibility audit for CRUDSQL.
+"""CPU-only Stage 6A PATCH2 eligibility audit for CRUDSQL.
 
 This script does not call a model and does not register a confirmation set. It
 audits whether the public CRUDSQL official test split can be deterministically
@@ -440,7 +440,13 @@ def new_reference_sets() -> dict[str, set[str]]:
 
 def add_reference_row_digests(reference: dict[str, set[str]], row: dict[str, Any]) -> None:
     sample_id = str(row.get("id") or row.get("sample_id") or row.get("instance_id") or "")
-    question = str(row.get("question") or row.get("input") or row.get("instruction") or "")
+    question = str(
+        row.get("question")
+        or row.get("input_text")
+        or row.get("input")
+        or row.get("instruction")
+        or ""
+    )
     source_group = str(row.get("source_group") or row.get("source") or sample_id)
     database_id = str(row.get("db_id") or row.get("database_id") or row.get("database") or "")
     if sample_id:
@@ -454,9 +460,22 @@ def add_reference_row_digests(reference: dict[str, set[str]], row: dict[str, Any
     reference["canonical_content_sha256"].add(sha256_text(canonical_json(row)))
 
 
+def registry_self_hash(registry: dict[str, Any]) -> str:
+    return sha256_text(
+        canonical_json(
+            {
+                key: value
+                for key, value in registry.items()
+                if key != "registry_sha256_excluding_self"
+            }
+        )
+    )
+
+
 def build_seen_reference_registry(project_root: Path, archived_677_dataset: Path) -> dict[str, Any]:
     forbidden = new_reference_sets()
     sources: list[dict[str, Any]] = []
+    source_digest_counts: dict[str, dict[str, int]] = {}
 
     stage4_manifest_path = project_root / "stage4_fresh_7b_protocol" / "data" / "fresh_dataset_manifest.json"
     if not stage4_manifest_path.is_file():
@@ -464,6 +483,12 @@ def build_seen_reference_registry(project_root: Path, archived_677_dataset: Path
     manifest = read_json(stage4_manifest_path)
     forbidden["sample_ids"].update(str(item) for item in manifest.get("selected_sample_ids") or [])
     forbidden["database_ids"].update(str(item) for item in (manifest.get("database_counts") or {}).keys())
+    source_digest_counts["stage4_fresh_300"] = {
+        "sample_ids": len(manifest.get("selected_sample_ids") or []),
+        "input_text_sha256": 0,
+        "canonical_content_sha256": 0,
+        "database_profile_fingerprints": 0,
+    }
     sources.append(
         {
             "name": "stage4_fresh_300",
@@ -484,6 +509,7 @@ def build_seen_reference_registry(project_root: Path, archived_677_dataset: Path
     if not final_dataset or not final_manifest:
         raise FileNotFoundError(final_zip)
     rows = final_dataset if isinstance(final_dataset, list) else final_dataset.get("samples", [])
+    before_final = {key: len(value) for key, value in forbidden.items()}
     for row in rows:
         add_reference_row_digests(forbidden, row)
     forbidden["database_ids"].update(str(item) for item in final_manifest.get("database_ids") or [])
@@ -491,6 +517,9 @@ def build_seen_reference_registry(project_root: Path, archived_677_dataset: Path
         for name in archive.namelist():
             if name.endswith(".sqlite") or "/profiles/" in name:
                 forbidden["database_profile_fingerprints"].add(sha256_bytes(archive.read(name)))
+    source_digest_counts["final_holdout_release_300"] = {
+        key: len(forbidden[key]) - before_final[key] for key in before_final
+    }
     sources.append(
         {
             "name": "final_holdout_release_300",
@@ -505,8 +534,12 @@ def build_seen_reference_registry(project_root: Path, archived_677_dataset: Path
     archived_rows = read_json(archived_677_dataset)
     if not isinstance(archived_rows, list):
         archived_rows = archived_rows.get("samples", [])
+    before_archived = {key: len(value) for key, value in forbidden.items()}
     for row in archived_rows:
         add_reference_row_digests(forbidden, row)
+    source_digest_counts["archived_677_pool"] = {
+        key: len(forbidden[key]) - before_archived[key] for key in before_archived
+    }
     sources.append(
         {
             "name": "archived_677_pool",
@@ -517,7 +550,7 @@ def build_seen_reference_registry(project_root: Path, archived_677_dataset: Path
     )
 
     registry = {
-        "stage": "Stage6A_PATCH1_SEEN_REFERENCE_REGISTRY",
+        "stage": "Stage6A_PATCH2_SEEN_REFERENCE_REGISTRY",
         "status": "PASS_REFERENCE_REGISTRY_FROZEN",
         "expected_source_names": EXPECTED_REFERENCE_SOURCES,
         "loaded_source_names": [source["name"] for source in sources],
@@ -526,17 +559,26 @@ def build_seen_reference_registry(project_root: Path, archived_677_dataset: Path
         "sources": sources,
         "forbidden_sets": {key: sorted(value) for key, value in forbidden.items()},
         "digest_counts": {key: len(value) for key, value in forbidden.items()},
+        "source_digest_counts": source_digest_counts,
+        "database_fingerprint_coverage": {
+            "database_identity_overlap_checked_for_sources": EXPECTED_REFERENCE_SOURCES,
+            "database_byte_or_profile_fingerprint_checked_for_sources": [
+                "final_holdout_release_300"
+            ],
+            "database_byte_or_profile_fingerprint_unavailable_for_sources": [
+                "stage4_fresh_300",
+                "archived_677_pool",
+            ],
+        },
     }
-    registry["registry_sha256_excluding_self"] = sha256_text(
-        canonical_json({key: value for key, value in registry.items() if key != "registry_sha256_excluding_self"})
-    )
+    registry["registry_sha256_excluding_self"] = registry_self_hash(registry)
     return registry
 
 
 def load_seen_reference_registry(registry_path: Path) -> tuple[dict[str, Any], list[str]]:
     if not registry_path.is_file():
         return {
-            "stage": "Stage6A_PATCH1_SEEN_REFERENCE_REGISTRY",
+            "stage": "Stage6A_PATCH2_SEEN_REFERENCE_REGISTRY",
             "status": "FAIL_REFERENCE_REGISTRY_MISSING",
             "expected_source_names": EXPECTED_REFERENCE_SOURCES,
             "loaded_source_names": [],
@@ -545,6 +587,7 @@ def load_seen_reference_registry(registry_path: Path) -> tuple[dict[str, Any], l
             "sources": [],
             "forbidden_sets": {key: [] for key in new_reference_sets()},
             "digest_counts": {key: 0 for key in new_reference_sets()},
+            "source_digest_counts": {},
         }, ["reference_registry_missing"]
     registry = read_json(registry_path)
     violations: list[str] = []
@@ -559,6 +602,18 @@ def load_seen_reference_registry(registry_path: Path) -> tuple[dict[str, Any], l
         violations.append("reference_registry_loaded_count_mismatch")
     if registry.get("status") != "PASS_REFERENCE_REGISTRY_FROZEN":
         violations.append("reference_registry_status_not_pass")
+    declared_hash = registry.get("registry_sha256_excluding_self")
+    recomputed_hash = registry_self_hash(registry)
+    if declared_hash != recomputed_hash:
+        violations.append("reference_registry_self_hash_mismatch")
+    digest_counts = registry.get("digest_counts") or {}
+    if int(digest_counts.get("input_text_sha256") or 0) <= 0:
+        violations.append("reference_registry_input_text_sha256_empty")
+    source_digest_counts = registry.get("source_digest_counts") or {}
+    for source_name in ["final_holdout_release_300", "archived_677_pool"]:
+        source_counts = source_digest_counts.get(source_name) or {}
+        if int(source_counts.get("input_text_sha256") or 0) <= 0:
+            violations.append(f"reference_registry_input_text_sha256_empty_for:{source_name}")
     return registry, violations
 
 
@@ -610,12 +665,17 @@ def overlap_audit(
         "expected_forbidden_reference_set_count": len(EXPECTED_REFERENCE_SOURCES),
         "loaded_forbidden_reference_set_count": registry.get("loaded_forbidden_reference_set_count", 0),
         "reference_sources": registry.get("sources") or [],
+        "reference_digest_counts": registry.get("digest_counts") or {},
+        "reference_source_digest_counts": registry.get("source_digest_counts") or {},
+        "database_fingerprint_coverage": registry.get("database_fingerprint_coverage") or {},
         "crudsql_sample_count": len(eligible_rows),
         "crudsql_table_count": len(table_manifest),
         **counts,
         "disclosure": (
-            "Stage6A PATCH1 compares stable sample locators, text/content hashes, "
-            "source groups, database IDs, and real table/schema/state fingerprints. "
+            "Stage6A PATCH2 compares stable sample locators, text/content hashes, "
+            "source groups, and database identities across all forbidden prior sources. "
+            "Database byte/profile fingerprint comparison is limited to prior sources "
+            "with packaged DB/profile assets, as recorded in database_fingerprint_coverage. "
             "The final decision ignores no missing expected forbidden source."
         ),
     }
@@ -629,7 +689,7 @@ def mcnemar_two_sided_p_no_regressions(favorable: int) -> float:
 
 def mcnemar_threshold_sensitivity(candidate_n: int) -> dict[str, Any]:
     rows = []
-    for n in [300, 400, 500, candidate_n]:
+    for n in sorted({300, 400, 500, candidate_n}):
         if n <= 0:
             continue
         favorable = 1
@@ -766,7 +826,7 @@ def run_audit(
         "violations": registry_violations,
     }
     source_registry = {
-        "stage": "Stage6A_CRUDSQL_ELIGIBILITY_AUDIT_PATCH1",
+        "stage": "Stage6A_CRUDSQL_ELIGIBILITY_AUDIT_PATCH2",
         "status": decision_status,
         "registration_status": "not_registered_in_stage6a",
         "model_called": False,
@@ -791,7 +851,7 @@ def run_audit(
         "seen_reference_registry": registry_summary,
     }
     audit = {
-        "stage": "Stage6A_CRUDSQL_ELIGIBILITY_AUDIT_PATCH1",
+        "stage": "Stage6A_CRUDSQL_ELIGIBILITY_AUDIT_PATCH2",
         "status": decision_status,
         "model_called": False,
         "gpu_called": False,

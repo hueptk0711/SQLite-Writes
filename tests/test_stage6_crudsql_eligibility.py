@@ -5,7 +5,13 @@ import sqlite3
 import subprocess
 from pathlib import Path
 
-from scripts.data.audit_crudsql_stage6a import EXPECTED_REFERENCE_SOURCES, run_audit
+from scripts.data.audit_crudsql_stage6a import (
+    EXPECTED_REFERENCE_SOURCES,
+    add_reference_row_digests,
+    new_reference_sets,
+    registry_self_hash,
+    run_audit,
+)
 
 
 def write_json(path: Path, value: object) -> None:
@@ -19,37 +25,51 @@ def write_reference_registry(path: Path, *, missing_archived_677: bool = False) 
         for source in EXPECTED_REFERENCE_SOURCES
         if not (missing_archived_677 and source == "archived_677_pool")
     ]
-    write_json(
-        path,
-        {
-            "stage": "Stage6A_PATCH1_SEEN_REFERENCE_REGISTRY",
-            "status": "PASS_REFERENCE_REGISTRY_FROZEN",
-            "expected_source_names": EXPECTED_REFERENCE_SOURCES,
-            "loaded_source_names": loaded,
-            "expected_forbidden_reference_set_count": len(EXPECTED_REFERENCE_SOURCES),
-            "loaded_forbidden_reference_set_count": len(loaded),
-            "sources": [
-                {"name": source, "sample_count": 0, "source_artifact_sha256": "0"}
-                for source in loaded
+    forbidden = {
+        "sample_ids": ["prior_sample"],
+        "source_groups": ["prior_source"],
+        "database_ids": ["prior_database"],
+        "input_text_sha256": ["not_a_crudsql_question_hash"],
+        "canonical_content_sha256": ["not_a_crudsql_content_hash"],
+        "database_profile_fingerprints": ["not_a_crudsql_database_hash"],
+    }
+    source_digest_counts = {
+        source: {
+            "sample_ids": 1,
+            "source_groups": 1,
+            "database_ids": 1,
+            "input_text_sha256": 1,
+            "canonical_content_sha256": 1,
+            "database_profile_fingerprints": 1 if source == "final_holdout_release_300" else 0,
+        }
+        for source in loaded
+    }
+    registry = {
+        "stage": "Stage6A_PATCH2_SEEN_REFERENCE_REGISTRY",
+        "status": "PASS_REFERENCE_REGISTRY_FROZEN",
+        "expected_source_names": EXPECTED_REFERENCE_SOURCES,
+        "loaded_source_names": loaded,
+        "expected_forbidden_reference_set_count": len(EXPECTED_REFERENCE_SOURCES),
+        "loaded_forbidden_reference_set_count": len(loaded),
+        "sources": [
+            {"name": source, "sample_count": 0, "source_artifact_sha256": "0"} for source in loaded
+        ],
+        "forbidden_sets": forbidden,
+        "digest_counts": {key: len(value) for key, value in forbidden.items()},
+        "source_digest_counts": source_digest_counts,
+        "database_fingerprint_coverage": {
+            "database_identity_overlap_checked_for_sources": EXPECTED_REFERENCE_SOURCES,
+            "database_byte_or_profile_fingerprint_checked_for_sources": [
+                "final_holdout_release_300"
             ],
-            "forbidden_sets": {
-                "sample_ids": [],
-                "source_groups": [],
-                "database_ids": [],
-                "input_text_sha256": [],
-                "canonical_content_sha256": [],
-                "database_profile_fingerprints": [],
-            },
-            "digest_counts": {
-                "sample_ids": 0,
-                "source_groups": 0,
-                "database_ids": 0,
-                "input_text_sha256": 0,
-                "canonical_content_sha256": 0,
-                "database_profile_fingerprints": 0,
-            },
+            "database_byte_or_profile_fingerprint_unavailable_for_sources": [
+                "stage4_fresh_300",
+                "archived_677_pool",
+            ],
         },
-    )
+    }
+    registry["registry_sha256_excluding_self"] = registry_self_hash(registry)
+    write_json(path, registry)
 
 
 def make_type0(table_id: str, question: str, conds: list[list[object]]) -> dict[str, object]:
@@ -171,6 +191,41 @@ def test_crudsql_stage6a_fails_when_archived_677_reference_missing(tmp_path: Pat
     assert any(
         "archived_677_pool" in item for item in report["overlap_audit"]["reference_registry_violations"]
     )
+
+
+def test_crudsql_stage6a_fails_when_registry_self_hash_is_mutated(tmp_path: Path) -> None:
+    crud = make_fixture(tmp_path)
+    registry = tmp_path / "registry.json"
+    write_reference_registry(registry)
+    registry_json = json.loads(registry.read_text(encoding="utf-8"))
+    registry_json["forbidden_sets"]["input_text_sha256"].append("mutated_without_hash_update")
+    write_json(registry, registry_json)
+
+    report = run_audit(
+        crud,
+        tmp_path / "out",
+        project_root=tmp_path / "missing_project",
+        reference_registry_path=registry,
+    )
+
+    assert report["status"] == "FAIL_NOT_ELIGIBLE_FOR_REGISTRATION"
+    assert "reference_registry_self_hash_mismatch" in report["overlap_audit"][
+        "reference_registry_violations"
+    ]
+
+
+def test_reference_row_digests_include_input_text_field() -> None:
+    reference = new_reference_sets()
+    add_reference_row_digests(
+        reference,
+        {
+            "sample_id": "prior_1",
+            "input_text": "Add one new equipment record.",
+            "database_id": "prior_db",
+        },
+    )
+
+    assert len(reference["input_text_sha256"]) == 1
 
 
 def test_crudsql_stage6a_uses_fresh_isolated_db_for_each_sample(tmp_path: Path) -> None:

@@ -41,12 +41,6 @@
         "minimum_favorable_discordant_pairs_with_zero_regressions_for_p_lt_0_025": 7,
         "minimum_favorable_rate": 0.014,
         "n": 500
-      },
-      {
-        "exact_two_sided_mcnemar_p": 0.015625,
-        "minimum_favorable_discordant_pairs_with_zero_regressions_for_p_lt_0_025": 7,
-        "minimum_favorable_rate": 0.014,
-        "n": 500
       }
     ],
     "status": "PASS"
@@ -56,14 +50,60 @@
     "canonical_content_hash_overlap_count": 0,
     "crudsql_sample_count": 500,
     "crudsql_table_count": 125,
+    "database_fingerprint_coverage": {
+      "database_byte_or_profile_fingerprint_checked_for_sources": [
+        "final_holdout_release_300"
+      ],
+      "database_byte_or_profile_fingerprint_unavailable_for_sources": [
+        "stage4_fresh_300",
+        "archived_677_pool"
+      ],
+      "database_identity_overlap_checked_for_sources": [
+        "stage4_fresh_300",
+        "final_holdout_release_300",
+        "archived_677_pool"
+      ]
+    },
     "database_fingerprint_overlap_count": 0,
     "database_id_namespace_overlap_count": 0,
-    "disclosure": "Stage6A PATCH1 compares stable sample locators, text/content hashes, source groups, database IDs, and real table/schema/state fingerprints. The final decision ignores no missing expected forbidden source.",
+    "disclosure": "Stage6A PATCH2 compares stable sample locators, text/content hashes, source groups, and database identities across all forbidden prior sources. Database byte/profile fingerprint comparison is limited to prior sources with packaged DB/profile assets, as recorded in database_fingerprint_coverage. The final decision ignores no missing expected forbidden source.",
     "expected_forbidden_reference_set_count": 3,
     "input_text_hash_overlap_count": 0,
     "loaded_forbidden_reference_set_count": 3,
+    "reference_digest_counts": {
+      "canonical_content_sha256": 977,
+      "database_ids": 16,
+      "database_profile_fingerprints": 10,
+      "input_text_sha256": 965,
+      "sample_ids": 977,
+      "source_groups": 977
+    },
     "reference_registry_status": "PASS_REFERENCE_REGISTRY_FROZEN",
     "reference_registry_violations": [],
+    "reference_source_digest_counts": {
+      "archived_677_pool": {
+        "canonical_content_sha256": 677,
+        "database_ids": 0,
+        "database_profile_fingerprints": 0,
+        "input_text_sha256": 665,
+        "sample_ids": 377,
+        "source_groups": 677
+      },
+      "final_holdout_release_300": {
+        "canonical_content_sha256": 300,
+        "database_ids": 5,
+        "database_profile_fingerprints": 10,
+        "input_text_sha256": 300,
+        "sample_ids": 300,
+        "source_groups": 300
+      },
+      "stage4_fresh_300": {
+        "canonical_content_sha256": 0,
+        "database_profile_fingerprints": 0,
+        "input_text_sha256": 0,
+        "sample_ids": 300
+      }
+    },
     "reference_sources": [
       {
         "name": "stage4_fresh_300",
@@ -163,7 +203,7 @@
       "total_rows": 7467
     }
   },
-  "stage": "Stage6A_CRUDSQL_ELIGIBILITY_AUDIT_PATCH1",
+  "stage": "Stage6A_CRUDSQL_ELIGIBILITY_AUDIT_PATCH2",
   "status": "PASS_ELIGIBLE_FOR_STAGE6B_REGISTRATION",
   "type0_adapter": {
     "adapter_fail_count": 0,

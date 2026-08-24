@@ -1,4 +1,4 @@
-# Stage 6A PATCH1 CRUDSQL Eligibility Validation Report
+# Stage 6A PATCH2 CRUDSQL Eligibility Validation Report
 
 Status: PASS
 
@@ -6,7 +6,7 @@ Validation date: 2026-08-24
 
 ## Scope
 
-Stage 6A PATCH1 is an eligibility audit hardening patch only. It does not
+Stage 6A PATCH2 is an eligibility audit hardening patch only. It does not
 register the confirmation dataset, does not call a model, does not run GPU
 inference, and does not edit Stage 5 method/protocol files.
 
@@ -37,14 +37,14 @@ Result: PASS.
 
 ```text
 $env:PYTHONPATH = "tests\support\windows_py314_pytest_tempdir"
-python -m pytest -q tests\test_stage6_crudsql_eligibility.py --basetemp pytest_tmp_stage6a_patch1_tests
+python -m pytest -q tests\test_stage6_crudsql_eligibility.py --basetemp pytest_tmp_stage6a_patch2_tests
 ```
 
-Result: PASS, 6 tests passed.
+Result: PASS, 8 tests passed.
 
 ```text
 $env:PYTHONPATH = "tests\support\windows_py314_pytest_tempdir"
-python -m pytest -q -m "not integration" --basetemp pytest_tmp_stage6a_patch1_full
+python -m pytest -q -m "not integration" --basetemp pytest_tmp_stage6a_patch2_full
 ```
 
 Result: PASS.
@@ -68,11 +68,17 @@ directory permissions observed in this local environment. The fresh
   integrity_check`.
 - Fail-closed prior-evidence registry loaded 3/3 expected sources:
   Stage4 fresh 300, final holdout 300, and archived 677 pool.
+- Prior input-text hashes are now populated: 965 total, including 300 from
+  final holdout and 665 from the archived 677 pool.
+- Registry self-hash is recomputed and enforced by the loader.
 - Overlap audit reports zero overlap by stable sample ID, upstream locator,
-  source group, database fingerprint, input-text SHA-256, and
-  canonical-content SHA-256.
+  source group, input-text SHA-256, and canonical-content SHA-256.
+- Database identity overlap is checked for all prior sources. Database
+  byte/profile fingerprint overlap is checked for final-holdout packaged assets;
+  DB/profile fingerprints are not available in the packaged Stage4 manifest or
+  archived 677 JSON.
 - McNemar threshold sensitivity recommends using all 500 eligible official test
-  `type=0` examples after reviewer acceptance.
+  `type=0` examples after reviewer acceptance, with unique N rows only.
 
 ## Decision
 
@@ -84,6 +90,8 @@ recommended_sampling_policy = use_all_eligible_official_test_type0_examples_no_r
 isolated_table_db_count = 125
 adapter_pass_count = 500
 reference_registry_loaded = 3/3
+prior_input_text_sha256 = 965
+registry_self_hash_verified = true
 model_called = false
 gpu_called = false
 ```

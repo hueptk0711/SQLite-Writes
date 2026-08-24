@@ -26,12 +26,6 @@
       "minimum_favorable_discordant_pairs_with_zero_regressions_for_p_lt_0_025": 7,
       "minimum_favorable_rate": 0.014,
       "n": 500
-    },
-    {
-      "exact_two_sided_mcnemar_p": 0.015625,
-      "minimum_favorable_discordant_pairs_with_zero_regressions_for_p_lt_0_025": 7,
-      "minimum_favorable_rate": 0.014,
-      "n": 500
     }
   ],
   "status": "PASS"
