@@ -1,0 +1,66 @@
+{
+  "C01_source_mtime": 1787575763.7833896,
+  "C01_submission_sha256": "56b24e07e721d2209e4db3928860f9690e07237f2da91a158cc414ca45a752c8",
+  "C02_source_mtime": 1787575769.0116067,
+  "C02_submission_sha256": "4f01075dd3bcf1affc039c65841b04ccf7a50388f0b8d289b5df43af51cee6ed",
+  "C03_packet_created": false,
+  "C03_required": false,
+  "agreed_approved_count": 21,
+  "agreed_rejected_count": 0,
+  "agreement_report_sha256": "770f9b9bdd73d6921e3070c4d3c5125bba5c04e402576931662abd8dc75c29ce",
+  "archive": {
+    "member_count": 7,
+    "members": [
+      {
+        "path": "C01_C02_CORRECTED_AGREEMENT_REPORT.json",
+        "sha256": "770f9b9bdd73d6921e3070c4d3c5125bba5c04e402576931662abd8dc75c29ce"
+      },
+      {
+        "path": "CORRECTED_ITEMS_RESOLUTION_REPORT.json",
+        "sha256": "45f1eefd9f46fc1057129448cd46c39b641a348405366ffd5105df3efe35261d"
+      },
+      {
+        "path": "CORRECTED_REVIEW_EXECUTION_MANIFEST.json",
+        "sha256": "6d661cbea8c09de134aa59b73a4333379e592a5b843ea196667c9be32684309c"
+      },
+      {
+        "path": "REVIEWER_README.md",
+        "sha256": "30be85d7b0cc44768a05346df8ba5af4a332ef917394c8e85365dcc282848cfd"
+      },
+      {
+        "path": "VALIDATION_REPORT.md",
+        "sha256": "0788bab8c5559469e7cf3ca6f9128552778da52f567d5e1cd285964465f0bffd"
+      },
+      {
+        "path": "submissions/stage6d_corrected_gold_review_C01.submitted.tsv",
+        "sha256": "56b24e07e721d2209e4db3928860f9690e07237f2da91a158cc414ca45a752c8"
+      },
+      {
+        "path": "submissions/stage6d_corrected_gold_review_C02.submitted.tsv",
+        "sha256": "4f01075dd3bcf1affc039c65841b04ccf7a50388f0b8d289b5df43af51cee6ed"
+      }
+    ],
+    "path": "stage6d_corrected_review_execution_artifacts_20260824.zip",
+    "sha256": "858d13250afc7b9c404167f2fa7ad5c955bf82a2a7c9b9cdd6ee5de905b6f278"
+  },
+  "confirmation_run_allowed_now": false,
+  "corrected_gold_review_items_sha256": "28bbbaad52cea9d9511a11ca7ac92115b72533801189ffacc5cad6e4369c787c",
+  "corrected_item_count": 21,
+  "disagreement_count": 0,
+  "final_gold_freeze_created": false,
+  "gpu_called": false,
+  "model_called": false,
+  "next_steps": [
+    "review_corrected_review_execution_package",
+    "do_not_create_final_gold_freeze_yet",
+    "resolve_19_source_task_invalid_items_via_stage6_registration_revision",
+    "then_create_final_gold_freeze_after_reviewer_acceptance"
+  ],
+  "protocol_lock_sha256": "d61fb438eb32cbed4ff8fdcf6ca3c3ea79dc2e5ab4df64213ce64326a7a871c2",
+  "resolution_report_sha256": "45f1eefd9f46fc1057129448cd46c39b641a348405366ffd5105df3efe35261d",
+  "setup_lock_sha256": "b259437488603696fc101d214279399f720ab7c7ee523fbe877f279a4c8d30d1",
+  "stage": "Stage6D_CORRECTED_REVIEW_EXECUTION",
+  "stage6d_setup_patch1_commit": "4c789bdebc08a8c35bce19290282b536da7676e3",
+  "status": "ALL_21_CORRECTED_ITEMS_ACCEPTED_PENDING_STAGE6_REGISTRATION_REVISION",
+  "validation_violations": []
+}

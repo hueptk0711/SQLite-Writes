@@ -1,0 +1,15 @@
+{
+  "C03_packet_created": false,
+  "C03_required": false,
+  "confirmation_run_allowed_now": false,
+  "corrected_item_count": 21,
+  "corrected_items_disagreement_count": 0,
+  "corrected_items_final_approved_count": 21,
+  "corrected_items_final_rejected_count": 0,
+  "final_gold_freeze_created": false,
+  "gpu_called": false,
+  "model_called": false,
+  "next_required_step": "Stage6_registration_revision_for_19_source_invalid_items_and_final_denominator_lock",
+  "stage": "Stage6D_CORRECTED_ITEMS_RESOLUTION",
+  "status": "ALL_21_CORRECTED_ITEMS_ACCEPTED_PENDING_STAGE6_REGISTRATION_REVISION"
+}
