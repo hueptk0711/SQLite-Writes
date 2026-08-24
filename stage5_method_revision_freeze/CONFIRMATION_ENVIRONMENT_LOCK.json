@@ -1,0 +1,33 @@
+{
+  "accepted_method_freeze_commit": "79f6a82144ec0407444ef37121f70eed2b20e01c",
+  "environment_lock_version": "stage5_patch2_reuse_stage4_validated_gpu_environment_v1",
+  "model_called_in_stage5_patch2": false,
+  "gpu_called_in_stage5_patch2": false,
+  "reuse_policy": "reuse_exact_Stage4_validated_dependency_and_inference_locks_before_any_confirmation_gpu_generation",
+  "required_preflight": {
+    "python_major_minor": "3.12",
+    "torch": "2.6.0+cu124",
+    "transformers": "5.5.3",
+    "accelerate": "1.14.0",
+    "bitsandbytes": "0.47.0",
+    "tokenizers": "0.22.2",
+    "safetensors": "0.5.3",
+    "cuda_wheel_index": "https://download.pytorch.org/whl/cu124",
+    "sqlite_runtime_must_be_captured": true,
+    "nvidia_driver_must_be_captured": true,
+    "gpu_environment_capture_required_before_generation": true
+  },
+  "anchored_files_sha256": {
+    "requirements-inference.lock.txt": "861a24b179b5edd1245aba33109402dd4ab82a634098bd8d81fcb666f5bdf9f1",
+    "stage4_fresh_7b_protocol/provenance/environment_lock.txt": "474c55042187944d02a5bd4511858786195e0af962750097d405ce316e5c4f20",
+    "stage4_fresh_7b_protocol/inference/stage4_qwen25_7b_in28672_out4096.json": "c7f43df89536ac412b73092c78d2cc251084f090dc0790cbe839a4248f6b5e16"
+  },
+  "confirmation_preflight_policy": {
+    "run_from_clean_git_worktree": true,
+    "method_freeze_tag_must_point_to_accepted_method_freeze_commit": true,
+    "accepted_method_freeze_commit": "79f6a82144ec0407444ef37121f70eed2b20e01c",
+    "confirmation_protocol_patch_commit_must_be_recorded_in_run_manifest": true,
+    "captured_environment_manifest_must_be_attached_to_confirmation_results": true,
+    "captured_environment_manifest_must_match_required_preflight": true
+  }
+}

@@ -4,7 +4,10 @@
   "status": "blocked_until_new_untouched_dataset_registered_and_reviewer_accepted",
   "paper_primary_result": false,
   "accepted_executable_tag": "stage5-vnext-r1-freeze-patch1",
-  "accepted_executable_commit_policy": "The accepted executable commit is the Git commit pointed to by accepted_executable_tag after PATCH1 acceptance; package GIT_INFO records the concrete commit SHA.",
+  "accepted_method_freeze_commit": "79f6a82144ec0407444ef37121f70eed2b20e01c",
+  "accepted_executable_commit_policy": "The accepted D+F+G1 executable-method freeze is commit 79f6a82144ec0407444ef37121f70eed2b20e01c, pointed to by accepted_executable_tag after PATCH1 acceptance. PATCH2 protocol commits must record their own concrete SHA in package GIT_INFO and future run manifests.",
+  "confirmation_arm_config_lock": "stage5_method_revision_freeze/CONFIRMATION_ARM_CONFIGS.json",
+  "confirmation_environment_lock": "stage5_method_revision_freeze/CONFIRMATION_ENVIRONMENT_LOCK.json",
   "method_under_test": {
     "method_name": "MP-FS+ vNext-R1",
     "method_id": "MP-FS+",
@@ -30,8 +33,7 @@
       "direct",
       "j_fs",
       "original_mp_fs_plus",
-      "d_g1_shared_mp_fs_plus",
-      "d_f_g1_shared_mp_fs_plus"
+      "shared_mp_fs_plus_generation"
     ],
     "included_deterministic_replay_arms": [
       "original_mp_fs_plus",
@@ -54,35 +56,45 @@
     "full_included": false,
     "generation_strategy": {
       "direct": {
+        "generation_config_path": "configs/stage5/resolved_direct_confirmation.json",
+        "generation_config_sha256": "0795d31926345c62d5ba832d8374c9ac067967a3842c45854a2fff9b32c9f826",
         "raw_generation_file": "raw_generations/direct.jsonl",
         "prompt_surface": "direct"
       },
       "j_fs": {
+        "generation_config_path": "configs/stage5/resolved_j_fs_confirmation.json",
+        "generation_config_sha256": "a4006a423eb62fd37e5b370aca48a3b9337971f49d94700703d634a3d25c0cfe",
         "raw_generation_file": "raw_generations/j_fs.jsonl",
         "prompt_surface": "j_fs"
       },
       "original_mp_fs_plus": {
+        "generation_config_path": "configs/stage5/resolved_original_mp_fs_plus.json",
+        "generation_config_sha256": "ddda333ccb9b307ed3002213dad6572daa959c2dd5deb2e7d4623cb3aeead84d",
+        "replay_config_path": "configs/stage5/resolved_original_mp_fs_plus.json",
+        "replay_config_sha256": "ddda333ccb9b307ed3002213dad6572daa959c2dd5deb2e7d4623cb3aeead84d",
         "raw_generation_file": "raw_generations/original_mp_fs_plus.jsonl",
         "prompt_surface": "original_mp_fs_plus"
       },
-      "d_g1_shared_mp_fs_plus": {
-        "raw_generation_file": "raw_generations/d_g1_shared_mp_fs_plus.jsonl",
+      "shared_mp_fs_plus_generation": {
+        "generation_config_path": "configs/stage5/resolved_d_g1_control.json",
+        "generation_config_sha256": "c7c9c4d54e59662ee8e251af3aea1747fa035cb306213f20c819098e96f1b6ca",
+        "raw_generation_file": "raw_generations/shared_mp_fs_plus_generation.jsonl",
         "prompt_surface": "D+G1",
-        "process_as": [
-          "D_G1",
-          "D_F_G1"
-        ]
-      },
-      "d_f_g1_shared_mp_fs_plus": {
-        "raw_generation_file": "raw_generations/d_g1_shared_mp_fs_plus.jsonl",
-        "shares_raw_generation_with": "d_g1_shared_mp_fs_plus",
-        "prompt_surface": "D+G1",
-        "process_as": [
-          "D_F_G1"
+        "deterministic_replays": [
+          {
+            "method_slug": "D_G1",
+            "replay_config_path": "configs/stage5/resolved_d_g1_control.json",
+            "replay_config_sha256": "c7c9c4d54e59662ee8e251af3aea1747fa035cb306213f20c819098e96f1b6ca"
+          },
+          {
+            "method_slug": "D_F_G1",
+            "replay_config_path": "configs/stage5/resolved_mp_fs_plus_vnext_r1.json",
+            "replay_config_sha256": "b3a946fc977c3ea95d3226dca1361b1885c098fddf4afdc650f4d36f0e1ce9bf"
+          }
         ]
       }
     },
-    "F_incremental_isolation": "D_G1 and D_F_G1 must be deterministic replays from the exact same D+G1 raw generation rows; F must not affect prompt construction.",
+    "F_incremental_isolation": "D_G1 and D_F_G1 must be deterministic replays from the exact same shared_mp_fs_plus_generation raw rows; F must not affect prompt construction.",
     "original_vs_vnext_generation_policy": "Original MP-FS+ may use its own raw generation if prompt/HF input IDs differ from D+G1; this must be decided by preflight before generation and not after seeing results."
   },
   "hypotheses": {
@@ -97,7 +109,7 @@
       "role": "key_confirmatory_component_comparison",
       "metric": "target_state_correct",
       "direction": "D_F_G1_greater_than_D_G1",
-      "raw_generation_requirement": "paired_deterministic_replay_from_identical_D_G1_raw_generation"
+      "raw_generation_requirement": "paired_deterministic_replay_from_identical_shared_mp_fs_plus_generation_raw_rows"
     },
     "declared_family": [
       "H1_method_level_confirmation",
@@ -201,7 +213,10 @@
       "tokenizer_final_input_ids_sha256_by_sample",
       "input_truncated_false_for_all_samples",
       "working_tree_clean",
-      "execution_commit_equals_accepted_freeze_commit"
+      "method_freeze_tag_points_to_79f6a82144ec0407444ef37121f70eed2b20e01c",
+      "confirmation_protocol_patch_commit_recorded_in_run_manifest",
+      "confirmation_arm_config_hashes_match_CONFIRMATION_ARM_CONFIGS",
+      "environment_lock_hashes_match_CONFIRMATION_ENVIRONMENT_LOCK"
     ]
   },
   "metric_lock": {
@@ -236,6 +251,9 @@
     "dataset_or_gold_edits_allowed_after_registration": false,
     "method_edits_allowed_after_stage5_acceptance": false,
     "resolved_config_required_for_confirmation": true,
+    "exact_arm_config_lock_required_for_confirmation": true,
+    "environment_lock_required_for_confirmation": true,
+    "accepted_method_freeze_commit": "79f6a82144ec0407444ef37121f70eed2b20e01c",
     "clean_worktree_required_for_packaging": true
   }
 }

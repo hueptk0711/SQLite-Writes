@@ -1,0 +1,74 @@
+{
+  "accepted_method_freeze_commit": "79f6a82144ec0407444ef37121f70eed2b20e01c",
+  "accepted_method_freeze_tag": "stage5-vnext-r1-freeze-patch1",
+  "arm_config_lock_version": "stage5_patch2_confirmation_arm_configs_v1",
+  "confirmation_run_policy": {
+    "configuration_source": "resolved_configs_only",
+    "dynamic_base_config_resolution_allowed": false,
+    "dynamic_demonstration_bank_loading_allowed": false,
+    "model_called_in_stage5_patch2": false,
+    "gpu_called_in_stage5_patch2": false
+  },
+  "executable_arms": {
+    "direct": {
+      "role": "declared_secondary_baseline",
+      "generation_config_path": "configs/stage5/resolved_direct_confirmation.json",
+      "generation_config_sha256": "0795d31926345c62d5ba832d8374c9ac067967a3842c45854a2fff9b32c9f826",
+      "raw_generation_file": "raw_generations/direct.jsonl",
+      "prompt_surface": "direct"
+    },
+    "j_fs": {
+      "role": "declared_secondary_baseline",
+      "generation_config_path": "configs/stage5/resolved_j_fs_confirmation.json",
+      "generation_config_sha256": "a4006a423eb62fd37e5b370aca48a3b9337971f49d94700703d634a3d25c0cfe",
+      "raw_generation_file": "raw_generations/j_fs.jsonl",
+      "prompt_surface": "j_fs"
+    },
+    "original_mp_fs_plus": {
+      "role": "H1_method_level_comparator",
+      "generation_config_path": "configs/stage5/resolved_original_mp_fs_plus.json",
+      "generation_config_sha256": "ddda333ccb9b307ed3002213dad6572daa959c2dd5deb2e7d4623cb3aeead84d",
+      "replay_config_path": "configs/stage5/resolved_original_mp_fs_plus.json",
+      "replay_config_sha256": "ddda333ccb9b307ed3002213dad6572daa959c2dd5deb2e7d4623cb3aeead84d",
+      "raw_generation_file": "raw_generations/original_mp_fs_plus.jsonl",
+      "prompt_surface": "original_mp_fs_plus"
+    },
+    "shared_mp_fs_plus_generation": {
+      "role": "H2_incremental_F_shared_generation",
+      "generation_config_path": "configs/stage5/resolved_d_g1_control.json",
+      "generation_config_sha256": "c7c9c4d54e59662ee8e251af3aea1747fa035cb306213f20c819098e96f1b6ca",
+      "raw_generation_file": "raw_generations/shared_mp_fs_plus_generation.jsonl",
+      "prompt_surface": "D+G1",
+      "deterministic_replays": [
+        {
+          "method_slug": "D_G1",
+          "replay_config_path": "configs/stage5/resolved_d_g1_control.json",
+          "replay_config_sha256": "c7c9c4d54e59662ee8e251af3aea1747fa035cb306213f20c819098e96f1b6ca"
+        },
+        {
+          "method_slug": "D_F_G1",
+          "replay_config_path": "configs/stage5/resolved_mp_fs_plus_vnext_r1.json",
+          "replay_config_sha256": "b3a946fc977c3ea95d3226dca1361b1885c098fddf4afdc650f4d36f0e1ce9bf"
+        }
+      ]
+    }
+  },
+  "forbidden_confirmation_generation_arms": [
+    "d_g1_shared_mp_fs_plus",
+    "d_f_g1_shared_mp_fs_plus",
+    "full",
+    "d_only",
+    "no_c",
+    "g2",
+    "token_budget_experiment",
+    "second_model_runs"
+  ],
+  "H2_identity_requirement": {
+    "comparison": "D_F_G1_vs_D_G1",
+    "raw_generation_file": "raw_generations/shared_mp_fs_plus_generation.jsonl",
+    "D_G1_replay_config_path": "configs/stage5/resolved_d_g1_control.json",
+    "D_F_G1_replay_config_path": "configs/stage5/resolved_mp_fs_plus_vnext_r1.json",
+    "independent_D_F_G1_generation_allowed": false,
+    "F_changes_prompt_surface": false
+  }
+}
