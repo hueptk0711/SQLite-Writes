@@ -1,0 +1,74 @@
+{
+  "conflict_default_policy": "needs_clarification",
+  "demonstration_policy": "matched_semantic_bank_v1",
+  "demonstration_representation": "mapping_reference",
+  "demonstrations": {
+    "free_text": [
+      {
+        "demonstration_id": "free_plain_insert",
+        "input": "REQUEST: Create major DS with name Data Science.\nEVIDENCE: e1=DS, e2=Data Science.\nDEMO SCHEMA: t1=majors; t1.c1=major_id; t1.c2=major_name; t1.u1=PRIMARY KEY(t1.c1).",
+        "output": "{\"version\":\"4.0\",\"plan_kind\":\"reference_write_plan\",\"write_groups\":[{\"group_id\":\"g1\",\"table_id\":\"t1\",\"rows\":[{\"t1.c1\":{\"value_from\":\"e1\",\"normalization\":\"identity\"},\"t1.c2\":{\"value_from\":\"e2\",\"normalization\":\"identity\"}}],\"write_semantics\":\"plain_insert\",\"conflict_target_id\":null,\"update_column_ids\":[]}],\"dependencies\":[],\"unresolved_fields\":[]}"
+      },
+      {
+        "demonstration_id": "free_conflict_aware",
+        "input": "REQUEST: Add product P01 described as Paper; ignore it if P01 already exists.\nEVIDENCE: e1=P01, e2=Paper.\nDEMO SCHEMA: t1=products; t1.c1=product_id; t1.c2=description; t1.u1=PRIMARY KEY(t1.c1).",
+        "output": "{\"version\":\"4.0\",\"plan_kind\":\"reference_write_plan\",\"write_groups\":[{\"group_id\":\"g1\",\"table_id\":\"t1\",\"rows\":[{\"t1.c1\":{\"value_from\":\"e1\",\"normalization\":\"identity\"},\"t1.c2\":{\"value_from\":\"e2\",\"normalization\":\"identity\"}}],\"write_semantics\":\"insert_ignore\",\"conflict_target_id\":\"t1.u1\",\"update_column_ids\":[]}],\"dependencies\":[],\"unresolved_fields\":[]}"
+      }
+    ],
+    "semi_structured": [
+      {
+        "demonstration_id": "semi_plain_insert",
+        "input": "REQUEST: Add the listed majors.\nSOURCE: c1/s1 at $[*], c1.f1=major code, c1.f2=major name.\nDATA: [{\"major code\":\"DS\",\"major name\":\"Data Science\"}]\nDEMO SCHEMA: t1=majors; t1.c1=major_id; t1.c2=major_name; t1.u1=PRIMARY KEY(t1.c1).",
+        "output": "{\"target_groups\":[{\"group_id\":\"g1\",\"source_collection_id\":\"c1\",\"source_selector_id\":\"s1\",\"table_id\":\"t1\",\"field_mapping\":{\"c1.f1\":\"t1.c1\",\"c1.f2\":\"t1.c2\"},\"constants\":{},\"write_semantics\":\"plain_insert\",\"conflict_target_id\":null,\"update_column_ids\":[]}],\"dependencies\":[],\"ignored_fields\":{}}"
+      },
+      {
+        "demonstration_id": "semi_insert_ignore",
+        "input": "REQUEST: Add the listed products and ignore an item when its product ID already exists.\nSOURCE: c1/s1 at $[*], c1.f1=product id, c1.f2=description.\nDATA: [{\"product id\":\"P01\",\"description\":\"Paper\"}]\nDEMO SCHEMA: t1=products; t1.c1=product_id; t1.c2=description; t1.u1=PRIMARY KEY(t1.c1).",
+        "output": "{\"target_groups\":[{\"group_id\":\"g1\",\"source_collection_id\":\"c1\",\"source_selector_id\":\"s1\",\"table_id\":\"t1\",\"field_mapping\":{\"c1.f1\":\"t1.c1\",\"c1.f2\":\"t1.c2\"},\"constants\":{},\"write_semantics\":\"insert_ignore\",\"conflict_target_id\":\"t1.u1\",\"update_column_ids\":[]}],\"dependencies\":[],\"ignored_fields\":{}}"
+      },
+      {
+        "demonstration_id": "semi_upsert_update",
+        "input": "REQUEST: Add the students; when a student ID exists, update only the supplied name and website.\nSOURCE: c1/s1 at $[*], c1.f1=student id, c1.f2=name, c1.f3=website.\nDATA: [{\"student id\":\"S001\",\"name\":\"Nguyen A\",\"website\":\"https://example.test\"}]\nDEMO SCHEMA: t1=students; t1.c1=student_id; t1.c2=name; t1.c3=website; t1.u1=PRIMARY KEY(t1.c1).",
+        "output": "{\"target_groups\":[{\"group_id\":\"g1\",\"source_collection_id\":\"c1\",\"source_selector_id\":\"s1\",\"table_id\":\"t1\",\"field_mapping\":{\"c1.f1\":\"t1.c1\",\"c1.f2\":\"t1.c2\",\"c1.f3\":\"t1.c3\"},\"constants\":{},\"write_semantics\":\"upsert_update\",\"conflict_target_id\":\"t1.u1\",\"update_column_ids\":[\"t1.c2\",\"t1.c3\"]}],\"dependencies\":[],\"ignored_fields\":{}}"
+      },
+      {
+        "demonstration_id": "semi_parent_child",
+        "input": "REQUEST: Add the customer before the related order.\nSOURCE: c1/s1 at $.customers[*], c1.f1=customer id, c1.f2=name; c2/s2 at $.orders[*], c2.f1=order id, c2.f2=customer id, c2.f3=amount.\nDATA: {\"customers\":[{\"customer id\":\"C1\",\"name\":\"Minh\"}],\"orders\":[{\"order id\":\"O1\",\"customer id\":\"C1\",\"amount\":120}]}\nDEMO SCHEMA: t1=customers(t1.c1=customer_id,t1.c2=name,t1.u1=PK); t2=orders(t2.c1=order_id,t2.c2=customer_id,t2.c3=amount,t2.u1=PK), FK t2.c2->t1.c1.",
+        "output": "{\"target_groups\":[{\"group_id\":\"parent\",\"source_collection_id\":\"c1\",\"source_selector_id\":\"s1\",\"table_id\":\"t1\",\"field_mapping\":{\"c1.f1\":\"t1.c1\",\"c1.f2\":\"t1.c2\"},\"constants\":{},\"write_semantics\":\"plain_insert\",\"conflict_target_id\":null,\"update_column_ids\":[]},{\"group_id\":\"child\",\"source_collection_id\":\"c2\",\"source_selector_id\":\"s2\",\"table_id\":\"t2\",\"field_mapping\":{\"c2.f1\":\"t2.c1\",\"c2.f2\":\"t2.c2\",\"c2.f3\":\"t2.c3\"},\"constants\":{},\"write_semantics\":\"plain_insert\",\"conflict_target_id\":null,\"update_column_ids\":[]}],\"dependencies\":[{\"before\":\"parent\",\"after\":\"child\"}],\"ignored_fields\":{}}"
+      }
+    ]
+  },
+  "evidence_contract": "enumerated_spans_only",
+  "free_text_branch": "evidence_grounded_extraction",
+  "freeze_usage": "confirmation comparator runs must use this resolved config directly; do not resolve base_config or demonstration_bank dynamically",
+  "method_id": "MP-FS+",
+  "normalization_mode": "lossless",
+  "normalize_values": false,
+  "reference_planning": true,
+  "repair": false,
+  "representation": "reference_based_mapping_first",
+  "resolved_demonstration_ids": {
+    "free_text": [
+      "free_plain_insert",
+      "free_conflict_aware"
+    ],
+    "semi_structured": [
+      "semi_plain_insert",
+      "semi_insert_ignore",
+      "semi_upsert_update",
+      "semi_parent_child"
+    ]
+  },
+  "resolved_from": {
+    "demonstration_bank": "configs/demonstrations/matched_semantic_bank.json",
+    "demonstration_representation": "mapping_reference",
+    "overlay_config": "configs/stage4/original_mp_fs_plus.json",
+    "source_config": "configs/stage4/original_mp_fs_plus.json"
+  },
+  "schema_reference_contract": "enumerated_ids_only",
+  "semi_structured_branch": "mapping_only",
+  "source_parser": "deterministic",
+  "source_selector_contract": "enumerated_ids_only",
+  "transactional_preflight": true,
+  "verifier": "mandatory_hard"
+}

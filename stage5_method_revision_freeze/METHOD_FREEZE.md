@@ -1,6 +1,6 @@
 # Stage 5 Method Revision Freeze
 
-Status: PATCH1 ready for reviewer inspection; no model run is authorized by
+Status: PATCH2 ready for reviewer inspection; no model run is authorized by
 this package.
 
 ## Frozen method
@@ -77,6 +77,20 @@ method implementation files. The accepted executable tag is:
 stage5-vnext-r1-freeze-patch1
 ```
 
+PATCH2 does not change the frozen method. It closes the remaining confirmation
+protocol degrees of freedom by adding:
+
+```text
+stage5_method_revision_freeze/CONFIRMATION_ARM_CONFIGS.json
+stage5_method_revision_freeze/CONFIRMATION_ENVIRONMENT_LOCK.json
+```
+
+The accepted D+F+G1 method freeze commit remains:
+
+```text
+79f6a82144ec0407444ef37121f70eed2b20e01c
+```
+
 The confirmation run must include both pre-specified hypotheses:
 
 ```text
@@ -85,8 +99,17 @@ H2: D+F+G1 vs D+G1
 ```
 
 For H2, `D+G1` and `D+F+G1` must be deterministic replays from the exact same
-`D+G1` raw generation rows, so the incremental contribution of `F` is not
-confounded with independent LLM sampling or prompt drift.
+`shared_mp_fs_plus_generation` raw generation rows, so the incremental
+contribution of `F` is not confounded with independent LLM sampling or prompt
+drift. The exact comparator configs are frozen as:
+
+```text
+Direct:             configs/stage5/resolved_direct_confirmation.json
+J-FS:               configs/stage5/resolved_j_fs_confirmation.json
+Original MP-FS+:    configs/stage5/resolved_original_mp_fs_plus.json
+D_G1 control:       configs/stage5/resolved_d_g1_control.json
+D_F_G1 final:       configs/stage5/resolved_mp_fs_plus_vnext_r1.json
+```
 
 Input overflow blocks the confirmation run before GPU generation. Output
 `max_new_tokens` hits are preserved, recorded as `hit_max_new_tokens`, kept in
