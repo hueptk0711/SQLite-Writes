@@ -20,6 +20,7 @@ from scripts.data.create_stage6e_final_registration import (
     CORRECTABLE_GOLD_ERROR_QUEUE_SHA256,
     SOURCE_TASK_INVALID_QUEUE_SHA256,
     STAGE6B_DIR,
+    STAGE6C_SETUP_DIR,
     STAGE6C_EXEC_DIR,
     STAGE6C_R03_DIR,
     STAGE6C_R04_DIR,
@@ -27,6 +28,7 @@ from scripts.data.create_stage6e_final_registration import (
     STAGE6D_EXECUTION_PATCH1_COMMIT,
     STAGE6D_SETUP_DIR,
     STAGE6E_DIR,
+    artifact_root_hashes,
     build_stage6e_artifacts,
     load_inputs,
     read_json,
@@ -57,6 +59,7 @@ def compare_json(path: Path, expected: dict[str, Any], violations: list[str], la
 def validate_stage6e_final_registration(
     stage6e_dir: Path = STAGE6E_DIR,
     stage6b_dir: Path = STAGE6B_DIR,
+    stage6c_setup_dir: Path = STAGE6C_SETUP_DIR,
     stage6c_exec_dir: Path = STAGE6C_EXEC_DIR,
     stage6c_r03_dir: Path = STAGE6C_R03_DIR,
     stage6c_r04_dir: Path = STAGE6C_R04_DIR,
@@ -76,6 +79,7 @@ def validate_stage6e_final_registration(
         artifacts_dir / "FINAL_GOLD_PROGRAMS.jsonl",
         artifacts_dir / "FINAL_GOLD_POST_STATE_HASHES.jsonl",
         artifacts_dir / "FINAL_GOLD_CORPUS.jsonl",
+        artifacts_dir / "FINAL_REVIEWED_GOLD_PROVENANCE.jsonl",
         artifacts_dir / "FINAL_GOLD_REPLAY_REPORT.json",
         artifacts_dir / "FINAL_DISTRIBUTION_REPORT.json",
         artifacts_dir / "FINAL_OVERLAP_AUDIT.json",
@@ -87,7 +91,15 @@ def validate_stage6e_final_registration(
     if violations:
         return {"status": "FAIL", "violations": violations, "stage": "Stage6E_FINAL_REGISTRATION_REVISION"}
 
-    inputs = load_inputs(stage6b_dir, stage6c_exec_dir, stage6c_r03_dir, stage6c_r04_dir, stage6d_setup_dir, stage6d_exec_dir)
+    inputs = load_inputs(
+        stage6b_dir,
+        stage6c_setup_dir,
+        stage6c_exec_dir,
+        stage6c_r03_dir,
+        stage6c_r04_dir,
+        stage6d_setup_dir,
+        stage6d_exec_dir,
+    )
     expected = build_stage6e_artifacts(inputs, stage6b_dir)
     compare_jsonl(artifacts_dir / "SOURCE_TASK_INVALID_EXCLUSIONS.jsonl", expected["exclusions"], violations, "source_task_invalid_exclusions")
     compare_jsonl(artifacts_dir / "FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl", expected["final_samples"], violations, "final_confirmation_sample_manifest")
@@ -95,6 +107,12 @@ def validate_stage6e_final_registration(
     compare_jsonl(artifacts_dir / "FINAL_GOLD_PROGRAMS.jsonl", expected["final_programs"], violations, "final_gold_programs")
     compare_jsonl(artifacts_dir / "FINAL_GOLD_POST_STATE_HASHES.jsonl", expected["final_posts"], violations, "final_gold_post_state_hashes")
     compare_jsonl(artifacts_dir / "FINAL_GOLD_CORPUS.jsonl", expected["final_corpus"], violations, "final_gold_corpus")
+    compare_jsonl(
+        artifacts_dir / "FINAL_REVIEWED_GOLD_PROVENANCE.jsonl",
+        expected["final_review_provenance"],
+        violations,
+        "final_reviewed_gold_provenance",
+    )
     compare_json(artifacts_dir / "FINAL_GOLD_REPLAY_REPORT.json", expected["replay_report"], violations, "final_gold_replay_report")
     compare_json(artifacts_dir / "FINAL_DISTRIBUTION_REPORT.json", expected["distribution"], violations, "final_distribution_report")
     compare_json(artifacts_dir / "FINAL_OVERLAP_AUDIT.json", expected["overlap"], violations, "final_overlap_audit")
@@ -102,6 +120,15 @@ def validate_stage6e_final_registration(
 
     lock = read_json(lock_path)
     expected_lock = expected["lock"]
+    root_hashes = artifact_root_hashes(
+        stage6b_dir,
+        stage6c_setup_dir,
+        stage6c_exec_dir,
+        stage6c_r03_dir,
+        stage6c_r04_dir,
+        stage6d_setup_dir,
+        stage6d_exec_dir,
+    )
     expected_lock.update(
         {
             "final_confirmation_sample_manifest_sha256": sha256_file(artifacts_dir / "FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl"),
@@ -109,11 +136,16 @@ def validate_stage6e_final_registration(
             "final_gold_programs_sha256": sha256_file(artifacts_dir / "FINAL_GOLD_PROGRAMS.jsonl"),
             "final_gold_post_state_hashes_sha256": sha256_file(artifacts_dir / "FINAL_GOLD_POST_STATE_HASHES.jsonl"),
             "final_gold_corpus_sha256": sha256_file(artifacts_dir / "FINAL_GOLD_CORPUS.jsonl"),
+            "final_reviewed_gold_provenance_sha256": sha256_file(
+                artifacts_dir / "FINAL_REVIEWED_GOLD_PROVENANCE.jsonl"
+            ),
             "source_task_invalid_exclusions_sha256": sha256_file(artifacts_dir / "SOURCE_TASK_INVALID_EXCLUSIONS.jsonl"),
             "final_gold_replay_report_sha256": sha256_file(artifacts_dir / "FINAL_GOLD_REPLAY_REPORT.json"),
             "final_distribution_report_sha256": sha256_file(artifacts_dir / "FINAL_DISTRIBUTION_REPORT.json"),
             "final_overlap_audit_sha256": sha256_file(artifacts_dir / "FINAL_OVERLAP_AUDIT.json"),
             "mcnemar_threshold_sensitivity_sha256": sha256_file(artifacts_dir / "MCNEMAR_THRESHOLD_SENSITIVITY_N481.json"),
+            "accepted_upstream_artifact_roots": root_hashes,
+            "reviewed_gold_provenance_anchored": True,
         }
     )
     archive_info = lock.get("archive", {})
@@ -134,6 +166,7 @@ def validate_stage6e_final_registration(
         "gpu_called": False,
         "source_task_invalid_queue_sha256": SOURCE_TASK_INVALID_QUEUE_SHA256,
         "correctable_gold_error_queue_sha256": CORRECTABLE_GOLD_ERROR_QUEUE_SHA256,
+        "reviewed_gold_provenance_anchored": True,
     }
     for field, value in exact_scalars.items():
         if lock.get(field) != value:

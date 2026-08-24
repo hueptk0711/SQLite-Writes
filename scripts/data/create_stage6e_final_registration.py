@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import sqlite3
@@ -23,6 +24,7 @@ from scripts.data.create_stage6c_gold_review_setup import canonical_json
 
 
 STAGE6B_DIR = PROJECT_ROOT / "stage6_crudsql_registration"
+STAGE6C_SETUP_DIR = PROJECT_ROOT / "stage6_gold_review_setup"
 STAGE6C_EXEC_DIR = PROJECT_ROOT / "stage6_gold_review_execution"
 STAGE6C_R03_DIR = PROJECT_ROOT / "stage6_gold_review_r03_adjudication"
 STAGE6C_R04_DIR = PROJECT_ROOT / "stage6_gold_review_r04_resolution"
@@ -55,6 +57,11 @@ def read_json(path: Path) -> Any:
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
+
+
+def read_tsv(path: Path) -> list[dict[str, str]]:
+    with path.open("r", encoding="utf-8-sig", newline="") as handle:
+        return list(csv.DictReader(handle, delimiter="\t"))
 
 
 def write_json(path: Path, value: Any) -> None:
@@ -106,6 +113,7 @@ def make_archive(archive_path: Path, members: list[Path], root: Path) -> dict[st
 
 def load_inputs(
     stage6b_dir: Path,
+    stage6c_setup_dir: Path,
     stage6c_exec_dir: Path,
     stage6c_r03_dir: Path,
     stage6c_r04_dir: Path,
@@ -120,13 +128,20 @@ def load_inputs(
         "registered_post_hashes": read_jsonl(artifacts / "gold_post_state_hashes.jsonl"),
         "db_manifest": read_json(artifacts / "isolated_table_db_manifest.json"),
         "reference_registry": read_json(artifacts / "stage6_seen_reference_registry.json"),
+        "gold_review_items": read_jsonl(stage6c_setup_dir / "artifacts" / "gold_review_items.jsonl"),
+        "r01_submissions": read_tsv(stage6c_exec_dir / "submissions" / "stage6c_gold_review_R01.submitted.tsv"),
+        "r02_submissions": read_tsv(stage6c_exec_dir / "submissions" / "stage6c_gold_review_R02.submitted.tsv"),
         "r01_r02_agreement": read_json(stage6c_exec_dir / "R01_R02_AGREEMENT_REPORT.json"),
+        "r03_submissions": read_tsv(stage6c_r03_dir / "submissions" / "stage6c_gold_review_R03.submitted.tsv"),
         "r03_report": read_json(stage6c_r03_dir / "R03_ADJUDICATION_REPORT.json"),
         "r04_report": read_json(stage6c_r04_dir / "R04_RESOLUTION_REPORT.json"),
         "source_invalid_queue": read_json(stage6c_r04_dir / "SOURCE_TASK_INVALID_QUEUE.json"),
         "correctable_queue": read_json(stage6c_r04_dir / "CORRECTABLE_GOLD_ERROR_QUEUE.json"),
         "corrected_agreement": read_json(stage6d_exec_dir / "C01_C02_CORRECTED_AGREEMENT_REPORT.json"),
         "corrected_resolution": read_json(stage6d_exec_dir / "CORRECTED_ITEMS_RESOLUTION_REPORT.json"),
+        "c01_submissions": read_tsv(stage6d_exec_dir / "submissions" / "stage6d_corrected_gold_review_C01.submitted.tsv"),
+        "c02_submissions": read_tsv(stage6d_exec_dir / "submissions" / "stage6d_corrected_gold_review_C02.submitted.tsv"),
+        "corrected_review_items": read_jsonl(stage6d_setup_dir / "artifacts" / "corrected_gold_review_items.jsonl"),
         "corrected_plans": read_jsonl(stage6d_setup_dir / "artifacts" / "corrected_gold_write_plans.jsonl"),
         "corrected_programs": read_jsonl(stage6d_setup_dir / "artifacts" / "corrected_gold_programs.jsonl"),
         "corrected_post_hashes": read_jsonl(stage6d_setup_dir / "artifacts" / "corrected_gold_post_state_hashes.jsonl"),
@@ -172,6 +187,126 @@ def replay_program(stage6b_dir: Path, program: dict[str, Any]) -> dict[str, Any]
             and post_fp["initial_state_sha256"] == program["post_state_sha256"]
         )
         else "FAIL",
+    }
+
+
+def final_plan_review_subset(plan: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "column_indexes": plan["column_indexes"],
+        "columns": plan["columns"],
+        "expected_inserted_row": plan["expected_inserted_row"],
+        "fresh_db_per_sample": True,
+        "operation": "INSERT",
+        "values": plan["values"],
+    }
+
+
+def final_program_review_subset(program: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "parameters": program["parameters"],
+        "sql_template": program["sql_template"],
+        "sqlite_parameter_style": program["sqlite_parameter_style"],
+    }
+
+
+def approved_original_review_hash(
+    sample_id: str,
+    approval_path: str,
+    review_item: dict[str, Any],
+    r01_by_id: dict[str, dict[str, str]],
+    r02_by_id: dict[str, dict[str, str]],
+    r03_by_id: dict[str, dict[str, str]],
+    violations: list[str],
+) -> str:
+    reviewed_hash = review_item["authored_content_sha256"]
+    if approval_path == "R01_R02_AGREED_APPROVED":
+        r01 = r01_by_id.get(sample_id)
+        r02 = r02_by_id.get(sample_id)
+        if not r01 or not r02:
+            violations.append(f"original_review_submission_missing:{sample_id}")
+        else:
+            if r01.get("decision") != "approved" or r02.get("decision") != "approved":
+                violations.append(f"original_review_decision_not_approved:{sample_id}")
+            if r01.get("authored_content_sha256") != reviewed_hash or r02.get("authored_content_sha256") != reviewed_hash:
+                violations.append(f"original_reviewed_content_hash_mismatch:{sample_id}")
+    elif approval_path == "R03_ADJUDICATED_APPROVED":
+        r03 = r03_by_id.get(sample_id)
+        if not r03:
+            violations.append(f"r03_review_submission_missing:{sample_id}")
+        else:
+            if r03.get("decision") != "approved":
+                violations.append(f"r03_review_decision_not_approved:{sample_id}")
+            if r03.get("authored_content_sha256") != reviewed_hash:
+                violations.append(f"r03_reviewed_content_hash_mismatch:{sample_id}")
+    else:
+        violations.append(f"unknown_original_approval_path:{sample_id}:{approval_path}")
+    return reviewed_hash
+
+
+def approved_corrected_review_hash(
+    sample_id: str,
+    corrected_item: dict[str, Any],
+    c01_by_id: dict[str, dict[str, str]],
+    c02_by_id: dict[str, dict[str, str]],
+    violations: list[str],
+) -> str:
+    reviewed_hash = corrected_item["corrected_authored_content_sha256"]
+    c01 = c01_by_id.get(sample_id)
+    c02 = c02_by_id.get(sample_id)
+    if not c01 or not c02:
+        violations.append(f"corrected_review_submission_missing:{sample_id}")
+    else:
+        if c01.get("decision") != "approved" or c02.get("decision") != "approved":
+            violations.append(f"corrected_review_decision_not_approved:{sample_id}")
+        if (
+            c01.get("corrected_authored_content_sha256") != reviewed_hash
+            or c02.get("corrected_authored_content_sha256") != reviewed_hash
+        ):
+            violations.append(f"corrected_reviewed_content_hash_mismatch:{sample_id}")
+    return reviewed_hash
+
+
+def artifact_root_hashes(
+    stage6b_dir: Path,
+    stage6c_setup_dir: Path,
+    stage6c_exec_dir: Path,
+    stage6c_r03_dir: Path,
+    stage6c_r04_dir: Path,
+    stage6d_setup_dir: Path,
+    stage6d_exec_dir: Path,
+) -> dict[str, str]:
+    return {
+        "stage6b_registration_lock_sha256": sha256_file(stage6b_dir / "STAGE6B_REGISTRATION_LOCK.json"),
+        "stage6c_gold_review_setup_lock_sha256": sha256_file(
+            stage6c_setup_dir / "STAGE6C_GOLD_REVIEW_SETUP_LOCK.json"
+        ),
+        "stage6c_gold_review_protocol_addendum_sha256": sha256_file(
+            stage6c_setup_dir / "GOLD_REVIEW_PROTOCOL_ADDENDUM_LOCK.json"
+        ),
+        "stage6c_gold_review_items_sha256": sha256_file(stage6c_setup_dir / "artifacts" / "gold_review_items.jsonl"),
+        "stage6c_execution_manifest_sha256": sha256_file(stage6c_exec_dir / "REVIEW_EXECUTION_MANIFEST.json"),
+        "r01_submission_tsv_sha256": sha256_file(
+            stage6c_exec_dir / "submissions" / "stage6c_gold_review_R01.submitted.tsv"
+        ),
+        "r02_submission_tsv_sha256": sha256_file(
+            stage6c_exec_dir / "submissions" / "stage6c_gold_review_R02.submitted.tsv"
+        ),
+        "r03_adjudication_report_sha256": sha256_file(stage6c_r03_dir / "R03_ADJUDICATION_REPORT.json"),
+        "r03_submission_tsv_sha256": sha256_file(
+            stage6c_r03_dir / "submissions" / "stage6c_gold_review_R03.submitted.tsv"
+        ),
+        "r04_resolution_report_sha256": sha256_file(stage6c_r04_dir / "R04_RESOLUTION_REPORT.json"),
+        "stage6d_setup_lock_sha256": sha256_file(stage6d_setup_dir / "STAGE6D_CORRECTED_GOLD_REVIEW_SETUP_LOCK.json"),
+        "stage6d_corrected_review_items_sha256": sha256_file(
+            stage6d_setup_dir / "artifacts" / "corrected_gold_review_items.jsonl"
+        ),
+        "stage6d_execution_manifest_sha256": sha256_file(stage6d_exec_dir / "CORRECTED_REVIEW_EXECUTION_MANIFEST.json"),
+        "c01_submission_tsv_sha256": sha256_file(
+            stage6d_exec_dir / "submissions" / "stage6d_corrected_gold_review_C01.submitted.tsv"
+        ),
+        "c02_submission_tsv_sha256": sha256_file(
+            stage6d_exec_dir / "submissions" / "stage6d_corrected_gold_review_C02.submitted.tsv"
+        ),
     }
 
 
@@ -268,6 +403,13 @@ def build_stage6e_artifacts(inputs: dict[str, Any], stage6b_dir: Path) -> dict[s
     registered_plans_by_id = by_id(inputs["registered_plans"])
     registered_programs_by_id = by_id(inputs["registered_programs"])
     registered_posts_by_id = by_id(inputs["registered_post_hashes"])
+    review_items_by_id = by_id(inputs["gold_review_items"])
+    r01_by_id = by_id(inputs["r01_submissions"])
+    r02_by_id = by_id(inputs["r02_submissions"])
+    r03_by_id = by_id(inputs["r03_submissions"])
+    corrected_review_items_by_id = by_id(inputs["corrected_review_items"])
+    c01_by_id = by_id(inputs["c01_submissions"])
+    c02_by_id = by_id(inputs["c02_submissions"])
     corrected_plans_by_id = by_id(inputs["corrected_plans"])
     corrected_programs_by_id = by_id(inputs["corrected_programs"])
     corrected_posts_by_id = by_id(inputs["corrected_post_hashes"])
@@ -300,6 +442,7 @@ def build_stage6e_artifacts(inputs: dict[str, Any], stage6b_dir: Path) -> dict[s
     final_programs: list[dict[str, Any]] = []
     final_posts: list[dict[str, Any]] = []
     final_corpus: list[dict[str, Any]] = []
+    final_review_provenance: list[dict[str, Any]] = []
     for sample_id in sorted(final_ids):
         source_sample = registered_samples_by_id[sample_id]
         table_id = source_sample["table_id"]
@@ -307,9 +450,14 @@ def build_stage6e_artifacts(inputs: dict[str, Any], stage6b_dir: Path) -> dict[s
             "CORRECTED_REVIEW_ACCEPTED" if sample_id in corrected_accepted_ids else "ORIGINAL_REVIEW_ACCEPTED"
         )
         if gold_source_type == "CORRECTED_REVIEW_ACCEPTED":
+            approval_path = "C01_C02_CORRECTED_APPROVED"
             corrected_plan = corrected_plans_by_id[sample_id]
             corrected_program = corrected_programs_by_id[sample_id]
             corrected_post = corrected_posts_by_id[sample_id]
+            corrected_review_item = corrected_review_items_by_id[sample_id]
+            reviewed_content_sha256 = approved_corrected_review_hash(
+                sample_id, corrected_review_item, c01_by_id, c02_by_id, violations
+            )
             post_state_sha256 = corrected_post["corrected_post_state_sha256"]
             plan = {
                 "stage6_sample_id": sample_id,
@@ -343,10 +491,25 @@ def build_stage6e_artifacts(inputs: dict[str, Any], stage6b_dir: Path) -> dict[s
                 "expected_inserted_row": corrected_program["expected_inserted_row"],
                 "post_state_sha256": post_state_sha256,
             }
+            if final_plan_review_subset(plan) != corrected_review_item["corrected_gold_write_plan"]:
+                violations.append(f"corrected_reviewed_gold_plan_mismatch:{sample_id}")
+            if final_program_review_subset(program) != corrected_review_item["corrected_gold_program"]:
+                violations.append(f"corrected_reviewed_gold_program_mismatch:{sample_id}")
+            if post_state_sha256 != corrected_review_item["corrected_hashes"]["corrected_post_state_sha256"]:
+                violations.append(f"corrected_reviewed_post_state_mismatch:{sample_id}")
         else:
+            approval_path = (
+                "R01_R02_AGREED_APPROVED"
+                if sample_id in inputs["r01_r02_agreement"]["agreed_approved_ids"]
+                else "R03_ADJUDICATED_APPROVED"
+            )
             source_plan = registered_plans_by_id[sample_id]
             source_program = registered_programs_by_id[sample_id]
             source_post = registered_posts_by_id[sample_id]
+            review_item = review_items_by_id[sample_id]
+            reviewed_content_sha256 = approved_original_review_hash(
+                sample_id, approval_path, review_item, r01_by_id, r02_by_id, r03_by_id, violations
+            )
             post_state_sha256 = source_post["post_state_sha256"]
             plan = {
                 "stage6_sample_id": sample_id,
@@ -363,6 +526,10 @@ def build_stage6e_artifacts(inputs: dict[str, Any], stage6b_dir: Path) -> dict[s
                 "expected_inserted_row": source_plan["expected_inserted_row"],
                 "post_state_sha256": post_state_sha256,
             }
+            if final_plan_review_subset(plan) != review_item["gold_write_plan"]:
+                violations.append(f"original_reviewed_gold_plan_mismatch:{sample_id}")
+            if post_state_sha256 != review_item["hashes"]["post_state_sha256"]:
+                violations.append(f"original_reviewed_post_state_mismatch:{sample_id}")
             program = {
                 "stage6_sample_id": sample_id,
                 "upstream_sample_locator": source_sample["upstream_sample_locator"],
@@ -377,6 +544,8 @@ def build_stage6e_artifacts(inputs: dict[str, Any], stage6b_dir: Path) -> dict[s
                 "expected_inserted_row": source_program["expected_inserted_row"],
                 "post_state_sha256": post_state_sha256,
             }
+            if final_program_review_subset(program) != review_item["gold_program"]:
+                violations.append(f"original_reviewed_gold_program_mismatch:{sample_id}")
         post = {
             "stage6_sample_id": sample_id,
             "upstream_sample_locator": source_sample["upstream_sample_locator"],
@@ -399,8 +568,23 @@ def build_stage6e_artifacts(inputs: dict[str, Any], stage6b_dir: Path) -> dict[s
             "database_id": f"crudsql_table:{table_id}",
             "gold_source_type": gold_source_type,
             "gold_artifact_sha256": gold_artifact_sha256,
+            "reviewed_content_sha256": reviewed_content_sha256,
+            "approval_path": approval_path,
             "question": source_sample["question"],
         }
+        final_review_provenance.append(
+            {
+                "stage6_sample_id": sample_id,
+                "upstream_sample_locator": source_sample["upstream_sample_locator"],
+                "gold_source_type": gold_source_type,
+                "approval_path": approval_path,
+                "reviewed_content_sha256": reviewed_content_sha256,
+                "final_gold_artifact_sha256": gold_artifact_sha256,
+                "plan_matches_reviewed_content": True,
+                "program_matches_reviewed_content": True,
+                "post_state_matches_reviewed_content": True,
+            }
+        )
         final_samples.append(final_sample)
         final_plans.append(plan)
         final_programs.append(program)
@@ -472,6 +656,7 @@ def build_stage6e_artifacts(inputs: dict[str, Any], stage6b_dir: Path) -> dict[s
         "final_programs": final_programs,
         "final_posts": final_posts,
         "final_corpus": final_corpus,
+        "final_review_provenance": final_review_provenance,
         "exclusions": exclusions,
         "replay_report": replay_report,
         "distribution": distribution,
@@ -482,6 +667,7 @@ def build_stage6e_artifacts(inputs: dict[str, Any], stage6b_dir: Path) -> dict[s
 
 def create_stage6e_final_registration(
     stage6b_dir: Path = STAGE6B_DIR,
+    stage6c_setup_dir: Path = STAGE6C_SETUP_DIR,
     stage6c_exec_dir: Path = STAGE6C_EXEC_DIR,
     stage6c_r03_dir: Path = STAGE6C_R03_DIR,
     stage6c_r04_dir: Path = STAGE6C_R04_DIR,
@@ -489,8 +675,25 @@ def create_stage6e_final_registration(
     stage6d_exec_dir: Path = STAGE6D_EXEC_DIR,
     out_dir: Path = STAGE6E_DIR,
 ) -> dict[str, Any]:
-    inputs = load_inputs(stage6b_dir, stage6c_exec_dir, stage6c_r03_dir, stage6c_r04_dir, stage6d_setup_dir, stage6d_exec_dir)
+    inputs = load_inputs(
+        stage6b_dir,
+        stage6c_setup_dir,
+        stage6c_exec_dir,
+        stage6c_r03_dir,
+        stage6c_r04_dir,
+        stage6d_setup_dir,
+        stage6d_exec_dir,
+    )
     artifacts = build_stage6e_artifacts(inputs, stage6b_dir)
+    root_hashes = artifact_root_hashes(
+        stage6b_dir,
+        stage6c_setup_dir,
+        stage6c_exec_dir,
+        stage6c_r03_dir,
+        stage6c_r04_dir,
+        stage6d_setup_dir,
+        stage6d_exec_dir,
+    )
     out_artifacts = out_dir / "artifacts"
     out_artifacts.mkdir(parents=True, exist_ok=True)
     write_jsonl(out_artifacts / "SOURCE_TASK_INVALID_EXCLUSIONS.jsonl", artifacts["exclusions"])
@@ -499,17 +702,21 @@ def create_stage6e_final_registration(
     write_jsonl(out_artifacts / "FINAL_GOLD_PROGRAMS.jsonl", artifacts["final_programs"])
     write_jsonl(out_artifacts / "FINAL_GOLD_POST_STATE_HASHES.jsonl", artifacts["final_posts"])
     write_jsonl(out_artifacts / "FINAL_GOLD_CORPUS.jsonl", artifacts["final_corpus"])
+    write_jsonl(out_artifacts / "FINAL_REVIEWED_GOLD_PROVENANCE.jsonl", artifacts["final_review_provenance"])
     write_json(out_artifacts / "FINAL_GOLD_REPLAY_REPORT.json", artifacts["replay_report"])
     write_json(out_artifacts / "FINAL_DISTRIBUTION_REPORT.json", artifacts["distribution"])
     write_json(out_artifacts / "FINAL_OVERLAP_AUDIT.json", artifacts["overlap"])
     write_json(out_artifacts / "MCNEMAR_THRESHOLD_SENSITIVITY_N481.json", artifacts["mcnemar"])
     lock = artifacts["lock"]
+    lock["accepted_upstream_artifact_roots"] = root_hashes
+    lock["reviewed_gold_provenance_anchored"] = True
     for field, rel in {
         "final_confirmation_sample_manifest_sha256": out_artifacts / "FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl",
         "final_gold_write_plans_sha256": out_artifacts / "FINAL_GOLD_WRITE_PLANS.jsonl",
         "final_gold_programs_sha256": out_artifacts / "FINAL_GOLD_PROGRAMS.jsonl",
         "final_gold_post_state_hashes_sha256": out_artifacts / "FINAL_GOLD_POST_STATE_HASHES.jsonl",
         "final_gold_corpus_sha256": out_artifacts / "FINAL_GOLD_CORPUS.jsonl",
+        "final_reviewed_gold_provenance_sha256": out_artifacts / "FINAL_REVIEWED_GOLD_PROVENANCE.jsonl",
         "source_task_invalid_exclusions_sha256": out_artifacts / "SOURCE_TASK_INVALID_EXCLUSIONS.jsonl",
         "final_gold_replay_report_sha256": out_artifacts / "FINAL_GOLD_REPLAY_REPORT.json",
         "final_distribution_report_sha256": out_artifacts / "FINAL_DISTRIBUTION_REPORT.json",
@@ -531,6 +738,7 @@ Validation date: 2026-08-24
 - original review accepted gold: 460
 - corrected review accepted gold: 21
 - final gold replay: {artifacts['replay_report']['pass_count']} / 481 PASS
+- reviewed-gold provenance anchored: 481 / 481
 - final gold freeze created: true
 - confirmation_run_allowed_now: false
 - model_called: false
@@ -547,7 +755,8 @@ resolution workflow, with no replacement samples. The final confirmation set has
 re-reviewed accepted gold items.
 
 This stage creates the final gold corpus hash and replays all 481 final gold
-programs on fresh isolated SQLite databases. It does not call a model, does not
+programs on fresh isolated SQLite databases. It also anchors each final gold
+artifact to the exact human-reviewed content hash and approval path. It does not call a model, does not
 use GPU, and does not permit confirmation inference. The next stage is GPU
 environment preflight after reviewer acceptance.
 """
@@ -564,6 +773,7 @@ environment preflight after reviewer acceptance.
             "FINAL_GOLD_PROGRAMS.jsonl",
             "FINAL_GOLD_POST_STATE_HASHES.jsonl",
             "FINAL_GOLD_CORPUS.jsonl",
+            "FINAL_REVIEWED_GOLD_PROVENANCE.jsonl",
             "FINAL_GOLD_REPLAY_REPORT.json",
             "FINAL_DISTRIBUTION_REPORT.json",
             "FINAL_OVERLAP_AUDIT.json",

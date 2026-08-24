@@ -11,6 +11,7 @@ Validation date: 2026-08-24
 - original review accepted gold: 460
 - corrected review accepted gold: 21
 - final gold replay: 481 / 481 PASS
+- reviewed-gold provenance anchored: 481 / 481
 - final gold freeze created: true
 - confirmation_run_allowed_now: false
 - model_called: false

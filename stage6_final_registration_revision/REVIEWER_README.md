@@ -9,6 +9,7 @@ resolution workflow, with no replacement samples. The final confirmation set has
 re-reviewed accepted gold items.
 
 This stage creates the final gold corpus hash and replays all 481 final gold
-programs on fresh isolated SQLite databases. It does not call a model, does not
+programs on fresh isolated SQLite databases. It also anchors each final gold
+artifact to the exact human-reviewed content hash and approval path. It does not call a model, does not
 use GPU, and does not permit confirmation inference. The next stage is GPU
 environment preflight after reviewer acceptance.
