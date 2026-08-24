@@ -146,6 +146,14 @@ def tree_hash(paths: Iterable[Path]) -> str:
     return sha256_text("\n".join(rows) + "\n")
 
 
+def tree_hash(paths: Iterable[Path]) -> str:
+    rows = []
+    for path in sorted(paths, key=lambda item: item.as_posix()):
+        relative = path.relative_to(PROJECT_ROOT).as_posix()
+        rows.append(f"{sha256_file(path)}  {relative}")
+    return sha256_text("\n".join(rows) + "\n")
+
+
 def add_violation(violations: list[dict[str, Any]], rule: str, **details: Any) -> None:
     row: dict[str, Any] = {"rule": rule}
     row.update(details)
