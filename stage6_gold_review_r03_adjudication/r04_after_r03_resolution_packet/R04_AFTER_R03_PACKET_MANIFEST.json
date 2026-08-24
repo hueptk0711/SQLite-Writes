@@ -14,11 +14,11 @@
     "members": [
       {
         "path": "FINAL_REJECTION_RESOLUTION_QUEUE_AFTER_R03.json",
-        "sha256": "3ecbe2dcb2c7e3215ed405221cb8e84449ba3c024fe797c3dc6f20d17154872f"
+        "sha256": "da7462b3249aae1ec260912f60b8a41036b9f28c26efe0d8ca8f19cd43a19446"
       },
       {
         "path": "r04_after_r03_resolution_packet/R04_AFTER_R03_PACKET_MANIFEST.json",
-        "sha256": "d1ab7442af1069bbe6fc27d4825b5916d115d6ab02e63c093bc70ce325fed146"
+        "sha256": "39ec99b3df797b3fedb94b0f4a3e7bfca99175cb49b1fcc6ed024331612c2d37"
       },
       {
         "path": "r04_after_r03_resolution_packet/official_table_metadata.jsonl",
@@ -26,7 +26,7 @@
       },
       {
         "path": "r04_after_r03_resolution_packet/r04_after_R03_resolution_items.jsonl",
-        "sha256": "c0a4faf71cedda18201c790415ccf1b8976c082980f3711d63669a7a2777b052"
+        "sha256": "b20c73370feb94849984f75127a5c9a7f4826000bacd9a53ccc2437c5f7c5372"
       },
       {
         "path": "r04_after_r03_resolution_packet/stage6c_final_rejection_after_R03_R04.tsv",
@@ -34,7 +34,7 @@
       }
     ],
     "path": "Stage6C_R04_final_rejection_resolution_after_R03_packet_20260824.zip",
-    "sha256": "64591cb06e12ea69493de3c9ef39189cf4dbb40cb4dd29c35abe7adb4caa3538"
+    "sha256": "8be3155c4636688ee7d2c73e6f0b927f85f141e1e20759975831a7a8386a86b0"
   },
   "classification_required_on_submission": true,
   "contains_only_final_rejected_items": true,
@@ -43,10 +43,10 @@
   "final_rejected_count": 40,
   "official_table_metadata_sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93",
   "packet_role": "R04",
-  "r04_items_sha256": "c0a4faf71cedda18201c790415ccf1b8976c082980f3711d63669a7a2777b052",
+  "r04_items_sha256": "b20c73370feb94849984f75127a5c9a7f4826000bacd9a53ccc2437c5f7c5372",
   "r04_tsv_sha256": "0a3a8d8e3e4379ff31289f83861134d710079e9c10cc29542948a38c46324890",
   "rationale_required_on_submission": true,
-  "resolution_queue_sha256": "3ecbe2dcb2c7e3215ed405221cb8e84449ba3c024fe797c3dc6f20d17154872f",
+  "resolution_queue_sha256": "da7462b3249aae1ec260912f60b8a41036b9f28c26efe0d8ca8f19cd43a19446",
   "stage": "Stage6C_R04_FINAL_REJECTION_RESOLUTION_AFTER_R03_PACKET",
   "status": "READY_FOR_R04_IF_REVIEWER_ACCEPTS_R03_ADJUDICATION_PACKAGE"
 }

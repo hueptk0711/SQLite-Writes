@@ -134,6 +134,20 @@ def validate_r03_adjudication(adjudication_dir: Path, execution_dir: Path) -> di
     final_rejected_items = queue.get("final_rejected_items", [])
     final_rejected_ids = {row.get("stage6_sample_id") for row in final_rejected_items}
     r03_rejected_ids = {row["stage6_sample_id"] for row in rejected}
+    for item in final_rejected_items:
+        sample_id = item.get("stage6_sample_id", "")
+        for role in ["R01", "R02", "R03"]:
+            decision = item.get(f"{role}_decision")
+            note = item.get(f"{role}_notes", "")
+            declared_hash = item.get(f"{role}_notes_sha256", "")
+            if decision == "rejected":
+                if not note.strip():
+                    violations.append(f"queue_missing_{role}_rejection_note:{sample_id}")
+                if sha256_text(note) != declared_hash:
+                    violations.append(f"queue_{role}_rejection_note_hash_mismatch:{sample_id}")
+            elif decision in {"approved", "not_applicable"}:
+                if note and sha256_text(note) != declared_hash:
+                    violations.append(f"queue_{role}_note_hash_mismatch:{sample_id}")
     if queue.get("status") != "LOCKED_PENDING_R04_TECHNICAL_RESOLUTION":
         violations.append("queue_status_not_locked")
     if queue.get("R04_task") != R04_TASK:
@@ -222,6 +236,15 @@ def validate_r03_adjudication(adjudication_dir: Path, execution_dir: Path) -> di
             if scope.get("final_rejection_source") == "R03_REJECTED_DISAGREEMENT":
                 if scope.get("R03_decision") != "rejected" or not scope.get("R03_notes"):
                     violations.append(f"R04_after_R03_missing_R03_rejection_reason:{sample_id}")
+            for role in ["R01", "R02", "R03"]:
+                decision = scope.get(f"{role}_decision")
+                note = scope.get(f"{role}_notes", "")
+                declared_hash = scope.get(f"{role}_notes_sha256", "")
+                if decision == "rejected":
+                    if not note.strip():
+                        violations.append(f"R04_after_R03_missing_{role}_rejection_reason:{sample_id}")
+                    if sha256_text(note) != declared_hash:
+                        violations.append(f"R04_after_R03_{role}_rejection_note_hash_mismatch:{sample_id}")
             if sample_id not in scope.get("same_table_final_rejected_sample_ids", []):
                 violations.append(f"R04_after_R03_missing_table_context:{sample_id}")
     if r04_tsv_path.is_file():

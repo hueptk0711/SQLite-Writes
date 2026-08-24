@@ -6,7 +6,7 @@
     "members": [
       {
         "path": "FINAL_REJECTION_RESOLUTION_QUEUE_AFTER_R03.json",
-        "sha256": "3ecbe2dcb2c7e3215ed405221cb8e84449ba3c024fe797c3dc6f20d17154872f"
+        "sha256": "da7462b3249aae1ec260912f60b8a41036b9f28c26efe0d8ca8f19cd43a19446"
       },
       {
         "path": "R03_ADJUDICATION_REPORT.json",
@@ -14,7 +14,7 @@
       },
       {
         "path": "R03_INGEST_MANIFEST.json",
-        "sha256": "8cfb08c9cae97bfce318eac37ffd982f601909e061dd73b99fefd68267970838"
+        "sha256": "3b88c3a0201619f622108c669cc02ce8ce40aed3257a123216a8b3a31deeeb6b"
       },
       {
         "path": "REVIEWER_README.md",
@@ -22,7 +22,7 @@
       },
       {
         "path": "Stage6C_R04_final_rejection_resolution_after_R03_packet_20260824.zip",
-        "sha256": "64591cb06e12ea69493de3c9ef39189cf4dbb40cb4dd29c35abe7adb4caa3538"
+        "sha256": "8be3155c4636688ee7d2c73e6f0b927f85f141e1e20759975831a7a8386a86b0"
       },
       {
         "path": "VALIDATION_REPORT.md",
@@ -30,7 +30,7 @@
       },
       {
         "path": "r04_after_r03_resolution_packet/R04_AFTER_R03_PACKET_MANIFEST.json",
-        "sha256": "489a106482a21dd8a6863f9f7f8bcf1719745f4db1d50976c8d0d4c4963e62c6"
+        "sha256": "a654d0f35728011b94d623abffa7a12f71efba0f884adbd27b9d0d2f2231994b"
       },
       {
         "path": "r04_after_r03_resolution_packet/official_table_metadata.jsonl",
@@ -38,7 +38,7 @@
       },
       {
         "path": "r04_after_r03_resolution_packet/r04_after_R03_resolution_items.jsonl",
-        "sha256": "c0a4faf71cedda18201c790415ccf1b8976c082980f3711d63669a7a2777b052"
+        "sha256": "b20c73370feb94849984f75127a5c9a7f4826000bacd9a53ccc2437c5f7c5372"
       },
       {
         "path": "r04_after_r03_resolution_packet/stage6c_final_rejection_after_R03_R04.tsv",
@@ -50,14 +50,14 @@
       }
     ],
     "path": "stage6c_r03_adjudication_artifacts_20260824.zip",
-    "sha256": "acc82c173ab79f03852cd4459f1db561243bed52324a9da0f95faba2da890ac4"
+    "sha256": "ef07b4e26b4394cdc4c1cb270edb1e60f427d78febbb06ef5c9baa3f63904815"
   },
   "confirmation_run_allowed_now": false,
   "final_approved_count_after_R03": 460,
   "final_gold_freeze_created": false,
   "final_rejected_count_after_R03": 40,
   "final_rejection_resolution_queue_created": true,
-  "final_rejection_resolution_queue_sha256": "3ecbe2dcb2c7e3215ed405221cb8e84449ba3c024fe797c3dc6f20d17154872f",
+  "final_rejection_resolution_queue_sha256": "da7462b3249aae1ec260912f60b8a41036b9f28c26efe0d8ca8f19cd43a19446",
   "gpu_called": false,
   "model_called": false,
   "next_steps": [
@@ -68,7 +68,7 @@
   "r03_source_mtime": 1787568118.390381,
   "r03_submission_sha256": "ecef969a6ea52904f249fa9121fbc6d2ed5e039122fe05dc1472caeba1bc5518",
   "r04_after_R03_packet_created": true,
-  "r04_after_R03_packet_manifest_sha256": "489a106482a21dd8a6863f9f7f8bcf1719745f4db1d50976c8d0d4c4963e62c6",
+  "r04_after_R03_packet_manifest_sha256": "a654d0f35728011b94d623abffa7a12f71efba0f884adbd27b9d0d2f2231994b",
   "stage": "Stage6C_R03_ADJUDICATION_INGEST",
   "stage6c_execution_patch2_commit": "a94407dc171f9705bd566a4812eab9cb2407bbbb",
   "status": "PASS_R03_COMPLETE_PENDING_FINAL_REJECTION_RESOLUTION",

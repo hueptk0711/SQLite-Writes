@@ -187,9 +187,13 @@ def build_post_r03_resolution_queue(
     r03_rows: list[dict[str, str]],
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     agreement = read_json(execution_dir / "R01_R02_AGREEMENT_REPORT.json")
+    _, r01_rows = read_packet(execution_dir / "submissions" / "stage6c_gold_review_R01.submitted.tsv")
+    _, r02_rows = read_packet(execution_dir / "submissions" / "stage6c_gold_review_R02.submitted.tsv")
     setup_items = read_jsonl(PROJECT_ROOT / "stage6_gold_review_setup" / "artifacts" / "gold_review_items.jsonl")
     item_by_id = {item["stage6_sample_id"]: item for item in setup_items}
     r03_by_id = {row["stage6_sample_id"]: row for row in r03_rows}
+    r01_by_id = {row["stage6_sample_id"]: row for row in r01_rows}
+    r02_by_id = {row["stage6_sample_id"]: row for row in r02_rows}
     disagreement_by_id = {row["stage6_sample_id"]: row for row in agreement["disagreement_items"]}
     agreed_rejected_by_id = {row["stage6_sample_id"]: row for row in agreement["agreed_rejected_items"]}
 
@@ -197,6 +201,8 @@ def build_post_r03_resolution_queue(
     for sample_id in sorted(agreed_rejected_by_id):
         item = item_by_id[sample_id]
         agreement_item = agreed_rejected_by_id[sample_id]
+        r01_note = r01_by_id[sample_id].get("notes", "")
+        r02_note = r02_by_id[sample_id].get("notes", "")
         final_rejected_items.append(
             {
                 "stage6_sample_id": sample_id,
@@ -206,8 +212,11 @@ def build_post_r03_resolution_queue(
                 "R01_decision": "rejected",
                 "R02_decision": "rejected",
                 "R03_decision": "not_applicable",
+                "R01_notes": r01_note,
                 "R01_notes_sha256": agreement_item["R01_notes_sha256"],
+                "R02_notes": r02_note,
                 "R02_notes_sha256": agreement_item["R02_notes_sha256"],
+                "R03_notes": "",
                 "R03_notes_sha256": "",
             }
         )
@@ -215,6 +224,9 @@ def build_post_r03_resolution_queue(
         sample_id = rejected["stage6_sample_id"]
         item = item_by_id[sample_id]
         disagreement_item = disagreement_by_id[sample_id]
+        r01_note = r01_by_id[sample_id].get("notes", "")
+        r02_note = r02_by_id[sample_id].get("notes", "")
+        r03_note = r03_by_id[sample_id].get("notes", "")
         final_rejected_items.append(
             {
                 "stage6_sample_id": sample_id,
@@ -224,8 +236,11 @@ def build_post_r03_resolution_queue(
                 "R01_decision": disagreement_item["R01_decision"],
                 "R02_decision": disagreement_item["R02_decision"],
                 "R03_decision": "rejected",
+                "R01_notes": r01_note,
                 "R01_notes_sha256": disagreement_item["R01_notes_sha256"],
+                "R02_notes": r02_note,
                 "R02_notes_sha256": disagreement_item["R02_notes_sha256"],
+                "R03_notes": r03_note,
                 "R03_notes_sha256": rejected["R03_notes_sha256"],
             }
         )
@@ -293,7 +308,6 @@ def build_r04_after_r03_packet(
                 **item,
                 "R04_resolution_scope": {
                     **rejected,
-                    "R03_notes": r03_row.get("notes", "") if r03_row else "",
                     "same_table_final_rejected_sample_ids": table_to_rejected_ids[table_id],
                     "table_final_rejected_count": len(table_to_rejected_ids[table_id]),
                 },
