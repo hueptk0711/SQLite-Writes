@@ -6,8 +6,10 @@ Validation date: 2026-08-24
 
 - review items: 500
 - reviewer packets: R01, R02
-- adjudication: third independent adjudicator
-- rejected/unresolved policy: blocks confirmation
+- reviewer distribution: separate isolated archive per reviewer
+- reviewer isolation: cross-reviewer decisions/notes hidden until both submitted
+- adjudication: blind third independent adjudicator for disagreements
+- final rejected/unresolved policy: blocks confirmation
 - model_called: false
 - gpu_called: false
 - confirmation_run_allowed_now: false

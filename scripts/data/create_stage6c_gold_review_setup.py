@@ -18,7 +18,11 @@ STAGE6C_DIR = PROJECT_ROOT / "stage6_gold_review_setup"
 DEFAULT_CRUDSQL_ROOT = PROJECT_ROOT.parents[1] / "external_sources" / "CRUDSQL_63bfce67"
 CRUDSQL_COMMIT = "63bfce67d8391185453a812751e115a499201363"
 STAGE6B_COMMIT = "bbbe4d374edd60696b0765771640a946a838fd4d"
-ARCHIVE_NAME = "stage6c_gold_review_packets_20260824.zip"
+LEGACY_COMBINED_ARCHIVE_NAME = "stage6c_gold_review_packets_20260824.zip"
+R01_ARCHIVE_NAME = "Stage6C_R01_review_packet_20260824.zip"
+R02_ARCHIVE_NAME = "Stage6C_R02_review_packet_20260824.zip"
+PATCH0_GOLD_REVIEW_ITEMS_SHA256 = "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b"
+PATCH0_OFFICIAL_TABLE_METADATA_SHA256 = "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93"
 ZIP_TIMESTAMP = (2026, 8, 24, 0, 0, 0)
 REVIEW_PACKET_COLUMNS = [
     "stage6_sample_id",
@@ -111,6 +115,43 @@ def make_archive(archive_path: Path, members: list[Path], root: Path) -> dict[st
         "member_count": len(member_rows),
         "members": member_rows,
     }
+
+
+def write_reviewer_archive_manifest(
+    path: Path,
+    reviewer_id: str,
+    packet_path: Path,
+    out_dir: Path,
+) -> None:
+    manifest = {
+        "stage": "Stage6C_PATCH1_REVIEWER_ISOLATED_PACKET",
+        "status": "READY_FOR_INDEPENDENT_REVIEW_EXECUTION",
+        "reviewer_id": reviewer_id,
+        "model_called": False,
+        "gpu_called": False,
+        "confirmation_run_allowed_now": False,
+        "contains_only_own_decision_packet": True,
+        "must_not_receive_other_reviewer_decisions_or_notes_before_submission": True,
+        "shared_materials": {
+            "gold_review_items": {
+                "path": "artifacts/gold_review_items.jsonl",
+                "sha256": sha256_file(out_dir / "artifacts" / "gold_review_items.jsonl"),
+            },
+            "official_table_metadata": {
+                "path": "artifacts/official_table_metadata.jsonl",
+                "sha256": sha256_file(out_dir / "artifacts" / "official_table_metadata.jsonl"),
+            },
+            "protocol_addendum": {
+                "path": "GOLD_REVIEW_PROTOCOL_ADDENDUM_LOCK.json",
+                "sha256": sha256_file(out_dir / "GOLD_REVIEW_PROTOCOL_ADDENDUM_LOCK.json"),
+            },
+        },
+        "decision_packet": {
+            "path": packet_path.relative_to(out_dir).as_posix(),
+            "sha256": sha256_file(packet_path),
+        },
+    }
+    write_json(path, manifest)
 
 
 def validate_stage6b_inputs(stage6b_dir: Path) -> dict[str, Any]:
@@ -235,6 +276,13 @@ def create_stage6c_setup(
     packets = out_dir / "review_packets"
     artifacts.mkdir(parents=True, exist_ok=True)
     packets.mkdir(parents=True, exist_ok=True)
+    for stale in [
+        out_dir / LEGACY_COMBINED_ARCHIVE_NAME,
+        out_dir / R01_ARCHIVE_NAME,
+        out_dir / R02_ARCHIVE_NAME,
+    ]:
+        if stale.exists():
+            stale.unlink()
 
     review_items, table_metadata_rows = build_review_items(stage6b_dir, crudsql_root)
     write_jsonl(artifacts / "gold_review_items.jsonl", review_items)
@@ -253,16 +301,44 @@ def create_stage6c_setup(
         "allowed_decisions_after_execution": ["approved", "rejected"],
         "packet_decision_fields_initially_blank": True,
         "notes_required_for_rejected": True,
+        "reviewer_isolation": {
+            "reviewer_roles_must_be_distinct": True,
+            "R01_must_not_see_R02_decisions_or_notes_before_submission": True,
+            "R02_must_not_see_R01_decisions_or_notes_before_submission": True,
+            "cross_reviewer_discussion_before_submission": False,
+            "each_reviewer_receives_only_own_decision_packet": True,
+            "reviewer_outputs_are_sealed_until_both_submitted": True,
+            "execution_manifest_must_record": [
+                "R01_submission_sha256",
+                "R02_submission_sha256",
+                "submission_timestamps",
+                "pseudonymous_reviewer_role_ids",
+                "distinct_reviewer_assertion",
+            ],
+        },
         "adjudication_policy": {
             "disagreement_rule": "third_independent_adjudicator",
             "third_adjudicator_role": "R03",
             "third_adjudicator_must_not_see_model_predictions": True,
+            "R03_must_not_see_R01_decision": True,
+            "R03_must_not_see_R02_decision": True,
+            "R03_must_not_see_R01_notes": True,
+            "R03_must_not_see_R02_notes": True,
             "third_adjudicator_materials": "source_plus_registered_gold_only_no_model_outputs",
             "joint_discussion_allowed": False,
             "decision_after_seeing_model_outputs_allowed": False,
         },
+        "final_decision_rule": [
+            {"R01": "approved", "R02": "approved", "action": "final_approved"},
+            {"R01": "rejected", "R02": "rejected", "action": "final_rejected_confirmation_blocked"},
+            {"R01": "approved", "R02": "rejected", "action": "blind_R03_adjudication"},
+            {"R01": "rejected", "R02": "approved", "action": "blind_R03_adjudication"},
+            {"R03": "approved", "action": "final_approved"},
+            {"R03": "rejected", "action": "final_rejected_confirmation_blocked"},
+        ],
         "rejection_policy": {
-            "any_unresolved_or_rejected_gold_blocks_confirmation": True,
+            "any_final_unresolved_or_rejected_gold_blocks_confirmation": True,
+            "initial_R01_R02_disagreement_goes_to_blind_R03_not_immediate_block": True,
             "drop_rejected_samples_allowed": False,
             "silent_exclusion_allowed": False,
             "if_adapter_or_gold_error": (
@@ -278,11 +354,43 @@ def create_stage6c_setup(
         "registered_gold_write_plans_sha256": sha256_file(stage6b_dir / "artifacts" / "gold_write_plans.jsonl"),
         "registered_gold_programs_sha256": sha256_file(stage6b_dir / "artifacts" / "gold_programs.jsonl"),
         "registered_gold_post_state_hashes_sha256": sha256_file(stage6b_dir / "artifacts" / "gold_post_state_hashes.jsonl"),
+        "patch1_content_immutability": {
+            "gold_review_items_sha256_must_remain": PATCH0_GOLD_REVIEW_ITEMS_SHA256,
+            "official_table_metadata_sha256_must_remain": PATCH0_OFFICIAL_TABLE_METADATA_SHA256,
+        },
     }
     write_json(out_dir / "GOLD_REVIEW_PROTOCOL_ADDENDUM_LOCK.json", addendum)
 
-    write_review_packet(packets / "stage6c_gold_review_R01.tsv", review_items, "R01")
-    write_review_packet(packets / "stage6c_gold_review_R02.tsv", review_items, "R02")
+    r01_packet = packets / "stage6c_gold_review_R01.tsv"
+    r02_packet = packets / "stage6c_gold_review_R02.tsv"
+    write_review_packet(r01_packet, review_items, "R01")
+    write_review_packet(r02_packet, review_items, "R02")
+    r01_manifest = packets / "Stage6C_R01_PACKET_MANIFEST.json"
+    r02_manifest = packets / "Stage6C_R02_PACKET_MANIFEST.json"
+    write_reviewer_archive_manifest(r01_manifest, "R01", r01_packet, out_dir)
+    write_reviewer_archive_manifest(r02_manifest, "R02", r02_packet, out_dir)
+    r01_archive = make_archive(
+        out_dir / R01_ARCHIVE_NAME,
+        [
+            out_dir / "GOLD_REVIEW_PROTOCOL_ADDENDUM_LOCK.json",
+            artifacts / "gold_review_items.jsonl",
+            artifacts / "official_table_metadata.jsonl",
+            r01_manifest,
+            r01_packet,
+        ],
+        out_dir,
+    )
+    r02_archive = make_archive(
+        out_dir / R02_ARCHIVE_NAME,
+        [
+            out_dir / "GOLD_REVIEW_PROTOCOL_ADDENDUM_LOCK.json",
+            artifacts / "gold_review_items.jsonl",
+            artifacts / "official_table_metadata.jsonl",
+            r02_manifest,
+            r02_packet,
+        ],
+        out_dir,
+    )
 
     packet_manifest = {
         "stage": "Stage6C_INDEPENDENT_GOLD_REVIEW_SETUP",
@@ -291,16 +399,19 @@ def create_stage6c_setup(
         "gpu_called": False,
         "confirmation_run_allowed_now": False,
         "sample_count": len(review_items),
+        "reviewer_isolation_distribution": "separate_archive_per_reviewer",
         "reviewer_packets": [
             {
                 "reviewer_id": "R01",
                 "path": "review_packets/stage6c_gold_review_R01.tsv",
-                "sha256": sha256_file(packets / "stage6c_gold_review_R01.tsv"),
+                "sha256": sha256_file(r01_packet),
+                "isolated_archive": r01_archive,
             },
             {
                 "reviewer_id": "R02",
                 "path": "review_packets/stage6c_gold_review_R02.tsv",
-                "sha256": sha256_file(packets / "stage6c_gold_review_R02.tsv"),
+                "sha256": sha256_file(r02_packet),
+                "isolated_archive": r02_archive,
             },
         ],
         "gold_review_items_sha256": sha256_file(artifacts / "gold_review_items.jsonl"),
@@ -318,6 +429,13 @@ This package does not call a model and does not permit GPU preflight. It locks
 the third-adjudicator rule, rejection policy, and R01/R02 packet templates for
 the 500 registered CRUDSQL Stage6B gold items.
 
+Each reviewer receives only their own archive:
+
+```text
+Stage6C_R01_review_packet_20260824.zip -> R01 only
+Stage6C_R02_review_packet_20260824.zip -> R02 only
+```
+
 Reviewers fill only:
 
 ```text
@@ -325,8 +443,9 @@ decision in {approved, rejected}
 notes
 ```
 
-All immutable fields and content hashes must remain unchanged. Any rejected or
-unresolved item blocks confirmation until resolved before model execution.
+All immutable fields and content hashes must remain unchanged. Reviewer outputs
+are sealed until both R01/R02 have submitted. Final rejected or unresolved items
+block confirmation until resolved before model execution.
 """
     validation = f"""# Stage 6C Gold Review Setup Validation Report
 
@@ -336,8 +455,10 @@ Validation date: 2026-08-24
 
 - review items: {len(review_items)}
 - reviewer packets: R01, R02
-- adjudication: third independent adjudicator
-- rejected/unresolved policy: blocks confirmation
+- reviewer distribution: separate isolated archive per reviewer
+- reviewer isolation: cross-reviewer decisions/notes hidden until both submitted
+- adjudication: blind third independent adjudicator for disagreements
+- final rejected/unresolved policy: blocks confirmation
 - model_called: false
 - gpu_called: false
 - confirmation_run_allowed_now: false
@@ -351,17 +472,6 @@ python scripts/data/validate_stage6c_gold_review_setup.py --setup-dir stage6_gol
     write_text(out_dir / "REVIEWER_README.md", readme)
     write_text(out_dir / "VALIDATION_REPORT.md", validation)
 
-    archive_members = [
-        out_dir / "GOLD_REVIEW_PROTOCOL_ADDENDUM_LOCK.json",
-        out_dir / "GOLD_REVIEW_PACKET_MANIFEST.json",
-        out_dir / "REVIEWER_README.md",
-        out_dir / "VALIDATION_REPORT.md",
-        artifacts / "gold_review_items.jsonl",
-        artifacts / "official_table_metadata.jsonl",
-        packets / "stage6c_gold_review_R01.tsv",
-        packets / "stage6c_gold_review_R02.tsv",
-    ]
-    archive = make_archive(out_dir / ARCHIVE_NAME, archive_members, out_dir)
     setup_lock = {
         "stage": "Stage6C_INDEPENDENT_GOLD_REVIEW_SETUP",
         "status": "PASS_LOCKED_PENDING_HUMAN_REVIEW_EXECUTION",
@@ -374,7 +484,9 @@ python scripts/data/validate_stage6c_gold_review_setup.py --setup-dir stage6_gol
         "packet_manifest_sha256": sha256_file(out_dir / "GOLD_REVIEW_PACKET_MANIFEST.json"),
         "reviewer_readme_sha256": sha256_file(out_dir / "REVIEWER_README.md"),
         "validation_report_sha256": sha256_file(out_dir / "VALIDATION_REPORT.md"),
-        "packet_archive": archive,
+        "gold_review_items_sha256": sha256_file(artifacts / "gold_review_items.jsonl"),
+        "official_table_metadata_sha256": sha256_file(artifacts / "official_table_metadata.jsonl"),
+        "review_packet_archives": [r01_archive, r02_archive],
     }
     write_json(out_dir / "STAGE6C_GOLD_REVIEW_SETUP_LOCK.json", setup_lock)
     return setup_lock

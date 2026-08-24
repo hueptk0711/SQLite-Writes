@@ -1,52 +1,71 @@
 {
   "confirmation_run_allowed_now": false,
+  "gold_review_items_sha256": "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b",
   "gpu_called": false,
   "model_called": false,
-  "packet_archive": {
-    "member_count": 8,
-    "members": [
-      {
-        "path": "GOLD_REVIEW_PACKET_MANIFEST.json",
-        "sha256": "48d383d24abbdb65e0cdd0ba4694e7310f958ab36a28862c8354046a484cb974"
-      },
-      {
-        "path": "GOLD_REVIEW_PROTOCOL_ADDENDUM_LOCK.json",
-        "sha256": "20bd21d35b2f4db737b5ad047f15aec0396bce44ce95992eb0191fc9be199a94"
-      },
-      {
-        "path": "REVIEWER_README.md",
-        "sha256": "8ab1a0ce045f3187bb9f7064ac37dbc88270ac87ad406e1d6e34e82fcf1464cb"
-      },
-      {
-        "path": "VALIDATION_REPORT.md",
-        "sha256": "d70c98fde8f2a90864e9149ac817c53bf9295f8e3d2a8f3bb22fa19261685f70"
-      },
-      {
-        "path": "artifacts/gold_review_items.jsonl",
-        "sha256": "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b"
-      },
-      {
-        "path": "artifacts/official_table_metadata.jsonl",
-        "sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93"
-      },
-      {
-        "path": "review_packets/stage6c_gold_review_R01.tsv",
-        "sha256": "af26b59f90d25b01d4a8cc6bc77ed560e9196fb982faad83341e46bf3565d506"
-      },
-      {
-        "path": "review_packets/stage6c_gold_review_R02.tsv",
-        "sha256": "19bb7d1595a1c85b07d4de158dba0ac3c5f2506aad898b142796cc641f56d6d9"
-      }
-    ],
-    "path": "stage6c_gold_review_packets_20260824.zip",
-    "sha256": "daec58c518989f9f6b7a29f35b28c661a59babccbfdc7d3b9271cba5f39b9f3f"
-  },
-  "packet_manifest_sha256": "48d383d24abbdb65e0cdd0ba4694e7310f958ab36a28862c8354046a484cb974",
-  "protocol_addendum_sha256": "20bd21d35b2f4db737b5ad047f15aec0396bce44ce95992eb0191fc9be199a94",
-  "reviewer_readme_sha256": "8ab1a0ce045f3187bb9f7064ac37dbc88270ac87ad406e1d6e34e82fcf1464cb",
+  "official_table_metadata_sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93",
+  "packet_manifest_sha256": "53b8f8d65e482916d23b29d6253b76f6cbea21699d5ed2905edf5d94c67a6a9c",
+  "protocol_addendum_sha256": "93b78d7d1f008e117b09dc0eb93cdaa7c017aedbeca83aa34e932d5fdd8f19b2",
+  "review_packet_archives": [
+    {
+      "member_count": 5,
+      "members": [
+        {
+          "path": "GOLD_REVIEW_PROTOCOL_ADDENDUM_LOCK.json",
+          "sha256": "93b78d7d1f008e117b09dc0eb93cdaa7c017aedbeca83aa34e932d5fdd8f19b2"
+        },
+        {
+          "path": "artifacts/gold_review_items.jsonl",
+          "sha256": "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b"
+        },
+        {
+          "path": "artifacts/official_table_metadata.jsonl",
+          "sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93"
+        },
+        {
+          "path": "review_packets/Stage6C_R01_PACKET_MANIFEST.json",
+          "sha256": "b674a590e9e922b4ade65b950b19f8c37b8cc9a551fa83ef3171f35868cc2913"
+        },
+        {
+          "path": "review_packets/stage6c_gold_review_R01.tsv",
+          "sha256": "af26b59f90d25b01d4a8cc6bc77ed560e9196fb982faad83341e46bf3565d506"
+        }
+      ],
+      "path": "Stage6C_R01_review_packet_20260824.zip",
+      "sha256": "33f5b6153a4db07627156a1e121326dbf9dab0abe5c84e7ffb0d1a1ea15817a7"
+    },
+    {
+      "member_count": 5,
+      "members": [
+        {
+          "path": "GOLD_REVIEW_PROTOCOL_ADDENDUM_LOCK.json",
+          "sha256": "93b78d7d1f008e117b09dc0eb93cdaa7c017aedbeca83aa34e932d5fdd8f19b2"
+        },
+        {
+          "path": "artifacts/gold_review_items.jsonl",
+          "sha256": "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b"
+        },
+        {
+          "path": "artifacts/official_table_metadata.jsonl",
+          "sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93"
+        },
+        {
+          "path": "review_packets/Stage6C_R02_PACKET_MANIFEST.json",
+          "sha256": "6fa92550b6dd460ea128742eca794bc09f79da2cf19db0d5d467d25b6567a122"
+        },
+        {
+          "path": "review_packets/stage6c_gold_review_R02.tsv",
+          "sha256": "19bb7d1595a1c85b07d4de158dba0ac3c5f2506aad898b142796cc641f56d6d9"
+        }
+      ],
+      "path": "Stage6C_R02_review_packet_20260824.zip",
+      "sha256": "9921c458bf0206c05a84f5933c6a65fc07d728ec3e1a29ca047a6c8245d103bf"
+    }
+  ],
+  "reviewer_readme_sha256": "e8f7b3a5283f729271833bb765dbd4e423d2393f2fb295f0297e6fd87d278455",
   "sample_count": 500,
   "stage": "Stage6C_INDEPENDENT_GOLD_REVIEW_SETUP",
   "stage6b_commit": "bbbe4d374edd60696b0765771640a946a838fd4d",
   "status": "PASS_LOCKED_PENDING_HUMAN_REVIEW_EXECUTION",
-  "validation_report_sha256": "d70c98fde8f2a90864e9149ac817c53bf9295f8e3d2a8f3bb22fa19261685f70"
+  "validation_report_sha256": "71260c28c6e2cbb1a0b585ca335c5df212c564a2408264a31747e66a3cc120f3"
 }
