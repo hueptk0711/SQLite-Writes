@@ -1,0 +1,30 @@
+{
+  "canonical_content_hash_overlap_count": 0,
+  "crudsql_sample_count": 500,
+  "database_overlap_count": 0,
+  "disclosure": "CRUDSQL uses upstream table IDs prefixed with crudsql: for source_group and database identity in this audit.",
+  "input_text_hash_overlap_count": 0,
+  "reference_sources": [
+    {
+      "name": "stage4_fresh_300",
+      "path": "stage4_fresh_7b_protocol/data/fresh_dataset_manifest.json",
+      "sample_count": 300,
+      "sha256": "d1850063af0a5b235cc4e8854d72b146fcca6e26bdebb5617ac3048abd4726ec"
+    },
+    {
+      "name": "final_holdout_release_300",
+      "path": "03_protocol_and_data/final_holdout_release/mp_fs_plus_external_holdout_300_20260731.zip",
+      "sample_count": 300,
+      "sha256": "525cdd7006ea32a8ab8d81f842332ac9b403dce2472cde608efb4e6962d456df"
+    },
+    {
+      "name": "archived_677_pool",
+      "path": "D:/paper kltn/text to sql/99_archive_history_20260731/legacy_sources_and_results/server_downloads/paper_v3_release_20260726/source/paper_v3_mapping_first/data/frozen/test/dataset_test_v3.json",
+      "sample_count": 677,
+      "sha256": "70d8a38552f46f81fee9abe04f0ebf96a862405965aeaff9958455dad08ebfb4"
+    }
+  ],
+  "sample_id_overlap_count": 0,
+  "source_group_overlap_count": 0,
+  "status": "PASS"
+}

@@ -1,0 +1,7 @@
+{
+  "claim_boundary": "external_generalization_to_public_Chinese_single_table_SQLite_insert_benchmark",
+  "eligible_for_stage6b_registration_after_reviewer_acceptance": true,
+  "recommended_registration_n": 500,
+  "recommended_sampling_policy": "use_all_eligible_official_test_type0_examples_no_random_sampling",
+  "status": "PASS_ELIGIBLE_FOR_STAGE6B_REGISTRATION"
+}

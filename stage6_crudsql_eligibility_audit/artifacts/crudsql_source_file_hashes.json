@@ -1,0 +1,13 @@
+{
+  "LICENSE": "230184f60bae2feaf244f10a8bac053c8ff33a183bcc365b4d8b876d2b7f4809",
+  "README.md": "69b904bcd977ebf71d94f456c517295fe097399ca84ad983e120dc844d6cf867",
+  "data/dev/crud_dev_sql.json": "ffc5baa985a682a4005d5ee891bd33ee287c334b8aba830add298bfb91af47f6",
+  "data/dev/crud_dev_table.json": "2b60c781f8f30b3a6907cf6da0b48be6b26f7dd6cf31d0478167f1313d94a517",
+  "data/dev/dev.db": "0134a3a27371b6e914b5803dda2fa5481f4f350b56394bf99063c8bbb1cf1fa6",
+  "data/test/crud_test_sql.json": "bbba7432784f00b91828ad35e533b59f34e0e57daab3c08ed426d293d44694f4",
+  "data/test/crud_test_table.json": "1fb4d2d7c3b328269ef0f781ccc3eb68723673192e11bceaa874af8b0917be7d",
+  "data/test/test.db": "c868184575176332fb706f07ce8ae53b13898f5cb242984af06a2ae7a311f580",
+  "data/train/crud_train_sql.json": "71b131834dbe45539f882d124feaac7adfa48a9d0dcaa9704dcb36e89d2917b8",
+  "data/train/crud_train_table.json": "088fa945d1e825915aba03de862d499f35fbb1afa8aa5c2cec71679e2e62311b",
+  "data/train/train.db": "29a1d5f3e1eed9512a77e68a889676f2b64ff1a6d6bf4fcb7d3ad22e512fa219"
+}
