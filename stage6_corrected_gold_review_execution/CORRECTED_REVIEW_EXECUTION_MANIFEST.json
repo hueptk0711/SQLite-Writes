@@ -21,11 +21,11 @@
       },
       {
         "path": "CORRECTED_REVIEW_EXECUTION_MANIFEST.json",
-        "sha256": "6d661cbea8c09de134aa59b73a4333379e592a5b843ea196667c9be32684309c"
+        "sha256": "ac9c29c4e879de32ec4714e2d76b2b5a7294c24144cf34a1caf10c228184c5a5"
       },
       {
         "path": "REVIEWER_README.md",
-        "sha256": "30be85d7b0cc44768a05346df8ba5af4a332ef917394c8e85365dcc282848cfd"
+        "sha256": "0da9e51068c9a9d17a100f6121e3d1e18c33d2694dc63f0da731063227eb2cf1"
       },
       {
         "path": "VALIDATION_REPORT.md",
@@ -41,12 +41,13 @@
       }
     ],
     "path": "stage6d_corrected_review_execution_artifacts_20260824.zip",
-    "sha256": "858d13250afc7b9c404167f2fa7ad5c955bf82a2a7c9b9cdd6ee5de905b6f278"
+    "sha256": "3ff24e995d2f3bf3abc087c792da0bf5339624c70c0da9780a8421d54eca7e6f"
   },
   "confirmation_run_allowed_now": false,
   "corrected_gold_review_items_sha256": "28bbbaad52cea9d9511a11ca7ac92115b72533801189ffacc5cad6e4369c787c",
   "corrected_item_count": 21,
   "disagreement_count": 0,
+  "distinct_reviewer_assertion": "required_by_protocol_and_recorded_as_execution_condition",
   "final_gold_freeze_created": false,
   "gpu_called": false,
   "model_called": false,
@@ -57,10 +58,29 @@
     "then_create_final_gold_freeze_after_reviewer_acceptance"
   ],
   "protocol_lock_sha256": "d61fb438eb32cbed4ff8fdcf6ca3c3ea79dc2e5ab4df64213ce64326a7a871c2",
+  "pseudonymous_reviewer_role_ids": [
+    "C01",
+    "C02"
+  ],
   "resolution_report_sha256": "45f1eefd9f46fc1057129448cd46c39b641a348405366ffd5105df3efe35261d",
+  "reviewer_isolation_attestation": {
+    "C01_C02_decisions_or_notes_shared_before_both_submitted": false,
+    "C01_is_R04": false,
+    "C02_is_R04": false,
+    "cross_reviewer_discussion_before_submission": false,
+    "model_predictions_visible_to_reviewers": false
+  },
   "setup_lock_sha256": "b259437488603696fc101d214279399f720ab7c7ee523fbe877f279a4c8d30d1",
   "stage": "Stage6D_CORRECTED_REVIEW_EXECUTION",
   "stage6d_setup_patch1_commit": "4c789bdebc08a8c35bce19290282b536da7676e3",
   "status": "ALL_21_CORRECTED_ITEMS_ACCEPTED_PENDING_STAGE6_REGISTRATION_REVISION",
+  "submission_hashes": {
+    "C01_submission_sha256": "56b24e07e721d2209e4db3928860f9690e07237f2da91a158cc414ca45a752c8",
+    "C02_submission_sha256": "4f01075dd3bcf1affc039c65841b04ccf7a50388f0b8d289b5df43af51cee6ed"
+  },
+  "submission_timestamps_recorded_from_source_files": {
+    "C01_submission_source_mtime": 1787575763.7833896,
+    "C02_submission_source_mtime": 1787575769.0116067
+  },
   "validation_violations": []
 }

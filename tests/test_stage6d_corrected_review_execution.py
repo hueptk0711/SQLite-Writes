@@ -36,6 +36,23 @@ def write_tsv(path: Path, fields: list[str], rows: list[dict[str, str]]) -> None
         writer.writerows(rows)
 
 
+def mutate_manifest(execution: Path, key: str, value) -> None:
+    path = execution / "CORRECTED_REVIEW_EXECUTION_MANIFEST.json"
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    if value is None:
+        manifest.pop(key, None)
+    else:
+        manifest[key] = value
+    path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def mutate_attestation(execution: Path, key: str, value: bool) -> None:
+    path = execution / "CORRECTED_REVIEW_EXECUTION_MANIFEST.json"
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    manifest["reviewer_isolation_attestation"][key] = value
+    path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
 def test_stage6d_corrected_review_execution_validator_passes_repo_artifact() -> None:
     report = validate_stage6d_corrected_review_execution(EXECUTION_DIR, SETUP_DIR)
 
@@ -103,3 +120,63 @@ def test_stage6d_corrected_review_execution_rejects_stale_agreement_report(tmp_p
 
     assert report["status"] == "FAIL"
     assert "agreement_report_not_reproducible_from_submissions" in report["violations"]
+
+
+def test_stage6d_corrected_review_execution_requires_distinct_reviewer_assertion(tmp_path: Path) -> None:
+    execution, setup = copy_execution(tmp_path)
+    mutate_manifest(execution, "distinct_reviewer_assertion", None)
+
+    report = validate_stage6d_corrected_review_execution(execution, setup)
+
+    assert report["status"] == "FAIL"
+    assert "manifest_distinct_reviewer_assertion_mismatch" in report["violations"]
+
+
+def test_stage6d_corrected_review_execution_rejects_shared_decisions_attestation(tmp_path: Path) -> None:
+    execution, setup = copy_execution(tmp_path)
+    mutate_attestation(execution, "C01_C02_decisions_or_notes_shared_before_both_submitted", True)
+
+    report = validate_stage6d_corrected_review_execution(execution, setup)
+
+    assert report["status"] == "FAIL"
+    assert "manifest_reviewer_isolation_attestation_mismatch" in report["violations"]
+
+
+def test_stage6d_corrected_review_execution_rejects_cross_reviewer_discussion_attestation(tmp_path: Path) -> None:
+    execution, setup = copy_execution(tmp_path)
+    mutate_attestation(execution, "cross_reviewer_discussion_before_submission", True)
+
+    report = validate_stage6d_corrected_review_execution(execution, setup)
+
+    assert report["status"] == "FAIL"
+    assert "manifest_reviewer_isolation_attestation_mismatch" in report["violations"]
+
+
+def test_stage6d_corrected_review_execution_rejects_model_visibility_attestation(tmp_path: Path) -> None:
+    execution, setup = copy_execution(tmp_path)
+    mutate_attestation(execution, "model_predictions_visible_to_reviewers", True)
+
+    report = validate_stage6d_corrected_review_execution(execution, setup)
+
+    assert report["status"] == "FAIL"
+    assert "manifest_reviewer_isolation_attestation_mismatch" in report["violations"]
+
+
+def test_stage6d_corrected_review_execution_rejects_c01_as_r04_attestation(tmp_path: Path) -> None:
+    execution, setup = copy_execution(tmp_path)
+    mutate_attestation(execution, "C01_is_R04", True)
+
+    report = validate_stage6d_corrected_review_execution(execution, setup)
+
+    assert report["status"] == "FAIL"
+    assert "manifest_reviewer_isolation_attestation_mismatch" in report["violations"]
+
+
+def test_stage6d_corrected_review_execution_rejects_c02_as_r04_attestation(tmp_path: Path) -> None:
+    execution, setup = copy_execution(tmp_path)
+    mutate_attestation(execution, "C02_is_R04", True)
+
+    report = validate_stage6d_corrected_review_execution(execution, setup)
+
+    assert report["status"] == "FAIL"
+    assert "manifest_reviewer_isolation_attestation_mismatch" in report["violations"]

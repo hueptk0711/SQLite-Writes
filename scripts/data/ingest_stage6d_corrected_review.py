@@ -260,6 +260,23 @@ def ingest_corrected_review(
         "C02_submission_sha256": sha256_file(c02_target),
         "C01_source_mtime": c01_submission.stat().st_mtime,
         "C02_source_mtime": c02_submission.stat().st_mtime,
+        "submission_hashes": {
+            "C01_submission_sha256": sha256_file(c01_target),
+            "C02_submission_sha256": sha256_file(c02_target),
+        },
+        "submission_timestamps_recorded_from_source_files": {
+            "C01_submission_source_mtime": c01_submission.stat().st_mtime,
+            "C02_submission_source_mtime": c02_submission.stat().st_mtime,
+        },
+        "pseudonymous_reviewer_role_ids": ["C01", "C02"],
+        "distinct_reviewer_assertion": "required_by_protocol_and_recorded_as_execution_condition",
+        "reviewer_isolation_attestation": {
+            "C01_C02_decisions_or_notes_shared_before_both_submitted": False,
+            "cross_reviewer_discussion_before_submission": False,
+            "model_predictions_visible_to_reviewers": False,
+            "C01_is_R04": False,
+            "C02_is_R04": False,
+        },
         "setup_lock_sha256": sha256_file(setup_dir / "STAGE6D_CORRECTED_GOLD_REVIEW_SETUP_LOCK.json"),
         "protocol_lock_sha256": sha256_file(setup_dir / "CORRECTED_GOLD_REVIEW_PROTOCOL_LOCK.json"),
         "corrected_gold_review_items_sha256": sha256_file(setup_dir / "artifacts" / "corrected_gold_review_items.jsonl"),
@@ -290,12 +307,17 @@ Validation date: 2026-08-24
 - confirmation_run_allowed_now: false
 - final_gold_freeze_created: false
 """
-    reviewer_readme = """# Stage 6D Corrected Review Execution
+    reviewer_readme = f"""# Stage 6D Corrected Review Execution
 
 This package ingests the completed C01/C02 corrected-gold re-review TSV
 submissions for the 21 R04-correctable items.
 
-Both reviewers approved all 21 corrected items. No C03 packet is created.
+Corrected review agreement:
+- agreed approved: {agreement['agreed_approved_count']}
+- agreed rejected: {agreement['agreed_rejected_count']}
+- disagreements: {agreement['disagreement_count']}
+- C03 required: {str(agreement['blind_C03_required']).lower()}
+- C03 packet created: false
 
 This package does not revise the 19 SOURCE_TASK_INVALID items, does not create
 a final gold freeze, and does not permit GPU preflight.

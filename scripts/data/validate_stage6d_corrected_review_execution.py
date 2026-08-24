@@ -28,6 +28,13 @@ from scripts.data.create_stage6d_corrected_gold_review_setup import REVIEW_PACKE
 
 EXPECTED_RESOLUTION_STATUS = "ALL_21_CORRECTED_ITEMS_ACCEPTED_PENDING_STAGE6_REGISTRATION_REVISION"
 EXPECTED_STAGE = "Stage6D_CORRECTED_REVIEW_EXECUTION"
+EXPECTED_REVIEWER_ISOLATION_ATTESTATION = {
+    "C01_C02_decisions_or_notes_shared_before_both_submitted": False,
+    "cross_reviewer_discussion_before_submission": False,
+    "model_predictions_visible_to_reviewers": False,
+    "C01_is_R04": False,
+    "C02_is_R04": False,
+}
 
 
 def expected_resolution(agreement: dict[str, Any]) -> dict[str, Any]:
@@ -126,6 +133,24 @@ def validate_stage6d_corrected_review_execution(
         violations.append("manifest_stage6d_patch1_commit_mismatch")
     if manifest.get("status") != EXPECTED_RESOLUTION_STATUS:
         violations.append("manifest_status_changed")
+    if manifest.get("pseudonymous_reviewer_role_ids") != ["C01", "C02"]:
+        violations.append("manifest_pseudonymous_reviewer_role_ids_mismatch")
+    if manifest.get("distinct_reviewer_assertion") != "required_by_protocol_and_recorded_as_execution_condition":
+        violations.append("manifest_distinct_reviewer_assertion_mismatch")
+    if manifest.get("reviewer_isolation_attestation") != EXPECTED_REVIEWER_ISOLATION_ATTESTATION:
+        violations.append("manifest_reviewer_isolation_attestation_mismatch")
+    expected_submission_hashes = {
+        "C01_submission_sha256": sha256_file(c01_path),
+        "C02_submission_sha256": sha256_file(c02_path),
+    }
+    if manifest.get("submission_hashes") != expected_submission_hashes:
+        violations.append("manifest_submission_hashes_mismatch")
+    expected_timestamps = {
+        "C01_submission_source_mtime": manifest.get("C01_source_mtime"),
+        "C02_submission_source_mtime": manifest.get("C02_source_mtime"),
+    }
+    if manifest.get("submission_timestamps_recorded_from_source_files") != expected_timestamps:
+        violations.append("manifest_submission_timestamps_mismatch")
     for field, expected in {
         "corrected_item_count": 21,
         "agreed_approved_count": 21,
