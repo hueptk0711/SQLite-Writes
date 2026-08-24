@@ -6,19 +6,23 @@
   "disagreement_count": 52,
   "distinct_reviewer_assertion": "required_by_protocol_and_recorded_as_execution_condition",
   "execution_archive": {
-    "member_count": 11,
+    "member_count": 12,
     "members": [
+      {
+        "path": "FINAL_REJECTION_RESOLUTION_LOCK.json",
+        "sha256": "0f2d64924e1918ea42eda50acfbc3a006a2808bceca30cbffcad3d9f6aaa1835"
+      },
       {
         "path": "R01_R02_AGREEMENT_REPORT.json",
         "sha256": "4103c8fdffb262f04d5c0a46f20a68207fa114671e5da10696c12a47c9175d57"
       },
       {
         "path": "REVIEWER_README.md",
-        "sha256": "e5f4caf31cbc258c92bacf3053196999be8cdd3b4632afe2bbf7a1050e0dd781"
+        "sha256": "55d75ecf9d7624e589a10c7a0eb5db9fd36273e85b556d161e1636fda6e3b362"
       },
       {
         "path": "REVIEW_EXECUTION_MANIFEST.json",
-        "sha256": "80f636110044a41e8d226b5578c181b779b5554d34e74be503f43c0659940a52"
+        "sha256": "5243baff4455d8c2b85ffbed0916902028d45da13e0094261558c9b0e85e5510"
       },
       {
         "path": "Stage6C_R03_blind_adjudication_packet_20260824.zip",
@@ -26,7 +30,7 @@
       },
       {
         "path": "VALIDATION_REPORT.md",
-        "sha256": "c455b7fa493129041e4f8dda4f2daae2b60a7dc9ae4af2a35e46207bbb2a7f2a"
+        "sha256": "180d7130741564797bf403acf8c9008c1ba6d01292a862737807ea89264ce7fb"
       },
       {
         "path": "r03_blind_packet/R03_BLIND_PACKET_MANIFEST.json",
@@ -54,13 +58,18 @@
       }
     ],
     "path": "stage6c_review_execution_artifacts_20260824.zip",
-    "sha256": "c11cf5a6d37bce2b77289710739936919c81a4a306dd19420c7ee59a4a2e3cd2"
+    "sha256": "31dafbbcf9f63ac865fa82948213a4c8cfb3c72e6ce874387e3e27d9d6f8612a"
   },
   "final_gold_freeze_created": false,
+  "final_rejection_resolution_lock_created": true,
+  "final_rejection_resolution_lock_sha256": "0f2d64924e1918ea42eda50acfbc3a006a2808bceca30cbffcad3d9f6aaa1835",
   "gold_review_items_sha256": "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b",
   "gpu_called": false,
   "model_called": false,
-  "next_step": "send_blind_R03_packet_and_wait_for_adjudication",
+  "next_steps": [
+    "send_blind_R03_packet_and_wait_for_adjudication",
+    "resolve_agreed_rejected_items_under_FINAL_REJECTION_RESOLUTION_LOCK"
+  ],
   "official_table_metadata_sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93",
   "protocol_addendum_sha256": "93b78d7d1f008e117b09dc0eb93cdaa7c017aedbeca83aa34e932d5fdd8f19b2",
   "pseudonymous_reviewer_role_ids": [
@@ -78,7 +87,7 @@
   "stage": "Stage6C_REVIEW_EXECUTION_AND_ADJUDICATION_PREP",
   "stage6b_commit": "bbbe4d374edd60696b0765771640a946a838fd4d",
   "stage6c_setup_commit": "cd89a33f41d4be6ba8094789aa6141fafd55b2c8",
-  "status": "PASS_PENDING_BLIND_R03_ADJUDICATION",
+  "status": "PASS_PENDING_R03_AND_FINAL_REJECTION_RESOLUTION",
   "submission_hashes": {
     "R01_submission_sha256": "38f65faffad6e686ce978673faba77f9f88b40379c1e02f4f2e47eebd681fa82",
     "R02_submission_sha256": "28922ebfacd028077266b534c66d8ed0b39331f75ebf21e9bbd5cfb4a9286db3"

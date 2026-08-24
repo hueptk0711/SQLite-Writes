@@ -22,6 +22,12 @@ def copy_execution(tmp_path: Path) -> Path:
 
 def test_stage6c_review_execution_validator_passes_repo_artifact() -> None:
     report = validate_execution(EXECUTION_DIR, SETUP_DIR)
+    manifest = json.loads(
+        (EXECUTION_DIR / "REVIEW_EXECUTION_MANIFEST.json").read_text(encoding="utf-8")
+    )
+    rejection_lock = json.loads(
+        (EXECUTION_DIR / "FINAL_REJECTION_RESOLUTION_LOCK.json").read_text(encoding="utf-8")
+    )
 
     assert report["status"] == "PASS"
     assert report["confirmation_run_allowed_now"] is False
@@ -29,6 +35,15 @@ def test_stage6c_review_execution_validator_passes_repo_artifact() -> None:
     assert report["gpu_called"] is False
     assert report["final_gold_freeze_created"] is False
     assert report["agreed_approved_count"] + report["agreed_rejected_count"] + report["disagreement_count"] == 500
+    assert manifest["status"] == "PASS_PENDING_R03_AND_FINAL_REJECTION_RESOLUTION"
+    assert "send_blind_R03_packet_and_wait_for_adjudication" in manifest["next_steps"]
+    assert "resolve_agreed_rejected_items_under_FINAL_REJECTION_RESOLUTION_LOCK" in manifest["next_steps"]
+    assert rejection_lock["classification_reviewer_role"] == "R04"
+    assert rejection_lock["agreed_rejected_count"] == report["agreed_rejected_count"] == 17
+    assert rejection_lock["allowed_classes"] == [
+        "CORRECTABLE_GOLD_ERROR",
+        "SOURCE_TASK_INVALID",
+    ]
 
 
 def test_stage6c_review_execution_rejects_blank_rejected_notes(tmp_path: Path) -> None:
@@ -82,3 +97,26 @@ def test_stage6c_r03_packet_contains_no_r01_r02_submissions() -> None:
 
     assert "r03_blind_packet/stage6c_gold_review_R03.tsv" in names
     assert all("R01" not in name and "R02" not in name and "submitted" not in name for name in names)
+
+
+def test_stage6c_review_execution_rejects_old_single_branch_status(tmp_path: Path) -> None:
+    execution = copy_execution(tmp_path)
+    manifest_path = execution / "REVIEW_EXECUTION_MANIFEST.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["status"] = "PASS_PENDING_BLIND_R03_ADJUDICATION"
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    report = validate_execution(execution, SETUP_DIR)
+
+    assert report["status"] == "FAIL"
+    assert "status_not_expected_for_agreement_state" in report["violations"]
+
+
+def test_stage6c_review_execution_rejects_missing_final_rejection_lock(tmp_path: Path) -> None:
+    execution = copy_execution(tmp_path)
+    (execution / "FINAL_REJECTION_RESOLUTION_LOCK.json").unlink()
+
+    report = validate_execution(execution, SETUP_DIR)
+
+    assert report["status"] == "FAIL"
+    assert "missing_final_rejection_resolution_lock" in report["violations"]

@@ -17,7 +17,11 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from scripts.data.create_stage6c_gold_review_setup import REVIEW_PACKET_COLUMNS, canonical_json  # noqa: E402
-from scripts.data.execute_stage6c_gold_review import ARCHIVE_NAME, R03_ARCHIVE_NAME  # noqa: E402
+from scripts.data.execute_stage6c_gold_review import (  # noqa: E402
+    ARCHIVE_NAME,
+    FINAL_REJECTION_LOCK_NAME,
+    R03_ARCHIVE_NAME,
+)
 
 
 def sha256_file(path: Path) -> str:
@@ -140,9 +144,73 @@ def validate_execution(execution_dir: Path, setup_dir: Path) -> dict[str, Any]:
     if manifest.get("disagreement_count") != len(disagreements):
         violations.append("manifest_disagreement_count_mismatch")
 
+    expected_status = (
+        "PASS_PENDING_R03_AND_FINAL_REJECTION_RESOLUTION"
+        if disagreements and rr else
+        "PASS_PENDING_BLIND_R03_ADJUDICATION"
+        if disagreements else
+        "PASS_FINAL_REJECTED_BLOCKS_CONFIRMATION"
+        if rr else
+        "PASS_ALL_APPROVED_READY_FOR_FINAL_GOLD_FREEZE"
+    )
+    if manifest.get("status") != expected_status:
+        violations.append("status_not_expected_for_agreement_state")
+
+    next_steps = manifest.get("next_steps")
+    if not isinstance(next_steps, list):
+        violations.append("next_steps_not_list")
+        next_steps = []
+    if disagreements and "send_blind_R03_packet_and_wait_for_adjudication" not in next_steps:
+        violations.append("missing_R03_next_step")
+    if rr and "resolve_agreed_rejected_items_under_FINAL_REJECTION_RESOLUTION_LOCK" not in next_steps:
+        violations.append("missing_final_rejection_resolution_next_step")
+    if not disagreements and not rr and "create_final_gold_freeze_package" not in next_steps:
+        violations.append("missing_final_gold_freeze_next_step")
+
+    if rr:
+        lock_path = execution_dir / FINAL_REJECTION_LOCK_NAME
+        if not lock_path.is_file():
+            violations.append("missing_final_rejection_resolution_lock")
+        else:
+            lock = read_json(lock_path)
+            lock_items = lock.get("agreed_rejected_items", [])
+            if lock.get("status") != "LOCKED_PENDING_R04_TECHNICAL_RESOLUTION":
+                violations.append("final_rejection_lock_status_not_locked")
+            if lock.get("agreed_rejected_count") != len(rr):
+                violations.append("final_rejection_lock_count_mismatch")
+            if {row.get("stage6_sample_id") for row in lock_items} != set(rr):
+                violations.append("final_rejection_lock_item_set_mismatch")
+            if lock.get("classification_reviewer_role") != "R04":
+                violations.append("final_rejection_lock_role_not_R04")
+            if lock.get("R04_must_not_see_model_predictions") is not True:
+                violations.append("final_rejection_lock_R04_model_blindness_not_locked")
+            if lock.get("R04_may_see_R01_R02_rejection_reasons") is not True:
+                violations.append("final_rejection_lock_R04_reason_access_not_locked")
+            allowed_classes = lock.get("allowed_classes")
+            if allowed_classes != ["CORRECTABLE_GOLD_ERROR", "SOURCE_TASK_INVALID"]:
+                violations.append("final_rejection_lock_allowed_classes_changed")
+            class_rules = lock.get("class_rules", {})
+            for cls in ["CORRECTABLE_GOLD_ERROR", "SOURCE_TASK_INVALID"]:
+                if cls not in class_rules:
+                    violations.append(f"final_rejection_lock_missing_class_rule:{cls}")
+            forbidden_actions = set(lock.get("forbidden_actions", []))
+            for required in [
+                "drop rejected samples without registration revision",
+                "replace rejected samples with train/dev or newly selected samples",
+                "choose correction versus invalid after seeing model outputs",
+                "create final gold freeze while any final rejection remains unresolved",
+                "permit GPU preflight before final rejection resolution acceptance",
+            ]:
+                if required not in forbidden_actions:
+                    violations.append(f"final_rejection_lock_missing_forbidden_action:{required}")
+            if manifest.get("final_rejection_resolution_lock_created") is not True:
+                violations.append("manifest_final_rejection_lock_not_created")
+            if manifest.get("final_rejection_resolution_lock_sha256") != sha256_file(lock_path):
+                violations.append("manifest_final_rejection_lock_hash_mismatch")
+    elif manifest.get("final_rejection_resolution_lock_created"):
+        violations.append("unexpected_final_rejection_lock_created")
+
     if disagreements:
-        if manifest.get("status") != "PASS_PENDING_BLIND_R03_ADJUDICATION":
-            violations.append("status_not_pending_R03_despite_disagreements")
         r03_manifest_path = execution_dir / "r03_blind_packet" / "R03_BLIND_PACKET_MANIFEST.json"
         r03_items_path = execution_dir / "r03_blind_packet" / "r03_blind_review_items.jsonl"
         r03_tsv_path = execution_dir / "r03_blind_packet" / "stage6c_gold_review_R03.tsv"
@@ -192,13 +260,6 @@ def validate_execution(execution_dir: Path, setup_dir: Path) -> dict[str, Any]:
                         violations.append(f"R03_archive_contains_forbidden_name:{forbidden}")
             except zipfile.BadZipFile:
                 violations.append("R03_archive_not_openable")
-    elif rr:
-        if manifest.get("status") != "PASS_FINAL_REJECTED_BLOCKS_CONFIRMATION":
-            violations.append("status_not_final_rejected_despite_no_disagreement")
-    else:
-        if manifest.get("status") != "PASS_ALL_APPROVED_READY_FOR_FINAL_GOLD_FREEZE":
-            violations.append("status_not_all_approved_ready")
-
     archive_info = manifest.get("execution_archive") or {}
     archive_path = execution_dir / archive_info.get("path", ARCHIVE_NAME)
     if not archive_path.is_file():

@@ -29,6 +29,7 @@ STAGE6C_SETUP_COMMIT = "cd89a33f41d4be6ba8094789aa6141fafd55b2c8"
 ARCHIVE_NAME = "stage6c_review_execution_artifacts_20260824.zip"
 R03_ARCHIVE_NAME = "Stage6C_R03_blind_adjudication_packet_20260824.zip"
 ZIP_TIMESTAMP = (2026, 8, 24, 0, 0, 0)
+FINAL_REJECTION_LOCK_NAME = "FINAL_REJECTION_RESOLUTION_LOCK.json"
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -265,6 +266,74 @@ def build_r03_packet(
     return manifest
 
 
+def build_final_rejection_resolution_lock(
+    out_dir: Path,
+    agreed_rejected_items: list[dict[str, Any]],
+) -> dict[str, Any] | None:
+    if not agreed_rejected_items:
+        return None
+    lock = {
+        "stage": "Stage6C_FINAL_REJECTION_RESOLUTION_PROTOCOL",
+        "status": "LOCKED_PENDING_R04_TECHNICAL_RESOLUTION",
+        "agreed_rejected_count": len(agreed_rejected_items),
+        "agreed_rejected_items": agreed_rejected_items,
+        "confirmation_blocked_until_all_final_rejections_resolved": True,
+        "model_called": False,
+        "gpu_called": False,
+        "classification_reviewer_role": "R04",
+        "R04_task": "technical_root_cause_classification_not_model_scoring",
+        "R04_must_not_see_model_predictions": True,
+        "R04_may_see_R01_R02_rejection_reasons": True,
+        "R04_allowed_inputs": [
+            "Chinese NL instruction",
+            "official CRUDSQL annotation",
+            "official table metadata and rows",
+            "registered gold plan and parameterized write",
+            "R01/R02 rejection decisions and notes",
+        ],
+        "allowed_classes": [
+            "CORRECTABLE_GOLD_ERROR",
+            "SOURCE_TASK_INVALID",
+        ],
+        "class_rules": {
+            "CORRECTABLE_GOLD_ERROR": {
+                "required_condition": (
+                    "the correct intended write is uniquely recoverable from "
+                    "NL plus official source annotation/table evidence"
+                ),
+                "required_action": [
+                    "correct gold before any model run",
+                    "recompute gold plan, parameterized program, expected inserted row, post-state hash, and authored_content hash",
+                    "create corrected-item review packet",
+                    "obtain two independent re-reviews of corrected item",
+                    "do not count correction as automatically approved",
+                ],
+            },
+            "SOURCE_TASK_INVALID": {
+                "required_condition": (
+                    "no unique valid gold exists, or the source task contradicts "
+                    "the target table/schema/frozen task contract"
+                ),
+                "required_action": [
+                    "do not fabricate replacement gold",
+                    "do not silently drop the sample",
+                    "revise Stage6 registration before any model run",
+                    "record item-level rationale and updated registration hashes",
+                ],
+            },
+        },
+        "forbidden_actions": [
+            "drop rejected samples without registration revision",
+            "replace rejected samples with train/dev or newly selected samples",
+            "choose correction versus invalid after seeing model outputs",
+            "create final gold freeze while any final rejection remains unresolved",
+            "permit GPU preflight before final rejection resolution acceptance",
+        ],
+    }
+    write_json(out_dir / FINAL_REJECTION_LOCK_NAME, lock)
+    return lock
+
+
 def execute_review(
     r01_submission: Path,
     r02_submission: Path,
@@ -311,9 +380,15 @@ def execute_review(
         setup_dir / "artifacts" / "official_table_metadata.jsonl",
         disagreement_ids,
     )
+    final_rejection_lock = None if violations else build_final_rejection_resolution_lock(
+        out_dir,
+        agreement["agreed_rejected_items"],
+    )
 
     if violations:
         status = "FAIL_REVIEW_SUBMISSION_VALIDATION"
+    elif agreement["disagreement_count"] and agreement["agreed_rejected_count"]:
+        status = "PASS_PENDING_R03_AND_FINAL_REJECTION_RESOLUTION"
     elif agreement["disagreement_count"]:
         status = "PASS_PENDING_BLIND_R03_ADJUDICATION"
     elif agreement["agreed_rejected_count"]:
@@ -359,13 +434,25 @@ def execute_review(
             sha256_file(out_dir / "r03_blind_packet" / "R03_BLIND_PACKET_MANIFEST.json")
             if r03_manifest else None
         ),
-        "next_step": (
-            "send_blind_R03_packet_and_wait_for_adjudication"
-            if r03_manifest else
-            "resolve_final_rejected_items_before_confirmation"
-            if agreement["agreed_rejected_count"] else
-            "create_final_gold_freeze_package"
+        "final_rejection_resolution_lock_created": final_rejection_lock is not None,
+        "final_rejection_resolution_lock_sha256": (
+            sha256_file(out_dir / FINAL_REJECTION_LOCK_NAME)
+            if final_rejection_lock else None
         ),
+        "next_steps": [
+            *(
+                ["send_blind_R03_packet_and_wait_for_adjudication"]
+                if r03_manifest else []
+            ),
+            *(
+                ["resolve_agreed_rejected_items_under_FINAL_REJECTION_RESOLUTION_LOCK"]
+                if final_rejection_lock else []
+            ),
+            *(
+                ["create_final_gold_freeze_package"]
+                if not r03_manifest and not final_rejection_lock else []
+            ),
+        ],
     }
     write_json(out_dir / "REVIEW_EXECUTION_MANIFEST.json", execution_manifest)
     validation_report = f"""# Stage 6C Review Execution Validation Report
@@ -380,6 +467,7 @@ Validation date: 2026-08-24
 - agreed rejected: {agreement['agreed_rejected_count']}
 - disagreements: {agreement['disagreement_count']}
 - R03 blind packet created: {r03_manifest is not None}
+- final rejection resolution lock created: {final_rejection_lock is not None}
 - model_called: false
 - gpu_called: false
 - confirmation_run_allowed_now: false
@@ -393,6 +481,11 @@ protocol.
 This package ingests the completed R01/R02 review TSV submissions, verifies
 immutable fields and decisions, computes agreement, and prepares a blind R03
 packet when disagreements exist.
+
+If R01/R02 agree to reject any item, the package also locks the final-rejection
+resolution workflow. Agreed final rejections block confirmation until resolved by
+the locked R04 technical classification and downstream correction/review or
+registration-revision process.
 
 It does not call a model, does not permit GPU preflight, and does not create a
 final gold freeze while unresolved disagreement or final rejection remains.
@@ -408,6 +501,8 @@ final gold freeze while unresolved disagreement or final rejection remains.
         r01_target,
         r02_target,
     ]
+    if final_rejection_lock:
+        archive_members.append(out_dir / FINAL_REJECTION_LOCK_NAME)
     if r03_manifest:
         archive_members.extend(
             [
