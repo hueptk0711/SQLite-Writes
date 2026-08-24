@@ -23,3 +23,7 @@ configs/stage3b/*.json text eol=lf
 configs/stage4/*.json text eol=lf
 stage4r_fresh_failure_attribution/** text eol=lf
 stage4r2_actual_d_f_g1_replay/** text eol=lf
+stage6_gold_review_execution/**/*.json text eol=lf
+stage6_gold_review_execution/**/*.jsonl text eol=lf
+stage6_gold_review_execution/**/*.md text eol=lf
+stage6_gold_review_execution/**/*.tsv text eol=lf
