@@ -1,43 +1,50 @@
 {
-  "stage": "Stage5_METHOD_REVISION_FREEZE",
-  "status": "ready_for_reviewer_inspection",
+  "accepted_executable_commit_policy": "Git tag stage5-vnext-r1-freeze-patch1 points to the accepted PATCH1 freeze commit after acceptance; reviewer package GIT_INFO records the concrete commit.",
+  "accepted_executable_tag": "stage5-vnext-r1-freeze-patch1",
   "created_date": "2026-08-24",
-  "model_called": false,
-  "gpu_called": false,
-  "new_evaluation_results": false,
+  "executable_freeze_manifest": "stage5_method_revision_freeze/EXECUTABLE_FREEZE_MANIFEST.json",
+  "executable_freeze_manifest_sha256": "d2973415a66308764642deeb0a4764ff8df911092262f99b9824019c0a5c6239",
+  "files": [
+    "configs/stage5/mp_fs_plus_vnext_r1.json",
+    "configs/stage5/resolved_mp_fs_plus_vnext_r1.json",
+    "scripts/analysis/validate_stage5_method_freeze.py",
+    "stage5_method_revision_freeze/CONFIRMATION_PROTOCOL_LOCK.json",
+    "stage5_method_revision_freeze/EXECUTABLE_FREEZE_MANIFEST.json",
+    "stage5_method_revision_freeze/METHOD_FREEZE.md",
+    "stage5_method_revision_freeze/REVIEWER_README.md",
+    "stage5_method_revision_freeze/VALIDATION_REPORT.md",
+    "tests/test_stage5_method_freeze.py"
+  ],
   "final_method": {
-    "method_name": "MP-FS+ vNext-R1",
-    "method_id": "MP-FS+",
-    "method_variant": "mp-fs-plus-vnext-r1",
     "component_set": [
       "D",
       "F",
       "G1"
     ],
-    "config_path": "configs/stage5/mp_fs_plus_vnext_r1.json"
+    "config_path": "configs/stage5/mp_fs_plus_vnext_r1.json",
+    "method_id": "MP-FS+",
+    "method_name": "MP-FS+ vNext-R1",
+    "method_variant": "mp-fs-plus-vnext-r1",
+    "resolved_config_path": "configs/stage5/resolved_mp_fs_plus_vnext_r1.json"
   },
+  "gpu_called": false,
+  "model_called": false,
+  "new_evaluation_results": false,
   "source_evidence": {
     "D": "original development evidence and Stage 3B selection analysis",
-    "G1": "original development evidence and Stage 3B selection analysis",
     "F": "post-hoc Stage 4 diagnostic failure analysis and Stage4R.2 actual replay",
+    "G1": "original development evidence and Stage 3B selection analysis",
     "stage4_interpretation": "diagnostic_used_not_confirmatory_for_D_F_G1"
   },
+  "stage": "Stage5_METHOD_REVISION_FREEZE_PATCH1",
   "stage4r2_anchor": {
-    "accepted_patch_commit": "b8f171157aff26fde13e9e1b5fec421ad8b1f46f",
-    "D_G1_correct": 99,
     "ACTUAL_D_F_G1_correct": 104,
-    "FULL_correct": 104,
-    "D_G1_to_ACTUAL_D_F_G1_rescue": 5,
+    "D_G1_correct": 99,
     "D_G1_to_ACTUAL_D_F_G1_regression": 0,
+    "D_G1_to_ACTUAL_D_F_G1_rescue": 5,
+    "FULL_correct": 104,
+    "accepted_patch_commit": "b8f171157aff26fde13e9e1b5fec421ad8b1f46f",
     "mcnemar_exact_p": 0.0625
   },
-  "files": [
-    "configs/stage5/mp_fs_plus_vnext_r1.json",
-    "stage5_method_revision_freeze/METHOD_FREEZE.md",
-    "stage5_method_revision_freeze/CONFIRMATION_PROTOCOL_LOCK.json",
-    "stage5_method_revision_freeze/REVIEWER_README.md",
-    "stage5_method_revision_freeze/VALIDATION_REPORT.md",
-    "scripts/analysis/validate_stage5_method_freeze.py",
-    "tests/test_stage5_method_freeze.py"
-  ]
+  "status": "patch1_executable_freeze_ready_for_reviewer_inspection"
 }

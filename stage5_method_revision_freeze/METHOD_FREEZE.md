@@ -1,7 +1,7 @@
 # Stage 5 Method Revision Freeze
 
-Status: ready for reviewer inspection; no model run is authorized by this
-package.
+Status: PATCH1 ready for reviewer inspection; no model run is authorized by
+this package.
 
 ## Frozen method
 
@@ -14,8 +14,12 @@ MP-FS+ vNext-R1 = D + F + G1
 The executable config is:
 
 ```text
-configs/stage5/mp_fs_plus_vnext_r1.json
+configs/stage5/resolved_mp_fs_plus_vnext_r1.json
 ```
+
+`configs/stage5/mp_fs_plus_vnext_r1.json` remains as the human-readable
+overlay. PATCH1 adds the resolved effective config so future confirmation runs
+do not dynamically resolve `base_config` or `demonstration_bank`.
 
 Component interpretation:
 
@@ -58,6 +62,36 @@ registered, hashed, overlap-audited, and accepted for review. The lock in
 `CONFIRMATION_PROTOCOL_LOCK.json` freezes the method, model, token budget,
 prompt surface, generation parameters, metrics, statistical tests, and dataset
 registration requirements before any GPU run.
+
+PATCH1 adds an executable freeze manifest:
+
+```text
+stage5_method_revision_freeze/EXECUTABLE_FREEZE_MANIFEST.json
+```
+
+It records SHA-256 hashes for the overlay config, resolved config, base configs,
+matched demonstration bank, protocol lock, validator, and selected executable
+method implementation files. The accepted executable tag is:
+
+```text
+stage5-vnext-r1-freeze-patch1
+```
+
+The confirmation run must include both pre-specified hypotheses:
+
+```text
+H1: D+F+G1 vs Original MP-FS+
+H2: D+F+G1 vs D+G1
+```
+
+For H2, `D+G1` and `D+F+G1` must be deterministic replays from the exact same
+`D+G1` raw generation rows, so the incremental contribution of `F` is not
+confounded with independent LLM sampling or prompt drift.
+
+Input overflow blocks the confirmation run before GPU generation. Output
+`max_new_tokens` hits are preserved, recorded as `hit_max_new_tokens`, kept in
+the denominator, and scored by the deterministic pipeline without raising the
+token budget after seeing confirmation outputs.
 
 No GPU command is required for Stage 5. A future confirmation run, after
 reviewer acceptance and dataset registration, should execute on the server
