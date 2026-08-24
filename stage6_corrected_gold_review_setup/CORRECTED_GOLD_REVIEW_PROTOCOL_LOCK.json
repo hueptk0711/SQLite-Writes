@@ -1,0 +1,63 @@
+{
+  "allowed_decisions_after_execution": [
+    "approved",
+    "rejected"
+  ],
+  "confirmation_run_allowed_now": false,
+  "final_decision_rule": [
+    {
+      "C01": "approved",
+      "C02": "approved",
+      "action": "corrected_item_accepted_pending_final_gold_freeze"
+    },
+    {
+      "C01": "rejected",
+      "C02": "rejected",
+      "action": "correction_rejected_confirmation_blocked"
+    },
+    {
+      "C01": "approved",
+      "C02": "rejected",
+      "action": "blind_C03_adjudication"
+    },
+    {
+      "C01": "rejected",
+      "C02": "approved",
+      "action": "blind_C03_adjudication"
+    },
+    {
+      "C03": "approved",
+      "action": "corrected_item_accepted_pending_final_gold_freeze"
+    },
+    {
+      "C03": "rejected",
+      "action": "correction_rejected_confirmation_blocked"
+    }
+  ],
+  "final_gold_freeze_created": false,
+  "forbidden_actions": [
+    "do_not_modify_the_19_SOURCE_TASK_INVALID_items_in_this_patch",
+    "do_not_drop_or_replace_any_registered_sample",
+    "do_not_create_final_gold_freeze_from_corrected_items_before_re_review_acceptance",
+    "do_not_permit_gpu_preflight_before_all_corrected_items_and_registration_revision_are_resolved"
+  ],
+  "gpu_called": false,
+  "model_called": false,
+  "notes_required_for_rejected": true,
+  "reviewer_isolation": {
+    "C01_must_not_see_C02_decisions_or_notes_before_submission": true,
+    "C02_must_not_see_C01_decisions_or_notes_before_submission": true,
+    "cross_reviewer_discussion_before_submission": false,
+    "each_reviewer_receives_only_own_decision_packet": true,
+    "reviewer_outputs_are_sealed_until_both_submitted": true
+  },
+  "reviewer_roles": [
+    "C01",
+    "C02"
+  ],
+  "reviewer_roles_must_be_distinct": true,
+  "reviewers_must_not_see_model_predictions": true,
+  "scope": "21_R04_CORRECTABLE_GOLD_ERROR_ITEMS_ONLY",
+  "stage": "Stage6D_CORRECTED_GOLD_RE_REVIEW_SETUP",
+  "status": "LOCKED_PENDING_CORRECTED_ITEM_HUMAN_RE_REVIEW"
+}
