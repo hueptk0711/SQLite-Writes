@@ -19,8 +19,17 @@ if str(PROJECT_ROOT) not in sys.path:
 from scripts.data.create_stage6c_gold_review_setup import REVIEW_PACKET_COLUMNS, canonical_json  # noqa: E402
 from scripts.data.execute_stage6c_gold_review import (  # noqa: E402
     ARCHIVE_NAME,
+    CORRECTABLE_GOLD_ERROR_REQUIRED_ACTION,
+    CORRECTABLE_GOLD_ERROR_REQUIRED_CONDITION,
     FINAL_REJECTION_LOCK_NAME,
+    FINAL_REJECTION_FORBIDDEN_ACTIONS,
     R03_ARCHIVE_NAME,
+    R04_ALLOWED_INPUTS,
+    R04_ARCHIVE_NAME,
+    R04_RESOLUTION_COLUMNS,
+    R04_TASK,
+    SOURCE_TASK_INVALID_REQUIRED_ACTION,
+    SOURCE_TASK_INVALID_REQUIRED_CONDITION,
 )
 
 
@@ -182,6 +191,17 @@ def validate_execution(execution_dir: Path, setup_dir: Path) -> dict[str, Any]:
                 violations.append("final_rejection_lock_item_set_mismatch")
             if lock.get("classification_reviewer_role") != "R04":
                 violations.append("final_rejection_lock_role_not_R04")
+            if lock.get("R04_task") != R04_TASK:
+                violations.append("final_rejection_lock_R04_task_changed")
+            if lock.get("R04_allowed_inputs") != R04_ALLOWED_INPUTS:
+                violations.append("final_rejection_lock_allowed_inputs_changed")
+            for key in [
+                "R04_must_be_distinct_from_R01",
+                "R04_must_be_distinct_from_R02",
+                "R04_must_be_distinct_from_R03",
+            ]:
+                if lock.get(key) is not True:
+                    violations.append(f"final_rejection_lock_{key}_not_locked")
             if lock.get("R04_must_not_see_model_predictions") is not True:
                 violations.append("final_rejection_lock_R04_model_blindness_not_locked")
             if lock.get("R04_may_see_R01_R02_rejection_reasons") is not True:
@@ -190,23 +210,135 @@ def validate_execution(execution_dir: Path, setup_dir: Path) -> dict[str, Any]:
             if allowed_classes != ["CORRECTABLE_GOLD_ERROR", "SOURCE_TASK_INVALID"]:
                 violations.append("final_rejection_lock_allowed_classes_changed")
             class_rules = lock.get("class_rules", {})
-            for cls in ["CORRECTABLE_GOLD_ERROR", "SOURCE_TASK_INVALID"]:
-                if cls not in class_rules:
-                    violations.append(f"final_rejection_lock_missing_class_rule:{cls}")
-            forbidden_actions = set(lock.get("forbidden_actions", []))
-            for required in [
-                "drop rejected samples without registration revision",
-                "replace rejected samples with train/dev or newly selected samples",
-                "choose correction versus invalid after seeing model outputs",
-                "create final gold freeze while any final rejection remains unresolved",
-                "permit GPU preflight before final rejection resolution acceptance",
-            ]:
-                if required not in forbidden_actions:
-                    violations.append(f"final_rejection_lock_missing_forbidden_action:{required}")
+            expected_class_rules = {
+                "CORRECTABLE_GOLD_ERROR": {
+                    "required_condition": CORRECTABLE_GOLD_ERROR_REQUIRED_CONDITION,
+                    "required_action": CORRECTABLE_GOLD_ERROR_REQUIRED_ACTION,
+                },
+                "SOURCE_TASK_INVALID": {
+                    "required_condition": SOURCE_TASK_INVALID_REQUIRED_CONDITION,
+                    "required_action": SOURCE_TASK_INVALID_REQUIRED_ACTION,
+                },
+            }
+            if class_rules != expected_class_rules:
+                violations.append("final_rejection_lock_class_rules_changed")
+            if lock.get("forbidden_actions") != FINAL_REJECTION_FORBIDDEN_ACTIONS:
+                violations.append("final_rejection_lock_forbidden_actions_changed")
+            if lock.get("R03_rejected_items_join_same_resolution_workflow") is not True:
+                violations.append("final_rejection_lock_R03_rejections_do_not_join_workflow")
             if manifest.get("final_rejection_resolution_lock_created") is not True:
                 violations.append("manifest_final_rejection_lock_not_created")
             if manifest.get("final_rejection_resolution_lock_sha256") != sha256_file(lock_path):
                 violations.append("manifest_final_rejection_lock_hash_mismatch")
+
+            r04_manifest_path = execution_dir / "r04_resolution_packet" / "R04_PACKET_MANIFEST.json"
+            r04_items_path = execution_dir / "r04_resolution_packet" / "r04_resolution_items.jsonl"
+            r04_tsv_path = execution_dir / "r04_resolution_packet" / "stage6c_final_rejection_R04.tsv"
+            r04_archive_path = execution_dir / R04_ARCHIVE_NAME
+            r04_table_metadata_path = execution_dir / "r04_resolution_packet" / "official_table_metadata.jsonl"
+            for path in [
+                r04_manifest_path,
+                r04_items_path,
+                r04_tsv_path,
+                r04_archive_path,
+                r04_table_metadata_path,
+            ]:
+                if not path.is_file():
+                    violations.append(f"missing_R04_artifact:{path.name}")
+            if r04_manifest_path.is_file():
+                r04_manifest = read_json(r04_manifest_path)
+                if r04_manifest.get("packet_role") != "R04":
+                    violations.append("R04_manifest_role_not_R04")
+                if r04_manifest.get("agreed_rejected_count") != len(rr):
+                    violations.append("R04_manifest_count_mismatch")
+                for key in [
+                    "contains_only_agreed_rejected_items",
+                    "R04_must_be_distinct_from_R01",
+                    "R04_must_be_distinct_from_R02",
+                    "R04_must_be_distinct_from_R03",
+                    "R04_must_not_see_model_predictions",
+                    "R04_may_see_R01_R02_rejection_reasons",
+                    "classification_required_on_submission",
+                    "rationale_required_on_submission",
+                    "correction_spec_required_when_correctable",
+                ]:
+                    if r04_manifest.get(key) is not True:
+                        violations.append(f"R04_manifest_{key}_not_locked")
+                for key in ["contains_R03_disagreement_items", "contains_unrelated_approved_items"]:
+                    if r04_manifest.get(key) is not False:
+                        violations.append(f"R04_manifest_{key}_not_false")
+                if r04_manifest.get("allowed_classes") != ["CORRECTABLE_GOLD_ERROR", "SOURCE_TASK_INVALID"]:
+                    violations.append("R04_manifest_allowed_classes_changed")
+                if r04_manifest.get("final_rejection_resolution_lock_sha256") != sha256_file(lock_path):
+                    violations.append("R04_manifest_lock_hash_mismatch")
+                if r04_items_path.is_file() and r04_manifest.get("r04_items_sha256") != sha256_file(r04_items_path):
+                    violations.append("R04_manifest_items_hash_mismatch")
+                if r04_tsv_path.is_file() and r04_manifest.get("r04_tsv_sha256") != sha256_file(r04_tsv_path):
+                    violations.append("R04_manifest_tsv_hash_mismatch")
+            if r04_items_path.is_file():
+                r04_items = read_jsonl(r04_items_path)
+                if {row["stage6_sample_id"] for row in r04_items} != set(rr):
+                    violations.append("R04_item_set_not_exact_agreed_rejections")
+                for item in r04_items:
+                    scope = item.get("R04_resolution_scope", {})
+                    sample_id = item.get("stage6_sample_id", "")
+                    if scope.get("R01_decision") != "rejected" or scope.get("R02_decision") != "rejected":
+                        violations.append(f"R04_item_missing_rejected_decisions:{sample_id}")
+                    if scope.get("R01_notes_sha256") != sha256_text(scope.get("R01_notes", "")):
+                        violations.append(f"R04_item_R01_notes_hash_mismatch:{sample_id}")
+                    if scope.get("R02_notes_sha256") != sha256_text(scope.get("R02_notes", "")):
+                        violations.append(f"R04_item_R02_notes_hash_mismatch:{sample_id}")
+                    if sample_id not in scope.get("same_table_agreed_rejected_sample_ids", []):
+                        violations.append(f"R04_item_missing_table_context:{sample_id}")
+            if r04_tsv_path.is_file():
+                fields, r04_rows = read_packet(r04_tsv_path)
+                if fields != R04_RESOLUTION_COLUMNS:
+                    violations.append("R04_unexpected_columns")
+                if len(r04_rows) != len(rr):
+                    violations.append("R04_row_count_mismatch")
+                r04_item_by_id = (
+                    {row["stage6_sample_id"]: row for row in read_jsonl(r04_items_path)}
+                    if r04_items_path.is_file() else {}
+                )
+                for row in r04_rows:
+                    sample_id = row.get("stage6_sample_id", "")
+                    item = r04_item_by_id.get(sample_id, {})
+                    scope = item.get("R04_resolution_scope", {})
+                    if row.get("reviewed_by") != "R04":
+                        violations.append(f"R04_reviewed_by_mismatch:{sample_id}")
+                    if row.get("classification") or row.get("rationale") or row.get("correction_spec"):
+                        violations.append(f"R04_prefilled_resolution_fields:{sample_id}")
+                    if item:
+                        if row.get("upstream_sample_locator") != item.get("upstream_sample_locator"):
+                            violations.append(f"R04_locator_mismatch:{sample_id}")
+                        if row.get("authored_content_sha256") != item.get("authored_content_sha256"):
+                            violations.append(f"R04_authored_hash_mismatch:{sample_id}")
+                        if row.get("R01_notes_sha256") != scope.get("R01_notes_sha256"):
+                            violations.append(f"R04_R01_notes_hash_mismatch:{sample_id}")
+                        if row.get("R02_notes_sha256") != scope.get("R02_notes_sha256"):
+                            violations.append(f"R04_R02_notes_hash_mismatch:{sample_id}")
+            if r04_archive_path.is_file():
+                try:
+                    with zipfile.ZipFile(r04_archive_path) as archive:
+                        bad_member = archive.testzip()
+                        names = set(archive.namelist())
+                    if bad_member:
+                        violations.append(f"R04_archive_bad_member:{bad_member}")
+                    expected_names = {
+                        FINAL_REJECTION_LOCK_NAME,
+                        "r04_resolution_packet/R04_PACKET_MANIFEST.json",
+                        "r04_resolution_packet/r04_resolution_items.jsonl",
+                        "r04_resolution_packet/official_table_metadata.jsonl",
+                        "r04_resolution_packet/stage6c_final_rejection_R04.tsv",
+                    }
+                    if names != expected_names:
+                        violations.append("R04_archive_members_changed")
+                except zipfile.BadZipFile:
+                    violations.append("R04_archive_not_openable")
+            if manifest.get("r04_resolution_packet_created") is not True:
+                violations.append("manifest_R04_packet_not_created")
+            if r04_manifest_path.is_file() and manifest.get("r04_resolution_packet_manifest_sha256") != sha256_file(r04_manifest_path):
+                violations.append("manifest_R04_packet_hash_mismatch")
     elif manifest.get("final_rejection_resolution_lock_created"):
         violations.append("unexpected_final_rejection_lock_created")
 

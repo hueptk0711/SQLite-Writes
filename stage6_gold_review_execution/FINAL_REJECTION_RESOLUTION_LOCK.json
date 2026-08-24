@@ -1,4 +1,5 @@
 {
+  "R03_rejected_items_join_same_resolution_workflow": true,
   "R04_allowed_inputs": [
     "Chinese NL instruction",
     "official CRUDSQL annotation",
@@ -7,6 +8,9 @@
     "R01/R02 rejection decisions and notes"
   ],
   "R04_may_see_R01_R02_rejection_reasons": true,
+  "R04_must_be_distinct_from_R01": true,
+  "R04_must_be_distinct_from_R02": true,
+  "R04_must_be_distinct_from_R03": true,
   "R04_must_not_see_model_predictions": true,
   "R04_task": "technical_root_cause_classification_not_model_scoring",
   "agreed_rejected_count": 17,

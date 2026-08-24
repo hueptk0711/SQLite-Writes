@@ -28,8 +28,56 @@ STAGE6C_EXECUTION_DIR = PROJECT_ROOT / "stage6_gold_review_execution"
 STAGE6C_SETUP_COMMIT = "cd89a33f41d4be6ba8094789aa6141fafd55b2c8"
 ARCHIVE_NAME = "stage6c_review_execution_artifacts_20260824.zip"
 R03_ARCHIVE_NAME = "Stage6C_R03_blind_adjudication_packet_20260824.zip"
+R04_ARCHIVE_NAME = "Stage6C_R04_final_rejection_resolution_packet_20260824.zip"
 ZIP_TIMESTAMP = (2026, 8, 24, 0, 0, 0)
 FINAL_REJECTION_LOCK_NAME = "FINAL_REJECTION_RESOLUTION_LOCK.json"
+R04_RESOLUTION_COLUMNS = [
+    "stage6_sample_id",
+    "upstream_sample_locator",
+    "authored_content_sha256",
+    "R01_notes_sha256",
+    "R02_notes_sha256",
+    "reviewed_by",
+    "classification",
+    "rationale",
+    "correction_spec",
+]
+R04_TASK = "technical_root_cause_classification_not_model_scoring"
+R04_ALLOWED_INPUTS = [
+    "Chinese NL instruction",
+    "official CRUDSQL annotation",
+    "official table metadata and rows",
+    "registered gold plan and parameterized write",
+    "R01/R02 rejection decisions and notes",
+]
+CORRECTABLE_GOLD_ERROR_REQUIRED_CONDITION = (
+    "the correct intended write is uniquely recoverable from "
+    "NL plus official source annotation/table evidence"
+)
+CORRECTABLE_GOLD_ERROR_REQUIRED_ACTION = [
+    "correct gold before any model run",
+    "recompute gold plan, parameterized program, expected inserted row, post-state hash, and authored_content hash",
+    "create corrected-item review packet",
+    "obtain two independent re-reviews of corrected item",
+    "do not count correction as automatically approved",
+]
+SOURCE_TASK_INVALID_REQUIRED_CONDITION = (
+    "no unique valid gold exists, or the source task contradicts "
+    "the target table/schema/frozen task contract"
+)
+SOURCE_TASK_INVALID_REQUIRED_ACTION = [
+    "do not fabricate replacement gold",
+    "do not silently drop the sample",
+    "revise Stage6 registration before any model run",
+    "record item-level rationale and updated registration hashes",
+]
+FINAL_REJECTION_FORBIDDEN_ACTIONS = [
+    "drop rejected samples without registration revision",
+    "replace rejected samples with train/dev or newly selected samples",
+    "choose correction versus invalid after seeing model outputs",
+    "create final gold freeze while any final rejection remains unresolved",
+    "permit GPU preflight before final rejection resolution acceptance",
+]
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -281,57 +329,139 @@ def build_final_rejection_resolution_lock(
         "model_called": False,
         "gpu_called": False,
         "classification_reviewer_role": "R04",
-        "R04_task": "technical_root_cause_classification_not_model_scoring",
+        "R04_task": R04_TASK,
+        "R04_must_be_distinct_from_R01": True,
+        "R04_must_be_distinct_from_R02": True,
+        "R04_must_be_distinct_from_R03": True,
         "R04_must_not_see_model_predictions": True,
         "R04_may_see_R01_R02_rejection_reasons": True,
-        "R04_allowed_inputs": [
-            "Chinese NL instruction",
-            "official CRUDSQL annotation",
-            "official table metadata and rows",
-            "registered gold plan and parameterized write",
-            "R01/R02 rejection decisions and notes",
-        ],
+        "R04_allowed_inputs": R04_ALLOWED_INPUTS,
         "allowed_classes": [
             "CORRECTABLE_GOLD_ERROR",
             "SOURCE_TASK_INVALID",
         ],
         "class_rules": {
             "CORRECTABLE_GOLD_ERROR": {
-                "required_condition": (
-                    "the correct intended write is uniquely recoverable from "
-                    "NL plus official source annotation/table evidence"
-                ),
-                "required_action": [
-                    "correct gold before any model run",
-                    "recompute gold plan, parameterized program, expected inserted row, post-state hash, and authored_content hash",
-                    "create corrected-item review packet",
-                    "obtain two independent re-reviews of corrected item",
-                    "do not count correction as automatically approved",
-                ],
+                "required_condition": CORRECTABLE_GOLD_ERROR_REQUIRED_CONDITION,
+                "required_action": CORRECTABLE_GOLD_ERROR_REQUIRED_ACTION,
             },
             "SOURCE_TASK_INVALID": {
-                "required_condition": (
-                    "no unique valid gold exists, or the source task contradicts "
-                    "the target table/schema/frozen task contract"
-                ),
-                "required_action": [
-                    "do not fabricate replacement gold",
-                    "do not silently drop the sample",
-                    "revise Stage6 registration before any model run",
-                    "record item-level rationale and updated registration hashes",
-                ],
+                "required_condition": SOURCE_TASK_INVALID_REQUIRED_CONDITION,
+                "required_action": SOURCE_TASK_INVALID_REQUIRED_ACTION,
             },
         },
-        "forbidden_actions": [
-            "drop rejected samples without registration revision",
-            "replace rejected samples with train/dev or newly selected samples",
-            "choose correction versus invalid after seeing model outputs",
-            "create final gold freeze while any final rejection remains unresolved",
-            "permit GPU preflight before final rejection resolution acceptance",
-        ],
+        "forbidden_actions": FINAL_REJECTION_FORBIDDEN_ACTIONS,
+        "R03_rejected_items_join_same_resolution_workflow": True,
     }
     write_json(out_dir / FINAL_REJECTION_LOCK_NAME, lock)
     return lock
+
+
+def build_r04_resolution_packet(
+    out_dir: Path,
+    review_items: list[dict[str, Any]],
+    table_metadata_path: Path,
+    agreed_rejected_items: list[dict[str, Any]],
+    r01_rows: list[dict[str, str]],
+    r02_rows: list[dict[str, str]],
+) -> dict[str, Any] | None:
+    if not agreed_rejected_items:
+        return None
+    r04_dir = out_dir / "r04_resolution_packet"
+    r04_dir.mkdir(parents=True, exist_ok=True)
+    agreed_ids = {row["stage6_sample_id"] for row in agreed_rejected_items}
+    agreement_by_id = {row["stage6_sample_id"]: row for row in agreed_rejected_items}
+    r01_by_id = {row["stage6_sample_id"]: row for row in r01_rows}
+    r02_by_id = {row["stage6_sample_id"]: row for row in r02_rows}
+    item_by_id = {row["stage6_sample_id"]: row for row in review_items}
+    table_to_rejected_ids: dict[str, list[str]] = {}
+    for sample_id in sorted(agreed_ids):
+        table_id = item_by_id[sample_id]["source"]["table_id"]
+        table_to_rejected_ids.setdefault(table_id, []).append(sample_id)
+
+    selected: list[dict[str, Any]] = []
+    r04_rows: list[dict[str, str]] = []
+    for sample_id in sorted(agreed_ids):
+        item = item_by_id[sample_id]
+        table_id = item["source"]["table_id"]
+        r01_notes = r01_by_id[sample_id].get("notes", "")
+        r02_notes = r02_by_id[sample_id].get("notes", "")
+        agreement_item = agreement_by_id[sample_id]
+        selected.append(
+            {
+                **item,
+                "R04_resolution_scope": {
+                    "R01_decision": "rejected",
+                    "R02_decision": "rejected",
+                    "R01_notes": r01_notes,
+                    "R02_notes": r02_notes,
+                    "R01_notes_sha256": agreement_item["R01_notes_sha256"],
+                    "R02_notes_sha256": agreement_item["R02_notes_sha256"],
+                    "same_table_agreed_rejected_sample_ids": table_to_rejected_ids[table_id],
+                    "table_agreed_rejected_count": len(table_to_rejected_ids[table_id]),
+                },
+            }
+        )
+        r04_rows.append(
+            {
+                "stage6_sample_id": sample_id,
+                "upstream_sample_locator": item["upstream_sample_locator"],
+                "authored_content_sha256": item["authored_content_sha256"],
+                "R01_notes_sha256": agreement_item["R01_notes_sha256"],
+                "R02_notes_sha256": agreement_item["R02_notes_sha256"],
+                "reviewed_by": "R04",
+                "classification": "",
+                "rationale": "",
+                "correction_spec": "",
+            }
+        )
+
+    write_jsonl(r04_dir / "r04_resolution_items.jsonl", selected)
+    (r04_dir / "official_table_metadata.jsonl").write_bytes(table_metadata_path.read_bytes())
+    tsv_lines = ["\t".join(R04_RESOLUTION_COLUMNS)]
+    for row in r04_rows:
+        tsv_lines.append("\t".join(row[column] for column in R04_RESOLUTION_COLUMNS))
+    write_text(r04_dir / "stage6c_final_rejection_R04.tsv", "\n".join(tsv_lines) + "\n")
+    manifest = {
+        "stage": "Stage6C_R04_FINAL_REJECTION_RESOLUTION_PACKET",
+        "status": "READY_FOR_R04_IF_REVIEWER_ACCEPTS_PATCH2",
+        "packet_role": "R04",
+        "agreed_rejected_count": len(selected),
+        "contains_only_agreed_rejected_items": True,
+        "contains_R03_disagreement_items": False,
+        "contains_unrelated_approved_items": False,
+        "R04_must_be_distinct_from_R01": True,
+        "R04_must_be_distinct_from_R02": True,
+        "R04_must_be_distinct_from_R03": True,
+        "R04_must_not_see_model_predictions": True,
+        "R04_may_see_R01_R02_rejection_reasons": True,
+        "classification_required_on_submission": True,
+        "rationale_required_on_submission": True,
+        "correction_spec_required_when_correctable": True,
+        "allowed_classes": [
+            "CORRECTABLE_GOLD_ERROR",
+            "SOURCE_TASK_INVALID",
+        ],
+        "r04_items_sha256": sha256_file(r04_dir / "r04_resolution_items.jsonl"),
+        "r04_tsv_sha256": sha256_file(r04_dir / "stage6c_final_rejection_R04.tsv"),
+        "final_rejection_resolution_lock_sha256": sha256_file(out_dir / FINAL_REJECTION_LOCK_NAME),
+        "official_table_metadata_sha256": sha256_file(r04_dir / "official_table_metadata.jsonl"),
+    }
+    write_json(r04_dir / "R04_PACKET_MANIFEST.json", manifest)
+    archive = make_archive(
+        out_dir / R04_ARCHIVE_NAME,
+        [
+            out_dir / FINAL_REJECTION_LOCK_NAME,
+            r04_dir / "R04_PACKET_MANIFEST.json",
+            r04_dir / "r04_resolution_items.jsonl",
+            r04_dir / "official_table_metadata.jsonl",
+            r04_dir / "stage6c_final_rejection_R04.tsv",
+        ],
+        out_dir,
+    )
+    manifest["archive"] = archive
+    write_json(r04_dir / "R04_PACKET_MANIFEST.json", manifest)
+    return manifest
 
 
 def execute_review(
@@ -383,6 +513,14 @@ def execute_review(
     final_rejection_lock = None if violations else build_final_rejection_resolution_lock(
         out_dir,
         agreement["agreed_rejected_items"],
+    )
+    r04_manifest = None if violations or final_rejection_lock is None else build_r04_resolution_packet(
+        out_dir,
+        review_items,
+        setup_dir / "artifacts" / "official_table_metadata.jsonl",
+        agreement["agreed_rejected_items"],
+        r01_rows,
+        r02_rows,
     )
 
     if violations:
@@ -439,6 +577,11 @@ def execute_review(
             sha256_file(out_dir / FINAL_REJECTION_LOCK_NAME)
             if final_rejection_lock else None
         ),
+        "r04_resolution_packet_created": r04_manifest is not None,
+        "r04_resolution_packet_manifest_sha256": (
+            sha256_file(out_dir / "r04_resolution_packet" / "R04_PACKET_MANIFEST.json")
+            if r04_manifest else None
+        ),
         "next_steps": [
             *(
                 ["send_blind_R03_packet_and_wait_for_adjudication"]
@@ -468,6 +611,7 @@ Validation date: 2026-08-24
 - disagreements: {agreement['disagreement_count']}
 - R03 blind packet created: {r03_manifest is not None}
 - final rejection resolution lock created: {final_rejection_lock is not None}
+- R04 resolution packet created: {r04_manifest is not None}
 - model_called: false
 - gpu_called: false
 - confirmation_run_allowed_now: false
@@ -487,6 +631,10 @@ resolution workflow. Agreed final rejections block confirmation until resolved b
 the locked R04 technical classification and downstream correction/review or
 registration-revision process.
 
+The R04 packet is isolated to the agreed-rejected items only. R04 may see R01/R02
+rejection reasons for those items but must be distinct from R01, R02, and R03 and
+must not see model predictions.
+
 It does not call a model, does not permit GPU preflight, and does not create a
 final gold freeze while unresolved disagreement or final rejection remains.
 """
@@ -503,6 +651,16 @@ final gold freeze while unresolved disagreement or final rejection remains.
     ]
     if final_rejection_lock:
         archive_members.append(out_dir / FINAL_REJECTION_LOCK_NAME)
+    if r04_manifest:
+        archive_members.extend(
+            [
+                out_dir / "r04_resolution_packet" / "R04_PACKET_MANIFEST.json",
+                out_dir / "r04_resolution_packet" / "r04_resolution_items.jsonl",
+                out_dir / "r04_resolution_packet" / "official_table_metadata.jsonl",
+                out_dir / "r04_resolution_packet" / "stage6c_final_rejection_R04.tsv",
+                out_dir / R04_ARCHIVE_NAME,
+            ]
+        )
     if r03_manifest:
         archive_members.extend(
             [

@@ -40,10 +40,14 @@ def test_stage6c_review_execution_validator_passes_repo_artifact() -> None:
     assert "resolve_agreed_rejected_items_under_FINAL_REJECTION_RESOLUTION_LOCK" in manifest["next_steps"]
     assert rejection_lock["classification_reviewer_role"] == "R04"
     assert rejection_lock["agreed_rejected_count"] == report["agreed_rejected_count"] == 17
+    assert rejection_lock["R04_must_be_distinct_from_R01"] is True
+    assert rejection_lock["R04_must_be_distinct_from_R02"] is True
+    assert rejection_lock["R04_must_be_distinct_from_R03"] is True
     assert rejection_lock["allowed_classes"] == [
         "CORRECTABLE_GOLD_ERROR",
         "SOURCE_TASK_INVALID",
     ]
+    assert rejection_lock["R03_rejected_items_join_same_resolution_workflow"] is True
 
 
 def test_stage6c_review_execution_rejects_blank_rejected_notes(tmp_path: Path) -> None:
@@ -99,6 +103,37 @@ def test_stage6c_r03_packet_contains_no_r01_r02_submissions() -> None:
     assert all("R01" not in name and "R02" not in name and "submitted" not in name for name in names)
 
 
+def test_stage6c_r04_packet_contains_only_final_rejection_resolution_materials() -> None:
+    archive_path = EXECUTION_DIR / "Stage6C_R04_final_rejection_resolution_packet_20260824.zip"
+    with zipfile.ZipFile(archive_path) as archive:
+        names = set(archive.namelist())
+
+    assert names == {
+        "FINAL_REJECTION_RESOLUTION_LOCK.json",
+        "r04_resolution_packet/R04_PACKET_MANIFEST.json",
+        "r04_resolution_packet/r04_resolution_items.jsonl",
+        "r04_resolution_packet/official_table_metadata.jsonl",
+        "r04_resolution_packet/stage6c_final_rejection_R04.tsv",
+    }
+
+    r04_items = [
+        json.loads(line)
+        for line in (EXECUTION_DIR / "r04_resolution_packet" / "r04_resolution_items.jsonl").read_text(encoding="utf-8").splitlines()
+        if line
+    ]
+    with (EXECUTION_DIR / "r04_resolution_packet" / "stage6c_final_rejection_R04.tsv").open(
+        "r", encoding="utf-8", newline=""
+    ) as handle:
+        rows = list(csv.DictReader(handle, delimiter="\t"))
+
+    assert len(r04_items) == len(rows) == 17
+    assert {item["stage6_sample_id"] for item in r04_items} == {row["stage6_sample_id"] for row in rows}
+    assert all(item["R04_resolution_scope"]["R01_decision"] == "rejected" for item in r04_items)
+    assert all(item["R04_resolution_scope"]["R02_decision"] == "rejected" for item in r04_items)
+    assert all(row["reviewed_by"] == "R04" for row in rows)
+    assert all(not row["classification"] and not row["rationale"] and not row["correction_spec"] for row in rows)
+
+
 def test_stage6c_review_execution_rejects_old_single_branch_status(tmp_path: Path) -> None:
     execution = copy_execution(tmp_path)
     manifest_path = execution / "REVIEW_EXECUTION_MANIFEST.json"
@@ -120,3 +155,29 @@ def test_stage6c_review_execution_rejects_missing_final_rejection_lock(tmp_path:
 
     assert report["status"] == "FAIL"
     assert "missing_final_rejection_resolution_lock" in report["violations"]
+
+
+def test_stage6c_review_execution_rejects_mutated_class_semantics(tmp_path: Path) -> None:
+    execution = copy_execution(tmp_path)
+    lock_path = execution / "FINAL_REJECTION_RESOLUTION_LOCK.json"
+    lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    lock["class_rules"]["CORRECTABLE_GOLD_ERROR"]["required_action"] = ["do anything"]
+    lock_path.write_text(json.dumps(lock, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    report = validate_execution(execution, SETUP_DIR)
+
+    assert report["status"] == "FAIL"
+    assert "final_rejection_lock_class_rules_changed" in report["violations"]
+
+
+def test_stage6c_review_execution_rejects_missing_r04_distinctness(tmp_path: Path) -> None:
+    execution = copy_execution(tmp_path)
+    lock_path = execution / "FINAL_REJECTION_RESOLUTION_LOCK.json"
+    lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    lock["R04_must_be_distinct_from_R02"] = False
+    lock_path.write_text(json.dumps(lock, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    report = validate_execution(execution, SETUP_DIR)
+
+    assert report["status"] == "FAIL"
+    assert "final_rejection_lock_R04_must_be_distinct_from_R02_not_locked" in report["violations"]

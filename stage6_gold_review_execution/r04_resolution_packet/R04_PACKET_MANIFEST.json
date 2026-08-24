@@ -1,0 +1,52 @@
+{
+  "R04_may_see_R01_R02_rejection_reasons": true,
+  "R04_must_be_distinct_from_R01": true,
+  "R04_must_be_distinct_from_R02": true,
+  "R04_must_be_distinct_from_R03": true,
+  "R04_must_not_see_model_predictions": true,
+  "agreed_rejected_count": 17,
+  "allowed_classes": [
+    "CORRECTABLE_GOLD_ERROR",
+    "SOURCE_TASK_INVALID"
+  ],
+  "archive": {
+    "member_count": 5,
+    "members": [
+      {
+        "path": "FINAL_REJECTION_RESOLUTION_LOCK.json",
+        "sha256": "144cd6c24256de54aa8b4a0f1ab29099817d3260d90dcf742e81178c65f5a88f"
+      },
+      {
+        "path": "r04_resolution_packet/R04_PACKET_MANIFEST.json",
+        "sha256": "007774459e6e783c5a60cc2286c0d90f9fb09fb39e5048dcd9d47b7b88503e89"
+      },
+      {
+        "path": "r04_resolution_packet/official_table_metadata.jsonl",
+        "sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93"
+      },
+      {
+        "path": "r04_resolution_packet/r04_resolution_items.jsonl",
+        "sha256": "a258741edda346afbbeb75b0ad8f98232f4b1d3fac39875e102e2021a7ad9ff0"
+      },
+      {
+        "path": "r04_resolution_packet/stage6c_final_rejection_R04.tsv",
+        "sha256": "2cb79107c0e28f8878912012e279307f8ae6dc4326037dfbe272fd27f34879da"
+      }
+    ],
+    "path": "Stage6C_R04_final_rejection_resolution_packet_20260824.zip",
+    "sha256": "77240140ccccab7d5d0a1e5d6cf15368d0547573dca6621a27f744a554b0402c"
+  },
+  "classification_required_on_submission": true,
+  "contains_R03_disagreement_items": false,
+  "contains_only_agreed_rejected_items": true,
+  "contains_unrelated_approved_items": false,
+  "correction_spec_required_when_correctable": true,
+  "final_rejection_resolution_lock_sha256": "144cd6c24256de54aa8b4a0f1ab29099817d3260d90dcf742e81178c65f5a88f",
+  "official_table_metadata_sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93",
+  "packet_role": "R04",
+  "r04_items_sha256": "a258741edda346afbbeb75b0ad8f98232f4b1d3fac39875e102e2021a7ad9ff0",
+  "r04_tsv_sha256": "2cb79107c0e28f8878912012e279307f8ae6dc4326037dfbe272fd27f34879da",
+  "rationale_required_on_submission": true,
+  "stage": "Stage6C_R04_FINAL_REJECTION_RESOLUTION_PACKET",
+  "status": "READY_FOR_R04_IF_REVIEWER_ACCEPTS_PATCH2"
+}

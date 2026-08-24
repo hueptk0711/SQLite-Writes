@@ -11,6 +11,7 @@ Validation date: 2026-08-24
 - disagreements: 52
 - R03 blind packet created: True
 - final rejection resolution lock created: True
+- R04 resolution packet created: True
 - model_called: false
 - gpu_called: false
 - confirmation_run_allowed_now: false
