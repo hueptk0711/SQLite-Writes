@@ -1,0 +1,9 @@
+﻿intervention,from_variant,to_variant,rescued,regressed,unchanged_correct,unchanged_incorrect,net_gain,rescued_ids,regressed_ids
+A,V0,V1,0,0,148,152,0,,
+B,V1,V2,0,0,148,152,0,,
+C,V2,V3,0,3,145,152,-3,,final_archeology_018|final_polar_018|final_virtual_018
+D,V3,V4,33,0,145,122,33,final_archeology_012|final_archeology_027|final_archeology_042|final_archeology_055|final_polar_014|final_polar_025|final_polar_026|final_polar_027|final_polar_040|final_polar_041|final_polar_055|final_polar_056|final_polar_057|final_polar_058|final_robot_010|final_robot_011|final_robot_012|final_robot_025|final_robot_026|final_robot_027|final_robot_040|final_robot_041|final_robot_055|final_robot_056|final_robot_057|final_vaccine_011|final_vaccine_025|final_vaccine_026|final_vaccine_040|final_virtual_010|final_virtual_012|final_virtual_025|final_virtual_040,
+E,V4,V5,0,0,178,122,0,,
+F,V5,V6,0,0,178,122,0,,
+G1,V6,V7,1,0,178,121,1,final_archeology_032,
+G2,V7,V8,0,0,179,121,0,,

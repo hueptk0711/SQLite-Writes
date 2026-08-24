@@ -2,6 +2,7 @@ from .grounding import collection_grounding, ground_mapping_plan
 from .evidence import (
     extract_evidence_candidates,
     materialize_reference_free_text_plan,
+    resolve_explicit_column_grounding,
 )
 from .materialize import MaterializationError, materialize_mapping_plan
 from .parse import parse_llm_plan, validate_plan_object
@@ -24,6 +25,7 @@ __all__ = [
     "ground_reference_mapping_plan",
     "materialize_mapping_plan",
     "materialize_reference_free_text_plan",
+    "resolve_explicit_column_grounding",
     "parse_llm_plan",
     "resolve_reference_mapping_plan",
     "resolve_reference_policy",

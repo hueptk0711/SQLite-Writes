@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "v0_frozen_equivalence_fields": [
+    "target_state_correct",
+    "strict_full_state_correct",
+    "execution_success"
+  ],
+  "v0_frozen_equivalence_mismatches": 0,
+  "state_scope": "all_user_tables",
+  "database_execution_isolation": "in-memory copy per evaluation"
+}

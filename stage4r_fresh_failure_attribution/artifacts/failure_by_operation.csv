@@ -1,0 +1,4 @@
+﻿operation_type,count,rate_among_d_g1_failures
+insert_ignore,134,0.6666666666666666
+plain_insert,48,0.23880597014925373
+upsert_update,19,0.0945273631840796

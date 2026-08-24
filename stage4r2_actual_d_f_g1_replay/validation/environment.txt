@@ -1,0 +1,33 @@
+python: Python 3.14.3
+pytest: pytest 9.1.1
+git rev: 67d313415a9ba0be4528b293df70e563ce3265de
+git branch: stage2/g-diagnostic-targeted-repair
+git status --short --branch:
+## stage2/g-diagnostic-targeted-repair...origin/stage2/g-diagnostic-targeted-repair
+ M .gitattributes
+ M scripts/analysis/run_stage4r_fresh_failure_attribution.py
+ M src/nldbwrite_v3/analysis/stage1_failure_analysis.py
+ M stage4r_fresh_failure_attribution/CHECKSUMS_SHA256.txt
+ M stage4r_fresh_failure_attribution/README_REVIEWER.md
+ M stage4r_fresh_failure_attribution/artifacts/analysis_manifest.json
+ M stage4r_fresh_failure_attribution/artifacts/d_g1_failure_sample_level.csv
+ M stage4r_fresh_failure_attribution/artifacts/d_g1_failure_taxonomy.csv
+ M stage4r_fresh_failure_attribution/artifacts/error_family_precedence.json
+ M stage4r_fresh_failure_attribution/artifacts/failure_family_summary.csv
+ M stage4r_fresh_failure_attribution/artifacts/failure_family_x_dependency.csv
+ M stage4r_fresh_failure_attribution/artifacts/failure_family_x_input_type.csv
+ M stage4r_fresh_failure_attribution/artifacts/failure_family_x_operation.csv
+ M stage4r_fresh_failure_attribution/validation/corrected_frozen_analysis_generation.txt
+ M stage4r_fresh_failure_attribution/validation/dedicated_stage4r1_tests.txt
+ M stage4r_fresh_failure_attribution/validation/dedicated_stage4r_tests.txt
+ M stage4r_fresh_failure_attribution/validation/environment.txt
+ M stage4r_fresh_failure_attribution/validation/full_fast_suite.txt
+ M stage4r_fresh_failure_attribution/validation/protocol_hash_tests.txt
+ M stage4r_fresh_failure_attribution/validation/python_compile.txt
+ M stage4r_fresh_failure_attribution/validation/stage4r1_generation.txt
+ M stage4r_fresh_failure_attribution/validation/stage4r_generation.txt
+ M tests/test_stage4r_fresh_failure_attribution.py
+?? scripts/analysis/run_stage4r2_actual_dfg1_replay.py
+?? stage1_1_manual_audit_packet.zip
+?? stage4r2_actual_d_f_g1_replay/
+?? "tage2)\357\200\272 harden A-C exactness and provenance\357\200\242"

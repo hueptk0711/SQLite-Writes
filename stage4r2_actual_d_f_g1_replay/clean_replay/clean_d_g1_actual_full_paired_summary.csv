@@ -1,0 +1,3 @@
+﻿comparison,paired_sample_count,baseline_correct,method_correct,both_correct,both_wrong,rescue,regression,accuracy_delta,mcnemar_exact_p
+D_G1_to_ACTUAL_D_F_G1,300,99,104,99,196,5,0,0.016666666666666666,0.0625
+ACTUAL_D_F_G1_to_FULL,300,104,104,104,196,0,0,0.0,1.0

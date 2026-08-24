@@ -1,0 +1,85 @@
+{
+  "stage": "Stage3_FULL_CAUSAL_REPLAY",
+  "files": {
+    "configs/V0_original.json": {
+      "sha256": "f2311e467edbd9deb5faabc939539b6ca79ad03f8202d499b16b6f48a7f196e3",
+      "size_bytes": 314
+    },
+    "configs/V1_v1_control.json": {
+      "sha256": "7b10eb7f82c34ce0e4dd5bcaa746880eb6011b50d351522f47e4661c4269a2e1",
+      "size_bytes": 309
+    },
+    "configs/V2_v2_conflict.json": {
+      "sha256": "49bbb936ae611b1191073e15a8caea32c74cae53f785c5b10191a3cdbec9ee8c",
+      "size_bytes": 318
+    },
+    "configs/V3_v3_update.json": {
+      "sha256": "5c7bfdd41e0c2095e38d92d4c651709e4b9aa0255cf3e7ab940acc00799468ba",
+      "size_bytes": 322
+    },
+    "configs/V4_v4_structured_parser.json": {
+      "sha256": "94a2f1dd237e44fac6bc3191aea7894e27a7309e6bbfede0866be9c49555fb65",
+      "size_bytes": 467
+    },
+    "configs/V5_v5_free_text_typed_normalization.json": {
+      "sha256": "d14244fd5662c3d9dedded2ec6ba0453d079ab49257c06e6c5454d152eb2eb94",
+      "size_bytes": 682
+    },
+    "configs/V6_v6_constrained_reference_repair.json": {
+      "sha256": "80e301f7d99ecdd1d9ce8eaee277c4080bc4270cdeea79f884feb7ea7f2b3c8b",
+      "size_bytes": 915
+    },
+    "configs/V7_v7_diagnostic_targeted_repair_g1.json": {
+      "sha256": "ff9f7bc2986793c0729d1f7a6180f435448407f9660995bca613e6b07489eef6",
+      "size_bytes": 1294
+    },
+    "configs/V8_v8_diagnostic_targeted_repair_g2.json": {
+      "sha256": "31475c84e4ac0a78f4ccc994a4e22ad2a3b7a4a9b1989ec7b7751bdd2408da1e",
+      "size_bytes": 1462
+    },
+    "provenance/run_lock.json": {
+      "sha256": "7ea6dd14ac637810d3d9754bdc8a87fc70e490d4b7f2a8b205191b4e8126195b",
+      "size_bytes": 3162
+    },
+    "results/causal_replay_sample_level.csv": {
+      "sha256": "b194375a495c68bbe5d2aa973e14acbf40b835ad569b4cb3c15d1eb488a247d3",
+      "size_bytes": 70511
+    },
+    "results/failure_stage_transitions.csv": {
+      "sha256": "a75fbf6134c8613183438f9184affe0d5f0e98b93f973e7d4a494334a00c709c",
+      "size_bytes": 3888
+    },
+    "results/failure_taxonomy_V0_V8.csv": {
+      "sha256": "f22596b12c390323e39368e5bc1d5c592ab0b039d2e1938ba1e45d67d3c5465c",
+      "size_bytes": 3208
+    },
+    "results/intervention_activation_summary.csv": {
+      "sha256": "fbbb8ec18bafbc8a9c6d92f19a2f402ed9c9937d2b105feb16d8c1fd44c17bab",
+      "size_bytes": 288
+    },
+    "results/repair_rule_summary.csv": {
+      "sha256": "6f2d6cf7e218bc84254b12c35a9ea80e3e45e8828a6018c8d543e4f19f68b502",
+      "size_bytes": 1287
+    },
+    "results/rescue_regression_matrix.csv": {
+      "sha256": "8da353686e7e7f2a8d64685df0f9af397730701bc32ca0453acbffe7b32be5a1",
+      "size_bytes": 965
+    },
+    "results/variant_metrics.csv": {
+      "sha256": "7acca7eb836a7db137407b6ea7a2b6f52e064e19c82ba2329db39815753e40f8",
+      "size_bytes": 1065
+    },
+    "traces/A_to_G2_intervention_traces.jsonl": {
+      "sha256": "fb13ee15e275c1a35192333852df043f9cdfbf9ff64c6a6b41dd7114fa3fa92e",
+      "size_bytes": 6800589
+    },
+    "validation/evaluator_checks.json": {
+      "sha256": "28fc60758e45c293841272ed81f0058a40242f44aa6715868baba244247f54d8",
+      "size_bytes": 293
+    },
+    "validation/replay_invariants.json": {
+      "sha256": "48221d2a17ff921a30fe567dbe5d34673dbf4dffed4319dfd4a9f6c4117291ed",
+      "size_bytes": 423
+    }
+  }
+}

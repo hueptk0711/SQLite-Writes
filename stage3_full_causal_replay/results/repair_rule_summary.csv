@@ -1,0 +1,8 @@
+﻿intervention,repair_rule,trace_count,attempted,applied,succeeded,final_state_correct,final_state_correct_after_applied,final_state_wrong_after_applied,false_repair,sample_ids
+F,ambiguous_closed_set,454,454,0,0,0,0,0,0,final_archeology_016|final_archeology_017|final_archeology_031|final_polar_003|final_polar_031|final_robot_016|final_robot_017|final_robot_031|final_vaccine_016|final_vaccine_017|final_vaccine_031|final_vaccine_056
+F,empty_closed_set,5,5,0,0,0,0,0,0,final_robot_020|final_robot_034|final_vaccine_006
+F,protected_semantics_not_repairable,2,0,0,0,0,0,0,0,final_archeology_029|final_vaccine_016
+F,replacement_slot_collision,1,1,0,0,0,0,0,0,final_vaccine_033
+F,unique_exact_identifier_name,56,56,55,55,0,0,55,55,final_archeology_021|final_archeology_035|final_archeology_036|final_archeology_041|final_archeology_049|final_archeology_050|final_robot_021|final_robot_049|final_vaccine_010|final_vaccine_033|final_vaccine_056|final_virtual_004|final_virtual_005|final_virtual_019|final_virtual_021|final_virtual_027|final_virtual_035|final_virtual_042|final_virtual_049|final_virtual_050
+G1,unique_pre_enumerated_terminal_punctuation_trim,1,1,1,1,1,1,0,0,final_archeology_032
+G2,unique_primary_temporal_candidate_in_forward_same_sentence,1,1,1,0,0,0,1,0,final_vaccine_002

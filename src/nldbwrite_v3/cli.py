@@ -250,6 +250,7 @@ def command_run_method(args: argparse.Namespace) -> int:
         final_protocol_path=args.final_protocol,
         allow_locked_test_rerun=args.allow_locked_test_rerun,
         v2_source_path=args.v2_source_path,
+        reuse_raw_generations_path=args.reuse_raw_generations,
     )
     print(json.dumps(metrics, ensure_ascii=False, indent=2))
     return 0
@@ -481,6 +482,14 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument(
         "--v2-source-path",
         default=os.environ.get("NLDB_V2_SOURCE"),
+    )
+    run.add_argument(
+        "--reuse-raw-generations",
+        help=(
+            "Deterministically reprocess an existing raw_generations.jsonl "
+            "file. The command fails closed unless every selected sample is "
+            "present and prompt_sha256 matches the current method prompt."
+        ),
     )
     run.set_defaults(func=command_run_method)
 

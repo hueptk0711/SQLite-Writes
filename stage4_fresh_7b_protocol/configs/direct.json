@@ -1,0 +1,7 @@
+{
+  "base_config": "configs/baselines/direct_fs.json",
+  "method_id": "D-FS-M",
+  "demonstration_policy": "matched_semantic_bank_v1",
+  "demonstration_bank": "configs/demonstrations/matched_semantic_bank.json",
+  "demonstration_representation": "direct"
+}

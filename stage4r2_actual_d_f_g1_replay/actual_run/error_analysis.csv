@@ -1,0 +1,301 @@
+sample_id,db_id,method,error_category,error_stage,error_type,error_message,detected_mode,detected_format
+aug_seed_000068_single_row_subset_002,superhero,MP-FS+,E11_conflict_target_or_mask,interpretation,MISSING_UPDATE_COLUMN_IDS,upsert_update requires at least one enumerated update column.,free_text,free_text
+seed_000231,california_schools,MP-FS+,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,"schools: missing required columns: CDSCode, DOC, DOCType, LastUpdate.",semi_structured,csv
+seed_000005,financial,MP-FS+,E10_conflict_semantics,interpretation,NEEDS_CLARIFICATION,Conflict behavior is ambiguous; the fail-closed policy abstains.,semi_structured,json_array
+aug_seed_000049_relational_format_variant_002,debit_card_specializing,MP-FS+,correct,correct,,,semi_structured,multi_table
+aug_seed_000292_single_row_subset_001,european_football_2,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a supported unambiguous date.,free_text,free_text
+aug_seed_000349_relational_format_variant_002,debit_card_specializing,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'Date' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,multi_table
+seed_000110,financial,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000073_relational_format_variant_002,superhero,MP-FS+,correct,correct,,,semi_structured,multi_table
+aug_seed_000054_small_batch_subset_001,card_games,MP-FS+,other,other,UNKNOWN_EVIDENCE_ID,Unknown enumerated evidence ID 'e28'.,free_text,free_text
+seed_000302,card_games,MP-FS+,E10_conflict_semantics,interpretation,NEEDS_CLARIFICATION,The request mentions a duplicate/conflict but leaves the write policy unspecified; the fail-closed policy abstains.,semi_structured,json_array
+aug_seed_000237_single_row_subset_001,student_club,MP-FS+,correct,correct,,,semi_structured,markdown_table
+aug_seed_000285_small_batch_subset_001,student_club,MP-FS+,correct,correct,,,semi_structured,key_value
+aug_seed_000356_small_batch_subset_001,financial,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not enclosed by one matching quote pair.,free_text,free_text
+seed_000002,debit_card_specializing,MP-FS+,E10_conflict_semantics,interpretation,NEEDS_CLARIFICATION,Conflict behavior is ambiguous; the fail-closed policy abstains.,semi_structured,json_array
+seed_000190,student_club,MP-FS+,E10_conflict_semantics,interpretation,NEEDS_CLARIFICATION,The request mentions a duplicate/conflict but leaves the write policy unspecified; the fail-closed policy abstains.,semi_structured,json_array
+aug_seed_000143_single_row_subset_001,financial,MP-FS+,correct,correct,,,free_text,free_text
+aug_seed_000346_relational_format_variant_002,codebase_community,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'Id' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,multi_table
+seed_000291,california_schools,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: schools.CDSCode,semi_structured,key_value
+aug_seed_000017_small_batch_subset_001,student_club,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a supported unambiguous date.,free_text,free_text
+seed_000261,debit_card_specializing,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: customers.CustomerID,semi_structured,key_value
+aug_seed_000246_single_row_subset_001,financial,MP-FS+,correct,correct,,,semi_structured,markdown_table
+aug_seed_000194_single_row_subset_001,student_club,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a supported unambiguous date.,free_text,free_text
+aug_seed_000068_small_batch_subset_001,superhero,MP-FS+,E16_state_mismatch,state,wrong_state,,free_text,free_text
+aug_seed_000183_small_batch_subset_001,european_football_2,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a supported unambiguous date.,free_text,free_text
+seed_000201,formula_1,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,datatype mismatch,semi_structured,json_array
+seed_000044,superhero,MP-FS+,E3_unknown_column,interpretation,UNKNOWN_COLUMN_ID,Unknown enumerated column ID 't9.id'.,semi_structured,json_array
+aug_seed_000253_small_batch_subset_001,formula_1,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: status.statusId,semi_structured,key_value
+seed_000243,formula_1,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: drivers.driverId,semi_structured,markdown_table
+aug_seed_000211_single_row_subset_001,european_football_2,MP-FS+,correct,correct,,,free_text,free_text
+seed_000189,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000253_single_row_subset_001,formula_1,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+aug_seed_000255_single_row_subset_001,financial,MP-FS+,correct,correct,,,free_text,free_text
+seed_000095,superhero,MP-FS+,E3_unknown_column,interpretation,UNKNOWN_COLUMN_ID,Unknown enumerated column ID 't1.c3'.,semi_structured,json_array
+aug_seed_000031_single_row_subset_001,student_club,MP-FS+,E16_state_mismatch,state,wrong_state,,free_text,free_text
+seed_000192,financial,MP-FS+,E10_conflict_semantics,interpretation,NEEDS_CLARIFICATION,Conflict behavior is ambiguous; the fail-closed policy abstains.,semi_structured,json_array
+aug_seed_000241_single_row_subset_001,european_football_2,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a supported unambiguous date.,free_text,free_text
+aug_seed_000353_single_row_subset_001,student_club,MP-FS+,E16_state_mismatch,state,wrong_state,,free_text,free_text
+aug_seed_000013_single_row_subset_001,european_football_2,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+aug_seed_000316_small_batch_subset_001,student_club,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: zip_code.zip_code,semi_structured,key_value
+aug_seed_000338_relational_format_variant_001,financial,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a valid thousands-separated number.,free_text,free_text
+aug_seed_000199_small_batch_subset_001,superhero,MP-FS+,correct,correct,,,semi_structured,key_value
+aug_seed_000285_single_row_subset_001,student_club,MP-FS+,correct,correct,,,free_text,free_text
+seed_000269,student_club,MP-FS+,correct,correct,,,semi_structured,csv
+aug_seed_000202_relational_format_variant_001,student_club,MP-FS+,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,member: missing required columns: member_id.,free_text,free_text
+seed_000146,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: account.account_id,semi_structured,json_array
+seed_000073,superhero,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'attribute value' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,markdown_table
+aug_seed_000014_small_batch_subset_001,student_club,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a supported unambiguous date.,free_text,free_text
+aug_seed_000254_single_row_subset_001,debit_card_specializing,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: customers.CustomerID,free_text,free_text
+aug_seed_000166_single_row_subset_001,financial,MP-FS+,E16_state_mismatch,state,wrong_state,,semi_structured,markdown_table
+seed_000100,european_football_2,MP-FS+,correct,correct,,,semi_structured,key_value
+seed_000356,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: district.district_id,semi_structured,key_value
+aug_seed_000167_single_row_subset_001,formula_1,MP-FS+,correct,correct,,,semi_structured,markdown_table
+aug_seed_000187_single_row_subset_001,student_club,MP-FS+,E13_dependency_fk,execution,preflight_abstention,FOREIGN KEY constraint failed,free_text,free_text
+aug_seed_000153_relational_format_variant_001,toxicology,MP-FS+,E1_invalid_output,parsing,parse_error,,free_text,free_text
+seed_000037,california_schools,MP-FS+,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,"schools: missing required columns: CDSCode, DOC.",semi_structured,json_array
+seed_000319,superhero,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'race name' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,json_array
+seed_000168,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000259,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: district.district_id,semi_structured,json_array
+aug_seed_000065_single_row_subset_002,formula_1,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: driverStandings.driverStandingsId,semi_structured,markdown_table
+aug_seed_000215_small_batch_subset_001,student_club,MP-FS+,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,member: missing required columns: member_id.,free_text,free_text
+aug_seed_000014_single_row_subset_002,student_club,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a supported unambiguous date.,free_text,free_text
+aug_seed_000088_relational_format_variant_001,thrombosis_prediction,MP-FS+,E1_invalid_output,parsing,parse_error,,free_text,free_text
+aug_seed_000321_small_batch_subset_001,debit_card_specializing,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: transactions_1k.TransactionID,semi_structured,key_value
+seed_000191,debit_card_specializing,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: gasstations.GasStationID,semi_structured,json_array
+seed_000159,student_club,MP-FS+,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,budget: missing required columns: budget_id.,semi_structured,json_array
+aug_seed_000144_small_batch_subset_001,superhero,MP-FS+,correct,correct,,,semi_structured,markdown_table
+seed_000235,financial,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000312_single_row_subset_001,student_club,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a supported unambiguous date.,free_text,free_text
+seed_000048,formula_1,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'status description' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,json_array
+seed_000289,debit_card_specializing,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000159_single_row_subset_001,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000107,california_schools,MP-FS+,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,"schools: missing required columns: CDSCode, DOC, DOCType.",semi_structured,markdown_table
+aug_seed_000282_small_batch_subset_001,european_football_2,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000194_small_batch_subset_001,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000076,european_football_2,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000002_relational_format_variant_003,debit_card_specializing,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'Date' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,multi_table
+aug_seed_000331_single_row_subset_001,formula_1,MP-FS+,correct,correct,,,free_text,free_text
+aug_seed_000275_relational_format_variant_003,student_club,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: zip_code.zip_code,semi_structured,multi_table
+seed_000344,card_games,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000194,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000108,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000044_single_row_subset_002,superhero,MP-FS+,E11_conflict_target_or_mask,interpretation,MISSING_UPDATE_COLUMN_IDS,upsert_update requires at least one enumerated update column.,free_text,free_text
+seed_000224,card_games,MP-FS+,E16_state_mismatch,state,wrong_state,,semi_structured,key_value
+seed_000065,formula_1,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: driverStandings.driverStandingsId,semi_structured,key_value
+aug_seed_000203_small_batch_subset_001,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+aug_seed_000162_relational_format_variant_002,codebase_community,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: users.Id,semi_structured,multi_table
+aug_seed_000072_relational_format_variant_003,toxicology,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'bond_id' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,multi_table
+seed_000166,financial,MP-FS+,E10_conflict_semantics,interpretation,NEEDS_CLARIFICATION,Conflict behavior is ambiguous; the fail-closed policy abstains.,semi_structured,json_array
+aug_seed_000048_single_row_subset_002,formula_1,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+aug_seed_000079_single_row_subset_002,debit_card_specializing,MP-FS+,correct,correct,,,free_text,free_text
+aug_seed_000335_small_batch_subset_001,debit_card_specializing,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+aug_seed_000108_single_row_subset_002,student_club,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a supported unambiguous date.,free_text,free_text
+aug_seed_000020_relational_format_variant_001,european_football_2,MP-FS+,E1_invalid_output,parsing,parse_error,,free_text,free_text
+seed_000169,debit_card_specializing,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000245,financial,MP-FS+,E10_conflict_semantics,interpretation,NEEDS_CLARIFICATION,Conflict behavior is ambiguous; the fail-closed policy abstains.,semi_structured,json_array
+seed_000263,california_schools,MP-FS+,E3_unknown_column,interpretation,UNKNOWN_COLUMN_ID,Unknown enumerated column ID 't3.StatusType'.,semi_structured,json_array
+aug_seed_000091_single_row_subset_001,financial,MP-FS+,correct,correct,,,free_text,free_text
+seed_000308,european_football_2,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000069,financial,MP-FS+,E10_conflict_semantics,interpretation,NEEDS_CLARIFICATION,Conflict behavior is ambiguous; the fail-closed policy abstains.,semi_structured,json_array
+seed_000099,formula_1,MP-FS+,E1_invalid_output,parsing,parse_error,,free_text,free_text
+seed_000010,california_schools,MP-FS+,E3_unknown_column,interpretation,UNKNOWN_COLUMN_ID,Unknown enumerated column ID 't3.DistrictType'.,semi_structured,json_array
+aug_seed_000017_single_row_subset_001,student_club,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a supported unambiguous date.,free_text,free_text
+aug_seed_000027_single_row_subset_002,debit_card_specializing,MP-FS+,correct,correct,,,free_text,free_text
+aug_seed_000145_single_row_subset_001,toxicology,MP-FS+,correct,correct,,,semi_structured,markdown_table
+aug_seed_000095_single_row_subset_002,superhero,MP-FS+,E11_conflict_target_or_mask,interpretation,MISSING_UPDATE_COLUMN_IDS,upsert_update requires at least one enumerated update column.,free_text,free_text
+seed_000056,california_schools,MP-FS+,correct,correct,,,semi_structured,csv
+seed_000311,card_games,MP-FS+,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,cards: missing required columns: uuid.,semi_structured,json_array
+aug_seed_000238_small_batch_subset_001,debit_card_specializing,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: customers.CustomerID,semi_structured,json_array
+aug_seed_000119_single_row_subset_002,superhero,MP-FS+,correct,correct,,,free_text,free_text
+aug_seed_000089_single_row_subset_001,student_club,MP-FS+,correct,correct,,,semi_structured,markdown_table
+aug_seed_000282_single_row_subset_001,european_football_2,MP-FS+,correct,correct,,,semi_structured,markdown_table
+aug_seed_000020_relational_format_variant_002,european_football_2,MP-FS+,correct,correct,,,semi_structured,multi_table
+seed_000219,financial,MP-FS+,E10_conflict_semantics,interpretation,NEEDS_CLARIFICATION,Conflict behavior is ambiguous; the fail-closed policy abstains.,semi_structured,json_array
+aug_seed_000202_relational_format_variant_003,student_club,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: zip_code.zip_code,semi_structured,multi_table
+aug_seed_000044_single_row_subset_001,superhero,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000261_small_batch_subset_001,debit_card_specializing,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+aug_seed_000069_single_row_subset_001,financial,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000139_small_batch_subset_001,european_football_2,MP-FS+,correct,correct,,,semi_structured,markdown_table
+aug_seed_000137_small_batch_subset_001,debit_card_specializing,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: gasstations.GasStationID,semi_structured,key_value
+aug_seed_000218_small_batch_subset_001,superhero,MP-FS+,correct,correct,,,free_text,free_text
+aug_seed_000025_single_row_subset_001,financial,MP-FS+,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,"district: missing required columns: A4, A5, A6, A7, A8.",free_text,free_text
+aug_seed_000002_relational_format_variant_001,debit_card_specializing,MP-FS+,E1_invalid_output,parsing,parse_error,,free_text,free_text
+aug_seed_000049_relational_format_variant_003,debit_card_specializing,MP-FS+,correct,correct,,,semi_structured,multi_table
+aug_seed_000031_small_batch_subset_001,student_club,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: zip_code.zip_code,semi_structured,key_value
+seed_000061,financial,MP-FS+,E10_conflict_semantics,interpretation,NEEDS_CLARIFICATION,Conflict behavior is ambiguous; the fail-closed policy abstains.,semi_structured,json_array
+aug_seed_000311_single_row_subset_001,card_games,MP-FS+,E11_conflict_target_or_mask,interpretation,MISSING_UPDATE_COLUMN_IDS,upsert_update requires at least one enumerated update column.,free_text,free_text
+aug_seed_000309_relational_format_variant_001,toxicology,MP-FS+,E13_dependency_fk,execution,preflight_abstention,FOREIGN KEY constraint failed,free_text,free_text
+aug_seed_000316_single_row_subset_001,student_club,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: zip_code.zip_code,semi_structured,markdown_table
+seed_000312,student_club,MP-FS+,correct,correct,,,semi_structured,csv
+aug_seed_000130_single_row_subset_001,formula_1,MP-FS+,E11_conflict_target_or_mask,interpretation,MISSING_UPDATE_COLUMN_IDS,upsert_update requires at least one enumerated update column.,free_text,free_text
+seed_000072,toxicology,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,"UNIQUE constraint failed: connected.atom_id, connected.atom_id2",semi_structured,json_array
+aug_seed_000343_small_batch_subset_001,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: district.district_id,semi_structured,key_value
+aug_seed_000293_relational_format_variant_001,student_club,MP-FS+,E13_dependency_fk,execution,preflight_abstention,FOREIGN KEY constraint failed,free_text,free_text
+seed_000325,superhero,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'race name' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,csv
+aug_seed_000301_single_row_subset_001,student_club,MP-FS+,correct,correct,,,semi_structured,markdown_table
+aug_seed_000356_single_row_subset_001,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: district.district_id,semi_structured,json_array
+seed_000121,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000217,codebase_community,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'with a reputation of' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,key_value
+aug_seed_000061_single_row_subset_002,financial,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000052,superhero,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000179_single_row_subset_001,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+seed_000088,thrombosis_prediction,MP-FS+,E16_state_mismatch,state,wrong_state,,semi_structured,json_array
+aug_seed_000351_relational_format_variant_001,toxicology,MP-FS+,E1_invalid_output,parsing,parse_error,,free_text,free_text
+aug_seed_000013_small_batch_subset_001,european_football_2,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+seed_000335,debit_card_specializing,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: customers.CustomerID,semi_structured,key_value
+aug_seed_000080_single_row_subset_002,student_club,MP-FS+,other,other,UNKNOWN_EVIDENCE_ID,Unknown enumerated evidence ID 'e13-e15'.,free_text,free_text
+aug_seed_000235_single_row_subset_001,financial,MP-FS+,correct,correct,,,free_text,free_text
+aug_seed_000019_single_row_subset_002,financial,MP-FS+,E7_duplicate,compilation,DUPLICATE_TARGET_COLUMN_AFTER_EVIDENCE_GROUNDING,Multiple cells resolve to target column 'A2'.,free_text,free_text
+seed_000174,california_schools,MP-FS+,correct,correct,,,semi_structured,key_value
+aug_seed_000280_single_row_subset_001,european_football_2,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000067,formula_1,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+aug_seed_000171_small_batch_subset_001,financial,MP-FS+,other,other,UNKNOWN_EVIDENCE_ID,Unknown enumerated evidence ID 'e23'.,free_text,free_text
+seed_000051,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: client.client_id,semi_structured,json_array
+seed_000040,codebase_community,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+aug_seed_000035_relational_format_variant_002,california_schools,MP-FS+,correct,correct,,,semi_structured,multi_table
+aug_seed_000148_small_batch_subset_001,codebase_community,MP-FS+,E11_conflict_target_or_mask,interpretation,MISSING_UPDATE_COLUMNS,do_update requires explicit update_columns.,free_text,free_text
+aug_seed_000303_small_batch_subset_001,thrombosis_prediction,MP-FS+,correct,correct,,,semi_structured,markdown_table
+aug_seed_000119_single_row_subset_001,superhero,MP-FS+,E11_conflict_target_or_mask,interpretation,MISSING_UPDATE_COLUMN_IDS,upsert_update requires at least one enumerated update column.,free_text,free_text
+seed_000193,california_schools,MP-FS+,E13_dependency_fk,execution,preflight_abstention,FOREIGN KEY constraint failed,semi_structured,json_array
+aug_seed_000161_single_row_subset_001,superhero,MP-FS+,E11_conflict_target_or_mask,interpretation,MISSING_UPDATE_COLUMN_IDS,upsert_update requires at least one enumerated update column.,free_text,free_text
+seed_000165,superhero,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'real name' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,json_array
+aug_seed_000110_single_row_subset_002,financial,MP-FS+,correct,correct,,,free_text,free_text
+aug_seed_000062_single_row_subset_001,superhero,MP-FS+,correct,correct,,,free_text,free_text
+seed_000307,european_football_2,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'home team goal' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,markdown_table
+aug_seed_000177_relational_format_variant_003,codebase_community,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: posts.Id,semi_structured,multi_table
+aug_seed_000085_single_row_subset_002,debit_card_specializing,MP-FS+,correct,correct,,,free_text,free_text
+aug_seed_000272_single_row_subset_001,card_games,MP-FS+,correct,correct,,,semi_structured,markdown_table
+aug_seed_000299_single_row_subset_001,formula_1,MP-FS+,E3_unknown_column,interpretation,UNKNOWN_COLUMN_ID,Unknown enumerated column ID 't10.c9'.,free_text,free_text
+seed_000196,codebase_community,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'usage count' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,json_array
+aug_seed_000101_small_batch_subset_001,formula_1,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+seed_000300,superhero,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'color name' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,json_array
+aug_seed_000076_single_row_subset_002,european_football_2,MP-FS+,correct,correct,,,semi_structured,markdown_table
+seed_000175,superhero,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'power name' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,json_array
+aug_seed_000054_single_row_subset_001,card_games,MP-FS+,E16_state_mismatch,state,wrong_state,,free_text,free_text
+aug_seed_000178_single_row_subset_001,formula_1,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: qualifying.qualifyId,free_text,free_text
+aug_seed_000251_single_row_subset_001,financial,MP-FS+,correct,correct,,,free_text,free_text
+aug_seed_000221_single_row_subset_001,superhero,MP-FS+,correct,correct,,,semi_structured,markdown_table
+seed_000030,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000272,card_games,MP-FS+,E3_unknown_column,interpretation,UNKNOWN_COLUMN_ID,Unknown enumerated column ID 't1.set_code'.,semi_structured,json_array
+aug_seed_000175_small_batch_subset_001,superhero,MP-FS+,correct,correct,,,free_text,free_text
+aug_seed_000004_relational_format_variant_002,debit_card_specializing,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'ProductID' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,multi_table
+seed_000328,debit_card_specializing,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: customers.CustomerID,semi_structured,key_value
+seed_000148,codebase_community,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not enclosed by one matching quote pair.,free_text,free_text
+seed_000313,debit_card_specializing,MP-FS+,E16_state_mismatch,state,wrong_state,,semi_structured,json_array
+aug_seed_000172_relational_format_variant_001,european_football_2,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+aug_seed_000202_relational_format_variant_002,student_club,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: zip_code.zip_code,semi_structured,multi_table
+aug_seed_000005_single_row_subset_001,financial,MP-FS+,E16_state_mismatch,state,wrong_state,,free_text,free_text
+aug_seed_000289_single_row_subset_001,debit_card_specializing,MP-FS+,E11_conflict_target_or_mask,interpretation,MISSING_UPDATE_COLUMN_IDS,upsert_update requires at least one enumerated update column.,free_text,free_text
+aug_seed_000051_single_row_subset_001,financial,MP-FS+,correct,correct,,,semi_structured,markdown_table
+seed_000131,california_schools,MP-FS+,E1_invalid_output,parsing,parse_error,,semi_structured,key_value
+aug_seed_000328_single_row_subset_001,debit_card_specializing,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: customers.CustomerID,semi_structured,json_array
+seed_000084,california_schools,MP-FS+,E3_unknown_column,interpretation,UNKNOWN_COLUMN_ID,Unknown enumerated column ID 't3.StatusType'.,semi_structured,json_array
+seed_000276,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000321_single_row_subset_001,debit_card_specializing,MP-FS+,correct,correct,,,free_text,free_text
+aug_seed_000112_relational_format_variant_003,toxicology,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'atom_id' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,multi_table
+aug_seed_000128_single_row_subset_001,superhero,MP-FS+,E11_conflict_target_or_mask,interpretation,MISSING_UPDATE_COLUMN_IDS,upsert_update requires at least one enumerated update column.,free_text,free_text
+seed_000092,financial,MP-FS+,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,"trans: missing required columns: date, type, amount, balance.",semi_structured,json_array
+aug_seed_000334_single_row_subset_001,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+seed_000353,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000271,financial,MP-FS+,E10_conflict_semantics,interpretation,NEEDS_CLARIFICATION,Conflict behavior is ambiguous; the fail-closed policy abstains.,semi_structured,json_array
+aug_seed_000293_relational_format_variant_003,student_club,MP-FS+,correct,correct,,,semi_structured,multi_table
+seed_000264,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: trans.trans_id,semi_structured,json_object
+seed_000079,debit_card_specializing,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'item name' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,json_array
+aug_seed_000314_single_row_subset_001,financial,MP-FS+,correct,correct,,,free_text,free_text
+seed_000253,formula_1,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+aug_seed_000343_single_row_subset_001,financial,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a valid thousands-separated number.,free_text,free_text
+aug_seed_000309_relational_format_variant_002,toxicology,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: atom.atom_id,semi_structured,multi_table
+aug_seed_000072_relational_format_variant_001,toxicology,MP-FS+,E1_invalid_output,parsing,parse_error,,free_text,free_text
+seed_000266,codebase_community,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000154_single_row_subset_001,european_football_2,MP-FS+,E11_conflict_target_or_mask,interpretation,UNKNOWN_CONSTRAINT_ID,Unknown enumerated constraint ID 't5.c28'.,free_text,free_text
+seed_000273,student_club,MP-FS+,correct,correct,,,semi_structured,markdown_table
+aug_seed_000353_small_batch_subset_001,student_club,MP-FS+,correct,correct,,,semi_structured,markdown_table
+aug_seed_000307_small_batch_subset_001,european_football_2,MP-FS+,correct,correct,,,semi_structured,key_value
+aug_seed_000257_single_row_subset_001,codebase_community,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000206,california_schools,MP-FS+,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,"schools: missing required columns: CDSCode, DOC, DOCType.",semi_structured,csv
+seed_000254,debit_card_specializing,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: customers.CustomerID,semi_structured,key_value
+aug_seed_000171_single_row_subset_001,financial,MP-FS+,E7_duplicate,compilation,DUPLICATE_TARGET_COLUMN_AFTER_EVIDENCE_GROUNDING,Multiple cells resolve to target column 'gender'.,free_text,free_text
+aug_seed_000042_single_row_subset_001,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,Candidate was rejected by the semantic-risk gate before transactional preflight.,free_text,free_text
+aug_seed_000208_single_row_subset_001,financial,MP-FS+,E13_dependency_fk,execution,preflight_abstention,FOREIGN KEY constraint failed,free_text,free_text
+seed_000154,european_football_2,MP-FS+,correct,correct,,,semi_structured,key_value
+aug_seed_000347_single_row_subset_001,financial,MP-FS+,correct,correct,,,free_text,free_text
+aug_seed_000066_single_row_subset_002,student_club,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a supported unambiguous date.,free_text,free_text
+seed_000187,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000252_small_batch_subset_001,superhero,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000022_single_row_subset_002,superhero,MP-FS+,E11_conflict_target_or_mask,interpretation,UNKNOWN_CONSTRAINT_ID,Unknown enumerated constraint ID 't5.u1'.,free_text,free_text
+seed_000150,superhero,MP-FS+,E3_unknown_column,interpretation,UNKNOWN_COLUMN_ID,Unknown enumerated column ID 't9.gender'.,semi_structured,key_value
+aug_seed_000181_single_row_subset_001,financial,MP-FS+,E7_duplicate,compilation,DUPLICATE_TARGET_COLUMN_AFTER_EVIDENCE_GROUNDING,Multiple cells resolve to target column 'A6'.,free_text,free_text
+aug_seed_000004_relational_format_variant_001,debit_card_specializing,MP-FS+,E1_invalid_output,parsing,parse_error,,free_text,free_text
+aug_seed_000169_single_row_subset_001,debit_card_specializing,MP-FS+,E16_state_mismatch,state,wrong_state,,free_text,free_text
+seed_000299,formula_1,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'season url' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,json_array
+aug_seed_000274_single_row_subset_001,formula_1,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: seasons.url,semi_structured,markdown_table
+aug_seed_000052_small_batch_subset_001,superhero,MP-FS+,correct,correct,,,semi_structured,key_value
+seed_000274,formula_1,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'season record page' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,json_array
+aug_seed_000135_single_row_subset_001,debit_card_specializing,MP-FS+,correct,correct,,,free_text,free_text
+aug_seed_000013_small_batch_subset_002,european_football_2,MP-FS+,correct,correct,,,semi_structured,key_value
+aug_seed_000121_small_batch_subset_001,student_club,MP-FS+,correct,correct,,,semi_structured,markdown_table
+seed_000208,financial,MP-FS+,E3_unknown_column,interpretation,UNKNOWN_COLUMN_ID,Unknown enumerated column ID 't8.k_symbol'.,semi_structured,json_array
+aug_seed_000190_single_row_subset_001,student_club,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a supported unambiguous date.,free_text,free_text
+seed_000185,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000337,card_games,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000059,formula_1,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: constructors.constructorId,semi_structured,json_array
+aug_seed_000203_single_row_subset_001,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: client.client_id,semi_structured,markdown_table
+aug_seed_000121_single_row_subset_002,student_club,MP-FS+,other,other,UNKNOWN_EVIDENCE_ID,Unknown enumerated evidence ID '(408) 555-7890'.,free_text,free_text
+aug_seed_000005_single_row_subset_002,financial,MP-FS+,E11_conflict_target_or_mask,interpretation,MISSING_UPDATE_COLUMN_IDS,upsert_update requires at least one enumerated update column.,free_text,free_text
+seed_000066,student_club,MP-FS+,E16_state_mismatch,state,wrong_state,,semi_structured,json_array
+aug_seed_000094_small_batch_subset_001,european_football_2,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: Match.id,free_text,free_text
+aug_seed_000127_single_row_subset_001,european_football_2,MP-FS+,correct,correct,,,free_text,free_text
+seed_000145,toxicology,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'toxicity label' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,json_array
+seed_000226,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000002_relational_format_variant_002,debit_card_specializing,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'Date' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,multi_table
+aug_seed_000287_single_row_subset_001,thrombosis_prediction,MP-FS+,E11_conflict_target_or_mask,interpretation,MISSING_UPDATE_COLUMN_IDS,upsert_update requires at least one enumerated update column.,free_text,free_text
+seed_000127,european_football_2,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000296,card_games,MP-FS+,other,other,UNKNOWN_EVIDENCE_ID,Unknown enumerated evidence ID 'e43'.,free_text,free_text
+seed_000042,financial,MP-FS+,E10_conflict_semantics,interpretation,NEEDS_CLARIFICATION,Conflict behavior is ambiguous; the fail-closed policy abstains.,semi_structured,json_array
+aug_seed_000116_single_row_subset_001,financial,MP-FS+,other,other,UNKNOWN_EVIDENCE_ID,Unknown enumerated evidence ID 'e12'.,free_text,free_text
+aug_seed_000260_single_row_subset_001,superhero,MP-FS+,correct,correct,,,free_text,free_text
+seed_000229,superhero,MP-FS+,E3_unknown_column,interpretation,UNKNOWN_COLUMN_ID,Unknown enumerated column ID 't8.race'.,semi_structured,json_array
+aug_seed_000189_small_batch_subset_001,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000139_single_row_subset_001,european_football_2,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000094,european_football_2,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'y2' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,key_value
+seed_000101,formula_1,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: status.statusId,semi_structured,key_value
+seed_000106,california_schools,MP-FS+,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,"schools: missing required columns: CDSCode, DOC, DOCType.",semi_structured,json_array
+seed_000212,superhero,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'shade' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,json_array
+aug_seed_000092_single_row_subset_002,financial,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000346_relational_format_variant_001,codebase_community,MP-FS+,E1_invalid_output,parsing,parse_error,,free_text,free_text
+aug_seed_000248_single_row_subset_001,financial,MP-FS+,correct,correct,,,free_text,free_text
+seed_000288,financial,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000301,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000222_small_batch_subset_001,financial,MP-FS+,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,card: missing required columns: type.,free_text,free_text
+seed_000182,student_club,MP-FS+,E16_state_mismatch,state,wrong_state,,semi_structured,json_array
+seed_000085,debit_card_specializing,MP-FS+,E16_state_mismatch,state,wrong_state,,semi_structured,json_array
+seed_000343,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: district.district_id,semi_structured,json_array
+aug_seed_000245_single_row_subset_001,financial,MP-FS+,correct,correct,,,free_text,free_text
+seed_000020,european_football_2,MP-FS+,E13_dependency_fk,execution,preflight_abstention,FOREIGN KEY constraint failed,semi_structured,key_value
+aug_seed_000216_single_row_subset_001,debit_card_specializing,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000275_relational_format_variant_002,student_club,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: zip_code.zip_code,semi_structured,multi_table
+seed_000151,student_club,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000267,california_schools,MP-FS+,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,"schools: missing required columns: CDSCode, DOC, DOCType, LastUpdate.",semi_structured,json_array
+aug_seed_000241_small_batch_subset_001,european_football_2,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Value is not a supported unambiguous date.,free_text,free_text
+aug_seed_000078_relational_format_variant_001,california_schools,MP-FS+,E8_wrong_or_hallucinated_value,source_grounding,LOSSY_NORMALIZATION_REJECTED,Integer parsing would remove leading zeros.,free_text,free_text
+seed_000252,superhero,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'name' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,markdown_table
+aug_seed_000234_relational_format_variant_001,toxicology,MP-FS+,E10_conflict_semantics,interpretation,NEEDS_CLARIFICATION,Conflict behavior is ambiguous; the fail-closed policy abstains.,free_text,free_text
+seed_000218,superhero,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'race name' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,json_array
+aug_seed_000127_small_batch_subset_001,european_football_2,MP-FS+,correct,correct,,,free_text,free_text
+seed_000346,codebase_community,MP-FS+,E5_wrong_mapping,source_grounding,UNRESOLVED_SOURCE_FIELD,"Source field 'post_id' is neither mapped, justified, nor consumed as typed control semantics.",semi_structured,key_value
+aug_seed_000222_single_row_subset_001,financial,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000191_single_row_subset_001,debit_card_specializing,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: gasstations.GasStationID,semi_structured,json_array
+aug_seed_000051_small_batch_subset_002,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: client.client_id,semi_structured,json_array
+aug_seed_000165_single_row_subset_001,superhero,MP-FS+,E11_conflict_target_or_mask,interpretation,MISSING_UPDATE_COLUMN_IDS,upsert_update requires at least one enumerated update column.,free_text,free_text
+aug_seed_000091_single_row_subset_002,financial,MP-FS+,correct,correct,,,semi_structured,markdown_table
+seed_000334,financial,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000003,california_schools,MP-FS+,E4_missing_column,compilation,MISSING_REQUIRED_COLUMN,"schools: missing required columns: DOC, DOCType.",semi_structured,markdown_table
+seed_000211,european_football_2,MP-FS+,correct,correct,,,semi_structured,json_array
+aug_seed_000009_small_batch_subset_002,debit_card_specializing,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: transactions_1k.TransactionID,free_text,free_text
+seed_000011,card_games,MP-FS+,E16_state_mismatch,state,wrong_state,,semi_structured,csv
+aug_seed_000061_single_row_subset_001,financial,MP-FS+,correct,correct,,,semi_structured,markdown_table
+seed_000176,superhero,MP-FS+,correct,correct,,,semi_structured,json_array
+seed_000303,thrombosis_prediction,MP-FS+,correct,correct,,,semi_structured,csv
+seed_000203,financial,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,UNIQUE constraint failed: client.client_id,semi_structured,markdown_table
+seed_000134,toxicology,MP-FS+,E15_preflight_abstention,execution,preflight_abstention,"UNIQUE constraint failed: connected.atom_id, connected.atom_id2",semi_structured,multi_table

@@ -1,0 +1,36 @@
+{
+  "stage": "Stage4R2_ACTUAL_D_F_G1_REPLAY",
+  "model_called": false,
+  "gpu_called": false,
+  "fresh_sample_count": 300,
+  "actual_method": "d_f_g1_diagnostic_actual",
+  "actual_config": "configs\\stage4\\d_f_g1_diagnostic.json",
+  "actual_config_sha256": "3036949521b25ea6d5767500a13ce91206e73cf94dc3576497d96562e0cc48af",
+  "replay": {
+    "status": "reused_existing_actual_run",
+    "actual_run_dir": "stage4r2_actual_d_f_g1_replay\\actual_run"
+  },
+  "D_G1_correct": 99,
+  "ACTUAL_D_F_G1_correct": 104,
+  "FULL_correct": 104,
+  "D_G1_to_ACTUAL_D_F_G1_rescue": 5,
+  "D_G1_to_ACTUAL_D_F_G1_regression": 0,
+  "ACTUAL_D_F_G1_to_FULL_rescue": 0,
+  "ACTUAL_D_F_G1_to_FULL_regression": 0,
+  "F_attempt_sample_count": 27,
+  "F_attempt_count": 102,
+  "F_exact_name_attempt_sample_count": 21,
+  "F_exact_name_attempt_count": 73,
+  "F_applied_sample_count": 17,
+  "F_applied_exact_name_repair_count": 62,
+  "F_materialized_sample_count": 9,
+  "F_materialized_exact_name_repair_count": 38,
+  "F_state_rescue_count": 5,
+  "F_state_regression_count": 0,
+  "F_attempt_rule_counts": {
+    "ambiguous_closed_set": 25,
+    "replacement_target_assignment_collision": 4,
+    "unique_exact_identifier_name": 73
+  },
+  "deprecated_note": "F_activation_sample_count/F_repair_count were removed because they undercounted repairs by reading only materialized_write_plans.jsonl."
+}

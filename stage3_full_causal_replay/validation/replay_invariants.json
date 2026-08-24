@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "variants": 9,
+  "samples_per_variant": 300,
+  "evaluations": 2700,
+  "repair_trace_counts_across_cumulative_variants": {
+    "F": {
+      "attempted": 1548,
+      "applied": 165,
+      "succeeded": 165
+    },
+    "G1": {
+      "attempted": 2,
+      "applied": 2,
+      "succeeded": 2
+    },
+    "G2": {
+      "attempted": 1,
+      "applied": 1,
+      "succeeded": 0
+    }
+  },
+  "violations": []
+}

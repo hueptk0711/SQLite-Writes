@@ -1,0 +1,61 @@
+{
+  "stage": "Stage3B_FINAL_COMPONENT_SELECTION",
+  "files": {
+    "configs/d_g1.json": {
+      "sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf",
+      "size_bytes": 964
+    },
+    "configs/d_only.json": {
+      "sha256": "212a489e956e2164459a4b15b006d69da47e67bb4b09457114f7ef05534c93bb",
+      "size_bytes": 602
+    },
+    "configs/full.json": {
+      "sha256": "b563ecbff9415f682662d2de3b9bc76f8f38b5fab0479b0621573702cc74832d",
+      "size_bytes": 1411
+    },
+    "configs/no_c.json": {
+      "sha256": "d159def187ccd21b79d61c965a55b1c10e54a1f62088048ee8fb28d4eeb079f8",
+      "size_bytes": 1406
+    },
+    "provenance/run_lock.json": {
+      "sha256": "3ae54b2e36ea387d73991645f4c0ba36f76d2aa54bca49a59409203ca6c7afc7",
+      "size_bytes": 3026
+    },
+    "results/candidate_false_accept_ids.csv": {
+      "sha256": "8855acadb03828271958bc677903b0514163e1898ded0df3a6ce722643fd5569",
+      "size_bytes": 3063
+    },
+    "results/candidate_metrics.csv": {
+      "sha256": "54f57b170b643849aee5ca6a3a94f8a0f6decb75ab4b25f538ce1de24ee49ed8",
+      "size_bytes": 515
+    },
+    "results/candidate_rescue_regression.csv": {
+      "sha256": "f643f7af77c01c3b9a2e75d79de762c853618605b994fd02450f0e84691e7d98",
+      "size_bytes": 2620
+    },
+    "results/candidate_sample_level.csv": {
+      "sha256": "01f7570dd56b9f3a2329362c6ccee134b98ea1ea8b948a93552b37fbac7c65b2",
+      "size_bytes": 57801
+    },
+    "results/candidate_subgroup_metrics.csv": {
+      "sha256": "d3cc100bf72ddf5187fab13dacbcc24128cee49cec971c6b7dda798e51dc375a",
+      "size_bytes": 3520
+    },
+    "results/prompt_equivalence_matrix.csv": {
+      "sha256": "0669687c5766cc82e19d055f6e5cd16a3bda0588743ef40bbaa688323c23886a",
+      "size_bytes": 272615
+    },
+    "results/prompt_surface_summary.csv": {
+      "sha256": "28cee552d43cb383bee53a24c9cfde9aa14daa44d4128aed2e32db6e6c7846ef",
+      "size_bytes": 2092
+    },
+    "traces/candidate_intervention_traces.jsonl": {
+      "sha256": "30e6e45ab5ef802dcca09c2868706bc254b7cdfbc149947161fe71e9a4e584a1",
+      "size_bytes": 3326406
+    },
+    "validation/stage3b_invariants.json": {
+      "sha256": "ea40b9781b6eaa0f27b8dd652e172b5f5bf3ba8ab5f4c648961f11deca5d0c34",
+      "size_bytes": 177
+    }
+  }
+}

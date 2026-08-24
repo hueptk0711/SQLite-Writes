@@ -1,0 +1,4 @@
+COMMAND: python -c <stage4r2 checksum verifier>
+EXIT: 0
+checked=56
+failures=0

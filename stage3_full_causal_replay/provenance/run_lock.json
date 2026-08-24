@@ -1,0 +1,99 @@
+{
+  "stage": "Stage3_FULL_CAUSAL_REPLAY",
+  "model_called": false,
+  "gpu_required": false,
+  "sample_count": 300,
+  "variant_order": [
+    "V0",
+    "V1",
+    "V2",
+    "V3",
+    "V4",
+    "V5",
+    "V6",
+    "V7",
+    "V8"
+  ],
+  "component_order": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G1",
+    "G2"
+  ],
+  "repository_head": "f1492f57b15cc1ef7404c31abf21e19f21e10e42",
+  "frozen_g2_tag": "Stage2-G2-FINAL",
+  "frozen_g2_commit": "b752867312727e9932dcf48af99c02b4b2af36cf",
+  "frozen_g2_tag_commit_verified": "b752867312727e9932dcf48af99c02b4b2af36cf",
+  "dataset_archive_sha256": "525cdd7006ea32a8ab8d81f842332ac9b403dce2472cde608efb4e6962d456df",
+  "result_archive_sha256": "e456037422281d56e03dd7766baf1cc9efa78a95061234444c452f3c04810911",
+  "raw_generations_sha256": "bf6e5365efd532c9e181ec77272c695dd22b49b9071dc83faa962b6528f24925",
+  "baseline_evaluation_sha256": "ebf2b1ea14e9970fc1b6d19d9d41cdb648cc16b289d5957dfb594f6f8a4d908b",
+  "sample_ids_sha256": "240a3ccf6e3fed65e754fdafbc3f52d8cadaabf6282c36efea8616a25bf8884a",
+  "config_hashes": {
+    "V0": {
+      "path": "configs/stage2/original.json",
+      "sha256": "ba26cf40840e46800e7ac079c7e9943f12f9660d900269d5818cbdb155129741"
+    },
+    "V1": {
+      "path": "configs/stage2/v1_control.json",
+      "sha256": "6896e273901714ada39c437b831fa8d0e7ac5e5ff9232ef4aa6976faca7a91c5"
+    },
+    "V2": {
+      "path": "configs/stage2/v2_conflict.json",
+      "sha256": "798d7dff1fa7cd19bd88b84f3812a13ee091befeead9e2eb56e83806ccfaaba2"
+    },
+    "V3": {
+      "path": "configs/stage2/v3_update.json",
+      "sha256": "63289bd6f7357cca8457279fc5a70069660d238ef46ee8a699ca993209de0aa8"
+    },
+    "V4": {
+      "path": "configs/stage2/v4_structured_parser.json",
+      "sha256": "8bd64917fee2760d6f90efd41d7a9561f144f3a91224e9d3c2f285501f972154"
+    },
+    "V5": {
+      "path": "configs/stage2/v5_free_text_typed_normalization.json",
+      "sha256": "578c0257281680a56dbe945cde0e614af96aa0772421bee346e4bd9a6b886939"
+    },
+    "V6": {
+      "path": "configs/stage2/v6_constrained_reference_repair.json",
+      "sha256": "c0bf2ec915f56ca3154189c7108a44740c1e0db937b41311f389caa34fad1ed0"
+    },
+    "V7": {
+      "path": "configs/stage2/v7_diagnostic_targeted_repair_g1.json",
+      "sha256": "287bb1d69be2370168e1ba4faf043c1ce36ccad14911a694d01046b6b4c28d66"
+    },
+    "V8": {
+      "path": "configs/stage2/v8_diagnostic_targeted_repair_g2.json",
+      "sha256": "5abec21fcfcec16495107a9c32fa91ab80fa70450e9a18106815957c900baf41"
+    }
+  },
+  "baseline_equivalence": {
+    "fields": [
+      "target_state_correct",
+      "strict_full_state_correct",
+      "execution_success"
+    ],
+    "mismatches": 0
+  },
+  "activation_definition": "trace signal or observable semantic fingerprint change from the preceding cumulative variant",
+  "first_failure_policy": [
+    "parse",
+    "pipeline stage",
+    "semantic_gate",
+    "preflight",
+    "execution",
+    "state_mismatch",
+    "off_target_state_change",
+    "none"
+  ],
+  "environment": {
+    "python": "3.14.3",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "sqlite": "3.50.4"
+  },
+  "elapsed_seconds": 229.40880703926086
+}

@@ -1,0 +1,82 @@
+{
+  "fixture_version": "stage2-g2-patch1",
+  "evidence_scope": "Stage-1 development diagnostic regression only; not confirmatory evidence",
+  "source": "04_results/mp_fs_plus_failure_analysis_v1/stage1_mpfsplus_failure_analysis/manual_audit_evidence.jsonl",
+  "cases": [
+    {
+      "sample_id": "final_vaccine_002",
+      "reviewer_root_cause": "DATE_NORMALIZATION_AND_EVIDENCE_SPAN_ERROR",
+      "request": "Process an insert batch that skips any row whose primary key already exists. For shipments, use shipmentregistry as the conflict target. Attempt the existing shipment VS255467 with its timestamp 2024-07-17 11:50:00.095446, route alignment Under Review, customs status In Process, and quality check Passed; this conflicting row must be ignored without changing it. Also add shipment VSVAC1002 with timestamp 2026-07-30 10:02:00, route alignment Under Review, customs status Pending, and quality check Pending. For containers, use containregistry as the conflict target and add CVAC1002 as a Thermal Shipper with volume 180 liters, mass 74.5 kilograms, status In Transit, coolant Phase Change Material, coolant remaining 92.4 percent, battery 88 percent, power feed Hybrid, backup status Available, and shipment owner VSVAC1002. Insert the shipment rows before the container row.",
+      "eligible_g2_patch1": true,
+      "selected_evidence": {
+        "evidence_id": "e2",
+        "text": "Attempt",
+        "start": 137,
+        "end": 144,
+        "candidate_type": "text"
+      },
+      "compatible_candidate": {
+        "evidence_id": "e4",
+        "text": "2024-07-17 11:50:00.095446",
+        "start": 195,
+        "end": 221,
+        "candidate_type": "datetime",
+        "candidate_role": "primary"
+      },
+      "excluded_candidates": [
+        {
+          "evidence_id": "e5",
+          "reason": "component candidate"
+        },
+        {
+          "evidence_id": "e17",
+          "reason": "outside selected evidence sentence"
+        }
+      ]
+    },
+    {
+      "sample_id": "final_vaccine_048",
+      "reviewer_root_cause": "EVIDENCE_SPAN_SELECTION_ERROR",
+      "request": "Upsert four related existing records. For the shipment, use shipmentregistry as the conflict target and update only routealign and handlingguide: shipment VS255467 keeps timestamp 2024-07-17 11:50:00.095446 and receives route alignment Compliant and handling guide Urgent. For the container, use containregistry as the conflict target and update only containflag, coolremainpct, and batterypct: container C52903 remains owned by VS255467 and receives status In Transit, coolant remaining 64.5 percent, and battery 66 percent. For the vehicle, use vehiclereg as the conflict target and update only speedkm, currentsite, and gpsflag: vehicle V7577 remains linked to shipment VS255467 and container C52903, with speed 52 km/h, current site Northbridge Depot, and GPS status Active. For the logger, use loggerreg as the conflict target and update only logflag, datapct, and syshealth: logger DL5868 remains linked to container C52903 and shipment VS255467, with logger status Active, data completeness 99.2 percent, and system health Good.",
+      "eligible_g2_patch1": true,
+      "selected_evidence": {
+        "evidence_id": "e2",
+        "text": "For",
+        "start": 38,
+        "end": 41,
+        "candidate_type": "text"
+      },
+      "compatible_candidate": {
+        "evidence_id": "e4",
+        "text": "2024-07-17 11:50:00.095446",
+        "start": 180,
+        "end": 206,
+        "candidate_type": "datetime",
+        "candidate_role": "primary"
+      },
+      "excluded_candidates": [
+        {
+          "evidence_id": "e5",
+          "reason": "component candidate"
+        }
+      ]
+    },
+    {
+      "sample_id": "final_virtual_046",
+      "reviewer_root_cause": "EVIDENCE_SPAN_SELECTION_ERROR",
+      "request": "Add one new additional note. Use notes registry VIR3NOTE046, link it to retention registry RET_L8K68, and store the note text “Schedule a retention review after the autumn showcase.” The note registry is new, so insert it normally without a conflict policy.",
+      "eligible_g2_patch1": false,
+      "selected_evidence": {
+        "evidence_id": "e1",
+        "text": "Use",
+        "candidate_type": "text"
+      },
+      "desired_evidence": {
+        "evidence_id": "e4",
+        "text": "text “Schedule a retention review after the autumn showcase",
+        "candidate_type": "label_value"
+      },
+      "exclusion_reason": "No deterministic temporal type contradiction; generic text evidence selection remains out of scope."
+    }
+  ]
+}

@@ -1,0 +1,241 @@
+{
+  "stage": "Stage5_METHOD_REVISION_FREEZE",
+  "protocol_id": "mp_fs_plus_vnext_r1_confirmation_v1",
+  "status": "blocked_until_new_untouched_dataset_registered_and_reviewer_accepted",
+  "paper_primary_result": false,
+  "accepted_executable_tag": "stage5-vnext-r1-freeze-patch1",
+  "accepted_executable_commit_policy": "The accepted executable commit is the Git commit pointed to by accepted_executable_tag after PATCH1 acceptance; package GIT_INFO records the concrete commit SHA.",
+  "method_under_test": {
+    "method_name": "MP-FS+ vNext-R1",
+    "method_id": "MP-FS+",
+    "method_variant": "mp-fs-plus-vnext-r1",
+    "component_set": [
+      "D",
+      "F",
+      "G1"
+    ],
+    "overlay_config_path": "configs/stage5/mp_fs_plus_vnext_r1.json",
+    "resolved_config_path": "configs/stage5/resolved_mp_fs_plus_vnext_r1.json",
+    "confirmation_config_policy": "use_resolved_config_directly"
+  },
+  "lifecycle_boundary": {
+    "D": "selected_using_original_development_evidence",
+    "G1": "selected_using_original_development_evidence",
+    "F": "promoted_after_post_hoc_stage4_failure_analysis",
+    "stage4_role_after_stage5": "diagnostic_used_not_confirmatory",
+    "forbidden_stage4_claim": "untouched_held_out_confirmation_for_D_F_G1"
+  },
+  "confirmation_arms": {
+    "included_generation_arms": [
+      "direct",
+      "j_fs",
+      "original_mp_fs_plus",
+      "d_g1_shared_mp_fs_plus",
+      "d_f_g1_shared_mp_fs_plus"
+    ],
+    "included_deterministic_replay_arms": [
+      "original_mp_fs_plus",
+      "d_g1",
+      "d_f_g1"
+    ],
+    "excluded_from_confirmation": [
+      "FULL",
+      "D_ONLY",
+      "NO_C",
+      "G2",
+      "token_budget_experiment",
+      "second_model_runs"
+    ],
+    "direct_included": true,
+    "j_fs_included": true,
+    "original_mp_fs_plus_included": true,
+    "d_g1_included": true,
+    "d_f_g1_included": true,
+    "full_included": false,
+    "generation_strategy": {
+      "direct": {
+        "raw_generation_file": "raw_generations/direct.jsonl",
+        "prompt_surface": "direct"
+      },
+      "j_fs": {
+        "raw_generation_file": "raw_generations/j_fs.jsonl",
+        "prompt_surface": "j_fs"
+      },
+      "original_mp_fs_plus": {
+        "raw_generation_file": "raw_generations/original_mp_fs_plus.jsonl",
+        "prompt_surface": "original_mp_fs_plus"
+      },
+      "d_g1_shared_mp_fs_plus": {
+        "raw_generation_file": "raw_generations/d_g1_shared_mp_fs_plus.jsonl",
+        "prompt_surface": "D+G1",
+        "process_as": [
+          "D_G1",
+          "D_F_G1"
+        ]
+      },
+      "d_f_g1_shared_mp_fs_plus": {
+        "raw_generation_file": "raw_generations/d_g1_shared_mp_fs_plus.jsonl",
+        "shares_raw_generation_with": "d_g1_shared_mp_fs_plus",
+        "prompt_surface": "D+G1",
+        "process_as": [
+          "D_F_G1"
+        ]
+      }
+    },
+    "F_incremental_isolation": "D_G1 and D_F_G1 must be deterministic replays from the exact same D+G1 raw generation rows; F must not affect prompt construction.",
+    "original_vs_vnext_generation_policy": "Original MP-FS+ may use its own raw generation if prompt/HF input IDs differ from D+G1; this must be decided by preflight before generation and not after seeing results."
+  },
+  "hypotheses": {
+    "H1_method_level_confirmation": {
+      "comparison": "D_F_G1_vs_original_mp_fs_plus",
+      "role": "primary_method_level",
+      "metric": "target_state_correct",
+      "direction": "D_F_G1_greater_than_original_mp_fs_plus"
+    },
+    "H2_F_incremental_confirmation": {
+      "comparison": "D_F_G1_vs_D_G1",
+      "role": "key_confirmatory_component_comparison",
+      "metric": "target_state_correct",
+      "direction": "D_F_G1_greater_than_D_G1",
+      "raw_generation_requirement": "paired_deterministic_replay_from_identical_D_G1_raw_generation"
+    },
+    "declared_family": [
+      "H1_method_level_confirmation",
+      "H2_F_incremental_confirmation"
+    ]
+  },
+  "dataset_lock": {
+    "confirmation_dataset_status": "not_registered_in_this_package",
+    "new_untouched_dataset_required": true,
+    "minimum_sample_count": 300,
+    "forbidden_sources": [
+      "stage1_to_stage3_development_300",
+      "stage4_fresh_300",
+      "archived_677_pool_used_for_stage4_selection",
+      "any_sample_seen_during_D_F_G1_method_development"
+    ],
+    "dataset_selection_provenance_required": [
+      "dataset_selection_policy",
+      "candidate_source_registry",
+      "selection_date",
+      "selection_commit",
+      "selection_performed_before_any_model_run",
+      "eligible_pool_sha256",
+      "sampling_algorithm",
+      "sampling_seed",
+      "benchmark_name_and_version_if_public"
+    ],
+    "registration_required_before_gpu_run": [
+      "dataset_archive_path",
+      "dataset_archive_sha256",
+      "sample_ids_path",
+      "sample_ids_sha256",
+      "gold_plans_path",
+      "gold_plans_sha256",
+      "database_file_sha256_by_db_id",
+      "profile_sha256_by_db_id",
+      "source_group_overlap_audit",
+      "input_text_hash_overlap_audit",
+      "canonical_content_hash_overlap_audit",
+      "two_independent_gold_reviews",
+      "gold_review_adjudication_protocol",
+      "final_gold_hash"
+    ],
+    "gold_review_adjudication_required": {
+      "reviewer_identities_or_roles": true,
+      "independence_rule": true,
+      "approved_rejected_vocabulary": true,
+      "disagreement_adjudication": true,
+      "adjudicator_blinded_to_model_predictions": true,
+      "gold_edit_cutoff": true,
+      "final_gold_hash": true
+    },
+    "confirmation_run_allowed_now": false
+  },
+  "model_lock": {
+    "primary_model": {
+      "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+      "snapshot_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+      "tokenizer_sha256": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468",
+      "model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357"
+    },
+    "secondary_model_runs": "not_part_of_stage5_freeze"
+  },
+  "generation_lock": {
+    "backend": "hf",
+    "framework": "transformers",
+    "batch_size": 1,
+    "context_length": 32768,
+    "max_input_tokens": 28672,
+    "max_new_tokens": 4096,
+    "input_truncation_policy": "error_before_confirmation_run",
+    "output_max_new_tokens_policy": "record_hit_max_new_tokens_continue_evaluation_score_invalid_or_wrong_state_as_false_keep_sample_in_denominator",
+    "quantization": "4bit",
+    "bitsandbytes_config": {
+      "load_in_4bit": true,
+      "bnb_4bit_quant_type": "fp4",
+      "bnb_4bit_use_double_quant": false,
+      "bnb_4bit_compute_dtype": "float16",
+      "bnb_4bit_quant_storage": "uint8"
+    },
+    "compute_dtype": "float16",
+    "device_map": "auto",
+    "do_sample": false,
+    "temperature": null,
+    "top_p": null,
+    "top_k": null,
+    "seed": 42,
+    "trust_remote_code": false,
+    "raw_generation_retry_policy": "completed_success_rows_are_immutable; infrastructure_resume_only_with_lock_checks",
+    "token_budget_after_failure_policy": "do_not_increase_budget_after_seeing_confirmation_outputs"
+  },
+  "prompt_lock": {
+    "prompt_builder": "nldbwrite_v3.planner.build_planner_prompt",
+    "source_parser": "nldbwrite_v3.source_parser.parse_source_payload",
+    "overlay_config_path": "configs/stage5/mp_fs_plus_vnext_r1.json",
+    "resolved_config_path": "configs/stage5/resolved_mp_fs_plus_vnext_r1.json",
+    "prompt_changes_after_freeze_allowed": false,
+    "gpu_preflight_required": [
+      "tokenizer_final_input_ids_sha256_by_sample",
+      "input_truncated_false_for_all_samples",
+      "working_tree_clean",
+      "execution_commit_equals_accepted_freeze_commit"
+    ]
+  },
+  "metric_lock": {
+    "primary_metric": "target_state_correct",
+    "secondary_metrics": [
+      "strict_full_state_correct",
+      "accepted_output",
+      "coverage",
+      "accepted_accuracy",
+      "any_off_target_change",
+      "first_failure_stage",
+      "hit_max_new_tokens"
+    ],
+    "denominator_policy": "all_registered_confirmation_samples",
+    "input_overflow_policy": "block_before_gpu_run",
+    "output_max_token_policy": "sample_remains_in_denominator_and_is_scored_by_deterministic_pipeline"
+  },
+  "statistics_lock": {
+    "primary_comparison": "D_F_G1_vs_original_mp_fs_plus",
+    "key_component_comparison": "D_F_G1_vs_D_G1",
+    "paired_test": "exact_mcnemar_two_sided",
+    "confidence_interval": "cluster_bootstrap_percentile_95",
+    "cluster_key": "source_group",
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 240824,
+    "multiple_comparison_policy": "holm_for_declared_H1_H2_family"
+  },
+  "execution_gate": {
+    "model_called_in_stage5": false,
+    "gpu_required_for_stage5": false,
+    "confirmation_gpu_run_allowed_before_reviewer_acceptance": false,
+    "dataset_or_gold_edits_allowed_after_registration": false,
+    "method_edits_allowed_after_stage5_acceptance": false,
+    "resolved_config_required_for_confirmation": true,
+    "clean_worktree_required_for_packaging": true
+  }
+}

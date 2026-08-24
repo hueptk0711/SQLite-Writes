@@ -1,0 +1,5 @@
+﻿preflight_rejection_reason,count,rate_among_preflight_rejections
+unique_constraint,45,0.6716417910447762
+semantic_risk_gate,15,0.22388059701492538
+foreign_key,6,0.08955223880597014
+type_or_datatype,1,0.014925373134328358

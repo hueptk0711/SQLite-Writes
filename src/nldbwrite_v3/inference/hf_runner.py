@@ -79,12 +79,28 @@ class HuggingFaceGenerator:
             model_kwargs["revision"] = revision
         quantization = str(config.get("quantization") or "").lower()
         if quantization in {"4bit", "4-bit"}:
-            model_kwargs["quantization_config"] = BitsAndBytesConfig(
-                load_in_4bit=True,
-                bnb_4bit_compute_dtype=getattr(
+            quantization_kwargs: dict[str, Any] = {
+                "load_in_4bit": True,
+                "bnb_4bit_compute_dtype": getattr(
                     torch,
                     str(config.get("compute_dtype") or "float16"),
                 ),
+            }
+            if config.get("bnb_4bit_quant_type") is not None:
+                quantization_kwargs["bnb_4bit_quant_type"] = str(
+                    config["bnb_4bit_quant_type"]
+                )
+            if config.get("bnb_4bit_use_double_quant") is not None:
+                quantization_kwargs["bnb_4bit_use_double_quant"] = bool(
+                    config["bnb_4bit_use_double_quant"]
+                )
+            if config.get("bnb_4bit_quant_storage") is not None:
+                quantization_kwargs["bnb_4bit_quant_storage"] = getattr(
+                    torch,
+                    str(config["bnb_4bit_quant_storage"]),
+                )
+            model_kwargs["quantization_config"] = BitsAndBytesConfig(
+                **quantization_kwargs,
             )
         elif quantization in {"8bit", "8-bit"}:
             model_kwargs["quantization_config"] = BitsAndBytesConfig(

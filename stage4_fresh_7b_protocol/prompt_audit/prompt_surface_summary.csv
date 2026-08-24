@@ -1,0 +1,7 @@
+﻿comparison,input_type,samples,same_prompt,changed_prompt,changed_sample_ids
+original_mp_fs_plus_vs_d_g1_primary,ALL,300,300,0,
+vnext_candidates_internal_equivalence,ALL,300,300,0,
+original_mp_fs_plus_vs_d_g1_primary,free_text,111,111,0,
+vnext_candidates_internal_equivalence,free_text,111,111,0,
+original_mp_fs_plus_vs_d_g1_primary,semi_structured,189,189,0,
+vnext_candidates_internal_equivalence,semi_structured,189,189,0,

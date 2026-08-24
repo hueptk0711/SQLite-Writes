@@ -1,0 +1,44 @@
+{
+  "precedence": [
+    {
+      "priority": "1",
+      "rule": "hit_max_new_tokens",
+      "family": "max_token_hit_associated"
+    },
+    {
+      "priority": "2",
+      "rule": "UNKNOWN_COLUMN_ID or UNKNOWN_EVIDENCE_ID",
+      "family": "schema_reference_grounding"
+    },
+    {
+      "priority": "3",
+      "rule": "UNRESOLVED_SOURCE_FIELD",
+      "family": "source_field_grounding"
+    },
+    {
+      "priority": "4",
+      "rule": "LOSSY_NORMALIZATION_REJECTED",
+      "family": "normalization"
+    },
+    {
+      "priority": "5",
+      "rule": "MISSING_REQUIRED_COLUMN or MISSING_UPDATE_COLUMN_IDS",
+      "family": "missing_write_semantics"
+    },
+    {
+      "priority": "6",
+      "rule": "NEEDS_CLARIFICATION",
+      "family": "ambiguity_or_insufficient_information"
+    },
+    {
+      "priority": "7",
+      "rule": "SQLite constraint-like error types",
+      "family": "constraint_or_execution"
+    },
+    {
+      "priority": "8",
+      "rule": "first_failure_stage fallback",
+      "family": "parse/build/preflight/execution/state_mismatch/other"
+    }
+  ]
+}

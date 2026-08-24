@@ -1,0 +1,10 @@
+protocol_build_python=3.14.3
+protocol_build_platform=Windows-11-10.0.26200-SP0
+expected_gpu_python_major_minor=3.12
+historical_verified_gpu_python=3.12.7
+historical_verified_environment_manifest=07_reproducibility/server_final_run/environment_manifest_final_server.json
+sqlite=3.50.4
+local_transformers_available=false
+exact_qwen_token_count_required_on_gpu_preflight=true
+gpu_environment_capture_required_before_generation=true
+required_gpu_packages=python,torch,transformers,accelerate,bitsandbytes,cuda,tokenizers,safetensors

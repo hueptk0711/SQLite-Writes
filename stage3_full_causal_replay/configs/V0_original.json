@@ -1,0 +1,11 @@
+{
+  "base_config": "configs/final/mp_fs_plus.json",
+  "method_id": "MP-FS+",
+  "method_variant": "stage2-original",
+  "method_version": "stage2-original-frozen",
+  "stage2_interventions": {
+    "control_field_roles": false,
+    "explicit_conflict_preservation": false,
+    "update_column_consistency": false
+  }
+}

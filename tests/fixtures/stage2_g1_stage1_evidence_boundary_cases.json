@@ -1,0 +1,32 @@
+{
+  "fixture_version": "stage2-g1-patch1",
+  "evidence_scope": "Stage-1 development diagnostic regression only; not confirmatory evidence",
+  "source": "04_results/mp_fs_plus_failure_analysis_v1/stage1_mpfsplus_failure_analysis/manual_audit_evidence.jsonl",
+  "cases": [
+    {
+      "sample_id": "final_archeology_032",
+      "reviewer_root_cause": "EVIDENCE_SPAN_BOUNDARY_ERROR",
+      "request": "Try to insert one site whose zoneregistry is SC9081. Treat zoneregistry as the conflict target. Because that site already exists, ignore the whole attempted row, update no columns, and leave the database unchanged.",
+      "selected_evidence": {
+        "evidence_id": "e3",
+        "text": "SC9081.",
+        "start": 45,
+        "end": 52,
+        "candidate_type": "number_or_identifier"
+      },
+      "bounded_candidate": {
+        "evidence_id": "e7",
+        "text": "SC9081",
+        "start": 45,
+        "end": 51,
+        "candidate_type": "number_or_identifier"
+      },
+      "expected_repair": {
+        "diagnosed_slot": "/write_groups/0/rows/0/t14.c19/value_from",
+        "old_reference": "e3",
+        "selected_repair": "e7",
+        "repair_rule": "unique_pre_enumerated_terminal_punctuation_trim"
+      }
+    }
+  ]
+}

@@ -1,0 +1,237 @@
+{
+  "stage": "Stage4_FRESH_7B_PROTOCOL",
+  "status": "template_pending_reviewer_acceptance",
+  "model_called": false,
+  "gpu_required_for_protocol": false,
+  "gpu_required_for_generation_after_acceptance": true,
+  "primary_method_slug": "d_g1_primary",
+  "primary_method_identity": "MP-FS+-vNext-D-G1-FINAL",
+  "primary_config_sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf",
+  "primary_config_expected_stage3b_sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf",
+  "generation_arms": [
+    "direct",
+    "j_fs",
+    "mp_fs_plus_shared"
+  ],
+  "generation_graph": {
+    "direct": {
+      "generates_raw": "raw_generations/direct.jsonl",
+      "process_as": [
+        "direct"
+      ]
+    },
+    "j_fs": {
+      "generates_raw": "raw_generations/j_fs.jsonl",
+      "process_as": [
+        "j_fs"
+      ]
+    },
+    "mp_fs_plus_shared": {
+      "generates_raw": "raw_generations/mp_fs_plus_shared.jsonl",
+      "process_as": [
+        "original_mp_fs_plus",
+        "d_g1_primary",
+        "d_only_secondary",
+        "full_secondary",
+        "no_c_secondary"
+      ],
+      "required_preflight_invariant": "original_vs_dg1_final_input_equal == 300/300"
+    }
+  },
+  "deterministic_reprocesses_share_raw_generation_with": {
+    "original_mp_fs_plus": "mp_fs_plus_shared",
+    "d_g1_primary": "mp_fs_plus_shared",
+    "d_only_secondary": "mp_fs_plus_shared",
+    "full_secondary": "mp_fs_plus_shared",
+    "no_c_secondary": "mp_fs_plus_shared"
+  },
+  "model_lock": {
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "snapshot_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+    "tokenizer_sha256": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468",
+    "model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357"
+  },
+  "inference_lock": {
+    "backend": "hf",
+    "framework": "transformers",
+    "batch_size": 1,
+    "context_length": 32768,
+    "max_input_tokens": 28672,
+    "max_new_tokens": 4096,
+    "input_truncation_policy": "error",
+    "quantization": "4bit",
+    "bitsandbytes_config": {
+      "load_in_4bit": true,
+      "bnb_4bit_quant_type": "fp4",
+      "bnb_4bit_use_double_quant": false,
+      "bnb_4bit_compute_dtype": "float16",
+      "bnb_4bit_quant_storage": "uint8",
+      "source": "Explicit lock of the historical runner behavior: the previous HF runner passed only load_in_4bit=True and compute_dtype=float16, therefore BitsAndBytes defaults are fixed here instead of left implicit."
+    },
+    "compute_dtype": "float16",
+    "device_map": "auto",
+    "do_sample": false,
+    "temperature": null,
+    "top_p": null,
+    "top_k": null,
+    "eos_token_id": "tokenizer.eos_token_id captured by GPU preflight",
+    "pad_token_id": "tokenizer.pad_token_id; if absent set to eos_token_id",
+    "bos_handling": "tokenizer(prompt, add_special_tokens=True)",
+    "chat_template_usage": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "<production_prompt>"
+        }
+      ],
+      "tokenize": false,
+      "add_generation_prompt": true
+    },
+    "padding_side": "left",
+    "generation_kwargs": {
+      "max_new_tokens": 4096,
+      "do_sample": false,
+      "pad_token_id": "tokenizer.pad_token_id",
+      "eos_token_id": "tokenizer.eos_token_id",
+      "temperature": "omitted_when_do_sample_false",
+      "top_p": "omitted_when_do_sample_false"
+    },
+    "seed": 42,
+    "stop_sequences": [],
+    "trust_remote_code": false,
+    "batching_policy": "fixed batch_size=1; resume keyed by generation_arm+sample_id",
+    "retry_policy": {
+      "completed_raw_output": "immutable_never_regenerate",
+      "infrastructure_crash_before_output": "resume_same_config_only",
+      "explicit_resume_flag_required": true,
+      "resume_lock_checks": [
+        "accepted_protocol_commit",
+        "runner_plan_sha256",
+        "sample_ids_sha256",
+        "inference_config_sha256",
+        "model_identity",
+        "dependency_lock_sha256"
+      ],
+      "valid_raw_completion_contract": "all selected IDs present exactly once, status == success, input_truncated == false",
+      "failed_generation_status_policy": "STOP; do not freeze central raw and do not count as SQL failure",
+      "semantic_retry": false,
+      "attempt_log_required": true
+    },
+    "expected_gpu_python_major_minor": "3.12",
+    "environment_version_enforcement": {
+      "source": "requirements-inference.lock.txt",
+      "packages": [
+        "torch",
+        "transformers",
+        "accelerate",
+        "bitsandbytes",
+        "tokenizers",
+        "safetensors"
+      ],
+      "exact_match_required_before_generation": true
+    }
+  },
+  "stage4_inference_config": {
+    "path": "stage4_fresh_7b_protocol/inference/stage4_qwen25_7b_in28672_out4096.json",
+    "sha256": "c7f43df89536ac412b73092c78d2cc251084f090dc0790cbe839a4248f6b5e16"
+  },
+  "gpu_environment_lock_required": [
+    "python",
+    "torch",
+    "transformers",
+    "accelerate",
+    "bitsandbytes",
+    "cuda_runtime",
+    "gpu_model",
+    "gpu_driver",
+    "tokenizers",
+    "safetensors"
+  ],
+  "runtime_assertions": {
+    "git_rev_parse_head_equals_accepted_protocol_commit": true,
+    "working_tree_clean_before_generation": true,
+    "execution_commit_equals_accepted_protocol_commit": true,
+    "generated_result_files_outside_git_allowed": true,
+    "explicit_resume_required_when_result_root_exists": true,
+    "resume_rejects_lock_drift": true,
+    "raw_generation_status_success_required": true,
+    "environment_package_versions_match_requirements_lock": true
+  },
+  "frozen_analysis": {
+    "script": "scripts/analysis/analyze_stage4_fresh_7b.py",
+    "primary_ci": "cluster_bootstrap_over_source_group",
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 240822
+  },
+  "token_budget_experiment": false,
+  "stopping_rule": "no tuning on fresh set; preserve raw outputs and report failures",
+  "protocol_builder_base_commit": "d0beef28cc9869666e72b382e8248c89c1dc9680",
+  "repository_branch": "stage2/g-diagnostic-targeted-repair",
+  "fresh_sample_ids_sha256": "5c8bd5cf2e5b79088322289f795beb95c33a1fa0de214f129eb0cf6680319a25",
+  "source_group_audit": {
+    "sample_count": 300,
+    "unique_source_groups": 194,
+    "multi_sample_group_count": 87,
+    "max_group_size": 4,
+    "group_size_distribution": {
+      "1": 107,
+      "2": 69,
+      "3": 17,
+      "4": 1
+    },
+    "source_group_source_counts": {
+      "source_group_id": 300
+    },
+    "policy": "Primary clustering key is official source_group/source_group_id; sample-ID root derivation is used only when official metadata is absent."
+  },
+  "statistics": {
+    "accuracy_weighting": "sample_weighted",
+    "primary_paired_difference": "accuracy(d_g1_primary)-accuracy(original_mp_fs_plus)",
+    "confidence_interval": "cluster_bootstrap_percentile_95",
+    "cluster_key": "source_group",
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 240822,
+    "secondary_mcnemar_exact": true
+  },
+  "prompt_set_hashes": {
+    "direct": "e77dc83edd1c9bf3b7dd105b0293552c0a300238a12eb5fe70be3b4a5c192a69",
+    "j_fs": "ed4564f6768904d4f460df7d98d255a01f908e69bd02d5030cbfcd2e4129a2ff",
+    "original_mp_fs_plus": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
+    "d_g1_primary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
+    "d_only_secondary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
+    "full_secondary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf",
+    "no_c_secondary": "cf944358966a111144611f856a52f8ad69dc7a0bd2a3d6fccfe82cee6ad24faf"
+  },
+  "config_hashes": {
+    "direct": {
+      "path": "configs/stage4/direct.json",
+      "sha256": "bc7c04f9daecc6706129ae06a04b612e339bd65e5bf722855e3f17b413b7f2f6"
+    },
+    "j_fs": {
+      "path": "configs/stage4/j_fs.json",
+      "sha256": "832665a5953f92e4ea66642b3e1f3dcfa9e9842518e98393dc5ffa7a23e49765"
+    },
+    "original_mp_fs_plus": {
+      "path": "configs/stage4/original_mp_fs_plus.json",
+      "sha256": "eed7feb1abdebdb5680e00922601135ea6f6ac809deaa9d548945569e7a5f206"
+    },
+    "d_g1_primary": {
+      "path": "configs/stage4/d_g1_primary.json",
+      "sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf"
+    },
+    "d_only_secondary": {
+      "path": "configs/stage4/d_only_secondary.json",
+      "sha256": "212a489e956e2164459a4b15b006d69da47e67bb4b09457114f7ef05534c93bb"
+    },
+    "full_secondary": {
+      "path": "configs/stage4/full_secondary.json",
+      "sha256": "ec935c92b0bc2eb4935db7635ca6fd238606fc1aac5d4159694b77bd95ea81f2"
+    },
+    "no_c_secondary": {
+      "path": "configs/stage4/no_c_secondary.json",
+      "sha256": "909adca682d619934bdbdc9042ef3987c684b4e9aae520a1774de3824a3c7ec3"
+    }
+  }
+}

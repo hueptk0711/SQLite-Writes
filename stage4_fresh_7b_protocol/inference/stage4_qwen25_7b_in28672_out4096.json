@@ -1,0 +1,41 @@
+{
+  "backend": "hf",
+  "model_name_or_path": "<SERVER_QWEN_7B_SNAPSHOT_PATH>",
+  "revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "model_hash": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+  "trust_remote_code": false,
+  "device_map": "auto",
+  "batch_size": 1,
+  "max_input_tokens": 28672,
+  "max_new_tokens": 4096,
+  "input_truncation_policy": "error",
+  "quantization": "4bit",
+  "compute_dtype": "float16",
+  "bnb_4bit_quant_type": "fp4",
+  "bnb_4bit_use_double_quant": false,
+  "bnb_4bit_quant_storage": "uint8",
+  "do_sample": false,
+  "temperature": null,
+  "top_p": null,
+  "top_k": null,
+  "seed": 42,
+  "padding_side": "left",
+  "chat_template_usage": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "<production_prompt>"
+      }
+    ],
+    "tokenize": false,
+    "add_generation_prompt": true
+  },
+  "generation_kwargs": {
+    "max_new_tokens": 4096,
+    "do_sample": false,
+    "pad_token_id": "tokenizer.pad_token_id",
+    "eos_token_id": "tokenizer.eos_token_id",
+    "temperature": "omitted_when_do_sample_false",
+    "top_p": "omitted_when_do_sample_false"
+  }
+}

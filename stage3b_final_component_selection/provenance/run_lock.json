@@ -1,0 +1,64 @@
+{
+  "stage": "Stage3B_FINAL_COMPONENT_SELECTION",
+  "interpretation": "fixed-generation conditional replay and prompt-surface audit",
+  "model_called": false,
+  "gpu_required": false,
+  "sample_count": 300,
+  "candidate_order": [
+    "FULL",
+    "NO_C",
+    "D_ONLY",
+    "D_G1"
+  ],
+  "repository_head": "11c036b412f0329fdb3a2f3fbd36f956638ac2e6",
+  "frozen_g2_tag": "Stage2-G2-FINAL",
+  "frozen_g2_commit": "b752867312727e9932dcf48af99c02b4b2af36cf",
+  "frozen_g2_tag_commit_verified": "b752867312727e9932dcf48af99c02b4b2af36cf",
+  "dataset_archive_sha256": "525cdd7006ea32a8ab8d81f842332ac9b403dce2472cde608efb4e6962d456df",
+  "result_archive_sha256": "e456037422281d56e03dd7766baf1cc9efa78a95061234444c452f3c04810911",
+  "raw_generations_sha256": "bf6e5365efd532c9e181ec77272c695dd22b49b9071dc83faa962b6528f24925",
+  "stage3_sample_level_sha256": "b194375a495c68bbe5d2aa973e14acbf40b835ad569b4cb3c15d1eb488a247d3",
+  "stage3_variant_metrics_sha256": "7acca7eb836a7db137407b6ea7a2b6f52e064e19c82ba2329db39815753e40f8",
+  "sample_ids_sha256": "240a3ccf6e3fed65e754fdafbc3f52d8cadaabf6282c36efea8616a25bf8884a",
+  "config_hashes": {
+    "FULL": {
+      "path": "configs/stage3b/full.json",
+      "sha256": "b563ecbff9415f682662d2de3b9bc76f8f38b5fab0479b0621573702cc74832d"
+    },
+    "NO_C": {
+      "path": "configs/stage3b/no_c.json",
+      "sha256": "d159def187ccd21b79d61c965a55b1c10e54a1f62088048ee8fb28d4eeb079f8"
+    },
+    "D_ONLY": {
+      "path": "configs/stage3b/d_only.json",
+      "sha256": "212a489e956e2164459a4b15b006d69da47e67bb4b09457114f7ef05534c93bb"
+    },
+    "D_G1": {
+      "path": "configs/stage3b/d_g1.json",
+      "sha256": "1ec5d19768fd1bc4c1814c0e2e02d3205007d2d53db9dab8ff0e8123e9e11fdf"
+    }
+  },
+  "prompt_set_hashes": {
+    "V0": "c54d5c24917d3bf4c00b7f393f3c5d4b168e493b5a5c134595bf2bed460cb186",
+    "V1": "c54d5c24917d3bf4c00b7f393f3c5d4b168e493b5a5c134595bf2bed460cb186",
+    "V2": "c54d5c24917d3bf4c00b7f393f3c5d4b168e493b5a5c134595bf2bed460cb186",
+    "V3": "c54d5c24917d3bf4c00b7f393f3c5d4b168e493b5a5c134595bf2bed460cb186",
+    "V4": "36f6ae3126577caa9acbf4195ea0ae1d5210dd102fa53308d601819eb2f37645",
+    "V5": "36f6ae3126577caa9acbf4195ea0ae1d5210dd102fa53308d601819eb2f37645",
+    "V6": "36f6ae3126577caa9acbf4195ea0ae1d5210dd102fa53308d601819eb2f37645",
+    "V7": "36f6ae3126577caa9acbf4195ea0ae1d5210dd102fa53308d601819eb2f37645",
+    "V8": "36f6ae3126577caa9acbf4195ea0ae1d5210dd102fa53308d601819eb2f37645",
+    "FULL": "36f6ae3126577caa9acbf4195ea0ae1d5210dd102fa53308d601819eb2f37645",
+    "NO_C": "36f6ae3126577caa9acbf4195ea0ae1d5210dd102fa53308d601819eb2f37645",
+    "D_ONLY": "36f6ae3126577caa9acbf4195ea0ae1d5210dd102fa53308d601819eb2f37645",
+    "D_G1": "36f6ae3126577caa9acbf4195ea0ae1d5210dd102fa53308d601819eb2f37645"
+  },
+  "full_v8_equivalence_mismatches": 0,
+  "selection_candidates_pre_specified": true,
+  "environment": {
+    "python": "3.14.3",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "sqlite": "3.50.4"
+  },
+  "elapsed_seconds": 349.80184602737427
+}

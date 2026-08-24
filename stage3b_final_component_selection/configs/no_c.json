@@ -1,0 +1,44 @@
+{
+  "base_config": "configs/final/mp_fs_plus.json",
+  "method_id": "MP-FS+",
+  "method_variant": "stage3b-no-c",
+  "method_version": "stage3b-abdefg1g2",
+  "stage2_interventions": {
+    "control_field_roles": true,
+    "explicit_conflict_preservation": true,
+    "update_column_consistency": false
+  },
+  "structured_source_parser": {
+    "enabled": true,
+    "null_literal_policy": "explicit_only",
+    "emit_value_provenance": true
+  },
+  "free_text_typed_normalization": {
+    "enabled": true,
+    "date_normalization": true,
+    "datetime_normalization": true,
+    "preserve_raw_evidence": true,
+    "fail_closed_on_ambiguous_format": true
+  },
+  "constrained_reference_repair": {
+    "enabled": true,
+    "max_attempts_per_slot": 1,
+    "require_unique_candidate": true,
+    "preserve_non_reference_semantics": true,
+    "emit_repair_provenance": true
+  },
+  "diagnostic_targeted_repair": {
+    "enabled": true,
+    "evidence_span_boundary": true,
+    "evidence_span_selection": true,
+    "selection_policy": "temporal_type_contradiction_forward_same_sentence",
+    "allowed_terminal_punctuation": [".", ","],
+    "max_revalidation_attempts": 1,
+    "require_deterministic_diagnostic": true,
+    "require_single_diagnosed_slot": true,
+    "require_unique_candidate": true,
+    "preserve_other_semantics": true,
+    "preserve_effective_target_grounding": true,
+    "emit_repair_provenance": true
+  }
+}

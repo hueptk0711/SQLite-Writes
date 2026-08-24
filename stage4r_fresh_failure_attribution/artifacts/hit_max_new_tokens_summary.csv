@@ -1,0 +1,8 @@
+﻿method_slug,n,hit_max_new_tokens_count,hit_max_new_tokens_rate,incorrect_after_hit_count,parse_failure_after_hit_count,label
+direct,300,15,0.05,15,0,max_token_hit_associated_cases
+j_fs,300,33,0.11,33,1,max_token_hit_associated_cases
+original_mp_fs_plus,300,9,0.03,9,9,max_token_hit_associated_cases
+d_g1_primary,300,9,0.03,9,9,max_token_hit_associated_cases
+d_only_secondary,300,9,0.03,9,9,max_token_hit_associated_cases
+full_secondary,300,9,0.03,9,9,max_token_hit_associated_cases
+no_c_secondary,300,9,0.03,9,9,max_token_hit_associated_cases

@@ -1,0 +1,10 @@
+﻿sample_id,db_id,input_type,operation_type,dependency_sensitive,F_exact_name_repair_count,F_applied_count,F_succeeded_count,D_G1_target_state_correct,FULL_target_state_correct,FULL_accepted_output,FULL_vs_D_G1_outcome,original_references,replacement_references
+seed_000110,financial,semi_structured,plain_insert,0,4,4,4,0,1,1,rescue,t8.amount|t8.balance|t8.k_symbol|t8.operation,t8.c3|t8.c4|t8.c7|t8.c8
+seed_000159,student_club,semi_structured,plain_insert,0,1,1,1,0,0,0,fail_closed,t2.link_to_event,t2.c5
+seed_000165,superhero,semi_structured,plain_insert,0,11,11,11,0,0,0,fail_closed,t9.alignment_id|t9.eye_colour_id|t9.full_name|t9.gender_id|t9.hair_colour_id|t9.height_cm|t9.publisher_id|t9.race_id|t9.skin_colour_id|t9.superhero_name|t9.weight_kg,t9.c1|t9.c10|t9.c11|t9.c12|t9.c2|t9.c3|t9.c4|t9.c5|t9.c6|t9.c8|t9.c9
+seed_000185,student_club,semi_structured,plain_insert,0,4,4,4,0,1,1,rescue,t6.college|t6.department|t6.major_id|t6.major_name,t6.c1|t6.c2|t6.c3|t6.c4
+seed_000235,financial,semi_structured,plain_insert,0,7,7,7,0,1,1,rescue,t8.account_id|t8.amount|t8.balance|t8.date|t8.k_symbol|t8.operation|t8.type,t8.c10|t8.c2|t8.c3|t8.c4|t8.c6|t8.c7|t8.c8
+seed_000288,financial,semi_structured,plain_insert,0,4,4,4,0,1,1,rescue,t3.birth_date|t3.client_id|t3.district_id|t3.gender,t3.c1|t3.c2|t3.c3|t3.c4
+seed_000307,european_football_2,semi_structured,plain_insert,0,2,2,2,0,0,0,fail_closed,t3.away_team_api_id|t3.home_team_api_id,t3.c34|t3.c88
+seed_000319,superhero,semi_structured,plain_insert,0,1,1,1,0,0,0,fail_closed,t9.race_id,t9.c9
+seed_000334,financial,semi_structured,plain_insert,0,4,4,4,0,1,1,rescue,t3.birth_date|t3.client_id|t3.district_id|t3.gender,t3.c1|t3.c2|t3.c3|t3.c4

@@ -1,5 +1,5 @@
 {
-  "stage": "2-D-structured-parser-null",
+  "stage": "2-G2-temporal-evidence-selection-repair",
   "baseline": "configs/stage2/original.json",
   "dispatch_family": "MP-FS+",
   "interventions": [
@@ -30,12 +30,56 @@
       "hypothesis": "Explicit row boundaries and conservative textual-null semantics prevent deterministic source-parser row collapse, control-row fabrication, and TEXT-to-NULL corruption.",
       "stage1_evidence": "3 SOURCE_PARSER_ROW_SEGMENTATION_ERROR + 2 SOURCE_PARSER_CONTROL_ROW_SEGMENTATION_ERROR + 2 SOURCE_PARSER_NULL_LITERAL_COERCION_ERROR",
       "config": "configs/stage2/v4_structured_parser.json",
-      "status": "in_review"
+      "status": "frozen",
+      "frozen_tag": "Stage2-D-FINAL",
+      "frozen_commit": "0eba16b297100966d3635172456086db872166d6"
+    },
+    {
+      "id": "E_free_text_typed_normalization",
+      "config_block": "free_text_typed_normalization",
+      "hypothesis": "A free-text cell whose reference plan explicitly requests date normalization can be normalized safely only when its verbatim evidence is a strict, unambiguous year-first DATE/DATETIME; unsupported or ambiguous temporal surfaces must fail closed and retain raw-span provenance.",
+      "stage1_evidence": "9 DATE_NORMALIZATION_POLICY_ERROR + 1 DATE_NORMALIZATION_AND_EVIDENCE_SPAN_ERROR; manual audit found 12 valid explicit datetime values rejected by iso_date_normalization and two wrong non-date evidence values (Attempt/For) that must remain rejected.",
+      "config": "configs/stage2/v5_free_text_typed_normalization.json",
+      "status": "frozen",
+      "frozen_tag": "Stage2-E-FINAL",
+      "frozen_commit": "7b9c4ef616fc2414fccba2cbe6b22016a3ed39b4"
+    },
+    {
+      "id": "F_constrained_reference_repair",
+      "config_block": "constrained_reference_repair",
+      "hypothesis": "A non-empty reference that has already failed a deterministic reference boundary may be repaired safely only from its slot-local closed valid set when one candidate is uniquely determined by an exact identifier-name anchor or by a singleton valid set; semantic evidence/conflict/update choices remain protected and all other cases fail closed.",
+      "stage1_evidence": "35 Stage-1 first failures at reference resolution (28 REF_UNKNOWN_COLUMN + 7 REF_INVALID_SOURCE_REF), manually classified under the final F eligibility whitelist as 13 reference-only repairable, 10 reference-repair-partial-but-sample-not-safe, and 12 non-repairable; diagnostic/regression evidence only.",
+      "config": "configs/stage2/v6_constrained_reference_repair.json",
+      "status": "frozen",
+      "frozen_tag": "Stage2-F-FINAL",
+      "frozen_commit": "48b36e06a0ccef2bee69120029820f99f9fa6af5"
+    },
+    {
+      "id": "G1_evidence_span_boundary_repair",
+      "config_block": "diagnostic_targeted_repair",
+      "hypothesis": "Under the conservative G1 boundary policy, a selected identifier evidence span with one terminal period or comma may be replaced only by the unique pre-enumerated candidate at the same start and end-minus-one boundary; this does not independently prove the punctuation is linguistically incorrect. The plan is deep-copied, only value_from changes, and the frozen boundary is retried once.",
+      "stage1_evidence": "One manually audited Stage-1 case, final_archeology_032, selected e3='SC9081.' while the frozen candidate set also contained e7='SC9081' at the exact bounded span; diagnostic/regression evidence only.",
+      "config": "configs/stage2/v7_diagnostic_targeted_repair_g1.json",
+      "status": "frozen",
+      "frozen_tag": "Stage2-G1-FINAL",
+      "frozen_commit": "b3d6e721b5d3c1ea9a5fd7e117692a807815dcb7",
+      "compatibility_note": "Comma remains a reserved compatibility branch in the frozen G1 config; no observed Stage-1 fixture or dedicated regression activates it."
+    },
+    {
+      "id": "G2_temporal_evidence_selection_repair",
+      "config_block": "diagnostic_targeted_repair.evidence_span_selection",
+      "hypothesis": "When frozen Stage E rejects a non-temporal evidence reference with TEMPORAL_EVIDENCE_TYPE_MISMATCH for one iso_date_normalization slot, G2 may replace only that value_from when both the rejected evidence and replacement preserve the diagnosed effective target under the frozen exact-column grounding rule, and exactly one compatible maximal primary DATE/DATETIME candidate remains after the forward same-sentence filters.",
+      "stage1_evidence": "Two manually audited temporal Stage-1 cases (final_vaccine_002 and final_vaccine_048) are eligible diagnostic/regression fixtures; final_virtual_046 is retained as a non-temporal out-of-scope control. No end-to-end rescue claim is made.",
+      "config": "configs/stage2/v8_diagnostic_targeted_repair_g2.json",
+      "status": "frozen",
+      "frozen_tag": "Stage2-G2-FINAL",
+      "frozen_commit": "b752867312727e9932dcf48af99c02b4b2af36cf"
     }
   ],
   "not_in_scope": [
-    "typed_normalization_v2",
-    "reference_repair",
+    "generic_or_non_temporal_evidence_selection_repair",
+    "conflict_target_repair",
+    "update_column_semantic_repair",
     "semantic_targeted_repair",
     "7B_end_to_end_run"
   ],
@@ -56,5 +100,65 @@
     "unquoted textual NULL is explicit null; ambiguous text None/nil is preserved as text",
     "quoted textual null markers are preserved as text",
     "A-C logic remains frozen and is only consumed through existing interfaces"
+  ],
+  "d_frozen_tag": "Stage2-D-FINAL",
+  "d_frozen_commit": "0eba16b297100966d3635172456086db872166d6",
+  "e_invariants": [
+    "E is independently ablatable through free_text_typed_normalization.enabled",
+    "E runs only on the free-text evidence-materialization path after evidence and target-column resolution",
+    "E never changes structured-source D3 NULL semantics",
+    "E handles only explicit iso_date_normalization requests with strict unambiguous year-first DATE/DATETIME evidence",
+    "unsupported or ambiguous temporal evidence fails closed; evidence/column repair remains out of scope",
+    "raw evidence text and offsets remain unchanged and are recorded alongside the normalized value"
+  ],
+  "e_frozen_tag": "Stage2-E-FINAL",
+  "e_frozen_commit": "7b9c4ef616fc2414fccba2cbe6b22016a3ed39b4",
+  "f_invariants": [
+    "F is independently ablatable through constrained_reference_repair.enabled",
+    "the frozen V5 reference/materialization boundary runs before any F repair",
+    "F repairs only non-empty references explicitly rejected by that boundary",
+    "valid references and missing slots are never rewritten or auto-filled",
+    "repair candidates come only from the diagnostic-provided slot-local closed set",
+    "selection uses only a unique exact identifier-name anchor or a singleton closed set; no fuzzy/edit-distance matching is allowed",
+    "evidence selection, conflict-target semantics, and update-column semantics are protected and never repaired by F",
+    "the repaired plan is revalidated by the same frozen boundary exactly once; newly surfaced failures are not recursively repaired",
+    "repair provenance is mandatory and does not alter non-reference values or semantics",
+    "A-E remain frozen and are consumed only through existing interfaces"
+  ],
+  "f_frozen_tag": "Stage2-F-FINAL",
+  "f_frozen_commit": "48b36e06a0ccef2bee69120029820f99f9fa6af5",
+  "g1_invariants": [
+    "G1 is independently ablatable through diagnostic_targeted_repair.enabled",
+    "G1 runs only on a successfully materialized free-text reference plan after A-F",
+    "the diagnostic is deterministic and identifies a selected number_or_identifier candidate with terminal period/comma plus a pre-enumerated same-start end-minus-one identifier candidate",
+    "repair candidates come only from the frozen evidence candidate set; request-wide search and evidence generation are prohibited",
+    "exactly one diagnosed semantic slot and exactly one bounded candidate are required",
+    "the input plan is deep-copied and only the diagnosed value_from reference is changed",
+    "replacement evidence already assigned to another slot causes fail-closed collision handling",
+    "the same frozen materializer and verifier boundary is retried at most once; no recursive repair is permitted",
+    "operation, conflict, update, table, column, group, dependency, value text, prompt, and all other evidence references are unchanged",
+    "repair provenance records diagnostic, old value/reference, closed candidate set, selected repair, rule, application/success flags, and revalidation result",
+    "A-F remain frozen and are consumed only through existing interfaces",
+    "G1 is frozen at Stage2-G1-FINAL; comma is reserved compatibility behavior with no observed activation in the frozen Stage-1 fixture set"
+  ],
+  "g1_frozen_tag": "Stage2-G1-FINAL",
+  "g1_frozen_commit": "b3d6e721b5d3c1ea9a5fd7e117692a807815dcb7",
+  "g2_invariants": [
+    "G2 is independently ablatable through diagnostic_targeted_repair.evidence_span_selection",
+    "G2 runs only after the frozen materializer emits TYPED_NORMALIZATION_REJECTED with typed_error_code TEMPORAL_EVIDENCE_TYPE_MISMATCH for iso_date_normalization",
+    "exactly one diagnosed value_from slot is required; multiple diagnosed slots fail closed",
+    "replacement candidates come only from the pre-enumerated evidence candidate set and are filtered by temporal type, target-column compatibility, forward order, same deterministic sentence, primary role, and maximal temporal span",
+    "G2 reuses a read-only adapter over the exact frozen materializer grounding helper; it does not change materializer behavior",
+    "rejected evidence with a different same-table target or other-table-only target signal makes the G2 diagnostic non-repairable before candidate selection",
+    "selected_evidence_effective_target_grounding is mandatory repair provenance and is rechecked before mutation",
+    "a candidate explicitly grounded to a different same-table column or only to another table is excluded before cardinality selection",
+    "preserve_effective_target_grounding is mandatory and cannot be disabled",
+    "exactly one compatible candidate is required; zero or multiple candidates fail closed without ranking",
+    "the plan is deep-copied and only the diagnosed value_from reference may change",
+    "replacement evidence already assigned to another semantic slot causes fail-closed collision handling",
+    "the same frozen materializer and verifier boundary is retried exactly once after an applied repair",
+    "G2 does not chain with G1 or another G2 repair during the same invocation",
+    "provenance records the source diagnostic, old value/reference, old-evidence grounding, candidate set, replacement grounding rejections, selected repair, rule, application/success flags, and revalidation result",
+    "A-F and frozen G1 remain unchanged and are consumed through existing interfaces"
   ]
 }

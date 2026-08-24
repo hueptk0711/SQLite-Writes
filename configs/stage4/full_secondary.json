@@ -1,0 +1,40 @@
+{
+  "base_config": "configs/final/mp_fs_plus.json",
+  "method_id": "MP-FS+",
+  "method_variant": "stage3b-full",
+  "method_version": "stage3b-full",
+  "stage2_interventions": {
+    "control_field_roles": true,
+    "explicit_conflict_preservation": true,
+    "update_column_consistency": true
+  },
+  "structured_source_parser": {
+    "enabled": true,
+    "null_literal_policy": "explicit_only",
+    "emit_value_provenance": true
+  },
+  "free_text_typed_normalization": {
+    "enabled": true,
+    "allowed_columns": ["contact_email", "email", "phone", "website"],
+    "rules": ["email_lowercase", "phone_digits_only", "url_lowercase_scheme_host"]
+  },
+  "constrained_reference_repair": {
+    "enabled": true,
+    "exact_name": true,
+    "singleton": true,
+    "max_revalidation_attempts": 1,
+    "emit_repair_provenance": true
+  },
+  "diagnostic_targeted_repair": {
+    "enabled": true,
+    "evidence_span_boundary": true,
+    "evidence_span_selection": true,
+    "allowed_terminal_punctuation": [".", ","],
+    "max_revalidation_attempts": 1,
+    "require_deterministic_diagnostic": true,
+    "require_single_diagnosed_slot": true,
+    "require_unique_candidate": true,
+    "preserve_other_semantics": true,
+    "emit_repair_provenance": true
+  }
+}

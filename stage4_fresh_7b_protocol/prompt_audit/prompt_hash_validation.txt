@@ -1,0 +1,6 @@
+PROMPT_HASH_VALIDATION=PASS
+sample_count=300
+prompt_rows=2100
+vnext_candidates_share_one_generation=true
+prompt_hash_scope=production_prompt_before_hf_chat_template
+exact_qwen_token_count_required_on_gpu_preflight=true

@@ -1,0 +1,16 @@
+{
+  "base_config": "configs/final/mp_fs_plus.json",
+  "method_id": "MP-FS+",
+  "method_variant": "vnext-v4-structured-parser",
+  "method_version": "stage2-v4-abc-structured-parser",
+  "stage2_interventions": {
+    "control_field_roles": true,
+    "explicit_conflict_preservation": true,
+    "update_column_consistency": true
+  },
+  "structured_source_parser": {
+    "enabled": true,
+    "null_literal_policy": "explicit_only",
+    "emit_value_provenance": true
+  }
+}

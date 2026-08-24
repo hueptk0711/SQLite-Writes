@@ -1,0 +1,39 @@
+{
+  "D_F_G1_diagnostic": {
+    "D_F_G1_correct": 104,
+    "D_F_G1_to_FULL_regression": 0,
+    "D_F_G1_to_FULL_rescue": 0,
+    "D_G1_correct": 99,
+    "D_G1_to_D_F_G1_regression": 0,
+    "D_G1_to_D_F_G1_rescue": 5,
+    "FULL_correct": 104,
+    "status": "post_hoc_projection_from_frozen_outputs"
+  },
+  "D_G1_incorrect_count": 201,
+  "FULL_vs_D_G1_paired_counts": {
+    "both_correct": 99,
+    "both_wrong": 196,
+    "paired_sample_count": 300,
+    "regression": 0,
+    "rescue": 5
+  },
+  "F_activation_sample_count": 9,
+  "F_exact_name_repair_count": 38,
+  "F_exact_name_repair_rule": "unique_exact_identifier_name",
+  "F_fail_closed_count": 4,
+  "F_method_analyzed": "full_secondary",
+  "F_regression_count": 0,
+  "F_rescue_count": 5,
+  "fresh_sample_count": 300,
+  "hit_max_new_tokens_by_method": {
+    "d_g1_primary": 9,
+    "d_only_secondary": 9,
+    "direct": 15,
+    "full_secondary": 9,
+    "j_fs": 33,
+    "no_c_secondary": 9,
+    "original_mp_fs_plus": 9
+  },
+  "model_called": false,
+  "stage": "Stage4R1_FRESH_FAILURE_ATTRIBUTION_TARGETED_REVISION"
+}
