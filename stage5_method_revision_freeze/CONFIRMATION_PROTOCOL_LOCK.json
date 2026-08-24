@@ -1,0 +1,118 @@
+{
+  "stage": "Stage5_METHOD_REVISION_FREEZE",
+  "protocol_id": "mp_fs_plus_vnext_r1_confirmation_v1",
+  "status": "blocked_until_new_untouched_dataset_registered_and_reviewer_accepted",
+  "paper_primary_result": false,
+  "method_under_test": {
+    "method_name": "MP-FS+ vNext-R1",
+    "method_id": "MP-FS+",
+    "method_variant": "mp-fs-plus-vnext-r1",
+    "component_set": [
+      "D",
+      "F",
+      "G1"
+    ],
+    "config_path": "configs/stage5/mp_fs_plus_vnext_r1.json"
+  },
+  "lifecycle_boundary": {
+    "D": "selected_using_original_development_evidence",
+    "G1": "selected_using_original_development_evidence",
+    "F": "promoted_after_post_hoc_stage4_failure_analysis",
+    "stage4_role_after_stage5": "diagnostic_used_not_confirmatory",
+    "forbidden_stage4_claim": "untouched_held_out_confirmation_for_D_F_G1"
+  },
+  "dataset_lock": {
+    "confirmation_dataset_status": "not_registered_in_this_package",
+    "new_untouched_dataset_required": true,
+    "minimum_sample_count": 300,
+    "forbidden_sources": [
+      "stage1_to_stage3_development_300",
+      "stage4_fresh_300",
+      "archived_677_pool_used_for_stage4_selection",
+      "any_sample_seen_during_D_F_G1_method_development"
+    ],
+    "registration_required_before_gpu_run": [
+      "dataset_archive_path",
+      "dataset_archive_sha256",
+      "sample_ids_path",
+      "sample_ids_sha256",
+      "gold_plans_path",
+      "gold_plans_sha256",
+      "database_file_sha256_by_db_id",
+      "profile_sha256_by_db_id",
+      "source_group_overlap_audit",
+      "input_text_hash_overlap_audit",
+      "canonical_content_hash_overlap_audit",
+      "two_independent_gold_reviews"
+    ],
+    "confirmation_run_allowed_now": false
+  },
+  "model_lock": {
+    "primary_model": {
+      "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+      "snapshot_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c"
+    },
+    "secondary_model_runs": "not_part_of_stage5_freeze"
+  },
+  "generation_lock": {
+    "backend": "hf",
+    "framework": "transformers",
+    "batch_size": 1,
+    "context_length": 32768,
+    "max_input_tokens": 28672,
+    "max_new_tokens": 4096,
+    "input_truncation_policy": "error",
+    "quantization": "4bit",
+    "compute_dtype": "float16",
+    "do_sample": false,
+    "temperature": null,
+    "top_p": null,
+    "top_k": null,
+    "seed": 42,
+    "trust_remote_code": false,
+    "raw_generation_retry_policy": "completed_success_rows_are_immutable; infrastructure_resume_only_with_lock_checks"
+  },
+  "prompt_lock": {
+    "prompt_builder": "nldbwrite_v3.planner.build_planner_prompt",
+    "source_parser": "nldbwrite_v3.source_parser.parse_source_payload",
+    "config_path": "configs/stage5/mp_fs_plus_vnext_r1.json",
+    "prompt_changes_after_freeze_allowed": false,
+    "gpu_preflight_required": [
+      "tokenizer_final_input_ids_sha256_by_sample",
+      "input_truncated_false_for_all_samples",
+      "working_tree_clean",
+      "execution_commit_equals_accepted_freeze_commit"
+    ]
+  },
+  "metric_lock": {
+    "primary_metric": "target_state_correct",
+    "secondary_metrics": [
+      "strict_full_state_correct",
+      "accepted_output",
+      "coverage",
+      "accepted_accuracy",
+      "any_off_target_change",
+      "first_failure_stage"
+    ],
+    "denominator_policy": "all_registered_confirmation_samples",
+    "failed_or_truncated_generation_policy": "stop_run_and_return_artifacts; do_not_score_as_confirmatory_sql_failure"
+  },
+  "statistics_lock": {
+    "primary_comparison": "MP-FS+ vNext-R1 vs original MP-FS+",
+    "paired_test": "exact_mcnemar_two_sided",
+    "confidence_interval": "cluster_bootstrap_percentile_95",
+    "cluster_key": "source_group",
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 240824,
+    "multiple_comparison_policy": "holm_for_declared_secondary_family"
+  },
+  "execution_gate": {
+    "model_called_in_stage5": false,
+    "gpu_required_for_stage5": false,
+    "confirmation_gpu_run_allowed_before_reviewer_acceptance": false,
+    "dataset_or_gold_edits_allowed_after_registration": false,
+    "method_edits_allowed_after_stage5_acceptance": false
+  }
+}
