@@ -1,4 +1,5 @@
 {
+  "analysis_type": "mcnemar_threshold_sensitivity_not_power_analysis",
   "candidate_n": 500,
   "declared_family": [
     "H1_method_level_confirmation",

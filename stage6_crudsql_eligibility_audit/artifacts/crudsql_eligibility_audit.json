@@ -6,39 +6,15 @@
     "recommended_sampling_policy": "use_all_eligible_official_test_type0_examples_no_random_sampling"
   },
   "gpu_called": false,
-  "model_called": false,
-  "overlap_audit": {
-    "canonical_content_hash_overlap_count": 0,
-    "crudsql_sample_count": 500,
-    "database_overlap_count": 0,
-    "disclosure": "CRUDSQL uses upstream table IDs prefixed with crudsql: for source_group and database identity in this audit.",
-    "input_text_hash_overlap_count": 0,
-    "reference_sources": [
-      {
-        "name": "stage4_fresh_300",
-        "path": "stage4_fresh_7b_protocol/data/fresh_dataset_manifest.json",
-        "sample_count": 300,
-        "sha256": "d1850063af0a5b235cc4e8854d72b146fcca6e26bdebb5617ac3048abd4726ec"
-      },
-      {
-        "name": "final_holdout_release_300",
-        "path": "03_protocol_and_data/final_holdout_release/mp_fs_plus_external_holdout_300_20260731.zip",
-        "sample_count": 300,
-        "sha256": "525cdd7006ea32a8ab8d81f842332ac9b403dce2472cde608efb4e6962d456df"
-      },
-      {
-        "name": "archived_677_pool",
-        "path": "D:/paper kltn/text to sql/99_archive_history_20260731/legacy_sources_and_results/server_downloads/paper_v3_release_20260726/source/paper_v3_mapping_first/data/frozen/test/dataset_test_v3.json",
-        "sample_count": 677,
-        "sha256": "70d8a38552f46f81fee9abe04f0ebf96a862405965aeaff9958455dad08ebfb4"
-      }
-    ],
-    "sample_id_overlap_count": 0,
-    "source_group_overlap_count": 0,
-    "status": "PASS"
+  "isolated_table_db_audit": {
+    "db_dir": "isolated_table_dbs",
+    "fresh_single_table_db_per_official_table": true,
+    "manifest_path": "artifacts/isolated_table_db_manifest.json",
+    "status": "PASS",
+    "table_count": 125
   },
-  "registration_status": "not_registered_in_stage6a",
-  "sample_size_sensitivity": {
+  "mcnemar_threshold_sensitivity": {
+    "analysis_type": "mcnemar_threshold_sensitivity_not_power_analysis",
     "candidate_n": 500,
     "declared_family": [
       "H1_method_level_confirmation",
@@ -75,6 +51,45 @@
     ],
     "status": "PASS"
   },
+  "model_called": false,
+  "overlap_audit": {
+    "canonical_content_hash_overlap_count": 0,
+    "crudsql_sample_count": 500,
+    "crudsql_table_count": 125,
+    "database_fingerprint_overlap_count": 0,
+    "database_id_namespace_overlap_count": 0,
+    "disclosure": "Stage6A PATCH1 compares stable sample locators, text/content hashes, source groups, database IDs, and real table/schema/state fingerprints. The final decision ignores no missing expected forbidden source.",
+    "expected_forbidden_reference_set_count": 3,
+    "input_text_hash_overlap_count": 0,
+    "loaded_forbidden_reference_set_count": 3,
+    "reference_registry_status": "PASS_REFERENCE_REGISTRY_FROZEN",
+    "reference_registry_violations": [],
+    "reference_sources": [
+      {
+        "name": "stage4_fresh_300",
+        "path": "stage4_fresh_7b_protocol/data/fresh_dataset_manifest.json",
+        "sample_count": 300,
+        "source_artifact_sha256": "d1850063af0a5b235cc4e8854d72b146fcca6e26bdebb5617ac3048abd4726ec"
+      },
+      {
+        "name": "final_holdout_release_300",
+        "path": "03_protocol_and_data/final_holdout_release/mp_fs_plus_external_holdout_300_20260731.zip",
+        "sample_count": 300,
+        "source_artifact_sha256": "525cdd7006ea32a8ab8d81f842332ac9b403dce2472cde608efb4e6962d456df"
+      },
+      {
+        "name": "archived_677_pool",
+        "path": "D:/paper kltn/text to sql/99_archive_history_20260731/legacy_sources_and_results/server_downloads/paper_v3_release_20260726/source/paper_v3_mapping_first/data/frozen/test/dataset_test_v3.json",
+        "sample_count": 677,
+        "source_artifact_sha256": "70d8a38552f46f81fee9abe04f0ebf96a862405965aeaff9958455dad08ebfb4"
+      }
+    ],
+    "sample_id_overlap_count": 0,
+    "source_group_overlap_count": 0,
+    "status": "PASS",
+    "upstream_locator_overlap_count": 0
+  },
+  "registration_status": "not_registered_in_stage6a",
   "split_counts": {
     "dev": {
       "by_type": {
@@ -148,13 +163,15 @@
       "total_rows": 7467
     }
   },
-  "stage": "Stage6A_CRUDSQL_ELIGIBILITY_AUDIT",
+  "stage": "Stage6A_CRUDSQL_ELIGIBILITY_AUDIT_PATCH1",
   "status": "PASS_ELIGIBLE_FOR_STAGE6B_REGISTRATION",
   "type0_adapter": {
     "adapter_fail_count": 0,
     "adapter_pass_count": 500,
+    "exact_inserted_row_validation": true,
     "failure_counts": {},
-    "gold_state_policy": "compile CRUDSQL type=0 conds with equality operators into one SQLite INSERT over col_{index+1}; verify row count increments by one on a DB copy",
+    "fresh_db_per_sample": true,
+    "gold_state_policy": "for each official test type=0 sample, start from the isolated fresh single-table SQLite DB, execute the parameterized CRUDSQL conds-derived INSERT, verify the exact inserted row including SQLite affinity and NULL unspecified columns, and hash the post-state",
     "official_test_type0_count": 500
   }
 }

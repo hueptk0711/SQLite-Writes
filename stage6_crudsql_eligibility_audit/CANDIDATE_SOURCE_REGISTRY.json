@@ -13,11 +13,17 @@
   "recommended_exact_n": 500,
   "registration_status": "not_registered_in_stage6a",
   "sample_count_floor": 300,
+  "seen_reference_registry": {
+    "path": "artifacts/stage6_seen_reference_registry.json",
+    "sha256": "4480dbda7f923d320c8babc730f0f2bc86278402978cf1f422406a41384f8148",
+    "status": "PASS_REFERENCE_REGISTRY_FROZEN",
+    "violations": []
+  },
   "source_commit": "63bfce67d8391185453a812751e115a499201363",
   "source_git_status_porcelain": "",
   "source_name": "CRUDSQL",
   "source_repository": "https://github.com/bizard-lab/CRUDSQL.git",
-  "stage": "Stage6A_CRUDSQL_ELIGIBILITY_AUDIT",
+  "stage": "Stage6A_CRUDSQL_ELIGIBILITY_AUDIT_PATCH1",
   "stage5_method_freeze_commit": "79f6a82144ec0407444ef37121f70eed2b20e01c",
   "stage5_protocol_commit": "a7742b4c9150ab208e7c5d6708f0dff40bf05440",
   "status": "PASS_ELIGIBLE_FOR_STAGE6B_REGISTRATION"

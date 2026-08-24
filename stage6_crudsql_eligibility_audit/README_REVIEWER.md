@@ -1,4 +1,4 @@
-# Stage 6A CRUDSQL Eligibility Audit
+# Stage 6A PATCH1 CRUDSQL Eligibility Audit
 
 Status: PASS for eligibility audit; not registered as the final confirmation
 dataset in this package.
@@ -7,6 +7,12 @@ This package is CPU-only. It does not call Qwen, does not run GPU inference,
 does not translate or paraphrase Chinese questions, and does not create new
 data. It audits whether the public CRUDSQL official test split is eligible for
 Stage 6B confirmation-dataset registration.
+
+PATCH1 hardens the PATCH0 audit. It uses stable upstream sample locators based
+on the original official test-file index, loads a fail-closed prior-evidence
+registry, fingerprints real table/schema/state content, derives 125 isolated
+single-table SQLite databases, and validates each candidate INSERT from a fresh
+per-sample database state.
 
 ## Source Pin
 
@@ -39,8 +45,19 @@ test:  2000 total;  500 Create /  500 Delete /  500 Update /  500 Read
 ```
 
 Stage 6A only considers official test `type=0` examples. All 500 test `type=0`
-examples compile into deterministic SQLite INSERT operations and execute on an
-in-memory copy of `test.db` with one-row state increments.
+examples compile into deterministic SQLite INSERT operations. PATCH1 executes
+each sample from a fresh isolated single-table SQLite database, verifies the
+exact inserted row with SQLite type affinity and NULL unspecified columns, and
+hashes the resulting post-state.
+
+PATCH1 generated:
+
+```text
+125 isolated table databases
+500 stable upstream sample locators
+500 gold adapter audit rows
+500 post-state hashes
+```
 
 Recommendation after reviewer acceptance:
 
@@ -63,11 +80,16 @@ external generalization to a public Chinese single-table SQLite insert benchmark
 2. `STAGE6A_DECISION.json`
 3. `artifacts/crudsql_eligibility_audit.json`
 4. `artifacts/crudsql_overlap_audit.json`
-5. `artifacts/stage6_sample_size_sensitivity.json`
-6. `artifacts/crudsql_official_test_type0_ids.txt`
-7. `scripts/data/audit_crudsql_stage6a.py`
-8. `tests/test_stage6_crudsql_eligibility.py`
-9. `VALIDATION_REPORT.md`
+5. `artifacts/stage6_seen_reference_registry.json`
+6. `artifacts/isolated_table_db_manifest.json`
+7. `artifacts/crudsql_official_test_type0_ids.tsv`
+8. `artifacts/crudsql_gold_adapter_audit.jsonl`
+9. `artifacts/gold_post_state_hashes.jsonl`
+10. `artifacts/mcnemar_threshold_sensitivity.json`
+11. `isolated_table_dbs/`
+12. `scripts/data/audit_crudsql_stage6a.py`
+13. `tests/test_stage6_crudsql_eligibility.py`
+14. `VALIDATION_REPORT.md`
 
 ## Rerun
 
@@ -83,6 +105,18 @@ python scripts/data/audit_crudsql_stage6a.py \
 PYTHONPATH=tests/support/windows_py314_pytest_tempdir \
 python -m pytest -q tests/test_stage6_crudsql_eligibility.py \
   --basetemp pytest_tmp_stage6a_fresh
+```
+
+The rerun above uses the packaged `artifacts/stage6_seen_reference_registry.json`.
+If rebuilding that registry from original prior evidence, provide the archived
+677 dataset explicitly:
+
+```bash
+python scripts/data/audit_crudsql_stage6a.py \
+  --crudsql-root /path/to/CRUDSQL \
+  --out-dir stage6_crudsql_eligibility_audit \
+  --rebuild-reference-registry \
+  --archived-677-dataset /path/to/dataset_test_v3.json
 ```
 
 On Windows PowerShell, use:
