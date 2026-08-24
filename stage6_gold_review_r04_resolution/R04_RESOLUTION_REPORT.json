@@ -1,0 +1,537 @@
+{
+  "correctable_gold_error_count": 21,
+  "correctable_gold_error_items": [
+    {
+      "authored_content_sha256": "c2b7e042f7bd0d4c41792c3a680592edf11195a41aca988f05565a6a9eee0efe",
+      "correction_spec": {
+        "column": "项目名称",
+        "corrected_value": "第十二届中国（西部）电子信息博览会",
+        "evidence": "NL explicitly names the event without a 2024 prefix; 2024 is supplied in the date.",
+        "registered_value": "2024年第十二届中国（西部）电子信息博览会"
+      },
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The NL explicitly names the project as 第十二届中国（西部）电子信息博览会 and gives 2024 only as part of the separate event date; the unsupported year prefix in 项目名称 can therefore be removed uniquely.",
+      "stage6_sample_id": "stage6_crudsql_0000",
+      "upstream_sample_locator": "crudsql:test:0584:a7d29bf33b0611e9a963f40f24344a08:df804272cb4d1949"
+    },
+    {
+      "authored_content_sha256": "0b1259819d321431a54af7095a5cc23bbf1ec55377cb2dcc016a88f21ec73521",
+      "correction_spec": {
+        "evidence": "NL provides only 计划录用人数与面试人选的确定比例=1：5, not an absolute 招考人数.",
+        "registered_value": "2",
+        "remove_column": "招考人数"
+      },
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The NL uniquely specifies 用人司局=欧洲司, 职位名称=意大利语, and the 1：5 interview ratio, but gives no absolute 招考人数. The valid write is uniquely recoverable by omitting the unsupported 招考人数 field.",
+      "stage6_sample_id": "stage6_crudsql_0014",
+      "upstream_sample_locator": "crudsql:test:0598:a84b9b1c3b0611e983c1f40f24344a08:d755a2ebde0671e9"
+    },
+    {
+      "authored_content_sha256": "78b8f2da63c4e55d6633adfc647f7df39cea5f6430178ffbd41b1a421c794c0f",
+      "correction_spec": {
+        "column": "数学",
+        "corrected_value": "110",
+        "evidence": "NL explicitly states 数学均分=110.",
+        "registered_value": "70"
+      },
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The NL explicitly states 数学均分=110 for 苏州大学, while the registered gold writes 70. The intended value and column are unambiguous.",
+      "stage6_sample_id": "stage6_crudsql_0070",
+      "upstream_sample_locator": "crudsql:test:0654:f3263a70453d11e98d96f40f24344a08:6560f1f9f81116d4"
+    },
+    {
+      "authored_content_sha256": "a7ae4e00921cedb7362ac5ca635c76878bdc3c76ffe80a7e1957da17aa6f86bb",
+      "correction_spec": {
+        "changes": [
+          {
+            "column": "1月准点率",
+            "corrected_value": "0.0067",
+            "registered_value": "0.67"
+          },
+          {
+            "column": "2月准点率",
+            "corrected_value": "0.0052",
+            "registered_value": "0.52"
+          }
+        ],
+        "normalization": "percentage_to_fraction"
+      },
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The NL values are literal percentages, while the official table stores punctuality rates as 0–1 fractions. Exact percent-to-fraction conversion uniquely gives 0.0067 and 0.0052.",
+      "stage6_sample_id": "stage6_crudsql_0076",
+      "upstream_sample_locator": "crudsql:test:0660:f5316ef0453d11e9b6ccf40f24344a08:564cfa318f7cae2a"
+    },
+    {
+      "authored_content_sha256": "06cb47e65e5a058067e97c93f9b654fade4e79c691ed68f0ddde41ac1980685e",
+      "correction_spec": {
+        "changes": [
+          {
+            "column": "3月准点率",
+            "corrected_value": "0.0076",
+            "registered_value": "0.76"
+          },
+          {
+            "column": "4月准点率",
+            "corrected_value": "0.0072",
+            "registered_value": "0.72"
+          },
+          {
+            "column": "5月准点率",
+            "corrected_value": "0.0075",
+            "registered_value": "0.75"
+          }
+        ],
+        "normalization": "percentage_to_fraction"
+      },
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The NL values are literal percentages, while the official table stores punctuality rates as 0–1 fractions. Exact percent-to-fraction conversion uniquely determines all three corrected values.",
+      "stage6_sample_id": "stage6_crudsql_0077",
+      "upstream_sample_locator": "crudsql:test:0661:f5316ef0453d11e9b6ccf40f24344a08:2c3fb5b9c8459962"
+    },
+    {
+      "authored_content_sha256": "a6be1cc4b30ab103acafb51302e07bff6117183b5cafe624789e2f33adce68a8",
+      "correction_spec": {
+        "changes": [
+          {
+            "column": "7月准点率",
+            "corrected_value": "0.0061",
+            "registered_value": "0.61"
+          },
+          {
+            "column": "8月准点率",
+            "corrected_value": "0.0063",
+            "registered_value": "0.63"
+          }
+        ],
+        "normalization": "percentage_to_fraction"
+      },
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The NL values are literal percentages, while the official table stores punctuality rates as 0–1 fractions. Exact percent-to-fraction conversion uniquely gives 0.0061 and 0.0063.",
+      "stage6_sample_id": "stage6_crudsql_0078",
+      "upstream_sample_locator": "crudsql:test:0662:f5316ef0453d11e9b6ccf40f24344a08:6a1434f0aeb3e2c1"
+    },
+    {
+      "authored_content_sha256": "21065f4c8595ddf512a5509183bee7ed67068a3ad24c6240a2c8253be27dd6e1",
+      "correction_spec": {
+        "column": "9月准点率",
+        "corrected_value": "0.0077",
+        "normalization": "percentage_to_fraction",
+        "registered_value": "0.77"
+      },
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The NL states 9月准点率=0.77%, while the official table stores rates as fractions. The unique normalized value is 0.0077.",
+      "stage6_sample_id": "stage6_crudsql_0079",
+      "upstream_sample_locator": "crudsql:test:0663:f5316ef0453d11e9b6ccf40f24344a08:fe2bd3222ffc162d"
+    },
+    {
+      "authored_content_sha256": "568c100dcd2062af5b39020958ed0a9ac34d4f5faef50a5fe85b765febd69810",
+      "correction_spec": {
+        "column": "累计票房（亿）",
+        "corrected_value": "220740",
+        "evidence": "Official rows store values such as 93918 and 199839 in this column, matching raw 万-scale source values.",
+        "registered_value": "22.0740"
+      },
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The official table rows store 累计票房 on the raw 万-scale despite the mislabeled “亿” header. The NL gives 220740万元, so the registered conversion to 22.0740 is inconsistent with the frozen table storage convention and has a unique correction.",
+      "stage6_sample_id": "stage6_crudsql_0085",
+      "upstream_sample_locator": "crudsql:test:0669:4d258f803aaa11e9af1cf40f24344a08:7865853b25424fc1"
+    },
+    {
+      "authored_content_sha256": "71910eb542358ebc1795be13c38291bd7ff0e9575c13777d6df92fd52e305490",
+      "correction_spec": {
+        "column": "场馆类型",
+        "corrected_value": "体育场",
+        "evidence": "NL says 广州大学城体育中心体育场 / 该体育场.",
+        "registered_value": "体育馆"
+      },
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The NL repeatedly identifies the venue as a 体育场, but gold writes 场馆类型=体育馆. The schema directly supports 体育场, so the correction is unique.",
+      "stage6_sample_id": "stage6_crudsql_0109",
+      "upstream_sample_locator": "crudsql:test:0693:a846c2d73b0611e99c8df40f24344a08:0bf2b030d598b16c"
+    },
+    {
+      "authored_content_sha256": "f71971c3b91d5f67d4f64d367d1b689ce11b5c4795f06f2157e6d46f95a75547",
+      "correction_spec": {
+        "add": {
+          "column": "最新收盘价",
+          "corrected_value": "6.24"
+        },
+        "evidence": "NL explicitly says 收盘价=6.24元.",
+        "remove": {
+          "column": "增发价格",
+          "registered_value": "6.24"
+        }
+      },
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The NL states that 6.24元 is the 收盘价. The schema has 最新收盘价 and 增发价格 as distinct fields, so 6.24 must be moved from 增发价格 to 最新收盘价; no 增发价格 is supplied.",
+      "stage6_sample_id": "stage6_crudsql_0158",
+      "upstream_sample_locator": "crudsql:test:0742:4d2664ee3aaa11e9bb29f40f24344a08:5832290bcc1dc069"
+    },
+    {
+      "authored_content_sha256": "308d5289dd4389939f76132a9d78e1b4b3437bdc7fb96391d1759e3e63854eff",
+      "correction_spec": {
+        "changes": [
+          {
+            "column": "2011年成交面积",
+            "corrected_value": "60000",
+            "registered_value": "600"
+          },
+          {
+            "column": "2012至今成交面积",
+            "corrected_value": "10000000",
+            "registered_value": "100000"
+          },
+          {
+            "column": "2011年成交金额",
+            "corrected_value": "1",
+            "registered_value": "10000"
+          },
+          {
+            "column": "2012至今成交金额",
+            "corrected_value": "2000",
+            "registered_value": "20000000"
+          }
+        ],
+        "unit_rules": {
+          "amount": "10000万元=1亿元",
+          "area": "1平方千米=100万平方米"
+        }
+      },
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The NL units can be converted deterministically to the official table row scale: 平方千米→万平方米 by ×100 and 万元→亿元 by ÷10000. The remaining fields are already unambiguous.",
+      "stage6_sample_id": "stage6_crudsql_0180",
+      "upstream_sample_locator": "crudsql:test:0764:69d31c5e334311e9b9d1542696d6e445:35ec92e1961213d0"
+    },
+    {
+      "authored_content_sha256": "e7a36d3f7d135349808b15dcbbb55793efd4d2b875ac084aef602bce558430d8",
+      "correction_spec": {
+        "changes": [
+          {
+            "column": "2011年成交面积",
+            "corrected_value": "120000",
+            "registered_value": "1200"
+          },
+          {
+            "column": "2012至今成交面积",
+            "corrected_value": "23000000",
+            "registered_value": "230000"
+          },
+          {
+            "column": "2011年成交金额",
+            "corrected_value": "2",
+            "registered_value": "20000"
+          },
+          {
+            "column": "2012至今成交金额",
+            "corrected_value": "3000",
+            "registered_value": "30000000"
+          }
+        ],
+        "unit_rules": {
+          "amount": "10000万元=1亿元",
+          "area": "1平方千米=100万平方米"
+        }
+      },
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The NL units can be converted deterministically to the official table row scale: 平方千米→万平方米 by ×100 and 万元→亿元 by ÷10000. The remaining fields are already unambiguous.",
+      "stage6_sample_id": "stage6_crudsql_0181",
+      "upstream_sample_locator": "crudsql:test:0765:69d31c5e334311e9b9d1542696d6e445:9dd2b65ea7fd3977"
+    },
+    {
+      "authored_content_sha256": "ae4e92bc5e1d4ebd7d029f961c1eb47c9f3a9ed16e29119987b1c5dda783595a",
+      "correction_spec": {
+        "changes": [
+          {
+            "column": "2011年成交面积",
+            "corrected_value": "220000",
+            "registered_value": "2200"
+          },
+          {
+            "column": "2012至今成交面积",
+            "corrected_value": "30000000",
+            "registered_value": "300000"
+          },
+          {
+            "column": "2011年成交金额",
+            "corrected_value": "3",
+            "registered_value": "30000"
+          },
+          {
+            "column": "2012至今成交金额",
+            "corrected_value": "4500",
+            "registered_value": "45000000"
+          }
+        ],
+        "unit_rules": {
+          "amount": "10000万元=1亿元",
+          "area": "1平方千米=100万平方米"
+        }
+      },
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The NL units can be converted deterministically to the official table row scale: 平方千米→万平方米 by ×100 and 万元→亿元 by ÷10000. The remaining fields are already unambiguous.",
+      "stage6_sample_id": "stage6_crudsql_0182",
+      "upstream_sample_locator": "crudsql:test:0766:69d31c5e334311e9b9d1542696d6e445:f71bc7475cb9b56a"
+    },
+    {
+      "authored_content_sha256": "f78c8c8bc66bada32d17e72c41ee0a9163f7b3dc930e3b02d1ef4ad81285728d",
+      "correction_spec": {
+        "changes": [
+          {
+            "column": "2011年成交面积",
+            "corrected_value": "120000",
+            "registered_value": "1200"
+          },
+          {
+            "column": "2012至今成交面积",
+            "corrected_value": "25000000",
+            "registered_value": "250000"
+          },
+          {
+            "column": "2011年成交金额",
+            "corrected_value": "12",
+            "registered_value": "120000"
+          },
+          {
+            "column": "2012至今成交金额",
+            "corrected_value": "4000",
+            "registered_value": "40000000"
+          }
+        ],
+        "unit_rules": {
+          "amount": "10000万元=1亿元",
+          "area": "1平方千米=100万平方米"
+        }
+      },
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The NL units can be converted deterministically to the official table row scale: 平方千米→万平方米 by ×100 and 万元→亿元 by ÷10000. The remaining fields are already unambiguous.",
+      "stage6_sample_id": "stage6_crudsql_0183",
+      "upstream_sample_locator": "crudsql:test:0767:69d31c5e334311e9b9d1542696d6e445:f5d0c3872a74e91c"
+    },
+    {
+      "authored_content_sha256": "6a26e0879d966c8b62d3823f515e39a699cb5e3600184763b4f2f8465c503a29",
+      "correction_spec": {
+        "column": "比赛时间",
+        "corrected_value": "1天",
+        "evidence": "NL says 比赛时间为1天 and official rows preserve 天 in duration values.",
+        "registered_value": "1"
+      },
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The official table uses 比赛时间 for both date ranges and duration strings such as “5天” and “7天”. The NL gives the duration “1天”, so the unique correction is to preserve the unit rather than write bare “1”.",
+      "stage6_sample_id": "stage6_crudsql_0199",
+      "upstream_sample_locator": "crudsql:test:0783:f67b7ea6453d11e98ea0f40f24344a08:e7235c142e86659b"
+    },
+    {
+      "authored_content_sha256": "042f95b95308c9a790e6f9a99aceaca19f9d541e1d8654601aa875144a5c079c",
+      "correction_spec": {
+        "column": "岗位名称",
+        "corrected_value": "生物教师",
+        "evidence": "NL says 招聘生物教师3名 and does not specify 高中.",
+        "registered_value": "高中生物教师"
+      },
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The NL gives 岗位名称=生物教师; “高中” is not stated. The intended row is uniquely recoverable by replacing the unsupported expanded title 高中生物教师 with the literal NL value 生物教师.",
+      "stage6_sample_id": "stage6_crudsql_0250",
+      "upstream_sample_locator": "crudsql:test:0834:aa6fa0b33b0611e984f1f40f24344a08:44f99b93a25244ff"
+    },
+    {
+      "authored_content_sha256": "f67fa15feedaddee1ed4312af45d049e29f562c15dd35850bea39a14848b6c46",
+      "correction_spec": {
+        "evidence": "NL does not state a publishing/platform value; 网络文学作者 is an author description.",
+        "registered_value": "网络",
+        "remove_column": "平台"
+      },
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "“网络文学作者” describes the author category/medium and does not provide a platform. The table platform column contains concrete platform names, so the valid write is uniquely recoverable by omitting the invented 平台=网络 while retaining the explicitly stated author and representative work.",
+      "stage6_sample_id": "stage6_crudsql_0268",
+      "upstream_sample_locator": "crudsql:test:0852:4d2a4f823aaa11e984a4f40f24344a08:fbf3593fb4c9cdf9"
+    },
+    {
+      "authored_content_sha256": "5ec345b2e9445c3e99b0d0b6ec0ea3c2d8ae15d6946392927bdf052db253a412",
+      "correction_spec": {
+        "evidence": "NL does not state a concrete platform.",
+        "registered_value": "网络",
+        "remove_column": "平台"
+      },
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "“网络文学作家” describes the author category/medium and does not provide a platform. The valid write is uniquely recoverable by omitting the invented 平台=网络 while retaining 作家=梦入神机 and 经典代表作=《龙蛇演义》.",
+      "stage6_sample_id": "stage6_crudsql_0269",
+      "upstream_sample_locator": "crudsql:test:0853:4d2a4f823aaa11e984a4f40f24344a08:91c58599a036f5dd"
+    },
+    {
+      "authored_content_sha256": "65191ab9c1599ed4cf8e0e098d9d4c1bc8236b388651c305ee084657eb1c87bf",
+      "correction_spec": {
+        "evidence": "NL does not state a concrete platform.",
+        "registered_value": "网络",
+        "remove_column": "平台"
+      },
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "“网络文学作家” describes the author category/medium and does not provide a platform. The valid write is uniquely recoverable by omitting the invented 平台=网络 while retaining 作家=我吃西红柿 and 经典代表作=《寸忙》.",
+      "stage6_sample_id": "stage6_crudsql_0270",
+      "upstream_sample_locator": "crudsql:test:0854:4d2a4f823aaa11e984a4f40f24344a08:6973a357452e0daa"
+    },
+    {
+      "authored_content_sha256": "f94796fe9d4fcb614fadee277a1abc2f58ce631d11341b94a19c3aa95a370f72",
+      "correction_spec": {
+        "evidence": "NL does not specify a concrete platform; 网络作家 is not a platform value.",
+        "registered_value": "网络",
+        "remove_column": "平台"
+      },
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "“网络作家” describes the author category and does not specify a platform; the official table uses concrete platform names. The gold can be uniquely corrected by omitting 平台=网络 and retaining the explicit author and representative-work fields.",
+      "stage6_sample_id": "stage6_crudsql_0271",
+      "upstream_sample_locator": "crudsql:test:0855:4d2a4f823aaa11e984a4f40f24344a08:5d1f546292075c7a"
+    },
+    {
+      "authored_content_sha256": "d3e2ea1ac182b08abba36bf4624a73b60dac447368de144fb735682639747f44",
+      "correction_spec": {
+        "column": "城市",
+        "corrected_value": "南昌",
+        "evidence": "NL explicitly states 南昌.",
+        "registered_value": "合肥"
+      },
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The NL explicitly requests 南昌, while the registered gold writes 城市=合肥. The intended city value is uniquely determined by the instruction.",
+      "stage6_sample_id": "stage6_crudsql_0317",
+      "upstream_sample_locator": "crudsql:test:1269:69d56ffd334311e9a90e542696d6e445:58671b8d29af7bf2"
+    }
+  ],
+  "final_rejected_count": 40,
+  "source_task_invalid_count": 19,
+  "source_task_invalid_items": [
+    {
+      "authored_content_sha256": "6bc1752d3a49667d1ba98ad080382498188a5a32b59a9e1657e1c9ad091b24a5",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The NL phrase “抽查了湖北稻花香酒业股份有限公司的…白酒” does not uniquely identify the company as either 标称生产企业名称 or 被抽样单位名称, while the schema contains both roles. No unique valid column mapping exists.",
+      "stage6_sample_id": "stage6_crudsql_0044",
+      "upstream_sample_locator": "crudsql:test:0628:a99c46cf3b0611e9b51df40f24344a08:7bee9279f7e2b5ad"
+    },
+    {
+      "authored_content_sha256": "d9f242bb2f060fc45cd5749568ec453470ca51e0cd971083d8c305659b8134d1",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen target table is explicitly the 2019/1/14–2019/1/20 box-office TOP10, whereas the NL explicitly gives a mainland release date of 2023-08-30. The task is outside the table scope and the schema has no release-date field, so no unique valid gold can preserve the requested information.",
+      "stage6_sample_id": "stage6_crudsql_0084",
+      "upstream_sample_locator": "crudsql:test:0668:4d258f803aaa11e9af1cf40f24344a08:ac82079292e2e510"
+    },
+    {
+      "authored_content_sha256": "92c2a5122656d4f1619ebe90fcdda8d57dda7128247cf13e1f0aee81638b6daa",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The NL explicitly identifies a 2021 National Day film, which conflicts with the frozen 2019/1/14–2019/1/20 TOP10 table. In addition, 场均人次 cannot be uniquely mapped to the distinct schema field 人均场次. No unique valid gold exists.",
+      "stage6_sample_id": "stage6_crudsql_0086",
+      "upstream_sample_locator": "crudsql:test:0670:4d258f803aaa11e9af1cf40f24344a08:59484faf0a607423"
+    },
+    {
+      "authored_content_sha256": "ec08b1af75c5578b5483be01a25cffe8084a0abd0e38a8083fdd74176a69f0b0",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业美国中概股 and its market-cap field is denominated in 亿美元, but the NL supplies A-share code 300291.SZ for 百纳千成 and states market value only in 亿 without a USD conversion basis. The record is outside table scope and normalization is not uniquely recoverable.",
+      "stage6_sample_id": "stage6_crudsql_0200",
+      "upstream_sample_locator": "crudsql:test:0784:4d2420113aaa11e9b9c1f40f24344a08:0d7447c9f961b309"
+    },
+    {
+      "authored_content_sha256": "b1a5ec5fd01365826e696dd31f75121956363b04bf4e154d3efb2c13da12d403",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业美国中概股 and its market-cap field is denominated in 亿美元, but the NL supplies A-share code 000100.SZ for TCL科技 and states market value only in 亿 without a USD conversion basis. The record is outside table scope and normalization is not uniquely recoverable.",
+      "stage6_sample_id": "stage6_crudsql_0201",
+      "upstream_sample_locator": "crudsql:test:0785:4d2420113aaa11e9b9c1f40f24344a08:5cd2fe295529bfc1"
+    },
+    {
+      "authored_content_sha256": "b20950141514d243d688bdc069c0c88c7ae5f31826368e7747994faaf65eae41",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业美国中概股 and its market-cap field is denominated in 亿美元, but the NL supplies A-share code 000725.SZ for 京东方Ａ and states market value only in 亿 without a USD conversion basis. The record is outside table scope and normalization is not uniquely recoverable.",
+      "stage6_sample_id": "stage6_crudsql_0202",
+      "upstream_sample_locator": "crudsql:test:0786:4d2420113aaa11e9b9c1f40f24344a08:94aec3836d486286"
+    },
+    {
+      "authored_content_sha256": "9cc062c17b5d76c4a86c64aaea6e1e83bdbbae49d03e5c15b08bcb83d6740ad4",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业美国中概股 and its market-cap field is denominated in 亿美元, but the NL supplies A-share code 002594.SZ for 比亚迪 and states market value only in 亿 without a USD conversion basis. The record is outside table scope and normalization is not uniquely recoverable.",
+      "stage6_sample_id": "stage6_crudsql_0203",
+      "upstream_sample_locator": "crudsql:test:0787:4d2420113aaa11e9b9c1f40f24344a08:5e9a5653dbb7d278"
+    },
+    {
+      "authored_content_sha256": "f94b8ea6867f905786c248e80c42188d1ed0bc6aef8470d2c961d5ece21d2eca",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen schema is specifically the 2018–2019 春节档TOP5前六日均价 table, while the NL gives a general 2019 box-office rank (#2) for 复仇者联盟4：终局之战. The schema has no rank field and the stated ranking context does not match the table scope, so no unique valid gold exists.",
+      "stage6_sample_id": "stage6_crudsql_0216",
+      "upstream_sample_locator": "crudsql:test:0800:4d26d4b03aaa11e9acf2f40f24344a08:002457b719da842f"
+    },
+    {
+      "authored_content_sha256": "646d3422c0b9d83a5596a7e84b24ce1b00b2d79a3b351c73cf5f084a99df9b91",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen schema is the 2018–2019 春节档TOP5前六日均价 table and has no rank field, while the NL requires rank #4. Moreover 飞驰人生 already appears in the official 2019 side with a different average price (43.6 vs 41.6), so the requested append conflicts with the frozen table evidence.",
+      "stage6_sample_id": "stage6_crudsql_0217",
+      "upstream_sample_locator": "crudsql:test:0801:4d26d4b03aaa11e9acf2f40f24344a08:dcf0595ad8e23edf"
+    },
+    {
+      "authored_content_sha256": "0faff81163664a5614e2632075377df46fedd7e26e9965d0c751f7d446500929",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen schema is specifically the 2018–2019 春节档TOP5前六日均价 table, but the NL gives a general 2019 rank (#5) for 大黄蜂. The schema cannot encode the stated rank and the ranking context is not uniquely compatible with the table scope.",
+      "stage6_sample_id": "stage6_crudsql_0218",
+      "upstream_sample_locator": "crudsql:test:0802:4d26d4b03aaa11e9acf2f40f24344a08:99a7037196f0d560"
+    },
+    {
+      "authored_content_sha256": "dcb6569e1d72cf8744f04b58f64d468ee8f7fb144b5ab2404232ca18b0a65252",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen schema is the 2018–2019 春节档TOP5前六日均价 table and has no rank field, while the NL requires rank #1. 流浪地球 already appears in the official 2019 side with a different average price (47.9 vs 44.5), so the requested append contradicts the frozen table evidence.",
+      "stage6_sample_id": "stage6_crudsql_0219",
+      "upstream_sample_locator": "crudsql:test:0803:4d26d4b03aaa11e9acf2f40f24344a08:bf546cc06f2ed9aa"
+    },
+    {
+      "authored_content_sha256": "d5bc6ca380c43cd2699779ac160439c6d7053f3db8c8d043c8e0fb4963e4f8cb",
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The frozen table is an A-share airline comparable-company valuation table, but 中远海控 (601919.SH) is outside that airline scope. In addition, 市值(USDmn) requires a USD-million value while the NL states only 1484.11亿 without a currency/conversion basis, and the table suffix convention is CH rather than SH/SZ. No unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0240",
+      "upstream_sample_locator": "crudsql:test:0824:6e614ce634ce11e991e5542696d6e445:4d8b18ffe692840f"
+    },
+    {
+      "authored_content_sha256": "dfdc14de7e0b502d475fcece13ff8fb16b1b06c99ec9a7aa54fb9c6a1ed2611b",
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The frozen table is an A-share airline comparable-company valuation table, but 格力电器 (000651.SZ) is outside that airline scope. In addition, 市值(USDmn) requires a USD-million value while the NL states only 1858.36亿 without a currency/conversion basis, and the table suffix convention is CH rather than SH/SZ. No unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0241",
+      "upstream_sample_locator": "crudsql:test:0825:6e614ce634ce11e991e5542696d6e445:ad0471aede4cc829"
+    },
+    {
+      "authored_content_sha256": "1292556cb4724006e8eae17a05a1c138ebd50a7bac64ba14522866bf17e2373e",
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The frozen table is an A-share airline comparable-company valuation table, but 三峡能源 (600905.SH) is outside that airline scope. In addition, 市值(USDmn) requires a USD-million value while the NL states only 1330.97亿 without a currency/conversion basis, and the table suffix convention is CH rather than SH/SZ. No unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0242",
+      "upstream_sample_locator": "crudsql:test:0826:6e614ce634ce11e991e5542696d6e445:e096b5141ad90987"
+    },
+    {
+      "authored_content_sha256": "8d3cd96c2cf34b54c1b87071f1b1c9249664107e3e408af4b46a81c0e58f376f",
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The frozen table is an A-share airline comparable-company valuation table, but 比亚迪 (002594.SZ) is outside that airline scope. In addition, 市值(USDmn) requires a USD-million value while the NL states only 6231.48亿 without a currency/conversion basis, and the table suffix convention is CH rather than SH/SZ. No unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0243",
+      "upstream_sample_locator": "crudsql:test:0827:6e614ce634ce11e991e5542696d6e445:af30f3f577a69c6a"
+    },
+    {
+      "authored_content_sha256": "0171e92094472496d26c659e8361ee9fe58605c84ea6c3e0645f3dfa1990a914",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业港股 and uses 港元/亿港元 units, but the NL supplies A-share code 000001.SZ for 平安银行 and market value only in 亿 without an HKD conversion basis. The record is outside table scope and no unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0276",
+      "upstream_sample_locator": "crudsql:test:0860:4d242e2b3aaa11e98a7ff40f24344a08:f5f96975e70b8126"
+    },
+    {
+      "authored_content_sha256": "863113f6b6ac4e9196f3d77d43ba8ef3dfb78d47b12fd911aba2cf7fafa8490c",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业港股 and uses 港元/亿港元 units, but the NL supplies A-share code 601198.SH for 东兴证券 and market value only in 亿 without an HKD conversion basis. The record is outside table scope and no unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0277",
+      "upstream_sample_locator": "crudsql:test:0861:4d242e2b3aaa11e98a7ff40f24344a08:4dc2ec156c2ca528"
+    },
+    {
+      "authored_content_sha256": "f1e6f8f5fded271fc9e2a562d668a4f0a3b8961a9e434ec2d89148f22a37b90c",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业港股 and uses 港元/亿港元 units, but the NL supplies A-share code 601988.SH for 中国银行 and market value only in 亿 without an HKD conversion basis. The record is outside table scope and no unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0278",
+      "upstream_sample_locator": "crudsql:test:0862:4d242e2b3aaa11e98a7ff40f24344a08:3e5091b18c3fe9cc"
+    },
+    {
+      "authored_content_sha256": "6f1efc5214922d00eabe11a8c4ff4a99d3addf6141ee0dad79208c986ab054c9",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业港股 and uses 港元/亿港元 units, but the NL supplies A-share code 600015.SH for 华夏银行 and market value only in 亿 without an HKD conversion basis. The record is outside table scope and no unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0279",
+      "upstream_sample_locator": "crudsql:test:0863:4d242e2b3aaa11e98a7ff40f24344a08:f9672ebc2cd63f84"
+    }
+  ],
+  "stage": "Stage6C_R04_FINAL_REJECTION_TECHNICAL_RESOLUTION",
+  "status": "PASS_PENDING_CORRECTION_AND_REGISTRATION_REVISION_WORKFLOWS"
+}

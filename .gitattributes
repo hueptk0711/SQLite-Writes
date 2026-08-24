@@ -31,3 +31,6 @@ stage6_gold_review_r03_adjudication/**/*.json text eol=lf
 stage6_gold_review_r03_adjudication/**/*.jsonl text eol=lf
 stage6_gold_review_r03_adjudication/**/*.md text eol=lf
 stage6_gold_review_r03_adjudication/**/*.tsv text eol=lf
+stage6_gold_review_r04_resolution/**/*.json text eol=lf
+stage6_gold_review_r04_resolution/**/*.md text eol=lf
+stage6_gold_review_r04_resolution/**/*.tsv text eol=lf
