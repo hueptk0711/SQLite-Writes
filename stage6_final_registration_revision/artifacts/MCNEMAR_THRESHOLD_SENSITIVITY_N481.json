@@ -1,0 +1,13 @@
+{
+  "effect_fraction_at_threshold": 0.014553014553014554,
+  "exact_two_sided_p_at_threshold": 0.015625,
+  "final_n": 481,
+  "holm_alpha_floor": 0.025,
+  "hypotheses_unchanged_from_stage5": [
+    "H1_D_F_G1_vs_Original",
+    "H2_D_F_G1_vs_D_G1"
+  ],
+  "minimum_favorable_discordant_pairs_with_zero_regressions": 7,
+  "stage": "Stage6E_MCNEMAR_THRESHOLD_SENSITIVITY_NOT_POWER_ANALYSIS",
+  "test": "exact_two_sided_McNemar"
+}

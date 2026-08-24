@@ -1,0 +1,18 @@
+{
+  "canonical_content_hash_overlap_count": 0,
+  "database_id_namespace_overlap_count": 0,
+  "final_sample_count": 481,
+  "input_text_hash_overlap_count": 0,
+  "reference_digest_counts": {
+    "canonical_content_sha256": 977,
+    "database_ids": 16,
+    "database_profile_fingerprints": 10,
+    "input_text_sha256": 965,
+    "sample_ids": 977,
+    "source_groups": 977
+  },
+  "reference_registry_sha256_excluding_self": "1c11ff21d827ee9c22192c0ba04f3edd58405036ffff521013375236571247b5",
+  "sample_id_overlap_count": 0,
+  "source_group_overlap_count": 0,
+  "status": "PASS"
+}

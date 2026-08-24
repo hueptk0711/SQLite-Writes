@@ -41,3 +41,6 @@ stage6_corrected_gold_review_setup/**/*.tsv text eol=lf
 stage6_corrected_gold_review_execution/**/*.json text eol=lf
 stage6_corrected_gold_review_execution/**/*.md text eol=lf
 stage6_corrected_gold_review_execution/**/*.tsv text eol=lf
+stage6_final_registration_revision/**/*.json text eol=lf
+stage6_final_registration_revision/**/*.jsonl text eol=lf
+stage6_final_registration_revision/**/*.md text eol=lf

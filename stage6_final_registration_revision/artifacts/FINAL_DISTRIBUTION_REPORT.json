@@ -1,0 +1,44 @@
+{
+  "columns_per_table": {
+    "max": 18,
+    "mean": 7.917355371900826,
+    "median": 7,
+    "min": 3
+  },
+  "gold_source_type_counts": {
+    "CORRECTED_REVIEW_ACCEPTED": 21,
+    "ORIGINAL_REVIEW_ACCEPTED": 460
+  },
+  "initial_rows_per_table": {
+    "max": 100,
+    "mean": 23.619834710743802,
+    "median": 11,
+    "min": 2
+  },
+  "inserted_fields_per_sample": {
+    "max": 7,
+    "mean": 3.5613305613305615,
+    "median": 3,
+    "min": 1
+  },
+  "inserted_sqlite_affinity_counts": {
+    "REAL": 715,
+    "TEXT": 998
+  },
+  "language": "Chinese questions retained from official CRUDSQL",
+  "question_length_characters": {
+    "max": 108,
+    "mean": 52.21829521829522,
+    "median": 51,
+    "min": 17
+  },
+  "removed_table_count_vs_stage6b": 4,
+  "sample_count": 481,
+  "samples_per_table": {
+    "2": 1,
+    "3": 1,
+    "4": 119
+  },
+  "status": "PASS",
+  "table_count": 121
+}
