@@ -4,7 +4,7 @@
     "members": [
       {
         "path": "CORRECTED_GOLD_REVIEW_PROTOCOL_LOCK.json",
-        "sha256": "d31820b68ba11d79f2c56e144e0eef063cdc1eb829084075dd91881fa1f77d6c"
+        "sha256": "d61fb438eb32cbed4ff8fdcf6ca3c3ea79dc2e5ab4df64213ce64326a7a871c2"
       },
       {
         "path": "artifacts/corrected_gold_review_items.jsonl",
@@ -16,7 +16,7 @@
       },
       {
         "path": "corrected_review_packets/Stage6D_C01_PACKET_MANIFEST.json",
-        "sha256": "74ddc507da6c135db243611996ad3f90f2be284753591acc836edbca55cf534a"
+        "sha256": "2364657562d9b92ea1652c582c36130d17a9d37ea9ac3f40895ff966eccb89af"
       },
       {
         "path": "corrected_review_packets/stage6d_corrected_gold_review_C01.tsv",
@@ -24,14 +24,14 @@
       }
     ],
     "path": "Stage6D_C01_corrected_review_packet_20260824.zip",
-    "sha256": "d5ce1c008300673b150a1b9b6517e4cd4e445e6b8bfacf86fcfab4f65ce70c73"
+    "sha256": "dc8a444e56bb13fc69cb4644aff79171aa82c2f6085778333b88de7b602cc272"
   },
   "C02_packet_archive": {
     "member_count": 5,
     "members": [
       {
         "path": "CORRECTED_GOLD_REVIEW_PROTOCOL_LOCK.json",
-        "sha256": "d31820b68ba11d79f2c56e144e0eef063cdc1eb829084075dd91881fa1f77d6c"
+        "sha256": "d61fb438eb32cbed4ff8fdcf6ca3c3ea79dc2e5ab4df64213ce64326a7a871c2"
       },
       {
         "path": "artifacts/corrected_gold_review_items.jsonl",
@@ -43,7 +43,7 @@
       },
       {
         "path": "corrected_review_packets/Stage6D_C02_PACKET_MANIFEST.json",
-        "sha256": "703fa3d4f2e5343d2267fc5bfbe853076fdc04024b9e7c0fc9f77391129d134e"
+        "sha256": "8d45bd2a84c4b38b252f78d38b250bf725a8c3ca4ec7c5a8e8e1784e97876d3b"
       },
       {
         "path": "corrected_review_packets/stage6d_corrected_gold_review_C02.tsv",
@@ -51,14 +51,19 @@
       }
     ],
     "path": "Stage6D_C02_corrected_review_packet_20260824.zip",
-    "sha256": "31fa913da2a65ce64e93466fff934ba2d3a7e090295ccafd354b20d920f73bdb"
+    "sha256": "82dc68355cfca406a5d77e98c960b3ee9713ba87f8ae024d7b4b272986f5fef8"
+  },
+  "accepted_r04_inputs": {
+    "CORRECTABLE_GOLD_ERROR_QUEUE_SHA256": "33fe542a38413f4159bbce6a82318f22d790d36b2a5a40882ac74c8c8da3a336",
+    "SOURCE_TASK_INVALID_QUEUE_SHA256": "f606cee0de6108b77b45c72ffdedd4cbfba229716c3f120bcc79f892b19422f1",
+    "accepted_R04_commit": "7f0950184ee40afb53581bd7b2127862fd581cde"
   },
   "archive": {
     "member_count": 14,
     "members": [
       {
         "path": "CORRECTED_GOLD_REVIEW_PROTOCOL_LOCK.json",
-        "sha256": "d31820b68ba11d79f2c56e144e0eef063cdc1eb829084075dd91881fa1f77d6c"
+        "sha256": "d61fb438eb32cbed4ff8fdcf6ca3c3ea79dc2e5ab4df64213ce64326a7a871c2"
       },
       {
         "path": "REVIEWER_README.md",
@@ -66,7 +71,7 @@
       },
       {
         "path": "STAGE6D_CORRECTED_GOLD_REVIEW_SETUP_LOCK.json",
-        "sha256": "6d0c3c38e3ae5e12aee797855e196b55d3b0a50bbca7da3fbcae07a742e35a2c"
+        "sha256": "34be7240a0bd1e8c02240be0804e5a086fbf7ab6dd52ce3101ef159b51455d9c"
       },
       {
         "path": "VALIDATION_REPORT.md",
@@ -98,11 +103,11 @@
       },
       {
         "path": "corrected_review_packets/Stage6D_C01_PACKET_MANIFEST.json",
-        "sha256": "74ddc507da6c135db243611996ad3f90f2be284753591acc836edbca55cf534a"
+        "sha256": "2364657562d9b92ea1652c582c36130d17a9d37ea9ac3f40895ff966eccb89af"
       },
       {
         "path": "corrected_review_packets/Stage6D_C02_PACKET_MANIFEST.json",
-        "sha256": "703fa3d4f2e5343d2267fc5bfbe853076fdc04024b9e7c0fc9f77391129d134e"
+        "sha256": "8d45bd2a84c4b38b252f78d38b250bf725a8c3ca4ec7c5a8e8e1784e97876d3b"
       },
       {
         "path": "corrected_review_packets/stage6d_corrected_gold_review_C01.tsv",
@@ -114,7 +119,7 @@
       }
     ],
     "path": "stage6d_corrected_gold_review_setup_artifacts_20260824.zip",
-    "sha256": "fd52e1168e841eb95512fa77e577ea39861da22fb46cefec0d8364ba6b7a0f6f"
+    "sha256": "93b870a0aaf0a8a8788917b9a36773532b64dc14f1ceee685fd0c7e95487d1ef"
   },
   "confirmation_run_allowed_now": false,
   "correctable_queue_sha256": "33fe542a38413f4159bbce6a82318f22d790d36b2a5a40882ac74c8c8da3a336",
@@ -134,7 +139,7 @@
     "do_not_create_final_gold_freeze_until_corrected_review_and_stage6_registration_revision_are_accepted"
   ],
   "official_table_metadata_sha256": "48d61e0db35f875afba2de689cb783c5842fbc454957377e7e9613a37acbfa4e",
-  "protocol_lock_sha256": "d31820b68ba11d79f2c56e144e0eef063cdc1eb829084075dd91881fa1f77d6c",
+  "protocol_lock_sha256": "d61fb438eb32cbed4ff8fdcf6ca3c3ea79dc2e5ab4df64213ce64326a7a871c2",
   "source_invalid_item_count_not_processed_here": 19,
   "source_invalid_queue_sha256": "f606cee0de6108b77b45c72ffdedd4cbfba229716c3f120bcc79f892b19422f1",
   "stage": "Stage6D_CORRECTED_GOLD_RE_REVIEW_SETUP",

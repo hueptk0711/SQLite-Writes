@@ -18,6 +18,8 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from scripts.data.create_stage6c_gold_review_setup import canonical_json
 from scripts.data.create_stage6d_corrected_gold_review_setup import (
+    ACCEPTED_CORRECTABLE_QUEUE_SHA256,
+    ACCEPTED_SOURCE_INVALID_QUEUE_SHA256,
     ARCHIVE_NAME,
     C01_ARCHIVE_NAME,
     C02_ARCHIVE_NAME,
@@ -28,6 +30,7 @@ from scripts.data.create_stage6d_corrected_gold_review_setup import (
     sha256_text,
 )
 
+STAGE6C_R04_COMMIT = "7f0950184ee40afb53581bd7b2127862fd581cde"
 
 EXPECTED_PROTOCOL = {
     "stage": "Stage6D_CORRECTED_GOLD_RE_REVIEW_SETUP",
@@ -45,6 +48,8 @@ EXPECTED_PROTOCOL = {
     ],
     "reviewer_roles": ["C01", "C02"],
     "reviewer_roles_must_be_distinct": True,
+    "C01_must_be_distinct_from_R04": True,
+    "C02_must_be_distinct_from_R04": True,
     "reviewers_must_not_see_model_predictions": True,
     "allowed_decisions_after_execution": ["approved", "rejected"],
     "notes_required_for_rejected": True,
@@ -63,6 +68,18 @@ EXPECTED_PROTOCOL = {
         {"C03": "approved", "action": "corrected_item_accepted_pending_final_gold_freeze"},
         {"C03": "rejected", "action": "correction_rejected_confirmation_blocked"},
     ],
+    "corrected_adjudicator": {
+        "role": "C03",
+        "C03_must_be_distinct_from_C01": True,
+        "C03_must_be_distinct_from_C02": True,
+        "C03_must_not_see_C01_decision": True,
+        "C03_must_not_see_C02_decision": True,
+        "C03_must_not_see_C01_notes": True,
+        "C03_must_not_see_C02_notes": True,
+        "C03_must_not_see_model_predictions": True,
+        "joint_discussion_allowed": False,
+        "only_disagreement_ids_go_to_isolated_C03_packet": True,
+    },
 }
 
 
@@ -337,6 +354,25 @@ def validate_stage6d_corrected_gold_review_setup(
             violations.append(f"{label}_not_false")
     if manifest.get("status") != "PASS_PENDING_CORRECTED_ITEM_RE_REVIEW":
         violations.append("manifest_status_changed")
+    if manifest.get("stage6c_r04_resolution_commit") != STAGE6C_R04_COMMIT:
+        violations.append("manifest_r04_commit_mismatch")
+    expected_inputs = {
+        "accepted_R04_commit": STAGE6C_R04_COMMIT,
+        "CORRECTABLE_GOLD_ERROR_QUEUE_SHA256": ACCEPTED_CORRECTABLE_QUEUE_SHA256,
+        "SOURCE_TASK_INVALID_QUEUE_SHA256": ACCEPTED_SOURCE_INVALID_QUEUE_SHA256,
+    }
+    if manifest.get("accepted_r04_inputs") != expected_inputs:
+        violations.append("manifest_accepted_r04_inputs_mismatch")
+    actual_correctable_queue_sha = sha256_file(r04_dir / "CORRECTABLE_GOLD_ERROR_QUEUE.json")
+    actual_source_invalid_queue_sha = sha256_file(r04_dir / "SOURCE_TASK_INVALID_QUEUE.json")
+    if actual_correctable_queue_sha != ACCEPTED_CORRECTABLE_QUEUE_SHA256:
+        violations.append("actual_correctable_queue_not_accepted_hash")
+    if actual_source_invalid_queue_sha != ACCEPTED_SOURCE_INVALID_QUEUE_SHA256:
+        violations.append("actual_source_invalid_queue_not_accepted_hash")
+    if manifest.get("correctable_queue_sha256") != ACCEPTED_CORRECTABLE_QUEUE_SHA256:
+        violations.append("manifest_correctable_queue_not_accepted_hash")
+    if manifest.get("source_invalid_queue_sha256") != ACCEPTED_SOURCE_INVALID_QUEUE_SHA256:
+        violations.append("manifest_source_invalid_queue_not_accepted_hash")
     if manifest.get("corrected_item_count") != 21:
         violations.append("manifest_corrected_item_count_not_21")
     if manifest.get("source_invalid_item_count_not_processed_here") != 19:

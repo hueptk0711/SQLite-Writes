@@ -1,9 +1,23 @@
 {
+  "C01_must_be_distinct_from_R04": true,
+  "C02_must_be_distinct_from_R04": true,
   "allowed_decisions_after_execution": [
     "approved",
     "rejected"
   ],
   "confirmation_run_allowed_now": false,
+  "corrected_adjudicator": {
+    "C03_must_be_distinct_from_C01": true,
+    "C03_must_be_distinct_from_C02": true,
+    "C03_must_not_see_C01_decision": true,
+    "C03_must_not_see_C01_notes": true,
+    "C03_must_not_see_C02_decision": true,
+    "C03_must_not_see_C02_notes": true,
+    "C03_must_not_see_model_predictions": true,
+    "joint_discussion_allowed": false,
+    "only_disagreement_ids_go_to_isolated_C03_packet": true,
+    "role": "C03"
+  },
   "final_decision_rule": [
     {
       "C01": "approved",

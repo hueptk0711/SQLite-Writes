@@ -8,6 +8,11 @@ from pathlib import Path
 from scripts.data.validate_stage6d_corrected_gold_review_setup import (
     validate_stage6d_corrected_gold_review_setup,
 )
+from scripts.data.create_stage6d_corrected_gold_review_setup import (
+    apply_operations_to_plan,
+    create_corrected_gold_review_setup,
+    normalize_correction_operations,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -88,3 +93,63 @@ def test_stage6d_rejects_prefilled_packet_decision(tmp_path: Path) -> None:
 
     assert report["status"] == "FAIL"
     assert any(item.startswith("C01_decision_or_notes_prefilled:") for item in report["violations"])
+
+
+def test_stage6d_rejects_mutated_authoritative_r04_queue_after_regeneration(tmp_path: Path) -> None:
+    r04 = tmp_path / "stage6_gold_review_r04_resolution"
+    shutil.copytree(R04_DIR, r04)
+    queue_path = r04 / "CORRECTABLE_GOLD_ERROR_QUEUE.json"
+    queue = json.loads(queue_path.read_text(encoding="utf-8"))
+    queue["items"][0]["correction_spec"]["corrected_value"] = "MUTATED_WRONG_VALUE"
+    queue_path.write_text(json.dumps(queue, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    try:
+        create_corrected_gold_review_setup(STAGE6B_DIR, SETUP_DIR, r04, tmp_path / "mutated_stage6d")
+    except RuntimeError as exc:
+        assert "R04 correctable queue hash mismatch" in str(exc)
+    else:  # pragma: no cover - defensive; creator should fail before writing artifacts.
+        report = validate_stage6d_corrected_gold_review_setup(
+            tmp_path / "mutated_stage6d", STAGE6B_DIR, SETUP_DIR, r04
+        )
+        assert report["status"] == "FAIL"
+        assert "actual_correctable_queue_not_accepted_hash" in report["violations"]
+
+
+def test_stage6d_correction_precondition_rejects_registered_value_mismatch() -> None:
+    queue = json.loads((R04_DIR / "CORRECTABLE_GOLD_ERROR_QUEUE.json").read_text(encoding="utf-8"))
+    items = {
+        json.loads(line)["stage6_sample_id"]: json.loads(line)
+        for line in (SETUP_DIR / "artifacts" / "gold_review_items.jsonl").read_text(encoding="utf-8").splitlines()
+    }
+    queue_item = next(item for item in queue["items"] if item["stage6_sample_id"] == "stage6_crudsql_0070")
+    item = items[queue_item["stage6_sample_id"]]
+    spec = dict(queue_item["correction_spec"])
+    spec["registered_value"] = "999"
+    operations = normalize_correction_operations(item, spec)
+
+    try:
+        apply_operations_to_plan(item, operations)
+    except ValueError as exc:
+        assert "precondition failed" in str(exc)
+    else:  # pragma: no cover - defensive.
+        raise AssertionError("precondition mismatch should fail")
+
+
+def test_stage6d_correction_precondition_rejects_missing_remove_column() -> None:
+    queue = json.loads((R04_DIR / "CORRECTABLE_GOLD_ERROR_QUEUE.json").read_text(encoding="utf-8"))
+    items = {
+        json.loads(line)["stage6_sample_id"]: json.loads(line)
+        for line in (SETUP_DIR / "artifacts" / "gold_review_items.jsonl").read_text(encoding="utf-8").splitlines()
+    }
+    queue_item = next(item for item in queue["items"] if item["stage6_sample_id"] == "stage6_crudsql_0014")
+    item = items[queue_item["stage6_sample_id"]]
+    operations = normalize_correction_operations(item, queue_item["correction_spec"])
+    operations[0]["column_index"] = 1
+    operations[0]["column"] = "机构性质"
+
+    try:
+        apply_operations_to_plan(item, operations)
+    except ValueError as exc:
+        assert "column missing from original gold" in str(exc)
+    else:  # pragma: no cover - defensive.
+        raise AssertionError("missing remove-column precondition should fail")

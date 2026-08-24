@@ -31,6 +31,8 @@ STAGE6C_SETUP_DIR = PROJECT_ROOT / "stage6_gold_review_setup"
 STAGE6C_R04_DIR = PROJECT_ROOT / "stage6_gold_review_r04_resolution"
 STAGE6D_DIR = PROJECT_ROOT / "stage6_corrected_gold_review_setup"
 STAGE6C_R04_COMMIT = "7f0950184ee40afb53581bd7b2127862fd581cde"
+ACCEPTED_CORRECTABLE_QUEUE_SHA256 = "33fe542a38413f4159bbce6a82318f22d790d36b2a5a40882ac74c8c8da3a336"
+ACCEPTED_SOURCE_INVALID_QUEUE_SHA256 = "f606cee0de6108b77b45c72ffdedd4cbfba229716c3f120bcc79f892b19422f1"
 ARCHIVE_NAME = "stage6d_corrected_gold_review_setup_artifacts_20260824.zip"
 C01_ARCHIVE_NAME = "Stage6D_C01_corrected_review_packet_20260824.zip"
 C02_ARCHIVE_NAME = "Stage6D_C02_corrected_review_packet_20260824.zip"
@@ -158,6 +160,55 @@ def normalize_correction_operations(item: dict[str, Any], spec: dict[str, Any]) 
     return operations
 
 
+def assert_queue_anchors(r04_dir: Path) -> None:
+    actual_correctable = sha256_file(r04_dir / "CORRECTABLE_GOLD_ERROR_QUEUE.json")
+    actual_source_invalid = sha256_file(r04_dir / "SOURCE_TASK_INVALID_QUEUE.json")
+    if actual_correctable != ACCEPTED_CORRECTABLE_QUEUE_SHA256:
+        raise RuntimeError(
+            "R04 correctable queue hash mismatch: "
+            f"expected {ACCEPTED_CORRECTABLE_QUEUE_SHA256}, got {actual_correctable}"
+        )
+    if actual_source_invalid != ACCEPTED_SOURCE_INVALID_QUEUE_SHA256:
+        raise RuntimeError(
+            "R04 source-invalid queue hash mismatch: "
+            f"expected {ACCEPTED_SOURCE_INVALID_QUEUE_SHA256}, got {actual_source_invalid}"
+        )
+
+
+def normalized_patch_value(value: Any) -> str | None:
+    if value is None:
+        return None
+    return str(value)
+
+
+def assert_registered_value_precondition(
+    item: dict[str, Any],
+    current_by_index: dict[int, Any],
+    operation: dict[str, Any],
+) -> None:
+    sample_id = item["stage6_sample_id"]
+    index = int(operation["column_index"])
+    expected_old = normalized_patch_value(operation.get("registered_value"))
+    actual_old = normalized_patch_value(current_by_index.get(index))
+    if operation["operation"] == "SET_VALUE" and expected_old is None:
+        if index in current_by_index:
+            raise ValueError(
+                f"{sample_id}: SET_VALUE add precondition failed for {operation['column']}: "
+                "column already exists in original gold"
+            )
+        return
+    if index not in current_by_index:
+        raise ValueError(
+            f"{sample_id}: {operation['operation']} precondition failed for {operation['column']}: "
+            "column missing from original gold"
+        )
+    if actual_old != expected_old:
+        raise ValueError(
+            f"{sample_id}: {operation['operation']} precondition failed for {operation['column']}: "
+            f"expected registered value {expected_old!r}, got {actual_old!r}"
+        )
+
+
 def apply_operations_to_plan(
     item: dict[str, Any],
     operations: list[dict[str, Any]],
@@ -170,10 +221,11 @@ def apply_operations_to_plan(
     }
     for operation in operations:
         index = int(operation["column_index"])
+        assert_registered_value_precondition(item, current_by_index, operation)
         if operation["operation"] == "SET_VALUE":
             current_by_index[index] = operation["corrected_value"]
         elif operation["operation"] == "REMOVE_COLUMN":
-            current_by_index.pop(index, None)
+            current_by_index.pop(index)
         else:  # pragma: no cover - protected by normalizer.
             raise ValueError(operation["operation"])
 
@@ -297,6 +349,7 @@ def create_corrected_gold_review_setup(
     artifacts.mkdir(parents=True, exist_ok=True)
     packets.mkdir(parents=True, exist_ok=True)
 
+    assert_queue_anchors(r04_dir)
     queue = read_json(r04_dir / "CORRECTABLE_GOLD_ERROR_QUEUE.json")
     if queue.get("count") != 21:
         raise SystemExit("Expected exactly 21 R04-correctable items")
@@ -436,6 +489,8 @@ def create_corrected_gold_review_setup(
         ],
         "reviewer_roles": ["C01", "C02"],
         "reviewer_roles_must_be_distinct": True,
+        "C01_must_be_distinct_from_R04": True,
+        "C02_must_be_distinct_from_R04": True,
         "reviewers_must_not_see_model_predictions": True,
         "allowed_decisions_after_execution": ["approved", "rejected"],
         "notes_required_for_rejected": True,
@@ -454,6 +509,18 @@ def create_corrected_gold_review_setup(
             {"C03": "approved", "action": "corrected_item_accepted_pending_final_gold_freeze"},
             {"C03": "rejected", "action": "correction_rejected_confirmation_blocked"},
         ],
+        "corrected_adjudicator": {
+            "role": "C03",
+            "C03_must_be_distinct_from_C01": True,
+            "C03_must_be_distinct_from_C02": True,
+            "C03_must_not_see_C01_decision": True,
+            "C03_must_not_see_C02_decision": True,
+            "C03_must_not_see_C01_notes": True,
+            "C03_must_not_see_C02_notes": True,
+            "C03_must_not_see_model_predictions": True,
+            "joint_discussion_allowed": False,
+            "only_disagreement_ids_go_to_isolated_C03_packet": True,
+        },
     }
     write_json(out_dir / "CORRECTED_GOLD_REVIEW_PROTOCOL_LOCK.json", protocol)
 
@@ -496,6 +563,11 @@ def create_corrected_gold_review_setup(
         "confirmation_run_allowed_now": False,
         "final_gold_freeze_created": False,
         "stage6c_r04_resolution_commit": STAGE6C_R04_COMMIT,
+        "accepted_r04_inputs": {
+            "accepted_R04_commit": STAGE6C_R04_COMMIT,
+            "CORRECTABLE_GOLD_ERROR_QUEUE_SHA256": ACCEPTED_CORRECTABLE_QUEUE_SHA256,
+            "SOURCE_TASK_INVALID_QUEUE_SHA256": ACCEPTED_SOURCE_INVALID_QUEUE_SHA256,
+        },
         "corrected_item_count": len(corrected_items),
         "source_invalid_item_count_not_processed_here": 19,
         "correctable_queue_sha256": sha256_file(r04_dir / "CORRECTABLE_GOLD_ERROR_QUEUE.json"),

@@ -9,7 +9,7 @@
   "gpu_called": false,
   "model_called": false,
   "official_table_metadata_sha256": "48d61e0db35f875afba2de689cb783c5842fbc454957377e7e9613a37acbfa4e",
-  "protocol_lock_sha256": "d31820b68ba11d79f2c56e144e0eef063cdc1eb829084075dd91881fa1f77d6c",
+  "protocol_lock_sha256": "d61fb438eb32cbed4ff8fdcf6ca3c3ea79dc2e5ab4df64213ce64326a7a871c2",
   "reviewer_id": "C02",
   "stage": "Stage6D_CORRECTED_GOLD_REVIEW_ISOLATED_PACKET",
   "status": "READY_FOR_INDEPENDENT_CORRECTED_ITEM_RE_REVIEW"
