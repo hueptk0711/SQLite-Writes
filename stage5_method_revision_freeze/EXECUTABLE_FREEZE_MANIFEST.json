@@ -1,0 +1,63 @@
+{
+  "accepted_executable_tag": "stage5-vnext-r1-freeze-patch1",
+  "component_set": [
+    "D",
+    "F",
+    "G1"
+  ],
+  "confirmation_config_policy": "use_resolved_config_directly",
+  "frozen_files_sha256": {
+    "configs/demonstrations/matched_semantic_bank.json": "04ce6544866b8af31e1b4d67a2a3a800edb851cdf0ffed914fcef52ebbafff9c",
+    "configs/final/mp_fs_plus.json": "eed7feb1abdebdb5680e00922601135ea6f6ac809deaa9d548945569e7a5f206",
+    "configs/proposed/mp_fs.json": "69b57f6d6abad21699dcde6fda5eed1b1b9551ee3e4c05987a33835217ebd0c6",
+    "configs/stage5/mp_fs_plus_vnext_r1.json": "796d5ec6dd69cef49008d7792c35f6190bf5baf70551f92ee564963247ffe381",
+    "configs/stage5/resolved_mp_fs_plus_vnext_r1.json": "b3a946fc977c3ea95d3226dca1361b1885c098fddf4afdc650f4d36f0e1ce9bf",
+    "scripts/analysis/validate_stage5_method_freeze.py": "e1ae47921506381d7a58727040edf2df59f0e3b973dd325aa626433bf2865801",
+    "stage5_method_revision_freeze/CONFIRMATION_PROTOCOL_LOCK.json": "5805b4eb33bc7e3174f33e2c8cfdb02a0d85da1aa5395c386c086603dacc02c8"
+  },
+  "gpu_called": false,
+  "method_implementation_files": [
+    "src/nldbwrite_v3/compiler/__init__.py",
+    "src/nldbwrite_v3/compiler/compiler.py",
+    "src/nldbwrite_v3/compiler/executor.py",
+    "src/nldbwrite_v3/compiler/normalization.py",
+    "src/nldbwrite_v3/evaluator/__init__.py",
+    "src/nldbwrite_v3/evaluator/state.py",
+    "src/nldbwrite_v3/experiments/run_method.py",
+    "src/nldbwrite_v3/pipeline.py",
+    "src/nldbwrite_v3/planner/__init__.py",
+    "src/nldbwrite_v3/planner/evidence.py",
+    "src/nldbwrite_v3/planner/grounding.py",
+    "src/nldbwrite_v3/planner/materialize.py",
+    "src/nldbwrite_v3/planner/parse.py",
+    "src/nldbwrite_v3/planner/prompt.py",
+    "src/nldbwrite_v3/planner/references.py",
+    "src/nldbwrite_v3/planner/schema_validation.py",
+    "src/nldbwrite_v3/schema/__init__.py",
+    "src/nldbwrite_v3/schema/profile.py",
+    "src/nldbwrite_v3/schema/prompt.py",
+    "src/nldbwrite_v3/source_parser/__init__.py",
+    "src/nldbwrite_v3/source_parser/parser.py",
+    "src/nldbwrite_v3/verifier/__init__.py",
+    "src/nldbwrite_v3/verifier/verify.py",
+    "src/nldbwrite_v3/vnext/__init__.py",
+    "src/nldbwrite_v3/vnext/interventions.py",
+    "src/nldbwrite_v3/vnext/reference_repair.py",
+    "src/nldbwrite_v3/vnext/targeted_repair.py",
+    "src/nldbwrite_v3/vnext/typed_normalization.py"
+  ],
+  "method_name": "MP-FS+ vNext-R1",
+  "method_source_tree_sha256": "29d8e1db29a9387b28b28bc64108fdd3f56f3cecd77b8fe3e0d6e77fada8c926",
+  "model_called": false,
+  "stage": "Stage5_METHOD_REVISION_FREEZE_PATCH1",
+  "status": "executable_method_frozen",
+  "subsystem_hashes": {
+    "compiler_tree_sha256": "13f2a51fb83a6d0630a74f00884345d712ddf7b1a8ee37e5ad7589fb0856aa35",
+    "evaluator_tree_sha256": "e24db0a404621e708fad79282b82dfea30998f2b3ef2f2ee9891eb3db981a6e3",
+    "pipeline_sha256": "97bfec5aca8cef469f375fbc80a3710f0470ae8668dd6841e5c934c5ff536edd",
+    "planner_prompt_implementation_sha256": "d2d4fc9695884d962318eab3ce58c622bea6124b02c47ad0003af16b906b8925",
+    "run_method_sha256": "1a24cc8cd3867a7b19031a3f03276a5bd580cc116fbbfea82a9c253cc3e11abb",
+    "source_parser_sha256": "135e0ed6b4027c5d764ed18aa55d5cc5a957e5b8fda3f35f352100cb776315df",
+    "verifier_sha256": "5dd7fcd5fcc51b111c4dca13eb9f8b271fc28c3ba9f051a391c3f02d3ffb4004"
+  }
+}
