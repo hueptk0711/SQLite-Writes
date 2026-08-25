@@ -1,0 +1,9 @@
+{
+  "F_changes_prompt_surface": false,
+  "all_shared_prompt_hashes_match": false,
+  "checked_pairs": 0,
+  "expected_shared_prompt_pairs": 481,
+  "independent_D_F_G1_generation_allowed": false,
+  "reason": "tokenizer_not_loaded_without_execute_gpu_preflight",
+  "status": "NOT_RUN"
+}

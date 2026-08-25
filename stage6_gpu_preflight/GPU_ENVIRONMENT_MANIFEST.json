@@ -1,0 +1,33 @@
+{
+  "captured_at_unix": 1787627175,
+  "environment_matches_expected": false,
+  "expected_environment": {
+    "accelerate": "1.14.0",
+    "bitsandbytes": "0.47.0",
+    "cuda_wheel_index": "https://download.pytorch.org/whl/cu124",
+    "python_major_minor": "3.12",
+    "safetensors": "0.5.3",
+    "tokenizers": "0.22.2",
+    "torch": "2.6.0+cu124",
+    "transformers": "5.5.3"
+  },
+  "nvidia_smi": {
+    "available": false,
+    "error": "[WinError 2] The system cannot find the file specified"
+  },
+  "packages": {
+    "accelerate": null,
+    "bitsandbytes": null,
+    "safetensors": null,
+    "tokenizers": null,
+    "torch": null,
+    "transformers": null
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.3",
+  "python_executable": "C:\\Python314\\python.exe",
+  "torch_cuda": {
+    "error": "No module named 'torch'",
+    "torch_imported": false
+  }
+}

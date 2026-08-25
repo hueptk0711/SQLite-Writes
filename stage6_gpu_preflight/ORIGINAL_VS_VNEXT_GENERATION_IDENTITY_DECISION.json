@@ -1,0 +1,6 @@
+{
+  "d_g1_and_d_f_g1_share_generation": true,
+  "original_mp_fs_plus_uses_independent_generation": true,
+  "reason": "original prompt surface is not asserted identical to D_G1; H2 sharing is required and checked on GPU preflight",
+  "status": "LOCKED_DECISION_PENDING_TOKEN_AUDIT"
+}

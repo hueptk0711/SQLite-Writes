@@ -1,0 +1,107 @@
+{
+  "files": [
+    {
+      "actual_sha256": "6a9fc9812d768001e3a8e8b87d2387a7b943c83237a4bca7603c304acf88bcc7",
+      "expected_sha256": "6a9fc9812d768001e3a8e8b87d2387a7b943c83237a4bca7603c304acf88bcc7",
+      "group": "stage6e_final_artifacts",
+      "match": true,
+      "name": "final_confirmation_sample_manifest",
+      "path": "stage6_final_registration_revision/artifacts/FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl"
+    },
+    {
+      "actual_sha256": "7d57145a062a91221ce95d74e5414e7f1d79bda9bea217ab016cb2175f8ddda8",
+      "expected_sha256": "7d57145a062a91221ce95d74e5414e7f1d79bda9bea217ab016cb2175f8ddda8",
+      "group": "stage6e_final_artifacts",
+      "match": true,
+      "name": "final_gold_write_plans",
+      "path": "stage6_final_registration_revision/artifacts/FINAL_GOLD_WRITE_PLANS.jsonl"
+    },
+    {
+      "actual_sha256": "d34208d3def6434591f05cb396505475f3fd1e5d057326baf8f7207cdceaa3cf",
+      "expected_sha256": "d34208d3def6434591f05cb396505475f3fd1e5d057326baf8f7207cdceaa3cf",
+      "group": "stage6e_final_artifacts",
+      "match": true,
+      "name": "final_gold_programs",
+      "path": "stage6_final_registration_revision/artifacts/FINAL_GOLD_PROGRAMS.jsonl"
+    },
+    {
+      "actual_sha256": "ea2fc586c764592268d9f330651d7c14855a731b4045a2f79d26dd1853b32cc6",
+      "expected_sha256": "ea2fc586c764592268d9f330651d7c14855a731b4045a2f79d26dd1853b32cc6",
+      "group": "stage6e_final_artifacts",
+      "match": true,
+      "name": "final_gold_post_state_hashes",
+      "path": "stage6_final_registration_revision/artifacts/FINAL_GOLD_POST_STATE_HASHES.jsonl"
+    },
+    {
+      "actual_sha256": "2082e892858c065531e2456239e77e51bae6232fccdf717497fecadc5421fd16",
+      "expected_sha256": "2082e892858c065531e2456239e77e51bae6232fccdf717497fecadc5421fd16",
+      "group": "stage6e_final_artifacts",
+      "match": true,
+      "name": "final_gold_corpus",
+      "path": "stage6_final_registration_revision/artifacts/FINAL_GOLD_CORPUS.jsonl"
+    },
+    {
+      "actual_sha256": "69e31913af8b0156807f3e2bf3e86ca495a9d1f779815933adb124a61b6c0f98",
+      "expected_sha256": "69e31913af8b0156807f3e2bf3e86ca495a9d1f779815933adb124a61b6c0f98",
+      "group": "stage6e_final_artifacts",
+      "match": true,
+      "name": "final_reviewed_gold_provenance",
+      "path": "stage6_final_registration_revision/artifacts/FINAL_REVIEWED_GOLD_PROVENANCE.jsonl"
+    },
+    {
+      "actual_sha256": "0795d31926345c62d5ba832d8374c9ac067967a3842c45854a2fff9b32c9f826",
+      "expected_sha256": "0795d31926345c62d5ba832d8374c9ac067967a3842c45854a2fff9b32c9f826",
+      "group": "stage5_confirmation_configs",
+      "match": true,
+      "name": "direct",
+      "path": "configs/stage5/resolved_direct_confirmation.json"
+    },
+    {
+      "actual_sha256": "a4006a423eb62fd37e5b370aca48a3b9337971f49d94700703d634a3d25c0cfe",
+      "expected_sha256": "a4006a423eb62fd37e5b370aca48a3b9337971f49d94700703d634a3d25c0cfe",
+      "group": "stage5_confirmation_configs",
+      "match": true,
+      "name": "j_fs",
+      "path": "configs/stage5/resolved_j_fs_confirmation.json"
+    },
+    {
+      "actual_sha256": "ddda333ccb9b307ed3002213dad6572daa959c2dd5deb2e7d4623cb3aeead84d",
+      "expected_sha256": "ddda333ccb9b307ed3002213dad6572daa959c2dd5deb2e7d4623cb3aeead84d",
+      "group": "stage5_confirmation_configs",
+      "match": true,
+      "name": "original_mp_fs_plus",
+      "path": "configs/stage5/resolved_original_mp_fs_plus.json"
+    },
+    {
+      "actual_sha256": "c7c9c4d54e59662ee8e251af3aea1747fa035cb306213f20c819098e96f1b6ca",
+      "expected_sha256": "c7c9c4d54e59662ee8e251af3aea1747fa035cb306213f20c819098e96f1b6ca",
+      "group": "stage5_confirmation_configs",
+      "match": true,
+      "name": "d_g1_control",
+      "path": "configs/stage5/resolved_d_g1_control.json"
+    },
+    {
+      "actual_sha256": "b3a946fc977c3ea95d3226dca1361b1885c098fddf4afdc650f4d36f0e1ce9bf",
+      "expected_sha256": "b3a946fc977c3ea95d3226dca1361b1885c098fddf4afdc650f4d36f0e1ce9bf",
+      "group": "stage5_confirmation_configs",
+      "match": true,
+      "name": "d_f_g1_vnext",
+      "path": "configs/stage5/resolved_mp_fs_plus_vnext_r1.json"
+    }
+  ],
+  "final_counts": {
+    "final_confirmation_n": 481,
+    "replacement_samples": 0,
+    "source_task_invalid_n": 19
+  },
+  "method_source_tree_sha256": {
+    "actual": "78901f8fec28b2aa6e75166283415926da2b5af1dec48c4ba37e71be3d73d67b",
+    "expected": "78901f8fec28b2aa6e75166283415926da2b5af1dec48c4ba37e71be3d73d67b",
+    "match": true
+  },
+  "stage5_method_commit": "79f6a82144ec0407444ef37121f70eed2b20e01c",
+  "stage5_protocol_commit": "a7742b4c9150ab208e7c5d6708f0dff40bf05440",
+  "stage6e_commit": "f32e8b2c7152e0f31829eab004da0f396084e57e",
+  "status": "PASS",
+  "violations": []
+}

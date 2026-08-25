@@ -1,0 +1,42 @@
+{
+  "confirmation_prediction_generated": false,
+  "expected_model_lock": {
+    "backend": "hf",
+    "batch_size": 1,
+    "bnb_4bit_quant_storage": "uint8",
+    "bnb_4bit_quant_type": "fp4",
+    "bnb_4bit_use_double_quant": false,
+    "chat_template_usage": {
+      "add_generation_prompt": true,
+      "messages": [
+        {
+          "content": "<production_prompt>",
+          "role": "user"
+        }
+      ],
+      "tokenize": false
+    },
+    "compute_dtype": "float16",
+    "context_length": 32768,
+    "device_map": "auto",
+    "do_sample": false,
+    "input_truncation_policy": "error",
+    "max_input_tokens": 28672,
+    "max_new_tokens": 4096,
+    "model_hash": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "padding_side": "left",
+    "quantization": "4bit",
+    "revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "seed": 42,
+    "temperature": null,
+    "top_k": null,
+    "top_p": null,
+    "trust_remote_code": false
+  },
+  "model_generate_called": false,
+  "model_loaded": false,
+  "model_name_or_path": null,
+  "reason": "execute_gpu_preflight_false",
+  "status": "NOT_RUN"
+}
