@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 import sqlite3
@@ -40,6 +41,11 @@ def write_jsonl(path: Path, rows: list[dict]) -> None:
         "".join(json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n" for row in rows),
         encoding="utf-8",
     )
+
+
+def canonical_sha256(value: dict) -> str:
+    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 def copy_stage6e_inputs(tmp_path: Path) -> dict[str, Path]:
@@ -108,6 +114,75 @@ def update_corrected_post_hash(rows: list[dict], sample_id: str, post_state_sha2
     for row in rows:
         if row["stage6_sample_id"] == sample_id:
             row["corrected_post_state_sha256"] = post_state_sha256
+            return
+    raise AssertionError(f"missing sample {sample_id}")
+
+
+def original_review_plan_subset(plan: dict) -> dict:
+    return {
+        "column_indexes": plan["column_indexes"],
+        "columns": plan["columns"],
+        "expected_inserted_row": plan["expected_inserted_row"],
+        "fresh_db_per_sample": True,
+        "operation": "INSERT",
+        "values": plan["values"],
+    }
+
+
+def review_program_subset(program: dict) -> dict:
+    return {
+        "parameters": program["parameters"],
+        "sql_template": program["sql_template"],
+        "sqlite_parameter_style": program["sqlite_parameter_style"],
+    }
+
+
+def rewrite_original_review_item(
+    stage6c_setup_dir: Path,
+    sample_id: str,
+    plan: dict,
+    program: dict,
+    post_state_sha256: str,
+) -> None:
+    path = stage6c_setup_dir / "artifacts" / "gold_review_items.jsonl"
+    rows = read_jsonl(path)
+    for row in rows:
+        if row["stage6_sample_id"] == sample_id:
+            row["gold_write_plan"] = original_review_plan_subset(plan)
+            row["gold_program"] = review_program_subset(program)
+            row["hashes"]["post_state_sha256"] = post_state_sha256
+            row["hashes"]["gold_write_plan_sha256"] = canonical_sha256(row["gold_write_plan"])
+            row["hashes"]["gold_program_sha256"] = canonical_sha256(row["gold_program"])
+            content = {key: value for key, value in row.items() if key != "authored_content_sha256"}
+            row["authored_content_sha256"] = canonical_sha256(content)
+            write_jsonl(path, rows)
+            return
+    raise AssertionError(f"missing sample {sample_id}")
+
+
+def rewrite_corrected_review_item(
+    stage6d_setup_dir: Path,
+    sample_id: str,
+    plan: dict,
+    program: dict,
+    post_state_sha256: str,
+) -> None:
+    path = stage6d_setup_dir / "artifacts" / "corrected_gold_review_items.jsonl"
+    rows = read_jsonl(path)
+    for row in rows:
+        if row["stage6_sample_id"] == sample_id:
+            row["corrected_gold_write_plan"] = original_review_plan_subset(plan)
+            row["corrected_gold_program"] = review_program_subset(program)
+            row["corrected_hashes"]["corrected_post_state_sha256"] = post_state_sha256
+            row["corrected_hashes"]["corrected_gold_write_plan_sha256"] = canonical_sha256(
+                row["corrected_gold_write_plan"]
+            )
+            row["corrected_hashes"]["corrected_gold_program_sha256"] = canonical_sha256(
+                row["corrected_gold_program"]
+            )
+            content = {key: value for key, value in row.items() if key != "corrected_authored_content_sha256"}
+            row["corrected_authored_content_sha256"] = canonical_sha256(content)
+            write_jsonl(path, rows)
             return
     raise AssertionError(f"missing sample {sample_id}")
 
@@ -287,4 +362,88 @@ def test_stage6e_rejects_corrected_gold_mutated_after_review(tmp_path: Path) -> 
     assert f"corrected_reviewed_gold_plan_mismatch:{sample_id}" in lock["validation_violations"]
     assert f"corrected_reviewed_gold_program_mismatch:{sample_id}" in lock["validation_violations"]
     assert f"corrected_reviewed_post_state_mismatch:{sample_id}" in lock["validation_violations"]
+    assert "final_gold_replay_failed" not in lock["validation_violations"]
+
+
+def test_stage6e_rejects_coordinated_original_gold_and_review_item_mutation(tmp_path: Path) -> None:
+    dirs = copy_stage6e_inputs(tmp_path)
+    sample_id = "stage6_crudsql_0001"
+    suffix = "_COORDINATED_MUTATION"
+
+    plan_path = dirs["stage6b"] / "artifacts" / "gold_write_plans.jsonl"
+    plans = read_jsonl(plan_path)
+    column_index = mutate_first_value(plans, sample_id, suffix)
+    mutated_plan = next(row for row in plans if row["stage6_sample_id"] == sample_id)
+    write_jsonl(plan_path, plans)
+
+    program_path = dirs["stage6b"] / "artifacts" / "gold_programs.jsonl"
+    programs = read_jsonl(program_path)
+    mutated_program = mutate_first_parameter(programs, sample_id, suffix, column_index)
+    post_state_sha256 = recompute_post_state(dirs["stage6b"], mutated_program)
+    mutated_program["post_state_sha256"] = post_state_sha256
+    write_jsonl(program_path, programs)
+
+    post_path = dirs["stage6b"] / "artifacts" / "gold_post_state_hashes.jsonl"
+    posts = read_jsonl(post_path)
+    update_original_post_hash(posts, sample_id, post_state_sha256)
+    write_jsonl(post_path, posts)
+
+    rewrite_original_review_item(dirs["stage6c_setup"], sample_id, mutated_plan, mutated_program, post_state_sha256)
+
+    lock = create_stage6e_final_registration(
+        stage6b_dir=dirs["stage6b"],
+        stage6c_setup_dir=dirs["stage6c_setup"],
+        stage6c_exec_dir=dirs["stage6c_exec"],
+        stage6c_r03_dir=dirs["stage6c_r03"],
+        stage6c_r04_dir=dirs["stage6c_r04"],
+        stage6d_setup_dir=dirs["stage6d_setup"],
+        stage6d_exec_dir=dirs["stage6d_exec"],
+        out_dir=dirs["stage6e"],
+    )
+
+    assert lock["status"] == "FAIL"
+    assert "accepted_upstream_root_mismatch:stage6c_gold_review_items_sha256" in lock["validation_violations"]
+    assert f"original_reviewed_gold_plan_mismatch:{sample_id}" not in lock["validation_violations"]
+    assert "final_gold_replay_failed" not in lock["validation_violations"]
+
+
+def test_stage6e_rejects_coordinated_corrected_gold_and_review_item_mutation(tmp_path: Path) -> None:
+    dirs = copy_stage6e_inputs(tmp_path)
+    sample_id = "stage6_crudsql_0000"
+    suffix = "_COORDINATED_MUTATION"
+
+    plan_path = dirs["stage6d_setup"] / "artifacts" / "corrected_gold_write_plans.jsonl"
+    plans = read_jsonl(plan_path)
+    column_index = mutate_first_value(plans, sample_id, suffix)
+    mutated_plan = next(row for row in plans if row["stage6_sample_id"] == sample_id)
+    write_jsonl(plan_path, plans)
+
+    program_path = dirs["stage6d_setup"] / "artifacts" / "corrected_gold_programs.jsonl"
+    programs = read_jsonl(program_path)
+    mutated_program = mutate_first_parameter(programs, sample_id, suffix, column_index)
+    post_state_sha256 = recompute_post_state(dirs["stage6b"], mutated_program)
+    mutated_program["post_state_sha256"] = post_state_sha256
+    write_jsonl(program_path, programs)
+
+    post_path = dirs["stage6d_setup"] / "artifacts" / "corrected_gold_post_state_hashes.jsonl"
+    posts = read_jsonl(post_path)
+    update_corrected_post_hash(posts, sample_id, post_state_sha256)
+    write_jsonl(post_path, posts)
+
+    rewrite_corrected_review_item(dirs["stage6d_setup"], sample_id, mutated_plan, mutated_program, post_state_sha256)
+
+    lock = create_stage6e_final_registration(
+        stage6b_dir=dirs["stage6b"],
+        stage6c_setup_dir=dirs["stage6c_setup"],
+        stage6c_exec_dir=dirs["stage6c_exec"],
+        stage6c_r03_dir=dirs["stage6c_r03"],
+        stage6c_r04_dir=dirs["stage6c_r04"],
+        stage6d_setup_dir=dirs["stage6d_setup"],
+        stage6d_exec_dir=dirs["stage6d_exec"],
+        out_dir=dirs["stage6e"],
+    )
+
+    assert lock["status"] == "FAIL"
+    assert "accepted_upstream_root_mismatch:stage6d_corrected_review_items_sha256" in lock["validation_violations"]
+    assert f"corrected_reviewed_gold_plan_mismatch:{sample_id}" not in lock["validation_violations"]
     assert "final_gold_replay_failed" not in lock["validation_violations"]

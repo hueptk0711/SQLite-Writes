@@ -18,6 +18,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from scripts.data.create_stage6e_final_registration import (
     ARCHIVE_NAME,
     CORRECTABLE_GOLD_ERROR_QUEUE_SHA256,
+    EXPECTED_ACCEPTED_UPSTREAM_ARTIFACT_ROOTS,
     SOURCE_TASK_INVALID_QUEUE_SHA256,
     STAGE6B_DIR,
     STAGE6C_SETUP_DIR,
@@ -28,6 +29,7 @@ from scripts.data.create_stage6e_final_registration import (
     STAGE6D_EXECUTION_PATCH1_COMMIT,
     STAGE6D_SETUP_DIR,
     STAGE6E_DIR,
+    accepted_upstream_roots_lock,
     artifact_root_hashes,
     build_stage6e_artifacts,
     load_inputs,
@@ -71,6 +73,7 @@ def validate_stage6e_final_registration(
     lock_path = stage6e_dir / "STAGE6E_FINAL_REGISTRATION_LOCK.json"
     required = [
         lock_path,
+        stage6e_dir / "ACCEPTED_UPSTREAM_REVIEW_ROOTS_LOCK.json",
         stage6e_dir / "REVIEWER_README.md",
         stage6e_dir / "VALIDATION_REPORT.md",
         artifacts_dir / "SOURCE_TASK_INVALID_EXCLUSIONS.jsonl",
@@ -129,8 +132,20 @@ def validate_stage6e_final_registration(
         stage6d_setup_dir,
         stage6d_exec_dir,
     )
+    expected_roots_lock = accepted_upstream_roots_lock(root_hashes)
+    compare_json(
+        stage6e_dir / "ACCEPTED_UPSTREAM_REVIEW_ROOTS_LOCK.json",
+        expected_roots_lock,
+        violations,
+        "accepted_upstream_review_roots_lock",
+    )
+    if root_hashes != EXPECTED_ACCEPTED_UPSTREAM_ARTIFACT_ROOTS:
+        violations.append("actual_upstream_roots_do_not_match_expected_constants")
     expected_lock.update(
         {
+            "accepted_upstream_review_roots_lock_sha256": sha256_file(
+                stage6e_dir / "ACCEPTED_UPSTREAM_REVIEW_ROOTS_LOCK.json"
+            ),
             "final_confirmation_sample_manifest_sha256": sha256_file(artifacts_dir / "FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl"),
             "final_gold_write_plans_sha256": sha256_file(artifacts_dir / "FINAL_GOLD_WRITE_PLANS.jsonl"),
             "final_gold_programs_sha256": sha256_file(artifacts_dir / "FINAL_GOLD_PROGRAMS.jsonl"),
@@ -144,7 +159,11 @@ def validate_stage6e_final_registration(
             "final_distribution_report_sha256": sha256_file(artifacts_dir / "FINAL_DISTRIBUTION_REPORT.json"),
             "final_overlap_audit_sha256": sha256_file(artifacts_dir / "FINAL_OVERLAP_AUDIT.json"),
             "mcnemar_threshold_sensitivity_sha256": sha256_file(artifacts_dir / "MCNEMAR_THRESHOLD_SENSITIVITY_N481.json"),
-            "accepted_upstream_artifact_roots": root_hashes,
+            "accepted_upstream_artifact_roots": EXPECTED_ACCEPTED_UPSTREAM_ARTIFACT_ROOTS,
+            "actual_upstream_artifact_roots_sha256": sha256_file(
+                stage6e_dir / "ACCEPTED_UPSTREAM_REVIEW_ROOTS_LOCK.json"
+            ),
+            "accepted_upstream_roots_authoritative": True,
             "reviewed_gold_provenance_anchored": True,
         }
     )
@@ -166,6 +185,7 @@ def validate_stage6e_final_registration(
         "gpu_called": False,
         "source_task_invalid_queue_sha256": SOURCE_TASK_INVALID_QUEUE_SHA256,
         "correctable_gold_error_queue_sha256": CORRECTABLE_GOLD_ERROR_QUEUE_SHA256,
+        "accepted_upstream_roots_authoritative": True,
         "reviewed_gold_provenance_anchored": True,
     }
     for field, value in exact_scalars.items():

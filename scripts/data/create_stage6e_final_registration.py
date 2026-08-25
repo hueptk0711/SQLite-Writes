@@ -37,6 +37,23 @@ ZIP_TIMESTAMP = (2026, 8, 24, 0, 0, 0)
 STAGE6D_EXECUTION_PATCH1_COMMIT = "b5b7bd8570290643aa819512e57a673eba2c8f87"
 SOURCE_TASK_INVALID_QUEUE_SHA256 = "f606cee0de6108b77b45c72ffdedd4cbfba229716c3f120bcc79f892b19422f1"
 CORRECTABLE_GOLD_ERROR_QUEUE_SHA256 = "33fe542a38413f4159bbce6a82318f22d790d36b2a5a40882ac74c8c8da3a336"
+EXPECTED_ACCEPTED_UPSTREAM_ARTIFACT_ROOTS = {
+    "c01_submission_tsv_sha256": "56b24e07e721d2209e4db3928860f9690e07237f2da91a158cc414ca45a752c8",
+    "c02_submission_tsv_sha256": "4f01075dd3bcf1affc039c65841b04ccf7a50388f0b8d289b5df43af51cee6ed",
+    "r01_submission_tsv_sha256": "38f65faffad6e686ce978673faba77f9f88b40379c1e02f4f2e47eebd681fa82",
+    "r02_submission_tsv_sha256": "28922ebfacd028077266b534c66d8ed0b39331f75ebf21e9bbd5cfb4a9286db3",
+    "r03_adjudication_report_sha256": "196ac666b7ba4fa3e1b4a266c0758aad073aa8138e4c77bbc18486e59bb811a1",
+    "r03_submission_tsv_sha256": "ecef969a6ea52904f249fa9121fbc6d2ed5e039122fe05dc1472caeba1bc5518",
+    "r04_resolution_report_sha256": "56d9b95be1b65cd5021b239afc008cb8b311baed3d26ae63b059aab6a066bc75",
+    "stage6b_registration_lock_sha256": "e8480a6169a36f5a47a2d0d89368eb411d4bd33acf47207eca1c9ad3cef06a8f",
+    "stage6c_execution_manifest_sha256": "90428542a9d35e8420d22f56795d9a7f6843b20165e55fa03ebbbd8272bceeec",
+    "stage6c_gold_review_items_sha256": "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b",
+    "stage6c_gold_review_protocol_addendum_sha256": "93b78d7d1f008e117b09dc0eb93cdaa7c017aedbeca83aa34e932d5fdd8f19b2",
+    "stage6c_gold_review_setup_lock_sha256": "5a9d49c0e0a0e1514c95b8348488b5c4397808587709cda9399b0bfc1993881a",
+    "stage6d_corrected_review_items_sha256": "28bbbaad52cea9d9511a11ca7ac92115b72533801189ffacc5cad6e4369c787c",
+    "stage6d_execution_manifest_sha256": "baaa8eb48ed5bb3f5e7f771ce9b3b0f5e8b7e094f567b5471b6d6905328da55e",
+    "stage6d_setup_lock_sha256": "b259437488603696fc101d214279399f720ab7c7ee523fbe877f279a4c8d30d1",
+}
 
 
 def sha256_file(path: Path) -> str:
@@ -209,6 +226,20 @@ def final_program_review_subset(program: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def recomputed_original_review_item_hash(review_item: dict[str, Any]) -> str:
+    content = {key: value for key, value in review_item.items() if key != "authored_content_sha256"}
+    return sha256_text(canonical_json(content))
+
+
+def recomputed_corrected_review_item_hash(corrected_item: dict[str, Any]) -> str:
+    content = {
+        key: value
+        for key, value in corrected_item.items()
+        if key != "corrected_authored_content_sha256"
+    }
+    return sha256_text(canonical_json(content))
+
+
 def approved_original_review_hash(
     sample_id: str,
     approval_path: str,
@@ -219,6 +250,9 @@ def approved_original_review_hash(
     violations: list[str],
 ) -> str:
     reviewed_hash = review_item["authored_content_sha256"]
+    recomputed_hash = recomputed_original_review_item_hash(review_item)
+    if recomputed_hash != reviewed_hash:
+        violations.append(f"original_reviewed_content_recomputed_hash_mismatch:{sample_id}")
     if approval_path == "R01_R02_AGREED_APPROVED":
         r01 = r01_by_id.get(sample_id)
         r02 = r02_by_id.get(sample_id)
@@ -251,6 +285,9 @@ def approved_corrected_review_hash(
     violations: list[str],
 ) -> str:
     reviewed_hash = corrected_item["corrected_authored_content_sha256"]
+    recomputed_hash = recomputed_corrected_review_item_hash(corrected_item)
+    if recomputed_hash != reviewed_hash:
+        violations.append(f"corrected_reviewed_content_recomputed_hash_mismatch:{sample_id}")
     c01 = c01_by_id.get(sample_id)
     c02 = c02_by_id.get(sample_id)
     if not c01 or not c02:
@@ -307,6 +344,28 @@ def artifact_root_hashes(
         "c02_submission_tsv_sha256": sha256_file(
             stage6d_exec_dir / "submissions" / "stage6d_corrected_gold_review_C02.submitted.tsv"
         ),
+    }
+
+
+def accepted_upstream_root_violations(actual_roots: dict[str, str]) -> list[str]:
+    violations: list[str] = []
+    if set(actual_roots) != set(EXPECTED_ACCEPTED_UPSTREAM_ARTIFACT_ROOTS):
+        violations.append("accepted_upstream_root_key_set_mismatch")
+    for key, expected in EXPECTED_ACCEPTED_UPSTREAM_ARTIFACT_ROOTS.items():
+        if actual_roots.get(key) != expected:
+            violations.append(f"accepted_upstream_root_mismatch:{key}")
+    return violations
+
+
+def accepted_upstream_roots_lock(actual_roots: dict[str, str]) -> dict[str, Any]:
+    violations = accepted_upstream_root_violations(actual_roots)
+    return {
+        "stage": "Stage6E_ACCEPTED_UPSTREAM_REVIEW_ROOTS_LOCK",
+        "status": "PASS" if not violations else "FAIL",
+        "description": "Authoritative prior-stage human-review roots accepted before Stage6E final gold assembly.",
+        "expected_accepted_upstream_artifact_roots": EXPECTED_ACCEPTED_UPSTREAM_ARTIFACT_ROOTS,
+        "actual_upstream_artifact_roots": actual_roots,
+        "violations": violations,
     }
 
 
@@ -675,6 +734,16 @@ def create_stage6e_final_registration(
     stage6d_exec_dir: Path = STAGE6D_EXEC_DIR,
     out_dir: Path = STAGE6E_DIR,
 ) -> dict[str, Any]:
+    root_hashes = artifact_root_hashes(
+        stage6b_dir,
+        stage6c_setup_dir,
+        stage6c_exec_dir,
+        stage6c_r03_dir,
+        stage6c_r04_dir,
+        stage6d_setup_dir,
+        stage6d_exec_dir,
+    )
+    upstream_roots_lock = accepted_upstream_roots_lock(root_hashes)
     inputs = load_inputs(
         stage6b_dir,
         stage6c_setup_dir,
@@ -685,17 +754,12 @@ def create_stage6e_final_registration(
         stage6d_exec_dir,
     )
     artifacts = build_stage6e_artifacts(inputs, stage6b_dir)
-    root_hashes = artifact_root_hashes(
-        stage6b_dir,
-        stage6c_setup_dir,
-        stage6c_exec_dir,
-        stage6c_r03_dir,
-        stage6c_r04_dir,
-        stage6d_setup_dir,
-        stage6d_exec_dir,
-    )
+    if upstream_roots_lock["violations"]:
+        artifacts["lock"]["validation_violations"].extend(upstream_roots_lock["violations"])
+        artifacts["lock"]["status"] = "FAIL"
     out_artifacts = out_dir / "artifacts"
     out_artifacts.mkdir(parents=True, exist_ok=True)
+    write_json(out_dir / "ACCEPTED_UPSTREAM_REVIEW_ROOTS_LOCK.json", upstream_roots_lock)
     write_jsonl(out_artifacts / "SOURCE_TASK_INVALID_EXCLUSIONS.jsonl", artifacts["exclusions"])
     write_jsonl(out_artifacts / "FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl", artifacts["final_samples"])
     write_jsonl(out_artifacts / "FINAL_GOLD_WRITE_PLANS.jsonl", artifacts["final_plans"])
@@ -708,9 +772,12 @@ def create_stage6e_final_registration(
     write_json(out_artifacts / "FINAL_OVERLAP_AUDIT.json", artifacts["overlap"])
     write_json(out_artifacts / "MCNEMAR_THRESHOLD_SENSITIVITY_N481.json", artifacts["mcnemar"])
     lock = artifacts["lock"]
-    lock["accepted_upstream_artifact_roots"] = root_hashes
+    lock["accepted_upstream_artifact_roots"] = EXPECTED_ACCEPTED_UPSTREAM_ARTIFACT_ROOTS
+    lock["actual_upstream_artifact_roots_sha256"] = sha256_file(out_dir / "ACCEPTED_UPSTREAM_REVIEW_ROOTS_LOCK.json")
+    lock["accepted_upstream_roots_authoritative"] = True
     lock["reviewed_gold_provenance_anchored"] = True
     for field, rel in {
+        "accepted_upstream_review_roots_lock_sha256": out_dir / "ACCEPTED_UPSTREAM_REVIEW_ROOTS_LOCK.json",
         "final_confirmation_sample_manifest_sha256": out_artifacts / "FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl",
         "final_gold_write_plans_sha256": out_artifacts / "FINAL_GOLD_WRITE_PLANS.jsonl",
         "final_gold_programs_sha256": out_artifacts / "FINAL_GOLD_PROGRAMS.jsonl",
@@ -739,6 +806,7 @@ Validation date: 2026-08-24
 - corrected review accepted gold: 21
 - final gold replay: {artifacts['replay_report']['pass_count']} / 481 PASS
 - reviewed-gold provenance anchored: 481 / 481
+- accepted upstream roots authoritative: true
 - final gold freeze created: true
 - confirmation_run_allowed_now: false
 - model_called: false
@@ -756,13 +824,15 @@ re-reviewed accepted gold items.
 
 This stage creates the final gold corpus hash and replays all 481 final gold
 programs on fresh isolated SQLite databases. It also anchors each final gold
-artifact to the exact human-reviewed content hash and approval path. It does not call a model, does not
+artifact to the exact human-reviewed content hash and approval path, and checks
+all upstream human-review roots against accepted constants. It does not call a model, does not
 use GPU, and does not permit confirmation inference. The next stage is GPU
 environment preflight after reviewer acceptance.
 """
     write_text(out_dir / "VALIDATION_REPORT.md", validation_report)
     write_text(out_dir / "REVIEWER_README.md", readme)
     members = [
+        out_dir / "ACCEPTED_UPSTREAM_REVIEW_ROOTS_LOCK.json",
         out_dir / "STAGE6E_FINAL_REGISTRATION_LOCK.json",
         out_dir / "VALIDATION_REPORT.md",
         out_dir / "REVIEWER_README.md",

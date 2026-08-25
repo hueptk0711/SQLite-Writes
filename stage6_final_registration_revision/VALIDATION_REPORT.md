@@ -12,6 +12,7 @@ Validation date: 2026-08-24
 - corrected review accepted gold: 21
 - final gold replay: 481 / 481 PASS
 - reviewed-gold provenance anchored: 481 / 481
+- accepted upstream roots authoritative: true
 - final gold freeze created: true
 - confirmation_run_allowed_now: false
 - model_called: false
