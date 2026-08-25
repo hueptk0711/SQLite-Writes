@@ -28,6 +28,13 @@ if str(SOURCE_ROOT) not in sys.path:
 
 AUTHORIZATION_DIR = "stage6_confirmation_run_authorization"
 STAGE6H_DIR = "stage6_confirmation_execution"
+DEFAULT_EXECUTION_ROOT = "../stage6_confirmation_run_outputs"
+STAGE6F_RUNTIME_DIR = (
+    "stage6_gpu_preflight_acceptance/server_output_zip_extract_patch2/"
+    "stage6f_gpu_preflight_patch2_outputs/stage6_gpu_preflight"
+)
+DEFAULT_PROMPT_TOKEN_AUDIT_PATH = f"{STAGE6F_RUNTIME_DIR}/PROMPT_TOKEN_AUDIT.jsonl"
+DEFAULT_GPU_ENVIRONMENT_MANIFEST_PATH = f"{STAGE6F_RUNTIME_DIR}/GPU_ENVIRONMENT_MANIFEST.json"
 STAGE6G_AUTHORIZATION_COMMIT = "ead5015c3efaa174772e8595b7b65a8f5c032166"
 FINAL_CONFIRMATION_N = 481
 FINAL_MANIFEST_PATH = "stage6_final_registration_revision/artifacts/FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl"
@@ -80,6 +87,12 @@ ARM_CONFIG_KEYS = {
     "original_mp_fs_plus": "original_mp_fs_plus",
     "shared_mp_fs_plus_generation": "d_g1_control",
 }
+STREAM_ORDER = [
+    "direct",
+    "j_fs",
+    "original_mp_fs_plus",
+    "shared_mp_fs_plus_generation",
+]
 
 REQUIRED_AUDIT_FIELDS = [
     "stage6_sample_id",
@@ -233,6 +246,7 @@ def verify_authorization_boundary(
     *,
     expected_git_head: str,
     require_git_clean: bool = True,
+    check_absent_raw_generations: bool = True,
 ) -> dict[str, Any]:
     validator = load_stage6g_validator(repo_root)
     report = validator.validate(
@@ -240,7 +254,7 @@ def verify_authorization_boundary(
         repo_root=repo_root,
         expected_git_head=expected_git_head,
         require_git_clean=require_git_clean,
-        check_absent_raw_generations=True,
+        check_absent_raw_generations=check_absent_raw_generations,
     )
     if report["status"] != "PASS":
         raise HarnessError(f"Stage6G authorization boundary failed: {report['violations']}")
@@ -248,6 +262,11 @@ def verify_authorization_boundary(
 
 
 def load_prompt_audit(path: Path) -> dict[tuple[str, str], dict[str, Any]]:
+    if sha256_file(path) != PROMPT_TOKEN_AUDIT_SHA256:
+        raise HarnessError(
+            f"Prompt token audit SHA-256 mismatch for {path}: "
+            f"expected {PROMPT_TOKEN_AUDIT_SHA256}"
+        )
     rows = read_jsonl(path)
     if len(rows) != FINAL_CONFIRMATION_N * 5:
         raise HarnessError(f"Prompt audit must contain 2405 rows, got {len(rows)}")
@@ -261,6 +280,55 @@ def load_prompt_audit(path: Path) -> dict[tuple[str, str], dict[str, Any]]:
             raise HarnessError(f"Duplicate prompt audit key: {key}")
         index[key] = row
     return index
+
+
+def method_source_tree_hash(repo_root: Path = PROJECT_ROOT) -> str:
+    manifest = read_json(repo_root / "stage5_method_revision_freeze" / "EXECUTABLE_FREEZE_MANIFEST.json")
+    rows = []
+    for relative in sorted(manifest.get("method_implementation_files") or []):
+        path = repo_root / relative
+        rows.append(f"{sha256_file(path)}  {relative}")
+    return sha256_text("\n".join(rows) + "\n")
+
+
+def execution_code_manifest(repo_root: Path = PROJECT_ROOT) -> dict[str, Any]:
+    config_hashes = {
+        key: {
+            "path": STREAMS[stream]["config_path"],
+            "sha256": sha256_file(repo_root / STREAMS[stream]["config_path"]),
+        }
+        for stream, key in ARM_CONFIG_KEYS.items()
+    }
+    config_hashes["d_f_g1_vnext"] = {
+        "path": "configs/stage5/resolved_mp_fs_plus_vnext_r1.json",
+        "sha256": sha256_file(repo_root / "configs/stage5/resolved_mp_fs_plus_vnext_r1.json"),
+    }
+    return {
+        "stage": "Stage6H_EXECUTION_CODE_MANIFEST",
+        "accepted_harness_commit": git_output(repo_root, "rev-parse", "HEAD"),
+        "runner": {
+            "path": "scripts/server/run_stage6_confirmation.py",
+            "sha256": sha256_file(repo_root / "scripts/server/run_stage6_confirmation.py"),
+        },
+        "stage6g_validator": {
+            "path": "scripts/data/validate_stage6g_confirmation_authorization.py",
+            "sha256": sha256_file(repo_root / "scripts/data/validate_stage6g_confirmation_authorization.py"),
+        },
+        "method_source_tree_sha256": method_source_tree_hash(repo_root),
+        "resolved_config_hashes": config_hashes,
+        "generation_lock_sha256": GENERATION_LOCK_SHA256,
+    }
+
+
+def validate_execution_code_manifest(
+    manifest: dict[str, Any],
+    *,
+    repo_root: Path = PROJECT_ROOT,
+) -> None:
+    actual = execution_code_manifest(repo_root)
+    for key in ("runner", "stage6g_validator", "method_source_tree_sha256", "resolved_config_hashes", "generation_lock_sha256"):
+        if manifest.get(key) != actual.get(key):
+            raise HarnessError(f"Execution code manifest mismatch: {key}")
 
 
 def row_sample_id(row: dict[str, Any]) -> str:
@@ -852,6 +920,186 @@ def execute_stream_integrated(
     return accumulated
 
 
+def stream_raw_path(execution_root: Path, stream: str) -> Path:
+    return execution_root / STREAMS[stream]["raw_generation_path"]
+
+
+def stream_checkpoint_path(execution_root: Path, stream: str) -> Path:
+    raw_path = stream_raw_path(execution_root, stream)
+    return raw_path.with_suffix(raw_path.suffix + ".checkpoint.json")
+
+
+def check_run_level_initial_absent(execution_root: Path) -> None:
+    existing = []
+    for stream in STREAM_ORDER:
+        raw_path = stream_raw_path(execution_root, stream)
+        checkpoint_path = stream_checkpoint_path(execution_root, stream)
+        if raw_path.exists():
+            existing.append(raw_path.as_posix())
+        if checkpoint_path.exists():
+            existing.append(checkpoint_path.as_posix())
+    if existing:
+        raise HarnessError(f"Initial confirmation run requires absent stream outputs: {existing}")
+
+
+def stream_completion_status(
+    *,
+    execution_root: Path,
+    stream: str,
+    expected_sample_ids: set[str],
+) -> dict[str, Any]:
+    raw_path = stream_raw_path(execution_root, stream)
+    checkpoint_path = stream_checkpoint_path(execution_root, stream)
+    if not raw_path.exists() and not checkpoint_path.exists():
+        return {
+            "stream": stream,
+            "status": "not_started",
+            "row_count": 0,
+            "raw_generation_path": raw_path.as_posix(),
+        }
+    if not raw_path.exists() or not checkpoint_path.exists():
+        raise HarnessError(f"{stream} has incomplete raw/checkpoint pair")
+    verify_resume_checkpoint(
+        raw_path,
+        checkpoint_path,
+        expected_sample_ids=expected_sample_ids,
+        full_completion=False,
+    )
+    rows = read_jsonl(raw_path)
+    full = len(rows) == FINAL_CONFIRMATION_N
+    if full:
+        validate_raw_generation_rows(rows, expected_sample_ids=expected_sample_ids, full_completion=True)
+    return {
+        "stream": stream,
+        "status": "complete" if full else "partial",
+        "row_count": len(rows),
+        "unique_sample_ids": len({str(row["stage6_sample_id"]) for row in rows}),
+        "raw_generation_path": raw_path.as_posix(),
+        "raw_generation_sha256": sha256_file(raw_path),
+        "checkpoint_path": checkpoint_path.as_posix(),
+        "checkpoint_sha256": sha256_file(checkpoint_path),
+    }
+
+
+def write_confirmation_run_state(
+    *,
+    execution_root: Path,
+    run_id: str,
+    mode: str,
+    prompt_audit_path: Path,
+    expected_git_head: str,
+    expected_sample_ids: set[str],
+) -> dict[str, Any]:
+    stream_states = [
+        stream_completion_status(
+            execution_root=execution_root,
+            stream=stream,
+            expected_sample_ids=expected_sample_ids,
+        )
+        for stream in STREAM_ORDER
+    ]
+    complete = all(state["status"] == "complete" for state in stream_states)
+    manifest = {
+        "stage": "Stage6H_CONFIRMATION_RUN_STATE",
+        "status": "COMPLETE" if complete else "PARTIAL",
+        "run_id": run_id,
+        "mode": mode,
+        "expected_git_head": expected_git_head,
+        "execution_root": execution_root.resolve().as_posix(),
+        "prompt_token_audit_path": prompt_audit_path.as_posix(),
+        "prompt_token_audit_sha256": sha256_file(prompt_audit_path),
+        "final_confirmation_n": FINAL_CONFIRMATION_N,
+        "stream_order": STREAM_ORDER,
+        "streams": stream_states,
+        "total_rows": sum(int(state.get("row_count") or 0) for state in stream_states),
+        "confirmation_predictions_created": any(int(state.get("row_count") or 0) for state in stream_states),
+    }
+    write_json(execution_root / "CONFIRMATION_RUN_STATE.json", manifest)
+    return manifest
+
+
+def execute_all_streams(
+    *,
+    prompt_audit_path: Path,
+    execution_root: Path,
+    run_id: str,
+    expected_git_head: str,
+    model_name_or_path: str | None,
+    mode: str = "initial",
+    repo_root: Path = PROJECT_ROOT,
+    tokenizer: Any | None = None,
+    generator: Any | None = None,
+) -> dict[str, Any]:
+    if mode not in {"initial", "resume"}:
+        raise HarnessError(f"Unknown run mode: {mode}")
+    if not expected_git_head:
+        raise HarnessError("--expected-git-head is required for GPU confirmation execution")
+    verify_authorization_boundary(
+        repo_root,
+        expected_git_head=expected_git_head,
+        require_git_clean=True,
+        check_absent_raw_generations=(mode == "initial"),
+    )
+    prompt_audit_index = load_prompt_audit(prompt_audit_path)
+    final_manifest_rows = load_final_confirmation_manifest(repo_root)
+    expected_sample_ids = verify_stage6e_stage6f_id_chain(final_manifest_rows, prompt_audit_index)
+    code_manifest = execution_code_manifest(repo_root)
+    validate_execution_code_manifest(code_manifest, repo_root=repo_root)
+    execution_root.mkdir(parents=True, exist_ok=True)
+    write_json(execution_root / "EXECUTION_CODE_MANIFEST.json", code_manifest)
+    if mode == "initial":
+        check_run_level_initial_absent(execution_root)
+
+    if generator is None:
+        if not model_name_or_path:
+            raise HarnessError("--model-name-or-path is required for integrated GPU execution")
+        deps = load_stage6h_runtime_dependencies()
+        generator = deps["create_generator"](generation_config(model_name_or_path))
+    if tokenizer is None:
+        tokenizer = getattr(generator, "tokenizer", None)
+    if tokenizer is None:
+        raise HarnessError("Integrated execution requires the exact tokenizer used by the generator")
+
+    run_state = write_confirmation_run_state(
+        execution_root=execution_root,
+        run_id=run_id,
+        mode=mode,
+        prompt_audit_path=prompt_audit_path,
+        expected_git_head=expected_git_head,
+        expected_sample_ids=expected_sample_ids,
+    )
+    for stream in STREAM_ORDER:
+        state = stream_completion_status(
+            execution_root=execution_root,
+            stream=stream,
+            expected_sample_ids=expected_sample_ids,
+        )
+        if state["status"] == "complete":
+            continue
+        stream_mode = "resume" if state["status"] == "partial" else "initial"
+        execute_stream_integrated(
+            stream=stream,
+            prompt_audit_path=prompt_audit_path,
+            output_root=execution_root,
+            run_id=run_id,
+            mode=stream_mode,
+            repo_root=repo_root,
+            expected_git_head=None,
+            model_name_or_path=None,
+            tokenizer=tokenizer,
+            generator=generator,
+        )
+        run_state = write_confirmation_run_state(
+            execution_root=execution_root,
+            run_id=run_id,
+            mode=mode,
+            prompt_audit_path=prompt_audit_path,
+            expected_git_head=expected_git_head,
+            expected_sample_ids=expected_sample_ids,
+        )
+    return run_state
+
+
 def run_stream_with_guard(
     *,
     stream: str,
@@ -980,10 +1228,7 @@ def execution_plan() -> dict[str, Any]:
         "prompt_token_audit_sha256": PROMPT_TOKEN_AUDIT_SHA256,
         "generation_lock_sha256": GENERATION_LOCK_SHA256,
         "generation_stream_order": [
-            "direct",
-            "j_fs",
-            "original_mp_fs_plus",
-            "shared_mp_fs_plus_generation",
+            *STREAM_ORDER,
         ],
         "generation_streams": STREAMS,
         "execution_modes": {
@@ -1000,7 +1245,7 @@ def execution_plan() -> dict[str, Any]:
         },
         "runtime_input_locks": {
             "stage6f_prompt_token_audit": {
-                "path": "stage6f_gpu_preflight_acceptance/server_output/PROMPT_TOKEN_AUDIT.jsonl",
+                "path": DEFAULT_PROMPT_TOKEN_AUDIT_PATH,
                 "sha256": PROMPT_TOKEN_AUDIT_SHA256,
             },
             "stage6g_authorization": {
@@ -1016,15 +1261,32 @@ def execution_plan() -> dict[str, Any]:
                 "sha256": FINAL_GOLD_CORPUS_SHA256,
             },
             "stage6f_gpu_environment_manifest": {
-                "path": "stage6f_gpu_preflight_acceptance/server_output/GPU_ENVIRONMENT_MANIFEST.json",
+                "path": DEFAULT_GPU_ENVIRONMENT_MANIFEST_PATH,
             },
             "stage6_crudsql_isolated_db_root": {
                 "path": STAGE6_CRUDSQL_DB_ROOT,
             },
         },
+        "run_level_controller": {
+            "execute_all_flag": "--execute-all",
+            "resume_flag": "--resume-run",
+            "fixed_stream_order": STREAM_ORDER,
+            "default_execution_root": DEFAULT_EXECUTION_ROOT,
+            "expected_git_head_required": True,
+            "dirty_worktree_bypass_allowed_in_gpu_mode": False,
+            "authorization_boundary_checked_once_per_initial_run": True,
+            "model_loaded_once_per_execute_all": True,
+            "run_state_manifest": "CONFIRMATION_RUN_STATE.json",
+            "execution_code_manifest": "EXECUTION_CODE_MANIFEST.json",
+        },
         "pre_generation_phases": [
             "verify_stage6g_authorization_with_expected_git_head_and_clean_worktree",
+            "reject_missing_expected_git_head_in_gpu_mode",
+            "reject_dirty_worktree_override_in_gpu_mode",
             "verify_zero_existing_raw_generation_files_for_initial_run",
+            "verify_prompt_token_audit_file_sha256_before_parse",
+            "write_and_validate_execution_code_manifest_before_model_load",
+            "run_level_initial_all_stream_outputs_absent_check",
             "recompute_current_prompt_token_audit_for_stream",
             "map_shared_generation_stream_to_d_g1_control_prompt_audit_arm",
             "verify_d_g1_control_and_d_f_g1_vnext_input_identity_481_of_481",
@@ -1034,6 +1296,7 @@ def execution_plan() -> dict[str, Any]:
             "tie_stage6e_final_id_set_to_stage6f_audit_and_runtime_ids",
         ],
         "post_generation_phases": [
+            "execute_all_four_streams_in_fixed_order_with_one_run_id",
             "generate_one_sample_at_a_time_from_integrated_runner",
             "verify_exact_481_unique_frozen_sample_ids_after_generation",
             "verify_generated_rows_report_same_prompt_chat_input_ids_and_token_count",
@@ -1043,6 +1306,8 @@ def execution_plan() -> dict[str, Any]:
             "write_raw_generation_row_sha256",
             "write_incremental_stream_checkpoint_manifest",
             "verify_resume_checkpoint_before_any_resume",
+            "write_run_state_manifest_after_each_stream",
+            "resume_run_verifies_prior_streams_before_continuation",
             "write_shared_replay_row_sha256_for_d_g1_and_d_f_g1",
             "write_actual_d_g1_and_d_f_g1_replay_provenance_after_shared_stream_completion",
         ],
@@ -1082,11 +1347,14 @@ def create_setup(output_dir: Path) -> dict[str, Any]:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", default=STAGE6H_DIR)
+    parser.add_argument("--execution-root", default=DEFAULT_EXECUTION_ROOT)
     parser.add_argument("--setup-only", action="store_true")
     parser.add_argument("--mode", choices=["initial", "resume"], default="initial")
     parser.add_argument("--execute-stream", choices=sorted(STREAMS))
+    parser.add_argument("--execute-all", action="store_true")
+    parser.add_argument("--resume-run", action="store_true")
     parser.add_argument("--enable-gpu-execution", action="store_true")
-    parser.add_argument("--prompt-token-audit", default="stage6_gpu_preflight_acceptance/server_output_zip_extract_patch2/stage6f_gpu_preflight_patch2_outputs/stage6_gpu_preflight/PROMPT_TOKEN_AUDIT.jsonl")
+    parser.add_argument("--prompt-token-audit", default=DEFAULT_PROMPT_TOKEN_AUDIT_PATH)
     parser.add_argument("--model-name-or-path")
     parser.add_argument("--run-id", default=f"stage6h_{int(time.time())}")
     parser.add_argument("--expected-git-head")
@@ -1097,21 +1365,40 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     if not args.setup_only:
-        if not args.execute_stream:
-            raise SystemExit("Stage6H execution requires --execute-stream or --setup-only.")
+        if args.allow_dirty_worktree:
+            raise SystemExit("--allow-dirty-worktree is forbidden in GPU confirmation execution mode.")
+        if not args.expected_git_head:
+            raise SystemExit("--expected-git-head is required in GPU confirmation execution mode.")
+        if args.execute_all and args.execute_stream:
+            raise SystemExit("Use either --execute-all or --execute-stream, not both.")
+        if args.resume_run and args.mode == "initial":
+            args.mode = "resume"
+        if not args.execute_stream and not args.execute_all:
+            raise SystemExit("Stage6H execution requires --execute-all, --execute-stream, or --setup-only.")
         if not args.enable_gpu_execution:
             raise SystemExit(
                 "Stage6H execution CLI is present but GPU execution requires "
                 "--enable-gpu-execution after reviewer acceptance."
             )
+        if args.execute_all:
+            state = execute_all_streams(
+                prompt_audit_path=Path(args.prompt_token_audit),
+                execution_root=Path(args.execution_root),
+                run_id=args.run_id,
+                expected_git_head=args.expected_git_head,
+                mode="resume" if args.resume_run else args.mode,
+                model_name_or_path=args.model_name_or_path,
+            )
+            print(json.dumps(state, ensure_ascii=False, indent=2, sort_keys=True))
+            return
         rows = execute_stream_integrated(
             stream=args.execute_stream,
             prompt_audit_path=Path(args.prompt_token_audit),
-            output_root=Path(args.output_dir),
+            output_root=Path(args.execution_root),
             run_id=args.run_id,
             mode=args.mode,
             expected_git_head=args.expected_git_head,
-            require_git_clean=not args.allow_dirty_worktree,
+            require_git_clean=True,
             model_name_or_path=args.model_name_or_path,
         )
         print(json.dumps(
@@ -1120,7 +1407,7 @@ def main() -> None:
                 "stream": args.execute_stream,
                 "row_count": len(rows),
                 "unique_sample_ids": len({str(row["stage6_sample_id"]) for row in rows}),
-                "raw_generation_path": str(Path(args.output_dir) / STREAMS[args.execute_stream]["raw_generation_path"]),
+                "raw_generation_path": str(Path(args.execution_root) / STREAMS[args.execute_stream]["raw_generation_path"]),
                 "confirmation_predictions_created": True,
             },
             ensure_ascii=False,
