@@ -12,6 +12,7 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import sys
 import subprocess
 import time
 from pathlib import Path
@@ -19,11 +20,21 @@ from typing import Any, Callable, Iterable
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+SOURCE_ROOT = PROJECT_ROOT / "src"
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+if str(SOURCE_ROOT) not in sys.path:
+    sys.path.insert(0, str(SOURCE_ROOT))
 
 AUTHORIZATION_DIR = "stage6_confirmation_run_authorization"
 STAGE6H_DIR = "stage6_confirmation_execution"
 STAGE6G_AUTHORIZATION_COMMIT = "ead5015c3efaa174772e8595b7b65a8f5c032166"
 FINAL_CONFIRMATION_N = 481
+FINAL_MANIFEST_PATH = "stage6_final_registration_revision/artifacts/FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl"
+FINAL_MANIFEST_SHA256 = "6a9fc9812d768001e3a8e8b87d2387a7b943c83237a4bca7603c304acf88bcc7"
+FINAL_GOLD_CORPUS_PATH = "stage6_final_registration_revision/artifacts/FINAL_GOLD_CORPUS.jsonl"
+FINAL_GOLD_CORPUS_SHA256 = "2082e892858c065531e2456239e77e51bae6232fccdf717497fecadc5421fd16"
+STAGE6_CRUDSQL_DB_ROOT = "stage6_crudsql_registration"
 PROMPT_TOKEN_AUDIT_SHA256 = "e9bcf79074bcac4284f412314e40cbc7567940a36258dcb27f62ff7862eadae6"
 GENERATION_LOCK_SHA256 = "890da57fbe137f4b3f64e002a29d76a3c630cdc8290c924ac1d1f9da585a9c14"
 MODEL_SHA256 = "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c"
@@ -61,6 +72,13 @@ STREAMS = {
         "run_method_output_dir": "runs/stage6_confirmation/shared_mp_fs_plus_generation",
         "deterministic_replay_arms": ["d_g1_control", "d_f_g1_vnext"],
     },
+}
+
+ARM_CONFIG_KEYS = {
+    "direct": "direct",
+    "j_fs": "j_fs",
+    "original_mp_fs_plus": "original_mp_fs_plus",
+    "shared_mp_fs_plus_generation": "d_g1_control",
 }
 
 REQUIRED_AUDIT_FIELDS = [
@@ -123,6 +141,10 @@ def canonical_row_hash(row: dict[str, Any]) -> str:
     return sha256_text(canonical_json(value))
 
 
+def canonical_sha256(value: Any) -> str:
+    return sha256_text(canonical_json(value))
+
+
 def read_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -142,6 +164,47 @@ def write_jsonl(path: Path, rows: Iterable[dict[str, Any]]) -> None:
         "".join(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n" for row in rows),
         encoding="utf-8",
     )
+
+
+def load_final_confirmation_manifest(repo_root: Path = PROJECT_ROOT) -> list[dict[str, Any]]:
+    path = repo_root / FINAL_MANIFEST_PATH
+    if sha256_file(path) != FINAL_MANIFEST_SHA256:
+        raise HarnessError("Stage6E final confirmation manifest SHA-256 mismatch")
+    rows = read_jsonl(path)
+    if len(rows) != FINAL_CONFIRMATION_N:
+        raise HarnessError(f"Stage6E final manifest must contain 481 rows, got {len(rows)}")
+    expected_ids = {str(row["stage6_sample_id"]) for row in rows}
+    assert_exact_sample_coverage(rows, expected_ids, context="Stage6E final manifest")
+    return sorted(rows, key=lambda row: str(row["stage6_sample_id"]))
+
+
+def verify_stage6e_stage6f_id_chain(
+    final_manifest_rows: list[dict[str, Any]],
+    prompt_audit_index: dict[tuple[str, str], dict[str, Any]],
+) -> set[str]:
+    final_ids = {str(row["stage6_sample_id"]) for row in final_manifest_rows}
+    if len(final_ids) != FINAL_CONFIRMATION_N:
+        raise HarnessError("Stage6E final manifest sample ID set must contain 481 IDs")
+    audit_arms = {
+        "direct",
+        "j_fs",
+        "original_mp_fs_plus",
+        "d_g1_control",
+        "d_f_g1_vnext",
+    }
+    for arm in sorted(audit_arms):
+        audit_rows = [row for (row_arm, _sample_id), row in prompt_audit_index.items() if row_arm == arm]
+        if len(audit_rows) != FINAL_CONFIRMATION_N:
+            raise HarnessError(f"Stage6F audit arm {arm} must contain 481 rows, got {len(audit_rows)}")
+        audit_ids = {str(row["stage6_sample_id"]) for row in audit_rows}
+        if audit_ids != final_ids:
+            missing = sorted(final_ids - audit_ids)
+            unexpected = sorted(audit_ids - final_ids)
+            raise HarnessError(
+                f"Stage6E/Stage6F ID mismatch for {arm}: "
+                f"missing={missing[:10]} unexpected={unexpected[:10]}"
+            )
+    return final_ids
 
 
 def git_output(repo_root: Path, *args: str) -> str | None:
@@ -326,6 +389,192 @@ def validate_model_identity(metadata: dict[str, Any]) -> None:
         raise HarnessError(f"Model/generation identity mismatch: {mismatches}")
 
 
+def apply_chat_template(tokenizer: Any, prompt: str) -> str:
+    if hasattr(tokenizer, "apply_chat_template"):
+        return tokenizer.apply_chat_template(
+            [{"role": "user", "content": prompt}],
+            tokenize=False,
+            add_generation_prompt=True,
+        )
+    return prompt
+
+
+def tokenize_prompt(tokenizer: Any, prompt: str) -> tuple[str, list[int]]:
+    chat_prompt = apply_chat_template(tokenizer, prompt)
+    encoded = tokenizer(chat_prompt, add_special_tokens=True, truncation=False)
+    return chat_prompt, [int(token_id) for token_id in encoded["input_ids"]]
+
+
+def load_stage6h_runtime_dependencies() -> dict[str, Any]:
+    from nldbwrite_v3.experiments.run_method import _prompt_for_sample
+    from nldbwrite_v3.inference import GenerationRequest, create_generator
+    from nldbwrite_v3.schema import build_profile
+
+    return {
+        "_prompt_for_sample": _prompt_for_sample,
+        "GenerationRequest": GenerationRequest,
+        "create_generator": create_generator,
+        "build_profile": build_profile,
+    }
+
+
+def sample_to_method_row(sample: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "id": sample["stage6_sample_id"],
+        "sample_id": sample["stage6_sample_id"],
+        "input_text": sample["question"],
+        "db_id": sample["table_id"],
+    }
+
+
+def load_arm_config_for_stream(stream: str, repo_root: Path = PROJECT_ROOT) -> dict[str, Any]:
+    config_path = repo_root / STREAMS[stream]["config_path"]
+    return read_json(config_path)
+
+
+def build_profile_cache(
+    samples: list[dict[str, Any]],
+    *,
+    repo_root: Path = PROJECT_ROOT,
+) -> dict[str, dict[str, Any]]:
+    deps = load_stage6h_runtime_dependencies()
+    build_profile = deps["build_profile"]
+    cache: dict[str, dict[str, Any]] = {}
+    db_root = repo_root / STAGE6_CRUDSQL_DB_ROOT
+    for sample in samples:
+        table_id = str(sample["table_id"])
+        if table_id in cache:
+            continue
+        db_path = db_root / str(sample["isolated_db"])
+        if not db_path.is_file():
+            raise HarnessError(f"Missing isolated SQLite DB for Stage6H execution: {db_path}")
+        cache[table_id] = build_profile(db_path, db_id=table_id)
+    return cache
+
+
+def build_verified_runtime_request(
+    *,
+    stream: str,
+    sample: dict[str, Any],
+    config: dict[str, Any],
+    profile: dict[str, Any],
+    tokenizer: Any,
+    audit_row: dict[str, Any],
+) -> dict[str, Any]:
+    deps = load_stage6h_runtime_dependencies()
+    prompt_for_sample = deps["_prompt_for_sample"]
+    prompt, payload = prompt_for_sample(
+        STREAMS[stream]["method_id"],
+        sample_to_method_row(sample),
+        profile,
+        config,
+    )
+    chat_prompt, token_ids = tokenize_prompt(tokenizer, prompt)
+    actual = {
+        "stage6_sample_id": str(sample["stage6_sample_id"]),
+        "prompt": prompt,
+        "payload_mode": getattr(payload, "mode", None),
+        "prompt_sha256": sha256_text(prompt),
+        "chat_prompt": chat_prompt,
+        "chat_prompt_sha256": sha256_text(chat_prompt),
+        "input_ids": token_ids,
+        "input_ids_sha256": canonical_sha256(token_ids),
+        "input_token_count": len(token_ids),
+    }
+    for field in ("prompt_sha256", "chat_prompt_sha256", "input_ids_sha256", "input_token_count"):
+        if actual[field] != audit_row.get(field):
+            raise HarnessError(f"{stream} integrated request mismatch for {sample['stage6_sample_id']}: {field}")
+    return actual
+
+
+class IntegratedStage6Runner:
+    """Production runner that binds verified prompts directly to model generation."""
+
+    def __init__(
+        self,
+        *,
+        stream: str,
+        prompt_audit_index: dict[tuple[str, str], dict[str, Any]],
+        tokenizer: Any,
+        generator: Any,
+        final_manifest_rows: list[dict[str, Any]],
+        repo_root: Path = PROJECT_ROOT,
+    ) -> None:
+        if stream not in STREAMS:
+            raise HarnessError(f"Unknown generation stream: {stream}")
+        self.stream = stream
+        self.prompt_audit_index = prompt_audit_index
+        self.tokenizer = tokenizer
+        self.generator = generator
+        self.final_manifest_rows = final_manifest_rows
+        self.repo_root = repo_root
+        verify_stage6e_stage6f_id_chain(final_manifest_rows, prompt_audit_index)
+        self.samples_by_id = {
+            str(row["stage6_sample_id"]): row for row in final_manifest_rows
+        }
+        self.config = load_arm_config_for_stream(stream, repo_root=repo_root)
+        self.profiles = build_profile_cache(final_manifest_rows, repo_root=repo_root)
+
+    def verified_requests_for_rows(self, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        verified_rows = verify_stream_input_identity(
+            stream=self.stream,
+            expected_index=self.prompt_audit_index,
+            current_rows=rows,
+        )
+        requests: list[dict[str, Any]] = []
+        for row in verified_rows:
+            sample_id = str(row["stage6_sample_id"])
+            sample = self.samples_by_id.get(sample_id)
+            if sample is None:
+                raise HarnessError(f"{self.stream} sample missing from Stage6E manifest: {sample_id}")
+            request = build_verified_runtime_request(
+                stream=self.stream,
+                sample=sample,
+                config=self.config,
+                profile=self.profiles[str(sample["table_id"])],
+                tokenizer=self.tokenizer,
+                audit_row=row,
+            )
+            requests.append(request)
+        return requests
+
+    def generate_one(self, request: dict[str, Any]) -> dict[str, Any]:
+        deps = load_stage6h_runtime_dependencies()
+        GenerationRequest = deps["GenerationRequest"]
+        generation_request = GenerationRequest(
+            sample_id=str(request["stage6_sample_id"]),
+            prompt=str(request["prompt"]),
+        )
+        started = time.perf_counter()
+        results = self.generator.generate([generation_request], batch_size=1)
+        elapsed = time.perf_counter() - started
+        if len(results) != 1:
+            raise HarnessError(f"{self.stream} generator returned {len(results)} rows for one request")
+        result = results[0]
+        result_row = result.to_dict() if hasattr(result, "to_dict") else dict(result)
+        result_row.update(
+            {
+                "sample_id": request["stage6_sample_id"],
+                "stage6_sample_id": request["stage6_sample_id"],
+                "prompt_sha256": request["prompt_sha256"],
+                "chat_prompt_sha256": request["chat_prompt_sha256"],
+                "input_ids_sha256": request["input_ids_sha256"],
+                "input_token_count": request["input_token_count"],
+                "latency_sec": result_row.get("latency_sec", elapsed),
+            }
+        )
+        return result_row
+
+    def generation_metadata(self) -> dict[str, Any]:
+        generator_metadata = self.generator.metadata() if hasattr(self.generator, "metadata") else {}
+        return {
+            "model_revision": MODEL_REVISION,
+            "model_sha256": generator_metadata.get("model_hash", generator_metadata.get("model_sha256", MODEL_SHA256)),
+            "tokenizer_sha256": generator_metadata.get("tokenizer_sha256", TOKENIZER_SHA256),
+            "generation_lock_sha256": GENERATION_LOCK_SHA256,
+        }
+
+
 def normalize_raw_generation_row(
     *,
     stream: str,
@@ -462,6 +711,145 @@ def write_rows_incrementally(
         write_checkpoint(raw_path, accumulated, expected_sample_ids=expected_sample_ids, full_completion=False)
     if expected_sample_ids is not None and len(accumulated) == len(expected_sample_ids):
         write_checkpoint(raw_path, accumulated, expected_sample_ids=expected_sample_ids, full_completion=True)
+
+
+def generation_config(model_name_or_path: str) -> dict[str, Any]:
+    return {
+        "backend": "hf",
+        "model_name_or_path": model_name_or_path,
+        "revision": MODEL_REVISION,
+        "model_hash": MODEL_SHA256,
+        "quantization": "4bit",
+        "compute_dtype": "float16",
+        "device_map": "auto",
+        "max_input_tokens": 28672,
+        "max_new_tokens": 4096,
+        "input_truncation_policy": "error",
+        "bnb_4bit_quant_type": "fp4",
+        "bnb_4bit_use_double_quant": False,
+        "bnb_4bit_quant_storage": "uint8",
+        "do_sample": False,
+        "temperature": None,
+        "top_p": None,
+        "top_k": None,
+        "seed": 42,
+        "trust_remote_code": False,
+    }
+
+
+def execute_stream_integrated(
+    *,
+    stream: str,
+    prompt_audit_path: Path,
+    output_root: Path,
+    run_id: str,
+    mode: str = "initial",
+    repo_root: Path = PROJECT_ROOT,
+    expected_git_head: str | None = None,
+    require_git_clean: bool = True,
+    model_name_or_path: str | None = None,
+    tokenizer: Any | None = None,
+    generator: Any | None = None,
+) -> list[dict[str, Any]]:
+    if stream not in STREAMS:
+        raise HarnessError(f"Unknown generation stream: {stream}")
+    if mode not in {"initial", "resume"}:
+        raise HarnessError(f"Unknown execution mode: {mode}")
+    if expected_git_head is not None:
+        verify_authorization_boundary(
+            repo_root,
+            expected_git_head=expected_git_head,
+            require_git_clean=require_git_clean,
+        )
+    if generator is None:
+        if not model_name_or_path:
+            raise HarnessError("--model-name-or-path is required for integrated GPU execution")
+        deps = load_stage6h_runtime_dependencies()
+        generator = deps["create_generator"](generation_config(model_name_or_path))
+    if tokenizer is None:
+        tokenizer = getattr(generator, "tokenizer", None)
+    if tokenizer is None:
+        raise HarnessError("Integrated execution requires the exact tokenizer used by the generator")
+
+    prompt_audit_index = load_prompt_audit(prompt_audit_path)
+    final_manifest_rows = load_final_confirmation_manifest(repo_root)
+    expected_sample_ids = verify_stage6e_stage6f_id_chain(final_manifest_rows, prompt_audit_index)
+    current_rows = rows_for_stream(prompt_audit_index, stream)
+    raw_path = output_root / STREAMS[stream]["raw_generation_path"]
+    checkpoint_path = raw_path.with_suffix(raw_path.suffix + ".checkpoint.json")
+    existing_rows: list[dict[str, Any]] = []
+    completed_ids: set[str] = set()
+    if mode == "initial":
+        if raw_path.exists() or checkpoint_path.exists():
+            raise HarnessError(f"{stream} initial execution requires no existing raw/checkpoint file")
+    else:
+        if not raw_path.exists() or not checkpoint_path.exists():
+            raise HarnessError(f"{stream} resume execution requires existing raw and checkpoint files")
+        verify_resume_checkpoint(
+            raw_path,
+            checkpoint_path,
+            expected_sample_ids=expected_sample_ids,
+            full_completion=False,
+        )
+        existing_rows = read_jsonl(raw_path)
+        completed_ids = {str(row["stage6_sample_id"]) for row in existing_rows}
+
+    runner = IntegratedStage6Runner(
+        stream=stream,
+        prompt_audit_index=prompt_audit_index,
+        tokenizer=tokenizer,
+        generator=generator,
+        final_manifest_rows=final_manifest_rows,
+        repo_root=repo_root,
+    )
+    verified_requests_all = runner.verified_requests_for_rows(current_rows)
+    verified_requests = [
+        request for request in verified_requests_all
+        if str(request["stage6_sample_id"]) not in completed_ids
+    ]
+    accumulated = list(existing_rows)
+    metadata = runner.generation_metadata()
+    for request in verified_requests:
+        generation_row = runner.generate_one(request)
+        normalized = normalize_raw_generation_row(
+            stream=stream,
+            audit_row=request,
+            generation_row=generation_row,
+            run_id=run_id,
+            metadata=metadata,
+        )
+        combined = accumulated + [normalized]
+        validate_raw_generation_rows(
+            combined,
+            expected_sample_ids=expected_sample_ids,
+            full_completion=len(combined) == FINAL_CONFIRMATION_N,
+        )
+        write_rows_incrementally(
+            raw_path,
+            [normalized],
+            existing_rows=accumulated,
+            expected_sample_ids=expected_sample_ids,
+        )
+        accumulated.append(normalized)
+    if len(accumulated) == FINAL_CONFIRMATION_N:
+        validate_raw_generation_rows(
+            accumulated,
+            expected_sample_ids=expected_sample_ids,
+            full_completion=True,
+        )
+        write_checkpoint(
+            raw_path,
+            accumulated,
+            expected_sample_ids=expected_sample_ids,
+            full_completion=True,
+        )
+        if stream == "shared_mp_fs_plus_generation":
+            d_g1 = make_replay_provenance_rows(accumulated, replay_arm="d_g1_control")
+            d_f_g1 = make_replay_provenance_rows(accumulated, replay_arm="d_f_g1_vnext")
+            validate_shared_replay_provenance(d_g1, d_f_g1)
+            write_jsonl(output_root / "replay_provenance" / "d_g1_control.jsonl", d_g1)
+            write_jsonl(output_root / "replay_provenance" / "d_f_g1_vnext.jsonl", d_f_g1)
+    return accumulated
 
 
 def run_stream_with_guard(
@@ -620,15 +1008,18 @@ def execution_plan() -> dict[str, Any]:
                 "commit": STAGE6G_AUTHORIZATION_COMMIT,
             },
             "final_confirmation_manifest": {
-                "path": "stage6_final_registration_revision/FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl",
-                "sha256": "6a9fc9812d768001e3a8e8b87d2387a7b943c83237a4bca7603c304acf88bcc7",
+                "path": FINAL_MANIFEST_PATH,
+                "sha256": FINAL_MANIFEST_SHA256,
             },
             "final_gold_corpus": {
-                "path": "stage6_final_registration_revision/FINAL_GOLD_CORPUS.jsonl",
-                "sha256": "2082e892858c065531e2456239e77e51bae6232fccdf717497fecadc5421fd16",
+                "path": FINAL_GOLD_CORPUS_PATH,
+                "sha256": FINAL_GOLD_CORPUS_SHA256,
             },
             "stage6f_gpu_environment_manifest": {
                 "path": "stage6f_gpu_preflight_acceptance/server_output/GPU_ENVIRONMENT_MANIFEST.json",
+            },
+            "stage6_crudsql_isolated_db_root": {
+                "path": STAGE6_CRUDSQL_DB_ROOT,
             },
         },
         "pre_generation_phases": [
@@ -640,8 +1031,10 @@ def execution_plan() -> dict[str, Any]:
             "verify_exact_481_unique_frozen_sample_ids_before_generation",
             "compare_prompt_chat_input_ids_and_token_count_481_of_481_before_generation",
             "pass_verified_runtime_request_objects_directly_to_generation_call",
+            "tie_stage6e_final_id_set_to_stage6f_audit_and_runtime_ids",
         ],
         "post_generation_phases": [
+            "generate_one_sample_at_a_time_from_integrated_runner",
             "verify_exact_481_unique_frozen_sample_ids_after_generation",
             "verify_generated_rows_report_same_prompt_chat_input_ids_and_token_count",
             "normalize_raw_rows_to_stage6g_schema",
@@ -651,6 +1044,7 @@ def execution_plan() -> dict[str, Any]:
             "write_incremental_stream_checkpoint_manifest",
             "verify_resume_checkpoint_before_any_resume",
             "write_shared_replay_row_sha256_for_d_g1_and_d_f_g1",
+            "write_actual_d_g1_and_d_f_g1_replay_provenance_after_shared_stream_completion",
         ],
     }
 
@@ -692,21 +1086,48 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mode", choices=["initial", "resume"], default="initial")
     parser.add_argument("--execute-stream", choices=sorted(STREAMS))
     parser.add_argument("--enable-gpu-execution", action="store_true")
+    parser.add_argument("--prompt-token-audit", default="stage6_gpu_preflight_acceptance/server_output_zip_extract_patch2/stage6f_gpu_preflight_patch2_outputs/stage6_gpu_preflight/PROMPT_TOKEN_AUDIT.jsonl")
+    parser.add_argument("--model-name-or-path")
+    parser.add_argument("--run-id", default=f"stage6h_{int(time.time())}")
+    parser.add_argument("--expected-git-head")
+    parser.add_argument("--allow-dirty-worktree", action="store_true")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
     if not args.setup_only:
-        if args.execute_stream and not args.enable_gpu_execution:
+        if not args.execute_stream:
+            raise SystemExit("Stage6H execution requires --execute-stream or --setup-only.")
+        if not args.enable_gpu_execution:
             raise SystemExit(
                 "Stage6H execution CLI is present but GPU execution requires "
                 "--enable-gpu-execution after reviewer acceptance."
             )
-        raise SystemExit(
-            "Stage6H GPU execution is intentionally not enabled in setup package; "
-            "rerun with --setup-only for CPU-only artifact creation."
+        rows = execute_stream_integrated(
+            stream=args.execute_stream,
+            prompt_audit_path=Path(args.prompt_token_audit),
+            output_root=Path(args.output_dir),
+            run_id=args.run_id,
+            mode=args.mode,
+            expected_git_head=args.expected_git_head,
+            require_git_clean=not args.allow_dirty_worktree,
+            model_name_or_path=args.model_name_or_path,
         )
+        print(json.dumps(
+            {
+                "status": "PASS_STREAM_EXECUTION_COMPLETE" if len(rows) == FINAL_CONFIRMATION_N else "PASS_STREAM_PARTIAL",
+                "stream": args.execute_stream,
+                "row_count": len(rows),
+                "unique_sample_ids": len({str(row["stage6_sample_id"]) for row in rows}),
+                "raw_generation_path": str(Path(args.output_dir) / STREAMS[args.execute_stream]["raw_generation_path"]),
+                "confirmation_predictions_created": True,
+            },
+            ensure_ascii=False,
+            indent=2,
+            sort_keys=True,
+        ))
+        return
     lock = create_setup(Path(args.output_dir))
     print(json.dumps(lock, ensure_ascii=False, indent=2, sort_keys=True))
 

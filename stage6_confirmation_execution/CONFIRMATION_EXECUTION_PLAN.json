@@ -58,6 +58,7 @@
   "gpu_called_in_stage6h_setup": false,
   "model_called_in_stage6h_setup": false,
   "post_generation_phases": [
+    "generate_one_sample_at_a_time_from_integrated_runner",
     "verify_exact_481_unique_frozen_sample_ids_after_generation",
     "verify_generated_rows_report_same_prompt_chat_input_ids_and_token_count",
     "normalize_raw_rows_to_stage6g_schema",
@@ -66,7 +67,8 @@
     "write_raw_generation_row_sha256",
     "write_incremental_stream_checkpoint_manifest",
     "verify_resume_checkpoint_before_any_resume",
-    "write_shared_replay_row_sha256_for_d_g1_and_d_f_g1"
+    "write_shared_replay_row_sha256_for_d_g1_and_d_f_g1",
+    "write_actual_d_g1_and_d_f_g1_replay_provenance_after_shared_stream_completion"
   ],
   "pre_generation_phases": [
     "verify_stage6g_authorization_with_expected_git_head_and_clean_worktree",
@@ -76,17 +78,21 @@
     "verify_d_g1_control_and_d_f_g1_vnext_input_identity_481_of_481",
     "verify_exact_481_unique_frozen_sample_ids_before_generation",
     "compare_prompt_chat_input_ids_and_token_count_481_of_481_before_generation",
-    "pass_verified_runtime_request_objects_directly_to_generation_call"
+    "pass_verified_runtime_request_objects_directly_to_generation_call",
+    "tie_stage6e_final_id_set_to_stage6f_audit_and_runtime_ids"
   ],
   "prompt_token_audit_sha256": "e9bcf79074bcac4284f412314e40cbc7567940a36258dcb27f62ff7862eadae6",
   "runtime_input_locks": {
     "final_confirmation_manifest": {
-      "path": "stage6_final_registration_revision/FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl",
+      "path": "stage6_final_registration_revision/artifacts/FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl",
       "sha256": "6a9fc9812d768001e3a8e8b87d2387a7b943c83237a4bca7603c304acf88bcc7"
     },
     "final_gold_corpus": {
-      "path": "stage6_final_registration_revision/FINAL_GOLD_CORPUS.jsonl",
+      "path": "stage6_final_registration_revision/artifacts/FINAL_GOLD_CORPUS.jsonl",
       "sha256": "2082e892858c065531e2456239e77e51bae6232fccdf717497fecadc5421fd16"
+    },
+    "stage6_crudsql_isolated_db_root": {
+      "path": "stage6_crudsql_registration"
     },
     "stage6f_gpu_environment_manifest": {
       "path": "stage6f_gpu_preflight_acceptance/server_output/GPU_ENVIRONMENT_MANIFEST.json"

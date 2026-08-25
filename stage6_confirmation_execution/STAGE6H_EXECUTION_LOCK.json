@@ -1,7 +1,7 @@
 {
   "confirmation_predictions_created": false,
   "confirmation_run_started": false,
-  "execution_plan_sha256": "f8477467d1a3db3efcd81b89ef6a6ef1806d0b9d7261f07480f5d5a071b9131b",
+  "execution_plan_sha256": "12265a3126ce6bd3ca62ed433d1606ce94b6770d0bf4f1bc56f27c2845201076",
   "final_confirmation_n": 481,
   "gpu_called": false,
   "model_called": false,
@@ -14,6 +14,8 @@
     "verify_exact_481_unique_frozen_sample_ids_before_generation",
     "compare_prompt_chat_input_ids_and_token_count_481_of_481_before_generation",
     "pass_verified_runtime_request_objects_directly_to_generation_call",
+    "tie_stage6e_final_id_set_to_stage6f_audit_and_runtime_ids",
+    "generate_one_sample_at_a_time_from_integrated_runner",
     "verify_exact_481_unique_frozen_sample_ids_after_generation",
     "verify_generated_rows_report_same_prompt_chat_input_ids_and_token_count",
     "normalize_raw_rows_to_stage6g_schema",
@@ -22,7 +24,8 @@
     "write_raw_generation_row_sha256",
     "write_incremental_stream_checkpoint_manifest",
     "verify_resume_checkpoint_before_any_resume",
-    "write_shared_replay_row_sha256_for_d_g1_and_d_f_g1"
+    "write_shared_replay_row_sha256_for_d_g1_and_d_f_g1",
+    "write_actual_d_g1_and_d_f_g1_replay_provenance_after_shared_stream_completion"
   ],
   "stage": "Stage6H_CONFIRMATION_EXECUTION_HARNESS_SETUP",
   "stage6g_authorization_commit": "ead5015c3efaa174772e8595b7b65a8f5c032166",

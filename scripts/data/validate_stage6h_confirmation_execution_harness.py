@@ -29,6 +29,8 @@ EXPECTED_REQUIRED_GUARDS = [
     "verify_exact_481_unique_frozen_sample_ids_before_generation",
     "compare_prompt_chat_input_ids_and_token_count_481_of_481_before_generation",
     "pass_verified_runtime_request_objects_directly_to_generation_call",
+    "tie_stage6e_final_id_set_to_stage6f_audit_and_runtime_ids",
+    "generate_one_sample_at_a_time_from_integrated_runner",
     "verify_exact_481_unique_frozen_sample_ids_after_generation",
     "verify_generated_rows_report_same_prompt_chat_input_ids_and_token_count",
     "normalize_raw_rows_to_stage6g_schema",
@@ -38,6 +40,7 @@ EXPECTED_REQUIRED_GUARDS = [
     "write_incremental_stream_checkpoint_manifest",
     "verify_resume_checkpoint_before_any_resume",
     "write_shared_replay_row_sha256_for_d_g1_and_d_f_g1",
+    "write_actual_d_g1_and_d_f_g1_replay_provenance_after_shared_stream_completion",
 ]
 
 
@@ -131,11 +134,15 @@ def validate(harness_dir: Path) -> dict[str, Any]:
         if resume.get(key) is not True:
             add(violations, "plan_resume_mode_policy_mismatch", field=key, actual=resume.get(key))
     runtime_inputs = plan.get("runtime_input_locks") or {}
-    for key in ("stage6f_prompt_token_audit", "stage6g_authorization", "final_confirmation_manifest", "final_gold_corpus", "stage6f_gpu_environment_manifest"):
+    for key in ("stage6f_prompt_token_audit", "stage6g_authorization", "final_confirmation_manifest", "final_gold_corpus", "stage6f_gpu_environment_manifest", "stage6_crudsql_isolated_db_root"):
         if key not in runtime_inputs:
             add(violations, "plan_runtime_input_lock_missing", field=key)
     if (runtime_inputs.get("stage6f_prompt_token_audit") or {}).get("sha256") != EXPECTED_PROMPT_TOKEN_AUDIT_SHA256:
         add(violations, "plan_runtime_prompt_audit_hash_mismatch")
+    if (runtime_inputs.get("final_confirmation_manifest") or {}).get("sha256") != "6a9fc9812d768001e3a8e8b87d2387a7b943c83237a4bca7603c304acf88bcc7":
+        add(violations, "plan_runtime_final_manifest_hash_mismatch")
+    if (runtime_inputs.get("final_gold_corpus") or {}).get("sha256") != "2082e892858c065531e2456239e77e51bae6232fccdf717497fecadc5421fd16":
+        add(violations, "plan_runtime_final_gold_corpus_hash_mismatch")
     guards = list(plan.get("pre_generation_phases") or []) + list(plan.get("post_generation_phases") or [])
     if guards != EXPECTED_REQUIRED_GUARDS:
         add(violations, "plan_required_guards_mismatch", actual=guards)
