@@ -1,0 +1,7 @@
+{
+  "confirmation_predictions_created": false,
+  "confirmation_samples_used": 0,
+  "reason": "Stage6F PATCH0 does not generate even synthetic outputs by default; enable a separate non-confirmation smoke only after reviewer approval if needed.",
+  "run_synthetic_smoke_requested": false,
+  "status": "NOT_RUN"
+}

@@ -1,0 +1,18 @@
+{
+  "actual_prompt_rows": 2405,
+  "expected_prompt_rows": 2405,
+  "final_confirmation_n": 481,
+  "input_truncation_error_count": 0,
+  "max_input_tokens": 28672,
+  "max_observed_input_tokens": 2253,
+  "over_limit_samples": [],
+  "prompt_token_audit_sha256": "e9bcf79074bcac4284f412314e40cbc7567940a36258dcb27f62ff7862eadae6",
+  "rows_per_arm": {
+    "d_f_g1_vnext": 481,
+    "d_g1_control": 481,
+    "direct": 481,
+    "j_fs": 481,
+    "original_mp_fs_plus": 481
+  },
+  "status": "PASS"
+}
