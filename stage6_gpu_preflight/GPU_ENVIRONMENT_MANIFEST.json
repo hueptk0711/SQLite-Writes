@@ -1,6 +1,12 @@
 {
-  "captured_at_unix": 1787627175,
+  "captured_at_unix": 1787630206,
   "environment_matches_expected": false,
+  "environment_variables": {
+    "CUDA_VISIBLE_DEVICES": null,
+    "HF_HOME": null,
+    "NVIDIA_VISIBLE_DEVICES": null,
+    "TRANSFORMERS_CACHE": null
+  },
   "expected_environment": {
     "accelerate": "1.14.0",
     "bitsandbytes": "0.47.0",
@@ -26,6 +32,15 @@
   "platform": "Windows-11-10.0.26200-SP0",
   "python": "3.14.3",
   "python_executable": "C:\\Python314\\python.exe",
+  "sqlite_runtime": {
+    "python_sqlite_module_file": "C:\\Python314\\Lib\\sqlite3\\__init__.py",
+    "sqlite_version": "3.50.4",
+    "sqlite_version_info": [
+      3,
+      50,
+      4
+    ]
+  },
   "torch_cuda": {
     "error": "No module named 'torch'",
     "torch_imported": false

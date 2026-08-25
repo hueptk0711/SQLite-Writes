@@ -13,6 +13,7 @@ REQUIRED_FILES = [
     "STAGE6F_GPU_PREFLIGHT_LOCK.json",
     "GPU_ENVIRONMENT_MANIFEST.json",
     "MODEL_ASSET_MANIFEST.json",
+    "MODEL_TOKENIZER_ASSET_AUDIT.json",
     "TOKENIZER_MANIFEST.json",
     "FROZEN_ARTIFACT_AUDIT.json",
     "PROMPT_TOKEN_AUDIT.jsonl",
@@ -69,6 +70,7 @@ def validate(preflight_dir: Path, *, require_gpu_pass: bool = False) -> dict[str
     frozen = read_json(preflight_dir / "FROZEN_ARTIFACT_AUDIT.json")
     env = read_json(preflight_dir / "GPU_ENVIRONMENT_MANIFEST.json")
     model = read_json(preflight_dir / "MODEL_ASSET_MANIFEST.json")
+    asset_audit = read_json(preflight_dir / "MODEL_TOKENIZER_ASSET_AUDIT.json")
     tokenizer = read_json(preflight_dir / "TOKENIZER_MANIFEST.json")
     prompt_summary = read_json(preflight_dir / "PROMPT_TOKEN_SUMMARY.json")
     h2 = read_json(preflight_dir / "H2_SHARED_PROMPT_IDENTITY_AUDIT.json")
@@ -86,8 +88,8 @@ def validate(preflight_dir: Path, *, require_gpu_pass: bool = False) -> dict[str
         add(violations, "frozen_final_count_mismatch", actual=frozen.get("final_counts", {}))
     if smoke.get("confirmation_predictions_created") is not False:
         add(violations, "synthetic_smoke_created_confirmation_predictions")
-    if model.get("model_generate_called") is not False:
-        add(violations, "model_generate_called_during_preflight")
+    if model.get("model_generate_called_for_confirmation_samples") is not False:
+        add(violations, "model_generate_called_for_confirmation_samples")
 
     streams = run_plan.get("generation_streams") or {}
     for stream, expected_path in EXPECTED_GENERATION_STREAMS.items():
@@ -137,8 +139,29 @@ def validate(preflight_dir: Path, *, require_gpu_pass: bool = False) -> dict[str
             add(violations, "tokenizer_not_pass", actual=tokenizer.get("status"))
         if model.get("status") not in {"PASS", "PASS_TOKENIZER_ONLY"}:
             add(violations, "model_asset_not_pass", actual=model.get("status"))
+        if asset_audit.get("status") != "PASS":
+            add(violations, "model_tokenizer_asset_audit_not_pass", actual=asset_audit.get("status"))
+        for field in (
+            "model_aggregate_match",
+            "tokenizer_match",
+            "model_config_match",
+        ):
+            if asset_audit.get(field) is not True:
+                add(violations, "model_tokenizer_asset_match_not_true", field=field)
         if not env.get("environment_matches_expected"):
             add(violations, "environment_not_expected")
+        if not env.get("sqlite_runtime", {}).get("sqlite_version"):
+            add(violations, "sqlite_runtime_missing")
+        if "CUDA_VISIBLE_DEVICES" not in (env.get("environment_variables") or {}):
+            add(violations, "cuda_visible_devices_not_captured")
+        if smoke.get("status") != "PASS":
+            add(violations, "synthetic_smoke_not_pass", actual=smoke.get("status"))
+        if smoke.get("confirmation_samples_used") != 0:
+            add(violations, "synthetic_smoke_used_confirmation_samples")
+        if smoke.get("model_generate_called_for_synthetic_smoke") is not True:
+            add(violations, "synthetic_smoke_generate_not_called")
+        if smoke.get("model_generate_called_for_confirmation_samples") is not False:
+            add(violations, "synthetic_smoke_called_confirmation_generation")
     else:
         if lock.get("status") not in {"PENDING_GPU_EXECUTION", "FAIL_GPU_PREFLIGHT"}:
             add(violations, "non_gpu_pass_status_invalid", actual=lock.get("status"))

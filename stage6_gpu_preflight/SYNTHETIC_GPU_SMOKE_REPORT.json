@@ -1,7 +1,9 @@
 {
   "confirmation_predictions_created": false,
   "confirmation_samples_used": 0,
-  "reason": "Stage6F PATCH0 does not generate even synthetic outputs by default; enable a separate non-confirmation smoke only after reviewer approval if needed.",
+  "model_generate_called_for_confirmation_samples": false,
+  "model_generate_called_for_synthetic_smoke": false,
+  "reason": "synthetic smoke was not requested or model load failed",
   "run_synthetic_smoke_requested": false,
   "status": "NOT_RUN"
 }

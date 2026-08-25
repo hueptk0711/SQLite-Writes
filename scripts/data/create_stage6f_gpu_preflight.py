@@ -111,6 +111,8 @@ MODEL_LOCK = {
     "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
     "revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
     "model_hash": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+    "tokenizer_sha256": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468",
+    "model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357",
     "device_map": "auto",
     "batch_size": 1,
     "context_length": 32768,
@@ -292,6 +294,17 @@ def capture_environment() -> dict[str, Any]:
         "python": platform.python_version(),
         "python_executable": sys.executable,
         "packages": packages,
+        "environment_variables": {
+            "CUDA_VISIBLE_DEVICES": os.environ.get("CUDA_VISIBLE_DEVICES"),
+            "NVIDIA_VISIBLE_DEVICES": os.environ.get("NVIDIA_VISIBLE_DEVICES"),
+            "HF_HOME": os.environ.get("HF_HOME"),
+            "TRANSFORMERS_CACHE": os.environ.get("TRANSFORMERS_CACHE"),
+        },
+        "sqlite_runtime": {
+            "sqlite_version": sqlite3.sqlite_version,
+            "sqlite_version_info": list(sqlite3.sqlite_version_info),
+            "python_sqlite_module_file": getattr(sqlite3, "__file__", None),
+        },
         "torch_cuda": torch_info,
         "nvidia_smi": run_nvidia_smi(),
         "expected_environment": EXPECTED_ENVIRONMENT,
@@ -510,24 +523,32 @@ def tokenizer_manifest(tokenizer: Any | None, model_name_or_path: str | None) ->
             "reason": "tokenizer_not_loaded_without_execute_gpu_preflight",
             "expected": MODEL_LOCK,
         }
-    identity = {
+    stage5_identity = {
         "class": type(tokenizer).__name__,
         "vocab_sha256": canonical_sha256(tokenizer.get_vocab()),
         "special_tokens_map": tokenizer.special_tokens_map,
         "chat_template": getattr(tokenizer, "chat_template", None),
         "model_max_length": tokenizer.model_max_length,
         "padding_side": tokenizer.padding_side,
+    }
+    expanded_identity = {
+        **stage5_identity,
         "pad_token_id": tokenizer.pad_token_id,
         "eos_token_id": tokenizer.eos_token_id,
         "bos_token_id": tokenizer.bos_token_id,
     }
+    actual_tokenizer_sha256 = canonical_sha256(stage5_identity)
     return {
-        "status": "PASS",
+        "status": "PASS" if actual_tokenizer_sha256 == MODEL_LOCK["tokenizer_sha256"] else "FAIL",
         "model_name_or_path": model_name_or_path,
         "revision": MODEL_LOCK["revision"],
-        "tokenizer_identity": identity,
-        "tokenizer_identity_sha256": canonical_sha256(identity),
-        "chat_template_sha256": canonical_sha256(identity["chat_template"]),
+        "expected_tokenizer_sha256": MODEL_LOCK["tokenizer_sha256"],
+        "actual_tokenizer_sha256": actual_tokenizer_sha256,
+        "tokenizer_match": actual_tokenizer_sha256 == MODEL_LOCK["tokenizer_sha256"],
+        "stage5_tokenizer_identity": stage5_identity,
+        "tokenizer_identity": expanded_identity,
+        "tokenizer_identity_sha256": canonical_sha256(expanded_identity),
+        "chat_template_sha256": canonical_sha256(stage5_identity["chat_template"]),
     }
 
 
@@ -646,12 +667,16 @@ def model_asset_manifest(
     model_name_or_path: str | None,
     execute_gpu_preflight: bool,
     load_model: bool,
+    tokenizer: Any | None = None,
+    run_synthetic_smoke: bool = False,
 ) -> dict[str, Any]:
     manifest: dict[str, Any] = {
         "expected_model_lock": MODEL_LOCK,
         "model_name_or_path": model_name_or_path,
         "model_loaded": False,
         "model_generate_called": False,
+        "model_generate_called_for_synthetic_smoke": False,
+        "model_generate_called_for_confirmation_samples": False,
         "confirmation_prediction_generated": False,
     }
     if not execute_gpu_preflight:
@@ -668,7 +693,11 @@ def model_asset_manifest(
         return manifest
     from transformers import AutoModelForCausalLM, BitsAndBytesConfig
     import torch
+    from nldbwrite_v3.inference.model_manifest import build_local_model_manifest
 
+    local_manifest = None
+    if Path(model_name_or_path).exists():
+        local_manifest = build_local_model_manifest(model_name_or_path)
     kwargs: dict[str, Any] = {
         "trust_remote_code": False,
         "device_map": "auto",
@@ -684,13 +713,34 @@ def model_asset_manifest(
         kwargs["revision"] = MODEL_LOCK["revision"]
     model = AutoModelForCausalLM.from_pretrained(model_name_or_path, **kwargs)
     model.eval()
+    model_config_sha256 = canonical_sha256(model.config.to_dict())
+    synthetic_report = run_synthetic_generation_smoke(model, tokenizer, torch) if run_synthetic_smoke else None
     manifest.update(
         {
-            "status": "PASS",
+            "status": (
+                "PASS"
+                if (
+                    (local_manifest or {}).get("aggregate_sha256") == MODEL_LOCK["model_hash"]
+                    and model_config_sha256 == MODEL_LOCK["model_config_sha256"]
+                    and (not run_synthetic_smoke or synthetic_report["status"] == "PASS")
+                )
+                else "FAIL"
+            ),
             "model_loaded": True,
             "model_class": type(model).__name__,
-            "model_config_sha256": canonical_sha256(model.config.to_dict()),
+            "expected_model_revision": MODEL_LOCK["revision"],
+            "actual_model_revision": MODEL_LOCK["revision"] if MODEL_LOCK["revision"] in str(model_name_or_path) else None,
+            "expected_model_aggregate_sha256": MODEL_LOCK["model_hash"],
+            "actual_model_aggregate_sha256": (local_manifest or {}).get("aggregate_sha256"),
+            "model_aggregate_match": (local_manifest or {}).get("aggregate_sha256") == MODEL_LOCK["model_hash"],
+            "local_model_manifest": local_manifest,
+            "expected_model_config_sha256": MODEL_LOCK["model_config_sha256"],
+            "model_config_sha256": model_config_sha256,
+            "model_config_match": model_config_sha256 == MODEL_LOCK["model_config_sha256"],
             "generation_config_sha256": canonical_sha256(model.generation_config.to_dict()),
+            "model_generate_called": bool(synthetic_report),
+            "model_generate_called_for_synthetic_smoke": bool(synthetic_report),
+            "synthetic_smoke_embedded_report": synthetic_report,
         }
     )
     del model
@@ -699,16 +749,111 @@ def model_asset_manifest(
     return manifest
 
 
-def synthetic_smoke_report(*, run_synthetic_smoke: bool) -> dict[str, Any]:
+def run_synthetic_generation_smoke(model: Any, tokenizer: Any | None, torch: Any) -> dict[str, Any]:
+    if tokenizer is None:
+        return {
+            "status": "FAIL",
+            "error": "tokenizer_required_for_synthetic_smoke",
+            "confirmation_samples_used": 0,
+            "confirmation_predictions_created": False,
+        }
+    prompt = (
+        "You are checking GPU generation plumbing only. "
+        "Given CREATE TABLE demo(id INTEGER PRIMARY KEY, name TEXT); "
+        "write one SQLite INSERT for id 1 and name Alice."
+    )
+    chat_prompt = apply_chat_template(tokenizer, prompt)
+    encoded = tokenizer(chat_prompt, return_tensors="pt", add_special_tokens=True, truncation=False)
+    device = next(model.parameters()).device
+    encoded = {key: value.to(device) for key, value in encoded.items()}
+    input_len = int(encoded["input_ids"].shape[-1])
+    with torch.no_grad():
+        output = model.generate(
+            **encoded,
+            max_new_tokens=32,
+            do_sample=False,
+            pad_token_id=tokenizer.pad_token_id,
+            eos_token_id=tokenizer.eos_token_id,
+        )
+    new_tokens = output[0][input_len:]
+    decoded = tokenizer.decode(new_tokens, skip_special_tokens=True)
+    return {
+        "status": "PASS",
+        "prompt_sha256": sha256_text(prompt),
+        "chat_prompt_sha256": sha256_text(chat_prompt),
+        "input_token_count": input_len,
+        "max_new_tokens": 32,
+        "output_token_count": int(new_tokens.shape[-1]),
+        "decoded_output_sha256": sha256_text(decoded),
+        "decoded_output_preview": decoded[:500],
+        "confirmation_samples_used": 0,
+        "model_generate_called_for_synthetic_smoke": True,
+        "model_generate_called_for_confirmation_samples": False,
+        "confirmation_predictions_created": False,
+    }
+
+
+def synthetic_smoke_report(*, model_info: dict[str, Any], run_synthetic_smoke: bool) -> dict[str, Any]:
+    embedded = model_info.get("synthetic_smoke_embedded_report")
+    if embedded:
+        return embedded
     return {
         "status": "NOT_RUN",
         "run_synthetic_smoke_requested": bool(run_synthetic_smoke),
-        "reason": (
-            "Stage6F PATCH0 does not generate even synthetic outputs by default; "
-            "enable a separate non-confirmation smoke only after reviewer approval if needed."
-        ),
+        "reason": "synthetic smoke was not requested or model load failed",
         "confirmation_samples_used": 0,
+        "model_generate_called_for_synthetic_smoke": False,
+        "model_generate_called_for_confirmation_samples": False,
         "confirmation_predictions_created": False,
+    }
+
+
+def model_tokenizer_asset_audit(model_info: dict[str, Any], tokenizer_info: dict[str, Any]) -> dict[str, Any]:
+    rows = [
+        {
+            "name": "model_revision",
+            "expected": MODEL_LOCK["revision"],
+            "actual": model_info.get("actual_model_revision"),
+            "match": model_info.get("actual_model_revision") == MODEL_LOCK["revision"],
+        },
+        {
+            "name": "model_aggregate_sha256",
+            "expected": MODEL_LOCK["model_hash"],
+            "actual": model_info.get("actual_model_aggregate_sha256"),
+            "match": model_info.get("actual_model_aggregate_sha256") == MODEL_LOCK["model_hash"],
+        },
+        {
+            "name": "tokenizer_sha256",
+            "expected": MODEL_LOCK["tokenizer_sha256"],
+            "actual": tokenizer_info.get("actual_tokenizer_sha256"),
+            "match": tokenizer_info.get("actual_tokenizer_sha256") == MODEL_LOCK["tokenizer_sha256"],
+        },
+        {
+            "name": "model_config_sha256",
+            "expected": MODEL_LOCK["model_config_sha256"],
+            "actual": model_info.get("model_config_sha256"),
+            "match": model_info.get("model_config_sha256") == MODEL_LOCK["model_config_sha256"],
+        },
+    ]
+    return {
+        "status": "PASS" if all(row["match"] for row in rows) else "FAIL",
+        "hashing_procedure": {
+            "model_aggregate_sha256": "nldbwrite_v3.inference.model_manifest.build_local_model_manifest",
+            "tokenizer_sha256": "HuggingFaceGenerator tokenizer identity JSON SHA-256",
+            "model_config_sha256": "model.config.to_dict canonical JSON SHA-256",
+        },
+        "expected_model_revision": MODEL_LOCK["revision"],
+        "actual_model_revision": model_info.get("actual_model_revision"),
+        "expected_model_aggregate_sha256": MODEL_LOCK["model_hash"],
+        "actual_model_aggregate_sha256": model_info.get("actual_model_aggregate_sha256"),
+        "model_aggregate_match": model_info.get("actual_model_aggregate_sha256") == MODEL_LOCK["model_hash"],
+        "expected_tokenizer_sha256": MODEL_LOCK["tokenizer_sha256"],
+        "actual_tokenizer_sha256": tokenizer_info.get("actual_tokenizer_sha256"),
+        "tokenizer_match": tokenizer_info.get("actual_tokenizer_sha256") == MODEL_LOCK["tokenizer_sha256"],
+        "expected_model_config_sha256": MODEL_LOCK["model_config_sha256"],
+        "actual_model_config_sha256": model_info.get("model_config_sha256"),
+        "model_config_match": model_info.get("model_config_sha256") == MODEL_LOCK["model_config_sha256"],
+        "checks": rows,
     }
 
 
@@ -746,7 +891,8 @@ python scripts/data/create_stage6f_gpu_preflight.py \\
   --execute-gpu-preflight \\
   --expected-execution-commit "$EXPECTED_EXECUTION_COMMIT" \\
   --model-name-or-path "$MODEL_PATH" \\
-  --load-model
+  --load-model \\
+  --run-synthetic-smoke
 
 python scripts/data/validate_stage6f_gpu_preflight.py \\
   --preflight-dir "$OUT_DIR" \\
@@ -797,8 +943,11 @@ def create_preflight(args: argparse.Namespace) -> dict[str, Any]:
         model_name_or_path=args.model_name_or_path,
         execute_gpu_preflight=bool(args.execute_gpu_preflight and not tokenizer_error),
         load_model=bool(args.load_model),
+        tokenizer=tokenizer,
+        run_synthetic_smoke=bool(args.run_synthetic_smoke),
     )
-    smoke = synthetic_smoke_report(run_synthetic_smoke=args.run_synthetic_smoke)
+    smoke = synthetic_smoke_report(model_info=model_info, run_synthetic_smoke=args.run_synthetic_smoke)
+    asset_audit = model_tokenizer_asset_audit(model_info, tokenizer_info)
     run_plan = build_confirmation_run_plan()
 
     gpu_pass = (
@@ -809,6 +958,8 @@ def create_preflight(args: argparse.Namespace) -> dict[str, Any]:
         and prompt_summary["status"] == "PASS"
         and h2_audit["status"] == "PASS"
         and model_info.get("status") in {"PASS", "PASS_TOKENIZER_ONLY"}
+        and smoke.get("status") == "PASS"
+        and asset_audit.get("status") == "PASS"
     )
     status = "PASS_GPU_PREFLIGHT_COMPLETE" if gpu_pass else "PENDING_GPU_EXECUTION"
     if args.execute_gpu_preflight and not gpu_pass:
@@ -825,6 +976,7 @@ def create_preflight(args: argparse.Namespace) -> dict[str, Any]:
         "frozen_artifact_audit_status": frozen_audit["status"],
         "gpu_environment_matches_expected": bool(environment["environment_matches_expected"]),
         "model_asset_status": model_info.get("status"),
+        "model_tokenizer_asset_audit_status": asset_audit.get("status"),
         "tokenizer_status": tokenizer_info.get("status"),
         "prompt_token_audit_status": prompt_summary["status"],
         "h2_shared_prompt_identity_status": h2_audit["status"],
@@ -847,6 +999,7 @@ def create_preflight(args: argparse.Namespace) -> dict[str, Any]:
     write_json(output_dir / "GPU_ENVIRONMENT_MANIFEST.json", environment)
     write_json(output_dir / "MODEL_ASSET_MANIFEST.json", model_info)
     write_json(output_dir / "TOKENIZER_MANIFEST.json", tokenizer_info)
+    write_json(output_dir / "MODEL_TOKENIZER_ASSET_AUDIT.json", asset_audit)
     write_json(output_dir / "PROMPT_TOKEN_SUMMARY.json", prompt_summary)
     write_json(output_dir / "H2_SHARED_PROMPT_IDENTITY_AUDIT.json", h2_audit)
     write_json(output_dir / "ORIGINAL_VS_VNEXT_GENERATION_IDENTITY_DECISION.json", original_decision)

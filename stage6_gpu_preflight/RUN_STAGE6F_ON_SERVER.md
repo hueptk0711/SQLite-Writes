@@ -31,7 +31,8 @@ python scripts/data/create_stage6f_gpu_preflight.py \
   --execute-gpu-preflight \
   --expected-execution-commit "$EXPECTED_EXECUTION_COMMIT" \
   --model-name-or-path "$MODEL_PATH" \
-  --load-model
+  --load-model \
+  --run-synthetic-smoke
 
 python scripts/data/validate_stage6f_gpu_preflight.py \
   --preflight-dir "$OUT_DIR" \
