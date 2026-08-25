@@ -1,0 +1,9 @@
+{
+  "actual_prompt_rows": 0,
+  "expected_prompt_rows": 2405,
+  "final_confirmation_n": 481,
+  "input_truncation_violations": "not_evaluated",
+  "max_input_tokens": 28672,
+  "reason": "tokenizer_not_loaded_without_execute_gpu_preflight",
+  "status": "NOT_RUN"
+}

@@ -1,0 +1,28 @@
+{
+  "confirmation_run_allowed_now": false,
+  "contains_only_own_decision_packet": true,
+  "decision_packet": {
+    "path": "review_packets/stage6c_gold_review_R01.tsv",
+    "sha256": "af26b59f90d25b01d4a8cc6bc77ed560e9196fb982faad83341e46bf3565d506"
+  },
+  "gpu_called": false,
+  "model_called": false,
+  "must_not_receive_other_reviewer_decisions_or_notes_before_submission": true,
+  "reviewer_id": "R01",
+  "shared_materials": {
+    "gold_review_items": {
+      "path": "artifacts/gold_review_items.jsonl",
+      "sha256": "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b"
+    },
+    "official_table_metadata": {
+      "path": "artifacts/official_table_metadata.jsonl",
+      "sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93"
+    },
+    "protocol_addendum": {
+      "path": "GOLD_REVIEW_PROTOCOL_ADDENDUM_LOCK.json",
+      "sha256": "93b78d7d1f008e117b09dc0eb93cdaa7c017aedbeca83aa34e932d5fdd8f19b2"
+    }
+  },
+  "stage": "Stage6C_PATCH1_REVIEWER_ISOLATED_PACKET",
+  "status": "READY_FOR_INDEPENDENT_REVIEW_EXECUTION"
+}

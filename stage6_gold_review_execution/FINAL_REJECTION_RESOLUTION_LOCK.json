@@ -1,0 +1,142 @@
+{
+  "R03_rejected_items_join_same_resolution_workflow": true,
+  "R04_allowed_inputs": [
+    "Chinese NL instruction",
+    "official CRUDSQL annotation",
+    "official table metadata and rows",
+    "registered gold plan and parameterized write",
+    "R01/R02 rejection decisions and notes"
+  ],
+  "R04_may_see_R01_R02_rejection_reasons": true,
+  "R04_must_be_distinct_from_R01": true,
+  "R04_must_be_distinct_from_R02": true,
+  "R04_must_be_distinct_from_R03": true,
+  "R04_must_not_see_model_predictions": true,
+  "R04_task": "technical_root_cause_classification_not_model_scoring",
+  "agreed_rejected_count": 17,
+  "agreed_rejected_items": [
+    {
+      "R01_notes_sha256": "d1f64393273894273b4ab4371efd3f686076f00319901e9cee6f3039bbeacb9c",
+      "R02_notes_sha256": "76ca56bc5b60f74cbd18968dcba5f202595d7640c4b80c79dcdf3cff698914f1",
+      "stage6_sample_id": "stage6_crudsql_0000"
+    },
+    {
+      "R01_notes_sha256": "1e7a6cb4036e206323b47c0054fad17fac5e6a4d10280cf17943d9c63aac3ca9",
+      "R02_notes_sha256": "d55ffaafdb4927530340e78b469c4f6c735934890f7d0b9995930e40614018eb",
+      "stage6_sample_id": "stage6_crudsql_0014"
+    },
+    {
+      "R01_notes_sha256": "d82a6d0ae5314c2fc37e29499a047f012dd0588ccb9302d3b360e61dd2db8d63",
+      "R02_notes_sha256": "cf005d4abad4bbafafcffe74e3bdf11a47b942c8c723398706ae0ea0e9315526",
+      "stage6_sample_id": "stage6_crudsql_0070"
+    },
+    {
+      "R01_notes_sha256": "82e88c91004d23942c79edf4b93bde617db9b60ac25fe8181799fc32952a41c8",
+      "R02_notes_sha256": "f5ad4e912aa27228a0569eb971ec2c6a868003f6c58b1b07e444fea4c813a431",
+      "stage6_sample_id": "stage6_crudsql_0085"
+    },
+    {
+      "R01_notes_sha256": "1ece82644af1d3aa6bd6b84fd5b4e83a945a662107a9ed5661c0190cc9412bb9",
+      "R02_notes_sha256": "d44fa8b0815f3fc00a8e815d98066bd32df104db3343082b8c75fc782130f685",
+      "stage6_sample_id": "stage6_crudsql_0109"
+    },
+    {
+      "R01_notes_sha256": "02dac37f72d45dc1e75367adbf5bd2d6cb45bf340982bee070fc61c9a6a92cd1",
+      "R02_notes_sha256": "d979065d099c219c04d20735d8de242ac6e8c6576a8109ff9c3f452c35a7822e",
+      "stage6_sample_id": "stage6_crudsql_0158"
+    },
+    {
+      "R01_notes_sha256": "ae71642a9c3e876c909d2d78f557443ed21af0f20bff61626841b4c520867b05",
+      "R02_notes_sha256": "da1bfe6a10b2e2902f64ef1a603ee62111ee651406fced6ac5f2367c6db801e9",
+      "stage6_sample_id": "stage6_crudsql_0180"
+    },
+    {
+      "R01_notes_sha256": "e3ee50d3a79f5af9b8fa29545dd4dc16442616bbf6b11b4b683640dade5b2b8d",
+      "R02_notes_sha256": "da1bfe6a10b2e2902f64ef1a603ee62111ee651406fced6ac5f2367c6db801e9",
+      "stage6_sample_id": "stage6_crudsql_0181"
+    },
+    {
+      "R01_notes_sha256": "95a515aaae7e3e2b55dc7a312b7cf301029fa9e48d1027d763eacf2f87315c0c",
+      "R02_notes_sha256": "da1bfe6a10b2e2902f64ef1a603ee62111ee651406fced6ac5f2367c6db801e9",
+      "stage6_sample_id": "stage6_crudsql_0182"
+    },
+    {
+      "R01_notes_sha256": "0838324202568be7ccabf45adf32d2cec76f1b6b7677c0ece7b0bfc46ede2a1b",
+      "R02_notes_sha256": "da1bfe6a10b2e2902f64ef1a603ee62111ee651406fced6ac5f2367c6db801e9",
+      "stage6_sample_id": "stage6_crudsql_0183"
+    },
+    {
+      "R01_notes_sha256": "1cf70dda33af6ca62ce7601617e6dbc1844385777f28f15c9b1af67ce375a144",
+      "R02_notes_sha256": "be6f0ca4d873f440a48e23a62b1fb76e34588dadbe1b8312985539e96d60deee",
+      "stage6_sample_id": "stage6_crudsql_0199"
+    },
+    {
+      "R01_notes_sha256": "667a41f6e1da7d414a0555fa6e84ea19afe8637f0660d6c2aede245998f6555c",
+      "R02_notes_sha256": "ace06c64c6eeebc0e4352bb78ea9cc87ec6d61dade038cb849e432c0409fb6ec",
+      "stage6_sample_id": "stage6_crudsql_0240"
+    },
+    {
+      "R01_notes_sha256": "b7ab4f9348db2fcb0e2a7779abafcbfb014389225d69e640a3e1c113ef0d8b89",
+      "R02_notes_sha256": "ace06c64c6eeebc0e4352bb78ea9cc87ec6d61dade038cb849e432c0409fb6ec",
+      "stage6_sample_id": "stage6_crudsql_0241"
+    },
+    {
+      "R01_notes_sha256": "ffba6c33e660be4e40a4bf5a29ef54fce42fa7dd4b7713b1d833231b2ff1642c",
+      "R02_notes_sha256": "ace06c64c6eeebc0e4352bb78ea9cc87ec6d61dade038cb849e432c0409fb6ec",
+      "stage6_sample_id": "stage6_crudsql_0242"
+    },
+    {
+      "R01_notes_sha256": "53ee82177d39f70098432cfa855c45855597d48e4f4d3b6d86a1c6691924e8f2",
+      "R02_notes_sha256": "ace06c64c6eeebc0e4352bb78ea9cc87ec6d61dade038cb849e432c0409fb6ec",
+      "stage6_sample_id": "stage6_crudsql_0243"
+    },
+    {
+      "R01_notes_sha256": "e1b0dfd2696424b10d0e1da7b01bf46a313d9dea637c1a0fc2cf583afac3f316",
+      "R02_notes_sha256": "4b3993c6b0cddeea814c471056b470e5b3683d47a0302d17f20f055001dd1c95",
+      "stage6_sample_id": "stage6_crudsql_0250"
+    },
+    {
+      "R01_notes_sha256": "1a7e3bf70fcf147909e24b51ff76b78b94ddd53568fc03332c06291e9e7bee38",
+      "R02_notes_sha256": "c03f25023bf5314728c74ea13b98c007429e534dbc3e4b61ecbf5c56d5da5fdb",
+      "stage6_sample_id": "stage6_crudsql_0317"
+    }
+  ],
+  "allowed_classes": [
+    "CORRECTABLE_GOLD_ERROR",
+    "SOURCE_TASK_INVALID"
+  ],
+  "class_rules": {
+    "CORRECTABLE_GOLD_ERROR": {
+      "required_action": [
+        "correct gold before any model run",
+        "recompute gold plan, parameterized program, expected inserted row, post-state hash, and authored_content hash",
+        "create corrected-item review packet",
+        "obtain two independent re-reviews of corrected item",
+        "do not count correction as automatically approved"
+      ],
+      "required_condition": "the correct intended write is uniquely recoverable from NL plus official source annotation/table evidence"
+    },
+    "SOURCE_TASK_INVALID": {
+      "required_action": [
+        "do not fabricate replacement gold",
+        "do not silently drop the sample",
+        "revise Stage6 registration before any model run",
+        "record item-level rationale and updated registration hashes"
+      ],
+      "required_condition": "no unique valid gold exists, or the source task contradicts the target table/schema/frozen task contract"
+    }
+  },
+  "classification_reviewer_role": "R04",
+  "confirmation_blocked_until_all_final_rejections_resolved": true,
+  "forbidden_actions": [
+    "drop rejected samples without registration revision",
+    "replace rejected samples with train/dev or newly selected samples",
+    "choose correction versus invalid after seeing model outputs",
+    "create final gold freeze while any final rejection remains unresolved",
+    "permit GPU preflight before final rejection resolution acceptance"
+  ],
+  "gpu_called": false,
+  "model_called": false,
+  "stage": "Stage6C_FINAL_REJECTION_RESOLUTION_PROTOCOL",
+  "status": "LOCKED_PENDING_R04_TECHNICAL_RESOLUTION"
+}

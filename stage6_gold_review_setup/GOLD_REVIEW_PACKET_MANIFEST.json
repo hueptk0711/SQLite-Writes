@@ -1,0 +1,86 @@
+{
+  "confirmation_run_allowed_now": false,
+  "gold_review_items_sha256": "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b",
+  "gpu_called": false,
+  "model_called": false,
+  "official_table_metadata_sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93",
+  "packet_columns": [
+    "stage6_sample_id",
+    "upstream_sample_locator",
+    "authored_content_sha256",
+    "reviewed_by",
+    "decision",
+    "notes"
+  ],
+  "protocol_addendum_sha256": "93b78d7d1f008e117b09dc0eb93cdaa7c017aedbeca83aa34e932d5fdd8f19b2",
+  "reviewer_isolation_distribution": "separate_archive_per_reviewer",
+  "reviewer_packets": [
+    {
+      "isolated_archive": {
+        "member_count": 5,
+        "members": [
+          {
+            "path": "GOLD_REVIEW_PROTOCOL_ADDENDUM_LOCK.json",
+            "sha256": "93b78d7d1f008e117b09dc0eb93cdaa7c017aedbeca83aa34e932d5fdd8f19b2"
+          },
+          {
+            "path": "artifacts/gold_review_items.jsonl",
+            "sha256": "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b"
+          },
+          {
+            "path": "artifacts/official_table_metadata.jsonl",
+            "sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93"
+          },
+          {
+            "path": "review_packets/Stage6C_R01_PACKET_MANIFEST.json",
+            "sha256": "b674a590e9e922b4ade65b950b19f8c37b8cc9a551fa83ef3171f35868cc2913"
+          },
+          {
+            "path": "review_packets/stage6c_gold_review_R01.tsv",
+            "sha256": "af26b59f90d25b01d4a8cc6bc77ed560e9196fb982faad83341e46bf3565d506"
+          }
+        ],
+        "path": "Stage6C_R01_review_packet_20260824.zip",
+        "sha256": "33f5b6153a4db07627156a1e121326dbf9dab0abe5c84e7ffb0d1a1ea15817a7"
+      },
+      "path": "review_packets/stage6c_gold_review_R01.tsv",
+      "reviewer_id": "R01",
+      "sha256": "af26b59f90d25b01d4a8cc6bc77ed560e9196fb982faad83341e46bf3565d506"
+    },
+    {
+      "isolated_archive": {
+        "member_count": 5,
+        "members": [
+          {
+            "path": "GOLD_REVIEW_PROTOCOL_ADDENDUM_LOCK.json",
+            "sha256": "93b78d7d1f008e117b09dc0eb93cdaa7c017aedbeca83aa34e932d5fdd8f19b2"
+          },
+          {
+            "path": "artifacts/gold_review_items.jsonl",
+            "sha256": "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b"
+          },
+          {
+            "path": "artifacts/official_table_metadata.jsonl",
+            "sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93"
+          },
+          {
+            "path": "review_packets/Stage6C_R02_PACKET_MANIFEST.json",
+            "sha256": "6fa92550b6dd460ea128742eca794bc09f79da2cf19db0d5d467d25b6567a122"
+          },
+          {
+            "path": "review_packets/stage6c_gold_review_R02.tsv",
+            "sha256": "19bb7d1595a1c85b07d4de158dba0ac3c5f2506aad898b142796cc641f56d6d9"
+          }
+        ],
+        "path": "Stage6C_R02_review_packet_20260824.zip",
+        "sha256": "9921c458bf0206c05a84f5933c6a65fc07d728ec3e1a29ca047a6c8245d103bf"
+      },
+      "path": "review_packets/stage6c_gold_review_R02.tsv",
+      "reviewer_id": "R02",
+      "sha256": "19bb7d1595a1c85b07d4de158dba0ac3c5f2506aad898b142796cc641f56d6d9"
+    }
+  ],
+  "sample_count": 500,
+  "stage": "Stage6C_INDEPENDENT_GOLD_REVIEW_SETUP",
+  "status": "PACKETS_CREATED_PENDING_HUMAN_REVIEW"
+}

@@ -1,0 +1,52 @@
+{
+  "confirmation_predictions_created": false,
+  "confirmation_run_allowed_now": false,
+  "final_confirmation_n": 481,
+  "forbidden_confirmation_arms": [
+    "FULL",
+    "D_ONLY",
+    "NO_C",
+    "G2",
+    "second_model",
+    "post_hoc_token_budget_increase"
+  ],
+  "generation_streams": {
+    "direct": {
+      "config_arm": "direct",
+      "raw_generation_path": "raw_generations/direct.jsonl",
+      "role": "secondary_baseline"
+    },
+    "j_fs": {
+      "config_arm": "j_fs",
+      "raw_generation_path": "raw_generations/j_fs.jsonl",
+      "role": "secondary_baseline"
+    },
+    "original_mp_fs_plus": {
+      "config_arm": "original_mp_fs_plus",
+      "raw_generation_path": "raw_generations/original_mp_fs_plus.jsonl",
+      "role": "H1_comparator"
+    },
+    "shared_mp_fs_plus_generation": {
+      "config_arm": "d_g1_control",
+      "deterministic_replay_arms": [
+        "d_g1_control",
+        "d_f_g1_vnext"
+      ],
+      "raw_generation_path": "raw_generations/shared_mp_fs_plus_generation.jsonl",
+      "role": "H2_shared_raw_generation"
+    }
+  },
+  "hypotheses": {
+    "H1": "d_f_g1_vnext_vs_original_mp_fs_plus",
+    "H2": "d_f_g1_vnext_vs_d_g1_control_shared_raw_generation"
+  },
+  "statistics": {
+    "cluster_bootstrap_replicates": 10000,
+    "cluster_key": "source_group",
+    "family_correction": "Holm_over_H1_H2",
+    "paired_test": "exact_two_sided_McNemar",
+    "primary_metric": "target_state_correct",
+    "seed": 240824
+  },
+  "status": "LOCKED_NOT_AUTHORIZED_FOR_CONFIRMATION_RUN"
+}

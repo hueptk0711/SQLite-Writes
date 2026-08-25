@@ -1,0 +1,190 @@
+{
+  "authorization_status": "AUTHORIZED_FOR_CONFIRMATORY_GENERATION",
+  "confirmation_predictions_created": false,
+  "confirmation_run_allowed_now": true,
+  "expected_absent_raw_generation_files_before_initial_execution": [
+    "raw_generations/direct.jsonl",
+    "raw_generations/j_fs.jsonl",
+    "raw_generations/original_mp_fs_plus.jsonl",
+    "raw_generations/shared_mp_fs_plus_generation.jsonl"
+  ],
+  "final_confirmation_manifest_sha256": "6a9fc9812d768001e3a8e8b87d2387a7b943c83237a4bca7603c304acf88bcc7",
+  "final_confirmation_n": 481,
+  "final_gold_corpus_sha256": "2082e892858c065531e2456239e77e51bae6232fccdf717497fecadc5421fd16",
+  "forbidden_confirmation_arms": [
+    "FULL",
+    "D_ONLY",
+    "NO_C",
+    "G2",
+    "second_model",
+    "post_hoc_token_budget_increase"
+  ],
+  "generation_lock": {
+    "backend": "hf",
+    "batch_size": 1,
+    "bitsandbytes_config": {
+      "bnb_4bit_compute_dtype": "float16",
+      "bnb_4bit_quant_storage": "uint8",
+      "bnb_4bit_quant_type": "fp4",
+      "bnb_4bit_use_double_quant": false,
+      "load_in_4bit": true
+    },
+    "compute_dtype": "float16",
+    "context_length": 32768,
+    "device_map": "auto",
+    "do_sample": false,
+    "framework": "transformers",
+    "input_truncation_policy": "error_before_confirmation_run",
+    "max_input_tokens": 28672,
+    "max_new_tokens": 4096,
+    "output_max_new_tokens_policy": "record_hit_max_new_tokens_continue_evaluation_score_invalid_or_wrong_state_as_false_keep_sample_in_denominator",
+    "quantization": "4bit",
+    "raw_generation_retry_policy": "completed_success_rows_are_immutable; infrastructure_resume_only_with_lock_checks",
+    "seed": 42,
+    "temperature": null,
+    "token_budget_after_failure_policy": "do_not_increase_budget_after_seeing_confirmation_outputs",
+    "top_k": null,
+    "top_p": null,
+    "trust_remote_code": false
+  },
+  "gpu_called_in_stage6g": false,
+  "hypotheses": {
+    "H1": "d_f_g1_vnext_vs_original_mp_fs_plus",
+    "H2": "d_f_g1_vnext_vs_d_g1_control_shared_raw_generation"
+  },
+  "initial_raw_generation_clean_start_required": true,
+  "model_called_in_stage6g": false,
+  "model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357",
+  "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "model_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+  "next_step": "run_confirmatory_generation_under_this_authorization_lock",
+  "patch": "PATCH1_EXECUTION_BOUNDARY_HARDENING",
+  "prompt_token_audit": {
+    "input_truncation_error_count": 0,
+    "max_input_tokens": 28672,
+    "max_observed_input_tokens": 2253,
+    "rows": 2405
+  },
+  "raw_generation_stream_count": 4,
+  "raw_generation_streams": {
+    "direct": {
+      "config_arm": "direct",
+      "raw_generation_path": "raw_generations/direct.jsonl",
+      "role": "secondary_baseline"
+    },
+    "j_fs": {
+      "config_arm": "j_fs",
+      "raw_generation_path": "raw_generations/j_fs.jsonl",
+      "role": "secondary_baseline"
+    },
+    "original_mp_fs_plus": {
+      "config_arm": "original_mp_fs_plus",
+      "raw_generation_path": "raw_generations/original_mp_fs_plus.jsonl",
+      "role": "H1_comparator"
+    },
+    "shared_mp_fs_plus_generation": {
+      "config_arm": "d_g1_control",
+      "deterministic_replay_arms": [
+        "d_g1_control",
+        "d_f_g1_vnext"
+      ],
+      "raw_generation_path": "raw_generations/shared_mp_fs_plus_generation.jsonl",
+      "role": "H2_shared_raw_generation"
+    }
+  },
+  "required_execution_git_head_source": "reviewer_accepted_stage6g_patch1_commit_recorded_in_GIT_INFO",
+  "required_git_worktree_clean": true,
+  "required_raw_generation_row_fields": [
+    "stage6_sample_id",
+    "generation_stream",
+    "prompt_sha256",
+    "chat_prompt_sha256",
+    "input_ids_sha256",
+    "input_token_count",
+    "raw_output",
+    "raw_output_sha256",
+    "output_token_count",
+    "hit_max_new_tokens",
+    "model_revision",
+    "model_sha256",
+    "tokenizer_sha256",
+    "generation_lock_sha256",
+    "run_id"
+  ],
+  "required_replay_provenance_fields": [
+    "stage6_sample_id",
+    "replay_arm",
+    "source_raw_generation_stream",
+    "shared_raw_generation_row_sha256"
+  ],
+  "resume_policy": {
+    "completed_success_rows_are_immutable": true,
+    "do_not_change_config_prompt_model_or_token_budget": true,
+    "do_not_regenerate_completed_rows": true,
+    "do_not_regenerate_semantic_or_model_failures": true,
+    "infrastructure_resume_only": true,
+    "policy": "completed_success_rows_are_immutable; infrastructure_resume_only_with_lock_checks",
+    "verify_existing_row_hashes_before_resume": true
+  },
+  "run_invariants": {
+    "F_changes_prompt_surface": false,
+    "confirmation_outputs_must_be_written_under_raw_generations": true,
+    "do_not_change_prompt_or_config_after_authorization": true,
+    "do_not_change_token_budget_after_authorization": true,
+    "do_not_drop_failures_from_denominator": true,
+    "do_not_rerun_max_token_hits_with_larger_budget": true,
+    "independent_D_F_G1_generation_allowed": false
+  },
+  "runtime_prompt_input_identity_guard": {
+    "on_mismatch": "stop_run_before_generation_for_that_sample",
+    "required_per_row_checks_before_generate": [
+      "stage6_sample_id",
+      "generation_stream",
+      "prompt_sha256",
+      "chat_prompt_sha256",
+      "input_ids_sha256",
+      "input_token_count"
+    ],
+    "stage6f_prompt_token_audit_sha256": "e9bcf79074bcac4284f412314e40cbc7567940a36258dcb27f62ff7862eadae6"
+  },
+  "server_preflight_zip_sha256": "004913b1778cc145d44f32aa49a60039438b24cc36d1f17a5c85091e8cc5bd1b",
+  "stage": "Stage6G_CONFIRMATION_RUN_AUTHORIZATION_AND_EXECUTION_LOCK",
+  "stage5_execution_boundary_roots": {
+    "confirmation_arm_configs_sha256": "cfa36ffb1a230c53920fd2e45356e48b45b236cbf2454fa328e470dbc5fd3682",
+    "confirmation_environment_lock_sha256": "bac701451b8027a189b579c6766d690e4756a3a49458bf85f623fec1a97ba2c1",
+    "confirmation_protocol_lock_sha256": "fca32f3566ab830981f4f5b5c6e364932f79ef3c8f82881b45e4a5c19d85df3c",
+    "generation_lock_sha256": "890da57fbe137f4b3f64e002a29d76a3c630cdc8290c924ac1d1f9da585a9c14",
+    "method_source_tree_sha256": "78901f8fec28b2aa6e75166283415926da2b5af1dec48c4ba37e71be3d73d67b",
+    "resolved_config_hashes": {
+      "configs/stage5/resolved_d_g1_control.json": "c7c9c4d54e59662ee8e251af3aea1747fa035cb306213f20c819098e96f1b6ca",
+      "configs/stage5/resolved_direct_confirmation.json": "0795d31926345c62d5ba832d8374c9ac067967a3842c45854a2fff9b32c9f826",
+      "configs/stage5/resolved_j_fs_confirmation.json": "a4006a423eb62fd37e5b370aca48a3b9337971f49d94700703d634a3d25c0cfe",
+      "configs/stage5/resolved_mp_fs_plus_vnext_r1.json": "b3a946fc977c3ea95d3226dca1361b1885c098fddf4afdc650f4d36f0e1ce9bf",
+      "configs/stage5/resolved_original_mp_fs_plus.json": "ddda333ccb9b307ed3002213dad6572daa959c2dd5deb2e7d4623cb3aeead84d"
+    }
+  },
+  "stage5_generation_lock_sha256": "890da57fbe137f4b3f64e002a29d76a3c630cdc8290c924ac1d1f9da585a9c14",
+  "stage6e_commit": "f32e8b2c7152e0f31829eab004da0f396084e57e",
+  "stage6f_acceptance_commit": "6cdbff685a16aff7eb9b6647937aaa7fe740ee35",
+  "stage6f_acceptance_roots": {
+    "acceptance_lock_sha256": "bfca33214efd17a951a5bb968f998285bcd9d7fa23e50ef407a3ec59918b160e",
+    "confirmation_run_plan_sha256": "f8423d025b37ac346ea3977218b078b465184a225ba40546f8896598afe503b2",
+    "model_tokenizer_asset_audit_sha256": "26b0ff29b902031457d0f60a95f482a5c900b792e18a40c79e4544c071fde84e",
+    "prompt_token_audit_sha256": "e9bcf79074bcac4284f412314e40cbc7567940a36258dcb27f62ff7862eadae6",
+    "server_output_manifest_sha256": "bc002e4352063159de9326219fb5c26934fda6fae54722c2cc95fc4217499765",
+    "server_preflight_lock_sha256": "1f044f58879fd5caa34449de4da77f6cdfe33325187f0497bd614bf5de119427"
+  },
+  "stage6f_execution_commit": "dfa1be8d9db133f6adb6ec3a796c9750db67b5b9",
+  "stage6g_authorization_commit_policy": "server execution must pass the reviewer-accepted Stage6G PATCH1 commit as --expected-git-head and must run from that exact clean checkout",
+  "statistics": {
+    "cluster_bootstrap_replicates": 10000,
+    "cluster_key": "source_group",
+    "confidence_interval": "cluster_bootstrap_percentile_95",
+    "family_correction": "Holm_over_H1_H2",
+    "paired_test": "exact_two_sided_McNemar",
+    "primary_metric": "target_state_correct",
+    "seed": 240824
+  },
+  "status": "AUTHORIZED_FOR_CONFIRMATORY_GENERATION_PENDING_EXECUTION",
+  "tokenizer_sha256": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468"
+}

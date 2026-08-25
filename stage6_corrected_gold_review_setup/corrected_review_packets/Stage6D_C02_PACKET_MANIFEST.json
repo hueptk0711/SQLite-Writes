@@ -1,0 +1,16 @@
+{
+  "confirmation_run_allowed_now": false,
+  "contains_only_own_decision_packet": true,
+  "corrected_gold_review_items_sha256": "28bbbaad52cea9d9511a11ca7ac92115b72533801189ffacc5cad6e4369c787c",
+  "decision_packet": {
+    "path": "corrected_review_packets/stage6d_corrected_gold_review_C02.tsv",
+    "sha256": "c2db72c83c46053706c8b109c141176cbbd234a1957429b4451f0bde259400bd"
+  },
+  "gpu_called": false,
+  "model_called": false,
+  "official_table_metadata_sha256": "48d61e0db35f875afba2de689cb783c5842fbc454957377e7e9613a37acbfa4e",
+  "protocol_lock_sha256": "d61fb438eb32cbed4ff8fdcf6ca3c3ea79dc2e5ab4df64213ce64326a7a871c2",
+  "reviewer_id": "C02",
+  "stage": "Stage6D_CORRECTED_GOLD_REVIEW_ISOLATED_PACKET",
+  "status": "READY_FOR_INDEPENDENT_CORRECTED_ITEM_RE_REVIEW"
+}

@@ -1,0 +1,32 @@
+{
+  "analysis_type": "mcnemar_threshold_sensitivity_not_power_analysis",
+  "candidate_n": 500,
+  "declared_family": [
+    "H1_method_level_confirmation",
+    "H2_F_incremental_confirmation"
+  ],
+  "holm_floor_used_for_sensitivity": 0.025,
+  "hypothesis": "H2_D_F_G1_vs_D_G1",
+  "recommendation": "use_all_official_test_type0_examples_if_eligibility_passes",
+  "rows": [
+    {
+      "exact_two_sided_mcnemar_p": 0.015625,
+      "minimum_favorable_discordant_pairs_with_zero_regressions_for_p_lt_0_025": 7,
+      "minimum_favorable_rate": 0.023333333333333334,
+      "n": 300
+    },
+    {
+      "exact_two_sided_mcnemar_p": 0.015625,
+      "minimum_favorable_discordant_pairs_with_zero_regressions_for_p_lt_0_025": 7,
+      "minimum_favorable_rate": 0.0175,
+      "n": 400
+    },
+    {
+      "exact_two_sided_mcnemar_p": 0.015625,
+      "minimum_favorable_discordant_pairs_with_zero_regressions_for_p_lt_0_025": 7,
+      "minimum_favorable_rate": 0.014,
+      "n": 500
+    }
+  ],
+  "status": "PASS"
+}

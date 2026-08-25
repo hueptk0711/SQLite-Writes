@@ -1,0 +1,17 @@
+{
+  "allowed_labels": [
+    "approved",
+    "rejected"
+  ],
+  "confirmation_run_allowed_now": false,
+  "disagreement_adjudication": "third_adjudicator_or_joint_protocol_decision_before_gpu",
+  "final_gold_hash_required_before_gpu": true,
+  "gold_edit_cutoff": "before_any_model_or_gpu_confirmation_run",
+  "reviewer_must_not_see_model_predictions": true,
+  "reviewer_roles": [
+    "primary_gold_reviewer",
+    "secondary_gold_reviewer"
+  ],
+  "status": "LOCKED_PENDING_REVIEW_EXECUTION",
+  "two_independent_reviews_required": true
+}

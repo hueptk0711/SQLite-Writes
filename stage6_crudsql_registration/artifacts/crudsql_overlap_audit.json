@@ -1,0 +1,83 @@
+{
+  "canonical_content_hash_overlap_count": 0,
+  "crudsql_sample_count": 500,
+  "crudsql_table_count": 125,
+  "database_fingerprint_coverage": {
+    "database_byte_or_profile_fingerprint_checked_for_sources": [
+      "final_holdout_release_300"
+    ],
+    "database_byte_or_profile_fingerprint_unavailable_for_sources": [
+      "stage4_fresh_300",
+      "archived_677_pool"
+    ],
+    "database_identity_overlap_checked_for_sources": [
+      "stage4_fresh_300",
+      "final_holdout_release_300",
+      "archived_677_pool"
+    ]
+  },
+  "database_fingerprint_overlap_count": 0,
+  "database_id_namespace_overlap_count": 0,
+  "disclosure": "Stage6A PATCH2 compares stable sample locators, text/content hashes, source groups, and database identities across all forbidden prior sources. Database byte/profile fingerprint comparison is limited to prior sources with packaged DB/profile assets, as recorded in database_fingerprint_coverage. The final decision ignores no missing expected forbidden source.",
+  "expected_forbidden_reference_set_count": 3,
+  "input_text_hash_overlap_count": 0,
+  "loaded_forbidden_reference_set_count": 3,
+  "reference_digest_counts": {
+    "canonical_content_sha256": 977,
+    "database_ids": 16,
+    "database_profile_fingerprints": 10,
+    "input_text_sha256": 965,
+    "sample_ids": 977,
+    "source_groups": 977
+  },
+  "reference_registry_status": "PASS_REFERENCE_REGISTRY_FROZEN",
+  "reference_registry_violations": [],
+  "reference_source_digest_counts": {
+    "archived_677_pool": {
+      "canonical_content_sha256": 677,
+      "database_ids": 0,
+      "database_profile_fingerprints": 0,
+      "input_text_sha256": 665,
+      "sample_ids": 377,
+      "source_groups": 677
+    },
+    "final_holdout_release_300": {
+      "canonical_content_sha256": 300,
+      "database_ids": 5,
+      "database_profile_fingerprints": 10,
+      "input_text_sha256": 300,
+      "sample_ids": 300,
+      "source_groups": 300
+    },
+    "stage4_fresh_300": {
+      "canonical_content_sha256": 0,
+      "database_profile_fingerprints": 0,
+      "input_text_sha256": 0,
+      "sample_ids": 300
+    }
+  },
+  "reference_sources": [
+    {
+      "name": "stage4_fresh_300",
+      "path": "stage4_fresh_7b_protocol/data/fresh_dataset_manifest.json",
+      "sample_count": 300,
+      "source_artifact_sha256": "d1850063af0a5b235cc4e8854d72b146fcca6e26bdebb5617ac3048abd4726ec"
+    },
+    {
+      "name": "final_holdout_release_300",
+      "path": "03_protocol_and_data/final_holdout_release/mp_fs_plus_external_holdout_300_20260731.zip",
+      "sample_count": 300,
+      "source_artifact_sha256": "525cdd7006ea32a8ab8d81f842332ac9b403dce2472cde608efb4e6962d456df"
+    },
+    {
+      "name": "archived_677_pool",
+      "path": "D:/paper kltn/text to sql/99_archive_history_20260731/legacy_sources_and_results/server_downloads/paper_v3_release_20260726/source/paper_v3_mapping_first/data/frozen/test/dataset_test_v3.json",
+      "sample_count": 677,
+      "source_artifact_sha256": "70d8a38552f46f81fee9abe04f0ebf96a862405965aeaff9958455dad08ebfb4"
+    }
+  ],
+  "sample_id_overlap_count": 0,
+  "source_group_overlap_count": 0,
+  "status": "PASS",
+  "upstream_locator_overlap_count": 0
+}

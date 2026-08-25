@@ -1,0 +1,30 @@
+{
+  "candidate_subset_policy": "all_official_test_type0_Create_examples_if_adapter_passes",
+  "expected_source_commit": "63bfce67d8391185453a812751e115a499201363",
+  "gpu_called": false,
+  "license": {
+    "declared_license": "GPL-3.0",
+    "path": "LICENSE",
+    "sha256": "230184f60bae2feaf244f10a8bac053c8ff33a183bcc365b4d8b876d2b7f4809"
+  },
+  "model_called": false,
+  "no_translation_or_paraphrase": true,
+  "official_split_policy": "official_test_split_only",
+  "recommended_exact_n": 500,
+  "registration_status": "not_registered_in_stage6a",
+  "sample_count_floor": 300,
+  "seen_reference_registry": {
+    "path": "artifacts/stage6_seen_reference_registry.json",
+    "sha256": "4628077dd0f00a2441ccb22fdb0257b43f34d475d0e277a0a08773d3aabeec4b",
+    "status": "PASS_REFERENCE_REGISTRY_FROZEN",
+    "violations": []
+  },
+  "source_commit": "63bfce67d8391185453a812751e115a499201363",
+  "source_git_status_porcelain": "",
+  "source_name": "CRUDSQL",
+  "source_repository": "https://github.com/bizard-lab/CRUDSQL.git",
+  "stage": "Stage6A_CRUDSQL_ELIGIBILITY_AUDIT_PATCH2",
+  "stage5_method_freeze_commit": "79f6a82144ec0407444ef37121f70eed2b20e01c",
+  "stage5_protocol_commit": "a7742b4c9150ab208e7c5d6708f0dff40bf05440",
+  "status": "PASS_ELIGIBLE_FOR_STAGE6B_REGISTRATION"
+}

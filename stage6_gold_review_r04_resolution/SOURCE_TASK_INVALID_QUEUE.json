@@ -1,0 +1,146 @@
+{
+  "count": 19,
+  "items": [
+    {
+      "authored_content_sha256": "6bc1752d3a49667d1ba98ad080382498188a5a32b59a9e1657e1c9ad091b24a5",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The NL phrase “抽查了湖北稻花香酒业股份有限公司的…白酒” does not uniquely identify the company as either 标称生产企业名称 or 被抽样单位名称, while the schema contains both roles. No unique valid column mapping exists.",
+      "stage6_sample_id": "stage6_crudsql_0044",
+      "upstream_sample_locator": "crudsql:test:0628:a99c46cf3b0611e9b51df40f24344a08:7bee9279f7e2b5ad"
+    },
+    {
+      "authored_content_sha256": "d9f242bb2f060fc45cd5749568ec453470ca51e0cd971083d8c305659b8134d1",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen target table is explicitly the 2019/1/14–2019/1/20 box-office TOP10, whereas the NL explicitly gives a mainland release date of 2023-08-30. The task is outside the table scope and the schema has no release-date field, so no unique valid gold can preserve the requested information.",
+      "stage6_sample_id": "stage6_crudsql_0084",
+      "upstream_sample_locator": "crudsql:test:0668:4d258f803aaa11e9af1cf40f24344a08:ac82079292e2e510"
+    },
+    {
+      "authored_content_sha256": "92c2a5122656d4f1619ebe90fcdda8d57dda7128247cf13e1f0aee81638b6daa",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The NL explicitly identifies a 2021 National Day film, which conflicts with the frozen 2019/1/14–2019/1/20 TOP10 table. In addition, 场均人次 cannot be uniquely mapped to the distinct schema field 人均场次. No unique valid gold exists.",
+      "stage6_sample_id": "stage6_crudsql_0086",
+      "upstream_sample_locator": "crudsql:test:0670:4d258f803aaa11e9af1cf40f24344a08:59484faf0a607423"
+    },
+    {
+      "authored_content_sha256": "ec08b1af75c5578b5483be01a25cffe8084a0abd0e38a8083fdd74176a69f0b0",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业美国中概股 and its market-cap field is denominated in 亿美元, but the NL supplies A-share code 300291.SZ for 百纳千成 and states market value only in 亿 without a USD conversion basis. The record is outside table scope and normalization is not uniquely recoverable.",
+      "stage6_sample_id": "stage6_crudsql_0200",
+      "upstream_sample_locator": "crudsql:test:0784:4d2420113aaa11e9b9c1f40f24344a08:0d7447c9f961b309"
+    },
+    {
+      "authored_content_sha256": "b1a5ec5fd01365826e696dd31f75121956363b04bf4e154d3efb2c13da12d403",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业美国中概股 and its market-cap field is denominated in 亿美元, but the NL supplies A-share code 000100.SZ for TCL科技 and states market value only in 亿 without a USD conversion basis. The record is outside table scope and normalization is not uniquely recoverable.",
+      "stage6_sample_id": "stage6_crudsql_0201",
+      "upstream_sample_locator": "crudsql:test:0785:4d2420113aaa11e9b9c1f40f24344a08:5cd2fe295529bfc1"
+    },
+    {
+      "authored_content_sha256": "b20950141514d243d688bdc069c0c88c7ae5f31826368e7747994faaf65eae41",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业美国中概股 and its market-cap field is denominated in 亿美元, but the NL supplies A-share code 000725.SZ for 京东方Ａ and states market value only in 亿 without a USD conversion basis. The record is outside table scope and normalization is not uniquely recoverable.",
+      "stage6_sample_id": "stage6_crudsql_0202",
+      "upstream_sample_locator": "crudsql:test:0786:4d2420113aaa11e9b9c1f40f24344a08:94aec3836d486286"
+    },
+    {
+      "authored_content_sha256": "9cc062c17b5d76c4a86c64aaea6e1e83bdbbae49d03e5c15b08bcb83d6740ad4",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业美国中概股 and its market-cap field is denominated in 亿美元, but the NL supplies A-share code 002594.SZ for 比亚迪 and states market value only in 亿 without a USD conversion basis. The record is outside table scope and normalization is not uniquely recoverable.",
+      "stage6_sample_id": "stage6_crudsql_0203",
+      "upstream_sample_locator": "crudsql:test:0787:4d2420113aaa11e9b9c1f40f24344a08:5e9a5653dbb7d278"
+    },
+    {
+      "authored_content_sha256": "f94b8ea6867f905786c248e80c42188d1ed0bc6aef8470d2c961d5ece21d2eca",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen schema is specifically the 2018–2019 春节档TOP5前六日均价 table, while the NL gives a general 2019 box-office rank (#2) for 复仇者联盟4：终局之战. The schema has no rank field and the stated ranking context does not match the table scope, so no unique valid gold exists.",
+      "stage6_sample_id": "stage6_crudsql_0216",
+      "upstream_sample_locator": "crudsql:test:0800:4d26d4b03aaa11e9acf2f40f24344a08:002457b719da842f"
+    },
+    {
+      "authored_content_sha256": "646d3422c0b9d83a5596a7e84b24ce1b00b2d79a3b351c73cf5f084a99df9b91",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen schema is the 2018–2019 春节档TOP5前六日均价 table and has no rank field, while the NL requires rank #4. Moreover 飞驰人生 already appears in the official 2019 side with a different average price (43.6 vs 41.6), so the requested append conflicts with the frozen table evidence.",
+      "stage6_sample_id": "stage6_crudsql_0217",
+      "upstream_sample_locator": "crudsql:test:0801:4d26d4b03aaa11e9acf2f40f24344a08:dcf0595ad8e23edf"
+    },
+    {
+      "authored_content_sha256": "0faff81163664a5614e2632075377df46fedd7e26e9965d0c751f7d446500929",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen schema is specifically the 2018–2019 春节档TOP5前六日均价 table, but the NL gives a general 2019 rank (#5) for 大黄蜂. The schema cannot encode the stated rank and the ranking context is not uniquely compatible with the table scope.",
+      "stage6_sample_id": "stage6_crudsql_0218",
+      "upstream_sample_locator": "crudsql:test:0802:4d26d4b03aaa11e9acf2f40f24344a08:99a7037196f0d560"
+    },
+    {
+      "authored_content_sha256": "dcb6569e1d72cf8744f04b58f64d468ee8f7fb144b5ab2404232ca18b0a65252",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen schema is the 2018–2019 春节档TOP5前六日均价 table and has no rank field, while the NL requires rank #1. 流浪地球 already appears in the official 2019 side with a different average price (47.9 vs 44.5), so the requested append contradicts the frozen table evidence.",
+      "stage6_sample_id": "stage6_crudsql_0219",
+      "upstream_sample_locator": "crudsql:test:0803:4d26d4b03aaa11e9acf2f40f24344a08:bf546cc06f2ed9aa"
+    },
+    {
+      "authored_content_sha256": "d5bc6ca380c43cd2699779ac160439c6d7053f3db8c8d043c8e0fb4963e4f8cb",
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The frozen table is an A-share airline comparable-company valuation table, but 中远海控 (601919.SH) is outside that airline scope. In addition, 市值(USDmn) requires a USD-million value while the NL states only 1484.11亿 without a currency/conversion basis, and the table suffix convention is CH rather than SH/SZ. No unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0240",
+      "upstream_sample_locator": "crudsql:test:0824:6e614ce634ce11e991e5542696d6e445:4d8b18ffe692840f"
+    },
+    {
+      "authored_content_sha256": "dfdc14de7e0b502d475fcece13ff8fb16b1b06c99ec9a7aa54fb9c6a1ed2611b",
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The frozen table is an A-share airline comparable-company valuation table, but 格力电器 (000651.SZ) is outside that airline scope. In addition, 市值(USDmn) requires a USD-million value while the NL states only 1858.36亿 without a currency/conversion basis, and the table suffix convention is CH rather than SH/SZ. No unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0241",
+      "upstream_sample_locator": "crudsql:test:0825:6e614ce634ce11e991e5542696d6e445:ad0471aede4cc829"
+    },
+    {
+      "authored_content_sha256": "1292556cb4724006e8eae17a05a1c138ebd50a7bac64ba14522866bf17e2373e",
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The frozen table is an A-share airline comparable-company valuation table, but 三峡能源 (600905.SH) is outside that airline scope. In addition, 市值(USDmn) requires a USD-million value while the NL states only 1330.97亿 without a currency/conversion basis, and the table suffix convention is CH rather than SH/SZ. No unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0242",
+      "upstream_sample_locator": "crudsql:test:0826:6e614ce634ce11e991e5542696d6e445:e096b5141ad90987"
+    },
+    {
+      "authored_content_sha256": "8d3cd96c2cf34b54c1b87071f1b1c9249664107e3e408af4b46a81c0e58f376f",
+      "final_rejection_source": "R01_R02_AGREED_REJECTED",
+      "rationale": "The frozen table is an A-share airline comparable-company valuation table, but 比亚迪 (002594.SZ) is outside that airline scope. In addition, 市值(USDmn) requires a USD-million value while the NL states only 6231.48亿 without a currency/conversion basis, and the table suffix convention is CH rather than SH/SZ. No unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0243",
+      "upstream_sample_locator": "crudsql:test:0827:6e614ce634ce11e991e5542696d6e445:af30f3f577a69c6a"
+    },
+    {
+      "authored_content_sha256": "0171e92094472496d26c659e8361ee9fe58605c84ea6c3e0645f3dfa1990a914",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业港股 and uses 港元/亿港元 units, but the NL supplies A-share code 000001.SZ for 平安银行 and market value only in 亿 without an HKD conversion basis. The record is outside table scope and no unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0276",
+      "upstream_sample_locator": "crudsql:test:0860:4d242e2b3aaa11e98a7ff40f24344a08:f5f96975e70b8126"
+    },
+    {
+      "authored_content_sha256": "863113f6b6ac4e9196f3d77d43ba8ef3dfb78d47b12fd911aba2cf7fafa8490c",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业港股 and uses 港元/亿港元 units, but the NL supplies A-share code 601198.SH for 东兴证券 and market value only in 亿 without an HKD conversion basis. The record is outside table scope and no unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0277",
+      "upstream_sample_locator": "crudsql:test:0861:4d242e2b3aaa11e98a7ff40f24344a08:4dc2ec156c2ca528"
+    },
+    {
+      "authored_content_sha256": "f1e6f8f5fded271fc9e2a562d668a4f0a3b8961a9e434ec2d89148f22a37b90c",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业港股 and uses 港元/亿港元 units, but the NL supplies A-share code 601988.SH for 中国银行 and market value only in 亿 without an HKD conversion basis. The record is outside table scope and no unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0278",
+      "upstream_sample_locator": "crudsql:test:0862:4d242e2b3aaa11e98a7ff40f24344a08:3e5091b18c3fe9cc"
+    },
+    {
+      "authored_content_sha256": "6f1efc5214922d00eabe11a8c4ff4a99d3addf6141ee0dad79208c986ab054c9",
+      "final_rejection_source": "R03_REJECTED_DISAGREEMENT",
+      "rationale": "The frozen table is for 传媒互联网行业港股 and uses 港元/亿港元 units, but the NL supplies A-share code 600015.SH for 华夏银行 and market value only in 亿 without an HKD conversion basis. The record is outside table scope and no unique valid normalization exists.",
+      "stage6_sample_id": "stage6_crudsql_0279",
+      "upstream_sample_locator": "crudsql:test:0863:4d242e2b3aaa11e98a7ff40f24344a08:f9672ebc2cd63f84"
+    }
+  ],
+  "required_next_action": [
+    "revise Stage6 registration before model run",
+    "do not silently drop samples",
+    "do not replace with train/dev or newly selected samples",
+    "record item-level rationale and updated hashes"
+  ],
+  "stage": "Stage6C_SOURCE_TASK_INVALID_QUEUE",
+  "status": "LOCKED_PENDING_STAGE6_REGISTRATION_REVISION"
+}

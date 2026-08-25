@@ -1,0 +1,567 @@
+{
+  "confirmation_run_allowed_now": false,
+  "dataset_archive": {
+    "member_count": 136,
+    "members": [
+      {
+        "path": "CONFIRMATION_DATASET_MANIFEST.json",
+        "sha256": "67fcf9d4be6d28871bedb7059acf56acfb3b06e4f617a38479e0e21a737e06b1"
+      },
+      {
+        "path": "GOLD_REVIEW_PROTOCOL_LOCK.json",
+        "sha256": "15a31c192f3fca0107ea19aaf3e28debe1ea840c48cea846adf1e0e3075d0546"
+      },
+      {
+        "path": "artifacts/crudsql_overlap_audit.json",
+        "sha256": "00c33bbad57d56bd2377d73411a37267c439fd2e222dc0ca4bb722853e3053a2"
+      },
+      {
+        "path": "artifacts/distribution_report.json",
+        "sha256": "d62cfcd9ef403ae1bf88b05e97bf3751ee6e52a6dbb5d53ff843d47b4c17a758"
+      },
+      {
+        "path": "artifacts/gold_post_state_hashes.jsonl",
+        "sha256": "84f9755b84e3ecd86b4fb55a88726e9aa3611e964c93de7e8559ab1da5aeaaa9"
+      },
+      {
+        "path": "artifacts/gold_programs.jsonl",
+        "sha256": "8ca5a5bb8a1308fef347687a1a3964d296aa89e427d31e17aaf5e50398e1c3f4"
+      },
+      {
+        "path": "artifacts/gold_write_plans.jsonl",
+        "sha256": "ae72a7508d71f9ea60be9052adca4ace85cf0efe4760aa2202297fd9ec4201c4"
+      },
+      {
+        "path": "artifacts/isolated_table_db_manifest.json",
+        "sha256": "648fa6808539278926ecd1a40d07cc61af8b0d0cc1c2930f52850774bfae4536"
+      },
+      {
+        "path": "artifacts/registered_ids.tsv",
+        "sha256": "b00b8d67f036adbd9a234a50a16decadc120aff708225252ae11407fbdc394a9"
+      },
+      {
+        "path": "artifacts/registered_samples.jsonl",
+        "sha256": "5ce7e08428f709b77b2ff8823ade9eb71a1458233443bcca5ea1df1daebd4001"
+      },
+      {
+        "path": "artifacts/stage6_seen_reference_registry.json",
+        "sha256": "4628077dd0f00a2441ccb22fdb0257b43f34d475d0e277a0a08773d3aabeec4b"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_0155fb21351311e9aae2542696d6e445.sqlite",
+        "sha256": "2d19056e27bf8749987df59bb78ad2a7ceef9bfae289d60da7110f11d02a8fa7"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_2530a745302e11e9878a542696d6e445.sqlite",
+        "sha256": "a780f1e515600c5e5424b125d6748d6af1522f5abe0875f00dd6f2f7f8f5cb5f"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_43af253d1d7111e9a7ddf40f24344a08.sqlite",
+        "sha256": "fd83a7370b8bea8eed6dd9838921224d4869ef82808b3f94c933f3e8654047bc"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_43b317d11d7111e9a717f40f24344a08.sqlite",
+        "sha256": "778e960cf0a8b90dffbff0231047e3b9d5bdfe2ba126974ddb8eefe9a11df1b3"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d240f593aaa11e9be91f40f24344a08.sqlite",
+        "sha256": "8cafdaefb2ad040c63af2109db2e8d7fbc0b42a1e758a23f24b154a7693436c5"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d2420113aaa11e9b9c1f40f24344a08.sqlite",
+        "sha256": "4ea3e235ec7f8e8338e18afc57360700df82781c23f59cdc113440f03b5dc63d"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d242e2b3aaa11e98a7ff40f24344a08.sqlite",
+        "sha256": "8e5d6f7596d5fb4ecd6e12b39e4c755b3792f5a6a5e9531532c0df59f45d58c8"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d24d5663aaa11e996b8f40f24344a08.sqlite",
+        "sha256": "90e5f91307e3e115f1c6b7e6984ec568a2a25bef54cf99e66b8c44cc0e318e28"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d258f803aaa11e9af1cf40f24344a08.sqlite",
+        "sha256": "45b8df57c82b65875c9eee136e361e1d2fe740b34b3da0f971d881f5937e5e2c"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d25c7783aaa11e9a27af40f24344a08.sqlite",
+        "sha256": "ad965ac5a9896509e1a796ff83a50a50f05f350d40b1eceba0929cfecf978f49"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d2664ee3aaa11e9bb29f40f24344a08.sqlite",
+        "sha256": "65d0184d5df0fe04b406350beade3e0e7377f2f6fc24838bf089a2404f5ef8e6"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d26d4b03aaa11e9acf2f40f24344a08.sqlite",
+        "sha256": "97c2528743d8f24fbc2753ae151367147c04de16a91e1e839d5a3087d3f35126"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d2740303aaa11e9951bf40f24344a08.sqlite",
+        "sha256": "0df29a526e1f9ccfdd5652292928554483a8ff4029230ace984b6ab55873c65d"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d27adfd3aaa11e9b4bef40f24344a08.sqlite",
+        "sha256": "6b4e34ee9eb7d2e5d1b34d3041d7ded32443e2bd6aeb429b4155796ca219f9d9"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d2838263aaa11e9a8a5f40f24344a08.sqlite",
+        "sha256": "75bab94000e15c0f00da1c254af25279747554e1d4298554142818e291d67cfb"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d285ad93aaa11e9912bf40f24344a08.sqlite",
+        "sha256": "e9642adf0a639e0f90c0f7b50aa15c3a891f06d3b5f380009ec7988428ff0e27"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d2879803aaa11e9ae5bf40f24344a08.sqlite",
+        "sha256": "76a749ccc8306461b49e7495d4bb96554c753b3e91148de72802216c0db21689"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d28edfd3aaa11e9a2edf40f24344a08.sqlite",
+        "sha256": "ab4d0be74c407a86a158fabfe0cd5fda1fca718e7a03d283679876a9a60bd03a"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d29b9003aaa11e989dff40f24344a08.sqlite",
+        "sha256": "5a6da1bea12812c4a5966362c1ab3ab6e75cd3e0d7cce2e12cccd200d4d05b9b"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d2a10753aaa11e98aacf40f24344a08.sqlite",
+        "sha256": "8ee6c3fa10ea77a04be3cefc5d2c786bd9fb7535227dec25ef8a161dea3d9f0f"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_4d2a4f823aaa11e984a4f40f24344a08.sqlite",
+        "sha256": "b32319bdf2819f465db2c73970b70396d85ca2a3c96711d9cee4015285c2b8c3"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_5a46cfab312b11e996fc542696d6e445.sqlite",
+        "sha256": "7c0aa9f1168ffab8a9bac34b7a9fba0a7cc48da75c0042ead257c5b3f3550414"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_5a4a35fa312b11e9926c542696d6e445.sqlite",
+        "sha256": "36a92ad698846e54189860e052fe4450ce3dc1624fbc3f6ea30274af42af4b91"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_5a4bc2bd312b11e9ba30542696d6e445.sqlite",
+        "sha256": "3ad106a6631a156095694afa602b02c4a5b613d96006af83402370a3931eca7f"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_5a4bf373312b11e9a9bd542696d6e445.sqlite",
+        "sha256": "241f41c02e15681a11e9369a9a1868d62294c07635722e950ebb56e58a8f5c62"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_5a4c6f70312b11e9b108542696d6e445.sqlite",
+        "sha256": "bc699edecb7a836e413c07a4f0e39a091714ca49452438b4e29feac5a3f1a5c9"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_5a4d636e312b11e9a474542696d6e445.sqlite",
+        "sha256": "f9fab6b340c1d5056fed703f39cfed37f7b0f4781cc4bef56436bb8fa4b39fc8"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_5a4e7cb5312b11e9a2fa542696d6e445.sqlite",
+        "sha256": "f93024e8c25164d0f2f65ab79fb5b13a798362ffbec48f0bfc3feb3b68d0d334"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_5a4efa23312b11e9b5f9542696d6e445.sqlite",
+        "sha256": "77e1b3027bf44eaa3b2aab2592e94b511b697ff489e34ecd2fb6e6ef8380abc6"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_5a4f254c312b11e981f7542696d6e445.sqlite",
+        "sha256": "e6c6ca206dac6b2c71c350f31480fd8cedbf27a017d1d8de363e1764d5e1f7b3"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69ccadd7334311e99873542696d6e445.sqlite",
+        "sha256": "5f81d8bddee7255fb7285e5a09caa3759692f14a999b9091cc6c9fd68528c1ca"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69ccb999334311e990b2542696d6e445.sqlite",
+        "sha256": "040928ad6cada910374b3c91d7e82fb2a4a7ae1b0e4cc9ce35c833caea71f2f7"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69cd1e11334311e9b703542696d6e445.sqlite",
+        "sha256": "02a3779366aac0c5cac4e5e8cb03cf0ca41430d0da2e86cdddfe37adcc7e7e25"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69cf5a2e334311e9a575542696d6e445.sqlite",
+        "sha256": "6d37d283b0cecc9d7a84975f6f070a39d421563b98facb833ef03f8f3037ed27"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69d0a74c334311e9ad2d542696d6e445.sqlite",
+        "sha256": "38ab1de16efae018d36ad5f4749ca29be5ba5fde492812d78880d60b25b8a1c3"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69d19c8a334311e9984a542696d6e445.sqlite",
+        "sha256": "7aa592c242274bfdfa728635309bdad302415c10fe625d01285802cf7e8a46fe"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69d22bb3334311e981da542696d6e445.sqlite",
+        "sha256": "0c57e0b26c6da8cefb00e089dc5923bb072f5b9682f2fc875073b863e983f359"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69d29a23334311e99c4d542696d6e445.sqlite",
+        "sha256": "9c0c18a09612fbfc71af73d4969bc6a3b05bbd7ef6d1cf1034a3ca03bfec63c8"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69d2de5e334311e9903d542696d6e445.sqlite",
+        "sha256": "44af05766a3ef3a4553948970cd06fe14e3037b3e6532282c2fe64c634897719"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69d31c5e334311e9b9d1542696d6e445.sqlite",
+        "sha256": "98b4251a5829fb9e5e9acbcd941526337fe7b6288818698956ed25cbc2a91948"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69d38e97334311e9affa542696d6e445.sqlite",
+        "sha256": "fbe09821a230749488ac44c2a6a787c06f1ae0cb47ac818a7d66dee310a0eb77"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69d45ec0334311e98719542696d6e445.sqlite",
+        "sha256": "a00d2a905baa193080006c2915c352a52f4b716f7f5c429280c28417e9adb0b8"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69d4ce4f334311e9a374542696d6e445.sqlite",
+        "sha256": "aab1810988425b5635410c954a99688dae9fe402389f4f03d3b7a5ef9901e11b"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69d4e34a334311e9b3b1542696d6e445.sqlite",
+        "sha256": "ddef88790e45c500b6564ab429cf77e4d58ce6ed477a3dd68b253f6962c44873"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69d51994334311e99ba2542696d6e445.sqlite",
+        "sha256": "ac97e58eca2c24e523a7bbea6c5d0092a6e6a2749b80ecb8c092d80038c3f418"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69d56ffd334311e9a90e542696d6e445.sqlite",
+        "sha256": "b6108effff3f50a7e8d129c276fb77dec288bd021a7302890c993ba90b435c0f"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_69d5ac6b334311e9af01542696d6e445.sqlite",
+        "sha256": "1785d3e5ab7106ef1e35d4a4b2b2cbf756479a1e3b700247768b9eb74ebd666b"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_6e61364a34ce11e9a4dd542696d6e445.sqlite",
+        "sha256": "24018b45ddcceb546b4692b681f1acd92debee83157f0c5f175e6e76e8c1e684"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_6e614ce634ce11e991e5542696d6e445.sqlite",
+        "sha256": "c17ba1d9168b26dc8391a9b3218b2075c2cda182f8535fead25da56227d67b27"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_733bc10f34c611e988ef542696d6e445.sqlite",
+        "sha256": "142a6d04080b3d0a5cbeb2ff4f0e5ffc79eed10cdb082cedc1a1f1b6448f4ee2"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_733c7e8a34c611e9a7d9542696d6e445.sqlite",
+        "sha256": "ec8a865263a317329777a0a0076528ad6bdd24e4c84d91f5dd7bac7a240d5fff"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_733d8a0c34c611e98d5e542696d6e445.sqlite",
+        "sha256": "7079c77b23108092dbf080ea16d9d33c74690197a1d46b0e0cc617c21aef6e8b"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a7d29bf33b0611e9a963f40f24344a08.sqlite",
+        "sha256": "02238dc617037749098ef21b14afc4ad1e8689a119f5c127b58a230c631d4bb0"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a7d95e453b0611e9945ff40f24344a08.sqlite",
+        "sha256": "ad6b52fd5039687fae98788b20ed1ca45a8e54831d2d593bc3e72fc96dda349f"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a842703a3b0611e9aee6f40f24344a08.sqlite",
+        "sha256": "7f6561d5e1fb0dee6002028055826181b445c19ae2896303e8a254b6bd6679e8"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a846c2d73b0611e99c8df40f24344a08.sqlite",
+        "sha256": "c13db69c61eff2246a70390f83bca888bf48a57c1605908bcd8840201bf5c1fd"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a8477d783b0611e996b9f40f24344a08.sqlite",
+        "sha256": "10198c538d98e338ab76951d133cc65ef7adfa7085e9a890458158cf90765ab5"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a84b9b1c3b0611e983c1f40f24344a08.sqlite",
+        "sha256": "5d8d2385b4c1c73b5bddc0be3d6ec43760d5c53801539ef33c2c07fde2d64eed"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a863094f3b0611e9bbbaf40f24344a08.sqlite",
+        "sha256": "d02f5df76a0180c78c605cd9b5355e076dc3b1f4f2010d11f549c53398c4149d"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a8be3a9e3b0611e98926f40f24344a08.sqlite",
+        "sha256": "77c8d3b2480f00638236fe2f148c5432089502168a5a8d660fe90ad83aff9393"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a8c5a0873b0611e983dbf40f24344a08.sqlite",
+        "sha256": "2e25cf646f668b531d2e9d6f5f6c64006d575a3fa46dc44f3b1cc735ff0b37e8"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a8c8d2943b0611e991a6f40f24344a08.sqlite",
+        "sha256": "de2aca33cdb293fd8ae040676fe2e85ef15e4cc0652b96649638a59b5cce3f87"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a9344ede3b0611e9a282f40f24344a08.sqlite",
+        "sha256": "a2a4bcc449107b93b55528fa6d17581849d249804fa6b1f5376be60720536a53"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a9380fae3b0611e981f6f40f24344a08.sqlite",
+        "sha256": "3c26b81c801d4a8a76d0e4362596209a936fe0269df81346b15d77a43a771a7f"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a94b72873b0611e9b64ff40f24344a08.sqlite",
+        "sha256": "43bc6dac3df49cab3b1b32f0cf25971a2a65d1db467188a885bbd0c34d6618be"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a964f15e3b0611e9a23ff40f24344a08.sqlite",
+        "sha256": "5684615fcb639d5f0bfda5c80b64133031293349249b6f1815067a0b1fbb1165"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a96a938f3b0611e98932f40f24344a08.sqlite",
+        "sha256": "92405a9c10351371028ef015ad1005a9bfce78a3678bc482b1bd35999342089b"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a98db0783b0611e99cdaf40f24344a08.sqlite",
+        "sha256": "498c6f8e3c4442293d77055e9c4ce1e0de2d68b28c27d2cc5ea05ba6fcc38745"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a995fe023b0611e9a75bf40f24344a08.sqlite",
+        "sha256": "4e39191b8ddd6a9470cd4a9c9cedd3b18d750355c9bd53fb96ffa5a5ded808f5"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a99c46cf3b0611e9b51df40f24344a08.sqlite",
+        "sha256": "894645c05278166ee793665b92f25543f6433257582b98109a3291289f215d05"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a9b45e803b0611e98731f40f24344a08.sqlite",
+        "sha256": "c5c93f8158b67ef96270ef5e8e4d5b38c0a44fe481f839d459f58ea76188fa42"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_a9c71dfd3b0611e98806f40f24344a08.sqlite",
+        "sha256": "19fed61149ade703b46261d6b3cdd95f2d56148b45b16a594e96fd97f739aae9"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_aa6fa0b33b0611e984f1f40f24344a08.sqlite",
+        "sha256": "41993fb2b425e382ecfcf15487bf21d825cf0c1804c021b1b477651a7433cba4"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_abac4db03b0611e99a64f40f24344a08.sqlite",
+        "sha256": "55a320adf088503a57e9d9c6d32df6b73384f44879404df9678de17420d270d5"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_abb0238f3b0611e99768f40f24344a08.sqlite",
+        "sha256": "ef91fcfde86a30ff578a5f654f282eb9b4e4b76f41c8ea931d639a4831e00a7c"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c5aad47834b411e9a517542696d6e445.sqlite",
+        "sha256": "80c8a73413d7657f79b810962bb0c369661c765276d5f08096d8015f812c3ec2"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c5ab972834b411e9bf8c542696d6e445.sqlite",
+        "sha256": "f3ae2d7ded515321fc0bf37ac954695945b4afb05cc8ced617bc3138319e53ee"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c5ac847534b411e9bd09542696d6e445.sqlite",
+        "sha256": "4d76c0a98478ad6e8b6b653d05c66bb7cfeaaf2ab4a9dfc4d08cffec8b67c71d"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c5acbc2834b411e9b03b542696d6e445.sqlite",
+        "sha256": "032e98edacf0eee9fd2d045ab1c03a0f58047e240906105431ef0d725e9faa85"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c5accda834b411e9beb7542696d6e445.sqlite",
+        "sha256": "b7aa23ae12df1fd1879582c6573d9ea6dc37d5e98bc70244348cb6eed7470fa6"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c5acd34034b411e9874b542696d6e445.sqlite",
+        "sha256": "ca881b3b6d10c01b85256cc6c6c15f6b542e5116ce042fda564f1ebfc5598465"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c5ae16c234b411e9a75c542696d6e445.sqlite",
+        "sha256": "ba76e487a9525b0c6f2d1fd8ce9702d6b2606c9e4ca5cebec6172fe628de31d7"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c5ae5c4234b411e9a235542696d6e445.sqlite",
+        "sha256": "569d583e25866e58e432e8aea0c7b572333f6f00c61ec5cb0efeedf5bf88e263"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c9896670332111e99719542696d6e445.sqlite",
+        "sha256": "0be1b7ab601efafbc52903fa7be9314a9497b85835f23a5fc66c02fae68c4e75"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c98987cc332111e9865a542696d6e445.sqlite",
+        "sha256": "0325f040888e8efd83eefbbdf485763bf9a1c664dfc02509588402931d19d3b3"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c989a1e3332111e98586542696d6e445.sqlite",
+        "sha256": "3997eb280a0ad095caaf0721dd60845edbe43e4f8580e618d786ce12db883236"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c98a06ab332111e9b639542696d6e445.sqlite",
+        "sha256": "8d003bce2007af4ffb2f351529806ab654f613fafeb3c4467647e9b57cb6be34"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c98a0c6b332111e9ab6e542696d6e445.sqlite",
+        "sha256": "747a2764892671f4f370853ecc745977e19e31d80e1491978f95b9468b794461"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c98a335c332111e99ca4542696d6e445.sqlite",
+        "sha256": "2ae6c0c5f992b67c1481968732784d9eb6c0c317ed66185ada562d993e7566ac"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c98c03ee332111e9b7eb542696d6e445.sqlite",
+        "sha256": "57422af1ba481e9d23a831e202f9bb7c1ff6d06f401864c896a080c1c9be2f2f"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c98c2fe1332111e992dc542696d6e445.sqlite",
+        "sha256": "981cb405896cf7f9ff2ec66c2ee547fec65d32a5715cef1ed30a7a7decac534f"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c98c4ade332111e9a9ce542696d6e445.sqlite",
+        "sha256": "fde5915e2b6305f56ac2c35c354ebf9860569d3c4fbd57e25c82b4599c505077"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c98d1342332111e98d98542696d6e445.sqlite",
+        "sha256": "be4c9a086e7419969392badc5856af9f492f680fcec3cf1615a37542020e7129"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c98df9a6332111e98a66542696d6e445.sqlite",
+        "sha256": "e096dd621c48fbf3a0498745fe4072615e532f78072950aa9d47ee707730816f"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c98dfe73332111e99574542696d6e445.sqlite",
+        "sha256": "3df823618d21412e1fdeee6da1b80c54a2b35039315543ebed9621aee1208fa6"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_c98e2fe8332111e998d5542696d6e445.sqlite",
+        "sha256": "fafca9fb4de434c5251de285d1151521c4ae794fe11c554e32c1a912783c7bac"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_e0ac1aa8333a11e9bd5e542696d6e445.sqlite",
+        "sha256": "4afa625ca2f76b57dec2d8da876f8bc1ba17925b9c68a760a3ce30df82af6013"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_e0ac4d54333a11e98222542696d6e445.sqlite",
+        "sha256": "9283f5bee9fff2f5595c35c69a758fa1111b6bcfffb737e355ae7dcc10421507"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_e0ac610c333a11e99aa7542696d6e445.sqlite",
+        "sha256": "fb29617531fbbd9991b6511f354fea630332cc926562c775b82c8ecda7d827a7"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_e0ae3902333a11e99bbc542696d6e445.sqlite",
+        "sha256": "fbea7d0532dd9de191a1c0e2716a722acd313a4767085d534bc02823ccedb8e0"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_e0ae97c5333a11e9b7cc542696d6e445.sqlite",
+        "sha256": "0e792de9772594709c71eb94dd55a0c5c1c5934b61f8460cedf942836e2ee9bc"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_ed98fadc453d11e999fbf40f24344a08.sqlite",
+        "sha256": "b54634644f8f347b75e93f015fa10ba9ae3bcb17ea42c8bf23e8f65879792f18"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_ee633482453d11e9925ef40f24344a08.sqlite",
+        "sha256": "5b2e2af1c03fa2d58bb3d0dab674928ff7fdc18f71091e84d29460c272fca00c"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_ef10b14a453d11e9ba1ff40f24344a08.sqlite",
+        "sha256": "c3e73ca85bf85835320680fdb4dd055daa7398e9b02a7450f629690a3714b12e"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_ef6b3911453d11e990d3f40f24344a08.sqlite",
+        "sha256": "575a5001650e12c5bb1c9dbb927e56bc696294e9c14ebc4693dc2ea8c443cbe9"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_ef828735453d11e9b24ff40f24344a08.sqlite",
+        "sha256": "ed5cdefdb0fb256c121136d383df589d44f4f462771bd8be1e4c2d8b07339a33"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_ef87c033453d11e9bca4f40f24344a08.sqlite",
+        "sha256": "6d039aad27c7bc2911b833b1572787d5313a91d62293d6190a5dfa18dc9a03a6"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_ef96afd1453d11e9812df40f24344a08.sqlite",
+        "sha256": "0efa3017aa5157e38f5671d43fa30d4a73103c83255040b84d735ed1a0bcc8c1"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_ef98b3ee453d11e9b7faf40f24344a08.sqlite",
+        "sha256": "0da72afba8129504dc3fd3defbc8c5d89dec8c8f4935c3ccdb55e7b491f4789d"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f03a3f4f453d11e98710f40f24344a08.sqlite",
+        "sha256": "8cda047f02013a5adac39209eb2d4c58b93df0d19868f7ef4c11182eb402b183"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f16110de453d11e98d52f40f24344a08.sqlite",
+        "sha256": "89a320ee3506c917be830bfcc0f1e63b4e53d2db937d192647ffd053da9707d8"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f24db459453d11e99b24f40f24344a08.sqlite",
+        "sha256": "54e36e8e4758b73bd77882d2ed5936dc49f11e0970b6ed19428caedc0ef743ec"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f24f259e453d11e98d99f40f24344a08.sqlite",
+        "sha256": "8240ffe9a2d28b58400b70d9b6bd33a9650aef14113dbcbfd86244c2710267a5"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f3263a70453d11e98d96f40f24344a08.sqlite",
+        "sha256": "f0a9f0aece31ed4bd3a4b5c3a6b8e11eb89b38a2cb8e85f1d36669c3ba4ba867"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f3b76928453d11e9ac2ff40f24344a08.sqlite",
+        "sha256": "0fdf8c9b3f4437b5d891ebe9b58df316db83609da55cc212cc311fe8b39eb75a"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f3ba486e453d11e994c6f40f24344a08.sqlite",
+        "sha256": "1718b52ff1d10b3a3673dc7b2f3d24304c90879b0bb97a1978811fdb808f39cb"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f45d8ed4453d11e98572f40f24344a08.sqlite",
+        "sha256": "f5c4f764be107c0b2177905ddebe051db03b1e1f9b82c266a4e0614ff1a72dd9"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f46aa40c453d11e9a616f40f24344a08.sqlite",
+        "sha256": "5c8f75500ad912f2300cec8ddc45d64b6ebd961e4ecdf4595a5f269c958d8cde"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f4c1fb61453d11e98a0ff40f24344a08.sqlite",
+        "sha256": "8bf3eba4a310ff162eea1dd181fdbe9226366ece3388f37a4146692b7a1ced0e"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f5316ef0453d11e9b6ccf40f24344a08.sqlite",
+        "sha256": "c309d220bd7b382d4871f607d9815b913fe5c9fc98ed4da71900b745af9b0aad"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f533fc6b453d11e98142f40f24344a08.sqlite",
+        "sha256": "b313c2d89abbe2d9125179b41494751c42d2e5e9d4efdc91e6ab005a16746192"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f63f89bd453d11e99c65f40f24344a08.sqlite",
+        "sha256": "e6ec9ad64e44d3bb0f724d4e8de3cb63390a747d3a9733e7caccb4017890330f"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f66a0ef0453d11e9ab03f40f24344a08.sqlite",
+        "sha256": "fb0c6f9dd7d612690f6491c4380cc230f6809769698a567e8df978e7881f8c48"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f67b7ea6453d11e98ea0f40f24344a08.sqlite",
+        "sha256": "b0ab3c65824248decb5959df2bc97383713fcef4932886e9eacfa52322803c1b"
+      },
+      {
+        "path": "isolated_table_dbs/crudsql_db_f6d8fb8a453d11e98359f40f24344a08.sqlite",
+        "sha256": "f074df5402c857dc9ba9fa3049f6027496cae784772027d9b03332ca0ec576b4"
+      }
+    ],
+    "path": "stage6b_crudsql_confirmation_dataset_20260824.zip",
+    "sha256": "348c365ee60afb20ded0773e8f78d5a941033ae4870f29d8654a6538f4983fce"
+  },
+  "dataset_manifest_sha256": "67fcf9d4be6d28871bedb7059acf56acfb3b06e4f617a38479e0e21a737e06b1",
+  "gpu_called": false,
+  "model_called": false,
+  "reviewer_readme_sha256": "a97b96198e69a9a08ab88b753f416b2b593e8d95b6e79a62888cde047fd3ff11",
+  "stage": "Stage6B_CRUDSQL_CONFIRMATION_DATASET_REGISTRATION",
+  "status": "PASS_REGISTERED_PENDING_REVIEWER_ACCEPTANCE",
+  "validation_policy": {
+    "any_nonzero_overlap_count_fails": true,
+    "database_id_namespace_overlap_count_fails_if_nonzero": true,
+    "gold_review_required_before_gpu": true,
+    "stage5_method_protocol_unchanged": true
+  },
+  "validation_report_sha256": "f25b5d173cc5a69ae4ef2e37ccccdd2cde381a715741195b62e75652ca7df80b"
+}

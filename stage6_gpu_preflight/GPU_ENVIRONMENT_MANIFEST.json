@@ -1,0 +1,48 @@
+{
+  "captured_at_unix": 1787630206,
+  "environment_matches_expected": false,
+  "environment_variables": {
+    "CUDA_VISIBLE_DEVICES": null,
+    "HF_HOME": null,
+    "NVIDIA_VISIBLE_DEVICES": null,
+    "TRANSFORMERS_CACHE": null
+  },
+  "expected_environment": {
+    "accelerate": "1.14.0",
+    "bitsandbytes": "0.47.0",
+    "cuda_wheel_index": "https://download.pytorch.org/whl/cu124",
+    "python_major_minor": "3.12",
+    "safetensors": "0.5.3",
+    "tokenizers": "0.22.2",
+    "torch": "2.6.0+cu124",
+    "transformers": "5.5.3"
+  },
+  "nvidia_smi": {
+    "available": false,
+    "error": "[WinError 2] The system cannot find the file specified"
+  },
+  "packages": {
+    "accelerate": null,
+    "bitsandbytes": null,
+    "safetensors": null,
+    "tokenizers": null,
+    "torch": null,
+    "transformers": null
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.3",
+  "python_executable": "C:\\Python314\\python.exe",
+  "sqlite_runtime": {
+    "python_sqlite_module_file": "C:\\Python314\\Lib\\sqlite3\\__init__.py",
+    "sqlite_version": "3.50.4",
+    "sqlite_version_info": [
+      3,
+      50,
+      4
+    ]
+  },
+  "torch_cuda": {
+    "error": "No module named 'torch'",
+    "torch_imported": false
+  }
+}

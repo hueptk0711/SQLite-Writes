@@ -1,0 +1,14 @@
+{
+  "chat_prompt_sha256": "9e6d3521f494d5a5e19845b1af0010d7fae30146add9c30f165490cc442b0092",
+  "confirmation_predictions_created": false,
+  "confirmation_samples_used": 0,
+  "decoded_output_preview": "Certainly! Here is the SQL statement to insert a row with `id` as 1 and `name` as \"Alice\" into the table `demo`",
+  "decoded_output_sha256": "5fcec57e984151a91de77306b34a5478d969a1bf5425928c93b53d2b72e7e832",
+  "input_token_count": 61,
+  "max_new_tokens": 32,
+  "model_generate_called_for_confirmation_samples": false,
+  "model_generate_called_for_synthetic_smoke": true,
+  "output_token_count": 32,
+  "prompt_sha256": "accacd8c53f9a53ddbeb8a7bc44b876fd3aca1d01ee915bbdd6af4d1df47442b",
+  "status": "PASS"
+}

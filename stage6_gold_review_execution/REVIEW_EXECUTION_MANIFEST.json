@@ -1,0 +1,122 @@
+{
+  "agreed_approved_count": 431,
+  "agreed_rejected_count": 17,
+  "agreement_report_sha256": "4103c8fdffb262f04d5c0a46f20a68207fa114671e5da10696c12a47c9175d57",
+  "confirmation_run_allowed_now": false,
+  "disagreement_count": 52,
+  "distinct_reviewer_assertion": "required_by_protocol_and_recorded_as_execution_condition",
+  "execution_archive": {
+    "member_count": 17,
+    "members": [
+      {
+        "path": "FINAL_REJECTION_RESOLUTION_LOCK.json",
+        "sha256": "144cd6c24256de54aa8b4a0f1ab29099817d3260d90dcf742e81178c65f5a88f"
+      },
+      {
+        "path": "R01_R02_AGREEMENT_REPORT.json",
+        "sha256": "4103c8fdffb262f04d5c0a46f20a68207fa114671e5da10696c12a47c9175d57"
+      },
+      {
+        "path": "REVIEWER_README.md",
+        "sha256": "b934ed5a748664c58f13f798dbc95c91de62a6a5dd64661255e70eb6ce88a797"
+      },
+      {
+        "path": "REVIEW_EXECUTION_MANIFEST.json",
+        "sha256": "877db82a0989aa2d44ae1b1507ec396820783418574beda32789f8f2fea2b07a"
+      },
+      {
+        "path": "Stage6C_R03_blind_adjudication_packet_20260824.zip",
+        "sha256": "8fb2f3ab118a092c336a45afdf844325d429eccb9e997ec30ae47ddb6feaa6bc"
+      },
+      {
+        "path": "Stage6C_R04_final_rejection_resolution_packet_20260824.zip",
+        "sha256": "77240140ccccab7d5d0a1e5d6cf15368d0547573dca6621a27f744a554b0402c"
+      },
+      {
+        "path": "VALIDATION_REPORT.md",
+        "sha256": "40d231995da0666867b92caea083d0c53a43f9a04df49c76948b200a6b341e0c"
+      },
+      {
+        "path": "r03_blind_packet/R03_BLIND_PACKET_MANIFEST.json",
+        "sha256": "c801aca2686dab8a65aff3e9ce657b71a406e8e9afec9ed8ebf36ff37d0d49fd"
+      },
+      {
+        "path": "r03_blind_packet/official_table_metadata.jsonl",
+        "sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93"
+      },
+      {
+        "path": "r03_blind_packet/r03_blind_review_items.jsonl",
+        "sha256": "af675fb312ef843e8d7c376fd56042586f9f8eca0b539e60cd3d21c46d597e8a"
+      },
+      {
+        "path": "r03_blind_packet/stage6c_gold_review_R03.tsv",
+        "sha256": "bea08944ea543ab68fa0c343425f03353a2376cfe9db18312aaeac5f56dffbef"
+      },
+      {
+        "path": "r04_resolution_packet/R04_PACKET_MANIFEST.json",
+        "sha256": "c51edcbff56f7b72e650f40cf7164396206ccf38d5d7a94145eefe6304ae3c7f"
+      },
+      {
+        "path": "r04_resolution_packet/official_table_metadata.jsonl",
+        "sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93"
+      },
+      {
+        "path": "r04_resolution_packet/r04_resolution_items.jsonl",
+        "sha256": "a258741edda346afbbeb75b0ad8f98232f4b1d3fac39875e102e2021a7ad9ff0"
+      },
+      {
+        "path": "r04_resolution_packet/stage6c_final_rejection_R04.tsv",
+        "sha256": "2cb79107c0e28f8878912012e279307f8ae6dc4326037dfbe272fd27f34879da"
+      },
+      {
+        "path": "submissions/stage6c_gold_review_R01.submitted.tsv",
+        "sha256": "38f65faffad6e686ce978673faba77f9f88b40379c1e02f4f2e47eebd681fa82"
+      },
+      {
+        "path": "submissions/stage6c_gold_review_R02.submitted.tsv",
+        "sha256": "28922ebfacd028077266b534c66d8ed0b39331f75ebf21e9bbd5cfb4a9286db3"
+      }
+    ],
+    "path": "stage6c_review_execution_artifacts_20260824.zip",
+    "sha256": "d8040a0b5e8df2f4e48c9d58b897e1d48557f1f70c2ed0ce937037572fe9486a"
+  },
+  "final_gold_freeze_created": false,
+  "final_rejection_resolution_lock_created": true,
+  "final_rejection_resolution_lock_sha256": "144cd6c24256de54aa8b4a0f1ab29099817d3260d90dcf742e81178c65f5a88f",
+  "gold_review_items_sha256": "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b",
+  "gpu_called": false,
+  "model_called": false,
+  "next_steps": [
+    "send_blind_R03_packet_and_wait_for_adjudication",
+    "resolve_agreed_rejected_items_under_FINAL_REJECTION_RESOLUTION_LOCK"
+  ],
+  "official_table_metadata_sha256": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93",
+  "protocol_addendum_sha256": "93b78d7d1f008e117b09dc0eb93cdaa7c017aedbeca83aa34e932d5fdd8f19b2",
+  "pseudonymous_reviewer_role_ids": [
+    "R01",
+    "R02"
+  ],
+  "r03_blind_packet_created": true,
+  "r03_blind_packet_manifest_sha256": "c801aca2686dab8a65aff3e9ce657b71a406e8e9afec9ed8ebf36ff37d0d49fd",
+  "r04_resolution_packet_created": true,
+  "r04_resolution_packet_manifest_sha256": "c51edcbff56f7b72e650f40cf7164396206ccf38d5d7a94145eefe6304ae3c7f",
+  "reviewer_isolation_attestation": {
+    "R01_R02_decisions_or_notes_shared_before_both_submitted": false,
+    "cross_reviewer_discussion_before_submission": false,
+    "model_predictions_visible_to_reviewers": false
+  },
+  "setup_lock_sha256": "5a9d49c0e0a0e1514c95b8348488b5c4397808587709cda9399b0bfc1993881a",
+  "stage": "Stage6C_REVIEW_EXECUTION_AND_ADJUDICATION_PREP",
+  "stage6b_commit": "bbbe4d374edd60696b0765771640a946a838fd4d",
+  "stage6c_setup_commit": "cd89a33f41d4be6ba8094789aa6141fafd55b2c8",
+  "status": "PASS_PENDING_R03_AND_FINAL_REJECTION_RESOLUTION",
+  "submission_hashes": {
+    "R01_submission_sha256": "38f65faffad6e686ce978673faba77f9f88b40379c1e02f4f2e47eebd681fa82",
+    "R02_submission_sha256": "28922ebfacd028077266b534c66d8ed0b39331f75ebf21e9bbd5cfb4a9286db3"
+  },
+  "submission_timestamps_recorded_from_source_files": {
+    "R01_submission_source_mtime": 1787563563.4983177,
+    "R02_submission_source_mtime": 1787563568.2627301
+  },
+  "validation_violations": []
+}

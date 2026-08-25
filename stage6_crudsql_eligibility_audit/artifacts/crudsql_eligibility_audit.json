@@ -1,0 +1,217 @@
+{
+  "decision": {
+    "claim_boundary": "external_generalization_to_public_Chinese_single_table_SQLite_insert_benchmark",
+    "eligible_for_stage6b_registration_after_reviewer_acceptance": true,
+    "recommended_registration_n": 500,
+    "recommended_sampling_policy": "use_all_eligible_official_test_type0_examples_no_random_sampling"
+  },
+  "gpu_called": false,
+  "isolated_table_db_audit": {
+    "db_dir": "isolated_table_dbs",
+    "fresh_single_table_db_per_official_table": true,
+    "manifest_path": "artifacts/isolated_table_db_manifest.json",
+    "status": "PASS",
+    "table_count": 125
+  },
+  "mcnemar_threshold_sensitivity": {
+    "analysis_type": "mcnemar_threshold_sensitivity_not_power_analysis",
+    "candidate_n": 500,
+    "declared_family": [
+      "H1_method_level_confirmation",
+      "H2_F_incremental_confirmation"
+    ],
+    "holm_floor_used_for_sensitivity": 0.025,
+    "hypothesis": "H2_D_F_G1_vs_D_G1",
+    "recommendation": "use_all_official_test_type0_examples_if_eligibility_passes",
+    "rows": [
+      {
+        "exact_two_sided_mcnemar_p": 0.015625,
+        "minimum_favorable_discordant_pairs_with_zero_regressions_for_p_lt_0_025": 7,
+        "minimum_favorable_rate": 0.023333333333333334,
+        "n": 300
+      },
+      {
+        "exact_two_sided_mcnemar_p": 0.015625,
+        "minimum_favorable_discordant_pairs_with_zero_regressions_for_p_lt_0_025": 7,
+        "minimum_favorable_rate": 0.0175,
+        "n": 400
+      },
+      {
+        "exact_two_sided_mcnemar_p": 0.015625,
+        "minimum_favorable_discordant_pairs_with_zero_regressions_for_p_lt_0_025": 7,
+        "minimum_favorable_rate": 0.014,
+        "n": 500
+      }
+    ],
+    "status": "PASS"
+  },
+  "model_called": false,
+  "overlap_audit": {
+    "canonical_content_hash_overlap_count": 0,
+    "crudsql_sample_count": 500,
+    "crudsql_table_count": 125,
+    "database_fingerprint_coverage": {
+      "database_byte_or_profile_fingerprint_checked_for_sources": [
+        "final_holdout_release_300"
+      ],
+      "database_byte_or_profile_fingerprint_unavailable_for_sources": [
+        "stage4_fresh_300",
+        "archived_677_pool"
+      ],
+      "database_identity_overlap_checked_for_sources": [
+        "stage4_fresh_300",
+        "final_holdout_release_300",
+        "archived_677_pool"
+      ]
+    },
+    "database_fingerprint_overlap_count": 0,
+    "database_id_namespace_overlap_count": 0,
+    "disclosure": "Stage6A PATCH2 compares stable sample locators, text/content hashes, source groups, and database identities across all forbidden prior sources. Database byte/profile fingerprint comparison is limited to prior sources with packaged DB/profile assets, as recorded in database_fingerprint_coverage. The final decision ignores no missing expected forbidden source.",
+    "expected_forbidden_reference_set_count": 3,
+    "input_text_hash_overlap_count": 0,
+    "loaded_forbidden_reference_set_count": 3,
+    "reference_digest_counts": {
+      "canonical_content_sha256": 977,
+      "database_ids": 16,
+      "database_profile_fingerprints": 10,
+      "input_text_sha256": 965,
+      "sample_ids": 977,
+      "source_groups": 977
+    },
+    "reference_registry_status": "PASS_REFERENCE_REGISTRY_FROZEN",
+    "reference_registry_violations": [],
+    "reference_source_digest_counts": {
+      "archived_677_pool": {
+        "canonical_content_sha256": 677,
+        "database_ids": 0,
+        "database_profile_fingerprints": 0,
+        "input_text_sha256": 665,
+        "sample_ids": 377,
+        "source_groups": 677
+      },
+      "final_holdout_release_300": {
+        "canonical_content_sha256": 300,
+        "database_ids": 5,
+        "database_profile_fingerprints": 10,
+        "input_text_sha256": 300,
+        "sample_ids": 300,
+        "source_groups": 300
+      },
+      "stage4_fresh_300": {
+        "canonical_content_sha256": 0,
+        "database_profile_fingerprints": 0,
+        "input_text_sha256": 0,
+        "sample_ids": 300
+      }
+    },
+    "reference_sources": [
+      {
+        "name": "stage4_fresh_300",
+        "path": "stage4_fresh_7b_protocol/data/fresh_dataset_manifest.json",
+        "sample_count": 300,
+        "source_artifact_sha256": "d1850063af0a5b235cc4e8854d72b146fcca6e26bdebb5617ac3048abd4726ec"
+      },
+      {
+        "name": "final_holdout_release_300",
+        "path": "03_protocol_and_data/final_holdout_release/mp_fs_plus_external_holdout_300_20260731.zip",
+        "sample_count": 300,
+        "source_artifact_sha256": "525cdd7006ea32a8ab8d81f842332ac9b403dce2472cde608efb4e6962d456df"
+      },
+      {
+        "name": "archived_677_pool",
+        "path": "D:/paper kltn/text to sql/99_archive_history_20260731/legacy_sources_and_results/server_downloads/paper_v3_release_20260726/source/paper_v3_mapping_first/data/frozen/test/dataset_test_v3.json",
+        "sample_count": 677,
+        "source_artifact_sha256": "70d8a38552f46f81fee9abe04f0ebf96a862405965aeaff9958455dad08ebfb4"
+      }
+    ],
+    "sample_id_overlap_count": 0,
+    "source_group_overlap_count": 0,
+    "status": "PASS",
+    "upstream_locator_overlap_count": 0
+  },
+  "registration_status": "not_registered_in_stage6a",
+  "split_counts": {
+    "dev": {
+      "by_type": {
+        "0": 240,
+        "1": 240,
+        "2": 240,
+        "3": 240
+      },
+      "by_type_label": {
+        "Create": 240,
+        "Delete": 240,
+        "Read": 240,
+        "Update": 240
+      },
+      "total": 960
+    },
+    "test": {
+      "by_type": {
+        "0": 500,
+        "1": 500,
+        "2": 500,
+        "3": 500
+      },
+      "by_type_label": {
+        "Create": 500,
+        "Delete": 500,
+        "Read": 500,
+        "Update": 500
+      },
+      "total": 2000
+    },
+    "train": {
+      "by_type": {
+        "0": 1760,
+        "1": 1760,
+        "2": 1760,
+        "3": 1760
+      },
+      "by_type_label": {
+        "Create": 1760,
+        "Delete": 1760,
+        "Read": 1760,
+        "Update": 1760
+      },
+      "total": 7040
+    }
+  },
+  "sqlite_checks": {
+    "dev": {
+      "integrity_check": "ok",
+      "opens_with_sqlite": true,
+      "path": "data/dev/dev.db",
+      "sha256": "0134a3a27371b6e914b5803dda2fa5481f4f350b56394bf99063c8bbb1cf1fa6",
+      "table_count": 60,
+      "total_rows": 1129
+    },
+    "test": {
+      "integrity_check": "ok",
+      "opens_with_sqlite": true,
+      "path": "data/test/test.db",
+      "sha256": "c868184575176332fb706f07ce8ae53b13898f5cb242984af06a2ae7a311f580",
+      "table_count": 125,
+      "total_rows": 2878
+    },
+    "train": {
+      "integrity_check": "ok",
+      "opens_with_sqlite": true,
+      "path": "data/train/train.db",
+      "sha256": "29a1d5f3e1eed9512a77e68a889676f2b64ff1a6d6bf4fcb7d3ad22e512fa219",
+      "table_count": 440,
+      "total_rows": 7467
+    }
+  },
+  "stage": "Stage6A_CRUDSQL_ELIGIBILITY_AUDIT_PATCH2",
+  "status": "PASS_ELIGIBLE_FOR_STAGE6B_REGISTRATION",
+  "type0_adapter": {
+    "adapter_fail_count": 0,
+    "adapter_pass_count": 500,
+    "exact_inserted_row_validation": true,
+    "failure_counts": {},
+    "fresh_db_per_sample": true,
+    "gold_state_policy": "for each official test type=0 sample, start from the isolated fresh single-table SQLite DB, execute the parameterized CRUDSQL conds-derived INSERT, verify the exact inserted row including SQLite affinity and NULL unspecified columns, and hash the post-state",
+    "official_test_type0_count": 500
+  }
+}

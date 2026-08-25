@@ -1,0 +1,8 @@
+{
+  "d_g1_and_d_f_g1_share_generation": true,
+  "h2_shared_raw_generation_path": "raw_generations/shared_mp_fs_plus_generation.jsonl",
+  "original_mp_fs_plus_uses_independent_generation": true,
+  "original_raw_generation_path": "raw_generations/original_mp_fs_plus.jsonl",
+  "reason": "H1 compares final method to original MP-FS+ as independent generation arms; H2 isolates F by replaying D_G1 and D_F_G1 from the same MP-FS+ raw generation.",
+  "status": "LOCKED"
+}

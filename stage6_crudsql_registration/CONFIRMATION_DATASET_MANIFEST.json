@@ -1,0 +1,31 @@
+{
+  "confirmation_run_allowed_now": false,
+  "distribution_report_sha256": "d62cfcd9ef403ae1bf88b05e97bf3751ee6e52a6dbb5d53ff843d47b4c17a758",
+  "gold_post_state_hashes_sha256": "84f9755b84e3ecd86b4fb55a88726e9aa3611e964c93de7e8559ab1da5aeaaa9",
+  "gold_programs_sha256": "8ca5a5bb8a1308fef347687a1a3964d296aa89e427d31e17aaf5e50398e1c3f4",
+  "gold_review_protocol_sha256": "15a31c192f3fca0107ea19aaf3e28debe1ea840c48cea846adf1e0e3075d0546",
+  "gold_write_plans_sha256": "ae72a7508d71f9ea60be9052adca4ace85cf0efe4760aa2202297fd9ec4201c4",
+  "gpu_called": false,
+  "isolated_table_db_manifest_sha256": "648fa6808539278926ecd1a40d07cc61af8b0d0cc1c2930f52850774bfae4536",
+  "model_called": false,
+  "overlap_audit_sha256": "00c33bbad57d56bd2377d73411a37267c439fd2e222dc0ca4bb722853e3053a2",
+  "overlap_registry_self_hash": "1c11ff21d827ee9c22192c0ba04f3edd58405036ffff521013375236571247b5",
+  "overlap_registry_sha256": "4628077dd0f00a2441ccb22fdb0257b43f34d475d0e277a0a08773d3aabeec4b",
+  "registered_ids_sha256": "b00b8d67f036adbd9a234a50a16decadc120aff708225252ae11407fbdc394a9",
+  "registered_samples_sha256": "5ce7e08428f709b77b2ff8823ade9eb71a1458233443bcca5ea1df1daebd4001",
+  "sample_count": 500,
+  "source": {
+    "commit": "63bfce67d8391185453a812751e115a499201363",
+    "dataset": "CRUDSQL",
+    "repository": "https://github.com/bizard-lab/CRUDSQL.git",
+    "sampling": "none_use_all_eligible_examples",
+    "split": "official test",
+    "subset": "all type=0 Create examples"
+  },
+  "stage": "Stage6B_CRUDSQL_CONFIRMATION_DATASET_REGISTRATION",
+  "stage5_method_commit": "79f6a82144ec0407444ef37121f70eed2b20e01c",
+  "stage5_protocol_commit": "a7742b4c9150ab208e7c5d6708f0dff40bf05440",
+  "stage6a_accepted_commit": "6aba9a40de238f272ae7d4a907f797ef65bf875a",
+  "status": "REGISTERED_PENDING_REVIEWER_ACCEPTANCE",
+  "table_count": 125
+}

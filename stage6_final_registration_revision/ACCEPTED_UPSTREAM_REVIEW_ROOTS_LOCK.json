@@ -1,0 +1,40 @@
+{
+  "actual_upstream_artifact_roots": {
+    "c01_submission_tsv_sha256": "56b24e07e721d2209e4db3928860f9690e07237f2da91a158cc414ca45a752c8",
+    "c02_submission_tsv_sha256": "4f01075dd3bcf1affc039c65841b04ccf7a50388f0b8d289b5df43af51cee6ed",
+    "r01_submission_tsv_sha256": "38f65faffad6e686ce978673faba77f9f88b40379c1e02f4f2e47eebd681fa82",
+    "r02_submission_tsv_sha256": "28922ebfacd028077266b534c66d8ed0b39331f75ebf21e9bbd5cfb4a9286db3",
+    "r03_adjudication_report_sha256": "196ac666b7ba4fa3e1b4a266c0758aad073aa8138e4c77bbc18486e59bb811a1",
+    "r03_submission_tsv_sha256": "ecef969a6ea52904f249fa9121fbc6d2ed5e039122fe05dc1472caeba1bc5518",
+    "r04_resolution_report_sha256": "56d9b95be1b65cd5021b239afc008cb8b311baed3d26ae63b059aab6a066bc75",
+    "stage6b_registration_lock_sha256": "e8480a6169a36f5a47a2d0d89368eb411d4bd33acf47207eca1c9ad3cef06a8f",
+    "stage6c_execution_manifest_sha256": "90428542a9d35e8420d22f56795d9a7f6843b20165e55fa03ebbbd8272bceeec",
+    "stage6c_gold_review_items_sha256": "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b",
+    "stage6c_gold_review_protocol_addendum_sha256": "93b78d7d1f008e117b09dc0eb93cdaa7c017aedbeca83aa34e932d5fdd8f19b2",
+    "stage6c_gold_review_setup_lock_sha256": "5a9d49c0e0a0e1514c95b8348488b5c4397808587709cda9399b0bfc1993881a",
+    "stage6d_corrected_review_items_sha256": "28bbbaad52cea9d9511a11ca7ac92115b72533801189ffacc5cad6e4369c787c",
+    "stage6d_execution_manifest_sha256": "baaa8eb48ed5bb3f5e7f771ce9b3b0f5e8b7e094f567b5471b6d6905328da55e",
+    "stage6d_setup_lock_sha256": "b259437488603696fc101d214279399f720ab7c7ee523fbe877f279a4c8d30d1"
+  },
+  "description": "Authoritative prior-stage human-review roots accepted before Stage6E final gold assembly.",
+  "expected_accepted_upstream_artifact_roots": {
+    "c01_submission_tsv_sha256": "56b24e07e721d2209e4db3928860f9690e07237f2da91a158cc414ca45a752c8",
+    "c02_submission_tsv_sha256": "4f01075dd3bcf1affc039c65841b04ccf7a50388f0b8d289b5df43af51cee6ed",
+    "r01_submission_tsv_sha256": "38f65faffad6e686ce978673faba77f9f88b40379c1e02f4f2e47eebd681fa82",
+    "r02_submission_tsv_sha256": "28922ebfacd028077266b534c66d8ed0b39331f75ebf21e9bbd5cfb4a9286db3",
+    "r03_adjudication_report_sha256": "196ac666b7ba4fa3e1b4a266c0758aad073aa8138e4c77bbc18486e59bb811a1",
+    "r03_submission_tsv_sha256": "ecef969a6ea52904f249fa9121fbc6d2ed5e039122fe05dc1472caeba1bc5518",
+    "r04_resolution_report_sha256": "56d9b95be1b65cd5021b239afc008cb8b311baed3d26ae63b059aab6a066bc75",
+    "stage6b_registration_lock_sha256": "e8480a6169a36f5a47a2d0d89368eb411d4bd33acf47207eca1c9ad3cef06a8f",
+    "stage6c_execution_manifest_sha256": "90428542a9d35e8420d22f56795d9a7f6843b20165e55fa03ebbbd8272bceeec",
+    "stage6c_gold_review_items_sha256": "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b",
+    "stage6c_gold_review_protocol_addendum_sha256": "93b78d7d1f008e117b09dc0eb93cdaa7c017aedbeca83aa34e932d5fdd8f19b2",
+    "stage6c_gold_review_setup_lock_sha256": "5a9d49c0e0a0e1514c95b8348488b5c4397808587709cda9399b0bfc1993881a",
+    "stage6d_corrected_review_items_sha256": "28bbbaad52cea9d9511a11ca7ac92115b72533801189ffacc5cad6e4369c787c",
+    "stage6d_execution_manifest_sha256": "baaa8eb48ed5bb3f5e7f771ce9b3b0f5e8b7e094f567b5471b6d6905328da55e",
+    "stage6d_setup_lock_sha256": "b259437488603696fc101d214279399f720ab7c7ee523fbe877f279a4c8d30d1"
+  },
+  "stage": "Stage6E_ACCEPTED_UPSTREAM_REVIEW_ROOTS_LOCK",
+  "status": "PASS",
+  "violations": []
+}

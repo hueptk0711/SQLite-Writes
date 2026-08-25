@@ -1,0 +1,121 @@
+{
+  "actual_model_aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+  "actual_model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "confirmation_prediction_generated": false,
+  "expected_model_aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+  "expected_model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357",
+  "expected_model_lock": {
+    "backend": "hf",
+    "batch_size": 1,
+    "bnb_4bit_quant_storage": "uint8",
+    "bnb_4bit_quant_type": "fp4",
+    "bnb_4bit_use_double_quant": false,
+    "chat_template_usage": {
+      "add_generation_prompt": true,
+      "messages": [
+        {
+          "content": "<production_prompt>",
+          "role": "user"
+        }
+      ],
+      "tokenize": false
+    },
+    "compute_dtype": "float16",
+    "context_length": 32768,
+    "device_map": "auto",
+    "do_sample": false,
+    "input_truncation_policy": "error",
+    "max_input_tokens": 28672,
+    "max_new_tokens": 4096,
+    "model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357",
+    "model_hash": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "padding_side": "left",
+    "quantization": "4bit",
+    "revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "seed": 42,
+    "temperature": null,
+    "tokenizer_sha256": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468",
+    "top_k": null,
+    "top_p": null,
+    "trust_remote_code": false
+  },
+  "expected_model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "generation_config_sha256": "04b672587c504dccaf508c944cabc2c0efe008a3079600ed964f7895835b2b94",
+  "local_model_manifest": {
+    "aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+    "file_count": 11,
+    "files": {
+      "config.json": {
+        "sha256": "c0242402ad6a13b331ea320feea8c7e3776ffb7a4eff0757b9cd667e116d9a28",
+        "size_bytes": 663
+      },
+      "generation_config.json": {
+        "sha256": "1a628a5775bc69cde01c6749a531150ca4d3189652c618a174f7077923acf3b1",
+        "size_bytes": 242
+      },
+      "merges.txt": {
+        "sha256": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+        "size_bytes": 1671839
+      },
+      "model-00001-of-00004.safetensors": {
+        "sha256": "0b6f069918b07c064cbba8ae4f00f529aa9bbf84b7cdfcb7fc2694a40f6aa8ef",
+        "size_bytes": 4877660776
+      },
+      "model-00002-of-00004.safetensors": {
+        "sha256": "c3d46733e7aa054ea7b063fbccd0a5a08446e7bd1814bef26936c5aa1331da62",
+        "size_bytes": 4932751008
+      },
+      "model-00003-of-00004.safetensors": {
+        "sha256": "9fe45dacee087385b3d2d6dd27a7413a8a56d95f145772facc148fa86fc73446",
+        "size_bytes": 4330865200
+      },
+      "model-00004-of-00004.safetensors": {
+        "sha256": "5aa6e5cbe642377fd441fb4e60e83cca96b2bcd9820e245b9ea06d94653f17f2",
+        "size_bytes": 1089994880
+      },
+      "model.safetensors.index.json": {
+        "sha256": "998a078123ffc97763690de7f2a677eb89168af5eaf8a5e12e6bc24d18e25bdb",
+        "size_bytes": 27752
+      },
+      "tokenizer.json": {
+        "sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+        "size_bytes": 7031645
+      },
+      "tokenizer_config.json": {
+        "sha256": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
+        "size_bytes": 7305
+      },
+      "vocab.json": {
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+        "size_bytes": 2776833
+      }
+    },
+    "manifest_version": 1,
+    "model_path": "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242"
+  },
+  "model_aggregate_match": true,
+  "model_class": "Qwen2ForCausalLM",
+  "model_config_match": true,
+  "model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357",
+  "model_generate_called": true,
+  "model_generate_called_for_confirmation_samples": false,
+  "model_generate_called_for_synthetic_smoke": true,
+  "model_loaded": true,
+  "model_name_or_path": "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "status": "PASS",
+  "synthetic_smoke_embedded_report": {
+    "chat_prompt_sha256": "9e6d3521f494d5a5e19845b1af0010d7fae30146add9c30f165490cc442b0092",
+    "confirmation_predictions_created": false,
+    "confirmation_samples_used": 0,
+    "decoded_output_preview": "Certainly! Here is the SQL statement to insert a row with `id` as 1 and `name` as \"Alice\" into the table `demo`",
+    "decoded_output_sha256": "5fcec57e984151a91de77306b34a5478d969a1bf5425928c93b53d2b72e7e832",
+    "input_token_count": 61,
+    "max_new_tokens": 32,
+    "model_generate_called_for_confirmation_samples": false,
+    "model_generate_called_for_synthetic_smoke": true,
+    "output_token_count": 32,
+    "prompt_sha256": "accacd8c53f9a53ddbeb8a7bc44b876fd3aca1d01ee915bbdd6af4d1df47442b",
+    "status": "PASS"
+  }
+}

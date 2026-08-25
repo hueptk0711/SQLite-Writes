@@ -1,0 +1,130 @@
+{
+  "R03_approved_count": 29,
+  "R03_approved_ids": [
+    "stage6_crudsql_0208",
+    "stage6_crudsql_0209",
+    "stage6_crudsql_0210",
+    "stage6_crudsql_0260",
+    "stage6_crudsql_0261",
+    "stage6_crudsql_0262",
+    "stage6_crudsql_0263",
+    "stage6_crudsql_0272",
+    "stage6_crudsql_0273",
+    "stage6_crudsql_0274",
+    "stage6_crudsql_0275",
+    "stage6_crudsql_0288",
+    "stage6_crudsql_0289",
+    "stage6_crudsql_0290",
+    "stage6_crudsql_0291",
+    "stage6_crudsql_0308",
+    "stage6_crudsql_0309",
+    "stage6_crudsql_0310",
+    "stage6_crudsql_0311",
+    "stage6_crudsql_0323",
+    "stage6_crudsql_0360",
+    "stage6_crudsql_0361",
+    "stage6_crudsql_0362",
+    "stage6_crudsql_0363",
+    "stage6_crudsql_0368",
+    "stage6_crudsql_0369",
+    "stage6_crudsql_0370",
+    "stage6_crudsql_0371",
+    "stage6_crudsql_0466"
+  ],
+  "R03_rejected_count": 23,
+  "R03_rejected_items": [
+    {
+      "R03_notes_sha256": "8d65303a1c9d34685a3e0e944c81edc1c23a2670fdb67f20042faa74c5095724",
+      "stage6_sample_id": "stage6_crudsql_0044"
+    },
+    {
+      "R03_notes_sha256": "81effce8168789a15a19ebec72edf0859abacef99df8e5eec1ae55a28034f19a",
+      "stage6_sample_id": "stage6_crudsql_0076"
+    },
+    {
+      "R03_notes_sha256": "ff24168097b864bc17c5e05ce9f1e7be6962ec5e57fad5877c6340160725af8e",
+      "stage6_sample_id": "stage6_crudsql_0077"
+    },
+    {
+      "R03_notes_sha256": "9fc3e1e3658fbca691463f79215c6060747856b85c5970fa0445d12539a3a742",
+      "stage6_sample_id": "stage6_crudsql_0078"
+    },
+    {
+      "R03_notes_sha256": "5efb919f9c6be13a4f736ffc7a459ca27f921879a8853ec1fe5d3aed0225cc33",
+      "stage6_sample_id": "stage6_crudsql_0079"
+    },
+    {
+      "R03_notes_sha256": "13ee027e5faf13d0eccb9b5ff31ca418fad0ab6f15ecd8cef81ee55784f0decf",
+      "stage6_sample_id": "stage6_crudsql_0084"
+    },
+    {
+      "R03_notes_sha256": "9223cd1447b1e6b6bcfd67ae7d70a2ee0afe9243d27d7db948713f96be03bcf5",
+      "stage6_sample_id": "stage6_crudsql_0086"
+    },
+    {
+      "R03_notes_sha256": "a2717f9aaf2e320c6b4c93cc09041c5dfbe22c32f4df7d54903321a72f1ac738",
+      "stage6_sample_id": "stage6_crudsql_0200"
+    },
+    {
+      "R03_notes_sha256": "a2717f9aaf2e320c6b4c93cc09041c5dfbe22c32f4df7d54903321a72f1ac738",
+      "stage6_sample_id": "stage6_crudsql_0201"
+    },
+    {
+      "R03_notes_sha256": "a2717f9aaf2e320c6b4c93cc09041c5dfbe22c32f4df7d54903321a72f1ac738",
+      "stage6_sample_id": "stage6_crudsql_0202"
+    },
+    {
+      "R03_notes_sha256": "a2717f9aaf2e320c6b4c93cc09041c5dfbe22c32f4df7d54903321a72f1ac738",
+      "stage6_sample_id": "stage6_crudsql_0203"
+    },
+    {
+      "R03_notes_sha256": "6db55cc25f8d04a3763795055b069962108565adf719dff9bbfbf73ade9f63b1",
+      "stage6_sample_id": "stage6_crudsql_0216"
+    },
+    {
+      "R03_notes_sha256": "503ae8935f602ed7be4daee137a7051e68c960e4dab8f993a67c151d5fae5bd9",
+      "stage6_sample_id": "stage6_crudsql_0217"
+    },
+    {
+      "R03_notes_sha256": "9feba55093fd8cf8a471ff02f8ea4a9fad5c947aec5f6cf4b738584a29adcc6e",
+      "stage6_sample_id": "stage6_crudsql_0218"
+    },
+    {
+      "R03_notes_sha256": "88c88df3b9d3bd9364188dd6df8bb40b3b7a5dcff3bf5fc7d13acff41c508298",
+      "stage6_sample_id": "stage6_crudsql_0219"
+    },
+    {
+      "R03_notes_sha256": "c5ce3068bc6746562848a792d94ea6fa286a56493a8ac572e6721582e86898f3",
+      "stage6_sample_id": "stage6_crudsql_0268"
+    },
+    {
+      "R03_notes_sha256": "271de3dec0e23e81a798e04ec05c68af6e4cae0236e3baea207ba780b0eafa1e",
+      "stage6_sample_id": "stage6_crudsql_0269"
+    },
+    {
+      "R03_notes_sha256": "271de3dec0e23e81a798e04ec05c68af6e4cae0236e3baea207ba780b0eafa1e",
+      "stage6_sample_id": "stage6_crudsql_0270"
+    },
+    {
+      "R03_notes_sha256": "6de52d18467e3d465b8be890348d933fce00f991c4e0926136c600832fb6818b",
+      "stage6_sample_id": "stage6_crudsql_0271"
+    },
+    {
+      "R03_notes_sha256": "a1ecd923efa3255f1117fe58b320dd14249bb529141064cb088ac0805ac3e8d6",
+      "stage6_sample_id": "stage6_crudsql_0276"
+    },
+    {
+      "R03_notes_sha256": "3237e7d61abbdafb6659c5836da05fc59fa7f002d2ffb7288b2b990bc3782ecf",
+      "stage6_sample_id": "stage6_crudsql_0277"
+    },
+    {
+      "R03_notes_sha256": "ef8521942142e8ceb393a8a47e64f096206db0d605d9d2445cbebc345651161e",
+      "stage6_sample_id": "stage6_crudsql_0278"
+    },
+    {
+      "R03_notes_sha256": "ef8521942142e8ceb393a8a47e64f096206db0d605d9d2445cbebc345651161e",
+      "stage6_sample_id": "stage6_crudsql_0279"
+    }
+  ],
+  "stage": "Stage6C_R03_BLIND_ADJUDICATION_RESULT"
+}

@@ -1,0 +1,60 @@
+{
+  "archive": {
+    "member_count": 7,
+    "members": [
+      {
+        "path": "CORRECTABLE_GOLD_ERROR_QUEUE.json",
+        "sha256": "33fe542a38413f4159bbce6a82318f22d790d36b2a5a40882ac74c8c8da3a336"
+      },
+      {
+        "path": "R04_INGEST_MANIFEST.json",
+        "sha256": "c9dba07d7692899784bf9cd39066c13d34a293bd21e59742a6a551ea83e4bfbe"
+      },
+      {
+        "path": "R04_RESOLUTION_REPORT.json",
+        "sha256": "56d9b95be1b65cd5021b239afc008cb8b311baed3d26ae63b059aab6a066bc75"
+      },
+      {
+        "path": "REVIEWER_README.md",
+        "sha256": "622deb46467cb014d43a39864eac89c59e7476cd8631396530485e3e01be3a09"
+      },
+      {
+        "path": "SOURCE_TASK_INVALID_QUEUE.json",
+        "sha256": "f606cee0de6108b77b45c72ffdedd4cbfba229716c3f120bcc79f892b19422f1"
+      },
+      {
+        "path": "VALIDATION_REPORT.md",
+        "sha256": "e5a669e69bc9c55d55e85fa568d4a50a6c83ffd3e1b9c7317b9d45ae610ba796"
+      },
+      {
+        "path": "submissions/stage6c_final_rejection_after_R03_R04.submitted.tsv",
+        "sha256": "6118ec9ef656123c71b6ef7438c5d1b3982402e94f4400bbed4ef50feaf36f15"
+      }
+    ],
+    "path": "stage6c_r04_resolution_artifacts_20260824.zip",
+    "sha256": "6f70081107c6e8fc328bca8d72b7315bbbc22942ce12bef71d8ddfd4d78c6936"
+  },
+  "confirmation_run_allowed_now": false,
+  "correctable_gold_error_count": 21,
+  "correctable_queue_sha256": "33fe542a38413f4159bbce6a82318f22d790d36b2a5a40882ac74c8c8da3a336",
+  "final_gold_freeze_created": false,
+  "final_rejected_count": 40,
+  "gpu_called": false,
+  "model_called": false,
+  "next_steps": [
+    "review_R04_resolution_package",
+    "deterministic_correction_package_for_correctable_gold_errors",
+    "Stage6_registration_revision_for_source_task_invalid_items",
+    "do_not_create_final_gold_freeze_until_all_corrected_items_are_re_reviewed_and_registration_revision_is_accepted"
+  ],
+  "r04_source_mtime": 1787571214.5258617,
+  "r04_submission_sha256": "6118ec9ef656123c71b6ef7438c5d1b3982402e94f4400bbed4ef50feaf36f15",
+  "resolution_report_sha256": "56d9b95be1b65cd5021b239afc008cb8b311baed3d26ae63b059aab6a066bc75",
+  "source_invalid_queue_sha256": "f606cee0de6108b77b45c72ffdedd4cbfba229716c3f120bcc79f892b19422f1",
+  "source_task_invalid_count": 19,
+  "stage": "Stage6C_R04_RESOLUTION_INGEST",
+  "stage6c_execution_patch2_commit": "a94407dc171f9705bd566a4812eab9cb2407bbbb",
+  "stage6c_r03_patch1_commit": "343049339e3f972db613b95662f835d679cc04e5",
+  "status": "PASS_PENDING_CORRECTION_AND_REGISTRATION_REVISION_WORKFLOWS",
+  "validation_violations": []
+}

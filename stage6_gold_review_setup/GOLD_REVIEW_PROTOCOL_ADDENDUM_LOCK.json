@@ -1,0 +1,94 @@
+{
+  "adjudication_policy": {
+    "R03_must_not_see_R01_decision": true,
+    "R03_must_not_see_R01_notes": true,
+    "R03_must_not_see_R02_decision": true,
+    "R03_must_not_see_R02_notes": true,
+    "decision_after_seeing_model_outputs_allowed": false,
+    "disagreement_rule": "third_independent_adjudicator",
+    "joint_discussion_allowed": false,
+    "third_adjudicator_materials": "source_plus_registered_gold_only_no_model_outputs",
+    "third_adjudicator_must_not_see_model_predictions": true,
+    "third_adjudicator_role": "R03"
+  },
+  "allowed_decisions_after_execution": [
+    "approved",
+    "rejected"
+  ],
+  "confirmation_run_allowed_now": false,
+  "final_decision_rule": [
+    {
+      "R01": "approved",
+      "R02": "approved",
+      "action": "final_approved"
+    },
+    {
+      "R01": "rejected",
+      "R02": "rejected",
+      "action": "final_rejected_confirmation_blocked"
+    },
+    {
+      "R01": "approved",
+      "R02": "rejected",
+      "action": "blind_R03_adjudication"
+    },
+    {
+      "R01": "rejected",
+      "R02": "approved",
+      "action": "blind_R03_adjudication"
+    },
+    {
+      "R03": "approved",
+      "action": "final_approved"
+    },
+    {
+      "R03": "rejected",
+      "action": "final_rejected_confirmation_blocked"
+    }
+  ],
+  "gpu_called": false,
+  "independent_reviews_required": 2,
+  "model_called": false,
+  "notes_required_for_rejected": true,
+  "packet_decision_fields_initially_blank": true,
+  "patch1_content_immutability": {
+    "gold_review_items_sha256_must_remain": "89942c53320735528f1516c25de5efee9aa2f18f6a70a7789221bd8609ec3a6b",
+    "official_table_metadata_sha256_must_remain": "f9e98479cdae560424c837e0bd75758f51c8582a3376567f8aa660a4dc690a93"
+  },
+  "registered_dataset_commit": "bbbe4d374edd60696b0765771640a946a838fd4d",
+  "registered_dataset_manifest_sha256": "67fcf9d4be6d28871bedb7059acf56acfb3b06e4f617a38479e0e21a737e06b1",
+  "registered_gold_post_state_hashes_sha256": "84f9755b84e3ecd86b4fb55a88726e9aa3611e964c93de7e8559ab1da5aeaaa9",
+  "registered_gold_programs_sha256": "8ca5a5bb8a1308fef347687a1a3964d296aa89e427d31e17aaf5e50398e1c3f4",
+  "registered_gold_write_plans_sha256": "ae72a7508d71f9ea60be9052adca4ace85cf0efe4760aa2202297fd9ec4201c4",
+  "rejection_policy": {
+    "any_final_unresolved_or_rejected_gold_blocks_confirmation": true,
+    "drop_rejected_samples_allowed": false,
+    "if_adapter_or_gold_error": "fix gold before any model run, recompute affected artifacts/hashes, and re-review corrected items independently",
+    "if_official_source_task_invalid_for_frozen_contract": "revise Stage6 registration before any model run and disclose rationale",
+    "initial_R01_R02_disagreement_goes_to_blind_R03_not_immediate_block": true,
+    "silent_exclusion_allowed": false
+  },
+  "review_materials": "source_plus_registered_gold_only_no_model_outputs",
+  "reviewer_isolation": {
+    "R01_must_not_see_R02_decisions_or_notes_before_submission": true,
+    "R02_must_not_see_R01_decisions_or_notes_before_submission": true,
+    "cross_reviewer_discussion_before_submission": false,
+    "each_reviewer_receives_only_own_decision_packet": true,
+    "execution_manifest_must_record": [
+      "R01_submission_sha256",
+      "R02_submission_sha256",
+      "submission_timestamps",
+      "pseudonymous_reviewer_role_ids",
+      "distinct_reviewer_assertion"
+    ],
+    "reviewer_outputs_are_sealed_until_both_submitted": true,
+    "reviewer_roles_must_be_distinct": true
+  },
+  "reviewer_must_not_see_model_predictions": true,
+  "reviewer_roles": [
+    "R01",
+    "R02"
+  ],
+  "stage": "Stage6C_INDEPENDENT_GOLD_REVIEW_SETUP",
+  "status": "LOCKED_PENDING_HUMAN_REVIEW_EXECUTION"
+}

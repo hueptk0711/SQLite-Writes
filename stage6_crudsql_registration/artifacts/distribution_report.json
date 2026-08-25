@@ -1,0 +1,41 @@
+{
+  "columns_per_table": {
+    "max": 22,
+    "mean": 8,
+    "median": 7,
+    "min": 3
+  },
+  "initial_rows_per_table": {
+    "max": 100,
+    "mean": 23.024,
+    "median": 11,
+    "min": 2
+  },
+  "inserted_fields_per_sample": {
+    "max": 7,
+    "mean": 3.59,
+    "median": 4.0,
+    "min": 1
+  },
+  "inserted_value_python_type_counts": {
+    "str": 1795
+  },
+  "language": "Chinese questions retained from official CRUDSQL",
+  "question_length_characters": {
+    "max": 108,
+    "mean": 52.378,
+    "median": 51.0,
+    "min": 17
+  },
+  "sample_count": 500,
+  "samples_per_table": {
+    "4": 125
+  },
+  "status": "PASS",
+  "table_count": 125,
+  "unspecified_columns": {
+    "all_unspecified_columns_null": true,
+    "null_after_insert": 2205,
+    "total": 2205
+  }
+}
