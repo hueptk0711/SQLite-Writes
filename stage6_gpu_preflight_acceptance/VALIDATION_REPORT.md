@@ -1,11 +1,11 @@
-# Stage6F GPU Preflight Acceptance Validation Report
+# Stage6F GPU Preflight Acceptance PATCH2 Validation Report
 
 Validation date: 2026-08-25
 
 Server output ZIP SHA-256:
 
 ```text
-2c349435bc7b4f509a64135e4ad34c14db5d49fde499373b1195b6eebdffd0ab
+004913b1778cc145d44f32aa49a60039438b24cc36d1f17a5c85091e8cc5bd1b
 ```
 
 Server-side validator result:
@@ -22,6 +22,28 @@ Local ingestion validator result:
 python scripts/data/validate_stage6f_gpu_preflight_acceptance.py --acceptance-dir stage6_gpu_preflight_acceptance
 status = PASS
 violations = []
+```
+
+Dedicated tests:
+
+```text
+python -m pytest -q tests/test_stage6f_gpu_preflight.py tests/test_stage6f_gpu_preflight_acceptance.py
+14 passed
+```
+
+PATCH2 hardening checks:
+
+```text
+model aggregate SHA-256 = PASS
+tokenizer SHA-256       = PASS
+model config SHA-256    = PASS
+SQLite runtime captured = PASS
+CUDA visibility captured = PASS
+synthetic smoke          = PASS
+synthetic confirmation samples used = 0
+H2 input-ID identity     = 481/481 PASS
+nested server ZIP SHA    = PASS
+extracted mirror vs ZIP  = PASS
 ```
 
 No confirmatory inference was run.

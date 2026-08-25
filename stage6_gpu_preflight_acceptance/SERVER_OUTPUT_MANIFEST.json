@@ -1,26 +1,31 @@
 {
-  "ingested_at_unix": 1787629016,
-  "server_file_count": 12,
+  "ingested_at_unix": 1787630497,
+  "server_file_count": 13,
   "server_file_manifest": [
     {
-      "bytes": 995,
+      "bytes": 1043,
       "path": "STAGE6F_GPU_PREFLIGHT_LOCK.json",
-      "sha256": "241acda05fcafe994a8603dbc58790eba92a8e71ef5f5292f3a3c655676bb319"
+      "sha256": "1f044f58879fd5caa34449de4da77f6cdfe33325187f0497bd614bf5de119427"
     },
     {
-      "bytes": 1190,
+      "bytes": 1627,
       "path": "GPU_ENVIRONMENT_MANIFEST.json",
-      "sha256": "7f431555b60e2dee5dd3193a2f740d1c442fa2306b157574cb209dbfaced1ccd"
+      "sha256": "d8c299b2169c8b55a897b7c6eb790d62a8672609fd408bf38d380bebfcc6656b"
     },
     {
-      "bytes": 1478,
+      "bytes": 5156,
       "path": "MODEL_ASSET_MANIFEST.json",
-      "sha256": "9a450e91e2b209334da98542917ab172a3423df493d7f678f80d24cb926213d6"
+      "sha256": "4861d9f02c6c42ce646fcdfdfa20bbfa23f50806218d74a9f4a22aa26fc7800a"
     },
     {
-      "bytes": 3468,
+      "bytes": 2069,
+      "path": "MODEL_TOKENIZER_ASSET_AUDIT.json",
+      "sha256": "26b0ff29b902031457d0f60a95f482a5c900b792e18a40c79e4544c071fde84e"
+    },
+    {
+      "bytes": 6661,
       "path": "TOKENIZER_MANIFEST.json",
-      "sha256": "834883b73de05ed37ef59ba8d5bbefac01312e740bc15962ad96080964cb4d7f"
+      "sha256": "17eb0b4e2d6e6ccb54ddebfc8a64de8785565e9bb689ce38d2717a6f2fd0b20a"
     },
     {
       "bytes": 4763,
@@ -48,9 +53,9 @@
       "sha256": "c9d8e847b048836474bf106779998affa4732b97f54d6e31583a0b880df920b5"
     },
     {
-      "bytes": 311,
+      "bytes": 712,
       "path": "SYNTHETIC_GPU_SMOKE_REPORT.json",
-      "sha256": "c1b46cf9b06fb5671211ce46fe9ed5f106bb3798b2e43a5ab4fdee6a33fa822b"
+      "sha256": "5abf9ba8ae3942b7e9c4d9fba504e4e08087617fa54d64d52469f4338c75eab5"
     },
     {
       "bytes": 1517,
@@ -58,13 +63,13 @@
       "sha256": "f8423d025b37ac346ea3977218b078b465184a225ba40546f8896598afe503b2"
     },
     {
-      "bytes": 1253,
+      "bytes": 1279,
       "path": "RUN_STAGE6F_ON_SERVER.md",
-      "sha256": "5c962b8afd58a6db4feb878c2b8c0aa018aca8b36beac91be46e1d4ec783b625"
+      "sha256": "dbcb8bb2b21eae585a034e0322de6ea2bb900f81d933fc0a11669d0226617123"
     }
   ],
   "server_output_unzip_test": "PASS",
-  "server_output_zip": "reviewer_packages/Stage6F_GPU_PREFLIGHT_SERVER_OUTPUT_20260825.zip",
-  "server_output_zip_sha256": "2c349435bc7b4f509a64135e4ad34c14db5d49fde499373b1195b6eebdffd0ab",
-  "stage": "Stage6F_GPU_PREFLIGHT_ACCEPTANCE"
+  "server_output_zip": "stage6_gpu_preflight_acceptance/server_output_zip/Stage6F_GPU_PREFLIGHT_PATCH2_SERVER_OUTPUT_20260825.zip",
+  "server_output_zip_sha256": "004913b1778cc145d44f32aa49a60039438b24cc36d1f17a5c85091e8cc5bd1b",
+  "stage": "Stage6F_GPU_PREFLIGHT_ACCEPTANCE_PATCH2"
 }

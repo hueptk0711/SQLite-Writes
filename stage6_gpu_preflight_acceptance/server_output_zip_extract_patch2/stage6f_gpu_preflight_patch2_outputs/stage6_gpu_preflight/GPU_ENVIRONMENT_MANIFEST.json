@@ -1,0 +1,58 @@
+{
+  "captured_at_unix": 1787630325,
+  "environment_matches_expected": true,
+  "environment_variables": {
+    "CUDA_VISIBLE_DEVICES": "1",
+    "HF_HOME": "/home/uet/hue_ptk/hf_cache",
+    "NVIDIA_VISIBLE_DEVICES": null,
+    "TRANSFORMERS_CACHE": null
+  },
+  "expected_environment": {
+    "accelerate": "1.14.0",
+    "bitsandbytes": "0.47.0",
+    "cuda_wheel_index": "https://download.pytorch.org/whl/cu124",
+    "python_major_minor": "3.12",
+    "safetensors": "0.5.3",
+    "tokenizers": "0.22.2",
+    "torch": "2.6.0+cu124",
+    "transformers": "5.5.3"
+  },
+  "nvidia_smi": {
+    "available": true,
+    "raw": "NVIDIA GeForce RTX 4090, 570.124.04, 49140 MiB\nNVIDIA GeForce RTX 4090, 570.124.04, 49140 MiB"
+  },
+  "packages": {
+    "accelerate": "1.14.0",
+    "bitsandbytes": "0.47.0",
+    "safetensors": "0.5.3",
+    "tokenizers": "0.22.2",
+    "torch": "2.6.0+cu124",
+    "transformers": "5.5.3"
+  },
+  "platform": "Linux-6.11.0-29-generic-x86_64-with-glibc2.39",
+  "python": "3.12.12",
+  "python_executable": "/home/uet/hue_ptk/stage6f_py312/bin/python",
+  "sqlite_runtime": {
+    "python_sqlite_module_file": "/home/uet/.local/share/uv/python/cpython-3.12.12-linux-x86_64-gnu/lib/python3.12/sqlite3/__init__.py",
+    "sqlite_version": "3.50.4",
+    "sqlite_version_info": [
+      3,
+      50,
+      4
+    ]
+  },
+  "torch_cuda": {
+    "cuda_available": true,
+    "cuda_version": "12.4",
+    "device_count": 1,
+    "devices": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 4090",
+        "total_memory_bytes": 50875924480
+      }
+    ],
+    "torch_imported": true,
+    "torch_version": "2.6.0+cu124"
+  }
+}

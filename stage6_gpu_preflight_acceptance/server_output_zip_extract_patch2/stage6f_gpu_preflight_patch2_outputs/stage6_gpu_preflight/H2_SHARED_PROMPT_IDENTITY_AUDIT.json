@@ -1,0 +1,11 @@
+{
+  "F_changes_prompt_surface": false,
+  "all_shared_prompt_hashes_match": true,
+  "checked_pairs": 481,
+  "expected_shared_prompt_pairs": 481,
+  "independent_D_F_G1_generation_allowed": false,
+  "mismatch_count": 0,
+  "mismatches": [],
+  "shared_raw_generation_path": "raw_generations/shared_mp_fs_plus_generation.jsonl",
+  "status": "PASS"
+}

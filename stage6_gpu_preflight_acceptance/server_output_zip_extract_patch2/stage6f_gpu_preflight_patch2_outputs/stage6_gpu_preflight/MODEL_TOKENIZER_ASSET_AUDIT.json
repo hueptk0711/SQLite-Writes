@@ -1,0 +1,45 @@
+{
+  "actual_model_aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+  "actual_model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357",
+  "actual_model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "actual_tokenizer_sha256": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468",
+  "checks": [
+    {
+      "actual": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "expected": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "match": true,
+      "name": "model_revision"
+    },
+    {
+      "actual": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+      "expected": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+      "match": true,
+      "name": "model_aggregate_sha256"
+    },
+    {
+      "actual": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468",
+      "expected": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468",
+      "match": true,
+      "name": "tokenizer_sha256"
+    },
+    {
+      "actual": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357",
+      "expected": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357",
+      "match": true,
+      "name": "model_config_sha256"
+    }
+  ],
+  "expected_model_aggregate_sha256": "e2026c78ea002527089b088023b7ae2c1486f127f667cafbb823225877cd268c",
+  "expected_model_config_sha256": "326f5a48d12e88e8115048769fd5bb4eac3f56dee63847b983bc908456d5c357",
+  "expected_model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "expected_tokenizer_sha256": "06d1f5403e9eda68466f91b5c235eab56b530a9b8155e21f3bd0523b4b29e468",
+  "hashing_procedure": {
+    "model_aggregate_sha256": "nldbwrite_v3.inference.model_manifest.build_local_model_manifest",
+    "model_config_sha256": "model.config.to_dict canonical JSON SHA-256",
+    "tokenizer_sha256": "HuggingFaceGenerator tokenizer identity JSON SHA-256"
+  },
+  "model_aggregate_match": true,
+  "model_config_match": true,
+  "status": "PASS",
+  "tokenizer_match": true
+}

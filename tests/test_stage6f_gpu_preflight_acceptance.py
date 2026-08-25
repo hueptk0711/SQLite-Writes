@@ -61,9 +61,7 @@ def test_mutating_server_preflight_status_fails():
     target = copy_acceptance()
     path = (
         target
-        / "server_output_zip_extract"
-        / "stage6f_gpu_preflight_outputs"
-        / "stage6_gpu_preflight"
+        / validator.SERVER_RELATIVE
         / "STAGE6F_GPU_PREFLIGHT_LOCK.json"
     )
     value = json.loads(path.read_text(encoding="utf-8"))
@@ -80,9 +78,7 @@ def test_mutating_h2_shared_generation_policy_fails():
     target = copy_acceptance()
     path = (
         target
-        / "server_output_zip_extract"
-        / "stage6f_gpu_preflight_outputs"
-        / "stage6_gpu_preflight"
+        / validator.SERVER_RELATIVE
         / "H2_SHARED_PROMPT_IDENTITY_AUDIT.json"
     )
     value = json.loads(path.read_text(encoding="utf-8"))
@@ -92,4 +88,69 @@ def test_mutating_h2_shared_generation_policy_fails():
     assert report["status"] == "FAIL"
     assert "server_file_manifest_mismatch" in {item["code"] for item in report["violations"]}
     assert "independent_dfg1_generation_allowed" in {item["code"] for item in report["violations"]}
+    shutil.rmtree(target, ignore_errors=True)
+
+
+def test_mutating_model_tokenizer_asset_identity_fails():
+    target = copy_acceptance()
+    path = target / validator.SERVER_RELATIVE / "MODEL_TOKENIZER_ASSET_AUDIT.json"
+    value = json.loads(path.read_text(encoding="utf-8"))
+    value["actual_tokenizer_sha256"] = "deadbeef"
+    value["tokenizer_match"] = False
+    write_json(path, value)
+    report = validator.validate(target)
+    codes = {item["code"] for item in report["violations"]}
+    assert report["status"] == "FAIL"
+    assert "server_file_manifest_mismatch" in codes
+    assert "extracted_server_artifacts_do_not_match_zip" in codes
+    assert "model_tokenizer_asset_field_mismatch" in codes
+    assert "model_tokenizer_asset_match_not_true" in codes
+    shutil.rmtree(target, ignore_errors=True)
+
+
+def test_mutating_synthetic_smoke_confirmation_usage_fails():
+    target = copy_acceptance()
+    path = target / validator.SERVER_RELATIVE / "SYNTHETIC_GPU_SMOKE_REPORT.json"
+    value = json.loads(path.read_text(encoding="utf-8"))
+    value["confirmation_samples_used"] = 1
+    write_json(path, value)
+    report = validator.validate(target)
+    codes = {item["code"] for item in report["violations"]}
+    assert report["status"] == "FAIL"
+    assert "synthetic_smoke_used_confirmation_samples" in codes
+    shutil.rmtree(target, ignore_errors=True)
+
+
+def test_mutating_nested_server_zip_fails():
+    target = copy_acceptance()
+    zip_path = target / "server_output_zip" / "Stage6F_GPU_PREFLIGHT_PATCH2_SERVER_OUTPUT_20260825.zip"
+    with zip_path.open("ab") as handle:
+        handle.write(b"mutation")
+    report = validator.validate(target)
+    codes = {item["code"] for item in report["violations"]}
+    assert report["status"] == "FAIL"
+    assert "nested_server_zip_actual_sha256_mismatch" in codes
+    shutil.rmtree(target, ignore_errors=True)
+
+
+def test_mutating_h2_input_id_identity_fails():
+    target = copy_acceptance()
+    path = target / validator.SERVER_RELATIVE / "PROMPT_TOKEN_AUDIT.jsonl"
+    rows = [
+        json.loads(line)
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    for row in rows:
+        if row["arm"] == "d_f_g1_vnext":
+            row["input_ids_sha256"] = "deadbeef"
+            break
+    path.write_text(
+        "".join(json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n" for row in rows),
+        encoding="utf-8",
+    )
+    report = validator.validate(target)
+    codes = {item["code"] for item in report["violations"]}
+    assert report["status"] == "FAIL"
+    assert "h2_input_identity_mismatch" in codes
     shutil.rmtree(target, ignore_errors=True)
