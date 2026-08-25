@@ -66,9 +66,12 @@
     "write_sample_id_and_stage6_sample_id_for_reuse_runner_compatibility",
     "preserve_generation_status_error_and_latency_fields",
     "write_raw_generation_row_sha256",
+    "verify_all_raw_rows_share_the_locked_run_id",
     "write_incremental_stream_checkpoint_manifest",
+    "write_and_verify_checkpoint_run_id",
     "verify_resume_checkpoint_before_any_resume",
     "write_run_state_manifest_after_each_stream",
+    "retain_one_run_id_across_run_state_updates",
     "resume_run_verifies_prior_streams_before_continuation",
     "write_shared_replay_row_sha256_for_d_g1_and_d_f_g1",
     "write_actual_d_g1_and_d_f_g1_replay_provenance_after_shared_stream_completion"
@@ -77,6 +80,11 @@
     "verify_stage6g_authorization_with_expected_git_head_and_clean_worktree",
     "reject_missing_expected_git_head_in_gpu_mode",
     "reject_dirty_worktree_override_in_gpu_mode",
+    "reject_single_stream_gpu_cli_execution",
+    "reject_execution_root_inside_source_checkout_in_gpu_mode",
+    "initial_run_requires_absent_run_state",
+    "resume_run_requires_existing_started_run_state",
+    "resume_run_reuses_existing_run_id",
     "verify_zero_existing_raw_generation_files_for_initial_run",
     "verify_prompt_token_audit_file_sha256_before_parse",
     "write_and_validate_execution_code_manifest_before_model_load",
@@ -92,10 +100,12 @@
   "prompt_token_audit_sha256": "e9bcf79074bcac4284f412314e40cbc7567940a36258dcb27f62ff7862eadae6",
   "run_level_controller": {
     "authorization_boundary_checked_once_per_initial_run": true,
+    "checkpoints_store_run_id": true,
     "default_execution_root": "../stage6_confirmation_run_outputs",
     "dirty_worktree_bypass_allowed_in_gpu_mode": false,
     "execute_all_flag": "--execute-all",
     "execution_code_manifest": "EXECUTION_CODE_MANIFEST.json",
+    "execution_root_must_be_outside_repo_in_gpu_mode": true,
     "expected_git_head_required": true,
     "fixed_stream_order": [
       "direct",
@@ -103,9 +113,15 @@
       "original_mp_fs_plus",
       "shared_mp_fs_plus_generation"
     ],
+    "initial_run_creates_one_run_id": true,
+    "initial_run_state_must_be_absent": true,
     "model_loaded_once_per_execute_all": true,
+    "raw_rows_require_single_run_id": true,
     "resume_flag": "--resume-run",
-    "run_state_manifest": "CONFIRMATION_RUN_STATE.json"
+    "resume_requires_existing_run_state": true,
+    "resume_reuses_existing_run_id": true,
+    "run_state_manifest": "CONFIRMATION_RUN_STATE.json",
+    "single_stream_gpu_cli_allowed": false
   },
   "runtime_input_locks": {
     "final_confirmation_manifest": {

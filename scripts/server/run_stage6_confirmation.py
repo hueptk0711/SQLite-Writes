@@ -29,6 +29,7 @@ if str(SOURCE_ROOT) not in sys.path:
 AUTHORIZATION_DIR = "stage6_confirmation_run_authorization"
 STAGE6H_DIR = "stage6_confirmation_execution"
 DEFAULT_EXECUTION_ROOT = "../stage6_confirmation_run_outputs"
+RUN_STATE_FILENAME = "CONFIRMATION_RUN_STATE.json"
 STAGE6F_RUNTIME_DIR = (
     "stage6_gpu_preflight_acceptance/server_output_zip_extract_patch2/"
     "stage6f_gpu_preflight_patch2_outputs/stage6_gpu_preflight"
@@ -692,6 +693,7 @@ def validate_raw_generation_rows(
     rows: list[dict[str, Any]],
     *,
     expected_sample_ids: set[str] | None = None,
+    expected_run_id: str | None = None,
     full_completion: bool = False,
 ) -> None:
     if expected_sample_ids is not None:
@@ -701,15 +703,23 @@ def validate_raw_generation_rows(
             context="raw generation rows",
             allow_partial=not full_completion,
         )
+    observed_run_ids: set[str] = set()
     for row in rows:
         missing = [field for field in REQUIRED_RAW_ROW_FIELDS if field not in row]
         if missing:
             raise HarnessError(f"Raw generation row missing required fields: {missing}")
         if str(row["sample_id"]) != str(row["stage6_sample_id"]):
             raise HarnessError("Raw generation row sample_id and stage6_sample_id differ")
+        observed_run_ids.add(str(row["run_id"]))
         expected_row_hash = canonical_row_hash(row)
         if row.get("raw_generation_row_sha256") != expected_row_hash:
             raise HarnessError("Raw generation row hash mismatch")
+    if len(observed_run_ids) > 1:
+        raise HarnessError(f"Raw generation rows contain mixed run_id values: {sorted(observed_run_ids)}")
+    if expected_run_id is not None and observed_run_ids and observed_run_ids != {expected_run_id}:
+        raise HarnessError(
+            f"Raw generation rows run_id mismatch: expected {expected_run_id}, actual {sorted(observed_run_ids)}"
+        )
 
 
 def write_checkpoint(
@@ -717,16 +727,20 @@ def write_checkpoint(
     rows: list[dict[str, Any]],
     *,
     expected_sample_ids: set[str] | None = None,
+    expected_run_id: str | None = None,
     full_completion: bool = False,
 ) -> Path:
     validate_raw_generation_rows(
         rows,
         expected_sample_ids=expected_sample_ids,
+        expected_run_id=expected_run_id,
         full_completion=full_completion,
     )
+    observed_run_ids = {str(row["run_id"]) for row in rows}
     checkpoint = raw_path.with_suffix(raw_path.suffix + ".checkpoint.json")
     payload = {
         "raw_generation_path": raw_path.as_posix(),
+        "run_id": expected_run_id or (next(iter(observed_run_ids)) if observed_run_ids else None),
         "row_count": len(rows),
         "rows": {
             str(row["stage6_sample_id"]): row["raw_generation_row_sha256"]
@@ -742,15 +756,22 @@ def verify_resume_checkpoint(
     checkpoint_path: Path,
     *,
     expected_sample_ids: set[str] | None = None,
+    expected_run_id: str | None = None,
     full_completion: bool = False,
 ) -> None:
     rows = read_jsonl(raw_path)
     validate_raw_generation_rows(
         rows,
         expected_sample_ids=expected_sample_ids,
+        expected_run_id=expected_run_id,
         full_completion=full_completion,
     )
     checkpoint = read_json(checkpoint_path)
+    observed_run_ids = {str(row["run_id"]) for row in rows}
+    observed_run_id = next(iter(observed_run_ids)) if observed_run_ids else None
+    expected_checkpoint_run_id = expected_run_id or observed_run_id
+    if checkpoint.get("run_id") != expected_checkpoint_run_id:
+        raise HarnessError("Resume checkpoint run_id does not match raw rows or expected run_id")
     expected = checkpoint.get("rows") or {}
     if checkpoint.get("row_count") != len(rows):
         raise HarnessError("Resume checkpoint row_count does not match raw rows")
@@ -770,15 +791,28 @@ def write_rows_incrementally(
     *,
     existing_rows: list[dict[str, Any]] | None = None,
     expected_sample_ids: set[str] | None = None,
+    expected_run_id: str | None = None,
 ) -> None:
     accumulated = list(existing_rows or [])
     raw_path.parent.mkdir(parents=True, exist_ok=True)
     for row in rows:
         accumulated.append(row)
         write_jsonl(raw_path, accumulated)
-        write_checkpoint(raw_path, accumulated, expected_sample_ids=expected_sample_ids, full_completion=False)
+        write_checkpoint(
+            raw_path,
+            accumulated,
+            expected_sample_ids=expected_sample_ids,
+            expected_run_id=expected_run_id,
+            full_completion=False,
+        )
     if expected_sample_ids is not None and len(accumulated) == len(expected_sample_ids):
-        write_checkpoint(raw_path, accumulated, expected_sample_ids=expected_sample_ids, full_completion=True)
+        write_checkpoint(
+            raw_path,
+            accumulated,
+            expected_sample_ids=expected_sample_ids,
+            expected_run_id=expected_run_id,
+            full_completion=True,
+        )
 
 
 def generation_config(model_name_or_path: str) -> dict[str, Any]:
@@ -857,6 +891,7 @@ def execute_stream_integrated(
             raw_path,
             checkpoint_path,
             expected_sample_ids=expected_sample_ids,
+            expected_run_id=run_id,
             full_completion=False,
         )
         existing_rows = read_jsonl(raw_path)
@@ -890,6 +925,7 @@ def execute_stream_integrated(
         validate_raw_generation_rows(
             combined,
             expected_sample_ids=expected_sample_ids,
+            expected_run_id=run_id,
             full_completion=len(combined) == FINAL_CONFIRMATION_N,
         )
         write_rows_incrementally(
@@ -897,18 +933,21 @@ def execute_stream_integrated(
             [normalized],
             existing_rows=accumulated,
             expected_sample_ids=expected_sample_ids,
+            expected_run_id=run_id,
         )
         accumulated.append(normalized)
     if len(accumulated) == FINAL_CONFIRMATION_N:
         validate_raw_generation_rows(
             accumulated,
             expected_sample_ids=expected_sample_ids,
+            expected_run_id=run_id,
             full_completion=True,
         )
         write_checkpoint(
             raw_path,
             accumulated,
             expected_sample_ids=expected_sample_ids,
+            expected_run_id=run_id,
             full_completion=True,
         )
         if stream == "shared_mp_fs_plus_generation":
@@ -947,6 +986,7 @@ def stream_completion_status(
     execution_root: Path,
     stream: str,
     expected_sample_ids: set[str],
+    expected_run_id: str | None = None,
 ) -> dict[str, Any]:
     raw_path = stream_raw_path(execution_root, stream)
     checkpoint_path = stream_checkpoint_path(execution_root, stream)
@@ -963,12 +1003,18 @@ def stream_completion_status(
         raw_path,
         checkpoint_path,
         expected_sample_ids=expected_sample_ids,
+        expected_run_id=expected_run_id,
         full_completion=False,
     )
     rows = read_jsonl(raw_path)
     full = len(rows) == FINAL_CONFIRMATION_N
     if full:
-        validate_raw_generation_rows(rows, expected_sample_ids=expected_sample_ids, full_completion=True)
+        validate_raw_generation_rows(
+            rows,
+            expected_sample_ids=expected_sample_ids,
+            expected_run_id=expected_run_id,
+            full_completion=True,
+        )
     return {
         "stream": stream,
         "status": "complete" if full else "partial",
@@ -995,6 +1041,7 @@ def write_confirmation_run_state(
             execution_root=execution_root,
             stream=stream,
             expected_sample_ids=expected_sample_ids,
+            expected_run_id=run_id,
         )
         for stream in STREAM_ORDER
     ]
@@ -1014,26 +1061,86 @@ def write_confirmation_run_state(
         "total_rows": sum(int(state.get("row_count") or 0) for state in stream_states),
         "confirmation_predictions_created": any(int(state.get("row_count") or 0) for state in stream_states),
     }
-    write_json(execution_root / "CONFIRMATION_RUN_STATE.json", manifest)
+    write_json(execution_root / RUN_STATE_FILENAME, manifest)
     return manifest
+
+
+def run_state_path(execution_root: Path) -> Path:
+    return execution_root / RUN_STATE_FILENAME
+
+
+def load_run_state(execution_root: Path) -> dict[str, Any]:
+    path = run_state_path(execution_root)
+    if not path.is_file():
+        raise HarnessError("Resume run requires existing CONFIRMATION_RUN_STATE.json")
+    state = read_json(path)
+    if not state.get("run_id"):
+        raise HarnessError("Existing run state is missing run_id")
+    return state
+
+
+def run_state_has_started_stream(state: dict[str, Any]) -> bool:
+    return any(int(stream.get("row_count") or 0) > 0 for stream in state.get("streams") or [])
+
+
+def resolve_run_id_for_mode(
+    *,
+    execution_root: Path,
+    mode: str,
+    requested_run_id: str | None,
+) -> str:
+    path = run_state_path(execution_root)
+    if mode == "initial":
+        if path.exists():
+            raise HarnessError("Initial confirmation run requires no existing CONFIRMATION_RUN_STATE.json")
+        return requested_run_id or f"stage6h_{int(time.time())}"
+    if mode == "resume":
+        state = load_run_state(execution_root)
+        existing_run_id = str(state["run_id"])
+        if requested_run_id is not None and requested_run_id != existing_run_id:
+            raise HarnessError(
+                f"Resume run_id mismatch: state has {existing_run_id}, CLI requested {requested_run_id}"
+            )
+        if not run_state_has_started_stream(state):
+            raise HarnessError("Resume run requires an existing started confirmation run")
+        return existing_run_id
+    raise HarnessError(f"Unknown run mode: {mode}")
+
+
+def path_is_relative_to(child: Path, parent: Path) -> bool:
+    child_resolved = child.resolve()
+    parent_resolved = parent.resolve()
+    try:
+        child_resolved.relative_to(parent_resolved)
+    except ValueError:
+        return False
+    return True
+
+
+def validate_execution_root_outside_repo(execution_root: Path, repo_root: Path) -> None:
+    if path_is_relative_to(execution_root, repo_root):
+        raise HarnessError("GPU confirmation execution_root must be outside the source checkout")
 
 
 def execute_all_streams(
     *,
     prompt_audit_path: Path,
     execution_root: Path,
-    run_id: str,
+    run_id: str | None,
     expected_git_head: str,
     model_name_or_path: str | None,
     mode: str = "initial",
     repo_root: Path = PROJECT_ROOT,
     tokenizer: Any | None = None,
     generator: Any | None = None,
+    enforce_external_execution_root: bool = True,
 ) -> dict[str, Any]:
     if mode not in {"initial", "resume"}:
         raise HarnessError(f"Unknown run mode: {mode}")
     if not expected_git_head:
         raise HarnessError("--expected-git-head is required for GPU confirmation execution")
+    if enforce_external_execution_root:
+        validate_execution_root_outside_repo(execution_root, repo_root)
     verify_authorization_boundary(
         repo_root,
         expected_git_head=expected_git_head,
@@ -1046,6 +1153,11 @@ def execute_all_streams(
     code_manifest = execution_code_manifest(repo_root)
     validate_execution_code_manifest(code_manifest, repo_root=repo_root)
     execution_root.mkdir(parents=True, exist_ok=True)
+    run_id = resolve_run_id_for_mode(
+        execution_root=execution_root,
+        mode=mode,
+        requested_run_id=run_id,
+    )
     write_json(execution_root / "EXECUTION_CODE_MANIFEST.json", code_manifest)
     if mode == "initial":
         check_run_level_initial_absent(execution_root)
@@ -1073,6 +1185,7 @@ def execute_all_streams(
             execution_root=execution_root,
             stream=stream,
             expected_sample_ids=expected_sample_ids,
+            expected_run_id=run_id,
         )
         if state["status"] == "complete":
             continue
@@ -1135,6 +1248,7 @@ def run_stream_with_guard(
             raw_path,
             checkpoint_path,
             expected_sample_ids=expected_sample_ids,
+            expected_run_id=run_id,
             full_completion=False,
         )
         existing_rows = read_jsonl(raw_path)
@@ -1166,6 +1280,7 @@ def run_stream_with_guard(
     validate_raw_generation_rows(
         combined,
         expected_sample_ids=expected_sample_ids,
+        expected_run_id=run_id,
         full_completion=len(combined) == FINAL_CONFIRMATION_N,
     )
     write_rows_incrementally(
@@ -1173,6 +1288,7 @@ def run_stream_with_guard(
         normalized,
         existing_rows=existing_rows,
         expected_sample_ids=expected_sample_ids,
+        expected_run_id=run_id,
     )
     return combined
 
@@ -1272,10 +1388,18 @@ def execution_plan() -> dict[str, Any]:
             "resume_flag": "--resume-run",
             "fixed_stream_order": STREAM_ORDER,
             "default_execution_root": DEFAULT_EXECUTION_ROOT,
+            "single_stream_gpu_cli_allowed": False,
             "expected_git_head_required": True,
             "dirty_worktree_bypass_allowed_in_gpu_mode": False,
+            "execution_root_must_be_outside_repo_in_gpu_mode": True,
             "authorization_boundary_checked_once_per_initial_run": True,
             "model_loaded_once_per_execute_all": True,
+            "initial_run_state_must_be_absent": True,
+            "initial_run_creates_one_run_id": True,
+            "resume_requires_existing_run_state": True,
+            "resume_reuses_existing_run_id": True,
+            "raw_rows_require_single_run_id": True,
+            "checkpoints_store_run_id": True,
             "run_state_manifest": "CONFIRMATION_RUN_STATE.json",
             "execution_code_manifest": "EXECUTION_CODE_MANIFEST.json",
         },
@@ -1283,6 +1407,11 @@ def execution_plan() -> dict[str, Any]:
             "verify_stage6g_authorization_with_expected_git_head_and_clean_worktree",
             "reject_missing_expected_git_head_in_gpu_mode",
             "reject_dirty_worktree_override_in_gpu_mode",
+            "reject_single_stream_gpu_cli_execution",
+            "reject_execution_root_inside_source_checkout_in_gpu_mode",
+            "initial_run_requires_absent_run_state",
+            "resume_run_requires_existing_started_run_state",
+            "resume_run_reuses_existing_run_id",
             "verify_zero_existing_raw_generation_files_for_initial_run",
             "verify_prompt_token_audit_file_sha256_before_parse",
             "write_and_validate_execution_code_manifest_before_model_load",
@@ -1304,9 +1433,12 @@ def execution_plan() -> dict[str, Any]:
             "write_sample_id_and_stage6_sample_id_for_reuse_runner_compatibility",
             "preserve_generation_status_error_and_latency_fields",
             "write_raw_generation_row_sha256",
+            "verify_all_raw_rows_share_the_locked_run_id",
             "write_incremental_stream_checkpoint_manifest",
+            "write_and_verify_checkpoint_run_id",
             "verify_resume_checkpoint_before_any_resume",
             "write_run_state_manifest_after_each_stream",
+            "retain_one_run_id_across_run_state_updates",
             "resume_run_verifies_prior_streams_before_continuation",
             "write_shared_replay_row_sha256_for_d_g1_and_d_f_g1",
             "write_actual_d_g1_and_d_f_g1_replay_provenance_after_shared_stream_completion",
@@ -1356,7 +1488,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--enable-gpu-execution", action="store_true")
     parser.add_argument("--prompt-token-audit", default=DEFAULT_PROMPT_TOKEN_AUDIT_PATH)
     parser.add_argument("--model-name-or-path")
-    parser.add_argument("--run-id", default=f"stage6h_{int(time.time())}")
+    parser.add_argument("--run-id")
     parser.add_argument("--expected-git-head")
     parser.add_argument("--allow-dirty-worktree", action="store_true")
     return parser.parse_args()
@@ -1369,51 +1501,29 @@ def main() -> None:
             raise SystemExit("--allow-dirty-worktree is forbidden in GPU confirmation execution mode.")
         if not args.expected_git_head:
             raise SystemExit("--expected-git-head is required in GPU confirmation execution mode.")
-        if args.execute_all and args.execute_stream:
-            raise SystemExit("Use either --execute-all or --execute-stream, not both.")
+        if args.execute_stream:
+            raise SystemExit(
+                "--execute-stream is forbidden for confirmatory GPU execution; "
+                "use --execute-all or --resume-run."
+            )
         if args.resume_run and args.mode == "initial":
             args.mode = "resume"
-        if not args.execute_stream and not args.execute_all:
-            raise SystemExit("Stage6H execution requires --execute-all, --execute-stream, or --setup-only.")
+        if not args.execute_all and not args.resume_run:
+            raise SystemExit("Stage6H GPU execution requires --execute-all or --resume-run.")
         if not args.enable_gpu_execution:
             raise SystemExit(
                 "Stage6H execution CLI is present but GPU execution requires "
                 "--enable-gpu-execution after reviewer acceptance."
             )
-        if args.execute_all:
-            state = execute_all_streams(
-                prompt_audit_path=Path(args.prompt_token_audit),
-                execution_root=Path(args.execution_root),
-                run_id=args.run_id,
-                expected_git_head=args.expected_git_head,
-                mode="resume" if args.resume_run else args.mode,
-                model_name_or_path=args.model_name_or_path,
-            )
-            print(json.dumps(state, ensure_ascii=False, indent=2, sort_keys=True))
-            return
-        rows = execute_stream_integrated(
-            stream=args.execute_stream,
+        state = execute_all_streams(
             prompt_audit_path=Path(args.prompt_token_audit),
-            output_root=Path(args.execution_root),
+            execution_root=Path(args.execution_root),
             run_id=args.run_id,
-            mode=args.mode,
             expected_git_head=args.expected_git_head,
-            require_git_clean=True,
+            mode="resume" if args.resume_run else args.mode,
             model_name_or_path=args.model_name_or_path,
         )
-        print(json.dumps(
-            {
-                "status": "PASS_STREAM_EXECUTION_COMPLETE" if len(rows) == FINAL_CONFIRMATION_N else "PASS_STREAM_PARTIAL",
-                "stream": args.execute_stream,
-                "row_count": len(rows),
-                "unique_sample_ids": len({str(row["stage6_sample_id"]) for row in rows}),
-                "raw_generation_path": str(Path(args.execution_root) / STREAMS[args.execute_stream]["raw_generation_path"]),
-                "confirmation_predictions_created": True,
-            },
-            ensure_ascii=False,
-            indent=2,
-            sort_keys=True,
-        ))
+        print(json.dumps(state, ensure_ascii=False, indent=2, sort_keys=True))
         return
     lock = create_setup(Path(args.output_dir))
     print(json.dumps(lock, ensure_ascii=False, indent=2, sort_keys=True))

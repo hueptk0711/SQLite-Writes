@@ -620,7 +620,7 @@ def test_resume_generates_only_unfinished_ids():
         current_rows=audit_rows(),
         generation_callable=generate_remaining,
         output_root=root,
-        run_id="resume",
+        run_id="partial",
         metadata=metadata(),
         mode="resume",
     )
@@ -687,7 +687,7 @@ def test_integrated_runner_crash_after_two_samples_persists_checkpoint():
             stream="direct",
             prompt_audit_path=audit_path,
             output_root=root,
-            run_id="resume",
+            run_id="crash",
             mode="resume",
             tokenizer=FakeTokenizer(),
             generator=resumed,
@@ -809,6 +809,7 @@ def test_execute_all_continues_from_direct_to_jfs_without_absent_recheck():
             model_name_or_path=None,
             tokenizer=FakeTokenizer(),
             generator=generator,
+            enforce_external_execution_root=False,
         )
     assert state["status"] == "COMPLETE"
     assert len(generator.prompts) == harness.FINAL_CONFIRMATION_N * 4
@@ -841,6 +842,7 @@ def test_execute_all_crash_in_jfs_then_resume_keeps_direct_immutable():
                 model_name_or_path=None,
                 tokenizer=FakeTokenizer(),
                 generator=crashing,
+                enforce_external_execution_root=False,
             )
         except RuntimeError as exc:
             assert "simulated infrastructure crash" in str(exc)
@@ -864,16 +866,158 @@ def test_execute_all_crash_in_jfs_then_resume_keeps_direct_immutable():
         state = harness.execute_all_streams(
             prompt_audit_path=audit_path,
             execution_root=root,
-            run_id="crash-run",
+            run_id=None,
             expected_git_head="1" * 40,
             mode="resume",
             model_name_or_path=None,
             tokenizer=FakeTokenizer(),
             generator=resumed,
+            enforce_external_execution_root=False,
         )
     assert state["status"] == "COMPLETE"
+    assert state["run_id"] == "crash-run"
     assert harness.sha256_file(direct_raw) == direct_hash_before
     assert all("stage6_crudsql_0000" not in prompt for prompt in resumed.prompts[:5])
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def test_resume_with_mismatched_run_id_fails():
+    samples = final_manifest_rows()
+    root = fresh_dir()
+    audit_path = root / "PROMPT_TOKEN_AUDIT.jsonl"
+    write_integrated_audit(audit_path, samples)
+    patches = integrated_patches(samples)
+    crashing = FakeGenerator(crash_after_successes=harness.FINAL_CONFIRMATION_N + 1)
+    with (
+        patches[0],
+        patches[1],
+        patches[2],
+        patches[3],
+        prompt_audit_hash_patch(audit_path),
+        no_op_authorization(),
+    ):
+        try:
+            harness.execute_all_streams(
+                prompt_audit_path=audit_path,
+                execution_root=root,
+                run_id="run-A",
+                expected_git_head="1" * 40,
+                model_name_or_path=None,
+                tokenizer=FakeTokenizer(),
+                generator=crashing,
+                enforce_external_execution_root=False,
+            )
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError("expected simulated crash")
+    with (
+        patches[0],
+        patches[1],
+        patches[2],
+        patches[3],
+        prompt_audit_hash_patch(audit_path),
+        no_op_authorization(),
+    ):
+        try:
+            harness.execute_all_streams(
+                prompt_audit_path=audit_path,
+                execution_root=root,
+                run_id="run-B",
+                expected_git_head="1" * 40,
+                mode="resume",
+                model_name_or_path=None,
+                tokenizer=FakeTokenizer(),
+                generator=FakeGenerator(),
+                enforce_external_execution_root=False,
+            )
+        except harness.HarnessError as exc:
+            assert "Resume run_id mismatch" in str(exc)
+        else:
+            raise AssertionError("expected HarnessError")
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def test_mixed_raw_run_ids_fail():
+    rows = [
+        harness.normalize_raw_generation_row(
+            stream="direct",
+            audit_row=row,
+            generation_row=generation_rows([row])[0],
+            run_id=run_id,
+            metadata=metadata(),
+        )
+        for row, run_id in zip(audit_rows()[:2], ["run-A", "run-B"])
+    ]
+    try:
+        harness.validate_raw_generation_rows(rows)
+    except harness.HarnessError as exc:
+        assert "mixed run_id" in str(exc)
+    else:
+        raise AssertionError("expected HarnessError")
+
+
+def test_resume_on_empty_execution_root_fails():
+    samples = final_manifest_rows()
+    root = fresh_dir()
+    audit_path = root / "PROMPT_TOKEN_AUDIT.jsonl"
+    write_integrated_audit(audit_path, samples)
+    patches = integrated_patches(samples)
+    with (
+        patches[0],
+        patches[1],
+        patches[2],
+        patches[3],
+        prompt_audit_hash_patch(audit_path),
+        no_op_authorization(),
+    ):
+        try:
+            harness.execute_all_streams(
+                prompt_audit_path=audit_path,
+                execution_root=root,
+                run_id=None,
+                expected_git_head="1" * 40,
+                mode="resume",
+                model_name_or_path=None,
+                tokenizer=FakeTokenizer(),
+                generator=FakeGenerator(),
+                enforce_external_execution_root=False,
+            )
+        except harness.HarnessError as exc:
+            assert "requires existing CONFIRMATION_RUN_STATE" in str(exc)
+        else:
+            raise AssertionError("expected HarnessError")
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def test_execution_root_inside_repo_fails_before_model_load():
+    samples = final_manifest_rows()
+    root = fresh_dir()
+    audit_path = root / "PROMPT_TOKEN_AUDIT.jsonl"
+    write_integrated_audit(audit_path, samples)
+    patches = integrated_patches(samples)
+    with (
+        patches[0],
+        patches[1],
+        patches[2],
+        patches[3],
+        prompt_audit_hash_patch(audit_path),
+        no_op_authorization(),
+    ):
+        try:
+            harness.execute_all_streams(
+                prompt_audit_path=audit_path,
+                execution_root=root,
+                run_id="inside",
+                expected_git_head="1" * 40,
+                model_name_or_path=None,
+                tokenizer=FakeTokenizer(),
+                generator=FakeGenerator(),
+            )
+        except harness.HarnessError as exc:
+            assert "outside the source checkout" in str(exc)
+        else:
+            raise AssertionError("expected HarnessError")
     shutil.rmtree(root, ignore_errors=True)
 
 
@@ -892,6 +1036,28 @@ def test_gpu_cli_requires_expected_git_head_and_rejects_dirty_bypass():
             harness.main()
         except SystemExit as exc:
             assert "--expected-git-head is required" in str(exc)
+        else:
+            raise AssertionError("expected SystemExit")
+
+
+def test_gpu_cli_forbids_single_stream_execution():
+    with mock.patch(
+        "sys.argv",
+        [
+            "run_stage6_confirmation.py",
+            "--execute-stream",
+            "j_fs",
+            "--enable-gpu-execution",
+            "--expected-git-head",
+            "1" * 40,
+            "--model-name-or-path",
+            "model",
+        ],
+    ):
+        try:
+            harness.main()
+        except SystemExit as exc:
+            assert "--execute-stream is forbidden" in str(exc)
         else:
             raise AssertionError("expected SystemExit")
     with mock.patch(
