@@ -24,10 +24,18 @@ EXPECTED_REQUIRED_GUARDS = [
     "verify_stage6g_authorization_with_expected_git_head_and_clean_worktree",
     "verify_zero_existing_raw_generation_files_for_initial_run",
     "recompute_current_prompt_token_audit_for_stream",
+    "map_shared_generation_stream_to_d_g1_control_prompt_audit_arm",
+    "verify_d_g1_control_and_d_f_g1_vnext_input_identity_481_of_481",
+    "verify_exact_481_unique_frozen_sample_ids_before_generation",
     "compare_prompt_chat_input_ids_and_token_count_481_of_481_before_generation",
+    "pass_verified_runtime_request_objects_directly_to_generation_call",
+    "verify_exact_481_unique_frozen_sample_ids_after_generation",
+    "verify_generated_rows_report_same_prompt_chat_input_ids_and_token_count",
     "normalize_raw_rows_to_stage6g_schema",
+    "write_sample_id_and_stage6_sample_id_for_reuse_runner_compatibility",
+    "preserve_generation_status_error_and_latency_fields",
     "write_raw_generation_row_sha256",
-    "write_stream_checkpoint_manifest",
+    "write_incremental_stream_checkpoint_manifest",
     "verify_resume_checkpoint_before_any_resume",
     "write_shared_replay_row_sha256_for_d_g1_and_d_f_g1",
 ]
@@ -107,8 +115,27 @@ def validate(harness_dir: Path) -> dict[str, Any]:
     if sorted(streams) != sorted(EXPECTED_STREAMS):
         add(violations, "plan_stream_set_mismatch", actual=sorted(streams))
     shared = streams.get("shared_mp_fs_plus_generation") or {}
+    if shared.get("prompt_audit_arm") != "d_g1_control":
+        add(violations, "plan_shared_prompt_audit_arm_mismatch", actual=shared.get("prompt_audit_arm"))
+    if shared.get("identity_audit_arm") != "d_f_g1_vnext":
+        add(violations, "plan_shared_identity_audit_arm_mismatch", actual=shared.get("identity_audit_arm"))
     if shared.get("deterministic_replay_arms") != ["d_g1_control", "d_f_g1_vnext"]:
         add(violations, "plan_shared_replay_arms_mismatch")
+    modes = plan.get("execution_modes") or {}
+    if sorted(modes) != ["initial", "resume"]:
+        add(violations, "plan_execution_modes_mismatch", actual=sorted(modes))
+    if (modes.get("initial") or {}).get("existing_raw_generation_rows_allowed") is not False:
+        add(violations, "plan_initial_mode_raw_policy_mismatch")
+    resume = modes.get("resume") or {}
+    for key in ("existing_raw_generation_rows_allowed", "required_existing_checkpoint", "completed_rows_are_immutable", "only_unfinished_ids_may_be_generated"):
+        if resume.get(key) is not True:
+            add(violations, "plan_resume_mode_policy_mismatch", field=key, actual=resume.get(key))
+    runtime_inputs = plan.get("runtime_input_locks") or {}
+    for key in ("stage6f_prompt_token_audit", "stage6g_authorization", "final_confirmation_manifest", "final_gold_corpus", "stage6f_gpu_environment_manifest"):
+        if key not in runtime_inputs:
+            add(violations, "plan_runtime_input_lock_missing", field=key)
+    if (runtime_inputs.get("stage6f_prompt_token_audit") or {}).get("sha256") != EXPECTED_PROMPT_TOKEN_AUDIT_SHA256:
+        add(violations, "plan_runtime_prompt_audit_hash_mismatch")
     guards = list(plan.get("pre_generation_phases") or []) + list(plan.get("post_generation_phases") or [])
     if guards != EXPECTED_REQUIRED_GUARDS:
         add(violations, "plan_required_guards_mismatch", actual=guards)

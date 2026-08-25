@@ -1,5 +1,17 @@
 {
   "confirmation_predictions_created": false,
+  "execution_modes": {
+    "initial": {
+      "existing_raw_generation_rows_allowed": false,
+      "required_existing_checkpoint": false
+    },
+    "resume": {
+      "completed_rows_are_immutable": true,
+      "existing_raw_generation_rows_allowed": true,
+      "only_unfinished_ids_may_be_generated": true,
+      "required_existing_checkpoint": true
+    }
+  },
   "final_confirmation_n": 481,
   "generation_lock_sha256": "890da57fbe137f4b3f64e002a29d76a3c630cdc8290c924ac1d1f9da585a9c14",
   "generation_stream_order": [
@@ -12,18 +24,21 @@
     "direct": {
       "config_path": "configs/stage5/resolved_direct_confirmation.json",
       "method_id": "D-FS-M",
+      "prompt_audit_arm": "direct",
       "raw_generation_path": "raw_generations/direct.jsonl",
       "run_method_output_dir": "runs/stage6_confirmation/direct"
     },
     "j_fs": {
       "config_path": "configs/stage5/resolved_j_fs_confirmation.json",
       "method_id": "J-FS-M",
+      "prompt_audit_arm": "j_fs",
       "raw_generation_path": "raw_generations/j_fs.jsonl",
       "run_method_output_dir": "runs/stage6_confirmation/j_fs"
     },
     "original_mp_fs_plus": {
       "config_path": "configs/stage5/resolved_original_mp_fs_plus.json",
       "method_id": "MP-FS+",
+      "prompt_audit_arm": "original_mp_fs_plus",
       "raw_generation_path": "raw_generations/original_mp_fs_plus.jsonl",
       "run_method_output_dir": "runs/stage6_confirmation/original_mp_fs_plus"
     },
@@ -33,7 +48,9 @@
         "d_g1_control",
         "d_f_g1_vnext"
       ],
+      "identity_audit_arm": "d_f_g1_vnext",
       "method_id": "MP-FS+",
+      "prompt_audit_arm": "d_g1_control",
       "raw_generation_path": "raw_generations/shared_mp_fs_plus_generation.jsonl",
       "run_method_output_dir": "runs/stage6_confirmation/shared_mp_fs_plus_generation"
     }
@@ -41,9 +58,13 @@
   "gpu_called_in_stage6h_setup": false,
   "model_called_in_stage6h_setup": false,
   "post_generation_phases": [
+    "verify_exact_481_unique_frozen_sample_ids_after_generation",
+    "verify_generated_rows_report_same_prompt_chat_input_ids_and_token_count",
     "normalize_raw_rows_to_stage6g_schema",
+    "write_sample_id_and_stage6_sample_id_for_reuse_runner_compatibility",
+    "preserve_generation_status_error_and_latency_fields",
     "write_raw_generation_row_sha256",
-    "write_stream_checkpoint_manifest",
+    "write_incremental_stream_checkpoint_manifest",
     "verify_resume_checkpoint_before_any_resume",
     "write_shared_replay_row_sha256_for_d_g1_and_d_f_g1"
   ],
@@ -51,9 +72,34 @@
     "verify_stage6g_authorization_with_expected_git_head_and_clean_worktree",
     "verify_zero_existing_raw_generation_files_for_initial_run",
     "recompute_current_prompt_token_audit_for_stream",
-    "compare_prompt_chat_input_ids_and_token_count_481_of_481_before_generation"
+    "map_shared_generation_stream_to_d_g1_control_prompt_audit_arm",
+    "verify_d_g1_control_and_d_f_g1_vnext_input_identity_481_of_481",
+    "verify_exact_481_unique_frozen_sample_ids_before_generation",
+    "compare_prompt_chat_input_ids_and_token_count_481_of_481_before_generation",
+    "pass_verified_runtime_request_objects_directly_to_generation_call"
   ],
   "prompt_token_audit_sha256": "e9bcf79074bcac4284f412314e40cbc7567940a36258dcb27f62ff7862eadae6",
+  "runtime_input_locks": {
+    "final_confirmation_manifest": {
+      "path": "stage6_final_registration_revision/FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl",
+      "sha256": "6a9fc9812d768001e3a8e8b87d2387a7b943c83237a4bca7603c304acf88bcc7"
+    },
+    "final_gold_corpus": {
+      "path": "stage6_final_registration_revision/FINAL_GOLD_CORPUS.jsonl",
+      "sha256": "2082e892858c065531e2456239e77e51bae6232fccdf717497fecadc5421fd16"
+    },
+    "stage6f_gpu_environment_manifest": {
+      "path": "stage6f_gpu_preflight_acceptance/server_output/GPU_ENVIRONMENT_MANIFEST.json"
+    },
+    "stage6f_prompt_token_audit": {
+      "path": "stage6f_gpu_preflight_acceptance/server_output/PROMPT_TOKEN_AUDIT.jsonl",
+      "sha256": "e9bcf79074bcac4284f412314e40cbc7567940a36258dcb27f62ff7862eadae6"
+    },
+    "stage6g_authorization": {
+      "commit": "ead5015c3efaa174772e8595b7b65a8f5c032166",
+      "directory": "stage6_confirmation_run_authorization"
+    }
+  },
   "stage": "Stage6H_CONFIRMATION_EXECUTION_HARNESS",
   "stage6g_authorization_commit": "ead5015c3efaa174772e8595b7b65a8f5c032166",
   "status": "HARNESS_READY_PENDING_REVIEWER_ACCEPTANCE"
