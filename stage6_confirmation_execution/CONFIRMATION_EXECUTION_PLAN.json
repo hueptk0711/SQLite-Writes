@@ -1,0 +1,60 @@
+{
+  "confirmation_predictions_created": false,
+  "final_confirmation_n": 481,
+  "generation_lock_sha256": "890da57fbe137f4b3f64e002a29d76a3c630cdc8290c924ac1d1f9da585a9c14",
+  "generation_stream_order": [
+    "direct",
+    "j_fs",
+    "original_mp_fs_plus",
+    "shared_mp_fs_plus_generation"
+  ],
+  "generation_streams": {
+    "direct": {
+      "config_path": "configs/stage5/resolved_direct_confirmation.json",
+      "method_id": "D-FS-M",
+      "raw_generation_path": "raw_generations/direct.jsonl",
+      "run_method_output_dir": "runs/stage6_confirmation/direct"
+    },
+    "j_fs": {
+      "config_path": "configs/stage5/resolved_j_fs_confirmation.json",
+      "method_id": "J-FS-M",
+      "raw_generation_path": "raw_generations/j_fs.jsonl",
+      "run_method_output_dir": "runs/stage6_confirmation/j_fs"
+    },
+    "original_mp_fs_plus": {
+      "config_path": "configs/stage5/resolved_original_mp_fs_plus.json",
+      "method_id": "MP-FS+",
+      "raw_generation_path": "raw_generations/original_mp_fs_plus.jsonl",
+      "run_method_output_dir": "runs/stage6_confirmation/original_mp_fs_plus"
+    },
+    "shared_mp_fs_plus_generation": {
+      "config_path": "configs/stage5/resolved_d_g1_control.json",
+      "deterministic_replay_arms": [
+        "d_g1_control",
+        "d_f_g1_vnext"
+      ],
+      "method_id": "MP-FS+",
+      "raw_generation_path": "raw_generations/shared_mp_fs_plus_generation.jsonl",
+      "run_method_output_dir": "runs/stage6_confirmation/shared_mp_fs_plus_generation"
+    }
+  },
+  "gpu_called_in_stage6h_setup": false,
+  "model_called_in_stage6h_setup": false,
+  "post_generation_phases": [
+    "normalize_raw_rows_to_stage6g_schema",
+    "write_raw_generation_row_sha256",
+    "write_stream_checkpoint_manifest",
+    "verify_resume_checkpoint_before_any_resume",
+    "write_shared_replay_row_sha256_for_d_g1_and_d_f_g1"
+  ],
+  "pre_generation_phases": [
+    "verify_stage6g_authorization_with_expected_git_head_and_clean_worktree",
+    "verify_zero_existing_raw_generation_files_for_initial_run",
+    "recompute_current_prompt_token_audit_for_stream",
+    "compare_prompt_chat_input_ids_and_token_count_481_of_481_before_generation"
+  ],
+  "prompt_token_audit_sha256": "e9bcf79074bcac4284f412314e40cbc7567940a36258dcb27f62ff7862eadae6",
+  "stage": "Stage6H_CONFIRMATION_EXECUTION_HARNESS",
+  "stage6g_authorization_commit": "ead5015c3efaa174772e8595b7b65a8f5c032166",
+  "status": "HARNESS_READY_PENDING_REVIEWER_ACCEPTANCE"
+}

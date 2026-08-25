@@ -1,0 +1,22 @@
+{
+  "confirmation_predictions_created": false,
+  "confirmation_run_started": false,
+  "execution_plan_sha256": "490030fb4757aa16a63a5bd8c57aa2d4daa6bebae4533fc10afb2a6037387e03",
+  "final_confirmation_n": 481,
+  "gpu_called": false,
+  "model_called": false,
+  "required_harness_guards": [
+    "verify_stage6g_authorization_with_expected_git_head_and_clean_worktree",
+    "verify_zero_existing_raw_generation_files_for_initial_run",
+    "recompute_current_prompt_token_audit_for_stream",
+    "compare_prompt_chat_input_ids_and_token_count_481_of_481_before_generation",
+    "normalize_raw_rows_to_stage6g_schema",
+    "write_raw_generation_row_sha256",
+    "write_stream_checkpoint_manifest",
+    "verify_resume_checkpoint_before_any_resume",
+    "write_shared_replay_row_sha256_for_d_g1_and_d_f_g1"
+  ],
+  "stage": "Stage6H_CONFIRMATION_EXECUTION_HARNESS_SETUP",
+  "stage6g_authorization_commit": "ead5015c3efaa174772e8595b7b65a8f5c032166",
+  "status": "HARNESS_SETUP_LOCKED_PENDING_REVIEWER_ACCEPTANCE"
+}
