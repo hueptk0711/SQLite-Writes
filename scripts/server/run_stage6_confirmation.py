@@ -1079,10 +1079,6 @@ def load_run_state(execution_root: Path) -> dict[str, Any]:
     return state
 
 
-def run_state_has_started_stream(state: dict[str, Any]) -> bool:
-    return any(int(stream.get("row_count") or 0) > 0 for stream in state.get("streams") or [])
-
-
 def resolve_run_id_for_mode(
     *,
     execution_root: Path,
@@ -1101,8 +1097,6 @@ def resolve_run_id_for_mode(
             raise HarnessError(
                 f"Resume run_id mismatch: state has {existing_run_id}, CLI requested {requested_run_id}"
             )
-        if not run_state_has_started_stream(state):
-            raise HarnessError("Resume run requires an existing started confirmation run")
         return existing_run_id
     raise HarnessError(f"Unknown run mode: {mode}")
 
@@ -1397,6 +1391,7 @@ def execution_plan() -> dict[str, Any]:
             "initial_run_state_must_be_absent": True,
             "initial_run_creates_one_run_id": True,
             "resume_requires_existing_run_state": True,
+            "resume_allows_initialized_zero_row_run_state": True,
             "resume_reuses_existing_run_id": True,
             "raw_rows_require_single_run_id": True,
             "checkpoints_store_run_id": True,
@@ -1410,7 +1405,8 @@ def execution_plan() -> dict[str, Any]:
             "reject_single_stream_gpu_cli_execution",
             "reject_execution_root_inside_source_checkout_in_gpu_mode",
             "initial_run_requires_absent_run_state",
-            "resume_run_requires_existing_started_run_state",
+            "resume_run_requires_existing_initialized_run_state",
+            "resume_run_allows_initialized_zero_row_state",
             "resume_run_reuses_existing_run_id",
             "verify_zero_existing_raw_generation_files_for_initial_run",
             "verify_prompt_token_audit_file_sha256_before_parse",

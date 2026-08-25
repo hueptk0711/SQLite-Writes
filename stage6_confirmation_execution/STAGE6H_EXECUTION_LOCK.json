@@ -1,7 +1,7 @@
 {
   "confirmation_predictions_created": false,
   "confirmation_run_started": false,
-  "execution_plan_sha256": "91c3b2d43b85b62921ed173db56abc19bb1746fe119f8b46b046c8de52a56fc4",
+  "execution_plan_sha256": "02ec4596321b20b4af805f9ae8fecbad1b842562fe49050939513416059bd9f3",
   "final_confirmation_n": 481,
   "gpu_called": false,
   "model_called": false,
@@ -12,7 +12,8 @@
     "reject_single_stream_gpu_cli_execution",
     "reject_execution_root_inside_source_checkout_in_gpu_mode",
     "initial_run_requires_absent_run_state",
-    "resume_run_requires_existing_started_run_state",
+    "resume_run_requires_existing_initialized_run_state",
+    "resume_run_allows_initialized_zero_row_state",
     "resume_run_reuses_existing_run_id",
     "verify_zero_existing_raw_generation_files_for_initial_run",
     "verify_prompt_token_audit_file_sha256_before_parse",
