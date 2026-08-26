@@ -1,0 +1,62 @@
+{
+  "date": "20260826",
+  "eval_arms": {
+    "d_f_g1_vnext": {
+      "config_path": "configs/stage5/resolved_mp_fs_plus_vnext_r1.json",
+      "config_stream": "shared_mp_fs_plus_generation",
+      "method_id": "MP-FS+",
+      "outcome_path": "replay_outcomes/d_f_g1_vnext.jsonl",
+      "outcome_sha256": "9eeb93747a381b50e6db5ca90988becca70f3888579e9fae6820de8ed3de1cae",
+      "raw_generation_sha256": "13d05a682ba1b1de2d60bd15cb2d206c69f9e9605cbd9cef113b0813bef723d3",
+      "raw_stream": "shared_mp_fs_plus_generation"
+    },
+    "d_g1_control": {
+      "config_stream": "shared_mp_fs_plus_generation",
+      "method_id": "MP-FS+",
+      "outcome_path": "replay_outcomes/d_g1_control.jsonl",
+      "outcome_sha256": "f574734661c5a8c445921ec9ef4502ba1423f222f42e9ea39413432dc1a1d6dc",
+      "raw_generation_sha256": "13d05a682ba1b1de2d60bd15cb2d206c69f9e9605cbd9cef113b0813bef723d3",
+      "raw_stream": "shared_mp_fs_plus_generation"
+    },
+    "direct": {
+      "config_stream": "direct",
+      "method_id": "D-FS-M",
+      "outcome_path": "replay_outcomes/direct.jsonl",
+      "outcome_sha256": "cfd5b76a8057d83c4140d737e3679dcae19f761f8de782a0c8442152a91728ea",
+      "raw_generation_sha256": "ef0c0669578c0f2a1645f3119a6273991c941a933d47c7c3b92a4b984b956afb",
+      "raw_stream": "direct"
+    },
+    "j_fs": {
+      "config_stream": "j_fs",
+      "method_id": "J-FS-M",
+      "outcome_path": "replay_outcomes/j_fs.jsonl",
+      "outcome_sha256": "35700c0cd59b8a4e3bd27fea854d69d6e3bac240a4edf3b27eb9528e94a7a7e3",
+      "raw_generation_sha256": "b0fcdef81cd666f4357998f02827fe64e7be7dc64d79c6d18820be1f812136b9",
+      "raw_stream": "j_fs"
+    },
+    "original_mp_fs_plus": {
+      "config_stream": "original_mp_fs_plus",
+      "method_id": "MP-FS+",
+      "outcome_path": "replay_outcomes/original_mp_fs_plus.jsonl",
+      "outcome_sha256": "f91b49bb326835c83cb59ea7808c5c5cd3025d149a68e83cc2b477831a78c752",
+      "raw_generation_sha256": "b10ba74e67c788a3c27df08354464bf51aeb4d60cd1b96b8719a12e62eb7feb6",
+      "raw_stream": "original_mp_fs_plus"
+    }
+  },
+  "execution_code_manifest_sha256": "f4896552a8eaf7f7b3f6b976b6b0877b06281c926047acc244eebb1e9767c68e",
+  "final_stage6e_artifacts": {
+    "final_gold_corpus_sha256": "2082e892858c065531e2456239e77e51bae6232fccdf717497fecadc5421fd16",
+    "final_gold_post_state_hashes_sha256": "ea2fc586c764592268d9f330651d7c14855a731b4045a2f79d26dd1853b32cc6",
+    "final_gold_programs_sha256": "d34208d3def6434591f05cb396505475f3fd1e5d057326baf8f7207cdceaa3cf",
+    "final_manifest_sha256": "6a9fc9812d768001e3a8e8b87d2387a7b943c83237a4bca7603c304acf88bcc7"
+  },
+  "raw_stream_hashes": {
+    "direct": "ef0c0669578c0f2a1645f3119a6273991c941a933d47c7c3b92a4b984b956afb",
+    "j_fs": "b0fcdef81cd666f4357998f02827fe64e7be7dc64d79c6d18820be1f812136b9",
+    "original_mp_fs_plus": "b10ba74e67c788a3c27df08354464bf51aeb4d60cd1b96b8719a12e62eb7feb6",
+    "shared_mp_fs_plus_generation": "13d05a682ba1b1de2d60bd15cb2d206c69f9e9605cbd9cef113b0813bef723d3"
+  },
+  "run_state_sha256": "a6e8fee1af818b186b30a476cba8327323374d451ff43e08dd72f394d90a5ce2",
+  "source_stage6i_zip_sha256": "d606c686d5176424898c75f074ec835c86ff893bc263f0adfbcac8d10445a571",
+  "stage": "Stage6J_DETERMINISTIC_REPLAY_EVALUATION"
+}

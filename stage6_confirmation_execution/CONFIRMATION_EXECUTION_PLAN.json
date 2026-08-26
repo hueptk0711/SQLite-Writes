@@ -58,6 +58,7 @@
   "gpu_called_in_stage6h_setup": false,
   "model_called_in_stage6h_setup": false,
   "post_generation_phases": [
+    "execute_all_four_streams_in_fixed_order_with_one_run_id",
     "generate_one_sample_at_a_time_from_integrated_runner",
     "verify_exact_481_unique_frozen_sample_ids_after_generation",
     "verify_generated_rows_report_same_prompt_chat_input_ids_and_token_count",
@@ -65,14 +66,30 @@
     "write_sample_id_and_stage6_sample_id_for_reuse_runner_compatibility",
     "preserve_generation_status_error_and_latency_fields",
     "write_raw_generation_row_sha256",
+    "verify_all_raw_rows_share_the_locked_run_id",
     "write_incremental_stream_checkpoint_manifest",
+    "write_and_verify_checkpoint_run_id",
     "verify_resume_checkpoint_before_any_resume",
+    "write_run_state_manifest_after_each_stream",
+    "retain_one_run_id_across_run_state_updates",
+    "resume_run_verifies_prior_streams_before_continuation",
     "write_shared_replay_row_sha256_for_d_g1_and_d_f_g1",
     "write_actual_d_g1_and_d_f_g1_replay_provenance_after_shared_stream_completion"
   ],
   "pre_generation_phases": [
     "verify_stage6g_authorization_with_expected_git_head_and_clean_worktree",
+    "reject_missing_expected_git_head_in_gpu_mode",
+    "reject_dirty_worktree_override_in_gpu_mode",
+    "reject_single_stream_gpu_cli_execution",
+    "reject_execution_root_inside_source_checkout_in_gpu_mode",
+    "initial_run_requires_absent_run_state",
+    "resume_run_requires_existing_initialized_run_state",
+    "resume_run_allows_initialized_zero_row_state",
+    "resume_run_reuses_existing_run_id",
     "verify_zero_existing_raw_generation_files_for_initial_run",
+    "verify_prompt_token_audit_file_sha256_before_parse",
+    "write_and_validate_execution_code_manifest_before_model_load",
+    "run_level_initial_all_stream_outputs_absent_check",
     "recompute_current_prompt_token_audit_for_stream",
     "map_shared_generation_stream_to_d_g1_control_prompt_audit_arm",
     "verify_d_g1_control_and_d_f_g1_vnext_input_identity_481_of_481",
@@ -82,6 +99,32 @@
     "tie_stage6e_final_id_set_to_stage6f_audit_and_runtime_ids"
   ],
   "prompt_token_audit_sha256": "e9bcf79074bcac4284f412314e40cbc7567940a36258dcb27f62ff7862eadae6",
+  "run_level_controller": {
+    "authorization_boundary_checked_once_per_initial_run": true,
+    "checkpoints_store_run_id": true,
+    "default_execution_root": "../stage6_confirmation_run_outputs",
+    "dirty_worktree_bypass_allowed_in_gpu_mode": false,
+    "execute_all_flag": "--execute-all",
+    "execution_code_manifest": "EXECUTION_CODE_MANIFEST.json",
+    "execution_root_must_be_outside_repo_in_gpu_mode": true,
+    "expected_git_head_required": true,
+    "fixed_stream_order": [
+      "direct",
+      "j_fs",
+      "original_mp_fs_plus",
+      "shared_mp_fs_plus_generation"
+    ],
+    "initial_run_creates_one_run_id": true,
+    "initial_run_state_must_be_absent": true,
+    "model_loaded_once_per_execute_all": true,
+    "raw_rows_require_single_run_id": true,
+    "resume_allows_initialized_zero_row_run_state": true,
+    "resume_flag": "--resume-run",
+    "resume_requires_existing_run_state": true,
+    "resume_reuses_existing_run_id": true,
+    "run_state_manifest": "CONFIRMATION_RUN_STATE.json",
+    "single_stream_gpu_cli_allowed": false
+  },
   "runtime_input_locks": {
     "final_confirmation_manifest": {
       "path": "stage6_final_registration_revision/artifacts/FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl",
@@ -95,10 +138,10 @@
       "path": "stage6_crudsql_registration"
     },
     "stage6f_gpu_environment_manifest": {
-      "path": "stage6f_gpu_preflight_acceptance/server_output/GPU_ENVIRONMENT_MANIFEST.json"
+      "path": "stage6_gpu_preflight_acceptance/server_output_zip_extract_patch2/stage6f_gpu_preflight_patch2_outputs/stage6_gpu_preflight/GPU_ENVIRONMENT_MANIFEST.json"
     },
     "stage6f_prompt_token_audit": {
-      "path": "stage6f_gpu_preflight_acceptance/server_output/PROMPT_TOKEN_AUDIT.jsonl",
+      "path": "stage6_gpu_preflight_acceptance/server_output_zip_extract_patch2/stage6f_gpu_preflight_patch2_outputs/stage6_gpu_preflight/PROMPT_TOKEN_AUDIT.jsonl",
       "sha256": "e9bcf79074bcac4284f412314e40cbc7567940a36258dcb27f62ff7862eadae6"
     },
     "stage6g_authorization": {

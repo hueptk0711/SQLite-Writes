@@ -1,0 +1,219 @@
+{
+  "arm_count": 5,
+  "arms": {
+    "d_f_g1_vnext": {
+      "admission_status_counts": {
+        "accepted": 43,
+        "not_applicable": 438
+      },
+      "construction_status_counts": {
+        "not_applicable": 438,
+        "success": 43
+      },
+      "execution_status_counts": {
+        "not_run": 438,
+        "success": 43
+      },
+      "f_applied_count": 0,
+      "f_attempted_count": 0,
+      "f_revalidation_passed_count": 0,
+      "failure_stage_counts": {
+        "parse": 2,
+        "state_mismatch": 43,
+        "verification": 436
+      },
+      "g1_applied_count": 0,
+      "g1_diagnostic_triggered_count": 0,
+      "g1_revalidation_passed_count": 0,
+      "hit_max_new_tokens_count": 0,
+      "n": 481,
+      "parse_status_counts": {
+        "parse_error": 2,
+        "success": 479
+      },
+      "pipeline_stage_counts": {
+        "None": 2,
+        "compiled": 43,
+        "evidence_materialization": 436
+      },
+      "target_state_correct": 0,
+      "target_state_incorrect": 481,
+      "verification_status_counts": {
+        "not_applicable": 2,
+        "success": 43,
+        "verification_error": 436
+      }
+    },
+    "d_g1_control": {
+      "admission_status_counts": {
+        "accepted": 43,
+        "not_applicable": 438
+      },
+      "construction_status_counts": {
+        "not_applicable": 438,
+        "success": 43
+      },
+      "execution_status_counts": {
+        "not_run": 438,
+        "success": 43
+      },
+      "f_applied_count": 0,
+      "f_attempted_count": 0,
+      "f_revalidation_passed_count": 0,
+      "failure_stage_counts": {
+        "parse": 2,
+        "state_mismatch": 43,
+        "verification": 436
+      },
+      "g1_applied_count": 0,
+      "g1_diagnostic_triggered_count": 0,
+      "g1_revalidation_passed_count": 0,
+      "hit_max_new_tokens_count": 0,
+      "n": 481,
+      "parse_status_counts": {
+        "parse_error": 2,
+        "success": 479
+      },
+      "pipeline_stage_counts": {
+        "None": 2,
+        "compiled": 43,
+        "evidence_materialization": 436
+      },
+      "target_state_correct": 0,
+      "target_state_incorrect": 481,
+      "verification_status_counts": {
+        "not_applicable": 2,
+        "success": 43,
+        "verification_error": 436
+      }
+    },
+    "direct": {
+      "admission_status_counts": {
+        "accepted": 481
+      },
+      "construction_status_counts": {
+        "success": 481
+      },
+      "execution_status_counts": {
+        "execution_error": 76,
+        "success": 405
+      },
+      "f_applied_count": 0,
+      "f_attempted_count": 0,
+      "f_revalidation_passed_count": 0,
+      "failure_stage_counts": {
+        "execution": 76,
+        "none": 58,
+        "state_mismatch": 347
+      },
+      "g1_applied_count": 0,
+      "g1_diagnostic_triggered_count": 0,
+      "g1_revalidation_passed_count": 0,
+      "hit_max_new_tokens_count": 0,
+      "n": 481,
+      "parse_status_counts": {
+        "success": 481
+      },
+      "pipeline_stage_counts": {
+        "None": 481
+      },
+      "target_state_correct": 58,
+      "target_state_incorrect": 423,
+      "verification_status_counts": {
+        "not_applicable": 481
+      }
+    },
+    "j_fs": {
+      "admission_status_counts": {
+        "accepted": 388,
+        "not_applicable": 93
+      },
+      "construction_status_counts": {
+        "not_applicable": 93,
+        "success": 388
+      },
+      "execution_status_counts": {
+        "not_run": 93,
+        "success": 388
+      },
+      "f_applied_count": 0,
+      "f_attempted_count": 0,
+      "f_revalidation_passed_count": 0,
+      "failure_stage_counts": {
+        "none": 50,
+        "parse": 1,
+        "state_mismatch": 338,
+        "verification": 92
+      },
+      "g1_applied_count": 0,
+      "g1_diagnostic_triggered_count": 0,
+      "g1_revalidation_passed_count": 0,
+      "hit_max_new_tokens_count": 0,
+      "n": 481,
+      "parse_status_counts": {
+        "parse_error": 1,
+        "success": 480
+      },
+      "pipeline_stage_counts": {
+        "None": 481
+      },
+      "target_state_correct": 50,
+      "target_state_incorrect": 431,
+      "verification_status_counts": {
+        "not_applicable": 1,
+        "success": 388,
+        "verification_error": 92
+      }
+    },
+    "original_mp_fs_plus": {
+      "admission_status_counts": {
+        "accepted": 43,
+        "not_applicable": 438
+      },
+      "construction_status_counts": {
+        "not_applicable": 438,
+        "success": 43
+      },
+      "execution_status_counts": {
+        "not_run": 438,
+        "success": 43
+      },
+      "f_applied_count": 0,
+      "f_attempted_count": 0,
+      "f_revalidation_passed_count": 0,
+      "failure_stage_counts": {
+        "parse": 2,
+        "state_mismatch": 43,
+        "verification": 436
+      },
+      "g1_applied_count": 0,
+      "g1_diagnostic_triggered_count": 0,
+      "g1_revalidation_passed_count": 0,
+      "hit_max_new_tokens_count": 0,
+      "n": 481,
+      "parse_status_counts": {
+        "parse_error": 2,
+        "success": 479
+      },
+      "pipeline_stage_counts": {
+        "None": 2,
+        "compiled": 43,
+        "evidence_materialization": 436
+      },
+      "target_state_correct": 0,
+      "target_state_incorrect": 481,
+      "verification_status_counts": {
+        "not_applicable": 2,
+        "success": 43,
+        "verification_error": 436
+      }
+    }
+  },
+  "final_confirmation_n": 481,
+  "gpu_called": false,
+  "model_called": false,
+  "significance_tests_computed": false,
+  "stage": "Stage6J_DETERMINISTIC_REPLAY_EVALUATION",
+  "statistics_computed": false,
+  "status": "PASS_REPLAY_EVALUATION_COMPLETE"
+}

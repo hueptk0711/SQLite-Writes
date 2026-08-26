@@ -1,0 +1,61 @@
+{
+  "confirmation_predictions_created": true,
+  "execution_root": "/home/uet/hue_ptk/stage6_confirmation_run_outputs",
+  "expected_git_head": "c6509b84f5ca7501b9b6ca581ba3c1af6200e7b6",
+  "final_confirmation_n": 481,
+  "mode": "resume",
+  "prompt_token_audit_path": "stage6_gpu_preflight_acceptance/server_output_zip_extract_patch2/stage6f_gpu_preflight_patch2_outputs/stage6_gpu_preflight/PROMPT_TOKEN_AUDIT.jsonl",
+  "prompt_token_audit_sha256": "e9bcf79074bcac4284f412314e40cbc7567940a36258dcb27f62ff7862eadae6",
+  "run_id": "stage6h_1787645607",
+  "stage": "Stage6H_CONFIRMATION_RUN_STATE",
+  "status": "COMPLETE",
+  "stream_order": [
+    "direct",
+    "j_fs",
+    "original_mp_fs_plus",
+    "shared_mp_fs_plus_generation"
+  ],
+  "streams": [
+    {
+      "checkpoint_path": "../stage6_confirmation_run_outputs/raw_generations/direct.jsonl.checkpoint.json",
+      "checkpoint_sha256": "038f921929148896f4232614f1ccaaa6d64a4d142c6814048da18a3ac4418303",
+      "raw_generation_path": "../stage6_confirmation_run_outputs/raw_generations/direct.jsonl",
+      "raw_generation_sha256": "ef0c0669578c0f2a1645f3119a6273991c941a933d47c7c3b92a4b984b956afb",
+      "row_count": 481,
+      "status": "complete",
+      "stream": "direct",
+      "unique_sample_ids": 481
+    },
+    {
+      "checkpoint_path": "../stage6_confirmation_run_outputs/raw_generations/j_fs.jsonl.checkpoint.json",
+      "checkpoint_sha256": "4b27c274e62a84ff3b42f7c6441ec58fe9444bcf0d69c784143724dc0d5487c6",
+      "raw_generation_path": "../stage6_confirmation_run_outputs/raw_generations/j_fs.jsonl",
+      "raw_generation_sha256": "b0fcdef81cd666f4357998f02827fe64e7be7dc64d79c6d18820be1f812136b9",
+      "row_count": 481,
+      "status": "complete",
+      "stream": "j_fs",
+      "unique_sample_ids": 481
+    },
+    {
+      "checkpoint_path": "../stage6_confirmation_run_outputs/raw_generations/original_mp_fs_plus.jsonl.checkpoint.json",
+      "checkpoint_sha256": "51baec58dd2eca860866a98c1dd1755eb6570dc31bf3e06580d4e4281549e115",
+      "raw_generation_path": "../stage6_confirmation_run_outputs/raw_generations/original_mp_fs_plus.jsonl",
+      "raw_generation_sha256": "b10ba74e67c788a3c27df08354464bf51aeb4d60cd1b96b8719a12e62eb7feb6",
+      "row_count": 481,
+      "status": "complete",
+      "stream": "original_mp_fs_plus",
+      "unique_sample_ids": 481
+    },
+    {
+      "checkpoint_path": "../stage6_confirmation_run_outputs/raw_generations/shared_mp_fs_plus_generation.jsonl.checkpoint.json",
+      "checkpoint_sha256": "836cbbc60b8f3848eeba0374f496f69aed52b8412412ec48b6328944d5799c3c",
+      "raw_generation_path": "../stage6_confirmation_run_outputs/raw_generations/shared_mp_fs_plus_generation.jsonl",
+      "raw_generation_sha256": "13d05a682ba1b1de2d60bd15cb2d206c69f9e9605cbd9cef113b0813bef723d3",
+      "row_count": 481,
+      "status": "complete",
+      "stream": "shared_mp_fs_plus_generation",
+      "unique_sample_ids": 481
+    }
+  ],
+  "total_rows": 1924
+}

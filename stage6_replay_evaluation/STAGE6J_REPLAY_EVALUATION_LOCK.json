@@ -1,0 +1,56 @@
+{
+  "arm_manifest_sha256": "7e8e38fe4ef6a08353f9e791d8b414730faf9d5a998c0143dd6e2b761a440b95",
+  "date": "20260826",
+  "denominator_audit_sha256": "82707b0687a9733af1b2cdf0820f97ca85453529081689e7a6a2171ad8c32f75",
+  "final_confirmation_n": 481,
+  "gpu_called": false,
+  "h2_shared_replay_audit_sha256": "4106eb11197941ca873d6294cd37102b065d7b7dca50274d0d008a66ffc90698",
+  "input_manifest": {
+    "execution_code_manifest": {
+      "path": "stage6i_generation_inputs/stage6_confirmation_run_outputs/EXECUTION_CODE_MANIFEST.json",
+      "sha256": "f4896552a8eaf7f7b3f6b976b6b0877b06281c926047acc244eebb1e9767c68e",
+      "zip_member": "stage6_confirmation_run_outputs/EXECUTION_CODE_MANIFEST.json"
+    },
+    "raw_direct": {
+      "path": "stage6i_generation_inputs/stage6_confirmation_run_outputs/raw_generations/direct.jsonl",
+      "sha256": "ef0c0669578c0f2a1645f3119a6273991c941a933d47c7c3b92a4b984b956afb",
+      "zip_member": "stage6_confirmation_run_outputs/raw_generations/direct.jsonl"
+    },
+    "raw_j_fs": {
+      "path": "stage6i_generation_inputs/stage6_confirmation_run_outputs/raw_generations/j_fs.jsonl",
+      "sha256": "b0fcdef81cd666f4357998f02827fe64e7be7dc64d79c6d18820be1f812136b9",
+      "zip_member": "stage6_confirmation_run_outputs/raw_generations/j_fs.jsonl"
+    },
+    "raw_original_mp_fs_plus": {
+      "path": "stage6i_generation_inputs/stage6_confirmation_run_outputs/raw_generations/original_mp_fs_plus.jsonl",
+      "sha256": "b10ba74e67c788a3c27df08354464bf51aeb4d60cd1b96b8719a12e62eb7feb6",
+      "zip_member": "stage6_confirmation_run_outputs/raw_generations/original_mp_fs_plus.jsonl"
+    },
+    "raw_shared_mp_fs_plus_generation": {
+      "path": "stage6i_generation_inputs/stage6_confirmation_run_outputs/raw_generations/shared_mp_fs_plus_generation.jsonl",
+      "sha256": "13d05a682ba1b1de2d60bd15cb2d206c69f9e9605cbd9cef113b0813bef723d3",
+      "zip_member": "stage6_confirmation_run_outputs/raw_generations/shared_mp_fs_plus_generation.jsonl"
+    },
+    "rprov_d_f_g1": {
+      "path": "stage6i_generation_inputs/stage6_confirmation_run_outputs/replay_provenance/d_f_g1_vnext.jsonl",
+      "sha256": "7978e90e26efb3b9320ccf1fdf463692c475efde3e27ca186c7ed1a20ca7d1e4",
+      "zip_member": "stage6_confirmation_run_outputs/replay_provenance/d_f_g1_vnext.jsonl"
+    },
+    "rprov_d_g1": {
+      "path": "stage6i_generation_inputs/stage6_confirmation_run_outputs/replay_provenance/d_g1_control.jsonl",
+      "sha256": "a6eb6090c7bd0fc863f05b1d3c0f45f818911ceb37886ad9475e1825ebf25de2",
+      "zip_member": "stage6_confirmation_run_outputs/replay_provenance/d_g1_control.jsonl"
+    },
+    "run_state": {
+      "path": "stage6i_generation_inputs/stage6_confirmation_run_outputs/CONFIRMATION_RUN_STATE.json",
+      "sha256": "a6e8fee1af818b186b30a476cba8327323374d451ff43e08dd72f394d90a5ce2",
+      "zip_member": "stage6_confirmation_run_outputs/CONFIRMATION_RUN_STATE.json"
+    }
+  },
+  "model_called": false,
+  "significance_tests_computed": false,
+  "stage": "Stage6J_DETERMINISTIC_REPLAY_EVALUATION",
+  "statistics_computed": false,
+  "status": "PASS_REPLAY_EVALUATION_COMPLETE",
+  "summary_sha256": "11cc65731fb2e5b38fea14c60ea1a1620ca772d63a3c474fd09dbec64cc6d612"
+}
