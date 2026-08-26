@@ -1,0 +1,36 @@
+{
+  "accepted_harness_commit": "c6509b84f5ca7501b9b6ca581ba3c1af6200e7b6",
+  "generation_lock_sha256": "890da57fbe137f4b3f64e002a29d76a3c630cdc8290c924ac1d1f9da585a9c14",
+  "method_source_tree_sha256": "78901f8fec28b2aa6e75166283415926da2b5af1dec48c4ba37e71be3d73d67b",
+  "resolved_config_hashes": {
+    "d_f_g1_vnext": {
+      "path": "configs/stage5/resolved_mp_fs_plus_vnext_r1.json",
+      "sha256": "b3a946fc977c3ea95d3226dca1361b1885c098fddf4afdc650f4d36f0e1ce9bf"
+    },
+    "d_g1_control": {
+      "path": "configs/stage5/resolved_d_g1_control.json",
+      "sha256": "c7c9c4d54e59662ee8e251af3aea1747fa035cb306213f20c819098e96f1b6ca"
+    },
+    "direct": {
+      "path": "configs/stage5/resolved_direct_confirmation.json",
+      "sha256": "0795d31926345c62d5ba832d8374c9ac067967a3842c45854a2fff9b32c9f826"
+    },
+    "j_fs": {
+      "path": "configs/stage5/resolved_j_fs_confirmation.json",
+      "sha256": "a4006a423eb62fd37e5b370aca48a3b9337971f49d94700703d634a3d25c0cfe"
+    },
+    "original_mp_fs_plus": {
+      "path": "configs/stage5/resolved_original_mp_fs_plus.json",
+      "sha256": "ddda333ccb9b307ed3002213dad6572daa959c2dd5deb2e7d4623cb3aeead84d"
+    }
+  },
+  "runner": {
+    "path": "scripts/server/run_stage6_confirmation.py",
+    "sha256": "a9b89b991d559951344bb046678b89519c8f4f033a9bf96b7ce793a6a7aa6091"
+  },
+  "stage": "Stage6H_EXECUTION_CODE_MANIFEST",
+  "stage6g_validator": {
+    "path": "scripts/data/validate_stage6g_confirmation_authorization.py",
+    "sha256": "33d8264b2612a885fc3272092cb133d073517b0a56ecbdc4042cd3c03197bca9"
+  }
+}

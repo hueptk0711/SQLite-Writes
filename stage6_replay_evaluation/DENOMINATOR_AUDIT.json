@@ -1,0 +1,37 @@
+{
+  "arms": {
+    "d_f_g1_vnext": {
+      "extra_sample_ids": [],
+      "missing_sample_ids": [],
+      "row_count": 481,
+      "unique_sample_ids": 481
+    },
+    "d_g1_control": {
+      "extra_sample_ids": [],
+      "missing_sample_ids": [],
+      "row_count": 481,
+      "unique_sample_ids": 481
+    },
+    "direct": {
+      "extra_sample_ids": [],
+      "missing_sample_ids": [],
+      "row_count": 481,
+      "unique_sample_ids": 481
+    },
+    "j_fs": {
+      "extra_sample_ids": [],
+      "missing_sample_ids": [],
+      "row_count": 481,
+      "unique_sample_ids": 481
+    },
+    "original_mp_fs_plus": {
+      "extra_sample_ids": [],
+      "missing_sample_ids": [],
+      "row_count": 481,
+      "unique_sample_ids": 481
+    }
+  },
+  "final_confirmation_n": 481,
+  "no_denominator_drops": true,
+  "status": "PASS"
+}

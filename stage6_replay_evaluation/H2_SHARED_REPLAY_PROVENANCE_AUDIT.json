@@ -1,0 +1,9 @@
+{
+  "checked_pairs": 481,
+  "d_f_g1_arm": "d_f_g1_vnext",
+  "d_g1_arm": "d_g1_control",
+  "mismatch_count": 0,
+  "mismatched_sample_ids": [],
+  "same_raw_generation_stream": "shared_mp_fs_plus_generation",
+  "status": "PASS"
+}
