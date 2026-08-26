@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import shutil
+import subprocess
+import sys
 import uuid
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -19,6 +23,7 @@ from scripts.data.validate_stage6k_frozen_statistics import (
     holm_recompute,
     mcnemar_recompute,
     validate,
+    write_validation_report_and_update_lock,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -100,6 +105,35 @@ def _copy_minimal_stage6e(workspace_tmp: Path) -> Path:
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, dest)
     return target
+
+
+def _copy_self_contained_package(workspace_tmp: Path) -> Path:
+    package = workspace_tmp / "Stage6K_FROZEN_STATISTICAL_ANALYSIS_PATCH_TEST_PACKAGE"
+    paths = [
+        "scripts/data/build_stage6k_frozen_statistics.py",
+        "scripts/data/validate_stage6k_frozen_statistics.py",
+        "tests/test_stage6k_frozen_statistics.py",
+        "stage6_frozen_statistical_analysis",
+        "stage6_replay_evaluation/STAGE6J_REPLAY_EVALUATION_LOCK.json",
+        "stage6_replay_evaluation/REPLAY_ARM_MANIFEST.json",
+        "stage6_replay_evaluation/REPLAY_EVALUATION_SUMMARY.json",
+        "stage6_replay_evaluation/replay_outcomes/direct.jsonl",
+        "stage6_replay_evaluation/replay_outcomes/j_fs.jsonl",
+        "stage6_replay_evaluation/replay_outcomes/original_mp_fs_plus.jsonl",
+        "stage6_replay_evaluation/replay_outcomes/d_g1_control.jsonl",
+        "stage6_replay_evaluation/replay_outcomes/d_f_g1_vnext.jsonl",
+        "stage6_final_registration_revision/STAGE6E_FINAL_REGISTRATION_LOCK.json",
+        "stage6_final_registration_revision/artifacts/FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl",
+    ]
+    for rel in paths:
+        source = ROOT / rel
+        dest = package / rel
+        if source.is_dir():
+            shutil.copytree(source, dest)
+        else:
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, dest)
+    return package
 
 
 def test_stage6k_artifact_validates() -> None:
@@ -207,6 +241,19 @@ def test_zero_discordant_mcnemar_returns_one() -> None:
     assert result["raw_p_value"] == 1.0
 
 
+def test_non_degenerate_mcnemar_rejects_when_p_below_alpha() -> None:
+    result = mcnemar_recompute(
+        [True, True, True, True, True, True],
+        [False, False, False, False, False, False],
+        "H1",
+        "D+F+G1",
+        "Original MP-FS+",
+    )
+    assert result["discordant_pairs"] == 6
+    assert result["raw_p_value"] == 0.03125
+    assert result["reject"] is True
+
+
 def test_holm_h1_h2_p_equals_one() -> None:
     h1 = mcnemar_recompute([False], [False], "H1", "D+F+G1", "Original MP-FS+")
     h2 = mcnemar_recompute([False], [False], "H2", "D+F+G1", "D+G1")
@@ -241,6 +288,24 @@ def test_artifact_modification_lock_validation_fails(workspace_tmp: Path) -> Non
     report = validate(artifact)
     assert report["status"] == "FAIL"
     assert "stage6k_lock_artifact_hashes_mismatch" in report["violations"]
+
+
+def test_validator_writes_actual_validation_report_and_updates_lock(workspace_tmp: Path) -> None:
+    artifact = _copy_stage6k(workspace_tmp)
+    report = validate(artifact)
+    write_validation_report_and_update_lock(artifact, report)
+    text = (artifact / "VALIDATION_REPORT.md").read_text(encoding="utf-8")
+    lock = _read_json(artifact / "STAGE6K_STATISTICAL_LOCK.json")
+    assert "Status: PASS" in text
+    assert "violations: []" in text
+    assert "paired_table_recomputed: true" in text
+    assert "mcnemar_h1_recomputed: true" in text
+    assert "mcnemar_h2_recomputed: true" in text
+    assert "holm_recomputed: true" in text
+    assert "cluster_bootstrap_recomputed: true" in text
+    assert "secondary_results_recomputed: true" in text
+    assert lock["artifact_hashes"]["VALIDATION_REPORT.md"] == _sha256_file(artifact / "VALIDATION_REPORT.md")
+    assert validate(artifact)["status"] == "PASS"
 
 
 def test_mcnemar_artifact_modification_recompute_fails_even_if_lock_hash_updated(workspace_tmp: Path) -> None:
@@ -332,3 +397,38 @@ def test_builder_does_not_rewrite_stage6j_files(workspace_tmp: Path) -> None:
     build_stage6k(STAGE6J_DIR, STAGE6E_DIR, workspace_tmp / "stage6k_generated")
     after = {path: _sha256_file(path) for path in tracked}
     assert after == before
+
+
+def test_self_contained_reviewer_package_clean_extraction_runs(workspace_tmp: Path) -> None:
+    if os.environ.get("STAGE6K_SKIP_CLEAN_PACKAGE_TEST") == "1":
+        pytest.skip("Nested clean-extraction package test disabled.")
+    package = _copy_self_contained_package(workspace_tmp)
+    zip_path = workspace_tmp / "stage6k_package.zip"
+    with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for path in sorted(package.rglob("*")):
+            if path.is_file():
+                archive.write(path, path.relative_to(package).as_posix())
+    extract_dir = workspace_tmp / "clean_extract"
+    with zipfile.ZipFile(zip_path) as archive:
+        assert archive.testzip() is None
+        archive.extractall(extract_dir)
+    env = os.environ.copy()
+    env["STAGE6K_SKIP_CLEAN_PACKAGE_TEST"] = "1"
+    validation = subprocess.run(
+        [sys.executable, "scripts/data/validate_stage6k_frozen_statistics.py"],
+        cwd=extract_dir,
+        env=env,
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    assert '"status": "PASS"' in validation.stdout
+    tests = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "tests/test_stage6k_frozen_statistics.py"],
+        cwd=extract_dir,
+        env=env,
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    assert "[100%]" in tests.stdout

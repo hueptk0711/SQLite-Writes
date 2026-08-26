@@ -18,6 +18,7 @@ BOOTSTRAP_SEED = 240824
 BOOTSTRAP_REPLICATES = 10000
 CLUSTER_KEY = "source_group"
 CI_LEVEL = 0.95
+ALPHA = 0.05
 PRIMARY_METRIC = "target_state_correct"
 CONFIRMATORY_HYPOTHESES = ("H1", "H2")
 
@@ -214,8 +215,8 @@ def mcnemar_recompute(a_values: list[bool], b_values: list[bool], hypothesis: st
         "discordant_pairs": discordant,
         "degenerate_no_discordant_pairs": degenerate,
         "raw_p_value": p_value,
-        "reject": False,
-        "alpha": 0.05,
+        "reject": p_value <= ALPHA,
+        "alpha": ALPHA,
         "test": "exact_two_sided_mcnemar",
         "zero_discordant_convention": "p_value=1.0",
     }
@@ -238,13 +239,13 @@ def holm_recompute(mcnemar_results: list[dict[str, Any]]) -> dict[str, Any]:
                 "comparison": f"{row['arm_a']} vs {row['arm_b']}",
                 "raw_p_value": float(row["raw_p_value"]),
                 "holm_adjusted_p_value": adjusted[hypothesis],
-                "reject": adjusted[hypothesis] <= 0.05,
+                "reject": adjusted[hypothesis] <= ALPHA,
             }
         )
     return {
         "stage": STAGE,
         "method": "Holm-Bonferroni",
-        "alpha": 0.05,
+        "alpha": ALPHA,
         "confirmatory_family": list(CONFIRMATORY_HYPOTHESES),
         "family_size": len(CONFIRMATORY_HYPOTHESES),
         "results": rows,
@@ -391,16 +392,75 @@ def contains_forbidden_p_value_key(value: Any) -> bool:
     return False
 
 
+def validation_report_text(report: dict[str, Any]) -> str:
+    violations_json = json.dumps(report.get("violations", []), ensure_ascii=False, sort_keys=True)
+    return f"""# Stage6K Validation Report
+
+Status: {report["status"]}
+
+violations: {violations_json}
+
+final_n: {report["final_n"]}
+paired_table_recomputed: {str(report["paired_table_recomputed"]).lower()}
+mcnemar_h1_recomputed: {str(report["mcnemar_h1_recomputed"]).lower()}
+mcnemar_h2_recomputed: {str(report["mcnemar_h2_recomputed"]).lower()}
+holm_recomputed: {str(report["holm_recomputed"]).lower()}
+cluster_bootstrap_recomputed: {str(report["cluster_bootstrap_recomputed"]).lower()}
+secondary_results_recomputed: {str(report["secondary_results_recomputed"]).lower()}
+
+model_called: {str(report["model_called"]).lower()}
+gpu_called: {str(report["gpu_called"]).lower()}
+
+bootstrap_replicates: {report["bootstrap_replicates"]}
+bootstrap_seed: {report["bootstrap_seed"]}
+cluster_key: {report["cluster_key"]}
+confirmatory_hypotheses: {", ".join(report["confirmatory_hypotheses"])}
+"""
+
+
+def write_validation_report_and_update_lock(output_dir: Path, report: dict[str, Any]) -> None:
+    report_path = output_dir / "VALIDATION_REPORT.md"
+    report_path.write_text(validation_report_text(report), encoding="utf-8")
+    lock_path = output_dir / "STAGE6K_STATISTICAL_LOCK.json"
+    if not lock_path.is_file():
+        return
+    lock = read_json(lock_path)
+    artifact_hashes = dict(lock.get("artifact_hashes") or {})
+    artifact_hashes["VALIDATION_REPORT.md"] = sha256_file(report_path)
+    lock["artifact_hashes"] = artifact_hashes
+    lock_path.write_text(json.dumps(lock, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
 def validate(output_dir: Path, stage6j_dir: Path | None = None, stage6e_dir: Path | None = None) -> dict[str, Any]:
     stage6j_dir = stage6j_dir or PROJECT_ROOT / "stage6_replay_evaluation"
     stage6e_dir = stage6e_dir or PROJECT_ROOT / "stage6_final_registration_revision"
     violations: list[str] = []
+    recompute_checks = {
+        "paired_table_recomputed": False,
+        "mcnemar_h1_recomputed": False,
+        "mcnemar_h2_recomputed": False,
+        "holm_recomputed": False,
+        "cluster_bootstrap_recomputed": False,
+        "secondary_results_recomputed": False,
+    }
 
     for rel in STAGE6K_REQUIRED_FILES:
         if not (output_dir / rel).is_file():
             violations.append(f"missing_stage6k_artifact:{rel}")
     if violations:
-        return {"status": "FAIL", "violations": violations}
+        return {
+            "status": "FAIL",
+            "violations": violations,
+            "stage": STAGE,
+            "final_n": FINAL_N,
+            "confirmatory_hypotheses": list(CONFIRMATORY_HYPOTHESES),
+            "bootstrap_seed": BOOTSTRAP_SEED,
+            "bootstrap_replicates": BOOTSTRAP_REPLICATES,
+            "cluster_key": CLUSTER_KEY,
+            "model_called": False,
+            "gpu_called": False,
+            **recompute_checks,
+        }
 
     input_hashes = {
         **relative_hashes(stage6j_dir, STAGE6J_REQUIRED_FILES, violations, "stage6j"),
@@ -415,6 +475,7 @@ def validate(output_dir: Path, stage6j_dir: Path | None = None, stage6e_dir: Pat
     validate_saved_paired_table(saved_paired, expected_ids, violations)
     rebuilt_paired = rebuild_paired_table(stage6j_dir, stage6e_dir, violations)
     compare("paired_table", saved_paired, rebuilt_paired, violations)
+    recompute_checks["paired_table_recomputed"] = True
 
     protocol_fields = {
         "final_n": FINAL_N,
@@ -459,6 +520,7 @@ def validate(output_dir: Path, stage6j_dir: Path | None = None, stage6e_dir: Pat
             "D+F+G1",
             "Original MP-FS+",
         )
+        recompute_checks["mcnemar_h1_recomputed"] = True
         h2 = mcnemar_recompute(
             [row["d_f_g1_correct"] for row in rebuilt_paired],
             [row["d_g1_correct"] for row in rebuilt_paired],
@@ -466,11 +528,15 @@ def validate(output_dir: Path, stage6j_dir: Path | None = None, stage6e_dir: Pat
             "D+F+G1",
             "D+G1",
         )
+        recompute_checks["mcnemar_h2_recomputed"] = True
         compare("mcnemar_h1", read_json(output_dir / "MCNEMAR_H1.json"), h1, violations)
         compare("mcnemar_h2", read_json(output_dir / "MCNEMAR_H2.json"), h2, violations)
         compare("holm", read_json(output_dir / "HOLM_CORRECTION.json"), holm_recompute([h1, h2]), violations)
+        recompute_checks["holm_recomputed"] = True
         compare("cluster_bootstrap", read_json(output_dir / "CLUSTER_BOOTSTRAP.json"), cluster_bootstrap_recompute(rebuilt_paired), violations)
+        recompute_checks["cluster_bootstrap_recomputed"] = True
         compare("secondary_results", read_json(output_dir / "SECONDARY_RESULTS.json"), secondary_recompute(rebuilt_paired, stage6j_dir), violations)
+        recompute_checks["secondary_results_recomputed"] = True
 
         if h1["contingency"]["n10_a_correct_b_incorrect"] != 0 or h1["contingency"]["n01_a_incorrect_b_correct"] != 0:
             violations.append("h1_expected_zero_discordant_not_met")
@@ -504,6 +570,7 @@ def validate(output_dir: Path, stage6j_dir: Path | None = None, stage6e_dir: Pat
         "cluster_key": CLUSTER_KEY,
         "model_called": False,
         "gpu_called": False,
+        **recompute_checks,
     }
 
 
@@ -512,8 +579,12 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, default=PROJECT_ROOT / "stage6_frozen_statistical_analysis")
     parser.add_argument("--stage6j-dir", type=Path, default=PROJECT_ROOT / "stage6_replay_evaluation")
     parser.add_argument("--stage6e-dir", type=Path, default=PROJECT_ROOT / "stage6_final_registration_revision")
+    parser.add_argument("--no-write-report", action="store_true")
     args = parser.parse_args()
-    print(json.dumps(validate(args.output_dir, args.stage6j_dir, args.stage6e_dir), ensure_ascii=False, indent=2, sort_keys=True))
+    report = validate(args.output_dir, args.stage6j_dir, args.stage6e_dir)
+    if not args.no_write_report:
+        write_validation_report_and_update_lock(args.output_dir, report)
+    print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

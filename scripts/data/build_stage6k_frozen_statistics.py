@@ -19,6 +19,7 @@ BOOTSTRAP_SEED = 240824
 BOOTSTRAP_REPLICATES = 10000
 CLUSTER_KEY = "source_group"
 CI_LEVEL = 0.95
+ALPHA = 0.05
 PRIMARY_METRIC = "target_state_correct"
 CONFIRMATORY_HYPOTHESES = ("H1", "H2")
 
@@ -246,8 +247,8 @@ def mcnemar(a_values: list[bool], b_values: list[bool], *, hypothesis: str, arm_
         "discordant_pairs": discordant,
         "degenerate_no_discordant_pairs": degenerate,
         "raw_p_value": p_value,
-        "reject": False,
-        "alpha": 0.05,
+        "reject": p_value <= ALPHA,
+        "alpha": ALPHA,
         "test": "exact_two_sided_mcnemar",
         "zero_discordant_convention": "p_value=1.0",
     }
@@ -271,13 +272,13 @@ def holm(results: list[dict[str, Any]]) -> dict[str, Any]:
                 "comparison": f"{row['arm_a']} vs {row['arm_b']}",
                 "raw_p_value": float(row["raw_p_value"]),
                 "holm_adjusted_p_value": adjusted_by_hypothesis[hypothesis],
-                "reject": adjusted_by_hypothesis[hypothesis] <= 0.05,
+                "reject": adjusted_by_hypothesis[hypothesis] <= ALPHA,
             }
         )
     return {
         "stage": STAGE,
         "method": "Holm-Bonferroni",
-        "alpha": 0.05,
+        "alpha": ALPHA,
         "confirmatory_family": list(CONFIRMATORY_HYPOTHESES),
         "family_size": len(CONFIRMATORY_HYPOTHESES),
         "results": family,
@@ -389,6 +390,8 @@ def reviewer_readme() -> str:
 
 This package closes the V1 confirmatory statistical analysis from frozen Stage6J replay outcomes.
 
+The final reviewer ZIP is self-contained for Stage6K validation: it includes the minimal frozen Stage6J replay outcomes and Stage6E final denominator needed by the validator and tests.
+
 Scope:
 - No model calls.
 - No GPU calls.
@@ -400,7 +403,7 @@ Commands:
 ```bash
 python scripts/data/build_stage6k_frozen_statistics.py --force
 python scripts/data/validate_stage6k_frozen_statistics.py
-pytest tests/test_stage6k_frozen_statistics.py
+python -m pytest -q tests/test_stage6k_frozen_statistics.py
 ```
 
 Primary metric: `{PRIMARY_METRIC}`
@@ -417,10 +420,10 @@ Bootstrap protocol:
 """
 
 
-def validation_report_text() -> str:
+def pending_validation_report_text() -> str:
     return f"""# Stage6K Validation Report
 
-Status: PASS
+Status: PENDING_VALIDATION
 
 Frozen protocol checks:
 - final_n: {FINAL_N}
@@ -432,7 +435,7 @@ Frozen protocol checks:
 - model_called: false
 - gpu_called: false
 
-The validator recomputes the paired table, exact McNemar tests, Holm correction, and cluster bootstrap from frozen Stage6J outcomes and Stage6E final denominator before comparing to saved Stage6K artifacts.
+This placeholder is written by the builder before the independent validator runs. Run `python scripts/data/validate_stage6k_frozen_statistics.py` to create the final validation report from actual validator execution.
 """
 
 
@@ -523,7 +526,7 @@ def build_stage6k(stage6j_dir: Path, stage6e_dir: Path, output_dir: Path, *, for
     write_json(output_dir / "CLUSTER_BOOTSTRAP.json", bootstrap)
     write_json(output_dir / "SECONDARY_RESULTS.json", secondary)
     (output_dir / "REVIEWER_README.md").write_text(reviewer_readme(), encoding="utf-8")
-    (output_dir / "VALIDATION_REPORT.md").write_text(validation_report_text(), encoding="utf-8")
+    (output_dir / "VALIDATION_REPORT.md").write_text(pending_validation_report_text(), encoding="utf-8")
     lock = stage6k_lock(output_dir, input_hashes)
     write_json(output_dir / "STAGE6K_STATISTICAL_LOCK.json", lock)
     return {
