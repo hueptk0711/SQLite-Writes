@@ -1,0 +1,62 @@
+{
+  "labels": [
+    "operation_semantics",
+    "invalid_reference",
+    "normalization",
+    "slot_or_update_completeness",
+    "unsupported_or_true_ambiguity",
+    "other"
+  ],
+  "matrix": {
+    "invalid_reference": {
+      "invalid_reference": 190,
+      "normalization": 56,
+      "operation_semantics": 34,
+      "other": 0,
+      "slot_or_update_completeness": 6,
+      "unsupported_or_true_ambiguity": 0
+    },
+    "normalization": {
+      "invalid_reference": 56,
+      "normalization": 133,
+      "operation_semantics": 1,
+      "other": 0,
+      "slot_or_update_completeness": 5,
+      "unsupported_or_true_ambiguity": 0
+    },
+    "operation_semantics": {
+      "invalid_reference": 34,
+      "normalization": 1,
+      "operation_semantics": 204,
+      "other": 0,
+      "slot_or_update_completeness": 0,
+      "unsupported_or_true_ambiguity": 0
+    },
+    "other": {
+      "invalid_reference": 0,
+      "normalization": 0,
+      "operation_semantics": 0,
+      "other": 0,
+      "slot_or_update_completeness": 0,
+      "unsupported_or_true_ambiguity": 0
+    },
+    "slot_or_update_completeness": {
+      "invalid_reference": 6,
+      "normalization": 5,
+      "operation_semantics": 0,
+      "other": 0,
+      "slot_or_update_completeness": 6,
+      "unsupported_or_true_ambiguity": 0
+    },
+    "unsupported_or_true_ambiguity": {
+      "invalid_reference": 0,
+      "normalization": 0,
+      "operation_semantics": 0,
+      "other": 0,
+      "slot_or_update_completeness": 0,
+      "unsupported_or_true_ambiguity": 0
+    }
+  },
+  "scope": "verification_failures",
+  "stage": "Stage7A_FORMAL_FAILURE_ANALYSIS"
+}

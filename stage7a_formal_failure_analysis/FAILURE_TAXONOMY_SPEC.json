@@ -1,0 +1,39 @@
+{
+  "classification_scope": "formal deterministic analysis of frozen Stage6J representative MP-FS arm",
+  "frozen_before_classification": true,
+  "gpu_called": false,
+  "model_called": false,
+  "multi_label": true,
+  "pipeline_stage_taxonomy": [
+    "parse",
+    "verification",
+    "execution",
+    "state_mismatch"
+  ],
+  "root_cause_labels": [
+    "operation_semantics",
+    "invalid_reference",
+    "normalization",
+    "slot_or_update_completeness",
+    "unsupported_or_true_ambiguity",
+    "other"
+  ],
+  "stage": "Stage7A_FORMAL_FAILURE_ANALYSIS",
+  "state_mismatch_subtype_mapping": {
+    "extra_assignment_or_over_write": "invalid_reference",
+    "missing_assignment_or_under_write": "slot_or_update_completeness",
+    "unresolved_other": "other",
+    "wrong_operation_or_conflict_semantics": "operation_semantics",
+    "wrong_row_or_cardinality": "operation_semantics",
+    "wrong_target_column": "invalid_reference",
+    "wrong_value_or_evidence": "invalid_reference"
+  },
+  "verification_error_code_mapping": {
+    "LOSSY_NORMALIZATION_REJECTED": "normalization",
+    "MISSING_UPDATE_COLUMN_IDS": "slot_or_update_completeness",
+    "NEEDS_CLARIFICATION": "operation_semantics",
+    "UNKNOWN_COLUMN_ID": "invalid_reference",
+    "UNKNOWN_CONSTRAINT_ID": "invalid_reference",
+    "UNKNOWN_EVIDENCE_ID": "invalid_reference"
+  }
+}

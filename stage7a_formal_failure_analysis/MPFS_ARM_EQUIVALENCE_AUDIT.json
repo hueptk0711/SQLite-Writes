@@ -1,0 +1,32 @@
+{
+  "checked_sample_count": 481,
+  "comparison_fields": [
+    "target_state_correct",
+    "failure_stage",
+    "parse_status",
+    "verification_status",
+    "execution_status",
+    "admission_status",
+    "candidate_program_sha256",
+    "predicted_post_state_sha256",
+    "gold_post_state_sha256",
+    "failure_reason",
+    "verification_errors"
+  ],
+  "difference_count": 0,
+  "differences": [],
+  "equivalent_arms_checked": [
+    "original_mp_fs_plus",
+    "d_g1_control",
+    "d_f_g1_vnext"
+  ],
+  "representative_arm": "d_f_g1_vnext",
+  "stage": "Stage7A_FORMAL_FAILURE_ANALYSIS",
+  "status": "PASS",
+  "verification_error_details_policy": "details are excluded from semantic arm equivalence because Stage2-F may add reference_repair provenance without changing failure code/path/message",
+  "verification_error_fields_compared": [
+    "error_code",
+    "path",
+    "message"
+  ]
+}

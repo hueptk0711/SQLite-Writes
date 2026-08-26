@@ -1,0 +1,39 @@
+{
+  "combination_counts": [
+    {
+      "root_cause_combination": "invalid_reference",
+      "sample_count": 99
+    },
+    {
+      "root_cause_combination": "invalid_reference+normalization",
+      "sample_count": 51
+    },
+    {
+      "root_cause_combination": "invalid_reference+normalization+slot_or_update_completeness",
+      "sample_count": 5
+    },
+    {
+      "root_cause_combination": "invalid_reference+operation_semantics",
+      "sample_count": 34
+    },
+    {
+      "root_cause_combination": "invalid_reference+slot_or_update_completeness",
+      "sample_count": 1
+    },
+    {
+      "root_cause_combination": "normalization",
+      "sample_count": 76
+    },
+    {
+      "root_cause_combination": "normalization+operation_semantics",
+      "sample_count": 1
+    },
+    {
+      "root_cause_combination": "operation_semantics",
+      "sample_count": 169
+    }
+  ],
+  "scope": "verification_failures",
+  "stage": "Stage7A_FORMAL_FAILURE_ANALYSIS",
+  "total": 436
+}

@@ -1,0 +1,13 @@
+{
+  "final_n": 481,
+  "n": 481,
+  "pipeline_failure_counts": {
+    "parse": 2,
+    "state_mismatch": 43,
+    "verification": 436
+  },
+  "representative_arm": "d_f_g1_vnext",
+  "stage": "Stage7A_FORMAL_FAILURE_ANALYSIS",
+  "target_state_correct": 0,
+  "target_state_incorrect": 481
+}

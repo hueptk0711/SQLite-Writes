@@ -1,0 +1,90 @@
+{
+  "no_v2_implementation": true,
+  "stage": "Stage7A_FORMAL_FAILURE_ANALYSIS",
+  "status": "DESIGN_REQUIREMENTS_ONLY",
+  "traceability": [
+    {
+      "design_requirement": "operation-conditioned IR and conflict/update semantics gate",
+      "example_sample_ids": [
+        "stage6_crudsql_0001",
+        "stage6_crudsql_0002",
+        "stage6_crudsql_0004",
+        "stage6_crudsql_0005",
+        "stage6_crudsql_0008",
+        "stage6_crudsql_0010",
+        "stage6_crudsql_0012",
+        "stage6_crudsql_0013",
+        "stage6_crudsql_0015",
+        "stage6_crudsql_0016"
+      ],
+      "root_cause_label": "operation_semantics",
+      "supporting_sample_count": 211
+    },
+    {
+      "design_requirement": "constrained enumerated reference selection",
+      "example_sample_ids": [
+        "stage6_crudsql_0000",
+        "stage6_crudsql_0002",
+        "stage6_crudsql_0003",
+        "stage6_crudsql_0006",
+        "stage6_crudsql_0007",
+        "stage6_crudsql_0009",
+        "stage6_crudsql_0014",
+        "stage6_crudsql_0015",
+        "stage6_crudsql_0018",
+        "stage6_crudsql_0021"
+      ],
+      "root_cause_label": "invalid_reference",
+      "supporting_sample_count": 233
+    },
+    {
+      "design_requirement": "deterministic typed materialization",
+      "example_sample_ids": [
+        "stage6_crudsql_0007",
+        "stage6_crudsql_0011",
+        "stage6_crudsql_0018",
+        "stage6_crudsql_0042",
+        "stage6_crudsql_0043",
+        "stage6_crudsql_0048",
+        "stage6_crudsql_0049",
+        "stage6_crudsql_0050",
+        "stage6_crudsql_0055",
+        "stage6_crudsql_0059"
+      ],
+      "root_cause_label": "normalization",
+      "supporting_sample_count": 133
+    },
+    {
+      "design_requirement": "semantic completeness verification for write slots/update columns",
+      "example_sample_ids": [
+        "stage6_crudsql_0000",
+        "stage6_crudsql_0018",
+        "stage6_crudsql_0021",
+        "stage6_crudsql_0040",
+        "stage6_crudsql_0054",
+        "stage6_crudsql_0122",
+        "stage6_crudsql_0123",
+        "stage6_crudsql_0178",
+        "stage6_crudsql_0183",
+        "stage6_crudsql_0209"
+      ],
+      "root_cause_label": "slot_or_update_completeness",
+      "supporting_sample_count": 47
+    },
+    {
+      "design_requirement": "explicit abstention path for unresolved source ambiguity",
+      "example_sample_ids": [
+        "stage6_crudsql_0102",
+        "stage6_crudsql_0193"
+      ],
+      "root_cause_label": "unsupported_or_true_ambiguity",
+      "supporting_sample_count": 2
+    },
+    {
+      "design_requirement": "manual audit queue before V2 method changes",
+      "example_sample_ids": [],
+      "root_cause_label": "other",
+      "supporting_sample_count": 0
+    }
+  ]
+}
