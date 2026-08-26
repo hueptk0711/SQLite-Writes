@@ -34,8 +34,13 @@
   ],
   "method_name": "Operation-Conditioned Slot-Grounded MP-FS",
   "model_called": false,
+  "operation_conditioning_protocol": "two_phase_operation_enum_then_schema_conditioned_mapping",
   "optional_deferred_variant": "V2-R bounded repair may be registered after V2 primary specification, but is not a core Stage7B component.",
   "primary_v2_depends_on_repair": false,
+  "registered_model_call_count": {
+    "Phase_M_mapping": 1,
+    "Phase_O_operation_conditioning": 1
+  },
   "representation_contract": "JSON Schema validation surrounds all model-produced IR before semantic verification.",
   "stage": "Stage7B_V2_METHOD_SPECIFICATION",
   "status": "FROZEN_SPECIFICATION",

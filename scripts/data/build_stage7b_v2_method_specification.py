@@ -14,6 +14,14 @@ HASH_POLICY = "text_sha256_canonical_lf"
 MODEL_CALLED = False
 GPU_CALLED = False
 V2_IMPLEMENTED = False
+SCHEMA_INVENTORY_EXAMPLE = {
+    "table_refs": ["TAB_1"],
+    "column_refs": ["COL_1", "COL_2", "COL_3", "COL_4", "COL_5"],
+    "evidence_refs": ["EV_1", "EV_2", "EV_3"],
+    "constraint_refs": ["CONSTRAINT_1"],
+}
+PREDICATE_OPERATORS = ["EQ", "NE", "LT", "GT"]
+PREDICATE_CONNECTORS = ["AND", "OR"]
 
 STAGE7A_INPUTS = (
     "stage7a_formal_failure_analysis/STAGE7A_FAILURE_ANALYSIS_LOCK.json",
@@ -167,6 +175,8 @@ def architecture_spec() -> dict[str, Any]:
             {"order": 5, "component": "deterministic_sqlite_compilation_preflight", "output": "sqlite_program_or_rejection"},
         ],
         "representation_contract": "JSON Schema validation surrounds all model-produced IR before semantic verification.",
+        "operation_conditioning_protocol": "two_phase_operation_enum_then_schema_conditioned_mapping",
+        "registered_model_call_count": {"Phase_O_operation_conditioning": 1, "Phase_M_mapping": 1},
         "primary_v2_depends_on_repair": False,
         "optional_deferred_variant": "V2-R bounded repair may be registered after V2 primary specification, but is not a core Stage7B component.",
         "model_called": MODEL_CALLED,
@@ -180,6 +190,20 @@ def operation_conditioning_spec() -> dict[str, Any]:
         "stage": STAGE,
         "component": "operation_conditioning",
         "operation_classes": ["INSERT", "UPDATE", "DELETE", "UPSERT"],
+        "protocol": "two_phase_operation_conditioning",
+        "phase_o": {
+            "name": "operation_enum_selection",
+            "model_call_count": 1,
+            "output_contract": {"operation": {"enum": ["INSERT", "UPDATE", "DELETE", "UPSERT"]}},
+            "forbidden_inputs": ["gold_operation", "gold_sql", "gold_post_state", "test_performance"],
+            "invalid_output_policy": "reject; do not fall back to unified rich plan",
+        },
+        "phase_m": {
+            "name": "schema_conditioned_mapping",
+            "model_call_count": 1,
+            "schema_selection": "select exactly one operation-specific dynamic-enum JSON Schema from Phase O output",
+            "operation_field_policy": "operation is fixed by Phase O and must match the selected schema const",
+        },
         "rule": "Determine operation class before producing slot-grounded IR; select a JSON schema by operation.",
         "operation_specific_allowed_fields": {
             "INSERT": ["operation", "table_ref", "assignments"],
@@ -196,14 +220,21 @@ def slot_grounded_ir_spec() -> dict[str, Any]:
     return {
         "stage": STAGE,
         "component": "slot_grounded_minimal_ir",
-        "llm_decisions": ["operation_class", "table_ref", "column_ref_to_evidence_ref_mapping", "row_selector_ref_when_required", "conflict_target_ref_only_for_upsert"],
+        "phase_o_llm_decisions": ["operation_class"],
+        "phase_m_llm_decisions": ["table_ref", "column_ref_to_evidence_ref_mapping", "structured_predicate_mapping_when_required", "conflict_target_ref_only_for_upsert"],
         "not_llm_decisions": ["SQL syntax", "normalization_function", "arbitrary_identifier_creation", "compiler_strategy", "silent_reference_repair"],
+        "predicate_ir": {
+            "connector": {"enum": PREDICATE_CONNECTORS},
+            "predicates": {"items": {"column_ref": "dynamic enum COL_*", "operator": PREDICATE_OPERATORS, "evidence_ref": "dynamic enum EV_*"}},
+            "supports_multi_condition": True,
+            "opaque_row_ref_allowed": False,
+        },
         "insert_example": {
             "operation": "INSERT",
             "table_ref": "TAB_1",
             "assignments": [
-                {"column_ref": "COL_2", "evidence_ref": "EV_1"},
-                {"column_ref": "COL_5", "evidence_ref": "EV_3"},
+                {"column_ref": "COL_2", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"},
+                {"column_ref": "COL_5", "evidence_ref": "EV_3", "slot_ref": "SLOT_2"},
             ],
         },
     }
@@ -213,8 +244,17 @@ def reference_constraint_spec() -> dict[str, Any]:
     return {
         "stage": STAGE,
         "component": "constrained_reference_selection",
-        "rule": "Every identifier emitted by the model must belong to a supplied finite inventory.",
-        "inventories": {"tables": "TAB_*", "columns": "COL_*", "evidence": "EV_*", "row_selectors": "ROW_*", "constraints": "CONSTRAINT_*"},
+        "selected_mechanism": "dynamic_per_sample_json_schema_enum",
+        "rule": "Every identifier emitted by the model must belong to a supplied finite inventory instantiated into the per-sample JSON Schema.",
+        "schema_instantiation": {
+            "table_ref": "enum(sample.table_refs)",
+            "column_ref": "enum(sample.column_refs)",
+            "evidence_ref": "enum(sample.evidence_refs)",
+            "conflict_target_ref": "enum(sample.constraint_refs)",
+        },
+        "validation_order": ["operation_phase_o_enum", "instantiate_operation_specific_schema_with_sample_inventory", "json_schema_validation", "inventory_membership_is_enforced_by_enum", "semantic_verification"],
+        "example_inventory_for_schema_artifacts": SCHEMA_INVENTORY_EXAMPLE,
+        "inventories": {"tables": "TAB_* dynamic enum", "columns": "COL_* dynamic enum", "evidence": "EV_* dynamic enum", "constraints": "CONSTRAINT_* dynamic enum"},
         "invalid_reference_policy": "deterministic rejection; no silent fuzzy correction",
         "unrestricted_reference_ids_allowed": False,
     }
@@ -226,6 +266,17 @@ def typed_materialization_spec() -> dict[str, Any]:
         "component": "deterministic_typed_materialization",
         "rule": "Typed values are derived from schema type plus raw evidence via deterministic parsers.",
         "llm_normalization_decisions_allowed": False,
+        "affinity_rule_table": [
+            {"schema_affinity": "INTEGER", "rule": "strict lossless integer parse", "unsafe_policy": "reject"},
+            {"schema_affinity": "REAL", "rule": "strict finite numeric parse", "unsafe_policy": "reject"},
+            {"schema_affinity": "TEXT", "rule": "preserve raw evidence string", "unsafe_policy": "not_applicable"},
+            {"schema_affinity": "NULL", "rule": "emit NULL only when evidence belongs to frozen null-literal set", "unsafe_policy": "reject otherwise"},
+            {"schema_affinity": "BLOB", "rule": "unsupported without a frozen binary representation", "unsafe_policy": "reject"},
+            {"schema_affinity": "ambiguous_or_lossy_parse", "rule": "no coercion", "unsafe_policy": "reject"},
+        ],
+        "null_literal_set": ["NULL", "null", "None", "无", "空"],
+        "implicit_date_time_normalization_allowed": False,
+        "sqlite_date_note": "SQLite has no native DATE storage class; TEXT columns preserve raw evidence unless a deterministic canonicalization rule is frozen before evaluation.",
         "examples": [
             {"schema_type": "INTEGER", "raw_evidence": "20", "materialized_value": 20},
             {"schema_type": "REAL", "raw_evidence": "12.50", "materialized_value": 12.5},
@@ -240,7 +291,23 @@ def completeness_verification_spec() -> dict[str, Any]:
         "stage": STAGE,
         "component": "semantic_completeness_verification",
         "rule": "Verify that semantic write slots implied by the request are fully represented before SQL compilation.",
-        "checks": ["all_required_slots_mapped", "no_unjustified_extra_slots", "operation_required_fields_present", "row_selector_present_for_update_delete"],
+        "semantic_slot_inventory": {
+            "required_input_to_phase_m": True,
+            "slot_schema": {"slot_ref": "SLOT_*", "evidence_ref": "EV_* dynamic enum", "role": ["write_value", "predicate_value", "conflict_key"], "required": "boolean"},
+            "creation_policy": {
+                "semi_structured_input": "deterministically convert supplied source fields/evidence cells into SLOT_* before mapping",
+                "free_text_input": "use a pre-registered evidence span inventory; if span discovery needs an LLM, it is an explicit model-dependent upstream module and cannot be claimed deterministic",
+            },
+        },
+        "set_definitions": {
+            "required": "set(SLOT_* where required=true)",
+            "allowed": "set(all SLOT_* in semantic_slot_inventory)",
+            "mapped": "set(SLOT_* represented by accepted IR assignments and predicates)",
+            "missing": "required - mapped",
+            "extra": "mapped - allowed",
+            "complete_iff": "missing == empty and extra == empty",
+        },
+        "checks": ["all_required_slots_mapped", "no_unjustified_extra_slots", "operation_required_fields_present", "row_selector_present_for_update_delete", "mapped_slots_are_allowed"],
         "coverage_metric": "semantic_slots_mapped / semantic_slots_required",
         "failure_policy": "reject incomplete or over-selected IR before deterministic compilation",
     }
@@ -250,7 +317,7 @@ def representation_contract_spec() -> dict[str, Any]:
     return {
         "stage": STAGE,
         "component": "representation_schema_contract",
-        "contract": ["JSON object only", "operation-specific required fields", "additionalProperties=false", "finite enum/pattern reference IDs", "schema validation before semantic verification"],
+        "contract": ["JSON object only", "operation-specific required fields", "additionalProperties=false", "dynamic per-sample enum reference IDs", "schema validation before semantic verification"],
         "constrained_structured_output_preferred": True,
         "fallback": "deterministic JSON parse followed by JSON Schema validation",
     }
@@ -272,11 +339,11 @@ def ablation_registration(evidence: dict[str, Any]) -> dict[str, Any]:
         "status": "FROZEN_BEFORE_IMPLEMENTATION",
         "primary_system": "V2-FULL",
         "variants": [
-            {"variant": "V2-FULL", "components": ["operation_conditioning", "constrained_references", "deterministic_materialization", "completeness_verification"]},
-            {"variant": "V2-A", "remove_component": "operation_conditioning", "stage7a_direct_support": 204},
-            {"variant": "V2-B", "remove_component": "constrained_references", "stage7a_direct_support": 190},
-            {"variant": "V2-C", "remove_component": "deterministic_materialization", "stage7a_direct_support": 133},
-            {"variant": "V2-D", "remove_component": "completeness_verification", "stage7a_direct_support": 6, "stage7a_indicative_support": {"under_write": 41, "over_write": 16}},
+            {"variant": "V2-FULL", "components": ["operation_conditioning", "constrained_references", "deterministic_materialization", "completeness_verification"], "intervention": "none", "everything_else_held_constant": True},
+            {"variant": "V2-A", "remove_component": "operation_conditioning", "intervention": "replace two-phase Phase O schema selection with a single operation-unconditioned union prompt while keeping dynamic inventory enums, materialization, completeness, compiler, and data policy unchanged", "everything_else_held_constant": True, "stage7a_direct_support": 204},
+            {"variant": "V2-B", "remove_component": "constrained_references", "intervention": "replace per-sample enum membership constraints with ID-shape pattern checks only; downstream invalid IDs are rejected at the same semantic verification boundary, with all other components unchanged", "everything_else_held_constant": True, "stage7a_direct_support": 190},
+            {"variant": "V2-C", "remove_component": "deterministic_materialization", "intervention": "replace typed materializer with raw evidence TEXT passthrough for all affinities; mappings, schema, completeness gate, compiler, and data policy unchanged", "everything_else_held_constant": True, "stage7a_direct_support": 133},
+            {"variant": "V2-D", "remove_component": "completeness_verification", "intervention": "bypass only the semantic completeness gate after schema and inventory validation; materialization, compiler preflight, prompts, schemas, and data policy unchanged", "everything_else_held_constant": True, "stage7a_direct_support": 6, "stage7a_indicative_support": {"under_write": 41, "over_write": 16}},
         ],
         "selection_metric_policy": "register variants now; measure future failure-family deltas without promising accuracy targets",
         "source_stage7a_final_n": evidence["pipeline"]["final_n"],
@@ -320,21 +387,61 @@ def design_to_evidence_traceability(evidence: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def ref_schema(pattern: str) -> dict[str, Any]:
-    return {"type": "string", "pattern": pattern}
+def ref_schema(values: list[str]) -> dict[str, Any]:
+    return {"type": "string", "enum": values}
 
 
-def assignment_schema() -> dict[str, Any]:
-    return {"type": "object", "additionalProperties": False, "required": ["column_ref", "evidence_ref"], "properties": {"column_ref": ref_schema("^COL_[0-9]+$"), "evidence_ref": ref_schema("^EV_[0-9]+$")}}
+def assignment_schema(*, include_slot_ref: bool = True) -> dict[str, Any]:
+    properties = {"column_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["column_refs"]), "evidence_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["evidence_refs"])}
+    required = ["column_ref", "evidence_ref"]
+    if include_slot_ref:
+        properties["slot_ref"] = {"type": "string", "pattern": "^SLOT_[0-9]+$"}
+        required.append("slot_ref")
+    return {"type": "object", "additionalProperties": False, "required": required, "properties": properties}
+
+
+def row_selector_schema() -> dict[str, Any]:
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["connector", "predicates"],
+        "properties": {
+            "connector": {"enum": PREDICATE_CONNECTORS},
+            "predicates": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["column_ref", "operator", "evidence_ref", "slot_ref"],
+                    "properties": {
+                        "column_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["column_refs"]),
+                        "operator": {"enum": PREDICATE_OPERATORS},
+                        "evidence_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["evidence_refs"]),
+                        "slot_ref": {"type": "string", "pattern": "^SLOT_[0-9]+$"},
+                    },
+                },
+            },
+        },
+    }
 
 
 def schemas() -> dict[str, dict[str, Any]]:
     base = {"$schema": "https://json-schema.org/draft/2020-12/schema", "additionalProperties": False, "type": "object"}
     return {
-        "schemas/insert_ir.schema.json": {**base, "required": ["operation", "table_ref", "assignments"], "properties": {"operation": {"const": "INSERT"}, "table_ref": ref_schema("^TAB_[0-9]+$"), "assignments": {"type": "array", "minItems": 1, "items": assignment_schema()}}},
-        "schemas/update_ir.schema.json": {**base, "required": ["operation", "table_ref", "row_selector", "assignments"], "properties": {"operation": {"const": "UPDATE"}, "table_ref": ref_schema("^TAB_[0-9]+$"), "row_selector": {"type": "object", "additionalProperties": False, "required": ["row_ref"], "properties": {"row_ref": ref_schema("^ROW_[0-9]+$")}}, "assignments": {"type": "array", "minItems": 1, "items": assignment_schema()}}},
-        "schemas/delete_ir.schema.json": {**base, "required": ["operation", "table_ref", "row_selector"], "properties": {"operation": {"const": "DELETE"}, "table_ref": ref_schema("^TAB_[0-9]+$"), "row_selector": {"type": "object", "additionalProperties": False, "required": ["row_ref"], "properties": {"row_ref": ref_schema("^ROW_[0-9]+$")}}}},
-        "schemas/upsert_ir.schema.json": {**base, "required": ["operation", "table_ref", "conflict_target_ref", "insert_assignments", "update_policy"], "properties": {"operation": {"const": "UPSERT"}, "table_ref": ref_schema("^TAB_[0-9]+$"), "conflict_target_ref": ref_schema("^CONSTRAINT_[0-9]+$"), "insert_assignments": {"type": "array", "minItems": 1, "items": assignment_schema()}, "update_policy": {"enum": ["DO_NOTHING", "DO_UPDATE"]}, "update_assignments": {"type": "array", "items": assignment_schema()}}},
+        "schemas/insert_ir.schema.json": {**base, "x-schema-instantiation": "dynamic_per_sample_enum_example", "required": ["operation", "table_ref", "assignments"], "properties": {"operation": {"const": "INSERT"}, "table_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["table_refs"]), "assignments": {"type": "array", "minItems": 1, "items": assignment_schema()}}},
+        "schemas/update_ir.schema.json": {**base, "x-schema-instantiation": "dynamic_per_sample_enum_example", "required": ["operation", "table_ref", "row_selector", "assignments"], "properties": {"operation": {"const": "UPDATE"}, "table_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["table_refs"]), "row_selector": row_selector_schema(), "assignments": {"type": "array", "minItems": 1, "items": assignment_schema()}}},
+        "schemas/delete_ir.schema.json": {**base, "x-schema-instantiation": "dynamic_per_sample_enum_example", "required": ["operation", "table_ref", "row_selector"], "properties": {"operation": {"const": "DELETE"}, "table_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["table_refs"]), "row_selector": row_selector_schema()}},
+        "schemas/upsert_ir.schema.json": {
+            **base,
+            "x-schema-instantiation": "dynamic_per_sample_enum_example",
+            "required": ["operation", "table_ref", "conflict_target_ref", "insert_assignments", "update_policy"],
+            "properties": {"operation": {"const": "UPSERT"}, "table_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["table_refs"]), "conflict_target_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["constraint_refs"]), "insert_assignments": {"type": "array", "minItems": 1, "items": assignment_schema()}, "update_policy": {"enum": ["DO_NOTHING", "DO_UPDATE"]}, "update_assignments": {"type": "array", "minItems": 1, "items": assignment_schema()}},
+            "oneOf": [
+                {"properties": {"update_policy": {"const": "DO_NOTHING"}}, "not": {"required": ["update_assignments"]}},
+                {"required": ["update_assignments"], "properties": {"update_policy": {"const": "DO_UPDATE"}}},
+            ],
+        },
     }
 
 
@@ -360,7 +467,7 @@ def pending_validation_report() -> str:
 def lock(output_dir: Path, hashes: dict[str, str]) -> dict[str, Any]:
     return {
         "stage": STAGE,
-        "status": "PASS_V2_METHOD_SPECIFICATION_LOCKED",
+        "status": "BUILT_PENDING_VALIDATION",
         "date": DATE,
         "hash_policy": HASH_POLICY,
         "input_hashes": hashes,

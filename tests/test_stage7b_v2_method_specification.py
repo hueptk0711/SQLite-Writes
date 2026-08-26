@@ -89,6 +89,57 @@ def _refresh_lock_hash(artifact: Path, rel: str) -> None:
     _write_json(lock_path, lock)
 
 
+def _schema_accepts(schema: dict, instance) -> bool:
+    if "oneOf" in schema and sum(1 for branch in schema["oneOf"] if _schema_accepts(branch, instance)) != 1:
+        return False
+    if "not" in schema and _schema_accepts(schema["not"], instance):
+        return False
+    if "const" in schema and instance != schema["const"]:
+        return False
+    if "enum" in schema and instance not in schema["enum"]:
+        return False
+    expected_type = schema.get("type")
+    if expected_type == "object" and not isinstance(instance, dict):
+        return False
+    if expected_type == "array" and not isinstance(instance, list):
+        return False
+    if expected_type == "string" and not isinstance(instance, str):
+        return False
+    if isinstance(instance, dict):
+        for key in schema.get("required", []):
+            if key not in instance:
+                return False
+        properties = schema.get("properties", {})
+        if schema.get("additionalProperties") is False and any(key not in properties for key in instance):
+            return False
+        for key, value in instance.items():
+            if key in properties and not _schema_accepts(properties[key], value):
+                return False
+    if isinstance(instance, list):
+        if "minItems" in schema and len(instance) < schema["minItems"]:
+            return False
+        item_schema = schema.get("items")
+        if item_schema and any(not _schema_accepts(item_schema, item) for item in instance):
+            return False
+    return True
+
+
+def _assignment(column_ref: str = "COL_1", evidence_ref: str = "EV_1", slot_ref: str = "SLOT_1") -> dict:
+    return {"column_ref": column_ref, "evidence_ref": evidence_ref, "slot_ref": slot_ref}
+
+
+def _predicate(column_ref: str = "COL_1", operator: str = "EQ", evidence_ref: str = "EV_1", slot_ref: str = "SLOT_1") -> dict:
+    return {"column_ref": column_ref, "operator": operator, "evidence_ref": evidence_ref, "slot_ref": slot_ref}
+
+
+def _selector(connector: str = "AND", predicates: list[dict] | None = None) -> dict:
+    return {"connector": connector, "predicates": predicates or [_predicate()]}
+
+
+def _complete(required: set[str], allowed: set[str], mapped: set[str]) -> bool:
+    return not (required - mapped) and not (mapped - allowed)
+
+
 def test_validator_passes_current_stage7b_artifacts() -> None:
     report = validate(ARTIFACT_DIR)
     assert report["status"] == "PASS"
@@ -132,11 +183,18 @@ def test_architecture_freezes_five_core_components_and_no_repair_dependency() ->
     ]
     assert spec["primary_v2_depends_on_repair"] is False
     assert spec["v2_implemented"] is False
+    assert spec["operation_conditioning_protocol"] == "two_phase_operation_enum_then_schema_conditioned_mapping"
+    assert spec["registered_model_call_count"] == {"Phase_M_mapping": 1, "Phase_O_operation_conditioning": 1}
 
 
 def test_operation_conditioning_has_operation_specific_allowed_fields() -> None:
     spec = _read_json(ARTIFACT_DIR / "OPERATION_CONDITIONING_SPEC.json")
     assert spec["operation_classes"] == ["INSERT", "UPDATE", "DELETE", "UPSERT"]
+    assert spec["protocol"] == "two_phase_operation_conditioning"
+    assert spec["phase_o"]["model_call_count"] == 1
+    assert spec["phase_m"]["model_call_count"] == 1
+    assert set(spec["phase_o"]["forbidden_inputs"]) >= {"gold_operation", "gold_sql", "gold_post_state"}
+    assert spec["phase_o"]["invalid_output_policy"] == "reject; do not fall back to unified rich plan"
     assert "conflict_target_ref" not in spec["operation_specific_allowed_fields"]["INSERT"]
     assert "assignments" not in spec["operation_specific_allowed_fields"]["DELETE"]
     assert "conflict_target_ref" in spec["operation_specific_allowed_fields"]["UPSERT"]
@@ -144,13 +202,20 @@ def test_operation_conditioning_has_operation_specific_allowed_fields() -> None:
 
 def test_slot_grounded_ir_keeps_llm_decisions_minimal() -> None:
     spec = _read_json(ARTIFACT_DIR / "SLOT_GROUNDED_IR_SPEC.json")
-    assert "column_ref_to_evidence_ref_mapping" in spec["llm_decisions"]
+    assert spec["phase_o_llm_decisions"] == ["operation_class"]
+    assert "column_ref_to_evidence_ref_mapping" in spec["phase_m_llm_decisions"]
+    assert spec["predicate_ir"]["opaque_row_ref_allowed"] is False
+    assert spec["predicate_ir"]["connector"]["enum"] == ["AND", "OR"]
+    assert spec["predicate_ir"]["predicates"]["items"]["operator"] == ["EQ", "NE", "LT", "GT"]
     assert "SQL syntax" in spec["not_llm_decisions"]
     assert "normalization_function" in spec["not_llm_decisions"]
 
 
 def test_reference_constraint_forbids_unrestricted_identifiers_and_silent_repair() -> None:
     spec = _read_json(ARTIFACT_DIR / "REFERENCE_CONSTRAINT_SPEC.json")
+    assert spec["selected_mechanism"] == "dynamic_per_sample_json_schema_enum"
+    assert spec["schema_instantiation"]["column_ref"] == "enum(sample.column_refs)"
+    assert "instantiate_operation_specific_schema_with_sample_inventory" in spec["validation_order"]
     assert spec["unrestricted_reference_ids_allowed"] is False
     assert spec["invalid_reference_policy"] == "deterministic rejection; no silent fuzzy correction"
     assert set(spec["inventories"]) >= {"tables", "columns", "evidence"}
@@ -160,6 +225,14 @@ def test_typed_materialization_removes_normalization_from_llm_output() -> None:
     spec = _read_json(ARTIFACT_DIR / "TYPED_MATERIALIZATION_SPEC.json")
     assert spec["llm_normalization_decisions_allowed"] is False
     assert spec["unsafe_materialization_policy"] == "reject; do not hallucinate conversion"
+    rules = {row["schema_affinity"]: row["rule"] for row in spec["affinity_rule_table"]}
+    assert rules["INTEGER"] == "strict lossless integer parse"
+    assert rules["REAL"] == "strict finite numeric parse"
+    assert rules["TEXT"] == "preserve raw evidence string"
+    assert rules["NULL"] == "emit NULL only when evidence belongs to frozen null-literal set"
+    assert rules["BLOB"] == "unsupported without a frozen binary representation"
+    assert rules["ambiguous_or_lossy_parse"] == "no coercion"
+    assert spec["implicit_date_time_normalization_allowed"] is False
     assert {"schema_type": "TEXT", "raw_evidence": "12.50", "materialized_value": "12.50"} in spec["examples"]
 
 
@@ -167,7 +240,14 @@ def test_completeness_verification_defines_semantic_slot_coverage() -> None:
     spec = _read_json(ARTIFACT_DIR / "COMPLETENESS_VERIFICATION_SPEC.json")
     assert "all_required_slots_mapped" in spec["checks"]
     assert "no_unjustified_extra_slots" in spec["checks"]
+    assert "mapped_slots_are_allowed" in spec["checks"]
     assert spec["coverage_metric"] == "semantic_slots_mapped / semantic_slots_required"
+    assert spec["semantic_slot_inventory"]["required_input_to_phase_m"] is True
+    assert "semi_structured_input" in spec["semantic_slot_inventory"]["creation_policy"]
+    assert "free_text_input" in spec["semantic_slot_inventory"]["creation_policy"]
+    assert spec["set_definitions"]["missing"] == "required - mapped"
+    assert spec["set_definitions"]["extra"] == "mapped - allowed"
+    assert spec["set_definitions"]["complete_iff"] == "missing == empty and extra == empty"
 
 
 def test_representation_contract_uses_operation_specific_json_schema() -> None:
@@ -189,6 +269,9 @@ def test_ablation_registration_freezes_full_and_four_component_removals() -> Non
     assert variants == {"V2-FULL", "V2-A", "V2-B", "V2-C", "V2-D"}
     assert spec["status"] == "FROZEN_BEFORE_IMPLEMENTATION"
     assert any(row.get("remove_component") == "operation_conditioning" and row.get("stage7a_direct_support") == 204 for row in spec["variants"])
+    for row in spec["variants"]:
+        assert row["everything_else_held_constant"] is True
+        assert row["intervention"]
 
 
 def test_development_data_policy_protects_481_and_external_benchmark() -> None:
@@ -225,8 +308,184 @@ def test_ir_schemas_are_operation_specific_and_closed() -> None:
         assert "normalization" not in json.dumps(schema, sort_keys=True).casefold()
     insert_schema = _read_json(ARTIFACT_DIR / "schemas" / "insert_ir.schema.json")
     assert "conflict_target_ref" not in insert_schema["properties"]
+    assert insert_schema["properties"]["table_ref"]["enum"] == ["TAB_1"]
+    assignment_props = insert_schema["properties"]["assignments"]["items"]["properties"]
+    assert assignment_props["column_ref"]["enum"] == ["COL_1", "COL_2", "COL_3", "COL_4", "COL_5"]
+    assert assignment_props["evidence_ref"]["enum"] == ["EV_1", "EV_2", "EV_3"]
     delete_schema = _read_json(ARTIFACT_DIR / "schemas" / "delete_ir.schema.json")
     assert "assignments" not in delete_schema["properties"]
+
+
+def test_insert_schema_rejects_table_ref_outside_inventory() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "insert_ir.schema.json")
+    instance = {"operation": "INSERT", "table_ref": "TAB_999", "assignments": [_assignment()]}
+    assert not _schema_accepts(schema, instance)
+
+
+def test_insert_schema_rejects_column_ref_outside_inventory() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "insert_ir.schema.json")
+    instance = {"operation": "INSERT", "table_ref": "TAB_1", "assignments": [_assignment(column_ref="COL_999")]}
+    assert not _schema_accepts(schema, instance)
+
+
+def test_insert_schema_rejects_evidence_ref_outside_inventory() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "insert_ir.schema.json")
+    instance = {"operation": "INSERT", "table_ref": "TAB_1", "assignments": [_assignment(evidence_ref="EV_999")]}
+    assert not _schema_accepts(schema, instance)
+
+
+def test_insert_schema_rejects_conflict_field() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "insert_ir.schema.json")
+    instance = {
+        "operation": "INSERT",
+        "table_ref": "TAB_1",
+        "assignments": [_assignment()],
+        "conflict_target_ref": "CONSTRAINT_1",
+    }
+    assert not _schema_accepts(schema, instance)
+
+
+def test_update_schema_accepts_two_predicate_selector() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "update_ir.schema.json")
+    instance = {
+        "operation": "UPDATE",
+        "table_ref": "TAB_1",
+        "row_selector": _selector(predicates=[_predicate("COL_2", "EQ", "EV_1", "SLOT_1"), _predicate("COL_3", "NE", "EV_2", "SLOT_2")]),
+        "assignments": [_assignment("COL_4", "EV_3", "SLOT_3")],
+    }
+    assert _schema_accepts(schema, instance)
+
+
+def test_delete_schema_accepts_and_or_predicate_contract() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "delete_ir.schema.json")
+    and_instance = {"operation": "DELETE", "table_ref": "TAB_1", "row_selector": _selector("AND", [_predicate("COL_1", "LT", "EV_1")])}
+    or_instance = {
+        "operation": "DELETE",
+        "table_ref": "TAB_1",
+        "row_selector": _selector("OR", [_predicate("COL_1", "GT", "EV_1", "SLOT_1"), _predicate("COL_2", "EQ", "EV_2", "SLOT_2")]),
+    }
+    assert _schema_accepts(schema, and_instance)
+    assert _schema_accepts(schema, or_instance)
+
+
+def test_update_schema_rejects_malformed_predicate() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "update_ir.schema.json")
+    missing_operator = {
+        "operation": "UPDATE",
+        "table_ref": "TAB_1",
+        "row_selector": {"connector": "AND", "predicates": [{"column_ref": "COL_1", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"}]},
+        "assignments": [_assignment()],
+    }
+    invalid_operator = {
+        "operation": "UPDATE",
+        "table_ref": "TAB_1",
+        "row_selector": _selector(predicates=[_predicate(operator="LIKE")]),
+        "assignments": [_assignment()],
+    }
+    assert not _schema_accepts(schema, missing_operator)
+    assert not _schema_accepts(schema, invalid_operator)
+
+
+def test_delete_schema_rejects_opaque_row_ref_selector() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "delete_ir.schema.json")
+    instance = {"operation": "DELETE", "table_ref": "TAB_1", "row_selector": {"row_ref": "ROW_1"}}
+    assert not _schema_accepts(schema, instance)
+
+
+def test_upsert_do_update_requires_assignments() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "upsert_ir.schema.json")
+    instance = {
+        "operation": "UPSERT",
+        "table_ref": "TAB_1",
+        "conflict_target_ref": "CONSTRAINT_1",
+        "insert_assignments": [_assignment()],
+        "update_policy": "DO_UPDATE",
+    }
+    assert not _schema_accepts(schema, instance)
+
+
+def test_upsert_do_update_rejects_empty_assignment_list() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "upsert_ir.schema.json")
+    instance = {
+        "operation": "UPSERT",
+        "table_ref": "TAB_1",
+        "conflict_target_ref": "CONSTRAINT_1",
+        "insert_assignments": [_assignment()],
+        "update_policy": "DO_UPDATE",
+        "update_assignments": [],
+    }
+    assert not _schema_accepts(schema, instance)
+
+
+def test_upsert_do_nothing_forbids_update_assignments() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "upsert_ir.schema.json")
+    instance = {
+        "operation": "UPSERT",
+        "table_ref": "TAB_1",
+        "conflict_target_ref": "CONSTRAINT_1",
+        "insert_assignments": [_assignment()],
+        "update_policy": "DO_NOTHING",
+        "update_assignments": [_assignment("COL_2", "EV_2", "SLOT_2")],
+    }
+    assert not _schema_accepts(schema, instance)
+
+
+def test_upsert_conditional_valid_cases() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "upsert_ir.schema.json")
+    do_nothing = {
+        "operation": "UPSERT",
+        "table_ref": "TAB_1",
+        "conflict_target_ref": "CONSTRAINT_1",
+        "insert_assignments": [_assignment()],
+        "update_policy": "DO_NOTHING",
+    }
+    do_update = {
+        "operation": "UPSERT",
+        "table_ref": "TAB_1",
+        "conflict_target_ref": "CONSTRAINT_1",
+        "insert_assignments": [_assignment()],
+        "update_policy": "DO_UPDATE",
+        "update_assignments": [_assignment("COL_2", "EV_2", "SLOT_2")],
+    }
+    assert _schema_accepts(schema, do_nothing)
+    assert _schema_accepts(schema, do_update)
+
+
+def test_completeness_set_logic_rejects_missing_required_slot() -> None:
+    assert not _complete(required={"SLOT_1", "SLOT_2"}, allowed={"SLOT_1", "SLOT_2"}, mapped={"SLOT_1"})
+
+
+def test_completeness_set_logic_rejects_extra_slot() -> None:
+    assert not _complete(required={"SLOT_1"}, allowed={"SLOT_1"}, mapped={"SLOT_1", "SLOT_99"})
+
+
+def test_completeness_set_logic_accepts_exact_required_allowed_mapping() -> None:
+    assert _complete(required={"SLOT_1", "SLOT_2"}, allowed={"SLOT_1", "SLOT_2", "SLOT_3"}, mapped={"SLOT_1", "SLOT_2"})
+
+
+def test_ablation_interventions_are_exact_counterfactuals() -> None:
+    spec = _read_json(ARTIFACT_DIR / "ABLATION_REGISTRATION.json")
+    rows = {row["variant"]: row for row in spec["variants"]}
+    assert "single operation-unconditioned union prompt" in rows["V2-A"]["intervention"]
+    assert "pattern checks only" in rows["V2-B"]["intervention"]
+    assert "same semantic verification boundary" in rows["V2-B"]["intervention"]
+    assert "raw evidence TEXT passthrough" in rows["V2-C"]["intervention"]
+    assert "bypass only the semantic completeness gate" in rows["V2-D"]["intervention"]
+
+
+def test_lock_builder_pending_then_validator_promotes_pass(workspace_tmp: Path) -> None:
+    artifact = workspace_tmp / "generated_stage7b"
+    build_stage7b(artifact)
+    assert _read_json(artifact / "STAGE7B_V2_SPECIFICATION_LOCK.json")["status"] == "BUILT_PENDING_VALIDATION"
+    validation = subprocess.run(
+        [sys.executable, str(ROOT / "scripts/data/validate_stage7b_v2_method_specification.py"), "--output-dir", str(artifact)],
+        cwd=ROOT,
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    assert '"status": "PASS"' in validation.stdout
+    assert _read_json(artifact / "STAGE7B_V2_SPECIFICATION_LOCK.json")["status"] == "PASS_V2_METHOD_SPECIFICATION_LOCKED"
 
 
 def test_validator_detects_traceability_tampering_even_if_hash_updated(workspace_tmp: Path) -> None:
@@ -253,6 +512,50 @@ def test_validator_detects_schema_that_allows_insert_conflict_target(workspace_t
     assert "insert_schema_has_non_insert_fields" in report["violations"]
 
 
+def test_validator_detects_reference_schema_degraded_to_pattern_only(workspace_tmp: Path) -> None:
+    artifact = _copy_stage7b(workspace_tmp)
+    path = artifact / "schemas" / "insert_ir.schema.json"
+    payload = _read_json(path)
+    payload["properties"]["assignments"]["items"]["properties"]["column_ref"] = {"type": "string", "pattern": "^COL_[0-9]+$"}
+    _write_json(path, payload)
+    _refresh_lock_hash(artifact, "schemas/insert_ir.schema.json")
+    report = validate(artifact)
+    assert report["status"] == "FAIL"
+    assert "insert_assignments_column_ref_not_enum" in report["violations"]
+
+
+def test_validator_detects_opaque_row_selector(workspace_tmp: Path) -> None:
+    artifact = _copy_stage7b(workspace_tmp)
+    path = artifact / "schemas" / "update_ir.schema.json"
+    payload = _read_json(path)
+    payload["properties"]["row_selector"] = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["row_ref"],
+        "properties": {"row_ref": {"type": "string", "pattern": "^ROW_[0-9]+$"}},
+    }
+    _write_json(path, payload)
+    _refresh_lock_hash(artifact, "schemas/update_ir.schema.json")
+    report = validate(artifact)
+    assert report["status"] == "FAIL"
+    assert "schema_uses_opaque_row_ref:UPDATE" in report["violations"]
+    assert "update_selector_not_structured" in report["violations"]
+
+
+def test_validator_detects_missing_upsert_conditional_contract(workspace_tmp: Path) -> None:
+    artifact = _copy_stage7b(workspace_tmp)
+    path = artifact / "schemas" / "upsert_ir.schema.json"
+    payload = _read_json(path)
+    payload.pop("oneOf")
+    payload["properties"]["update_assignments"]["minItems"] = 0
+    _write_json(path, payload)
+    _refresh_lock_hash(artifact, "schemas/upsert_ir.schema.json")
+    report = validate(artifact)
+    assert report["status"] == "FAIL"
+    assert "upsert_missing_conditional_contract" in report["violations"]
+    assert "upsert_update_assignments_not_nonempty" in report["violations"]
+
+
 def test_validator_detects_llm_normalization_allowed(workspace_tmp: Path) -> None:
     artifact = _copy_stage7b(workspace_tmp)
     path = artifact / "TYPED_MATERIALIZATION_SPEC.json"
@@ -263,6 +566,44 @@ def test_validator_detects_llm_normalization_allowed(workspace_tmp: Path) -> Non
     report = validate(artifact)
     assert report["status"] == "FAIL"
     assert "llm_normalization_allowed" in report["violations"]
+
+
+def test_validator_detects_incomplete_typed_affinity_table(workspace_tmp: Path) -> None:
+    artifact = _copy_stage7b(workspace_tmp)
+    path = artifact / "TYPED_MATERIALIZATION_SPEC.json"
+    payload = _read_json(path)
+    payload["affinity_rule_table"] = [row for row in payload["affinity_rule_table"] if row["schema_affinity"] != "BLOB"]
+    _write_json(path, payload)
+    _refresh_lock_hash(artifact, "TYPED_MATERIALIZATION_SPEC.json")
+    report = validate(artifact)
+    assert report["status"] == "FAIL"
+    assert "typed_affinity_table_incomplete" in report["violations"]
+
+
+def test_validator_detects_missing_semantic_slot_inventory(workspace_tmp: Path) -> None:
+    artifact = _copy_stage7b(workspace_tmp)
+    path = artifact / "COMPLETENESS_VERIFICATION_SPEC.json"
+    payload = _read_json(path)
+    payload["semantic_slot_inventory"]["required_input_to_phase_m"] = False
+    _write_json(path, payload)
+    _refresh_lock_hash(artifact, "COMPLETENESS_VERIFICATION_SPEC.json")
+    report = validate(artifact)
+    assert report["status"] == "FAIL"
+    assert "semantic_slot_inventory_not_required" in report["violations"]
+
+
+def test_validator_detects_missing_ablation_intervention(workspace_tmp: Path) -> None:
+    artifact = _copy_stage7b(workspace_tmp)
+    path = artifact / "ABLATION_REGISTRATION.json"
+    payload = _read_json(path)
+    payload["variants"][1]["intervention"] = ""
+    payload["variants"][1]["everything_else_held_constant"] = False
+    _write_json(path, payload)
+    _refresh_lock_hash(artifact, "ABLATION_REGISTRATION.json")
+    report = validate(artifact)
+    assert report["status"] == "FAIL"
+    assert "ablation_intervention_missing:V2-A" in report["violations"]
+    assert "ablation_constant_control_missing:V2-A" in report["violations"]
 
 
 def test_validator_detects_481_tuning_allowed(workspace_tmp: Path) -> None:

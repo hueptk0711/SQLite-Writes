@@ -3,11 +3,37 @@
     "all_required_slots_mapped",
     "no_unjustified_extra_slots",
     "operation_required_fields_present",
-    "row_selector_present_for_update_delete"
+    "row_selector_present_for_update_delete",
+    "mapped_slots_are_allowed"
   ],
   "component": "semantic_completeness_verification",
   "coverage_metric": "semantic_slots_mapped / semantic_slots_required",
   "failure_policy": "reject incomplete or over-selected IR before deterministic compilation",
   "rule": "Verify that semantic write slots implied by the request are fully represented before SQL compilation.",
+  "semantic_slot_inventory": {
+    "creation_policy": {
+      "free_text_input": "use a pre-registered evidence span inventory; if span discovery needs an LLM, it is an explicit model-dependent upstream module and cannot be claimed deterministic",
+      "semi_structured_input": "deterministically convert supplied source fields/evidence cells into SLOT_* before mapping"
+    },
+    "required_input_to_phase_m": true,
+    "slot_schema": {
+      "evidence_ref": "EV_* dynamic enum",
+      "required": "boolean",
+      "role": [
+        "write_value",
+        "predicate_value",
+        "conflict_key"
+      ],
+      "slot_ref": "SLOT_*"
+    }
+  },
+  "set_definitions": {
+    "allowed": "set(all SLOT_* in semantic_slot_inventory)",
+    "complete_iff": "missing == empty and extra == empty",
+    "extra": "mapped - allowed",
+    "mapped": "set(SLOT_* represented by accepted IR assignments and predicates)",
+    "missing": "required - mapped",
+    "required": "set(SLOT_* where required=true)"
+  },
   "stage": "Stage7B_V2_METHOD_SPECIFICATION"
 }

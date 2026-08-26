@@ -8,18 +8,69 @@
     "row_selector": {
       "additionalProperties": false,
       "properties": {
-        "row_ref": {
-          "pattern": "^ROW_[0-9]+$",
-          "type": "string"
+        "connector": {
+          "enum": [
+            "AND",
+            "OR"
+          ]
+        },
+        "predicates": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "column_ref": {
+                "enum": [
+                  "COL_1",
+                  "COL_2",
+                  "COL_3",
+                  "COL_4",
+                  "COL_5"
+                ],
+                "type": "string"
+              },
+              "evidence_ref": {
+                "enum": [
+                  "EV_1",
+                  "EV_2",
+                  "EV_3"
+                ],
+                "type": "string"
+              },
+              "operator": {
+                "enum": [
+                  "EQ",
+                  "NE",
+                  "LT",
+                  "GT"
+                ]
+              },
+              "slot_ref": {
+                "pattern": "^SLOT_[0-9]+$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "column_ref",
+              "operator",
+              "evidence_ref",
+              "slot_ref"
+            ],
+            "type": "object"
+          },
+          "minItems": 1,
+          "type": "array"
         }
       },
       "required": [
-        "row_ref"
+        "connector",
+        "predicates"
       ],
       "type": "object"
     },
     "table_ref": {
-      "pattern": "^TAB_[0-9]+$",
+      "enum": [
+        "TAB_1"
+      ],
       "type": "string"
     }
   },
@@ -28,5 +79,6 @@
     "table_ref",
     "row_selector"
   ],
-  "type": "object"
+  "type": "object",
+  "x-schema-instantiation": "dynamic_per_sample_enum_example"
 }

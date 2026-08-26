@@ -40,6 +40,34 @@
       "update_assignments"
     ]
   },
+  "phase_m": {
+    "model_call_count": 1,
+    "name": "schema_conditioned_mapping",
+    "operation_field_policy": "operation is fixed by Phase O and must match the selected schema const",
+    "schema_selection": "select exactly one operation-specific dynamic-enum JSON Schema from Phase O output"
+  },
+  "phase_o": {
+    "forbidden_inputs": [
+      "gold_operation",
+      "gold_sql",
+      "gold_post_state",
+      "test_performance"
+    ],
+    "invalid_output_policy": "reject; do not fall back to unified rich plan",
+    "model_call_count": 1,
+    "name": "operation_enum_selection",
+    "output_contract": {
+      "operation": {
+        "enum": [
+          "INSERT",
+          "UPDATE",
+          "DELETE",
+          "UPSERT"
+        ]
+      }
+    }
+  },
+  "protocol": "two_phase_operation_conditioning",
   "rule": "Determine operation class before producing slot-grounded IR; select a JSON schema by operation.",
   "stage": "Stage7B_V2_METHOD_SPECIFICATION"
 }

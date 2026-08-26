@@ -1,4 +1,36 @@
 {
+  "affinity_rule_table": [
+    {
+      "rule": "strict lossless integer parse",
+      "schema_affinity": "INTEGER",
+      "unsafe_policy": "reject"
+    },
+    {
+      "rule": "strict finite numeric parse",
+      "schema_affinity": "REAL",
+      "unsafe_policy": "reject"
+    },
+    {
+      "rule": "preserve raw evidence string",
+      "schema_affinity": "TEXT",
+      "unsafe_policy": "not_applicable"
+    },
+    {
+      "rule": "emit NULL only when evidence belongs to frozen null-literal set",
+      "schema_affinity": "NULL",
+      "unsafe_policy": "reject otherwise"
+    },
+    {
+      "rule": "unsupported without a frozen binary representation",
+      "schema_affinity": "BLOB",
+      "unsafe_policy": "reject"
+    },
+    {
+      "rule": "no coercion",
+      "schema_affinity": "ambiguous_or_lossy_parse",
+      "unsafe_policy": "reject"
+    }
+  ],
   "component": "deterministic_typed_materialization",
   "examples": [
     {
@@ -17,8 +49,17 @@
       "schema_type": "TEXT"
     }
   ],
+  "implicit_date_time_normalization_allowed": false,
   "llm_normalization_decisions_allowed": false,
+  "null_literal_set": [
+    "NULL",
+    "null",
+    "None",
+    "无",
+    "空"
+  ],
   "rule": "Typed values are derived from schema type plus raw evidence via deterministic parsers.",
+  "sqlite_date_note": "SQLite has no native DATE storage class; TEXT columns preserve raw evidence unless a deterministic canonicalization rule is frozen before evaluation.",
   "stage": "Stage7B_V2_METHOD_SPECIFICATION",
   "unsafe_materialization_policy": "reject; do not hallucinate conversion"
 }

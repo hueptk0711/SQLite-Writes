@@ -1,14 +1,47 @@
 {
   "component": "constrained_reference_selection",
+  "example_inventory_for_schema_artifacts": {
+    "column_refs": [
+      "COL_1",
+      "COL_2",
+      "COL_3",
+      "COL_4",
+      "COL_5"
+    ],
+    "constraint_refs": [
+      "CONSTRAINT_1"
+    ],
+    "evidence_refs": [
+      "EV_1",
+      "EV_2",
+      "EV_3"
+    ],
+    "table_refs": [
+      "TAB_1"
+    ]
+  },
   "invalid_reference_policy": "deterministic rejection; no silent fuzzy correction",
   "inventories": {
-    "columns": "COL_*",
-    "constraints": "CONSTRAINT_*",
-    "evidence": "EV_*",
-    "row_selectors": "ROW_*",
-    "tables": "TAB_*"
+    "columns": "COL_* dynamic enum",
+    "constraints": "CONSTRAINT_* dynamic enum",
+    "evidence": "EV_* dynamic enum",
+    "tables": "TAB_* dynamic enum"
   },
-  "rule": "Every identifier emitted by the model must belong to a supplied finite inventory.",
+  "rule": "Every identifier emitted by the model must belong to a supplied finite inventory instantiated into the per-sample JSON Schema.",
+  "schema_instantiation": {
+    "column_ref": "enum(sample.column_refs)",
+    "conflict_target_ref": "enum(sample.constraint_refs)",
+    "evidence_ref": "enum(sample.evidence_refs)",
+    "table_ref": "enum(sample.table_refs)"
+  },
+  "selected_mechanism": "dynamic_per_sample_json_schema_enum",
   "stage": "Stage7B_V2_METHOD_SPECIFICATION",
-  "unrestricted_reference_ids_allowed": false
+  "unrestricted_reference_ids_allowed": false,
+  "validation_order": [
+    "operation_phase_o_enum",
+    "instantiate_operation_specific_schema_with_sample_inventory",
+    "json_schema_validation",
+    "inventory_membership_is_enforced_by_enum",
+    "semantic_verification"
+  ]
 }

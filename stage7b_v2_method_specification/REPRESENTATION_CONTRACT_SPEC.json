@@ -5,7 +5,7 @@
     "JSON object only",
     "operation-specific required fields",
     "additionalProperties=false",
-    "finite enum/pattern reference IDs",
+    "dynamic per-sample enum reference IDs",
     "schema validation before semantic verification"
   ],
   "fallback": "deterministic JSON parse followed by JSON Schema validation",

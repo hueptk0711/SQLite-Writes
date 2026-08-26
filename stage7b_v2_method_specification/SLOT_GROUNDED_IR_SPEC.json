@@ -4,23 +4,18 @@
     "assignments": [
       {
         "column_ref": "COL_2",
-        "evidence_ref": "EV_1"
+        "evidence_ref": "EV_1",
+        "slot_ref": "SLOT_1"
       },
       {
         "column_ref": "COL_5",
-        "evidence_ref": "EV_3"
+        "evidence_ref": "EV_3",
+        "slot_ref": "SLOT_2"
       }
     ],
     "operation": "INSERT",
     "table_ref": "TAB_1"
   },
-  "llm_decisions": [
-    "operation_class",
-    "table_ref",
-    "column_ref_to_evidence_ref_mapping",
-    "row_selector_ref_when_required",
-    "conflict_target_ref_only_for_upsert"
-  ],
   "not_llm_decisions": [
     "SQL syntax",
     "normalization_function",
@@ -28,5 +23,36 @@
     "compiler_strategy",
     "silent_reference_repair"
   ],
+  "phase_m_llm_decisions": [
+    "table_ref",
+    "column_ref_to_evidence_ref_mapping",
+    "structured_predicate_mapping_when_required",
+    "conflict_target_ref_only_for_upsert"
+  ],
+  "phase_o_llm_decisions": [
+    "operation_class"
+  ],
+  "predicate_ir": {
+    "connector": {
+      "enum": [
+        "AND",
+        "OR"
+      ]
+    },
+    "opaque_row_ref_allowed": false,
+    "predicates": {
+      "items": {
+        "column_ref": "dynamic enum COL_*",
+        "evidence_ref": "dynamic enum EV_*",
+        "operator": [
+          "EQ",
+          "NE",
+          "LT",
+          "GT"
+        ]
+      }
+    },
+    "supports_multi_condition": true
+  },
   "stage": "Stage7B_V2_METHOD_SPECIFICATION"
 }

@@ -12,24 +12,34 @@
         "deterministic_materialization",
         "completeness_verification"
       ],
+      "everything_else_held_constant": true,
+      "intervention": "none",
       "variant": "V2-FULL"
     },
     {
+      "everything_else_held_constant": true,
+      "intervention": "replace two-phase Phase O schema selection with a single operation-unconditioned union prompt while keeping dynamic inventory enums, materialization, completeness, compiler, and data policy unchanged",
       "remove_component": "operation_conditioning",
       "stage7a_direct_support": 204,
       "variant": "V2-A"
     },
     {
+      "everything_else_held_constant": true,
+      "intervention": "replace per-sample enum membership constraints with ID-shape pattern checks only; downstream invalid IDs are rejected at the same semantic verification boundary, with all other components unchanged",
       "remove_component": "constrained_references",
       "stage7a_direct_support": 190,
       "variant": "V2-B"
     },
     {
+      "everything_else_held_constant": true,
+      "intervention": "replace typed materializer with raw evidence TEXT passthrough for all affinities; mappings, schema, completeness gate, compiler, and data policy unchanged",
       "remove_component": "deterministic_materialization",
       "stage7a_direct_support": 133,
       "variant": "V2-C"
     },
     {
+      "everything_else_held_constant": true,
+      "intervention": "bypass only the semantic completeness gate after schema and inventory validation; materialization, compiler preflight, prompts, schemas, and data policy unchanged",
       "remove_component": "completeness_verification",
       "stage7a_direct_support": 6,
       "stage7a_indicative_support": {
