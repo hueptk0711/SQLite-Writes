@@ -101,8 +101,8 @@ EVAL_ARMS = {
 FIRST_FAILURE_ORDER = (
     "generation",
     "parse",
-    "construction",
     "verification",
+    "construction",
     "admission",
     "execution",
     "state_mismatch",
@@ -272,6 +272,55 @@ def program_payload(program: Any, direct_sql: list[str] | None) -> dict[str, Any
     return None
 
 
+def diagnostics_from_verification(verification: dict[str, Any] | None) -> tuple[list[Any], list[Any]]:
+    if not verification:
+        return [], []
+    return list(verification.get("errors") or []), list(verification.get("warnings") or [])
+
+
+def find_repair_traces(value: Any) -> list[dict[str, Any]]:
+    traces: list[dict[str, Any]] = []
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if key in {"constrained_reference_repairs", "diagnostic_targeted_repairs", "reference_repair", "targeted_repair"}:
+                if isinstance(item, list):
+                    traces.extend(trace for trace in item if isinstance(trace, dict))
+                elif isinstance(item, dict):
+                    traces.append(item)
+            traces.extend(find_repair_traces(item))
+    elif isinstance(value, list):
+        for item in value:
+            traces.extend(find_repair_traces(item))
+    return traces
+
+
+def repair_summary_from_plan(plan: dict[str, Any] | None) -> dict[str, Any]:
+    traces = find_repair_traces(plan)
+    f_traces = [
+        trace
+        for trace in traces
+        if "reference" in str(trace.get("repair_type") or trace.get("stage") or trace.get("kind") or "").casefold()
+        or "constrained" in canonical_json(trace).casefold()
+    ]
+    g1_traces = [
+        trace
+        for trace in traces
+        if "targeted" in str(trace.get("repair_type") or trace.get("stage") or trace.get("kind") or "").casefold()
+        or "diagnostic_targeted" in canonical_json(trace).casefold()
+    ]
+    return {
+        "repair_applied": bool(traces),
+        "repair_trace_count": len(traces),
+        "repair_trace_sha256": canonical_sha256(traces) if traces else None,
+        "f_attempted": bool(f_traces),
+        "f_applied": any(bool(trace.get("applied", True)) for trace in f_traces),
+        "f_revalidation_passed": any(str(trace.get("revalidation_result") or "").upper() == "PASS" for trace in f_traces),
+        "g1_diagnostic_triggered": bool(g1_traces),
+        "g1_applied": any(bool(trace.get("applied", True)) for trace in g1_traces),
+        "g1_revalidation_passed": any(str(trace.get("revalidation_result") or "").upper() == "PASS" for trace in g1_traces),
+    }
+
+
 def build_candidate(
     *,
     arm: str,
@@ -288,6 +337,8 @@ def build_candidate(
     parsed_plan: dict[str, Any] | None = None
     materialized_plan: dict[str, Any] | None = None
     verification_dict: dict[str, Any] | None = None
+    pipeline_stage: str | None = None
+    pipeline_result_dict: dict[str, Any] | None = None
     program = None
     direct_sql: list[str] | None = None
     diagnostics: list[Any] = []
@@ -342,6 +393,8 @@ def build_candidate(
                 constrained_reference_repair=config.get("constrained_reference_repair"),
                 diagnostic_targeted_repair=config.get("diagnostic_targeted_repair"),
             ).run(str(sample.get("question") or ""), parsed.plan)
+            pipeline_stage = pipeline_result.stage
+            pipeline_result_dict = pipeline_result.to_dict()
             materialized_plan = pipeline_result.write_plan
             verification_dict = pipeline_result.verification.to_dict() if pipeline_result.verification else None
             verification_status = (
@@ -350,7 +403,10 @@ def build_candidate(
                 else "verification_error"
             )
             program = pipeline_result.program
-            construction_status = str(program.status) if program is not None else "construction_error"
+            if verification_status == "verification_error":
+                construction_status = "not_applicable"
+            else:
+                construction_status = str(program.status) if program is not None else "construction_error"
         else:
             construction_status = "not_applicable"
     else:
@@ -372,6 +428,8 @@ def build_candidate(
         "construction_status": construction_status,
         "verification_status": verification_status,
         "admission_status": admission_status,
+        "pipeline_stage": pipeline_stage,
+        "pipeline_result": pipeline_result_dict,
         "parsed_plan": parsed_plan,
         "materialized_plan": materialized_plan,
         "verification": verification_dict,
@@ -379,6 +437,9 @@ def build_candidate(
         "program": program,
         "direct_sql": direct_sql,
         "diagnostics": diagnostics,
+        "parsed_plan_sha256": canonical_sha256(parsed_plan) if parsed_plan is not None else None,
+        "materialized_plan_sha256": canonical_sha256(materialized_plan) if materialized_plan is not None else None,
+        **repair_summary_from_plan(materialized_plan or parsed_plan),
     }
 
 
@@ -438,6 +499,7 @@ def evaluate_arm(
         gold_post_state_sha = str(gold_posts[sample_id]["post_state_sha256"])
         target_state_correct = predicted_post_state_sha == gold_post_state_sha
         candidate_program = program_payload(candidate["program"], candidate["direct_sql"])
+        verification_errors, verification_warnings = diagnostics_from_verification(candidate["verification"])
         statuses = {
             "generation": str(raw.get("generation_status") or "success"),
             "parse": str(candidate["parse_status"]),
@@ -475,6 +537,25 @@ def evaluate_arm(
             "target_state_correct": bool(target_state_correct),
             "failure_stage": failure_stage,
             "failure_reason": failure_reason,
+            "pipeline_stage": candidate["pipeline_stage"],
+            "verification_errors": verification_errors,
+            "verification_warnings": verification_warnings,
+            "parsed_plan_sha256": candidate["parsed_plan_sha256"],
+            "materialized_plan_sha256": candidate["materialized_plan_sha256"],
+            "repair_applied": candidate["repair_applied"],
+            "repair_trace_count": candidate["repair_trace_count"],
+            "repair_trace_sha256": candidate["repair_trace_sha256"],
+            "f_attempted": candidate["f_attempted"],
+            "f_applied": candidate["f_applied"],
+            "f_revalidation_passed": candidate["f_revalidation_passed"],
+            "g1_diagnostic_triggered": candidate["g1_diagnostic_triggered"],
+            "g1_applied": candidate["g1_applied"],
+            "g1_revalidation_passed": candidate["g1_revalidation_passed"],
+            "preflight_status": (
+                "not_applicable"
+                if candidate["preflight"] is None
+                else ("accepted" if bool(candidate["preflight"].get("accepted")) else "rejected")
+            ),
         }
         outcomes.append(outcome)
     return outcomes
@@ -494,6 +575,13 @@ def summarize_outcomes(outcomes_by_arm: dict[str, list[dict[str, Any]]]) -> dict
             "execution_status_counts": dict(Counter(str(row["execution_status"]) for row in rows)),
             "failure_stage_counts": dict(Counter(str(row["failure_stage"]) for row in rows)),
             "hit_max_new_tokens_count": sum(1 for row in rows if row["hit_max_new_tokens"]),
+            "pipeline_stage_counts": dict(Counter(str(row.get("pipeline_stage")) for row in rows)),
+            "f_attempted_count": sum(1 for row in rows if row.get("f_attempted")),
+            "f_applied_count": sum(1 for row in rows if row.get("f_applied")),
+            "f_revalidation_passed_count": sum(1 for row in rows if row.get("f_revalidation_passed")),
+            "g1_diagnostic_triggered_count": sum(1 for row in rows if row.get("g1_diagnostic_triggered")),
+            "g1_applied_count": sum(1 for row in rows if row.get("g1_applied")),
+            "g1_revalidation_passed_count": sum(1 for row in rows if row.get("g1_revalidation_passed")),
         }
     return {
         "stage": "Stage6J_DETERMINISTIC_REPLAY_EVALUATION",

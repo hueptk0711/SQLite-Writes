@@ -1,4 +1,4 @@
-# Stage6J Validation Report
+# Stage6J PATCH1 Validation Report
 
 Validation date: 2026-08-26
 
@@ -24,7 +24,7 @@ PYTHONPATH=src python scripts/data/validate_stage6j_replay_evaluation.py
 
 ```text
 tests/test_stage6j_replay_evaluation.py
-5 passed
+14 passed
 ```
 
 Command:
@@ -47,14 +47,28 @@ J-FS:
 Original MP-FS+:
   N = 481
   target_state_correct = 0
+  failure_stage_counts:
+    parse = 2
+    verification = 436
+    state_mismatch = 43
 
 D+G1:
   N = 481
   target_state_correct = 0
+  failure_stage_counts:
+    parse = 2
+    verification = 436
+    state_mismatch = 43
 
 D+F+G1:
   N = 481
   target_state_correct = 0
+  failure_stage_counts:
+    parse = 2
+    verification = 436
+    state_mismatch = 43
 ```
 
 No significance tests were computed in Stage6J.
+
+PATCH1 hardening validates mirrored Stage6I raw roots, outcome file hashes, source raw-row provenance, raw-output hashes, candidate program hashes, frozen Stage6E gold post-state hashes, target-state booleans, H2 shared raw-row identity, summary recomputation, and exact Stage6E denominator coverage.

@@ -1,5 +1,5 @@
 {
-  "arm_manifest_sha256": "bd306723ab82245e4cdd381ce1eaaf9ac9358a986b5420bbc79ea955434d8013",
+  "arm_manifest_sha256": "7e8e38fe4ef6a08353f9e791d8b414730faf9d5a998c0143dd6e2b761a440b95",
   "date": "20260826",
   "denominator_audit_sha256": "82707b0687a9733af1b2cdf0820f97ca85453529081689e7a6a2171ad8c32f75",
   "final_confirmation_n": 481,
@@ -52,5 +52,5 @@
   "stage": "Stage6J_DETERMINISTIC_REPLAY_EVALUATION",
   "statistics_computed": false,
   "status": "PASS_REPLAY_EVALUATION_COMPLETE",
-  "summary_sha256": "7e7a27b27b194e1aef8076f7042ed289205cdc627f5357d267cec549f245f72b"
+  "summary_sha256": "11cc65731fb2e5b38fea14c60ea1a1620ca772d63a3c474fd09dbec64cc6d612"
 }

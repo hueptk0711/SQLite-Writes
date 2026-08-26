@@ -6,7 +6,7 @@
       "config_stream": "shared_mp_fs_plus_generation",
       "method_id": "MP-FS+",
       "outcome_path": "replay_outcomes/d_f_g1_vnext.jsonl",
-      "outcome_sha256": "e5d14c8a68cbc8e05e35cd3c924b8938604b4d152c53192bc41a4b278f4c8658",
+      "outcome_sha256": "9eeb93747a381b50e6db5ca90988becca70f3888579e9fae6820de8ed3de1cae",
       "raw_generation_sha256": "13d05a682ba1b1de2d60bd15cb2d206c69f9e9605cbd9cef113b0813bef723d3",
       "raw_stream": "shared_mp_fs_plus_generation"
     },
@@ -14,7 +14,7 @@
       "config_stream": "shared_mp_fs_plus_generation",
       "method_id": "MP-FS+",
       "outcome_path": "replay_outcomes/d_g1_control.jsonl",
-      "outcome_sha256": "e1e60bfcf82c3f7e6baf63a7490f82d01a6bc41418bf48abec169436502340e1",
+      "outcome_sha256": "f574734661c5a8c445921ec9ef4502ba1423f222f42e9ea39413432dc1a1d6dc",
       "raw_generation_sha256": "13d05a682ba1b1de2d60bd15cb2d206c69f9e9605cbd9cef113b0813bef723d3",
       "raw_stream": "shared_mp_fs_plus_generation"
     },
@@ -22,7 +22,7 @@
       "config_stream": "direct",
       "method_id": "D-FS-M",
       "outcome_path": "replay_outcomes/direct.jsonl",
-      "outcome_sha256": "c7c685835fef9889b475f4d55d2b6326473e2a1ecd18af5b29dca65353d557a5",
+      "outcome_sha256": "cfd5b76a8057d83c4140d737e3679dcae19f761f8de782a0c8442152a91728ea",
       "raw_generation_sha256": "ef0c0669578c0f2a1645f3119a6273991c941a933d47c7c3b92a4b984b956afb",
       "raw_stream": "direct"
     },
@@ -30,7 +30,7 @@
       "config_stream": "j_fs",
       "method_id": "J-FS-M",
       "outcome_path": "replay_outcomes/j_fs.jsonl",
-      "outcome_sha256": "47e7e328914bdcdff7ad237fa2ec725d0c1358d12fcd831b933c421f50dd3181",
+      "outcome_sha256": "35700c0cd59b8a4e3bd27fea854d69d6e3bac240a4edf3b27eb9528e94a7a7e3",
       "raw_generation_sha256": "b0fcdef81cd666f4357998f02827fe64e7be7dc64d79c6d18820be1f812136b9",
       "raw_stream": "j_fs"
     },
@@ -38,7 +38,7 @@
       "config_stream": "original_mp_fs_plus",
       "method_id": "MP-FS+",
       "outcome_path": "replay_outcomes/original_mp_fs_plus.jsonl",
-      "outcome_sha256": "c111a06d5f087d1cd1c28999f1a3e5efb4299a5773ef3cf6a9f32e918c3d03e9",
+      "outcome_sha256": "f91b49bb326835c83cb59ea7808c5c5cd3025d149a68e83cc2b477831a78c752",
       "raw_generation_sha256": "b10ba74e67c788a3c27df08354464bf51aeb4d60cd1b96b8719a12e62eb7feb6",
       "raw_stream": "original_mp_fs_plus"
     }

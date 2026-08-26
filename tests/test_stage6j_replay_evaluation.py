@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import shutil
 import uuid
 from pathlib import Path
@@ -50,6 +51,22 @@ def _write_jsonl(path: Path, rows: list[dict]) -> None:
     )
 
 
+def _sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _mutate_first_outcome(
+    artifact: Path,
+    arm: str,
+    mutator,
+) -> dict:
+    path = artifact / "replay_outcomes" / f"{arm}.jsonl"
+    rows = _read_jsonl(path)
+    mutator(rows[0])
+    _write_jsonl(path, rows)
+    return validate(artifact)
+
+
 def test_stage6j_artifact_validates() -> None:
     report = validate(ARTIFACT_DIR)
     assert report["status"] == "PASS"
@@ -86,6 +103,105 @@ def test_h2_shared_raw_row_mismatch_fails() -> None:
         _cleanup(artifact)
 
 
+def test_mutate_target_state_correct_fails() -> None:
+    artifact = _copy_artifact()
+    try:
+        report = _mutate_first_outcome(
+            artifact,
+            "direct",
+            lambda row: row.update({"target_state_correct": not row["target_state_correct"]}),
+        )
+        assert report["status"] == "FAIL"
+        assert any(item.startswith("outcome_target_state_correct_mismatch:direct:") for item in report["violations"])
+    finally:
+        _cleanup(artifact)
+
+
+def test_mutate_gold_post_state_fails() -> None:
+    artifact = _copy_artifact()
+    try:
+        report = _mutate_first_outcome(
+            artifact,
+            "direct",
+            lambda row: row.update({"gold_post_state_sha256": "0" * 64}),
+        )
+        assert report["status"] == "FAIL"
+        assert any(item.startswith("outcome_gold_post_state_mismatch:direct:") for item in report["violations"])
+    finally:
+        _cleanup(artifact)
+
+
+def test_mutate_predicted_post_state_fails() -> None:
+    artifact = _copy_artifact()
+    try:
+        def mutate(row: dict) -> None:
+            row["predicted_post_state_sha256"] = row["gold_post_state_sha256"]
+
+        report = _mutate_first_outcome(artifact, "direct", mutate)
+        assert report["status"] == "FAIL"
+        assert any(item.startswith("outcome_target_state_correct_mismatch:direct:") for item in report["violations"])
+    finally:
+        _cleanup(artifact)
+
+
+def test_mutate_candidate_program_without_sha_fails() -> None:
+    artifact = _copy_artifact()
+    try:
+        def mutate(row: dict) -> None:
+            row["candidate_program"]["statements"][0] += " -- mutated"
+
+        report = _mutate_first_outcome(artifact, "direct", mutate)
+        assert report["status"] == "FAIL"
+        assert any(item.startswith("outcome_candidate_program_hash_mismatch:direct:") for item in report["violations"])
+    finally:
+        _cleanup(artifact)
+
+
+def test_mutate_source_raw_generation_row_sha_fails() -> None:
+    artifact = _copy_artifact()
+    try:
+        report = _mutate_first_outcome(
+            artifact,
+            "direct",
+            lambda row: row.update({"source_raw_generation_row_sha256": "0" * 64}),
+        )
+        assert report["status"] == "FAIL"
+        assert any(item.startswith("outcome_source_raw_row_hash_mismatch:direct:") for item in report["violations"])
+    finally:
+        _cleanup(artifact)
+
+
+def test_mutate_mirrored_stage6i_raw_jsonl_fails() -> None:
+    artifact = _copy_artifact()
+    try:
+        path = artifact / "stage6i_generation_inputs" / "stage6_confirmation_run_outputs" / "raw_generations" / "direct.jsonl"
+        rows = _read_jsonl(path)
+        rows[0]["raw_output"] = rows[0]["raw_output"] + " -- mutated"
+        _write_jsonl(path, rows)
+        report = validate(artifact)
+        assert report["status"] == "FAIL"
+        assert "mirrored_raw_generation_hash_mismatch:direct" in report["violations"]
+    finally:
+        _cleanup(artifact)
+
+
+def test_mutate_h2_shared_hash_in_both_arms_fails_against_raw() -> None:
+    artifact = _copy_artifact()
+    try:
+        sample_id = None
+        for arm in ("d_g1_control", "d_f_g1_vnext"):
+            path = artifact / "replay_outcomes" / f"{arm}.jsonl"
+            rows = _read_jsonl(path)
+            sample_id = rows[0]["stage6_sample_id"]
+            rows[0]["shared_raw_generation_row_sha256"] = "1" * 64
+            _write_jsonl(path, rows)
+        report = validate(artifact)
+        assert report["status"] == "FAIL"
+        assert f"h2_shared_raw_row_mismatch:{sample_id}" in report["violations"]
+    finally:
+        _cleanup(artifact)
+
+
 def test_significance_outputs_are_forbidden() -> None:
     artifact = _copy_artifact()
     try:
@@ -116,5 +232,38 @@ def test_raw_stream_hash_mutation_fails() -> None:
         report = validate(artifact)
         assert report["status"] == "FAIL"
         assert "raw_stream_hashes_mismatch" in report["violations"]
+    finally:
+        _cleanup(artifact)
+
+
+def test_mutate_summary_count_fails_even_if_lock_hash_updated() -> None:
+    artifact = _copy_artifact()
+    try:
+        summary_path = artifact / "REPLAY_EVALUATION_SUMMARY.json"
+        summary = _read_json(summary_path)
+        summary["arms"]["direct"]["target_state_correct"] += 1
+        _write_json(summary_path, summary)
+        lock = _read_json(artifact / "STAGE6J_REPLAY_EVALUATION_LOCK.json")
+        lock["summary_sha256"] = _sha256_file(summary_path)
+        _write_json(artifact / "STAGE6J_REPLAY_EVALUATION_LOCK.json", lock)
+        report = validate(artifact)
+        assert report["status"] == "FAIL"
+        assert "summary_recompute_mismatch" in report["violations"]
+    finally:
+        _cleanup(artifact)
+
+
+def test_replace_same_sample_id_in_all_arms_fails_against_stage6e_manifest() -> None:
+    artifact = _copy_artifact()
+    try:
+        for arm in ("direct", "j_fs", "original_mp_fs_plus", "d_g1_control", "d_f_g1_vnext"):
+            path = artifact / "replay_outcomes" / f"{arm}.jsonl"
+            rows = _read_jsonl(path)
+            rows[-1]["stage6_sample_id"] = rows[0]["stage6_sample_id"]
+            rows[-1]["sample_id"] = rows[0]["sample_id"]
+            _write_jsonl(path, rows)
+        report = validate(artifact)
+        assert report["status"] == "FAIL"
+        assert any(item.startswith("duplicate_sample_ids:") for item in report["violations"])
     finally:
         _cleanup(artifact)
