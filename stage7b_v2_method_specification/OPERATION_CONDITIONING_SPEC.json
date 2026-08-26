@@ -1,0 +1,80 @@
+{
+  "component": "operation_conditioning",
+  "failure_policy": "reject rather than silently reinterpret operation-specific schema violations",
+  "forbidden_insert_fields": [
+    "conflict_target_ref",
+    "update_columns",
+    "upsert_action",
+    "delete_predicate",
+    "row_selector"
+  ],
+  "operation_classes": [
+    "INSERT",
+    "UPDATE",
+    "DELETE",
+    "UPSERT"
+  ],
+  "operation_specific_allowed_fields": {
+    "DELETE": [
+      "operation",
+      "table_ref",
+      "row_selector"
+    ],
+    "INSERT": [
+      "operation",
+      "table_ref",
+      "assignments"
+    ],
+    "UPDATE": [
+      "operation",
+      "table_ref",
+      "row_selector",
+      "assignments"
+    ],
+    "UPSERT": [
+      "operation",
+      "table_ref",
+      "conflict_target_ref",
+      "insert_assignments",
+      "update_policy",
+      "update_assignments"
+    ]
+  },
+  "phase_m": {
+    "input_contract": [
+      "natural_language_write_request",
+      "schema_inventory",
+      "evidence_inventory",
+      "semantic_slot_inventory",
+      "operation_specific_dynamic_enum_schema"
+    ],
+    "model_call_count": 1,
+    "name": "schema_conditioned_mapping",
+    "operation_field_policy": "operation is fixed by Phase O and must match the selected schema const",
+    "schema_selection": "select exactly one operation-specific dynamic-enum JSON Schema from Phase O output"
+  },
+  "phase_o": {
+    "forbidden_inputs": [
+      "gold_operation",
+      "gold_sql",
+      "gold_post_state",
+      "test_performance"
+    ],
+    "invalid_output_policy": "reject; do not fall back to unified rich plan",
+    "model_call_count": 1,
+    "name": "operation_enum_selection",
+    "output_contract": {
+      "operation": {
+        "enum": [
+          "INSERT",
+          "UPDATE",
+          "DELETE",
+          "UPSERT"
+        ]
+      }
+    }
+  },
+  "protocol": "two_phase_operation_conditioning",
+  "rule": "Determine operation class before producing slot-grounded IR; select a JSON schema by operation.",
+  "stage": "Stage7B_V2_METHOD_SPECIFICATION"
+}

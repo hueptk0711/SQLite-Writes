@@ -1,0 +1,20 @@
+{
+  "date": "20260826",
+  "gpu_called": false,
+  "hash_policy": "text_sha256_canonical_lf",
+  "input_hashes": {
+    "stage7a_formal_failure_analysis/DESIGN_REQUIREMENT_TRACEABILITY.json": "08658973b33045412d253011c16448ce1d48a11f68757760253338a86dcb3877",
+    "stage7a_formal_failure_analysis/FAILURE_COMBINATION_COUNTS.json": "35aeac38274b650a1c5bd894e21d9728f9b174aceefa51fe11184d9b30d49f01",
+    "stage7a_formal_failure_analysis/FAILURE_OVERLAP_MATRIX.json": "63af7cac0d2eb020fb7261cfa5dd2e43f43bccf4573e49552772be99e324a3cc",
+    "stage7a_formal_failure_analysis/FAILURE_TAXONOMY_SPEC.json": "090869cef4fbfcdd9ed130cfad99adb33a0e69509402b4d520cd6a0559a02664",
+    "stage7a_formal_failure_analysis/PARSE_FAILURE_ANALYSIS.jsonl": "21f6cac4e5e9783d1dc92b6872122176fb17c13ec528fc879e2b814aef3e437d",
+    "stage7a_formal_failure_analysis/PIPELINE_FAILURE_SUMMARY.json": "0f2c0bd4958d756e98a29b46fd2abd86fc30fb9b59aeec50417e3d326cc1a4c9",
+    "stage7a_formal_failure_analysis/STAGE7A_FAILURE_ANALYSIS_LOCK.json": "fe23b5000da2feaa2db6b2c452cd60aafa3db4f8fa253991aefc7a423ad34d2a",
+    "stage7a_formal_failure_analysis/STAGE7A_INPUT_MANIFEST.json": "09923b01a3ade4280e88a5d840c29086cd59d6844479c3604fcceb2f8d5d2688",
+    "stage7a_formal_failure_analysis/STATE_MISMATCH_ANALYSIS.jsonl": "de8a7ac8ecb5f449ccdba198b93dc0990fe3cfb666fd5adc7873a48dc773e1d3",
+    "stage7a_formal_failure_analysis/VERIFICATION_FAILURE_SUMMARY.json": "91dd8414f6fb8a4e5a94c3e4b7f7ce782b790e7137ce5e8bc6f358c3445a9169"
+  },
+  "model_called": false,
+  "stage": "Stage7B_V2_METHOD_SPECIFICATION",
+  "stage7a_locked": true
+}

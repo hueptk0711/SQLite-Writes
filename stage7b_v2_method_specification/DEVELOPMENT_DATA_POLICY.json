@@ -1,0 +1,25 @@
+{
+  "allowed_for_selection_tuning": [
+    "CRUDSQL dev Create"
+  ],
+  "allowed_for_v2_development": [
+    "CRUDSQL train Create"
+  ],
+  "forbidden_for_selection_tuning": [
+    "current 481 CRUDSQL Create test analyzed in Stage6/Stage7A"
+  ],
+  "live_sql_bench_gt_policy": "do not open or inspect ground truth during V2 development/specification",
+  "performance_tuning_on_481_allowed": false,
+  "post_hoc_adaptation_evaluation_only": [
+    "current 481 CRUDSQL Create test analyzed in Stage6/Stage7A"
+  ],
+  "reserved_until_after_v2_freeze": [
+    "CRUDSQL Update",
+    "CRUDSQL Delete"
+  ],
+  "stage": "Stage7B_V2_METHOD_SPECIFICATION",
+  "status": "FROZEN_SPECIFICATION",
+  "untouched_external_benchmark": [
+    "LiveSQLBench SQLite"
+  ]
+}

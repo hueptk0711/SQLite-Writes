@@ -1,0 +1,97 @@
+{
+  "accuracy_target_registered": false,
+  "entries": [
+    {
+      "component": "operation_conditioning",
+      "design_decision": "condition IR and allowed fields on INSERT/UPDATE/DELETE/UPSERT before downstream mapping",
+      "expected_future_measure": "operation-semantics verification failures",
+      "expected_mechanism": "reduce operation/conflict semantic degrees of freedom",
+      "stage7a_direct_support": {
+        "failure_family": "operation_semantics",
+        "sample_count": 204
+      },
+      "stage7a_indicative_support": [
+        {
+          "failure_family": "row_cardinality",
+          "sample_count": 7
+        }
+      ]
+    },
+    {
+      "component": "constrained_reference_selection",
+      "design_decision": "restrict model-produced references to enumerated inventory IDs",
+      "expected_future_measure": "invalid-reference verification failures",
+      "expected_mechanism": "make invalid identifiers deterministically impossible or rejectable",
+      "stage7a_direct_support": {
+        "failure_family": "invalid_reference",
+        "sample_count": 190
+      },
+      "stage7a_indicative_support": [
+        {
+          "failure_family": "wrong_target_column",
+          "sample_count": 8
+        }
+      ]
+    },
+    {
+      "component": "deterministic_typed_materialization",
+      "design_decision": "remove normalization decisions from LLM output",
+      "expected_future_measure": "normalization/materialization failures",
+      "expected_mechanism": "derive values from schema type and raw evidence with deterministic parsers",
+      "stage7a_direct_support": {
+        "failure_family": "normalization",
+        "sample_count": 133
+      },
+      "stage7a_indicative_support": [
+        {
+          "failure_family": "wrong_value_or_evidence",
+          "sample_count": 35
+        }
+      ]
+    },
+    {
+      "component": "semantic_completeness_verification",
+      "design_decision": "verify semantic slot coverage before SQLite compilation",
+      "expected_future_measure": "semantic completeness and executable state-mismatch subtypes",
+      "expected_mechanism": "reject under-selected and over-selected write mappings",
+      "stage7a_direct_support": {
+        "failure_family": "slot_or_update_completeness",
+        "sample_count": 6
+      },
+      "stage7a_indicative_support": [
+        {
+          "failure_family": "missing_assignment_or_under_write",
+          "sample_count": 41
+        },
+        {
+          "failure_family": "extra_assignment_or_over_write",
+          "sample_count": 16
+        }
+      ]
+    },
+    {
+      "component": "representation_schema_contract",
+      "design_decision": "validate operation-specific JSON Schema before semantic verification",
+      "expected_future_measure": "parse/schema nonconformance failures",
+      "expected_mechanism": "turn valid-JSON wrong-shape outputs into deterministic schema failures",
+      "stage7a_direct_support": {
+        "failure_family": "representation_schema_nonconformance",
+        "sample_count": 2
+      },
+      "stage7a_indicative_support": []
+    },
+    {
+      "component": "explicit_abstention_for_true_ambiguity",
+      "design_decision": "treat abstention as a safety mechanism unless ambiguity is independently audited",
+      "expected_future_measure": "independently audited ambiguity abstentions",
+      "expected_mechanism": "avoid using parse failures as causal evidence for true ambiguity",
+      "stage7a_direct_support": {
+        "failure_family": "unsupported_or_true_ambiguity",
+        "sample_count": 0
+      },
+      "stage7a_indicative_support": []
+    }
+  ],
+  "stage": "Stage7B_V2_METHOD_SPECIFICATION",
+  "status": "FROZEN_TRACEABILITY"
+}

@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "oneOf": [
+    {
+      "not": {
+        "required": [
+          "update_assignments"
+        ]
+      },
+      "properties": {
+        "update_policy": {
+          "const": "DO_NOTHING"
+        }
+      }
+    },
+    {
+      "properties": {
+        "update_policy": {
+          "const": "DO_UPDATE"
+        }
+      },
+      "required": [
+        "update_assignments"
+      ]
+    }
+  ],
+  "properties": {
+    "conflict_target_ref": {
+      "enum": [
+        "CONSTRAINT_1"
+      ],
+      "type": "string"
+    },
+    "insert_assignments": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "column_ref": {
+            "enum": [
+              "COL_1",
+              "COL_2",
+              "COL_3",
+              "COL_4",
+              "COL_5"
+            ],
+            "type": "string"
+          },
+          "evidence_ref": {
+            "enum": [
+              "EV_1",
+              "EV_2",
+              "EV_3"
+            ],
+            "type": "string"
+          },
+          "slot_ref": {
+            "enum": [
+              "SLOT_1",
+              "SLOT_2",
+              "SLOT_3"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "column_ref",
+          "evidence_ref",
+          "slot_ref"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "operation": {
+      "const": "UPSERT"
+    },
+    "table_ref": {
+      "enum": [
+        "TAB_1"
+      ],
+      "type": "string"
+    },
+    "update_assignments": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "column_ref": {
+            "enum": [
+              "COL_1",
+              "COL_2",
+              "COL_3",
+              "COL_4",
+              "COL_5"
+            ],
+            "type": "string"
+          },
+          "evidence_ref": {
+            "enum": [
+              "EV_1",
+              "EV_2",
+              "EV_3"
+            ],
+            "type": "string"
+          },
+          "slot_ref": {
+            "enum": [
+              "SLOT_1",
+              "SLOT_2",
+              "SLOT_3"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "column_ref",
+          "evidence_ref",
+          "slot_ref"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "update_policy": {
+      "enum": [
+        "DO_NOTHING",
+        "DO_UPDATE"
+      ]
+    }
+  },
+  "required": [
+    "operation",
+    "table_ref",
+    "conflict_target_ref",
+    "insert_assignments",
+    "update_policy"
+  ],
+  "type": "object",
+  "x-schema-instantiation": "dynamic_per_sample_enum_example",
+  "x-semantic-constraints": {
+    "cross_branch_column_reuse_allowed": true,
+    "insert_assignment_slot_ref_multiplicity": "exactly_once_for_required_slots_and_at_most_once_for_all_mapped_slots within insert_assignments",
+    "insert_assignment_target_column_uniqueness": "column_ref values must be unique within insert_assignments",
+    "update_assignment_slot_ref_multiplicity": "exactly_once_for_required_slots_and_at_most_once_for_all_mapped_slots within update_assignments when present",
+    "update_assignment_target_column_uniqueness": "column_ref values must be unique within update_assignments when present"
+  }
+}
