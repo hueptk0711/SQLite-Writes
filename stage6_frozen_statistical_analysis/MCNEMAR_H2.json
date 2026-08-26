@@ -1,0 +1,21 @@
+{
+  "alpha": 0.05,
+  "arm_a": "D+F+G1",
+  "arm_b": "D+G1",
+  "contingency": {
+    "n00_a_incorrect_b_incorrect": 481,
+    "n01_a_incorrect_b_correct": 0,
+    "n10_a_correct_b_incorrect": 0,
+    "n11_a_correct_b_correct": 0
+  },
+  "degenerate_no_discordant_pairs": true,
+  "discordant_pairs": 0,
+  "hypothesis": "H2",
+  "paired_n": 481,
+  "primary_metric": "target_state_correct",
+  "raw_p_value": 1.0,
+  "reject": false,
+  "stage": "Stage6K_FROZEN_STATISTICAL_ANALYSIS",
+  "test": "exact_two_sided_mcnemar",
+  "zero_discordant_convention": "p_value=1.0"
+}

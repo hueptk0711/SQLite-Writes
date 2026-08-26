@@ -1,0 +1,48 @@
+{
+  "artifact_hashes": {
+    "CLUSTER_BOOTSTRAP.json": "4dabb7a01d74333c4fe096562213dbde0a8fde6e4d01c7dac24f9021c1e56308",
+    "FROZEN_OUTCOME_MANIFEST.json": "b2af0d742875cb838596d2de480a1cee4668b7de373a60f97fd95d69d82c79ec",
+    "HOLM_CORRECTION.json": "f67aad49f6301c882acb8df9066cdd7d8e40f0ddd4e523c2e81e3d845bf41d19",
+    "MCNEMAR_H1.json": "110bf1d70c65bf70aa202ff0fdab3417208b1509028dca3dea13754217883859",
+    "MCNEMAR_H2.json": "baa0c01bb0f977469bddd8a33852aa1c7fad13de5cb236c7a872e7c87703aac3",
+    "PAIRED_OUTCOME_TABLE.jsonl": "995330dc00fa8852922b4cf0d1a03752491a89eb2f3327794b3d13443dee815d",
+    "REVIEWER_README.md": "8b43e4eed26a39b1d35f5c096138fa99b1480b175d44f4a96920f1ad6bed8d58",
+    "SECONDARY_RESULTS.json": "1e1a2dc1237bad9470fb0ea9acd469083bdd6982a04efaeee438266598f571a1",
+    "VALIDATION_REPORT.md": "9e685707ce709040d4f41fe167394462ffa490b718be6ae3efbc9c3526209414"
+  },
+  "bootstrap_replicates": 10000,
+  "bootstrap_seed": 240824,
+  "ci_level": 0.95,
+  "cluster_key": "source_group",
+  "confirmatory_hypotheses": [
+    "H1",
+    "H2"
+  ],
+  "date": "20260826",
+  "final_n": 481,
+  "gold_changed": false,
+  "gpu_called": false,
+  "input_hashes": {
+    "stage6e/STAGE6E_FINAL_REGISTRATION_LOCK.json": "c2fa9fdf3e4f249f6222b20fff49e6991d05ec4f0186ffea9415fc490748c0f1",
+    "stage6e/artifacts/FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl": "6a9fc9812d768001e3a8e8b87d2387a7b943c83237a4bca7603c304acf88bcc7",
+    "stage6j/REPLAY_ARM_MANIFEST.json": "7e8e38fe4ef6a08353f9e791d8b414730faf9d5a998c0143dd6e2b761a440b95",
+    "stage6j/REPLAY_EVALUATION_SUMMARY.json": "11cc65731fb2e5b38fea14c60ea1a1620ca772d63a3c474fd09dbec64cc6d612",
+    "stage6j/STAGE6J_REPLAY_EVALUATION_LOCK.json": "ac0b3f52eb4517566f8a84e74093ded4233a1ed89bd9cf2f6a73a638c8e4ee53",
+    "stage6j/replay_outcomes/d_f_g1_vnext.jsonl": "9eeb93747a381b50e6db5ca90988becca70f3888579e9fae6820de8ed3de1cae",
+    "stage6j/replay_outcomes/d_g1_control.jsonl": "f574734661c5a8c445921ec9ef4502ba1423f222f42e9ea39413432dc1a1d6dc",
+    "stage6j/replay_outcomes/direct.jsonl": "cfd5b76a8057d83c4140d737e3679dcae19f761f8de782a0c8442152a91728ea",
+    "stage6j/replay_outcomes/j_fs.jsonl": "35700c0cd59b8a4e3bd27fea854d69d6e3bac240a4edf3b27eb9528e94a7a7e3",
+    "stage6j/replay_outcomes/original_mp_fs_plus.jsonl": "f91b49bb326835c83cb59ea7808c5c5cd3025d149a68e83cc2b477831a78c752"
+  },
+  "model_called": false,
+  "new_hypothesis_added": false,
+  "primary_metric": "target_state_correct",
+  "raw_generation_rewritten": false,
+  "sample_exclusion_added": false,
+  "stage": "Stage6K_FROZEN_STATISTICAL_ANALYSIS",
+  "status": "PASS_FROZEN_STATISTICAL_ANALYSIS_LOCKED",
+  "upstream_dependency_hashes": {
+    "stage6e/STAGE6E_FINAL_REGISTRATION_LOCK.json": "c2fa9fdf3e4f249f6222b20fff49e6991d05ec4f0186ffea9415fc490748c0f1",
+    "stage6j/STAGE6J_REPLAY_EVALUATION_LOCK.json": "ac0b3f52eb4517566f8a84e74093ded4233a1ed89bd9cf2f6a73a638c8e4ee53"
+  }
+}

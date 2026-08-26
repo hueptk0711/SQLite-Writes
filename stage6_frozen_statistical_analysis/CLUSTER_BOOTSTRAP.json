@@ -1,0 +1,31 @@
+{
+  "bootstrap_replicates": 10000,
+  "bootstrap_seed": 240824,
+  "ci_level": 0.95,
+  "cluster_count": 121,
+  "cluster_key": "source_group",
+  "resampling_unit": "source_group",
+  "results": [
+    {
+      "ci_lower": 0.0,
+      "ci_lower_percentage_points": 0.0,
+      "ci_upper": 0.0,
+      "ci_upper_percentage_points": 0.0,
+      "estimand": "Accuracy(D+F+G1) - Accuracy(Original MP-FS+)",
+      "hypothesis": "H1",
+      "observed_difference": 0.0,
+      "observed_difference_percentage_points": 0.0
+    },
+    {
+      "ci_lower": 0.0,
+      "ci_lower_percentage_points": 0.0,
+      "ci_upper": 0.0,
+      "ci_upper_percentage_points": 0.0,
+      "estimand": "Accuracy(D+F+G1) - Accuracy(D+G1)",
+      "hypothesis": "H2",
+      "observed_difference": 0.0,
+      "observed_difference_percentage_points": 0.0
+    }
+  ],
+  "stage": "Stage6K_FROZEN_STATISTICAL_ANALYSIS"
+}

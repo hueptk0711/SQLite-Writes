@@ -1,0 +1,117 @@
+{
+  "arms": [
+    {
+      "accuracy": 0.12058212058212059,
+      "accuracy_percent": 12.058212058212058,
+      "arm": "Direct",
+      "correct": 58,
+      "failure_stage_counts": {
+        "execution": 76,
+        "none": 58,
+        "state_mismatch": 347
+      },
+      "n": 481,
+      "paired_table_field": "direct_correct",
+      "parse_status_counts": {
+        "success": 481
+      },
+      "verification_status_counts": {
+        "not_applicable": 481
+      }
+    },
+    {
+      "accuracy": 0.10395010395010396,
+      "accuracy_percent": 10.395010395010395,
+      "arm": "J-FS",
+      "correct": 50,
+      "failure_stage_counts": {
+        "none": 50,
+        "parse": 1,
+        "state_mismatch": 338,
+        "verification": 92
+      },
+      "n": 481,
+      "paired_table_field": "j_fs_correct",
+      "parse_status_counts": {
+        "parse_error": 1,
+        "success": 480
+      },
+      "verification_status_counts": {
+        "not_applicable": 1,
+        "success": 388,
+        "verification_error": 92
+      }
+    },
+    {
+      "accuracy": 0.0,
+      "accuracy_percent": 0.0,
+      "arm": "Original MP-FS+",
+      "correct": 0,
+      "failure_stage_counts": {
+        "parse": 2,
+        "state_mismatch": 43,
+        "verification": 436
+      },
+      "n": 481,
+      "paired_table_field": "original_mp_fs_plus_correct",
+      "parse_status_counts": {
+        "parse_error": 2,
+        "success": 479
+      },
+      "verification_status_counts": {
+        "not_applicable": 2,
+        "success": 43,
+        "verification_error": 436
+      }
+    },
+    {
+      "accuracy": 0.0,
+      "accuracy_percent": 0.0,
+      "arm": "D+G1",
+      "correct": 0,
+      "failure_stage_counts": {
+        "parse": 2,
+        "state_mismatch": 43,
+        "verification": 436
+      },
+      "n": 481,
+      "paired_table_field": "d_g1_correct",
+      "parse_status_counts": {
+        "parse_error": 2,
+        "success": 479
+      },
+      "verification_status_counts": {
+        "not_applicable": 2,
+        "success": 43,
+        "verification_error": 436
+      }
+    },
+    {
+      "accuracy": 0.0,
+      "accuracy_percent": 0.0,
+      "arm": "D+F+G1",
+      "correct": 0,
+      "failure_stage_counts": {
+        "parse": 2,
+        "state_mismatch": 43,
+        "verification": 436
+      },
+      "n": 481,
+      "paired_table_field": "d_f_g1_correct",
+      "parse_status_counts": {
+        "parse_error": 2,
+        "success": 479
+      },
+      "verification_status_counts": {
+        "not_applicable": 2,
+        "success": 43,
+        "verification_error": 436
+      }
+    }
+  ],
+  "n": 481,
+  "no_secondary_p_values": true,
+  "primary_metric": "target_state_correct",
+  "stage": "Stage6K_FROZEN_STATISTICAL_ANALYSIS",
+  "status": "DESCRIPTIVE_ONLY"
+}

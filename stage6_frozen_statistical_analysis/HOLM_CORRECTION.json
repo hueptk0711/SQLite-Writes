@@ -1,0 +1,26 @@
+{
+  "alpha": 0.05,
+  "confirmatory_family": [
+    "H1",
+    "H2"
+  ],
+  "family_size": 2,
+  "method": "Holm-Bonferroni",
+  "results": [
+    {
+      "comparison": "D+F+G1 vs Original MP-FS+",
+      "holm_adjusted_p_value": 1.0,
+      "hypothesis": "H1",
+      "raw_p_value": 1.0,
+      "reject": false
+    },
+    {
+      "comparison": "D+F+G1 vs D+G1",
+      "holm_adjusted_p_value": 1.0,
+      "hypothesis": "H2",
+      "raw_p_value": 1.0,
+      "reject": false
+    }
+  ],
+  "stage": "Stage6K_FROZEN_STATISTICAL_ANALYSIS"
+}
