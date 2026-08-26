@@ -1,0 +1,12 @@
+{
+  "core_v2_max_model_calls": 2,
+  "max_tokens": "to_be_frozen_before_stage7d_execution",
+  "model_revision_selection_rule": "freeze exact model revision before Stage7D execution; if unavailable, record replacement before any generation",
+  "phase_m_model_calls": 1,
+  "phase_o_model_calls": 1,
+  "retry_policy": "no hidden retry beyond registered protocol",
+  "semantic_slot_inventory_model_call_allowed": false,
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL",
+  "temperature": "to_be_frozen_before_stage7d_execution",
+  "v2_generation_run": false
+}

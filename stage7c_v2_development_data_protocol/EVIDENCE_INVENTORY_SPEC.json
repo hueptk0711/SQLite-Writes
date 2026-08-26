@@ -1,0 +1,7 @@
+{
+  "construction": "deterministic split on frozen punctuation delimiters",
+  "gold_sql_or_cond_values_used": false,
+  "model_call_used": false,
+  "source": "natural_language_question_only",
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
+}

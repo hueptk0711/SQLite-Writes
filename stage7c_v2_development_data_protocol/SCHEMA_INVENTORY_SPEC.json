@@ -1,0 +1,7 @@
+{
+  "column_refs": "COL_* assigned in table header order",
+  "gold_assignment_visible": false,
+  "sqlite_affinity_policy": "Stage7B five-affinity policy",
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL",
+  "table_refs": "TAB_* assigned deterministically per sample"
+}

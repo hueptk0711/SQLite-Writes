@@ -1,0 +1,9 @@
+{
+  "database_policy": "copy per sample; transaction/savepoint; rollback after evaluation",
+  "post_state_comparison": "canonical SQLite post-state comparison consistent with frozen V1 principles where applicable",
+  "primary_metric": "target_state_accuracy",
+  "sqlite_foreign_keys": "ON",
+  "sqlite_version": "3.50.4",
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL",
+  "timeout_policy": "to_be_frozen before execution, not tuned on 481"
+}

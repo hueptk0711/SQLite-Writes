@@ -1,0 +1,71 @@
+{
+  "excluded_splits": [
+    "test"
+  ],
+  "files": [
+    {
+      "path": "upstream_crudsql/data/train/crud_train_sql.json",
+      "record_count": 7040,
+      "sha256": "71b131834dbe45539f882d124feaac7adfa48a9d0dcaa9704dcb36e89d2917b8",
+      "size_bytes": 2217837,
+      "source_path": "data/train/crud_train_sql.json",
+      "source_sha256_matches_packaged": true
+    },
+    {
+      "path": "upstream_crudsql/data/train/crud_train_table.json",
+      "record_count": 440,
+      "sha256": "088fa945d1e825915aba03de862d499f35fbb1afa8aa5c2cec71679e2e62311b",
+      "size_bytes": 931184,
+      "source_path": "data/train/crud_train_table.json",
+      "source_sha256_matches_packaged": true
+    },
+    {
+      "integrity_check": "ok",
+      "path": "upstream_crudsql/data/train/train.db",
+      "sha256": "29a1d5f3e1eed9512a77e68a889676f2b64ff1a6d6bf4fcb7d3ad22e512fa219",
+      "size_bytes": 2379776,
+      "source_path": "data/train/train.db",
+      "source_sha256_matches_packaged": true,
+      "table_count": 440
+    },
+    {
+      "path": "upstream_crudsql/data/dev/crud_dev_sql.json",
+      "record_count": 960,
+      "sha256": "ffc5baa985a682a4005d5ee891bd33ee287c334b8aba830add298bfb91af47f6",
+      "size_bytes": 314650,
+      "source_path": "data/dev/crud_dev_sql.json",
+      "source_sha256_matches_packaged": true
+    },
+    {
+      "path": "upstream_crudsql/data/dev/crud_dev_table.json",
+      "record_count": 60,
+      "sha256": "2b60c781f8f30b3a6907cf6da0b48be6b26f7dd6cf31d0478167f1313d94a517",
+      "size_bytes": 156296,
+      "source_path": "data/dev/crud_dev_table.json",
+      "source_sha256_matches_packaged": true
+    },
+    {
+      "integrity_check": "ok",
+      "path": "upstream_crudsql/data/dev/dev.db",
+      "sha256": "0134a3a27371b6e914b5803dda2fa5481f4f350b56394bf99063c8bbb1cf1fa6",
+      "size_bytes": 335872,
+      "source_path": "data/dev/dev.db",
+      "source_sha256_matches_packaged": true,
+      "table_count": 60
+    }
+  ],
+  "gpu_called": false,
+  "included_splits": [
+    "train",
+    "dev"
+  ],
+  "model_called": false,
+  "source": {
+    "commit": "63bfce67d8391185453a812751e115a499201363",
+    "dataset": "CRUDSQL",
+    "local_source_clean": true,
+    "local_source_head": "63bfce67d8391185453a812751e115a499201363",
+    "repository": "https://github.com/bizard-lab/CRUDSQL.git"
+  },
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
+}

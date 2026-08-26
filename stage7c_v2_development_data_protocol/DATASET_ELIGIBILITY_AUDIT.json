@@ -1,0 +1,39 @@
+{
+  "all_exclusions_method_agnostic": true,
+  "eligible_create_counts": {
+    "dev": 240,
+    "train": 1760
+  },
+  "exclusions_from_create_pool": {
+    "dev": {},
+    "train": {}
+  },
+  "expected_official_create_counts": {
+    "dev": 240,
+    "train": 1760
+  },
+  "source_split_counts": {
+    "dev": {
+      "create_type0_count": 240,
+      "total_records": 960,
+      "type_counts": {
+        "0": 240,
+        "1": 240,
+        "2": 240,
+        "3": 240
+      }
+    },
+    "train": {
+      "create_type0_count": 1760,
+      "total_records": 7040,
+      "type_counts": {
+        "0": 1760,
+        "1": 1760,
+        "2": 1760,
+        "3": 1760
+      }
+    }
+  },
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL",
+  "status": "PASS"
+}

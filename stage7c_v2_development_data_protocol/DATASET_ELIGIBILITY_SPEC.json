@@ -1,0 +1,23 @@
+{
+  "eligibility_frozen_before_v2": true,
+  "forbidden_exclusion_reasons": [
+    "v2_prediction_wrong",
+    "low_confidence_after_generation",
+    "dev_accuracy_hurts",
+    "manual_metric_optimization"
+  ],
+  "method_agnostic_exclusion_reasons": [
+    "missing_source_file",
+    "db_integrity_failure",
+    "table_id_missing",
+    "malformed_record",
+    "no_question_text",
+    "no_deterministic_question_span"
+  ],
+  "scope": "CRUDSQL train/dev Create only",
+  "selected_operation": {
+    "crudsql_sql_type": 0,
+    "label": "Create"
+  },
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
+}

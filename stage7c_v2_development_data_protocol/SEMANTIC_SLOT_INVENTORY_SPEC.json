@@ -1,0 +1,8 @@
+{
+  "construction": "one required write_value SLOT_* per deterministic question span",
+  "hidden_third_llm_call_allowed": false,
+  "model_call_used": false,
+  "required_flag_policy": "all deterministic question spans required before later dev redesign; no gold SQL is used to decide requiredness",
+  "source": "evidence_inventory_from_question_only",
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
+}

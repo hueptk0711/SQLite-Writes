@@ -1,0 +1,28 @@
+{
+  "canonical_record_fields": [
+    "sample_id",
+    "split",
+    "question",
+    "table_id",
+    "model_side_input",
+    "label_side_bookkeeping"
+  ],
+  "gold_sql_visibility": "label_side_bookkeeping_only_never_model_side_input",
+  "no_v2_implementation": true,
+  "operation": "Create",
+  "phase_m_input_fields": [
+    "question",
+    "schema_inventory",
+    "evidence_inventory",
+    "semantic_slot_inventory",
+    "phase_o_predicted_operation",
+    "operation_specific_dynamic_schema"
+  ],
+  "phase_o_input_fields": [
+    "question",
+    "schema_inventory",
+    "evidence_inventory",
+    "semantic_slot_inventory"
+  ],
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
+}

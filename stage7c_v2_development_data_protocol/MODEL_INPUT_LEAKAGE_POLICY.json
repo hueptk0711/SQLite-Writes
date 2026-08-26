@@ -1,0 +1,17 @@
+{
+  "forbidden_model_side_fields": [
+    "operation_label",
+    "gold_sql",
+    "crudsql_sql",
+    "conds",
+    "sel",
+    "agg",
+    "target_state",
+    "post_state_hash",
+    "dev_metric"
+  ],
+  "gold_structured_annotation_use": "development_evaluation_only",
+  "phase_o_must_predict_operation": true,
+  "slot_inventory_gold_sql_use_allowed": false,
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
+}

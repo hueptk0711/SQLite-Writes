@@ -1,0 +1,13 @@
+{
+  "forbidden_selection_split": "current 481 CRUDSQL Create test",
+  "primary_metric": "Target-State Accuracy",
+  "primary_system": "V2-FULL",
+  "selection_split": "CRUDSQL dev Create",
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL",
+  "tie_breakers_ordered": [
+    "verification_failure_rate",
+    "execution_success_rate",
+    "schema_rejection_rate"
+  ],
+  "variant_selection_rule": "V2-FULL remains primary; ablations diagnose components. If FULL is not viable, open formal redesign rather than cherry-pick an ablation."
+}
