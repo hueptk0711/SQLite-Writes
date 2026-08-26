@@ -1,19 +1,28 @@
 {
   "all_verification_failures_accounted_for": true,
-  "error_code_counts": {
+  "multi_label": true,
+  "raw_error_occurrence_counts": {
+    "LOSSY_NORMALIZATION_REJECTED": 192,
+    "MISSING_UPDATE_COLUMN_IDS": 6,
+    "NEEDS_CLARIFICATION": 204,
+    "UNKNOWN_COLUMN_ID": 7,
+    "UNKNOWN_CONSTRAINT_ID": 155,
+    "UNKNOWN_EVIDENCE_ID": 40
+  },
+  "root_cause_family_prevalence": {
+    "invalid_reference": 190,
+    "normalization": 133,
+    "operation_semantics": 204,
+    "slot_or_update_completeness": 6
+  },
+  "sample_prevalence_note": "samples_with_error_code counts samples with at least one verifier error code; raw_error_occurrence_counts counts verifier error objects",
+  "samples_with_error_code": {
     "LOSSY_NORMALIZATION_REJECTED": 133,
     "MISSING_UPDATE_COLUMN_IDS": 6,
     "NEEDS_CLARIFICATION": 204,
     "UNKNOWN_COLUMN_ID": 4,
     "UNKNOWN_CONSTRAINT_ID": 155,
     "UNKNOWN_EVIDENCE_ID": 37
-  },
-  "multi_label": true,
-  "root_cause_family_prevalence": {
-    "invalid_reference": 190,
-    "normalization": 133,
-    "operation_semantics": 204,
-    "slot_or_update_completeness": 6
   },
   "stage": "Stage7A_FORMAL_FAILURE_ANALYSIS",
   "verification_failure_n": 436

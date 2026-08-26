@@ -143,8 +143,10 @@ def test_verification_family_prevalence_and_error_codes_are_recomputed_targets()
     assert summary["verification_failure_n"] == 436
     assert summary["all_verification_failures_accounted_for"] is True
     assert summary["root_cause_family_prevalence"] == EXPECTED_VERIFICATION_PREVALENCE
-    assert summary["error_code_counts"]["NEEDS_CLARIFICATION"] == 204
-    assert summary["error_code_counts"]["UNKNOWN_CONSTRAINT_ID"] == 155
+    assert "error_code_counts" not in summary
+    assert summary["samples_with_error_code"]["NEEDS_CLARIFICATION"] == 204
+    assert summary["samples_with_error_code"]["UNKNOWN_CONSTRAINT_ID"] == 155
+    assert summary["raw_error_occurrence_counts"]["LOSSY_NORMALIZATION_REJECTED"] == 192
 
 
 def test_verification_overlap_combinations_match_record_level_multilabel_counts() -> None:
@@ -173,9 +175,10 @@ def test_mpfs_arm_equivalence_is_semantic_and_complete() -> None:
 def test_parse_failures_are_traced_to_raw_generation() -> None:
     rows = _read_jsonl(ARTIFACT_DIR / "PARSE_FAILURE_ANALYSIS.jsonl")
     assert [row["stage6_sample_id"] for row in rows] == ["stage6_crudsql_0102", "stage6_crudsql_0193"]
-    assert all(row["parse_failure_type"] == "schema_mismatch_valid_json" for row in rows)
+    assert all(row["parse_failure_type"] == "schema_nonconformance_valid_json" for row in rows)
     assert all(row["valid_json_after_fence_strip"] is True for row in rows)
     assert all(row["hit_max_new_tokens"] is False for row in rows)
+    assert all(row["root_cause_status"] == "observed_not_causally_resolved" for row in rows)
 
 
 def test_state_mismatches_all_have_allowed_subtypes_or_explicit_unresolved() -> None:
@@ -192,14 +195,68 @@ def test_state_mismatches_all_have_allowed_subtypes_or_explicit_unresolved() -> 
     assert len(rows) == 43
     assert all(row["state_mismatch_subtypes"] for row in rows)
     assert all(set(row["state_mismatch_subtypes"]) <= allowed for row in rows)
+    assert all(row["direct_causal_root_labels"] == [] for row in rows)
+    assert all(row["root_cause_status"] == "observed_difference_not_direct_verifier_causal_label" for row in rows)
+
+
+def test_parse_schema_failures_are_not_true_ambiguity_root_causes() -> None:
+    records = _read_jsonl(ARTIFACT_DIR / "FAILURE_RECORDS.jsonl")
+    parse_records = [row for row in records if row["failure_stage"] == "parse"]
+    assert len(parse_records) == 2
+    assert all("unsupported_or_true_ambiguity" not in row["root_cause_labels"] for row in parse_records)
+    assert all(row["root_cause_labels"] == [] for row in parse_records)
+    assert all(row["parse_failure_type"] == "schema_nonconformance_valid_json" for row in parse_records)
+
+
+def test_state_mismatches_are_not_promoted_to_invalid_reference_root_causes() -> None:
+    records = _read_jsonl(ARTIFACT_DIR / "FAILURE_RECORDS.jsonl")
+    state_records = [row for row in records if row["failure_stage"] == "state_mismatch"]
+    assert len(state_records) == 43
+    assert all(row["root_cause_labels"] == [] for row in state_records)
+    assert all("invalid_reference" not in row["root_cause_labels"] for row in state_records)
+
+
+def test_state_subtype_counts_are_recomputed_from_records() -> None:
+    records = _read_jsonl(ARTIFACT_DIR / "FAILURE_RECORDS.jsonl")
+    subtype_counts: dict[str, int] = {}
+    family_counts: dict[str, int] = {}
+    for row in records:
+        if row["failure_stage"] != "state_mismatch":
+            continue
+        for subtype in row["state_mismatch_subtypes"]:
+            subtype_counts[subtype] = subtype_counts.get(subtype, 0) + 1
+        for family in row["state_mismatch_families"]:
+            family_counts[family] = family_counts.get(family, 0) + 1
+    assert subtype_counts == {
+        "extra_assignment_or_over_write": 16,
+        "missing_assignment_or_under_write": 41,
+        "wrong_row_or_cardinality": 7,
+        "wrong_target_column": 8,
+        "wrong_value_or_evidence": 35,
+    }
+    assert family_counts == {
+        "row_cardinality": 7,
+        "slot_completeness": 41,
+        "slot_grounding": 8,
+        "value_grounding_or_materialization": 35,
+    }
 
 
 def test_design_traceability_is_requirement_only_with_no_v2_code() -> None:
     traceability = _read_json(ARTIFACT_DIR / "DESIGN_REQUIREMENT_TRACEABILITY.json")
     labels = {row["root_cause_label"] for row in traceability["traceability"]}
     assert traceability["status"] == "DESIGN_REQUIREMENTS_ONLY"
+    assert traceability["support_model"] == "direct_support_vs_indicative_support"
     assert traceability["no_v2_implementation"] is True
     assert labels >= set(EXPECTED_VERIFICATION_PREVALENCE)
+
+
+def test_traceability_keeps_direct_and_indicative_support_separate() -> None:
+    rows = {row["design_requirement_id"]: row for row in _read_json(ARTIFACT_DIR / "DESIGN_REQUIREMENT_TRACEABILITY.json")["traceability"]}
+    assert rows["constrained_reference_selection"]["direct_support"]["sample_count"] == 190
+    assert rows["constrained_reference_selection"]["indicative_support"][0]["sample_count"] == 8
+    assert rows["explicit_abstention_for_true_ambiguity"]["direct_support"]["sample_count"] == 0
+    assert rows["representation_schema_contract"]["direct_support"]["sample_count"] == 2
 
 
 def test_input_manifest_hashes_include_stage6k_lock() -> None:

@@ -2,89 +2,200 @@
   "no_v2_implementation": true,
   "stage": "Stage7A_FORMAL_FAILURE_ANALYSIS",
   "status": "DESIGN_REQUIREMENTS_ONLY",
+  "support_model": "direct_support_vs_indicative_support",
   "traceability": [
     {
       "design_requirement": "operation-conditioned IR and conflict/update semantics gate",
-      "example_sample_ids": [
-        "stage6_crudsql_0001",
-        "stage6_crudsql_0002",
-        "stage6_crudsql_0004",
-        "stage6_crudsql_0005",
-        "stage6_crudsql_0008",
-        "stage6_crudsql_0010",
-        "stage6_crudsql_0012",
-        "stage6_crudsql_0013",
-        "stage6_crudsql_0015",
-        "stage6_crudsql_0016"
+      "design_requirement_id": "operation_conditioned_ir",
+      "direct_support": {
+        "example_sample_ids": [
+          "stage6_crudsql_0001",
+          "stage6_crudsql_0002",
+          "stage6_crudsql_0004",
+          "stage6_crudsql_0005",
+          "stage6_crudsql_0008",
+          "stage6_crudsql_0010",
+          "stage6_crudsql_0012",
+          "stage6_crudsql_0013",
+          "stage6_crudsql_0015",
+          "stage6_crudsql_0016"
+        ],
+        "sample_count": 204,
+        "source": "verification_errors:operation_semantics"
+      },
+      "indicative_support": [
+        {
+          "example_sample_ids": [
+            "stage6_crudsql_0178",
+            "stage6_crudsql_0183",
+            "stage6_crudsql_0257",
+            "stage6_crudsql_0288",
+            "stage6_crudsql_0382",
+            "stage6_crudsql_0391",
+            "stage6_crudsql_0439"
+          ],
+          "sample_count": 7,
+          "source": "state_mismatch_family:row_cardinality"
+        },
+        {
+          "example_sample_ids": [],
+          "sample_count": 0,
+          "source": "state_mismatch_family:operation_semantics"
+        }
       ],
-      "root_cause_label": "operation_semantics",
-      "supporting_sample_count": 211
+      "root_cause_label": "operation_semantics"
     },
     {
       "design_requirement": "constrained enumerated reference selection",
-      "example_sample_ids": [
-        "stage6_crudsql_0000",
-        "stage6_crudsql_0002",
-        "stage6_crudsql_0003",
-        "stage6_crudsql_0006",
-        "stage6_crudsql_0007",
-        "stage6_crudsql_0009",
-        "stage6_crudsql_0014",
-        "stage6_crudsql_0015",
-        "stage6_crudsql_0018",
-        "stage6_crudsql_0021"
+      "design_requirement_id": "constrained_reference_selection",
+      "direct_support": {
+        "example_sample_ids": [
+          "stage6_crudsql_0002",
+          "stage6_crudsql_0003",
+          "stage6_crudsql_0006",
+          "stage6_crudsql_0007",
+          "stage6_crudsql_0009",
+          "stage6_crudsql_0014",
+          "stage6_crudsql_0015",
+          "stage6_crudsql_0018",
+          "stage6_crudsql_0024",
+          "stage6_crudsql_0026"
+        ],
+        "sample_count": 190,
+        "source": "verification_errors:invalid_reference"
+      },
+      "indicative_support": [
+        {
+          "example_sample_ids": [
+            "stage6_crudsql_0000",
+            "stage6_crudsql_0123",
+            "stage6_crudsql_0257",
+            "stage6_crudsql_0288",
+            "stage6_crudsql_0296",
+            "stage6_crudsql_0487",
+            "stage6_crudsql_0492",
+            "stage6_crudsql_0498"
+          ],
+          "sample_count": 8,
+          "source": "state_mismatch_subtype:wrong_target_column"
+        }
       ],
-      "root_cause_label": "invalid_reference",
-      "supporting_sample_count": 233
+      "root_cause_label": "invalid_reference"
     },
     {
       "design_requirement": "deterministic typed materialization",
-      "example_sample_ids": [
-        "stage6_crudsql_0007",
-        "stage6_crudsql_0011",
-        "stage6_crudsql_0018",
-        "stage6_crudsql_0042",
-        "stage6_crudsql_0043",
-        "stage6_crudsql_0048",
-        "stage6_crudsql_0049",
-        "stage6_crudsql_0050",
-        "stage6_crudsql_0055",
-        "stage6_crudsql_0059"
+      "design_requirement_id": "typed_materialization",
+      "direct_support": {
+        "example_sample_ids": [
+          "stage6_crudsql_0007",
+          "stage6_crudsql_0011",
+          "stage6_crudsql_0018",
+          "stage6_crudsql_0042",
+          "stage6_crudsql_0043",
+          "stage6_crudsql_0048",
+          "stage6_crudsql_0049",
+          "stage6_crudsql_0050",
+          "stage6_crudsql_0055",
+          "stage6_crudsql_0059"
+        ],
+        "sample_count": 133,
+        "source": "verification_errors:normalization"
+      },
+      "indicative_support": [
+        {
+          "example_sample_ids": [
+            "stage6_crudsql_0021",
+            "stage6_crudsql_0040",
+            "stage6_crudsql_0054",
+            "stage6_crudsql_0122",
+            "stage6_crudsql_0178",
+            "stage6_crudsql_0183",
+            "stage6_crudsql_0209",
+            "stage6_crudsql_0211",
+            "stage6_crudsql_0237",
+            "stage6_crudsql_0252"
+          ],
+          "sample_count": 35,
+          "source": "state_mismatch_subtype:wrong_value_or_evidence"
+        }
       ],
-      "root_cause_label": "normalization",
-      "supporting_sample_count": 133
+      "root_cause_label": "normalization"
     },
     {
       "design_requirement": "semantic completeness verification for write slots/update columns",
-      "example_sample_ids": [
-        "stage6_crudsql_0000",
-        "stage6_crudsql_0018",
-        "stage6_crudsql_0021",
-        "stage6_crudsql_0040",
-        "stage6_crudsql_0054",
-        "stage6_crudsql_0122",
-        "stage6_crudsql_0123",
-        "stage6_crudsql_0178",
-        "stage6_crudsql_0183",
-        "stage6_crudsql_0209"
+      "design_requirement_id": "semantic_completeness_verification",
+      "direct_support": {
+        "example_sample_ids": [
+          "stage6_crudsql_0018",
+          "stage6_crudsql_0300",
+          "stage6_crudsql_0306",
+          "stage6_crudsql_0477",
+          "stage6_crudsql_0485",
+          "stage6_crudsql_0494"
+        ],
+        "sample_count": 6,
+        "source": "verification_errors:slot_or_update_completeness"
+      },
+      "indicative_support": [
+        {
+          "example_sample_ids": [
+            "stage6_crudsql_0000",
+            "stage6_crudsql_0021",
+            "stage6_crudsql_0040",
+            "stage6_crudsql_0054",
+            "stage6_crudsql_0122",
+            "stage6_crudsql_0123",
+            "stage6_crudsql_0178",
+            "stage6_crudsql_0183",
+            "stage6_crudsql_0209",
+            "stage6_crudsql_0211"
+          ],
+          "sample_count": 41,
+          "source": "state_mismatch_subtype:missing_assignment_or_under_write"
+        },
+        {
+          "example_sample_ids": [
+            "stage6_crudsql_0000",
+            "stage6_crudsql_0040",
+            "stage6_crudsql_0122",
+            "stage6_crudsql_0123",
+            "stage6_crudsql_0256",
+            "stage6_crudsql_0257",
+            "stage6_crudsql_0288",
+            "stage6_crudsql_0290",
+            "stage6_crudsql_0296",
+            "stage6_crudsql_0327"
+          ],
+          "sample_count": 16,
+          "source": "state_mismatch_subtype:extra_assignment_or_over_write"
+        }
       ],
-      "root_cause_label": "slot_or_update_completeness",
-      "supporting_sample_count": 47
+      "root_cause_label": "slot_or_update_completeness"
     },
     {
-      "design_requirement": "explicit abstention path for unresolved source ambiguity",
-      "example_sample_ids": [
-        "stage6_crudsql_0102",
-        "stage6_crudsql_0193"
-      ],
-      "root_cause_label": "unsupported_or_true_ambiguity",
-      "supporting_sample_count": 2
+      "design_requirement": "schema-constrained representation contract between generation and parser",
+      "design_requirement_id": "representation_schema_contract",
+      "direct_support": {
+        "example_sample_ids": [
+          "stage6_crudsql_0102",
+          "stage6_crudsql_0193"
+        ],
+        "sample_count": 2,
+        "source": "parse_failure_type:schema_nonconformance_valid_json"
+      },
+      "indicative_support": [],
+      "root_cause_label": "representation_schema_nonconformance"
     },
     {
-      "design_requirement": "manual audit queue before V2 method changes",
-      "example_sample_ids": [],
-      "root_cause_label": "other",
-      "supporting_sample_count": 0
+      "design_requirement": "explicit abstention path only for independently demonstrated source ambiguity",
+      "design_requirement_id": "explicit_abstention_for_true_ambiguity",
+      "direct_support": {
+        "example_sample_ids": [],
+        "sample_count": 0,
+        "source": "independent_true_ambiguity_audit"
+      },
+      "indicative_support": [],
+      "root_cause_label": "unsupported_or_true_ambiguity"
     }
   ]
 }

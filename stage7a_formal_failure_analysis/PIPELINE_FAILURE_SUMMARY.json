@@ -1,13 +1,34 @@
 {
   "final_n": 481,
   "n": 481,
+  "parse_failure_type_prevalence": {
+    "schema_nonconformance_valid_json": 2
+  },
   "pipeline_failure_counts": {
     "parse": 2,
     "state_mismatch": 43,
     "verification": 436
   },
   "representative_arm": "d_f_g1_vnext",
+  "root_cause_status_counts": {
+    "direct_verifier_causal_evidence": 436,
+    "observed_difference_not_direct_verifier_causal_label": 43,
+    "observed_not_causally_resolved": 2
+  },
   "stage": "Stage7A_FORMAL_FAILURE_ANALYSIS",
+  "state_mismatch_indicative_family_prevalence": {
+    "row_cardinality": 7,
+    "slot_completeness": 41,
+    "slot_grounding": 8,
+    "value_grounding_or_materialization": 35
+  },
+  "state_mismatch_subtype_prevalence": {
+    "extra_assignment_or_over_write": 16,
+    "missing_assignment_or_under_write": 41,
+    "wrong_row_or_cardinality": 7,
+    "wrong_target_column": 8,
+    "wrong_value_or_evidence": 35
+  },
   "target_state_correct": 0,
   "target_state_incorrect": 481
 }

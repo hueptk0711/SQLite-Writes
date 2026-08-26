@@ -1,16 +1,47 @@
 {
+  "causal_policy": {
+    "parse": "valid JSON schema nonconformance is observed but not evidence of true task ambiguity",
+    "state_mismatch": "executable output differences are observed subtypes and indicative families, not verifier invalid-reference roots",
+    "verification": "direct verifier error codes are treated as causal evidence"
+  },
   "classification_scope": "formal deterministic analysis of frozen Stage6J representative MP-FS arm",
+  "evidence_layers": [
+    "pipeline_stage",
+    "directly_observed_failure",
+    "architectural_implication"
+  ],
   "frozen_before_classification": true,
   "gpu_called": false,
   "model_called": false,
   "multi_label": true,
+  "parse_observed_failure_labels": [
+    "representation_schema_nonconformance"
+  ],
   "pipeline_stage_taxonomy": [
     "parse",
     "verification",
     "execution",
     "state_mismatch"
   ],
-  "root_cause_labels": [
+  "stage": "Stage7A_FORMAL_FAILURE_ANALYSIS",
+  "state_mismatch_indicative_families": [
+    "slot_completeness",
+    "slot_grounding",
+    "value_grounding_or_materialization",
+    "row_cardinality",
+    "operation_semantics",
+    "unresolved"
+  ],
+  "state_mismatch_subtype_to_indicative_family": {
+    "extra_assignment_or_over_write": "slot_completeness",
+    "missing_assignment_or_under_write": "slot_completeness",
+    "unresolved_other": "unresolved",
+    "wrong_operation_or_conflict_semantics": "operation_semantics",
+    "wrong_row_or_cardinality": "row_cardinality",
+    "wrong_target_column": "slot_grounding",
+    "wrong_value_or_evidence": "value_grounding_or_materialization"
+  },
+  "verification_direct_root_cause_labels": [
     "operation_semantics",
     "invalid_reference",
     "normalization",
@@ -18,16 +49,6 @@
     "unsupported_or_true_ambiguity",
     "other"
   ],
-  "stage": "Stage7A_FORMAL_FAILURE_ANALYSIS",
-  "state_mismatch_subtype_mapping": {
-    "extra_assignment_or_over_write": "invalid_reference",
-    "missing_assignment_or_under_write": "slot_or_update_completeness",
-    "unresolved_other": "other",
-    "wrong_operation_or_conflict_semantics": "operation_semantics",
-    "wrong_row_or_cardinality": "operation_semantics",
-    "wrong_target_column": "invalid_reference",
-    "wrong_value_or_evidence": "invalid_reference"
-  },
   "verification_error_code_mapping": {
     "LOSSY_NORMALIZATION_REJECTED": "normalization",
     "MISSING_UPDATE_COLUMN_IDS": "slot_or_update_completeness",

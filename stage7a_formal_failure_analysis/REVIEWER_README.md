@@ -2,6 +2,8 @@
 
 This package analyzes frozen V1 failures only. It does not implement V2.
 
+PATCH1 separates direct verifier causal evidence from observed parse/state mismatch evidence.
+
 Commands:
 ```bash
 python scripts/data/build_stage7a_formal_failure_analysis.py --force

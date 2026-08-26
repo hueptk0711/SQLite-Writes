@@ -57,7 +57,7 @@ ERROR_CODE_TO_ROOT = {
     "LOSSY_NORMALIZATION_REJECTED": "normalization",
     "MISSING_UPDATE_COLUMN_IDS": "slot_or_update_completeness",
 }
-ROOT_LABELS = [
+VERIFICATION_ROOT_LABELS = [
     "operation_semantics",
     "invalid_reference",
     "normalization",
@@ -65,15 +65,27 @@ ROOT_LABELS = [
     "unsupported_or_true_ambiguity",
     "other",
 ]
-STATE_SUBTYPE_TO_ROOT = {
-    "missing_assignment_or_under_write": "slot_or_update_completeness",
-    "wrong_value_or_evidence": "invalid_reference",
-    "wrong_target_column": "invalid_reference",
-    "extra_assignment_or_over_write": "invalid_reference",
-    "wrong_row_or_cardinality": "operation_semantics",
+
+PARSE_OBSERVED_LABELS = ["representation_schema_nonconformance"]
+
+STATE_SUBTYPE_TO_INDICATIVE_FAMILY = {
+    "missing_assignment_or_under_write": "slot_completeness",
+    "wrong_value_or_evidence": "value_grounding_or_materialization",
+    "wrong_target_column": "slot_grounding",
+    "extra_assignment_or_over_write": "slot_completeness",
+    "wrong_row_or_cardinality": "row_cardinality",
     "wrong_operation_or_conflict_semantics": "operation_semantics",
-    "unresolved_other": "other",
+    "unresolved_other": "unresolved",
 }
+
+STATE_INDICATIVE_FAMILIES = [
+    "slot_completeness",
+    "slot_grounding",
+    "value_grounding_or_materialization",
+    "row_cardinality",
+    "operation_semantics",
+    "unresolved",
+]
 
 
 def canonical_json(value: Any) -> str:
@@ -172,7 +184,7 @@ def classify_state(row: dict[str, Any], gold: dict[str, Any]) -> tuple[list[str]
     gold_columns = list(gold.get("columns") or [])
     gold_values = list(gold.get("values") or [])
     if not assignments:
-        return ["unresolved_other"], ["other"], True
+        return ["unresolved_other"], ["unresolved"], True
     subtypes: set[str] = set()
     if len(assignments) != 1 or assignments[0].get("row_count") != 1:
         subtypes.add("wrong_row_or_cardinality")
@@ -193,8 +205,8 @@ def classify_state(row: dict[str, Any], gold: dict[str, Any]) -> tuple[list[str]
     if not shared and columns and gold_columns:
         subtypes.add("wrong_target_column")
     final_subtypes = sorted(subtypes) or ["unresolved_other"]
-    labels = sorted({STATE_SUBTYPE_TO_ROOT.get(subtype, "other") for subtype in final_subtypes})
-    return final_subtypes, labels, "unresolved_other" in final_subtypes
+    families = sorted({STATE_SUBTYPE_TO_INDICATIVE_FAMILY.get(subtype, "unresolved") for subtype in final_subtypes})
+    return final_subtypes, families, "unresolved_other" in final_subtypes
 
 
 def root_labels(errors: list[dict[str, Any]]) -> list[str]:
@@ -202,9 +214,15 @@ def root_labels(errors: list[dict[str, Any]]) -> list[str]:
     return labels or ["other"]
 
 
+def parse_failure_type_from_raw(raw: dict[str, Any]) -> str:
+    valid_json, _json_error = parse_json_from_fenced(str(raw.get("raw_output") or ""))
+    return "schema_nonconformance_valid_json" if valid_json else "malformed_json"
+
+
 def rebuild_records(root: Path, violations: list[str]) -> list[dict[str, Any]]:
     samples = load_by_id(root, "stage6_final_registration_revision/artifacts/FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl", violations)
     outcomes = load_by_id(root, "stage6_replay_evaluation/replay_outcomes/d_f_g1_vnext.jsonl", violations)
+    raw_rows = load_by_id(root, "stage6_replay_evaluation/stage6i_generation_inputs/stage6_confirmation_run_outputs/raw_generations/shared_mp_fs_plus_generation.jsonl", violations)
     gold_programs = load_by_id(root, "stage6_final_registration_revision/artifacts/FINAL_GOLD_PROGRAMS.jsonl", violations)
     gold_plans = load_by_id(root, "stage6_final_registration_revision/artifacts/FINAL_GOLD_WRITE_PLANS.jsonl", violations)
     if len(samples) != FINAL_N:
@@ -222,19 +240,39 @@ def rebuild_records(root: Path, violations: list[str]) -> list[dict[str, Any]]:
         if failure_stage == "verification":
             labels = root_labels(errors)
             subtypes: list[str] = []
+            state_families: list[str] = []
+            observed_labels = labels
+            implication_labels = labels
+            parse_failure_type = None
+            root_cause_status = "direct_verifier_causal_evidence"
             mode = "deterministic_verifier_error_code"
             unresolved = False
         elif failure_stage == "parse":
-            labels = ["unsupported_or_true_ambiguity"]
+            labels = []
             subtypes = []
+            state_families = []
+            observed_labels = PARSE_OBSERVED_LABELS
+            implication_labels = PARSE_OBSERVED_LABELS
+            parse_failure_type = parse_failure_type_from_raw(raw_rows[sample_id])
+            root_cause_status = "observed_not_causally_resolved"
             mode = "deterministic_raw_parse_analysis"
-            unresolved = False
+            unresolved = True
         elif failure_stage == "state_mismatch":
-            subtypes, labels, unresolved = classify_state(row, gold_plans[sample_id])
+            subtypes, state_families, unresolved = classify_state(row, gold_plans[sample_id])
+            labels = []
+            observed_labels = subtypes
+            implication_labels = state_families
+            parse_failure_type = None
+            root_cause_status = "observed_difference_not_direct_verifier_causal_label"
             mode = "deterministic_candidate_vs_gold_write_plan"
         else:
             labels = ["other"]
             subtypes = []
+            state_families = []
+            observed_labels = ["other"]
+            implication_labels = ["other"]
+            parse_failure_type = None
+            root_cause_status = "unresolved"
             mode = "deterministic_pipeline_stage_fallback"
             unresolved = True
         records.append(
@@ -245,9 +283,15 @@ def rebuild_records(root: Path, violations: list[str]) -> list[dict[str, Any]]:
                 "target_state_correct": bool(row.get("target_state_correct")),
                 "failure_stage": failure_stage,
                 "error_codes": sorted({str(err.get("error_code")) for err in errors if err.get("error_code")}),
+                "raw_error_occurrence_codes": [str(err.get("error_code")) for err in errors if err.get("error_code")],
                 "root_cause_labels": labels,
+                "root_cause_status": root_cause_status,
+                "observed_failure_labels": observed_labels,
+                "architectural_implication_labels": implication_labels,
+                "parse_failure_type": parse_failure_type,
                 "evidence_paths": sorted({str(err.get("path")) for err in errors if err.get("path")}),
                 "state_mismatch_subtypes": subtypes,
+                "state_mismatch_families": state_families,
                 "classification_mode": mode,
                 "unresolved": unresolved,
                 "candidate_program_sha256": row.get("candidate_program_sha256"),
@@ -263,23 +307,54 @@ def rebuild_records(root: Path, violations: list[str]) -> list[dict[str, Any]]:
 
 def pipeline_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
     counts = Counter(row["failure_stage"] for row in records)
-    return {"stage": STAGE, "representative_arm": REPRESENTATIVE_ARM, "n": len(records), "final_n": len(records), "pipeline_failure_counts": dict(sorted(counts.items())), "target_state_correct": sum(1 for row in records if row["target_state_correct"]), "target_state_incorrect": sum(1 for row in records if not row["target_state_correct"])}
+    parse_types = Counter(row["parse_failure_type"] for row in records if row["failure_stage"] == "parse")
+    state_subtypes: Counter[str] = Counter()
+    state_families: Counter[str] = Counter()
+    root_status = Counter(row["root_cause_status"] for row in records)
+    for row in records:
+        if row["failure_stage"] == "state_mismatch":
+            state_subtypes.update(row["state_mismatch_subtypes"])
+            state_families.update(row["state_mismatch_families"])
+    return {
+        "stage": STAGE,
+        "representative_arm": REPRESENTATIVE_ARM,
+        "n": len(records),
+        "final_n": len(records),
+        "pipeline_failure_counts": dict(sorted(counts.items())),
+        "parse_failure_type_prevalence": dict(sorted(parse_types.items())),
+        "state_mismatch_subtype_prevalence": dict(sorted(state_subtypes.items())),
+        "state_mismatch_indicative_family_prevalence": dict(sorted(state_families.items())),
+        "root_cause_status_counts": dict(sorted(root_status.items())),
+        "target_state_correct": sum(1 for row in records if row["target_state_correct"]),
+        "target_state_incorrect": sum(1 for row in records if not row["target_state_correct"]),
+    }
 
 
 def verification_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
     verification = [row for row in records if row["failure_stage"] == "verification"]
     family_counts: Counter[str] = Counter()
-    code_counts: Counter[str] = Counter()
+    samples_with_code: Counter[str] = Counter()
+    raw_occurrences: Counter[str] = Counter()
     for row in verification:
         family_counts.update(row["root_cause_labels"])
-        code_counts.update(row["error_codes"])
-    return {"stage": STAGE, "verification_failure_n": len(verification), "all_verification_failures_accounted_for": len(verification) == 436, "root_cause_family_prevalence": dict(sorted(family_counts.items())), "error_code_counts": dict(sorted(code_counts.items())), "multi_label": True}
+        samples_with_code.update(row["error_codes"])
+        raw_occurrences.update(row["raw_error_occurrence_codes"])
+    return {
+        "stage": STAGE,
+        "verification_failure_n": len(verification),
+        "all_verification_failures_accounted_for": len(verification) == 436,
+        "root_cause_family_prevalence": dict(sorted(family_counts.items())),
+        "samples_with_error_code": dict(sorted(samples_with_code.items())),
+        "raw_error_occurrence_counts": dict(sorted(raw_occurrences.items())),
+        "sample_prevalence_note": "samples_with_error_code counts samples with at least one verifier error code; raw_error_occurrence_counts counts verifier error objects",
+        "multi_label": True,
+    }
 
 
 def overlap_matrix(records: list[dict[str, Any]]) -> dict[str, Any]:
     verification = [row for row in records if row["failure_stage"] == "verification"]
-    matrix = {left: {right: sum(1 for row in verification if left in row["root_cause_labels"] and right in row["root_cause_labels"]) for right in ROOT_LABELS} for left in ROOT_LABELS}
-    return {"stage": STAGE, "scope": "verification_failures", "labels": ROOT_LABELS, "matrix": matrix}
+    matrix = {left: {right: sum(1 for row in verification if left in row["root_cause_labels"] and right in row["root_cause_labels"]) for right in VERIFICATION_ROOT_LABELS} for left in VERIFICATION_ROOT_LABELS}
+    return {"stage": STAGE, "scope": "verification_failures", "labels": VERIFICATION_ROOT_LABELS, "matrix": matrix}
 
 
 def combination_counts(records: list[dict[str, Any]]) -> dict[str, Any]:
@@ -307,7 +382,7 @@ def parse_analysis(root: Path, records: list[dict[str, Any]], violations: list[s
             continue
         raw_row = raw[record["stage6_sample_id"]]
         valid_json, json_error = parse_json_from_fenced(str(raw_row.get("raw_output") or ""))
-        rows.append({"stage6_sample_id": record["stage6_sample_id"], "raw_generation_stream": "shared_mp_fs_plus_generation", "raw_generation_row_sha256": raw_row.get("raw_generation_row_sha256"), "raw_output_sha256": raw_row.get("raw_output_sha256"), "hit_max_new_tokens": bool(raw_row.get("hit_max_new_tokens")), "output_token_count": raw_row.get("output_token_count"), "valid_json_after_fence_strip": valid_json, "json_parse_error": json_error, "parse_failure_type": "schema_mismatch_valid_json" if valid_json else "malformed_json", "classification_mode": "deterministic_raw_json_schema_check"})
+        rows.append({"stage6_sample_id": record["stage6_sample_id"], "raw_generation_stream": "shared_mp_fs_plus_generation", "raw_generation_row_sha256": raw_row.get("raw_generation_row_sha256"), "raw_output_sha256": raw_row.get("raw_output_sha256"), "hit_max_new_tokens": bool(raw_row.get("hit_max_new_tokens")), "output_token_count": raw_row.get("output_token_count"), "valid_json_after_fence_strip": valid_json, "json_parse_error": json_error, "parse_failure_type": "schema_nonconformance_valid_json" if valid_json else "malformed_json", "root_cause_status": "observed_not_causally_resolved", "observed_failure_labels": PARSE_OBSERVED_LABELS, "classification_mode": "deterministic_raw_json_schema_check"})
     return rows
 
 
@@ -321,29 +396,50 @@ def state_analysis(root: Path, records: list[dict[str, Any]], violations: list[s
         sample_id = record["stage6_sample_id"]
         row = outcomes[sample_id]
         gold = gold_plans[sample_id]
-        subtypes, labels, unresolved = classify_state(row, gold)
-        rows.append({"stage6_sample_id": sample_id, "candidate_program_sha256": row.get("candidate_program_sha256"), "gold_write_plan_sha256": hashlib.sha256(canonical_json(gold).encode("utf-8")).hexdigest(), "candidate_assignments": extract_assignments(row), "gold_columns": gold.get("columns") or [], "gold_values": gold.get("values") or [], "state_mismatch_subtypes": subtypes, "root_cause_labels": labels, "unresolved": unresolved, "classification_mode": "deterministic_candidate_vs_gold_write_plan"})
+        subtypes, families, unresolved = classify_state(row, gold)
+        rows.append({"stage6_sample_id": sample_id, "candidate_program_sha256": row.get("candidate_program_sha256"), "gold_write_plan_sha256": hashlib.sha256(canonical_json(gold).encode("utf-8")).hexdigest(), "candidate_assignments": extract_assignments(row), "gold_columns": gold.get("columns") or [], "gold_values": gold.get("values") or [], "state_mismatch_subtypes": subtypes, "state_mismatch_families": families, "direct_causal_root_labels": [], "root_cause_status": "observed_difference_not_direct_verifier_causal_label", "unresolved": unresolved, "classification_mode": "deterministic_candidate_vs_gold_write_plan"})
     return rows
 
 
 def traceability(records: list[dict[str, Any]]) -> dict[str, Any]:
-    requirements = {
-        "operation_semantics": "operation-conditioned IR and conflict/update semantics gate",
-        "invalid_reference": "constrained enumerated reference selection",
-        "normalization": "deterministic typed materialization",
-        "slot_or_update_completeness": "semantic completeness verification for write slots/update columns",
-        "unsupported_or_true_ambiguity": "explicit abstention path for unresolved source ambiguity",
-        "other": "manual audit queue before V2 method changes",
-    }
-    rows = []
-    for label, requirement in requirements.items():
-        ids = [row["stage6_sample_id"] for row in records if label in row["root_cause_labels"]]
-        rows.append({"root_cause_label": label, "design_requirement": requirement, "supporting_sample_count": len(ids), "example_sample_ids": ids[:10]})
-    return {"stage": STAGE, "status": "DESIGN_REQUIREMENTS_ONLY", "no_v2_implementation": True, "traceability": rows}
+    def ids_for(predicate) -> list[str]:
+        return [row["stage6_sample_id"] for row in records if predicate(row)]
+
+    def support(source: str, ids: list[str]) -> dict[str, Any]:
+        return {"source": source, "sample_count": len(ids), "example_sample_ids": ids[:10]}
+
+    rows = [
+        {"design_requirement_id": "operation_conditioned_ir", "root_cause_label": "operation_semantics", "design_requirement": "operation-conditioned IR and conflict/update semantics gate", "direct_support": support("verification_errors:operation_semantics", ids_for(lambda row: row["failure_stage"] == "verification" and "operation_semantics" in row["root_cause_labels"])), "indicative_support": [support("state_mismatch_family:row_cardinality", ids_for(lambda row: row["failure_stage"] == "state_mismatch" and "row_cardinality" in row["state_mismatch_families"])), support("state_mismatch_family:operation_semantics", ids_for(lambda row: row["failure_stage"] == "state_mismatch" and "operation_semantics" in row["state_mismatch_families"]))]},
+        {"design_requirement_id": "constrained_reference_selection", "root_cause_label": "invalid_reference", "design_requirement": "constrained enumerated reference selection", "direct_support": support("verification_errors:invalid_reference", ids_for(lambda row: row["failure_stage"] == "verification" and "invalid_reference" in row["root_cause_labels"])), "indicative_support": [support("state_mismatch_subtype:wrong_target_column", ids_for(lambda row: row["failure_stage"] == "state_mismatch" and "wrong_target_column" in row["state_mismatch_subtypes"]))]},
+        {"design_requirement_id": "typed_materialization", "root_cause_label": "normalization", "design_requirement": "deterministic typed materialization", "direct_support": support("verification_errors:normalization", ids_for(lambda row: row["failure_stage"] == "verification" and "normalization" in row["root_cause_labels"])), "indicative_support": [support("state_mismatch_subtype:wrong_value_or_evidence", ids_for(lambda row: row["failure_stage"] == "state_mismatch" and "wrong_value_or_evidence" in row["state_mismatch_subtypes"]))]},
+        {"design_requirement_id": "semantic_completeness_verification", "root_cause_label": "slot_or_update_completeness", "design_requirement": "semantic completeness verification for write slots/update columns", "direct_support": support("verification_errors:slot_or_update_completeness", ids_for(lambda row: row["failure_stage"] == "verification" and "slot_or_update_completeness" in row["root_cause_labels"])), "indicative_support": [support("state_mismatch_subtype:missing_assignment_or_under_write", ids_for(lambda row: row["failure_stage"] == "state_mismatch" and "missing_assignment_or_under_write" in row["state_mismatch_subtypes"])), support("state_mismatch_subtype:extra_assignment_or_over_write", ids_for(lambda row: row["failure_stage"] == "state_mismatch" and "extra_assignment_or_over_write" in row["state_mismatch_subtypes"]))]},
+        {"design_requirement_id": "representation_schema_contract", "root_cause_label": "representation_schema_nonconformance", "design_requirement": "schema-constrained representation contract between generation and parser", "direct_support": support("parse_failure_type:schema_nonconformance_valid_json", ids_for(lambda row: row["failure_stage"] == "parse" and row["parse_failure_type"] == "schema_nonconformance_valid_json")), "indicative_support": []},
+        {"design_requirement_id": "explicit_abstention_for_true_ambiguity", "root_cause_label": "unsupported_or_true_ambiguity", "design_requirement": "explicit abstention path only for independently demonstrated source ambiguity", "direct_support": support("independent_true_ambiguity_audit", ids_for(lambda row: "unsupported_or_true_ambiguity" in row["root_cause_labels"])), "indicative_support": []},
+    ]
+    return {"stage": STAGE, "status": "DESIGN_REQUIREMENTS_ONLY", "support_model": "direct_support_vs_indicative_support", "no_v2_implementation": True, "traceability": rows}
 
 
 def taxonomy_spec() -> dict[str, Any]:
-    return {"stage": STAGE, "classification_scope": "formal deterministic analysis of frozen Stage6J representative MP-FS arm", "pipeline_stage_taxonomy": ["parse", "verification", "execution", "state_mismatch"], "root_cause_labels": ROOT_LABELS, "verification_error_code_mapping": ERROR_CODE_TO_ROOT, "state_mismatch_subtype_mapping": STATE_SUBTYPE_TO_ROOT, "frozen_before_classification": True, "multi_label": True, "model_called": False, "gpu_called": False}
+    return {
+        "stage": STAGE,
+        "classification_scope": "formal deterministic analysis of frozen Stage6J representative MP-FS arm",
+        "pipeline_stage_taxonomy": ["parse", "verification", "execution", "state_mismatch"],
+        "evidence_layers": ["pipeline_stage", "directly_observed_failure", "architectural_implication"],
+        "verification_direct_root_cause_labels": VERIFICATION_ROOT_LABELS,
+        "parse_observed_failure_labels": PARSE_OBSERVED_LABELS,
+        "state_mismatch_indicative_families": STATE_INDICATIVE_FAMILIES,
+        "verification_error_code_mapping": ERROR_CODE_TO_ROOT,
+        "state_mismatch_subtype_to_indicative_family": STATE_SUBTYPE_TO_INDICATIVE_FAMILY,
+        "causal_policy": {
+            "verification": "direct verifier error codes are treated as causal evidence",
+            "parse": "valid JSON schema nonconformance is observed but not evidence of true task ambiguity",
+            "state_mismatch": "executable output differences are observed subtypes and indicative families, not verifier invalid-reference roots",
+        },
+        "frozen_before_classification": True,
+        "multi_label": True,
+        "model_called": False,
+        "gpu_called": False,
+    }
 
 
 def compare(name: str, saved: Any, rebuilt: Any, violations: list[str]) -> None:
@@ -413,6 +509,39 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
         violations.append("parse_failure_n_not_2")
     if len([r for r in records if r["failure_stage"] == "state_mismatch"]) != 43:
         violations.append("state_mismatch_n_not_43")
+    verification = [row for row in records if row["failure_stage"] == "verification"]
+    state = [row for row in records if row["failure_stage"] == "state_mismatch"]
+    parse = [row for row in records if row["failure_stage"] == "parse"]
+    family_counts: Counter[str] = Counter()
+    samples_with_code: Counter[str] = Counter()
+    for row in verification:
+        family_counts.update(row["root_cause_labels"])
+        samples_with_code.update(row["error_codes"])
+    if dict(sorted(family_counts.items())) != {"invalid_reference": 190, "normalization": 133, "operation_semantics": 204, "slot_or_update_completeness": 6}:
+        violations.append(f"verification_direct_family_counts_unexpected:{dict(sorted(family_counts.items()))}")
+    if "error_code_counts" in read_json(output_dir / "VERIFICATION_FAILURE_SUMMARY.json"):
+        violations.append("ambiguous_error_code_counts_field_present")
+    if any("unsupported_or_true_ambiguity" in row["root_cause_labels"] for row in parse):
+        violations.append("parse_failure_promoted_to_true_ambiguity")
+    if any(row["parse_failure_type"] != "schema_nonconformance_valid_json" for row in parse):
+        violations.append("parse_failure_type_not_schema_nonconformance_valid_json")
+    if any(row["root_cause_labels"] for row in state):
+        violations.append("state_mismatch_promoted_to_direct_root_cause")
+    if any("invalid_reference" in row["root_cause_labels"] for row in state):
+        violations.append("state_mismatch_promoted_to_invalid_reference")
+    state_subtypes: Counter[str] = Counter()
+    for row in state:
+        state_subtypes.update(row["state_mismatch_subtypes"])
+    if dict(sorted(state_subtypes.items())) != {"extra_assignment_or_over_write": 16, "missing_assignment_or_under_write": 41, "wrong_row_or_cardinality": 7, "wrong_target_column": 8, "wrong_value_or_evidence": 35}:
+        violations.append(f"state_subtype_counts_unexpected:{dict(sorted(state_subtypes.items()))}")
+    trace = read_json(output_dir / "DESIGN_REQUIREMENT_TRACEABILITY.json")
+    trace_by_id = {row.get("design_requirement_id"): row for row in trace.get("traceability", [])}
+    if trace_by_id.get("constrained_reference_selection", {}).get("direct_support", {}).get("sample_count") != 190:
+        violations.append("direct_invalid_reference_support_not_190")
+    if trace_by_id.get("explicit_abstention_for_true_ambiguity", {}).get("direct_support", {}).get("sample_count") != 0:
+        violations.append("unsupported_true_ambiguity_direct_support_not_zero")
+    if trace_by_id.get("representation_schema_contract", {}).get("direct_support", {}).get("sample_count") != 2:
+        violations.append("parse_schema_contract_support_not_two")
 
     return {"status": "PASS" if not violations else "FAIL", "violations": violations, "stage": STAGE, "final_n": FINAL_N, "model_called": False, "gpu_called": False, **checks}
 

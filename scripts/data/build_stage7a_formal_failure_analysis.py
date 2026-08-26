@@ -62,15 +62,35 @@ ERROR_CODE_TO_ROOT = {
     "MISSING_UPDATE_COLUMN_IDS": "slot_or_update_completeness",
 }
 
-STATE_SUBTYPE_TO_ROOT = {
-    "missing_assignment_or_under_write": "slot_or_update_completeness",
-    "wrong_value_or_evidence": "invalid_reference",
-    "wrong_target_column": "invalid_reference",
-    "extra_assignment_or_over_write": "invalid_reference",
-    "wrong_row_or_cardinality": "operation_semantics",
+VERIFICATION_ROOT_LABELS = [
+    "operation_semantics",
+    "invalid_reference",
+    "normalization",
+    "slot_or_update_completeness",
+    "unsupported_or_true_ambiguity",
+    "other",
+]
+
+PARSE_OBSERVED_LABELS = ["representation_schema_nonconformance"]
+
+STATE_SUBTYPE_TO_INDICATIVE_FAMILY = {
+    "missing_assignment_or_under_write": "slot_completeness",
+    "wrong_value_or_evidence": "value_grounding_or_materialization",
+    "wrong_target_column": "slot_grounding",
+    "extra_assignment_or_over_write": "slot_completeness",
+    "wrong_row_or_cardinality": "row_cardinality",
     "wrong_operation_or_conflict_semantics": "operation_semantics",
-    "unresolved_other": "other",
+    "unresolved_other": "unresolved",
 }
+
+STATE_INDICATIVE_FAMILIES = [
+    "slot_completeness",
+    "slot_grounding",
+    "value_grounding_or_materialization",
+    "row_cardinality",
+    "operation_semantics",
+    "unresolved",
+]
 
 
 class Stage7AError(RuntimeError):
@@ -131,16 +151,17 @@ def taxonomy_spec() -> dict[str, Any]:
         "stage": STAGE,
         "classification_scope": "formal deterministic analysis of frozen Stage6J representative MP-FS arm",
         "pipeline_stage_taxonomy": ["parse", "verification", "execution", "state_mismatch"],
-        "root_cause_labels": [
-            "operation_semantics",
-            "invalid_reference",
-            "normalization",
-            "slot_or_update_completeness",
-            "unsupported_or_true_ambiguity",
-            "other",
-        ],
+        "evidence_layers": ["pipeline_stage", "directly_observed_failure", "architectural_implication"],
+        "verification_direct_root_cause_labels": VERIFICATION_ROOT_LABELS,
+        "parse_observed_failure_labels": PARSE_OBSERVED_LABELS,
+        "state_mismatch_indicative_families": STATE_INDICATIVE_FAMILIES,
         "verification_error_code_mapping": ERROR_CODE_TO_ROOT,
-        "state_mismatch_subtype_mapping": STATE_SUBTYPE_TO_ROOT,
+        "state_mismatch_subtype_to_indicative_family": STATE_SUBTYPE_TO_INDICATIVE_FAMILY,
+        "causal_policy": {
+            "verification": "direct verifier error codes are treated as causal evidence",
+            "parse": "valid JSON schema nonconformance is observed but not evidence of true task ambiguity",
+            "state_mismatch": "executable output differences are observed subtypes and indicative families, not verifier invalid-reference roots",
+        },
         "frozen_before_classification": True,
         "multi_label": True,
         "model_called": False,
@@ -278,6 +299,11 @@ def parse_json_from_fenced(raw_output: str) -> tuple[bool, str | None]:
         return False, str(exc)
 
 
+def parse_failure_type_from_raw(raw: dict[str, Any]) -> str:
+    valid_json, _json_error = parse_json_from_fenced(str(raw.get("raw_output") or ""))
+    return "schema_nonconformance_valid_json" if valid_json else "malformed_json"
+
+
 def parse_failure_rows(representative_rows: dict[str, dict[str, Any]], raw_rows: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
     rows = []
     for sample_id, row in sorted(representative_rows.items()):
@@ -285,7 +311,7 @@ def parse_failure_rows(representative_rows: dict[str, dict[str, Any]], raw_rows:
             continue
         raw = raw_rows[sample_id]
         valid_json, json_error = parse_json_from_fenced(str(raw.get("raw_output") or ""))
-        classification = "schema_mismatch_valid_json" if valid_json else "malformed_json"
+        classification = "schema_nonconformance_valid_json" if valid_json else "malformed_json"
         rows.append(
             {
                 "stage6_sample_id": sample_id,
@@ -297,6 +323,8 @@ def parse_failure_rows(representative_rows: dict[str, dict[str, Any]], raw_rows:
                 "valid_json_after_fence_strip": valid_json,
                 "json_parse_error": json_error,
                 "parse_failure_type": classification,
+                "root_cause_status": "observed_not_causally_resolved",
+                "observed_failure_labels": PARSE_OBSERVED_LABELS,
                 "classification_mode": "deterministic_raw_json_schema_check",
             }
         )
@@ -310,7 +338,7 @@ def state_mismatch_rows(representative_rows: dict[str, dict[str, Any]], gold_pla
             continue
         gold = gold_plans[sample_id]
         subtypes = state_mismatch_subtypes(row, gold)
-        roots = sorted({STATE_SUBTYPE_TO_ROOT.get(subtype, "other") for subtype in subtypes})
+        families = sorted({STATE_SUBTYPE_TO_INDICATIVE_FAMILY.get(subtype, "unresolved") for subtype in subtypes})
         rows.append(
             {
                 "stage6_sample_id": sample_id,
@@ -320,7 +348,9 @@ def state_mismatch_rows(representative_rows: dict[str, dict[str, Any]], gold_pla
                 "gold_columns": gold.get("columns") or [],
                 "gold_values": gold.get("values") or [],
                 "state_mismatch_subtypes": subtypes,
-                "root_cause_labels": roots,
+                "state_mismatch_families": families,
+                "direct_causal_root_labels": [],
+                "root_cause_status": "observed_difference_not_direct_verifier_causal_label",
                 "unresolved": "unresolved_other" in subtypes,
                 "classification_mode": "deterministic_candidate_vs_gold_write_plan",
             }
@@ -333,6 +363,7 @@ def failure_records(
     representative_rows: dict[str, dict[str, Any]],
     gold_programs: dict[str, dict[str, Any]],
     gold_plans: dict[str, dict[str, Any]],
+    raw_rows: dict[str, dict[str, Any]],
 ) -> list[dict[str, Any]]:
     state_by_id = {row["stage6_sample_id"]: row for row in state_mismatch_rows(representative_rows, gold_plans)}
     records = []
@@ -344,22 +375,42 @@ def failure_records(
         if stage == "verification":
             labels = root_labels_from_errors(errors)
             subtypes: list[str] = []
+            state_families: list[str] = []
+            observed_labels = labels
+            implication_labels = labels
+            parse_failure_type = None
+            root_cause_status = "direct_verifier_causal_evidence"
             mode = "deterministic_verifier_error_code"
             unresolved = False
         elif stage == "parse":
-            labels = ["unsupported_or_true_ambiguity"]
+            labels = []
             subtypes = []
+            state_families = []
+            observed_labels = PARSE_OBSERVED_LABELS
+            implication_labels = PARSE_OBSERVED_LABELS
+            parse_failure_type = parse_failure_type_from_raw(raw_rows[sample_id])
+            root_cause_status = "observed_not_causally_resolved"
             mode = "deterministic_raw_parse_analysis"
-            unresolved = False
+            unresolved = True
         elif stage == "state_mismatch":
             state = state_by_id[sample_id]
-            labels = state["root_cause_labels"]
+            labels = []
             subtypes = state["state_mismatch_subtypes"]
+            state_families = state["state_mismatch_families"]
+            observed_labels = subtypes
+            implication_labels = state_families
+            parse_failure_type = None
+            root_cause_status = state["root_cause_status"]
             mode = "deterministic_candidate_vs_gold_write_plan"
             unresolved = bool(state["unresolved"])
         else:
             labels = ["other"]
             subtypes = []
+            state_families = []
+            observed_labels = ["other"]
+            implication_labels = ["other"]
+            parse_failure_type = None
+            root_cause_status = "unresolved"
             mode = "deterministic_pipeline_stage_fallback"
             unresolved = True
         records.append(
@@ -370,9 +421,15 @@ def failure_records(
                 "target_state_correct": bool(row.get("target_state_correct")),
                 "failure_stage": stage,
                 "error_codes": sorted({str(err.get("error_code")) for err in errors if err.get("error_code")}),
+                "raw_error_occurrence_codes": [str(err.get("error_code")) for err in errors if err.get("error_code")],
                 "root_cause_labels": labels,
+                "root_cause_status": root_cause_status,
+                "observed_failure_labels": observed_labels,
+                "architectural_implication_labels": implication_labels,
+                "parse_failure_type": parse_failure_type,
                 "evidence_paths": evidence_paths(errors),
                 "state_mismatch_subtypes": subtypes,
+                "state_mismatch_families": state_families,
                 "classification_mode": mode,
                 "unresolved": unresolved,
                 "candidate_program_sha256": row.get("candidate_program_sha256"),
@@ -388,12 +445,24 @@ def failure_records(
 
 def pipeline_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
     counts = Counter(row["failure_stage"] for row in records)
+    parse_types = Counter(row["parse_failure_type"] for row in records if row["failure_stage"] == "parse")
+    state_subtypes: Counter[str] = Counter()
+    state_families: Counter[str] = Counter()
+    root_status = Counter(row["root_cause_status"] for row in records)
+    for row in records:
+        if row["failure_stage"] == "state_mismatch":
+            state_subtypes.update(row["state_mismatch_subtypes"])
+            state_families.update(row["state_mismatch_families"])
     return {
         "stage": STAGE,
         "representative_arm": REPRESENTATIVE_ARM,
         "n": len(records),
         "final_n": len(records),
         "pipeline_failure_counts": dict(sorted(counts.items())),
+        "parse_failure_type_prevalence": dict(sorted(parse_types.items())),
+        "state_mismatch_subtype_prevalence": dict(sorted(state_subtypes.items())),
+        "state_mismatch_indicative_family_prevalence": dict(sorted(state_families.items())),
+        "root_cause_status_counts": dict(sorted(root_status.items())),
         "target_state_correct": sum(1 for row in records if row["target_state_correct"]),
         "target_state_incorrect": sum(1 for row in records if not row["target_state_correct"]),
     }
@@ -402,22 +471,26 @@ def pipeline_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
 def verification_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
     verification = [row for row in records if row["failure_stage"] == "verification"]
     family_counts: Counter[str] = Counter()
-    code_counts: Counter[str] = Counter()
+    samples_with_code: Counter[str] = Counter()
+    raw_occurrences: Counter[str] = Counter()
     for row in verification:
         family_counts.update(row["root_cause_labels"])
-        code_counts.update(row["error_codes"])
+        samples_with_code.update(row["error_codes"])
+        raw_occurrences.update(row["raw_error_occurrence_codes"])
     return {
         "stage": STAGE,
         "verification_failure_n": len(verification),
         "all_verification_failures_accounted_for": len(verification) == 436,
         "root_cause_family_prevalence": dict(sorted(family_counts.items())),
-        "error_code_counts": dict(sorted(code_counts.items())),
+        "samples_with_error_code": dict(sorted(samples_with_code.items())),
+        "raw_error_occurrence_counts": dict(sorted(raw_occurrences.items())),
+        "sample_prevalence_note": "samples_with_error_code counts samples with at least one verifier error code; raw_error_occurrence_counts counts verifier error objects",
         "multi_label": True,
     }
 
 
 def overlap_matrix(records: list[dict[str, Any]]) -> dict[str, Any]:
-    labels = taxonomy_spec()["root_cause_labels"]
+    labels = taxonomy_spec()["verification_direct_root_cause_labels"]
     verification = [row for row in records if row["failure_stage"] == "verification"]
     matrix = {
         left: {right: sum(1 for row in verification if left in row["root_cause_labels"] and right in row["root_cause_labels"]) for right in labels}
@@ -438,25 +511,75 @@ def combination_counts(records: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def traceability(records: list[dict[str, Any]]) -> dict[str, Any]:
-    requirements = {
-        "operation_semantics": "operation-conditioned IR and conflict/update semantics gate",
-        "invalid_reference": "constrained enumerated reference selection",
-        "normalization": "deterministic typed materialization",
-        "slot_or_update_completeness": "semantic completeness verification for write slots/update columns",
-        "unsupported_or_true_ambiguity": "explicit abstention path for unresolved source ambiguity",
-        "other": "manual audit queue before V2 method changes",
-    }
-    rows = []
-    for label, requirement in requirements.items():
-        matching = [row["stage6_sample_id"] for row in records if label in row["root_cause_labels"]]
-        rows.append({"root_cause_label": label, "design_requirement": requirement, "supporting_sample_count": len(matching), "example_sample_ids": matching[:10]})
-    return {"stage": STAGE, "status": "DESIGN_REQUIREMENTS_ONLY", "no_v2_implementation": True, "traceability": rows}
+    def ids_for(predicate) -> list[str]:
+        return [row["stage6_sample_id"] for row in records if predicate(row)]
+
+    def support(source: str, ids: list[str]) -> dict[str, Any]:
+        return {"source": source, "sample_count": len(ids), "example_sample_ids": ids[:10]}
+
+    rows = [
+        {
+            "design_requirement_id": "operation_conditioned_ir",
+            "root_cause_label": "operation_semantics",
+            "design_requirement": "operation-conditioned IR and conflict/update semantics gate",
+            "direct_support": support("verification_errors:operation_semantics", ids_for(lambda row: row["failure_stage"] == "verification" and "operation_semantics" in row["root_cause_labels"])),
+            "indicative_support": [
+                support("state_mismatch_family:row_cardinality", ids_for(lambda row: row["failure_stage"] == "state_mismatch" and "row_cardinality" in row["state_mismatch_families"])),
+                support("state_mismatch_family:operation_semantics", ids_for(lambda row: row["failure_stage"] == "state_mismatch" and "operation_semantics" in row["state_mismatch_families"])),
+            ],
+        },
+        {
+            "design_requirement_id": "constrained_reference_selection",
+            "root_cause_label": "invalid_reference",
+            "design_requirement": "constrained enumerated reference selection",
+            "direct_support": support("verification_errors:invalid_reference", ids_for(lambda row: row["failure_stage"] == "verification" and "invalid_reference" in row["root_cause_labels"])),
+            "indicative_support": [
+                support("state_mismatch_subtype:wrong_target_column", ids_for(lambda row: row["failure_stage"] == "state_mismatch" and "wrong_target_column" in row["state_mismatch_subtypes"])),
+            ],
+        },
+        {
+            "design_requirement_id": "typed_materialization",
+            "root_cause_label": "normalization",
+            "design_requirement": "deterministic typed materialization",
+            "direct_support": support("verification_errors:normalization", ids_for(lambda row: row["failure_stage"] == "verification" and "normalization" in row["root_cause_labels"])),
+            "indicative_support": [
+                support("state_mismatch_subtype:wrong_value_or_evidence", ids_for(lambda row: row["failure_stage"] == "state_mismatch" and "wrong_value_or_evidence" in row["state_mismatch_subtypes"])),
+            ],
+        },
+        {
+            "design_requirement_id": "semantic_completeness_verification",
+            "root_cause_label": "slot_or_update_completeness",
+            "design_requirement": "semantic completeness verification for write slots/update columns",
+            "direct_support": support("verification_errors:slot_or_update_completeness", ids_for(lambda row: row["failure_stage"] == "verification" and "slot_or_update_completeness" in row["root_cause_labels"])),
+            "indicative_support": [
+                support("state_mismatch_subtype:missing_assignment_or_under_write", ids_for(lambda row: row["failure_stage"] == "state_mismatch" and "missing_assignment_or_under_write" in row["state_mismatch_subtypes"])),
+                support("state_mismatch_subtype:extra_assignment_or_over_write", ids_for(lambda row: row["failure_stage"] == "state_mismatch" and "extra_assignment_or_over_write" in row["state_mismatch_subtypes"])),
+            ],
+        },
+        {
+            "design_requirement_id": "representation_schema_contract",
+            "root_cause_label": "representation_schema_nonconformance",
+            "design_requirement": "schema-constrained representation contract between generation and parser",
+            "direct_support": support("parse_failure_type:schema_nonconformance_valid_json", ids_for(lambda row: row["failure_stage"] == "parse" and row["parse_failure_type"] == "schema_nonconformance_valid_json")),
+            "indicative_support": [],
+        },
+        {
+            "design_requirement_id": "explicit_abstention_for_true_ambiguity",
+            "root_cause_label": "unsupported_or_true_ambiguity",
+            "design_requirement": "explicit abstention path only for independently demonstrated source ambiguity",
+            "direct_support": support("independent_true_ambiguity_audit", ids_for(lambda row: "unsupported_or_true_ambiguity" in row["root_cause_labels"])),
+            "indicative_support": [],
+        },
+    ]
+    return {"stage": STAGE, "status": "DESIGN_REQUIREMENTS_ONLY", "support_model": "direct_support_vs_indicative_support", "no_v2_implementation": True, "traceability": rows}
 
 
 def reviewer_readme() -> str:
     return f"""# Stage7A Formal Failure Analysis
 
 This package analyzes frozen V1 failures only. It does not implement V2.
+
+PATCH1 separates direct verifier causal evidence from observed parse/state mismatch evidence.
 
 Commands:
 ```bash
@@ -512,7 +635,7 @@ def build_stage7a(output_dir: Path, *, force: bool = False) -> dict[str, Any]:
     representative_rows = outcomes[REPRESENTATIVE_ARM]
     if len(samples) != FINAL_N or set(samples) != set(representative_rows):
         raise Stage7AError("Stage6E denominator and representative arm IDs must match exactly.")
-    records = failure_records(samples, representative_rows, gold_programs, gold_plans)
+    records = failure_records(samples, representative_rows, gold_programs, gold_plans, raw_rows)
     parse_rows = parse_failure_rows(representative_rows, raw_rows)
     state_rows = state_mismatch_rows(representative_rows, gold_plans)
 
