@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "conflict_target_ref": {
+      "pattern": "^CONSTRAINT_[0-9]+$",
+      "type": "string"
+    },
+    "insert_assignments": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "column_ref": {
+            "pattern": "^COL_[0-9]+$",
+            "type": "string"
+          },
+          "evidence_ref": {
+            "pattern": "^EV_[0-9]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "column_ref",
+          "evidence_ref"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "operation": {
+      "const": "UPSERT"
+    },
+    "table_ref": {
+      "pattern": "^TAB_[0-9]+$",
+      "type": "string"
+    },
+    "update_assignments": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "column_ref": {
+            "pattern": "^COL_[0-9]+$",
+            "type": "string"
+          },
+          "evidence_ref": {
+            "pattern": "^EV_[0-9]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "column_ref",
+          "evidence_ref"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "update_policy": {
+      "enum": [
+        "DO_NOTHING",
+        "DO_UPDATE"
+      ]
+    }
+  },
+  "required": [
+    "operation",
+    "table_ref",
+    "conflict_target_ref",
+    "insert_assignments",
+    "update_policy"
+  ],
+  "type": "object"
+}

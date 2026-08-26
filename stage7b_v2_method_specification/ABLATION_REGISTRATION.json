@@ -1,0 +1,42 @@
+{
+  "primary_system": "V2-FULL",
+  "selection_metric_policy": "register variants now; measure future failure-family deltas without promising accuracy targets",
+  "source_stage7a_final_n": 481,
+  "stage": "Stage7B_V2_METHOD_SPECIFICATION",
+  "status": "FROZEN_BEFORE_IMPLEMENTATION",
+  "variants": [
+    {
+      "components": [
+        "operation_conditioning",
+        "constrained_references",
+        "deterministic_materialization",
+        "completeness_verification"
+      ],
+      "variant": "V2-FULL"
+    },
+    {
+      "remove_component": "operation_conditioning",
+      "stage7a_direct_support": 204,
+      "variant": "V2-A"
+    },
+    {
+      "remove_component": "constrained_references",
+      "stage7a_direct_support": 190,
+      "variant": "V2-B"
+    },
+    {
+      "remove_component": "deterministic_materialization",
+      "stage7a_direct_support": 133,
+      "variant": "V2-C"
+    },
+    {
+      "remove_component": "completeness_verification",
+      "stage7a_direct_support": 6,
+      "stage7a_indicative_support": {
+        "over_write": 16,
+        "under_write": 41
+      },
+      "variant": "V2-D"
+    }
+  ]
+}

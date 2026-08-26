@@ -1,0 +1,75 @@
+{
+  "design_principles": [
+    "minimize model degrees of freedom before SQL compilation",
+    "use operation-specific contracts rather than one rich universal JSON object",
+    "restrict model references to enumerated finite inventories",
+    "derive typed values deterministically from evidence and schema",
+    "separate directly observed verifier evidence from indicative executable mismatches"
+  ],
+  "method_name": "Operation-Conditioned Slot-Grounded MP-FS",
+  "non_goals": [
+    "no V2 implementation in Stage7B",
+    "no model call, GPU call, experiment, or performance tuning",
+    "no LiveSQLBench ground-truth inspection",
+    "no adaptation against the 481 Stage6/Stage7A test samples"
+  ],
+  "stage": "Stage7B_V2_METHOD_SPECIFICATION",
+  "stage7a_evidence_summary": {
+    "final_n": 481,
+    "parse_failure_type_prevalence": {
+      "schema_nonconformance_valid_json": 2
+    },
+    "pipeline_counts": {
+      "parse": 2,
+      "state_mismatch": 43,
+      "verification": 436
+    },
+    "state_mismatch_indicative_families": {
+      "row_cardinality": 7,
+      "slot_completeness": 41,
+      "slot_grounding": 8,
+      "value_grounding_or_materialization": 35
+    },
+    "verification_direct_families": {
+      "invalid_reference": 190,
+      "normalization": 133,
+      "operation_semantics": 204,
+      "slot_or_update_completeness": 6
+    },
+    "verification_overlap_combinations": [
+      {
+        "root_cause_combination": "invalid_reference",
+        "sample_count": 99
+      },
+      {
+        "root_cause_combination": "invalid_reference+normalization",
+        "sample_count": 51
+      },
+      {
+        "root_cause_combination": "invalid_reference+normalization+slot_or_update_completeness",
+        "sample_count": 5
+      },
+      {
+        "root_cause_combination": "invalid_reference+operation_semantics",
+        "sample_count": 34
+      },
+      {
+        "root_cause_combination": "invalid_reference+slot_or_update_completeness",
+        "sample_count": 1
+      },
+      {
+        "root_cause_combination": "normalization",
+        "sample_count": 76
+      },
+      {
+        "root_cause_combination": "normalization+operation_semantics",
+        "sample_count": 1
+      },
+      {
+        "root_cause_combination": "operation_semantics",
+        "sample_count": 169
+      }
+    ]
+  },
+  "status": "SPECIFICATION_ONLY"
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "assignments": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "column_ref": {
+            "pattern": "^COL_[0-9]+$",
+            "type": "string"
+          },
+          "evidence_ref": {
+            "pattern": "^EV_[0-9]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "column_ref",
+          "evidence_ref"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "operation": {
+      "const": "INSERT"
+    },
+    "table_ref": {
+      "pattern": "^TAB_[0-9]+$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "operation",
+    "table_ref",
+    "assignments"
+  ],
+  "type": "object"
+}

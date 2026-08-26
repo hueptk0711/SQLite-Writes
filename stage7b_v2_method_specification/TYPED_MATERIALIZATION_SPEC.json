@@ -1,0 +1,24 @@
+{
+  "component": "deterministic_typed_materialization",
+  "examples": [
+    {
+      "materialized_value": 20,
+      "raw_evidence": "20",
+      "schema_type": "INTEGER"
+    },
+    {
+      "materialized_value": 12.5,
+      "raw_evidence": "12.50",
+      "schema_type": "REAL"
+    },
+    {
+      "materialized_value": "12.50",
+      "raw_evidence": "12.50",
+      "schema_type": "TEXT"
+    }
+  ],
+  "llm_normalization_decisions_allowed": false,
+  "rule": "Typed values are derived from schema type plus raw evidence via deterministic parsers.",
+  "stage": "Stage7B_V2_METHOD_SPECIFICATION",
+  "unsafe_materialization_policy": "reject; do not hallucinate conversion"
+}

@@ -1,0 +1,43 @@
+{
+  "core_pipeline": [
+    {
+      "component": "operation_conditioning",
+      "order": 1,
+      "output": "operation_class"
+    },
+    {
+      "component": "slot_grounded_minimal_ir",
+      "order": 2,
+      "output": "operation_specific_ir_with_constrained_references"
+    },
+    {
+      "component": "deterministic_typed_materialization",
+      "order": 3,
+      "output": "typed_assignments"
+    },
+    {
+      "component": "semantic_completeness_verification",
+      "order": 4,
+      "output": "accepted_or_rejected_ir"
+    },
+    {
+      "component": "deterministic_sqlite_compilation_preflight",
+      "order": 5,
+      "output": "sqlite_program_or_rejection"
+    }
+  ],
+  "gpu_called": false,
+  "input_contract": [
+    "natural_language_write_request",
+    "schema_inventory",
+    "evidence_inventory"
+  ],
+  "method_name": "Operation-Conditioned Slot-Grounded MP-FS",
+  "model_called": false,
+  "optional_deferred_variant": "V2-R bounded repair may be registered after V2 primary specification, but is not a core Stage7B component.",
+  "primary_v2_depends_on_repair": false,
+  "representation_contract": "JSON Schema validation surrounds all model-produced IR before semantic verification.",
+  "stage": "Stage7B_V2_METHOD_SPECIFICATION",
+  "status": "FROZEN_SPECIFICATION",
+  "v2_implemented": false
+}

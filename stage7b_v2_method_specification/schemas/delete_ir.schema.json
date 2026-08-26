@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "operation": {
+      "const": "DELETE"
+    },
+    "row_selector": {
+      "additionalProperties": false,
+      "properties": {
+        "row_ref": {
+          "pattern": "^ROW_[0-9]+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "row_ref"
+      ],
+      "type": "object"
+    },
+    "table_ref": {
+      "pattern": "^TAB_[0-9]+$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "operation",
+    "table_ref",
+    "row_selector"
+  ],
+  "type": "object"
+}

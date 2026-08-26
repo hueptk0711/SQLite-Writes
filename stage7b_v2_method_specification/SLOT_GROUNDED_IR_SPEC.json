@@ -1,0 +1,32 @@
+{
+  "component": "slot_grounded_minimal_ir",
+  "insert_example": {
+    "assignments": [
+      {
+        "column_ref": "COL_2",
+        "evidence_ref": "EV_1"
+      },
+      {
+        "column_ref": "COL_5",
+        "evidence_ref": "EV_3"
+      }
+    ],
+    "operation": "INSERT",
+    "table_ref": "TAB_1"
+  },
+  "llm_decisions": [
+    "operation_class",
+    "table_ref",
+    "column_ref_to_evidence_ref_mapping",
+    "row_selector_ref_when_required",
+    "conflict_target_ref_only_for_upsert"
+  ],
+  "not_llm_decisions": [
+    "SQL syntax",
+    "normalization_function",
+    "arbitrary_identifier_creation",
+    "compiler_strategy",
+    "silent_reference_repair"
+  ],
+  "stage": "Stage7B_V2_METHOD_SPECIFICATION"
+}

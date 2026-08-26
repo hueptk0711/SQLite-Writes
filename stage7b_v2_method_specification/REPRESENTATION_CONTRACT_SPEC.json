@@ -1,0 +1,13 @@
+{
+  "component": "representation_schema_contract",
+  "constrained_structured_output_preferred": true,
+  "contract": [
+    "JSON object only",
+    "operation-specific required fields",
+    "additionalProperties=false",
+    "finite enum/pattern reference IDs",
+    "schema validation before semantic verification"
+  ],
+  "fallback": "deterministic JSON parse followed by JSON Schema validation",
+  "stage": "Stage7B_V2_METHOD_SPECIFICATION"
+}
