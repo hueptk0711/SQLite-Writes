@@ -40,6 +40,7 @@
       ]
     },
     "opaque_row_ref_allowed": false,
+    "predicate_column_uniqueness_required": false,
     "predicates": {
       "items": {
         "column_ref": "dynamic enum COL_*",
@@ -49,7 +50,8 @@
           "NE",
           "LT",
           "GT"
-        ]
+        ],
+        "slot_ref": "dynamic enum SLOT_*"
       }
     },
     "supports_multi_condition": true

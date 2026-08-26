@@ -9,6 +9,7 @@ import subprocess
 import sys
 import uuid
 import zipfile
+from collections import Counter
 from pathlib import Path
 
 import pytest
@@ -136,8 +137,13 @@ def _selector(connector: str = "AND", predicates: list[dict] | None = None) -> d
     return {"connector": connector, "predicates": predicates or [_predicate()]}
 
 
-def _complete(required: set[str], allowed: set[str], mapped: set[str]) -> bool:
-    return not (required - mapped) and not (mapped - allowed)
+def _complete(required: set[str], allowed: set[str], mapped_occurrences, assignment_columns=None) -> bool:
+    mapped = set(mapped_occurrences)
+    counts = Counter(mapped_occurrences)
+    duplicate_required = {slot for slot in required if counts[slot] != 1}
+    duplicate_mapped = {slot for slot, count in counts.items() if count > 1}
+    columns_unique = True if assignment_columns is None else len(assignment_columns) == len(set(assignment_columns))
+    return not (required - mapped) and not (mapped - allowed) and not duplicate_required and not duplicate_mapped and columns_unique
 
 
 def test_validator_passes_current_stage7b_artifacts() -> None:
@@ -183,6 +189,7 @@ def test_architecture_freezes_five_core_components_and_no_repair_dependency() ->
     ]
     assert spec["primary_v2_depends_on_repair"] is False
     assert spec["v2_implemented"] is False
+    assert "semantic_slot_inventory" in spec["input_contract"]
     assert spec["operation_conditioning_protocol"] == "two_phase_operation_enum_then_schema_conditioned_mapping"
     assert spec["registered_model_call_count"] == {"Phase_M_mapping": 1, "Phase_O_operation_conditioning": 1}
 
@@ -193,6 +200,7 @@ def test_operation_conditioning_has_operation_specific_allowed_fields() -> None:
     assert spec["protocol"] == "two_phase_operation_conditioning"
     assert spec["phase_o"]["model_call_count"] == 1
     assert spec["phase_m"]["model_call_count"] == 1
+    assert "semantic_slot_inventory" in spec["phase_m"]["input_contract"]
     assert set(spec["phase_o"]["forbidden_inputs"]) >= {"gold_operation", "gold_sql", "gold_post_state"}
     assert spec["phase_o"]["invalid_output_policy"] == "reject; do not fall back to unified rich plan"
     assert "conflict_target_ref" not in spec["operation_specific_allowed_fields"]["INSERT"]
@@ -215,6 +223,8 @@ def test_reference_constraint_forbids_unrestricted_identifiers_and_silent_repair
     spec = _read_json(ARTIFACT_DIR / "REFERENCE_CONSTRAINT_SPEC.json")
     assert spec["selected_mechanism"] == "dynamic_per_sample_json_schema_enum"
     assert spec["schema_instantiation"]["column_ref"] == "enum(sample.column_refs)"
+    assert spec["schema_instantiation"]["slot_ref"] == "enum(sample.slot_refs)"
+    assert spec["example_inventory_for_schema_artifacts"]["slot_refs"] == ["SLOT_1", "SLOT_2", "SLOT_3"]
     assert "instantiate_operation_specific_schema_with_sample_inventory" in spec["validation_order"]
     assert spec["unrestricted_reference_ids_allowed"] is False
     assert spec["invalid_reference_policy"] == "deterministic rejection; no silent fuzzy correction"
@@ -225,13 +235,16 @@ def test_typed_materialization_removes_normalization_from_llm_output() -> None:
     spec = _read_json(ARTIFACT_DIR / "TYPED_MATERIALIZATION_SPEC.json")
     assert spec["llm_normalization_decisions_allowed"] is False
     assert spec["unsafe_materialization_policy"] == "reject; do not hallucinate conversion"
-    rules = {row["schema_affinity"]: row["rule"] for row in spec["affinity_rule_table"]}
-    assert rules["INTEGER"] == "strict lossless integer parse"
-    assert rules["REAL"] == "strict finite numeric parse"
-    assert rules["TEXT"] == "preserve raw evidence string"
-    assert rules["NULL"] == "emit NULL only when evidence belongs to frozen null-literal set"
+    rules = {row["sqlite_affinity"]: row["rule"] for row in spec["affinity_rule_table"]}
+    assert set(rules) == {"TEXT", "NUMERIC", "INTEGER", "REAL", "BLOB"}
+    assert rules["INTEGER"] == "strict lossless integer/numeric handling"
+    assert rules["REAL"] == "strict finite real handling"
+    assert rules["TEXT"] == "preserve raw evidence text"
+    assert "SQLite-aware numeric" in rules["NUMERIC"]
     assert rules["BLOB"] == "unsupported without a frozen binary representation"
-    assert rules["ambiguous_or_lossy_parse"] == "no coercion"
+    assert "NULL" not in rules
+    assert spec["null_value_policy"]["null_is_affinity"] is False
+    assert "无" in spec["null_value_policy"]["language_broad_heuristics_forbidden"]
     assert spec["implicit_date_time_normalization_allowed"] is False
     assert {"schema_type": "TEXT", "raw_evidence": "12.50", "materialized_value": "12.50"} in spec["examples"]
 
@@ -239,6 +252,9 @@ def test_typed_materialization_removes_normalization_from_llm_output() -> None:
 def test_completeness_verification_defines_semantic_slot_coverage() -> None:
     spec = _read_json(ARTIFACT_DIR / "COMPLETENESS_VERIFICATION_SPEC.json")
     assert "all_required_slots_mapped" in spec["checks"]
+    assert "required_slots_mapped_exactly_once" in spec["checks"]
+    assert "no_duplicate_slot_mapping" in spec["checks"]
+    assert "assignment_target_columns_unique" in spec["checks"]
     assert "no_unjustified_extra_slots" in spec["checks"]
     assert "mapped_slots_are_allowed" in spec["checks"]
     assert spec["coverage_metric"] == "semantic_slots_mapped / semantic_slots_required"
@@ -247,7 +263,11 @@ def test_completeness_verification_defines_semantic_slot_coverage() -> None:
     assert "free_text_input" in spec["semantic_slot_inventory"]["creation_policy"]
     assert spec["set_definitions"]["missing"] == "required - mapped"
     assert spec["set_definitions"]["extra"] == "mapped - allowed"
-    assert spec["set_definitions"]["complete_iff"] == "missing == empty and extra == empty"
+    assert spec["set_definitions"]["duplicate_required"] == "any required SLOT_i where count(mapped_occurrences[SLOT_i]) != 1"
+    assert spec["set_definitions"]["complete_iff"] == "missing == empty and extra == empty and duplicate_required == empty and duplicate_mapped == empty and assignment_target_columns_unique == true"
+    assert spec["multiplicity_constraints"]["insert_assignments"] == "column_ref values must be unique within assignments"
+    assert spec["multiplicity_constraints"]["upsert_cross_branch_column_reuse"] == "allowed because insert_assignments and update_assignments are separate semantic branches"
+    assert spec["multiplicity_constraints"]["predicates"].startswith("column_ref uniqueness is not required")
 
 
 def test_representation_contract_uses_operation_specific_json_schema() -> None:
@@ -312,6 +332,8 @@ def test_ir_schemas_are_operation_specific_and_closed() -> None:
     assignment_props = insert_schema["properties"]["assignments"]["items"]["properties"]
     assert assignment_props["column_ref"]["enum"] == ["COL_1", "COL_2", "COL_3", "COL_4", "COL_5"]
     assert assignment_props["evidence_ref"]["enum"] == ["EV_1", "EV_2", "EV_3"]
+    assert assignment_props["slot_ref"]["enum"] == ["SLOT_1", "SLOT_2", "SLOT_3"]
+    assert "pattern" not in json.dumps(insert_schema, sort_keys=True)
     delete_schema = _read_json(ARTIFACT_DIR / "schemas" / "delete_ir.schema.json")
     assert "assignments" not in delete_schema["properties"]
 
@@ -331,6 +353,12 @@ def test_insert_schema_rejects_column_ref_outside_inventory() -> None:
 def test_insert_schema_rejects_evidence_ref_outside_inventory() -> None:
     schema = _read_json(ARTIFACT_DIR / "schemas" / "insert_ir.schema.json")
     instance = {"operation": "INSERT", "table_ref": "TAB_1", "assignments": [_assignment(evidence_ref="EV_999")]}
+    assert not _schema_accepts(schema, instance)
+
+
+def test_insert_schema_rejects_slot_ref_outside_inventory() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "insert_ir.schema.json")
+    instance = {"operation": "INSERT", "table_ref": "TAB_1", "assignments": [_assignment(slot_ref="SLOT_999")]}
     assert not _schema_accepts(schema, instance)
 
 
@@ -356,6 +384,28 @@ def test_update_schema_accepts_two_predicate_selector() -> None:
     assert _schema_accepts(schema, instance)
 
 
+def test_update_schema_rejects_slot_ref_outside_inventory_in_assignment() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "update_ir.schema.json")
+    instance = {
+        "operation": "UPDATE",
+        "table_ref": "TAB_1",
+        "row_selector": _selector(),
+        "assignments": [_assignment(slot_ref="SLOT_999")],
+    }
+    assert not _schema_accepts(schema, instance)
+
+
+def test_update_schema_rejects_slot_ref_outside_inventory_in_predicate() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "update_ir.schema.json")
+    instance = {
+        "operation": "UPDATE",
+        "table_ref": "TAB_1",
+        "row_selector": _selector(predicates=[_predicate(slot_ref="SLOT_999")]),
+        "assignments": [_assignment("COL_4", "EV_3", "SLOT_3")],
+    }
+    assert not _schema_accepts(schema, instance)
+
+
 def test_delete_schema_accepts_and_or_predicate_contract() -> None:
     schema = _read_json(ARTIFACT_DIR / "schemas" / "delete_ir.schema.json")
     and_instance = {"operation": "DELETE", "table_ref": "TAB_1", "row_selector": _selector("AND", [_predicate("COL_1", "LT", "EV_1")])}
@@ -366,6 +416,12 @@ def test_delete_schema_accepts_and_or_predicate_contract() -> None:
     }
     assert _schema_accepts(schema, and_instance)
     assert _schema_accepts(schema, or_instance)
+
+
+def test_delete_schema_rejects_slot_ref_outside_inventory() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "delete_ir.schema.json")
+    instance = {"operation": "DELETE", "table_ref": "TAB_1", "row_selector": _selector(predicates=[_predicate(slot_ref="SLOT_999")])}
+    assert not _schema_accepts(schema, instance)
 
 
 def test_update_schema_rejects_malformed_predicate() -> None:
@@ -400,6 +456,18 @@ def test_upsert_do_update_requires_assignments() -> None:
         "conflict_target_ref": "CONSTRAINT_1",
         "insert_assignments": [_assignment()],
         "update_policy": "DO_UPDATE",
+    }
+    assert not _schema_accepts(schema, instance)
+
+
+def test_upsert_rejects_slot_ref_outside_inventory() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "upsert_ir.schema.json")
+    instance = {
+        "operation": "UPSERT",
+        "table_ref": "TAB_1",
+        "conflict_target_ref": "CONSTRAINT_1",
+        "insert_assignments": [_assignment(slot_ref="SLOT_999")],
+        "update_policy": "DO_NOTHING",
     }
     assert not _schema_accepts(schema, instance)
 
@@ -452,15 +520,37 @@ def test_upsert_conditional_valid_cases() -> None:
 
 
 def test_completeness_set_logic_rejects_missing_required_slot() -> None:
-    assert not _complete(required={"SLOT_1", "SLOT_2"}, allowed={"SLOT_1", "SLOT_2"}, mapped={"SLOT_1"})
+    assert not _complete(required={"SLOT_1", "SLOT_2"}, allowed={"SLOT_1", "SLOT_2"}, mapped_occurrences=["SLOT_1"])
 
 
 def test_completeness_set_logic_rejects_extra_slot() -> None:
-    assert not _complete(required={"SLOT_1"}, allowed={"SLOT_1"}, mapped={"SLOT_1", "SLOT_99"})
+    assert not _complete(required={"SLOT_1"}, allowed={"SLOT_1"}, mapped_occurrences=["SLOT_1", "SLOT_99"])
 
 
 def test_completeness_set_logic_accepts_exact_required_allowed_mapping() -> None:
-    assert _complete(required={"SLOT_1", "SLOT_2"}, allowed={"SLOT_1", "SLOT_2", "SLOT_3"}, mapped={"SLOT_1", "SLOT_2"})
+    assert _complete(required={"SLOT_1", "SLOT_2"}, allowed={"SLOT_1", "SLOT_2", "SLOT_3"}, mapped_occurrences=["SLOT_1", "SLOT_2"], assignment_columns=["COL_1", "COL_2"])
+
+
+def test_completeness_multiplicity_rejects_duplicate_required_slot() -> None:
+    assert not _complete(required={"SLOT_1", "SLOT_2"}, allowed={"SLOT_1", "SLOT_2"}, mapped_occurrences=["SLOT_1", "SLOT_1", "SLOT_2"])
+
+
+def test_completeness_rejects_duplicate_insert_assignment_column() -> None:
+    assert not _complete(required={"SLOT_1", "SLOT_2"}, allowed={"SLOT_1", "SLOT_2"}, mapped_occurrences=["SLOT_1", "SLOT_2"], assignment_columns=["COL_1", "COL_1"])
+
+
+def test_completeness_rejects_duplicate_update_set_column() -> None:
+    assert not _complete(required={"SLOT_1", "SLOT_2"}, allowed={"SLOT_1", "SLOT_2"}, mapped_occurrences=["SLOT_1", "SLOT_2"], assignment_columns=["COL_3", "COL_3"])
+
+
+def test_predicate_contract_does_not_require_unique_columns() -> None:
+    schema = _read_json(ARTIFACT_DIR / "schemas" / "delete_ir.schema.json")
+    instance = {
+        "operation": "DELETE",
+        "table_ref": "TAB_1",
+        "row_selector": _selector("AND", [_predicate("COL_2", "GT", "EV_1", "SLOT_1"), _predicate("COL_2", "LT", "EV_2", "SLOT_2")]),
+    }
+    assert _schema_accepts(schema, instance)
 
 
 def test_ablation_interventions_are_exact_counterfactuals() -> None:
@@ -524,6 +614,19 @@ def test_validator_detects_reference_schema_degraded_to_pattern_only(workspace_t
     assert "insert_assignments_column_ref_not_enum" in report["violations"]
 
 
+def test_validator_detects_slot_ref_degraded_to_pattern_only(workspace_tmp: Path) -> None:
+    artifact = _copy_stage7b(workspace_tmp)
+    path = artifact / "schemas" / "insert_ir.schema.json"
+    payload = _read_json(path)
+    payload["properties"]["assignments"]["items"]["properties"]["slot_ref"] = {"type": "string", "pattern": "^SLOT_[0-9]+$"}
+    _write_json(path, payload)
+    _refresh_lock_hash(artifact, "schemas/insert_ir.schema.json")
+    report = validate(artifact)
+    assert report["status"] == "FAIL"
+    assert "schema_uses_shape_reference_constraint:INSERT" in report["violations"]
+    assert "insert_assignments_slot_ref_not_enum" in report["violations"]
+
+
 def test_validator_detects_opaque_row_selector(workspace_tmp: Path) -> None:
     artifact = _copy_stage7b(workspace_tmp)
     path = artifact / "schemas" / "update_ir.schema.json"
@@ -572,12 +675,26 @@ def test_validator_detects_incomplete_typed_affinity_table(workspace_tmp: Path) 
     artifact = _copy_stage7b(workspace_tmp)
     path = artifact / "TYPED_MATERIALIZATION_SPEC.json"
     payload = _read_json(path)
-    payload["affinity_rule_table"] = [row for row in payload["affinity_rule_table"] if row["schema_affinity"] != "BLOB"]
+    payload["affinity_rule_table"] = [row for row in payload["affinity_rule_table"] if row["sqlite_affinity"] != "NUMERIC"]
     _write_json(path, payload)
     _refresh_lock_hash(artifact, "TYPED_MATERIALIZATION_SPEC.json")
     report = validate(artifact)
     assert report["status"] == "FAIL"
-    assert "typed_affinity_table_incomplete" in report["violations"]
+    assert "typed_affinity_table_not_sqlite_five" in report["violations"]
+    assert "numeric_affinity_missing" in report["violations"]
+
+
+def test_validator_detects_null_listed_as_sqlite_affinity(workspace_tmp: Path) -> None:
+    artifact = _copy_stage7b(workspace_tmp)
+    path = artifact / "TYPED_MATERIALIZATION_SPEC.json"
+    payload = _read_json(path)
+    payload["affinity_rule_table"].append({"sqlite_affinity": "NULL", "rule": "bad", "unsafe_policy": "bad"})
+    _write_json(path, payload)
+    _refresh_lock_hash(artifact, "TYPED_MATERIALIZATION_SPEC.json")
+    report = validate(artifact)
+    assert report["status"] == "FAIL"
+    assert "typed_affinity_table_not_sqlite_five" in report["violations"]
+    assert "null_listed_as_sqlite_affinity" in report["violations"]
 
 
 def test_validator_detects_missing_semantic_slot_inventory(workspace_tmp: Path) -> None:
@@ -590,6 +707,44 @@ def test_validator_detects_missing_semantic_slot_inventory(workspace_tmp: Path) 
     report = validate(artifact)
     assert report["status"] == "FAIL"
     assert "semantic_slot_inventory_not_required" in report["violations"]
+
+
+def test_validator_detects_missing_semantic_slot_architecture_input(workspace_tmp: Path) -> None:
+    artifact = _copy_stage7b(workspace_tmp)
+    path = artifact / "V2_ARCHITECTURE_SPEC.json"
+    payload = _read_json(path)
+    payload["input_contract"] = [item for item in payload["input_contract"] if item != "semantic_slot_inventory"]
+    _write_json(path, payload)
+    _refresh_lock_hash(artifact, "V2_ARCHITECTURE_SPEC.json")
+    report = validate(artifact)
+    assert report["status"] == "FAIL"
+    assert "semantic_slot_inventory_missing_from_architecture_input" in report["violations"]
+
+
+def test_validator_detects_missing_duplicate_slot_policy(workspace_tmp: Path) -> None:
+    artifact = _copy_stage7b(workspace_tmp)
+    path = artifact / "COMPLETENESS_VERIFICATION_SPEC.json"
+    payload = _read_json(path)
+    payload["checks"] = [item for item in payload["checks"] if item != "required_slots_mapped_exactly_once"]
+    payload["set_definitions"].pop("duplicate_required")
+    _write_json(path, payload)
+    _refresh_lock_hash(artifact, "COMPLETENESS_VERIFICATION_SPEC.json")
+    report = validate(artifact)
+    assert report["status"] == "FAIL"
+    assert "completeness_multiplicity_check_missing" in report["violations"]
+    assert "duplicate_required_not_frozen" in report["violations"]
+
+
+def test_validator_detects_missing_assignment_column_uniqueness_policy(workspace_tmp: Path) -> None:
+    artifact = _copy_stage7b(workspace_tmp)
+    path = artifact / "schemas" / "insert_ir.schema.json"
+    payload = _read_json(path)
+    payload["x-semantic-constraints"].pop("assignment_target_column_uniqueness")
+    _write_json(path, payload)
+    _refresh_lock_hash(artifact, "schemas/insert_ir.schema.json")
+    report = validate(artifact)
+    assert report["status"] == "FAIL"
+    assert "insert_assignment_uniqueness_missing" in report["violations"]
 
 
 def test_validator_detects_missing_ablation_intervention(workspace_tmp: Path) -> None:

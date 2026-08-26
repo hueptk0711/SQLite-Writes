@@ -16,6 +16,11 @@
       "EV_2",
       "EV_3"
     ],
+    "slot_refs": [
+      "SLOT_1",
+      "SLOT_2",
+      "SLOT_3"
+    ],
     "table_refs": [
       "TAB_1"
     ]
@@ -25,6 +30,7 @@
     "columns": "COL_* dynamic enum",
     "constraints": "CONSTRAINT_* dynamic enum",
     "evidence": "EV_* dynamic enum",
+    "slots": "SLOT_* dynamic enum",
     "tables": "TAB_* dynamic enum"
   },
   "rule": "Every identifier emitted by the model must belong to a supplied finite inventory instantiated into the per-sample JSON Schema.",
@@ -32,6 +38,7 @@
     "column_ref": "enum(sample.column_refs)",
     "conflict_target_ref": "enum(sample.constraint_refs)",
     "evidence_ref": "enum(sample.evidence_refs)",
+    "slot_ref": "enum(sample.slot_refs)",
     "table_ref": "enum(sample.table_refs)"
   },
   "selected_mechanism": "dynamic_per_sample_json_schema_enum",

@@ -55,7 +55,11 @@
             "type": "string"
           },
           "slot_ref": {
-            "pattern": "^SLOT_[0-9]+$",
+            "enum": [
+              "SLOT_1",
+              "SLOT_2",
+              "SLOT_3"
+            ],
             "type": "string"
           }
         },
@@ -101,7 +105,11 @@
             "type": "string"
           },
           "slot_ref": {
-            "pattern": "^SLOT_[0-9]+$",
+            "enum": [
+              "SLOT_1",
+              "SLOT_2",
+              "SLOT_3"
+            ],
             "type": "string"
           }
         },
@@ -130,5 +138,12 @@
     "update_policy"
   ],
   "type": "object",
-  "x-schema-instantiation": "dynamic_per_sample_enum_example"
+  "x-schema-instantiation": "dynamic_per_sample_enum_example",
+  "x-semantic-constraints": {
+    "cross_branch_column_reuse_allowed": true,
+    "insert_assignment_slot_ref_multiplicity": "exactly_once_for_required_slots_and_at_most_once_for_all_mapped_slots within insert_assignments",
+    "insert_assignment_target_column_uniqueness": "column_ref values must be unique within insert_assignments",
+    "update_assignment_slot_ref_multiplicity": "exactly_once_for_required_slots_and_at_most_once_for_all_mapped_slots within update_assignments when present",
+    "update_assignment_target_column_uniqueness": "column_ref values must be unique within update_assignments when present"
+  }
 }

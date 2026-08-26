@@ -1,33 +1,28 @@
 {
   "affinity_rule_table": [
     {
-      "rule": "strict lossless integer parse",
-      "schema_affinity": "INTEGER",
-      "unsafe_policy": "reject"
+      "rule": "strict lossless integer/numeric handling",
+      "sqlite_affinity": "INTEGER",
+      "unsafe_policy": "reject ambiguous or lossy numeric evidence"
     },
     {
-      "rule": "strict finite numeric parse",
-      "schema_affinity": "REAL",
-      "unsafe_policy": "reject"
+      "rule": "strict finite real handling",
+      "sqlite_affinity": "REAL",
+      "unsafe_policy": "reject non-finite, ambiguous, or lossy numeric evidence"
     },
     {
-      "rule": "preserve raw evidence string",
-      "schema_affinity": "TEXT",
+      "rule": "preserve raw evidence text",
+      "sqlite_affinity": "TEXT",
       "unsafe_policy": "not_applicable"
     },
     {
-      "rule": "emit NULL only when evidence belongs to frozen null-literal set",
-      "schema_affinity": "NULL",
-      "unsafe_policy": "reject otherwise"
+      "rule": "deterministic SQLite-aware numeric handling; otherwise preserve as TEXT or reject according to frozen numeric policy",
+      "sqlite_affinity": "NUMERIC",
+      "unsafe_policy": "reject ambiguous numeric evidence when preserving text would change expected storage semantics"
     },
     {
       "rule": "unsupported without a frozen binary representation",
-      "schema_affinity": "BLOB",
-      "unsafe_policy": "reject"
-    },
-    {
-      "rule": "no coercion",
-      "schema_affinity": "ambiguous_or_lossy_parse",
+      "sqlite_affinity": "BLOB",
       "unsafe_policy": "reject"
     }
   ],
@@ -51,15 +46,24 @@
   ],
   "implicit_date_time_normalization_allowed": false,
   "llm_normalization_decisions_allowed": false,
-  "null_literal_set": [
-    "NULL",
-    "null",
-    "None",
-    "无",
-    "空"
-  ],
+  "null_value_policy": {
+    "language_broad_heuristics_forbidden": [
+      "无",
+      "空"
+    ],
+    "null_is_affinity": false,
+    "raw_text_default": "preserve as text unless metadata marks nullness",
+    "rule": "materialize SQL NULL only from explicit source/evidence metadata or a frozen unambiguous null token policy"
+  },
   "rule": "Typed values are derived from schema type plus raw evidence via deterministic parsers.",
-  "sqlite_date_note": "SQLite has no native DATE storage class; TEXT columns preserve raw evidence unless a deterministic canonicalization rule is frozen before evaluation.",
+  "sqlite_affinity_set": [
+    "TEXT",
+    "NUMERIC",
+    "INTEGER",
+    "REAL",
+    "BLOB"
+  ],
+  "sqlite_date_note": "SQLite has no native DATE storage class; DATE and DATETIME declared types have NUMERIC affinity. TEXT columns preserve raw evidence unless a deterministic canonicalization rule is frozen before evaluation.",
   "stage": "Stage7B_V2_METHOD_SPECIFICATION",
   "unsafe_materialization_policy": "reject; do not hallucinate conversion"
 }

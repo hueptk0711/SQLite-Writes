@@ -41,6 +41,13 @@
     ]
   },
   "phase_m": {
+    "input_contract": [
+      "natural_language_write_request",
+      "schema_inventory",
+      "evidence_inventory",
+      "semantic_slot_inventory",
+      "operation_specific_dynamic_enum_schema"
+    ],
     "model_call_count": 1,
     "name": "schema_conditioned_mapping",
     "operation_field_policy": "operation is fixed by Phase O and must match the selected schema const",

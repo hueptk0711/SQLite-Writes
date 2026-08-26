@@ -18,6 +18,7 @@ SCHEMA_INVENTORY_EXAMPLE = {
     "table_refs": ["TAB_1"],
     "column_refs": ["COL_1", "COL_2", "COL_3", "COL_4", "COL_5"],
     "evidence_refs": ["EV_1", "EV_2", "EV_3"],
+    "slot_refs": ["SLOT_1", "SLOT_2", "SLOT_3"],
     "constraint_refs": ["CONSTRAINT_1"],
 }
 PREDICATE_OPERATORS = ["EQ", "NE", "LT", "GT"]
@@ -166,7 +167,7 @@ def architecture_spec() -> dict[str, Any]:
         "stage": STAGE,
         "method_name": "Operation-Conditioned Slot-Grounded MP-FS",
         "status": "FROZEN_SPECIFICATION",
-        "input_contract": ["natural_language_write_request", "schema_inventory", "evidence_inventory"],
+        "input_contract": ["natural_language_write_request", "schema_inventory", "evidence_inventory", "semantic_slot_inventory"],
         "core_pipeline": [
             {"order": 1, "component": "operation_conditioning", "output": "operation_class"},
             {"order": 2, "component": "slot_grounded_minimal_ir", "output": "operation_specific_ir_with_constrained_references"},
@@ -174,7 +175,7 @@ def architecture_spec() -> dict[str, Any]:
             {"order": 4, "component": "semantic_completeness_verification", "output": "accepted_or_rejected_ir"},
             {"order": 5, "component": "deterministic_sqlite_compilation_preflight", "output": "sqlite_program_or_rejection"},
         ],
-        "representation_contract": "JSON Schema validation surrounds all model-produced IR before semantic verification.",
+        "representation_contract": "JSON Schema validation surrounds all model-produced IR before semantic verification. The semantic slot inventory is available before Phase M and supplies dynamic SLOT_* enums.",
         "operation_conditioning_protocol": "two_phase_operation_enum_then_schema_conditioned_mapping",
         "registered_model_call_count": {"Phase_O_operation_conditioning": 1, "Phase_M_mapping": 1},
         "primary_v2_depends_on_repair": False,
@@ -201,6 +202,7 @@ def operation_conditioning_spec() -> dict[str, Any]:
         "phase_m": {
             "name": "schema_conditioned_mapping",
             "model_call_count": 1,
+            "input_contract": ["natural_language_write_request", "schema_inventory", "evidence_inventory", "semantic_slot_inventory", "operation_specific_dynamic_enum_schema"],
             "schema_selection": "select exactly one operation-specific dynamic-enum JSON Schema from Phase O output",
             "operation_field_policy": "operation is fixed by Phase O and must match the selected schema const",
         },
@@ -225,9 +227,10 @@ def slot_grounded_ir_spec() -> dict[str, Any]:
         "not_llm_decisions": ["SQL syntax", "normalization_function", "arbitrary_identifier_creation", "compiler_strategy", "silent_reference_repair"],
         "predicate_ir": {
             "connector": {"enum": PREDICATE_CONNECTORS},
-            "predicates": {"items": {"column_ref": "dynamic enum COL_*", "operator": PREDICATE_OPERATORS, "evidence_ref": "dynamic enum EV_*"}},
+            "predicates": {"items": {"column_ref": "dynamic enum COL_*", "operator": PREDICATE_OPERATORS, "evidence_ref": "dynamic enum EV_*", "slot_ref": "dynamic enum SLOT_*"}},
             "supports_multi_condition": True,
             "opaque_row_ref_allowed": False,
+            "predicate_column_uniqueness_required": False,
         },
         "insert_example": {
             "operation": "INSERT",
@@ -250,11 +253,12 @@ def reference_constraint_spec() -> dict[str, Any]:
             "table_ref": "enum(sample.table_refs)",
             "column_ref": "enum(sample.column_refs)",
             "evidence_ref": "enum(sample.evidence_refs)",
+            "slot_ref": "enum(sample.slot_refs)",
             "conflict_target_ref": "enum(sample.constraint_refs)",
         },
         "validation_order": ["operation_phase_o_enum", "instantiate_operation_specific_schema_with_sample_inventory", "json_schema_validation", "inventory_membership_is_enforced_by_enum", "semantic_verification"],
         "example_inventory_for_schema_artifacts": SCHEMA_INVENTORY_EXAMPLE,
-        "inventories": {"tables": "TAB_* dynamic enum", "columns": "COL_* dynamic enum", "evidence": "EV_* dynamic enum", "constraints": "CONSTRAINT_* dynamic enum"},
+        "inventories": {"tables": "TAB_* dynamic enum", "columns": "COL_* dynamic enum", "evidence": "EV_* dynamic enum", "slots": "SLOT_* dynamic enum", "constraints": "CONSTRAINT_* dynamic enum"},
         "invalid_reference_policy": "deterministic rejection; no silent fuzzy correction",
         "unrestricted_reference_ids_allowed": False,
     }
@@ -267,16 +271,21 @@ def typed_materialization_spec() -> dict[str, Any]:
         "rule": "Typed values are derived from schema type plus raw evidence via deterministic parsers.",
         "llm_normalization_decisions_allowed": False,
         "affinity_rule_table": [
-            {"schema_affinity": "INTEGER", "rule": "strict lossless integer parse", "unsafe_policy": "reject"},
-            {"schema_affinity": "REAL", "rule": "strict finite numeric parse", "unsafe_policy": "reject"},
-            {"schema_affinity": "TEXT", "rule": "preserve raw evidence string", "unsafe_policy": "not_applicable"},
-            {"schema_affinity": "NULL", "rule": "emit NULL only when evidence belongs to frozen null-literal set", "unsafe_policy": "reject otherwise"},
-            {"schema_affinity": "BLOB", "rule": "unsupported without a frozen binary representation", "unsafe_policy": "reject"},
-            {"schema_affinity": "ambiguous_or_lossy_parse", "rule": "no coercion", "unsafe_policy": "reject"},
+            {"sqlite_affinity": "INTEGER", "rule": "strict lossless integer/numeric handling", "unsafe_policy": "reject ambiguous or lossy numeric evidence"},
+            {"sqlite_affinity": "REAL", "rule": "strict finite real handling", "unsafe_policy": "reject non-finite, ambiguous, or lossy numeric evidence"},
+            {"sqlite_affinity": "TEXT", "rule": "preserve raw evidence text", "unsafe_policy": "not_applicable"},
+            {"sqlite_affinity": "NUMERIC", "rule": "deterministic SQLite-aware numeric handling; otherwise preserve as TEXT or reject according to frozen numeric policy", "unsafe_policy": "reject ambiguous numeric evidence when preserving text would change expected storage semantics"},
+            {"sqlite_affinity": "BLOB", "rule": "unsupported without a frozen binary representation", "unsafe_policy": "reject"},
         ],
-        "null_literal_set": ["NULL", "null", "None", "无", "空"],
+        "sqlite_affinity_set": ["TEXT", "NUMERIC", "INTEGER", "REAL", "BLOB"],
+        "null_value_policy": {
+            "null_is_affinity": False,
+            "rule": "materialize SQL NULL only from explicit source/evidence metadata or a frozen unambiguous null token policy",
+            "raw_text_default": "preserve as text unless metadata marks nullness",
+            "language_broad_heuristics_forbidden": ["无", "空"],
+        },
         "implicit_date_time_normalization_allowed": False,
-        "sqlite_date_note": "SQLite has no native DATE storage class; TEXT columns preserve raw evidence unless a deterministic canonicalization rule is frozen before evaluation.",
+        "sqlite_date_note": "SQLite has no native DATE storage class; DATE and DATETIME declared types have NUMERIC affinity. TEXT columns preserve raw evidence unless a deterministic canonicalization rule is frozen before evaluation.",
         "examples": [
             {"schema_type": "INTEGER", "raw_evidence": "20", "materialized_value": 20},
             {"schema_type": "REAL", "raw_evidence": "12.50", "materialized_value": 12.5},
@@ -293,7 +302,7 @@ def completeness_verification_spec() -> dict[str, Any]:
         "rule": "Verify that semantic write slots implied by the request are fully represented before SQL compilation.",
         "semantic_slot_inventory": {
             "required_input_to_phase_m": True,
-            "slot_schema": {"slot_ref": "SLOT_*", "evidence_ref": "EV_* dynamic enum", "role": ["write_value", "predicate_value", "conflict_key"], "required": "boolean"},
+            "slot_schema": {"slot_ref": "SLOT_* dynamic enum", "evidence_ref": "EV_* dynamic enum", "role": ["write_value", "predicate_value", "conflict_key"], "required": "boolean"},
             "creation_policy": {
                 "semi_structured_input": "deterministically convert supplied source fields/evidence cells into SLOT_* before mapping",
                 "free_text_input": "use a pre-registered evidence span inventory; if span discovery needs an LLM, it is an explicit model-dependent upstream module and cannot be claimed deterministic",
@@ -303,11 +312,24 @@ def completeness_verification_spec() -> dict[str, Any]:
             "required": "set(SLOT_* where required=true)",
             "allowed": "set(all SLOT_* in semantic_slot_inventory)",
             "mapped": "set(SLOT_* represented by accepted IR assignments and predicates)",
+            "mapped_occurrences": "multiset/list of SLOT_* references represented by accepted IR assignments and predicates in the relevant context",
             "missing": "required - mapped",
             "extra": "mapped - allowed",
-            "complete_iff": "missing == empty and extra == empty",
+            "duplicate_required": "any required SLOT_i where count(mapped_occurrences[SLOT_i]) != 1",
+            "duplicate_mapped": "any SLOT_i where count(mapped_occurrences[SLOT_i]) > 1 in the same mapping context",
+            "complete_iff": "missing == empty and extra == empty and duplicate_required == empty and duplicate_mapped == empty and assignment_target_columns_unique == true",
         },
-        "checks": ["all_required_slots_mapped", "no_unjustified_extra_slots", "operation_required_fields_present", "row_selector_present_for_update_delete", "mapped_slots_are_allowed"],
+        "multiplicity_constraints": {
+            "required_slot_refs": "every required SLOT must appear exactly once in its relevant mapping context",
+            "mapped_slot_refs": "no SLOT may appear more than once in the same mapping context",
+            "insert_assignments": "column_ref values must be unique within assignments",
+            "update_assignments": "column_ref values must be unique within assignments",
+            "upsert_insert_assignments": "column_ref values must be unique within insert_assignments",
+            "upsert_update_assignments": "column_ref values must be unique within update_assignments",
+            "upsert_cross_branch_column_reuse": "allowed because insert_assignments and update_assignments are separate semantic branches",
+            "predicates": "column_ref uniqueness is not required; repeated columns are allowed for ranges such as age > 18 AND age < 60",
+        },
+        "checks": ["all_required_slots_mapped", "required_slots_mapped_exactly_once", "no_duplicate_slot_mapping", "assignment_target_columns_unique", "no_unjustified_extra_slots", "operation_required_fields_present", "row_selector_present_for_update_delete", "mapped_slots_are_allowed"],
         "coverage_metric": "semantic_slots_mapped / semantic_slots_required",
         "failure_policy": "reject incomplete or over-selected IR before deterministic compilation",
     }
@@ -391,11 +413,15 @@ def ref_schema(values: list[str]) -> dict[str, Any]:
     return {"type": "string", "enum": values}
 
 
+def slot_ref_schema() -> dict[str, Any]:
+    return ref_schema(SCHEMA_INVENTORY_EXAMPLE["slot_refs"])
+
+
 def assignment_schema(*, include_slot_ref: bool = True) -> dict[str, Any]:
     properties = {"column_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["column_refs"]), "evidence_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["evidence_refs"])}
     required = ["column_ref", "evidence_ref"]
     if include_slot_ref:
-        properties["slot_ref"] = {"type": "string", "pattern": "^SLOT_[0-9]+$"}
+        properties["slot_ref"] = slot_ref_schema()
         required.append("slot_ref")
     return {"type": "object", "additionalProperties": False, "required": required, "properties": properties}
 
@@ -418,10 +444,14 @@ def row_selector_schema() -> dict[str, Any]:
                         "column_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["column_refs"]),
                         "operator": {"enum": PREDICATE_OPERATORS},
                         "evidence_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["evidence_refs"]),
-                        "slot_ref": {"type": "string", "pattern": "^SLOT_[0-9]+$"},
+                        "slot_ref": slot_ref_schema(),
                     },
                 },
             },
+        },
+        "x-semantic-constraints": {
+            "predicate_slot_ref_multiplicity": "slot_ref values must be unique within predicates",
+            "predicate_column_uniqueness_required": False,
         },
     }
 
@@ -429,12 +459,19 @@ def row_selector_schema() -> dict[str, Any]:
 def schemas() -> dict[str, dict[str, Any]]:
     base = {"$schema": "https://json-schema.org/draft/2020-12/schema", "additionalProperties": False, "type": "object"}
     return {
-        "schemas/insert_ir.schema.json": {**base, "x-schema-instantiation": "dynamic_per_sample_enum_example", "required": ["operation", "table_ref", "assignments"], "properties": {"operation": {"const": "INSERT"}, "table_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["table_refs"]), "assignments": {"type": "array", "minItems": 1, "items": assignment_schema()}}},
-        "schemas/update_ir.schema.json": {**base, "x-schema-instantiation": "dynamic_per_sample_enum_example", "required": ["operation", "table_ref", "row_selector", "assignments"], "properties": {"operation": {"const": "UPDATE"}, "table_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["table_refs"]), "row_selector": row_selector_schema(), "assignments": {"type": "array", "minItems": 1, "items": assignment_schema()}}},
-        "schemas/delete_ir.schema.json": {**base, "x-schema-instantiation": "dynamic_per_sample_enum_example", "required": ["operation", "table_ref", "row_selector"], "properties": {"operation": {"const": "DELETE"}, "table_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["table_refs"]), "row_selector": row_selector_schema()}},
+        "schemas/insert_ir.schema.json": {**base, "x-schema-instantiation": "dynamic_per_sample_enum_example", "x-semantic-constraints": {"assignment_slot_ref_multiplicity": "exactly_once_for_required_slots_and_at_most_once_for_all_mapped_slots", "assignment_target_column_uniqueness": "column_ref values must be unique within assignments"}, "required": ["operation", "table_ref", "assignments"], "properties": {"operation": {"const": "INSERT"}, "table_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["table_refs"]), "assignments": {"type": "array", "minItems": 1, "items": assignment_schema()}}},
+        "schemas/update_ir.schema.json": {**base, "x-schema-instantiation": "dynamic_per_sample_enum_example", "x-semantic-constraints": {"assignment_slot_ref_multiplicity": "exactly_once_for_required_slots_and_at_most_once_for_all_mapped_slots", "assignment_target_column_uniqueness": "column_ref values must be unique within assignments", "predicate_column_uniqueness_required": False}, "required": ["operation", "table_ref", "row_selector", "assignments"], "properties": {"operation": {"const": "UPDATE"}, "table_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["table_refs"]), "row_selector": row_selector_schema(), "assignments": {"type": "array", "minItems": 1, "items": assignment_schema()}}},
+        "schemas/delete_ir.schema.json": {**base, "x-schema-instantiation": "dynamic_per_sample_enum_example", "x-semantic-constraints": {"predicate_column_uniqueness_required": False, "predicate_slot_ref_multiplicity": "at_most_once_for_all_mapped_predicate_slots"}, "required": ["operation", "table_ref", "row_selector"], "properties": {"operation": {"const": "DELETE"}, "table_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["table_refs"]), "row_selector": row_selector_schema()}},
         "schemas/upsert_ir.schema.json": {
             **base,
             "x-schema-instantiation": "dynamic_per_sample_enum_example",
+            "x-semantic-constraints": {
+                "insert_assignment_slot_ref_multiplicity": "exactly_once_for_required_slots_and_at_most_once_for_all_mapped_slots within insert_assignments",
+                "update_assignment_slot_ref_multiplicity": "exactly_once_for_required_slots_and_at_most_once_for_all_mapped_slots within update_assignments when present",
+                "insert_assignment_target_column_uniqueness": "column_ref values must be unique within insert_assignments",
+                "update_assignment_target_column_uniqueness": "column_ref values must be unique within update_assignments when present",
+                "cross_branch_column_reuse_allowed": True,
+            },
             "required": ["operation", "table_ref", "conflict_target_ref", "insert_assignments", "update_policy"],
             "properties": {"operation": {"const": "UPSERT"}, "table_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["table_refs"]), "conflict_target_ref": ref_schema(SCHEMA_INVENTORY_EXAMPLE["constraint_refs"]), "insert_assignments": {"type": "array", "minItems": 1, "items": assignment_schema()}, "update_policy": {"enum": ["DO_NOTHING", "DO_UPDATE"]}, "update_assignments": {"type": "array", "minItems": 1, "items": assignment_schema()}},
             "oneOf": [

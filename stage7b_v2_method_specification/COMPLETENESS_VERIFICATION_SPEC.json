@@ -1,6 +1,9 @@
 {
   "checks": [
     "all_required_slots_mapped",
+    "required_slots_mapped_exactly_once",
+    "no_duplicate_slot_mapping",
+    "assignment_target_columns_unique",
     "no_unjustified_extra_slots",
     "operation_required_fields_present",
     "row_selector_present_for_update_delete",
@@ -9,6 +12,16 @@
   "component": "semantic_completeness_verification",
   "coverage_metric": "semantic_slots_mapped / semantic_slots_required",
   "failure_policy": "reject incomplete or over-selected IR before deterministic compilation",
+  "multiplicity_constraints": {
+    "insert_assignments": "column_ref values must be unique within assignments",
+    "mapped_slot_refs": "no SLOT may appear more than once in the same mapping context",
+    "predicates": "column_ref uniqueness is not required; repeated columns are allowed for ranges such as age > 18 AND age < 60",
+    "required_slot_refs": "every required SLOT must appear exactly once in its relevant mapping context",
+    "update_assignments": "column_ref values must be unique within assignments",
+    "upsert_cross_branch_column_reuse": "allowed because insert_assignments and update_assignments are separate semantic branches",
+    "upsert_insert_assignments": "column_ref values must be unique within insert_assignments",
+    "upsert_update_assignments": "column_ref values must be unique within update_assignments"
+  },
   "rule": "Verify that semantic write slots implied by the request are fully represented before SQL compilation.",
   "semantic_slot_inventory": {
     "creation_policy": {
@@ -24,14 +37,17 @@
         "predicate_value",
         "conflict_key"
       ],
-      "slot_ref": "SLOT_*"
+      "slot_ref": "SLOT_* dynamic enum"
     }
   },
   "set_definitions": {
     "allowed": "set(all SLOT_* in semantic_slot_inventory)",
-    "complete_iff": "missing == empty and extra == empty",
+    "complete_iff": "missing == empty and extra == empty and duplicate_required == empty and duplicate_mapped == empty and assignment_target_columns_unique == true",
+    "duplicate_mapped": "any SLOT_i where count(mapped_occurrences[SLOT_i]) > 1 in the same mapping context",
+    "duplicate_required": "any required SLOT_i where count(mapped_occurrences[SLOT_i]) != 1",
     "extra": "mapped - allowed",
     "mapped": "set(SLOT_* represented by accepted IR assignments and predicates)",
+    "mapped_occurrences": "multiset/list of SLOT_* references represented by accepted IR assignments and predicates in the relevant context",
     "missing": "required - mapped",
     "required": "set(SLOT_* where required=true)"
   },

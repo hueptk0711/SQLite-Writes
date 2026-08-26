@@ -53,9 +53,11 @@ EXPECTED_ENUMS = {
     "table_refs": ["TAB_1"],
     "column_refs": ["COL_1", "COL_2", "COL_3", "COL_4", "COL_5"],
     "evidence_refs": ["EV_1", "EV_2", "EV_3"],
+    "slot_refs": ["SLOT_1", "SLOT_2", "SLOT_3"],
     "constraint_refs": ["CONSTRAINT_1"],
 }
 EXPECTED_OPERATORS = ["EQ", "NE", "LT", "GT"]
+EXPECTED_SQLITE_AFFINITIES = {"TEXT", "NUMERIC", "INTEGER", "REAL", "BLOB"}
 
 
 def sha256_file(path: Path) -> str:
@@ -106,7 +108,7 @@ def validate_schemas(output_dir: Path, violations: list[str]) -> None:
         require(schema.get("additionalProperties") is False, violations, f"schema_allows_additional_properties:{op}")
         text = json.dumps(schema, sort_keys=True)
         require("normalization" not in text, violations, f"schema_contains_normalization:{op}")
-        require("pattern" not in text or "SLOT_" in text, violations, f"schema_uses_shape_reference_constraint:{op}")
+        require("pattern" not in text, violations, f"schema_uses_shape_reference_constraint:{op}")
         require("row_ref" not in text, violations, f"schema_uses_opaque_row_ref:{op}")
         require(schema.get("x-schema-instantiation") == "dynamic_per_sample_enum_example", violations, f"schema_missing_dynamic_enum_marker:{op}")
     insert_props = set(schemas["INSERT"].get("properties", {}))
@@ -117,6 +119,7 @@ def validate_schemas(output_dir: Path, violations: list[str]) -> None:
         assignment = schemas[schema_key]["properties"][field_name]["items"]["properties"]
         require(assignment["column_ref"].get("enum") == EXPECTED_ENUMS["column_refs"], violations, f"{schema_key.lower()}_{field_name}_column_ref_not_enum")
         require(assignment["evidence_ref"].get("enum") == EXPECTED_ENUMS["evidence_refs"], violations, f"{schema_key.lower()}_{field_name}_evidence_ref_not_enum")
+        require(assignment["slot_ref"].get("enum") == EXPECTED_ENUMS["slot_refs"], violations, f"{schema_key.lower()}_{field_name}_slot_ref_not_enum")
     update_required = set(schemas["UPDATE"].get("required", []))
     delete_required = set(schemas["DELETE"].get("required", []))
     upsert_required = set(schemas["UPSERT"].get("required", []))
@@ -132,10 +135,15 @@ def validate_schemas(output_dir: Path, violations: list[str]) -> None:
         predicate = predicate_item.get("properties", {})
         require(predicate.get("column_ref", {}).get("enum") == EXPECTED_ENUMS["column_refs"], violations, f"{op.lower()}_predicate_column_ref_not_enum")
         require(predicate.get("evidence_ref", {}).get("enum") == EXPECTED_ENUMS["evidence_refs"], violations, f"{op.lower()}_predicate_evidence_ref_not_enum")
+        require(predicate.get("slot_ref", {}).get("enum") == EXPECTED_ENUMS["slot_refs"], violations, f"{op.lower()}_predicate_slot_ref_not_enum")
         require(predicate.get("operator", {}).get("enum") == EXPECTED_OPERATORS, violations, f"{op.lower()}_predicate_operator_inventory_invalid")
         require("row_ref" not in json.dumps(selector), violations, f"{op.lower()}_selector_uses_opaque_row_ref")
+    require("assignment_target_column_uniqueness" in schemas["INSERT"].get("x-semantic-constraints", {}), violations, "insert_assignment_uniqueness_missing")
+    require("assignment_target_column_uniqueness" in schemas["UPDATE"].get("x-semantic-constraints", {}), violations, "update_assignment_uniqueness_missing")
+    require(schemas["DELETE"].get("x-semantic-constraints", {}).get("predicate_column_uniqueness_required") is False, violations, "delete_predicate_column_uniqueness_wrong")
     upsert = schemas["UPSERT"]
     require(upsert["properties"]["conflict_target_ref"].get("enum") == EXPECTED_ENUMS["constraint_refs"], violations, "upsert_conflict_target_not_enum")
+    require(upsert.get("x-semantic-constraints", {}).get("cross_branch_column_reuse_allowed") is True, violations, "upsert_cross_branch_reuse_policy_missing")
     require("oneOf" in upsert, violations, "upsert_missing_conditional_contract")
     require(upsert["properties"]["update_assignments"].get("minItems") == 1, violations, "upsert_update_assignments_not_nonempty")
 
@@ -186,6 +194,7 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
     require(architecture.get("primary_v2_depends_on_repair") is False, violations, "primary_v2_depends_on_repair")
     require(architecture.get("operation_conditioning_protocol") == "two_phase_operation_enum_then_schema_conditioned_mapping", violations, "operation_conditioning_protocol_not_two_phase")
     require(architecture.get("registered_model_call_count") == {"Phase_M_mapping": 1, "Phase_O_operation_conditioning": 1}, violations, "registered_model_call_count_not_frozen")
+    require("semantic_slot_inventory" in architecture.get("input_contract", []), violations, "semantic_slot_inventory_missing_from_architecture_input")
     require(architecture.get("v2_implemented") is False, violations, "architecture_v2_implemented")
     checks["architecture_spec_validated"] = True
 
@@ -193,25 +202,41 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
     require(op_spec.get("operation_classes") == ["INSERT", "UPDATE", "DELETE", "UPSERT"], violations, "operation_classes_not_frozen")
     require(op_spec.get("protocol") == "two_phase_operation_conditioning", violations, "operation_protocol_not_two_phase")
     require(op_spec.get("phase_o", {}).get("model_call_count") == 1 and op_spec.get("phase_m", {}).get("model_call_count") == 1, violations, "operation_phase_model_counts_invalid")
+    require("semantic_slot_inventory" in op_spec.get("phase_m", {}).get("input_contract", []), violations, "semantic_slot_inventory_missing_from_phase_m_input")
     require("gold_sql" in op_spec.get("phase_o", {}).get("forbidden_inputs", []), violations, "operation_phase_o_gold_not_forbidden")
     require("conflict_target_ref" not in op_spec.get("operation_specific_allowed_fields", {}).get("INSERT", []), violations, "insert_allows_conflict_target")
     ref_spec = read_json(output_dir / "REFERENCE_CONSTRAINT_SPEC.json")
     require(ref_spec.get("selected_mechanism") == "dynamic_per_sample_json_schema_enum", violations, "reference_constraint_not_dynamic_enum")
     require(ref_spec.get("example_inventory_for_schema_artifacts") == EXPECTED_ENUMS, violations, "reference_example_inventory_changed")
+    require(ref_spec.get("schema_instantiation", {}).get("slot_ref") == "enum(sample.slot_refs)", violations, "slot_ref_schema_instantiation_missing")
     require("instantiate_operation_specific_schema_with_sample_inventory" in ref_spec.get("validation_order", []), violations, "reference_validation_order_missing_instantiation")
     require(ref_spec.get("unrestricted_reference_ids_allowed") is False, violations, "unrestricted_reference_ids_allowed")
     typed_spec = read_json(output_dir / "TYPED_MATERIALIZATION_SPEC.json")
     require(typed_spec.get("llm_normalization_decisions_allowed") is False, violations, "llm_normalization_allowed")
-    affinities = {row.get("schema_affinity"): row for row in typed_spec.get("affinity_rule_table", [])}
-    require({"INTEGER", "REAL", "TEXT", "NULL", "BLOB", "ambiguous_or_lossy_parse"} <= set(affinities), violations, "typed_affinity_table_incomplete")
-    require(affinities.get("TEXT", {}).get("rule") == "preserve raw evidence string", violations, "text_affinity_not_raw_preserve")
+    affinities = {row.get("sqlite_affinity"): row for row in typed_spec.get("affinity_rule_table", [])}
+    require(set(affinities) == EXPECTED_SQLITE_AFFINITIES, violations, "typed_affinity_table_not_sqlite_five")
+    require("NULL" not in set(affinities), violations, "null_listed_as_sqlite_affinity")
+    require(typed_spec.get("sqlite_affinity_set") == ["TEXT", "NUMERIC", "INTEGER", "REAL", "BLOB"], violations, "sqlite_affinity_set_not_frozen")
+    require(affinities.get("TEXT", {}).get("rule") == "preserve raw evidence text", violations, "text_affinity_not_raw_preserve")
+    require("NUMERIC" in affinities, violations, "numeric_affinity_missing")
+    null_policy = typed_spec.get("null_value_policy", {})
+    require(null_policy.get("null_is_affinity") is False, violations, "null_policy_claims_affinity")
+    require("无" in null_policy.get("language_broad_heuristics_forbidden", []), violations, "broad_null_heuristics_not_forbidden")
     require(typed_spec.get("implicit_date_time_normalization_allowed") is False, violations, "implicit_date_time_normalization_allowed")
     complete_spec = read_json(output_dir / "COMPLETENESS_VERIFICATION_SPEC.json")
     require("all_required_slots_mapped" in complete_spec.get("checks", []), violations, "completeness_missing_required_slot_check")
+    require("required_slots_mapped_exactly_once" in complete_spec.get("checks", []), violations, "completeness_multiplicity_check_missing")
+    require("assignment_target_columns_unique" in complete_spec.get("checks", []), violations, "assignment_column_uniqueness_check_missing")
     require(complete_spec.get("semantic_slot_inventory", {}).get("required_input_to_phase_m") is True, violations, "semantic_slot_inventory_not_required")
     sets = complete_spec.get("set_definitions", {})
     require(sets.get("missing") == "required - mapped" and sets.get("extra") == "mapped - allowed", violations, "completeness_set_math_not_frozen")
-    require(sets.get("complete_iff") == "missing == empty and extra == empty", violations, "completeness_complete_iff_invalid")
+    require(sets.get("duplicate_required") == "any required SLOT_i where count(mapped_occurrences[SLOT_i]) != 1", violations, "duplicate_required_not_frozen")
+    require(sets.get("duplicate_mapped") == "any SLOT_i where count(mapped_occurrences[SLOT_i]) > 1 in the same mapping context", violations, "duplicate_mapped_not_frozen")
+    require(sets.get("complete_iff") == "missing == empty and extra == empty and duplicate_required == empty and duplicate_mapped == empty and assignment_target_columns_unique == true", violations, "completeness_complete_iff_invalid")
+    multiplicity = complete_spec.get("multiplicity_constraints", {})
+    require(multiplicity.get("required_slot_refs") == "every required SLOT must appear exactly once in its relevant mapping context", violations, "required_slot_multiplicity_missing")
+    require(multiplicity.get("insert_assignments") == "column_ref values must be unique within assignments", violations, "insert_column_uniqueness_missing")
+    require(multiplicity.get("predicates", "").startswith("column_ref uniqueness is not required"), violations, "predicate_column_uniqueness_policy_invalid")
     rep_spec = read_json(output_dir / "REPRESENTATION_CONTRACT_SPEC.json")
     require("additionalProperties=false" in rep_spec.get("contract", []), violations, "representation_contract_allows_extra_fields")
     abstain = read_json(output_dir / "ABSTENTION_POLICY_SPEC.json")

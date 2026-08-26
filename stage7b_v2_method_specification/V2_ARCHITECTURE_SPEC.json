@@ -30,7 +30,8 @@
   "input_contract": [
     "natural_language_write_request",
     "schema_inventory",
-    "evidence_inventory"
+    "evidence_inventory",
+    "semantic_slot_inventory"
   ],
   "method_name": "Operation-Conditioned Slot-Grounded MP-FS",
   "model_called": false,
@@ -41,7 +42,7 @@
     "Phase_M_mapping": 1,
     "Phase_O_operation_conditioning": 1
   },
-  "representation_contract": "JSON Schema validation surrounds all model-produced IR before semantic verification.",
+  "representation_contract": "JSON Schema validation surrounds all model-produced IR before semantic verification. The semantic slot inventory is available before Phase M and supplies dynamic SLOT_* enums.",
   "stage": "Stage7B_V2_METHOD_SPECIFICATION",
   "status": "FROZEN_SPECIFICATION",
   "v2_implemented": false
