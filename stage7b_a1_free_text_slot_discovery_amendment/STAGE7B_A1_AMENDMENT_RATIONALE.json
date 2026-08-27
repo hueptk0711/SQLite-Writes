@@ -16,6 +16,20 @@
   "model_called": false,
   "not_a_stage7c_regex_patch": true,
   "scientific_reason": "deterministic free-text slot discovery produced high substring/context coverage but low materializable atomic-value coverage under the frozen typed materializer, and near-zero required-slot coverage made completeness verification non-viable",
+  "source_span_oracle_ceiling": {
+    "dev": {
+      "denominator": 845,
+      "rate": 0.95858,
+      "samples_with_gap": 33,
+      "source_selectable": 810
+    },
+    "train": {
+      "denominator": 5407,
+      "rate": 0.979286,
+      "samples_with_gap": 93,
+      "source_selectable": 5295
+    }
+  },
   "stage": "Stage7B_A1_FREE_TEXT_SLOT_DISCOVERY_AMENDMENT",
   "status": "ARCHITECTURE_AMENDMENT_ONLY"
 }

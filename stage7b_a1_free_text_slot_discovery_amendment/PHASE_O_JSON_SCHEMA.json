@@ -18,22 +18,18 @@
             "minimum": 1,
             "type": "integer"
           },
-          "span_ref": {
-            "pattern": "^SPAN_[1-9][0-9]*$",
-            "type": "string"
-          },
           "start_char": {
             "minimum": 0,
             "type": "integer"
           }
         },
         "required": [
-          "span_ref",
           "start_char",
           "end_char"
         ],
         "type": "object"
       },
+      "minItems": 1,
       "type": "array"
     }
   },
@@ -44,10 +40,14 @@
   "title": "Stage7B A1 Phase O operation and semantic span selection",
   "type": "object",
   "x-deterministic-validation": [
+    "Phase O receives the exact original question string Q with no strip, Unicode normalization, whitespace collapse, or punctuation replacement",
+    "offsets use Python Unicode code-point indexing",
+    "range convention is [start_char, end_char)",
     "0 <= start_char < end_char <= len(question)",
     "text is derived only as question[start_char:end_char]",
+    "model-generated span_ref, evidence_ref, slot_ref, or value text are forbidden",
     "duplicate span offsets are rejected",
     "nested or partially overlapping spans are rejected",
-    "model-emitted value text is forbidden"
+    "accepted spans are sorted by (start_char, end_char) before deterministic SPAN_i, EV_i, and SLOT_i assignment"
   ]
 }

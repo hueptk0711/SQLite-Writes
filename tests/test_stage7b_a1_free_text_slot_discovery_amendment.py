@@ -20,9 +20,13 @@ from scripts.data.build_stage7b_a1_free_text_slot_discovery_amendment import (
     STAGE7C_PATCH2_INPUTS,
     build_stage7b_a1,
     canonical_json,
+    inventory_from_phase_o_spans,
     materializable_slot_audit,
     phase_o_schema,
     sha256_file,
+    source_span_oracle_audit,
+    validate_phase_o_spans,
+    validate_question_identity,
 )
 from scripts.data.validate_stage7b_a1_free_text_slot_discovery_amendment import PASS_STATUS, validate
 
@@ -82,6 +86,39 @@ def _refresh_artifact_hash(package: Path, rel: str) -> None:
     _write_json(artifact / LOCK_FILE, lock)
 
 
+def _schema_accepts(schema: dict, instance) -> bool:
+    def check(node: dict, value) -> bool:
+        if "enum" in node and value not in node["enum"]:
+            return False
+        expected_type = node.get("type")
+        if expected_type == "object":
+            if not isinstance(value, dict):
+                return False
+            required = set(node.get("required", []))
+            if not required.issubset(value):
+                return False
+            allowed = set(node.get("properties", {}))
+            if node.get("additionalProperties") is False and not set(value).issubset(allowed):
+                return False
+            return all(check(node["properties"][key], value[key]) for key in value if key in node.get("properties", {}))
+        if expected_type == "array":
+            if not isinstance(value, list):
+                return False
+            if len(value) < node.get("minItems", 0):
+                return False
+            return all(check(node.get("items", {}), item) for item in value)
+        if expected_type == "integer":
+            return isinstance(value, int) and not isinstance(value, bool) and value >= node.get("minimum", -(10**18))
+        if expected_type == "string":
+            if not isinstance(value, str):
+                return False
+            pattern = node.get("pattern")
+            return pattern is None or re.fullmatch(pattern, value) is not None
+        return True
+
+    return check(schema, instance)
+
+
 def test_validator_passes_current_a1_artifacts() -> None:
     report = validate(ARTIFACT_DIR)
     assert report["status"] == "PASS"
@@ -118,11 +155,42 @@ def test_materializable_audit_recomputes_patch2_limitation() -> None:
     assert audit["train"]["materializable_candidate_coverage_count"] == 2366
 
 
+def test_source_span_oracle_audit_recomputes_ceiling() -> None:
+    oracle = _read_json(ARTIFACT_DIR / "SOURCE_SPAN_ORACLE_AUDIT.json")
+    assert oracle == source_span_oracle_audit()
+    assert oracle["train"]["source_selectable_gold_value_count"] == 5295
+    assert oracle["train"]["gold_assignment_count"] == 5407
+    assert oracle["train"]["source_selectable_gold_value_rate"] == 0.979286
+    assert oracle["train"]["samples_with_at_least_one_non_source_alignable_value"] == 93
+
+
+def test_source_span_oracle_dev_recomputes_ceiling() -> None:
+    oracle = _read_json(ARTIFACT_DIR / "SOURCE_SPAN_ORACLE_AUDIT.json")
+    assert oracle["dev"]["source_selectable_gold_value_count"] == 810
+    assert oracle["dev"]["gold_assignment_count"] == 845
+    assert oracle["dev"]["source_selectable_gold_value_rate"] == 0.95858
+    assert oracle["dev"]["samples_with_at_least_one_non_source_alignable_value"] == 33
+
+
+def test_nonalignable_samples_are_retained_in_primary_denominator() -> None:
+    oracle = _read_json(ARTIFACT_DIR / "SOURCE_SPAN_ORACLE_AUDIT.json")
+    policy = _read_json(ARTIFACT_DIR / "NONALIGNABLE_SOURCE_SPAN_POLICY.json")
+    assert oracle["dev"]["sample_count"] == 240
+    assert oracle["dev"]["samples_with_at_least_one_non_source_alignable_value"] == 33
+    assert oracle["nonalignable_policy"]["retain_in_primary_dev_denominator"] is True
+    assert policy["retain_in_primary_dev_denominator"] is True
+    assert policy["dev_eligible"] is True
+    assert policy["diagnostic_flag"] == "source_gold_nonalignable_under_frozen_materializer"
+    assert policy["modify_gold"] is False
+    assert policy["add_post_hoc_normalization"] is False
+
+
 def test_rationale_reopens_stage7b_not_stage7c_regex_patch() -> None:
     rationale = _read_json(ARTIFACT_DIR / "STAGE7B_A1_AMENDMENT_RATIONALE.json")
     assert rationale["not_a_stage7c_regex_patch"] is True
     assert "operation plus grounded atomic semantic span selection" in rationale["decision"]
     assert rationale["empirical_trigger_from_stage7c_patch2"]["materializable_dev_coverage"]["rate"] == 0.304142
+    assert rationale["source_span_oracle_ceiling"]["dev"]["source_selectable"] == 810
 
 
 def test_phase_o_schema_is_offsets_only_without_model_value_text() -> None:
@@ -130,22 +198,94 @@ def test_phase_o_schema_is_offsets_only_without_model_value_text() -> None:
     assert schema == phase_o_schema()
     assert schema["additionalProperties"] is False
     assert schema["required"] == ["operation", "value_spans"]
+    assert schema["properties"]["value_spans"]["minItems"] == 1
     span_item = schema["properties"]["value_spans"]["items"]
-    assert span_item["required"] == ["span_ref", "start_char", "end_char"]
+    assert span_item["required"] == ["start_char", "end_char"]
+    assert "span_ref" not in span_item["properties"]
     text = canonical_json(schema)
+    assert '"span_ref"' not in text
     assert '"text"' not in text
     assert '"value"' not in text
     assert '"raw_value"' not in text
+
+
+def test_phase_o_schema_rejects_model_generated_span_ref() -> None:
+    schema = phase_o_schema()
+    instance = {"operation": "INSERT", "value_spans": [{"span_ref": "SPAN_1", "start_char": 0, "end_char": 1}]}
+    assert not _schema_accepts(schema, instance)
+
+
+def test_phase_o_schema_rejects_empty_value_spans() -> None:
+    schema = phase_o_schema()
+    assert not _schema_accepts(schema, {"operation": "INSERT", "value_spans": []})
+
+
+def test_phase_o_schema_accepts_offset_only_nonempty_spans() -> None:
+    schema = phase_o_schema()
+    assert _schema_accepts(schema, {"operation": "INSERT", "value_spans": [{"start_char": 0, "end_char": 1}]})
 
 
 def test_span_validation_rejects_duplicate_nested_and_overlap() -> None:
     spec = _read_json(ARTIFACT_DIR / "SPAN_VALIDATION_SPEC.json")
     assert spec["span_text_source"] == "question[start_char:end_char] only"
     assert spec["model_emitted_text_allowed"] is False
+    assert spec["model_generated_span_ids_allowed"] is False
+    assert spec["offset_coordinate_system"] == "Python Unicode code-point indexing"
+    assert spec["range_convention"] == "[start_char, end_char)"
+    assert spec["phase_o_question_string"] == "exact original question string Q"
+    assert spec["normalization_before_offset_validation"] == "none"
     assert spec["duplicate_span_policy"] == "reject"
     assert spec["nested_span_policy"] == "reject"
     assert spec["partial_overlap_policy"] == "reject"
     assert spec["same_span_selected_twice_policy"] == "reject"
+    assert spec["inventory_assignment_order"] == "sort_by_start_char_then_end_char"
+
+
+def test_duplicate_exact_offsets_are_rejected() -> None:
+    with pytest.raises(ValueError, match="duplicate_exact_span_offsets"):
+        validate_phase_o_spans("abcdef", [{"start_char": 1, "end_char": 3}, {"start_char": 1, "end_char": 3}])
+
+
+def test_nested_offsets_are_rejected() -> None:
+    with pytest.raises(ValueError, match="nested_or_partially_overlapping_spans"):
+        validate_phase_o_spans("abcdef", [{"start_char": 1, "end_char": 5}, {"start_char": 2, "end_char": 3}])
+
+
+def test_partial_overlap_offsets_are_rejected() -> None:
+    with pytest.raises(ValueError, match="nested_or_partially_overlapping_spans"):
+        validate_phase_o_spans("abcdef", [{"start_char": 1, "end_char": 4}, {"start_char": 3, "end_char": 5}])
+
+
+def test_unicode_chinese_codepoint_slicing_is_frozen() -> None:
+    question = "昆明中心假日酒店位于云南省"
+    start = question.index("中心")
+    spans = validate_phase_o_spans(question, [{"start_char": start, "end_char": start + len("中心")}])
+    assert spans[0]["text"] == "中心"
+
+
+def test_mixed_ascii_chinese_codepoint_slicing_is_frozen() -> None:
+    question = "Alice住在北京20岁"
+    start = question.index("北京")
+    spans = validate_phase_o_spans(question, [{"start_char": start, "end_char": start + len("北京")}])
+    assert spans[0]["text"] == "北京"
+
+
+def test_out_of_order_spans_create_deterministic_slot_refs() -> None:
+    inventory = inventory_from_phase_o_spans(
+        "Alice住在北京20岁",
+        [{"start_char": 9, "end_char": 11}, {"start_char": 0, "end_char": 5}, {"start_char": 7, "end_char": 9}],
+    )
+    evidence = inventory["evidence_inventory"]["evidence"]
+    slots = inventory["semantic_slot_inventory"]["slots"]
+    assert [entry["text"] for entry in evidence] == ["Alice", "北京", "20"]
+    assert [entry["span_ref"] for entry in evidence] == ["SPAN_1", "SPAN_2", "SPAN_3"]
+    assert [slot["slot_ref"] for slot in slots] == ["SLOT_1", "SLOT_2", "SLOT_3"]
+    assert all(slot["required"] is True for slot in slots)
+
+
+def test_input_normalization_change_is_rejected() -> None:
+    with pytest.raises(ValueError, match="exact original question"):
+        validate_question_identity("  北京", "北京")
 
 
 def test_evidence_and_slot_are_separated() -> None:
@@ -166,11 +306,30 @@ def test_completeness_uses_phase_o_required_slots() -> None:
 
 def test_ablation_amendment_preserves_two_calls_and_adds_span_diagnostic() -> None:
     ablation = _read_json(ARTIFACT_DIR / "ABLATION_AMENDMENT.json")
-    assert ablation == _read_json(ARTIFACT_DIR / "ABALATION_AMENDMENT.json")
     assert ablation["everything_else_held_constant"] is True
     assert ablation["hidden_third_model_call_allowed"] is False
     assert "V2-D_MINUS_COMPLETENESS_VERIFICATION" in ablation["amended_variants"]
     assert "V2-O_MINUS_SPAN_SELECTION" in ablation["amended_variants"]
+    assert not (ARTIFACT_DIR / "ABALATION_AMENDMENT.json").exists()
+
+
+def test_v2a_a1_intervention_is_fully_frozen() -> None:
+    ablation = _read_json(ARTIFACT_DIR / "ABLATION_AMENDMENT.json")
+    v2a = ablation["amended_variants"]["V2-A_MINUS_OPERATION_CONDITIONING"]
+    assert v2a["phase_o_a_responsibilities"] == ["semantic_span_selection"]
+    assert v2a["phase_m_a_responsibilities"] == ["operation_prediction", "slot_to_column_or_predicate_mapping"]
+    assert v2a["total_model_calls"] == 2
+    assert v2a["schemas"] == "single unified operation-unconditioned Phase M schema"
+    assert "typed_materializer" in v2a["unchanged_from_v2_full_a1"]
+
+
+def test_span_selection_diagnostic_is_not_confirmatory_ablation() -> None:
+    ablation = _read_json(ARTIFACT_DIR / "ABLATION_AMENDMENT.json")
+    v2o = ablation["amended_variants"]["V2-O_MINUS_SPAN_SELECTION"]
+    assert v2o["diagnostic_only"] is True
+    assert v2o["confirmatory_ablation_family_member"] is False
+    assert v2o["p_value_baseline_allowed"] is False
+    assert "V2-O_MINUS_SPAN_SELECTION" not in ablation["confirmatory_ablation_family"]
 
 
 def test_generation_capacity_amendment_is_pre_experiment_and_literal() -> None:
@@ -241,8 +400,48 @@ def test_validator_catches_hidden_third_call_in_ablation(workspace_tmp: Path) ->
     _refresh_artifact_hash(package, "ABLATION_AMENDMENT.json")
     report = validate(package / "stage7b_a1_free_text_slot_discovery_amendment", root=package)
     assert report["status"] == "FAIL"
-    assert "ablation_alias_mismatch" in report["violations"]
     assert "ablation_allows_hidden_third_call" in report["violations"]
+
+
+def test_validator_catches_oracle_tamper(workspace_tmp: Path) -> None:
+    package = _copy_package_root(workspace_tmp)
+    path = package / "stage7b_a1_free_text_slot_discovery_amendment" / "SOURCE_SPAN_ORACLE_AUDIT.json"
+    oracle = _read_json(path)
+    oracle["dev"]["source_selectable_gold_value_count"] = 845
+    _write_json(path, oracle)
+    _refresh_artifact_hash(package, "SOURCE_SPAN_ORACLE_AUDIT.json")
+    report = validate(package / "stage7b_a1_free_text_slot_discovery_amendment", root=package)
+    assert report["status"] == "FAIL"
+    assert "source_span_oracle_audit_mismatch" in report["violations"]
+    assert "dev_oracle_source_selectable_count_changed" in report["violations"]
+
+
+def test_validator_catches_nonalignable_policy_tamper(workspace_tmp: Path) -> None:
+    package = _copy_package_root(workspace_tmp)
+    path = package / "stage7b_a1_free_text_slot_discovery_amendment" / "NONALIGNABLE_SOURCE_SPAN_POLICY.json"
+    policy = _read_json(path)
+    policy["retain_in_primary_dev_denominator"] = False
+    policy["add_post_hoc_normalization"] = True
+    _write_json(path, policy)
+    _refresh_artifact_hash(package, "NONALIGNABLE_SOURCE_SPAN_POLICY.json")
+    report = validate(package / "stage7b_a1_free_text_slot_discovery_amendment", root=package)
+    assert report["status"] == "FAIL"
+    assert "nonalignable_dev_denominator_not_retained" in report["violations"]
+    assert "nonalignable_policy_allows_post_hoc_normalization" in report["violations"]
+
+
+def test_validator_catches_offset_contract_tamper(workspace_tmp: Path) -> None:
+    package = _copy_package_root(workspace_tmp)
+    path = package / "stage7b_a1_free_text_slot_discovery_amendment" / "SPAN_VALIDATION_SPEC.json"
+    spec = _read_json(path)
+    spec["offset_coordinate_system"] = "UTF-16 code units"
+    spec["normalization_policy"]["unicode_nfkc"] = True
+    _write_json(path, spec)
+    _refresh_artifact_hash(package, "SPAN_VALIDATION_SPEC.json")
+    report = validate(package / "stage7b_a1_free_text_slot_discovery_amendment", root=package)
+    assert report["status"] == "FAIL"
+    assert "offset_coordinate_system_not_frozen" in report["violations"]
+    assert "normalization_policy_not_all_false" in report["violations"]
 
 
 def test_self_contained_reviewer_package_clean_extraction(workspace_tmp: Path) -> None:

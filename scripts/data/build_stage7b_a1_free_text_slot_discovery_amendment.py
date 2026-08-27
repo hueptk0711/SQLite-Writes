@@ -51,14 +51,15 @@ ARTIFACTS = (
     "STAGE7B_A1_INPUT_MANIFEST.json",
     "STAGE7B_A1_AMENDMENT_RATIONALE.json",
     "MATERIALIZABLE_SLOT_AUDIT.json",
+    "SOURCE_SPAN_ORACLE_AUDIT.json",
     "PHASE_O_SEMANTIC_SPAN_SPEC.json",
     "PHASE_O_JSON_SCHEMA.json",
     "SPAN_VALIDATION_SPEC.json",
     "EVIDENCE_VS_SLOT_SEPARATION_SPEC.json",
     "COMPLETENESS_AMENDED_SPEC.json",
     "ABLATION_AMENDMENT.json",
-    "ABALATION_AMENDMENT.json",
     "GENERATION_CAPACITY_AMENDMENT.json",
+    "NONALIGNABLE_SOURCE_SPAN_POLICY.json",
     "VALIDATION_REPORT.md",
     "REVIEWER_README.md",
 )
@@ -232,6 +233,154 @@ def materializable_slot_audit() -> dict[str, Any]:
     }
 
 
+def numeric_literals(text: str) -> list[str]:
+    return [match.group(0) for match in re.finditer(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)", text)]
+
+
+def source_span_can_materialize(question: str, gold: str, source_type: str) -> bool:
+    affinity = sqlite_affinity(source_type)
+    target = str(gold).strip()
+    if not target:
+        return False
+    if affinity == "TEXT":
+        return target in question
+    if affinity == "INTEGER":
+        if not re.fullmatch(r"[+-]?\d+", target):
+            return False
+        return any(re.fullmatch(r"[+-]?\d+", candidate) and int(candidate) == int(target) for candidate in numeric_literals(question))
+    if affinity in {"REAL", "NUMERIC"}:
+        gold_num = strict_number(target)
+        if gold_num is None:
+            return False
+        return any((parsed := strict_number(candidate)) is not None and abs(parsed - gold_num) <= 1e-9 for candidate in numeric_literals(question))
+    return False
+
+
+def split_source_span_oracle_audit(split: str) -> dict[str, Any]:
+    base = PROJECT_ROOT / "stage7c_v2_development_data_protocol"
+    rows = read_jsonl(base / f"{split.upper()}_CREATE_MANIFEST.jsonl")
+    raw_rows = read_json(base / "upstream_crudsql" / "data" / split / f"crud_{split}_sql.json")
+    tables = {row["id"]: row for row in read_json(base / "upstream_crudsql" / "data" / split / f"crud_{split}_table.json")}
+    total = 0
+    source_selectable = 0
+    samples_with_gap = 0
+    examples = []
+    for manifest_row in rows:
+        raw = raw_rows[manifest_row["source_sql_index"]]
+        table = tables[raw["table_id"]]
+        question = raw["question"]
+        missing_values = []
+        for cond in raw["sql"].get("conds", []):
+            column_index = int(cond[0])
+            gold = str(cond[2])
+            source_type = table["types"][column_index]
+            total += 1
+            if source_span_can_materialize(question, gold, source_type):
+                source_selectable += 1
+            else:
+                missing_values.append({"column_index": column_index, "gold_value": gold, "source_type": source_type})
+        if missing_values:
+            samples_with_gap += 1
+            if len(examples) < 10:
+                examples.append(
+                    {
+                        "sample_id": manifest_row["sample_id"],
+                        "question": question,
+                        "missing_values": missing_values,
+                    }
+                )
+    return {
+        "split": split,
+        "sample_count": len(rows),
+        "gold_assignment_count": total,
+        "source_selectable_gold_value_count": source_selectable,
+        "source_selectable_gold_value_rate": round(source_selectable / total, 6) if total else 1.0,
+        "samples_with_at_least_one_non_source_alignable_value": samples_with_gap,
+        "nonalignable_sample_rate": round(samples_with_gap / len(rows), 6) if rows else 0.0,
+        "example_non_source_alignable_samples": examples,
+    }
+
+
+def source_span_oracle_audit() -> dict[str, Any]:
+    train = split_source_span_oracle_audit("train")
+    dev = split_source_span_oracle_audit("dev")
+    return {
+        "stage": STAGE,
+        "oracle_question": "If Phase O selected perfect exact source spans, how many gold values could be materialized under the frozen Stage7B materializer?",
+        "coordinate_contract": "Python Unicode code-point offsets on the exact original question string, [start_char, end_char)",
+        "normalization_before_offset_validation": "none",
+        "materialization_contract": {
+            "TEXT": "gold text must be an exact substring of the original question",
+            "INTEGER": "some exact numeric substring must parse losslessly to the gold integer",
+            "REAL_OR_NUMERIC": "some exact numeric substring must parse to the gold finite numeric value",
+            "BLOB_OR_UNSUPPORTED": "not source-alignable under A1 span-only policy",
+        },
+        "train": train,
+        "dev": dev,
+        "nonalignable_policy": {
+            "retain_in_primary_dev_denominator": True,
+            "retain_in_primary_train_denominator": True,
+            "eligible": True,
+            "diagnostic_flag": "source_gold_nonalignable_under_frozen_materializer",
+            "exclude_after_model_performance": False,
+            "modify_gold": False,
+            "add_post_hoc_normalization": False,
+        },
+    }
+
+
+def validate_question_identity(original_question: str, phase_o_prompt_question: str) -> None:
+    if original_question != phase_o_prompt_question:
+        raise ValueError("Phase O offsets must be computed on the exact original question string with no normalization.")
+
+
+def validate_phase_o_spans(question: str, spans: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    normalized = []
+    for index, span in enumerate(spans):
+        if set(span) != {"start_char", "end_char"}:
+            raise ValueError(f"span_{index}_must_contain_only_start_char_and_end_char")
+        start = span["start_char"]
+        end = span["end_char"]
+        if not isinstance(start, int) or not isinstance(end, int):
+            raise ValueError(f"span_{index}_offsets_must_be_integers")
+        if not (0 <= start < end <= len(question)):
+            raise ValueError(f"span_{index}_offsets_out_of_bounds")
+        normalized.append({"start_char": start, "end_char": end, "text": question[start:end]})
+    sorted_spans = sorted(normalized, key=lambda item: (item["start_char"], item["end_char"]))
+    previous: dict[str, Any] | None = None
+    seen_offsets: set[tuple[int, int]] = set()
+    for span in sorted_spans:
+        offsets = (span["start_char"], span["end_char"])
+        if offsets in seen_offsets:
+            raise ValueError("duplicate_exact_span_offsets")
+        seen_offsets.add(offsets)
+        if previous is not None and span["start_char"] < previous["end_char"]:
+            raise ValueError("nested_or_partially_overlapping_spans")
+        previous = span
+    return sorted_spans
+
+
+def inventory_from_phase_o_spans(question: str, spans: list[dict[str, Any]]) -> dict[str, Any]:
+    accepted = validate_phase_o_spans(question, spans)
+    evidence = []
+    slots = []
+    for index, span in enumerate(accepted, start=1):
+        span_ref = f"SPAN_{index}"
+        evidence_ref = f"EV_{index}"
+        slot_ref = f"SLOT_{index}"
+        evidence.append(
+            {
+                "span_ref": span_ref,
+                "evidence_ref": evidence_ref,
+                "start_char": span["start_char"],
+                "end_char": span["end_char"],
+                "text": span["text"],
+            }
+        )
+        slots.append({"slot_ref": slot_ref, "evidence_ref": evidence_ref, "required": True, "role": "write_value"})
+    return {"evidence_inventory": {"evidence": evidence}, "semantic_slot_inventory": {"slots": slots}}
+
+
 def phase_o_schema() -> dict[str, Any]:
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -243,12 +392,12 @@ def phase_o_schema() -> dict[str, Any]:
             "operation": {"enum": ["INSERT", "UPDATE", "DELETE", "UPSERT"]},
             "value_spans": {
                 "type": "array",
+                "minItems": 1,
                 "items": {
                     "type": "object",
                     "additionalProperties": False,
-                    "required": ["span_ref", "start_char", "end_char"],
+                    "required": ["start_char", "end_char"],
                     "properties": {
-                        "span_ref": {"type": "string", "pattern": "^SPAN_[1-9][0-9]*$"},
                         "start_char": {"type": "integer", "minimum": 0},
                         "end_char": {"type": "integer", "minimum": 1},
                     },
@@ -256,16 +405,37 @@ def phase_o_schema() -> dict[str, Any]:
             },
         },
         "x-deterministic-validation": [
+            "Phase O receives the exact original question string Q with no strip, Unicode normalization, whitespace collapse, or punctuation replacement",
+            "offsets use Python Unicode code-point indexing",
+            "range convention is [start_char, end_char)",
             "0 <= start_char < end_char <= len(question)",
             "text is derived only as question[start_char:end_char]",
+            "model-generated span_ref, evidence_ref, slot_ref, or value text are forbidden",
             "duplicate span offsets are rejected",
             "nested or partially overlapping spans are rejected",
-            "model-emitted value text is forbidden",
+            "accepted spans are sorted by (start_char, end_char) before deterministic SPAN_i, EV_i, and SLOT_i assignment",
         ],
     }
 
 
-def static_artifacts(audit: dict[str, Any]) -> dict[str, Any]:
+def nonalignable_policy_payload() -> dict[str, Any]:
+    return {
+        "stage": STAGE,
+        "policy": "source-gold non-alignability under the frozen A1 span-only materializer is diagnostic only",
+        "diagnostic_flag": "source_gold_nonalignable_under_frozen_materializer",
+        "train_eligible": True,
+        "dev_eligible": True,
+        "retain_in_primary_train_denominator": True,
+        "retain_in_primary_dev_denominator": True,
+        "exclude_after_model_performance": False,
+        "modify_gold": False,
+        "add_post_hoc_normalization": False,
+        "allowed_reporting": ["overall_target_state_accuracy", "source_alignable_subset_diagnostic"],
+        "primary_metric_denominator_policy": "full frozen split denominator",
+    }
+
+
+def static_artifacts(audit: dict[str, Any], oracle: dict[str, Any]) -> dict[str, Any]:
     dev = audit["dev"]
     return {
         "STAGE7B_A1_AMENDMENT_RATIONALE.json": {
@@ -282,6 +452,20 @@ def static_artifacts(audit: dict[str, Any]) -> dict[str, Any]:
                 "dev_samples_missing_materializable_candidate": dev["samples_missing_materializable_candidate"],
                 "dev_required_slots": dev["required_slot_count"],
                 "dev_required_slots_per_gold_assignment": dev["required_slots_per_gold_assignment"],
+            },
+            "source_span_oracle_ceiling": {
+                "train": {
+                    "source_selectable": oracle["train"]["source_selectable_gold_value_count"],
+                    "denominator": oracle["train"]["gold_assignment_count"],
+                    "rate": oracle["train"]["source_selectable_gold_value_rate"],
+                    "samples_with_gap": oracle["train"]["samples_with_at_least_one_non_source_alignable_value"],
+                },
+                "dev": {
+                    "source_selectable": oracle["dev"]["source_selectable_gold_value_count"],
+                    "denominator": oracle["dev"]["gold_assignment_count"],
+                    "rate": oracle["dev"]["source_selectable_gold_value_rate"],
+                    "samples_with_gap": oracle["dev"]["samples_with_at_least_one_non_source_alignable_value"],
+                },
             },
             "scientific_reason": "deterministic free-text slot discovery produced high substring/context coverage but low materializable atomic-value coverage under the frozen typed materializer, and near-zero required-slot coverage made completeness verification non-viable",
             "decision": "reopen Stage7B by amending Phase O from operation-only to operation plus grounded atomic semantic span selection",
@@ -300,7 +484,13 @@ def static_artifacts(audit: dict[str, Any]) -> dict[str, Any]:
             "value_span_semantics": "each accepted span is the model-selected atomic source text for one semantic write value",
             "text_generation_for_values_allowed": False,
             "offsets_only": True,
+            "model_generated_span_ids_allowed": False,
+            "offset_coordinate_system": "Python Unicode code-point indexing",
+            "range_convention": "[start_char, end_char)",
+            "phase_o_question_string": "exact original question string Q",
+            "normalization_before_offset_validation": "none",
             "accepted_spans_to_inventory": "deterministically create EV_i and SLOT_i from question[start_char:end_char]",
+            "deterministic_inventory_order": "sort accepted spans by start_char ascending, then end_char ascending before assigning SPAN_i, EV_i, and SLOT_i",
             "accepted_slot_requiredness": "all accepted Phase O semantic value spans become required=true",
             "phase_m_receives": ["operation", "schema_inventory", "evidence_inventory", "semantic_slot_inventory"],
         },
@@ -315,12 +505,26 @@ def static_artifacts(audit: dict[str, Any]) -> dict[str, Any]:
                 "reject_nested_or_partially_overlapping_spans",
                 "assign_deterministic_EV_and_SLOT_refs",
             ],
+            "offset_coordinate_system": "Python Unicode code-point indexing",
+            "range_convention": "[start_char, end_char)",
+            "phase_o_question_string": "exact original question string Q",
+            "normalization_before_offset_validation": "none",
+            "normalization_policy": {
+                "strip": False,
+                "unicode_nfc": False,
+                "unicode_nfkc": False,
+                "whitespace_collapse": False,
+                "punctuation_replacement": False,
+            },
             "duplicate_span_policy": "reject",
             "nested_span_policy": "reject",
             "partial_overlap_policy": "reject",
             "same_span_selected_twice_policy": "reject",
             "span_text_source": "question[start_char:end_char] only",
             "model_emitted_text_allowed": False,
+            "model_generated_span_ids_allowed": False,
+            "inventory_assignment_order": "sort_by_start_char_then_end_char",
+            "deterministic_inventory_ids": ["SPAN_i", "EV_i", "SLOT_i"],
         },
         "EVIDENCE_VS_SLOT_SEPARATION_SPEC.json": {
             "stage": STAGE,
@@ -341,7 +545,6 @@ def static_artifacts(audit: dict[str, Any]) -> dict[str, Any]:
             "phase_o_span_recall_failure": "reported separately when Phase O misses an atomic write value; not hidden as Phase M completeness success",
         },
         "ABLATION_AMENDMENT.json": ablation_payload(),
-        "ABALATION_AMENDMENT.json": ablation_payload(),
         "GENERATION_CAPACITY_AMENDMENT.json": {
             "stage": STAGE,
             "capacity_change": "Phase O output expands from one enum to enum plus span offsets",
@@ -354,6 +557,7 @@ def static_artifacts(audit: dict[str, Any]) -> dict[str, Any]:
             "model_called": False,
             "gpu_called": False,
         },
+        "NONALIGNABLE_SOURCE_SPAN_POLICY.json": nonalignable_policy_payload(),
         "REVIEWER_README.md": reviewer_readme_payload(),
     }
 
@@ -363,15 +567,33 @@ def ablation_payload() -> dict[str, Any]:
         "stage": STAGE,
         "amended_variants": {
             "V2-FULL-A1": "Phase O selects operation plus grounded atomic semantic value spans; Phase M maps required SLOT_* refs to columns/predicates",
-            "V2-A_MINUS_OPERATION_CONDITIONING": "remove operation conditioning while preserving Phase O span selection and all other components",
+            "V2-A_MINUS_OPERATION_CONDITIONING": {
+                "intervention": "Phase O-A selects semantic spans only and emits no operation; Phase M-A uses a single unified operation-unconditioned IR schema that predicts operation plus mappings",
+                "phase_o_a_responsibilities": ["semantic_span_selection"],
+                "phase_m_a_responsibilities": ["operation_prediction", "slot_to_column_or_predicate_mapping"],
+                "total_model_calls": 2,
+                "schemas": "single unified operation-unconditioned Phase M schema",
+                "unchanged_from_v2_full_a1": ["span_offsets", "dynamic_reference_enums", "typed_materializer", "completeness_verifier", "deterministic_compiler_and_preflight"],
+            },
             "V2-B_MINUS_CONSTRAINED_REFERENCES": "remove dynamic inventory membership gates while preserving Phase O span selection and all other components",
             "V2-C_MINUS_DETERMINISTIC_MATERIALIZATION": "replace deterministic typed materializer with the pre-registered counterfactual from Stage7B while preserving Phase O span selection",
             "V2-D_MINUS_COMPLETENESS_VERIFICATION": "bypass required SLOT_* completeness gate while preserving Phase O span selection and all other components",
-            "V2-O_MINUS_SPAN_SELECTION": "diagnostic only: retain operation prediction but replace Phase O span inventory with deterministic Stage7C PATCH2 inventory to isolate the free-text slot discovery amendment",
+            "V2-O_MINUS_SPAN_SELECTION": {
+                "intervention": "retain operation prediction but replace Phase O span inventory with deterministic Stage7C PATCH2 inventory to isolate the free-text slot discovery amendment",
+                "diagnostic_only": True,
+                "confirmatory_ablation_family_member": False,
+                "p_value_baseline_allowed": False,
+            },
         },
         "everything_else_held_constant": True,
         "hidden_third_model_call_allowed": False,
         "ablation_selection_after_dev_performance_allowed": False,
+        "confirmatory_ablation_family": [
+            "V2-A_MINUS_OPERATION_CONDITIONING",
+            "V2-B_MINUS_CONSTRAINED_REFERENCES",
+            "V2-C_MINUS_DETERMINISTIC_MATERIALIZATION",
+            "V2-D_MINUS_COMPLETENESS_VERIFICATION",
+        ],
     }
 
 
@@ -402,6 +624,7 @@ def artifact_hashes(output_dir: Path) -> dict[str, str]:
 
 def lock(output_dir: Path, inputs: dict[str, str]) -> dict[str, Any]:
     audit = read_json(output_dir / "MATERIALIZABLE_SLOT_AUDIT.json")
+    oracle = read_json(output_dir / "SOURCE_SPAN_ORACLE_AUDIT.json")
     return {
         "stage": STAGE,
         "status": "BUILT_PENDING_VALIDATION",
@@ -412,6 +635,8 @@ def lock(output_dir: Path, inputs: dict[str, str]) -> dict[str, Any]:
         "amends": "Stage7B_V2_METHOD_SPECIFICATION",
         "dev_materializable_candidate_coverage_rate": audit["dev"]["materializable_candidate_coverage_rate"],
         "dev_required_slots_per_gold_assignment": audit["dev"]["required_slots_per_gold_assignment"],
+        "dev_source_span_oracle_rate": oracle["dev"]["source_selectable_gold_value_rate"],
+        "dev_non_source_alignable_samples": oracle["dev"]["samples_with_at_least_one_non_source_alignable_value"],
         "phase_o_model_call_count": 1,
         "phase_m_model_call_count": 1,
         "total_model_call_count": 2,
@@ -428,9 +653,11 @@ def build_stage7b_a1(output_dir: Path = PROJECT_ROOT / "stage7b_a1_free_text_slo
     reset_output_dir(output_dir, force)
     inputs = input_hashes()
     audit = materializable_slot_audit()
+    oracle = source_span_oracle_audit()
     write_json(output_dir / "STAGE7B_A1_INPUT_MANIFEST.json", {"stage": STAGE, "date": DATE, "hash_policy": HASH_POLICY, "input_hashes": inputs})
     write_json(output_dir / "MATERIALIZABLE_SLOT_AUDIT.json", audit)
-    for rel, payload in static_artifacts(audit).items():
+    write_json(output_dir / "SOURCE_SPAN_ORACLE_AUDIT.json", oracle)
+    for rel, payload in static_artifacts(audit, oracle).items():
         if rel.endswith(".md"):
             (output_dir / rel).write_text(payload, encoding="utf-8")
         else:
@@ -441,6 +668,7 @@ def build_stage7b_a1(output_dir: Path = PROJECT_ROOT / "stage7b_a1_free_text_slo
         "stage": STAGE,
         "status": "PASS_BUILT",
         "dev_materializable_candidate_coverage_rate": audit["dev"]["materializable_candidate_coverage_rate"],
+        "dev_source_span_oracle_rate": oracle["dev"]["source_selectable_gold_value_rate"],
         "dev_required_slots_per_gold_assignment": audit["dev"]["required_slots_per_gold_assignment"],
         "model_called": False,
         "gpu_called": False,
