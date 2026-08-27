@@ -12,6 +12,10 @@ raw_crudsql_hashes_recomputed: true
 train_dev_create_manifests_recomputed: true
 model_input_leakage_recomputed: true
 split_contamination_recomputed: true
+semantic_slot_derivation_audit_recomputed: true
+gold_program_derivation_audit_recomputed: true
+operation_mapping_validated: true
+generation_config_validated: true
 selection_policy_validated: true
 reserved_benchmarks_validated: true
 

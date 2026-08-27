@@ -24,5 +24,7 @@
     "evidence_inventory",
     "semantic_slot_inventory"
   ],
-  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL",
+  "stage7d_prompt_input_contract": "generation code must pass only row['model_side_input']; canonical record and label_side_bookkeeping are forbidden prompt inputs",
+  "v2_operation_for_create": "INSERT"
 }

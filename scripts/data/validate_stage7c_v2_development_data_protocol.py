@@ -20,16 +20,22 @@ from scripts.data.build_stage7c_v2_development_data_protocol import (
     ARTIFACTS,
     CRUDSQL_COMMIT,
     EXPECTED_CREATE_COUNTS,
+    EXPECTED_TABLE_COUNTS,
+    FROZEN_GENERATION_CONFIG,
     LOCK_FILE,
+    OPERATION_LABEL_MAPPING,
     RAW_ARTIFACTS,
     RAW_SOURCE_RELS,
     STAGE,
     STAGE6_TEST_INPUTS,
     STAGE7B_INPUTS,
     canonical_json,
-    extract_question_spans,
+    evidence_and_slots,
+    gold_program_derivation_audit,
+    gold_insert_program,
     read_json,
     read_jsonl,
+    semantic_slot_derivation_audit,
     sha256_file,
     sha256_text,
     source_split_counts,
@@ -105,40 +111,7 @@ def forbidden_keys_present(value: Any) -> set[str]:
     return found
 
 
-def expected_evidence_and_slots(question: str) -> tuple[dict[str, Any], dict[str, Any]]:
-    evidence = []
-    slots = []
-    for index, span in enumerate(extract_question_spans(question), start=1):
-        evidence_ref = f"EV_{index}"
-        slot_ref = f"SLOT_{index}"
-        evidence.append(
-            {
-                "evidence_ref": evidence_ref,
-                "text": span["text"],
-                "start_char": span["start_char"],
-                "end_char": span["end_char"],
-                "source": "question_text_deterministic_span",
-            }
-        )
-        slots.append(
-            {
-                "slot_ref": slot_ref,
-                "evidence_ref": evidence_ref,
-                "role": "write_value",
-                "required": True,
-                "source": "deterministic_question_span",
-                "uses_gold_sql": False,
-            }
-        )
-    return {"evidence": evidence, "construction": "deterministic_question_span_split"}, {
-        "slots": slots,
-        "construction": "one_required_slot_per_question_span",
-        "uses_gold_sql": False,
-        "model_call_used": False,
-    }
-
-
-def validate_manifest_rows(rows: list[dict[str, Any]], split: str, violations: list[str]) -> dict[str, Any]:
+def validate_manifest_rows(rows: list[dict[str, Any]], split: str, raw_rows: list[dict[str, Any]], tables: dict[str, dict[str, Any]], violations: list[str]) -> dict[str, Any]:
     ids = [row.get("sample_id") for row in rows]
     question_hashes = [row.get("question_sha256") for row in rows]
     require(len(ids) == len(set(ids)), violations, f"{split}_sample_ids_not_unique")
@@ -148,19 +121,26 @@ def validate_manifest_rows(rows: list[dict[str, Any]], split: str, violations: l
         require(row.get("split") == split, violations, f"{prefix}:split_mismatch")
         require(row.get("source_commit") == CRUDSQL_COMMIT, violations, f"{prefix}:commit_mismatch")
         require(row.get("operation_label_for_evaluation_only") == "CREATE", violations, f"{prefix}:operation_label_not_create")
+        require(row.get("v2_gold_operation_for_evaluation_only") == "INSERT", violations, f"{prefix}:v2_gold_operation_not_insert")
         require(row.get("operation_label_visible_to_phase_o") is False, violations, f"{prefix}:operation_label_visible")
         require(row.get("model_side_input_fields") == ["question", "schema_inventory", "evidence_inventory", "semantic_slot_inventory"], violations, f"{prefix}:model_fields_changed")
         require(row.get("semantic_slot_inventory_derivation_inputs") == ["question"], violations, f"{prefix}:slot_derivation_not_question_only")
         label = row.get("label_side_bookkeeping", {})
         require(label.get("crudsql_type") == 0, violations, f"{prefix}:label_not_create_type0")
+        require(label.get("crudsql_operation_label") == "Create", violations, f"{prefix}:crudsql_label_not_create")
+        require(label.get("v2_gold_operation") == "INSERT", violations, f"{prefix}:label_v2_operation_not_insert")
         require(label.get("gold_sql_or_structured_annotation_visible_to_model") is False, violations, f"{prefix}:gold_visible_to_model")
         model_side = row.get("model_side_input", {})
         require(row.get("model_side_input_sha256") == sha256_text(canonical_json(model_side)), violations, f"{prefix}:model_side_hash_mismatch")
         require(not forbidden_keys_present(model_side), violations, f"{prefix}:forbidden_model_key_present")
         require(model_side.get("question") == row.get("question"), violations, f"{prefix}:question_mismatch")
-        expected_evidence, expected_slots = expected_evidence_and_slots(row.get("question", ""))
+        raw = raw_rows[row["source_sql_index"]]
+        table = tables[raw["table_id"]]
+        expected_evidence, expected_slots = evidence_and_slots(row.get("question", ""), table)
         require(model_side.get("evidence_inventory") == expected_evidence, violations, f"{prefix}:evidence_not_recomputed")
         require(model_side.get("semantic_slot_inventory") == expected_slots, violations, f"{prefix}:slots_not_recomputed")
+        require(label.get("gold_assignment_count") == len(raw["sql"].get("conds", [])), violations, f"{prefix}:gold_assignment_count_mismatch")
+        require(label.get("gold_insert_program_sha256") == sha256_text(canonical_json(gold_insert_program(raw, table))), violations, f"{prefix}:gold_program_hash_mismatch")
         slots = model_side.get("semantic_slot_inventory", {}).get("slots", [])
         evidence_refs = {entry.get("evidence_ref") for entry in model_side.get("evidence_inventory", {}).get("evidence", [])}
         require(all(slot.get("evidence_ref") in evidence_refs for slot in slots), violations, f"{prefix}:slot_evidence_missing")
@@ -174,11 +154,17 @@ def recompute_contamination(root: Path, train_rows: list[dict[str, Any]], dev_ro
     train_hashes = {row["question_sha256"] for row in train_rows}
     dev_hashes = {row["question_sha256"] for row in dev_rows}
     test_hashes = {row["input_text_sha256"] for row in test_rows}
+    train_tables = {row["table_id"] for row in train_rows}
+    dev_tables = {row["table_id"] for row in dev_rows}
+    confirmation_tables = {row["table_id"] for row in test_rows}
     return {
         "train_dev_question_hash_overlap": len(train_hashes & dev_hashes),
         "train_481_question_hash_overlap": len(train_hashes & test_hashes),
         "dev_481_question_hash_overlap": len(dev_hashes & test_hashes),
         "train_dev_sample_id_overlap": len({row["sample_id"] for row in train_rows} & {row["sample_id"] for row in dev_rows}),
+        "train_dev_table_id_overlap": len(train_tables & dev_tables),
+        "train_confirmation_table_id_overlap": len(train_tables & confirmation_tables),
+        "dev_confirmation_table_id_overlap": len(dev_tables & confirmation_tables),
     }
 
 
@@ -191,6 +177,10 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
         "train_dev_create_manifests_recomputed": False,
         "model_input_leakage_recomputed": False,
         "split_contamination_recomputed": False,
+        "semantic_slot_derivation_audit_recomputed": False,
+        "gold_program_derivation_audit_recomputed": False,
+        "operation_mapping_validated": False,
+        "generation_config_validated": False,
         "selection_policy_validated": False,
         "reserved_benchmarks_validated": False,
     }
@@ -236,8 +226,12 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
 
     train_rows = read_jsonl(output_dir / "TRAIN_CREATE_MANIFEST.jsonl")
     dev_rows = read_jsonl(output_dir / "DEV_CREATE_MANIFEST.jsonl")
-    train_checks = validate_manifest_rows(train_rows, "train", violations)
-    dev_checks = validate_manifest_rows(dev_rows, "dev", violations)
+    train_raw = read_json(output_dir / "upstream_crudsql" / "data" / "train" / "crud_train_sql.json")
+    dev_raw = read_json(output_dir / "upstream_crudsql" / "data" / "dev" / "crud_dev_sql.json")
+    train_tables = {row["id"]: row for row in read_json(output_dir / "upstream_crudsql" / "data" / "train" / "crud_train_table.json")}
+    dev_tables = {row["id"]: row for row in read_json(output_dir / "upstream_crudsql" / "data" / "dev" / "crud_dev_table.json")}
+    train_checks = validate_manifest_rows(train_rows, "train", train_raw, train_tables, violations)
+    dev_checks = validate_manifest_rows(dev_rows, "dev", dev_raw, dev_tables, violations)
     require(train_checks["count"] == EXPECTED_CREATE_COUNTS["train"], violations, "train_create_manifest_count_not_1760")
     require(dev_checks["count"] == EXPECTED_CREATE_COUNTS["dev"], violations, "dev_create_manifest_count_not_240")
     checks["train_dev_create_manifests_recomputed"] = True
@@ -256,16 +250,60 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
     require(contamination.get("test_question_text_imported") is False, violations, "test_question_text_imported")
     require(contamination.get("model_input_leakage_status") == "PASS", violations, "model_input_leakage_status_not_pass")
     require(contamination.get("model_input_leakage_counts") == {}, violations, "model_input_leakage_counts_nonempty")
+    require(contamination.get("train_table_id_count") == EXPECTED_TABLE_COUNTS["train"], violations, "train_table_count_not_440")
+    require(contamination.get("dev_table_id_count") == EXPECTED_TABLE_COUNTS["dev"], violations, "dev_table_count_not_60")
+    require(contamination.get("confirmation_table_id_count") == EXPECTED_TABLE_COUNTS["confirmation"], violations, "confirmation_table_count_not_121")
+    require(contamination.get("train_dev_table_id_overlap") == 0, violations, "train_dev_table_overlap_nonzero")
+    require(contamination.get("train_confirmation_table_id_overlap") == 0, violations, "train_confirmation_table_overlap_nonzero")
+    require(contamination.get("dev_confirmation_table_id_overlap") == 0, violations, "dev_confirmation_table_overlap_nonzero")
     checks["split_contamination_recomputed"] = True
 
     policy = read_json(output_dir / "MODEL_INPUT_LEAKAGE_POLICY.json")
     require(policy.get("phase_o_must_predict_operation") is True, violations, "phase_o_operation_prediction_not_required")
     require(policy.get("slot_inventory_gold_sql_use_allowed") is False, violations, "slot_inventory_gold_sql_allowed")
+    require("only row['model_side_input']" in policy.get("stage7d_prompt_input_contract", ""), violations, "stage7d_prompt_contract_missing")
+
+    mapping = read_json(output_dir / "OPERATION_LABEL_MAPPING_SPEC.json")
+    require(mapping.get("mapping") == OPERATION_LABEL_MAPPING, violations, "operation_label_mapping_changed")
+    require(mapping.get("phase_o_dev_accuracy_gold_operation") == "INSERT", violations, "phase_o_gold_operation_not_insert")
+    require(mapping.get("literal_create_compared_to_phase_o_output") is False, violations, "literal_create_compared_to_phase_o")
+    checks["operation_mapping_validated"] = True
+
+    slot_spec = read_json(output_dir / "SEMANTIC_SLOT_DERIVATION_SPEC.json")
+    require(slot_spec.get("model_side_inputs") == ["question", "schema_inventory"], violations, "slot_derivation_model_inputs_changed")
+    require("sql.conds" in slot_spec.get("forbidden_derivation_inputs", []), violations, "slot_derivation_conds_not_forbidden")
+    require(slot_spec.get("model_call_used") is False, violations, "slot_derivation_model_call_used")
+    slot_audit = read_json(output_dir / "SEMANTIC_SLOT_DERIVATION_AUDIT.json")
+    require(slot_audit == semantic_slot_derivation_audit(output_dir, train_rows, dev_rows), violations, "semantic_slot_derivation_audit_mismatch")
+    require(slot_audit.get("gold_used_for_model_side_inventory") is False, violations, "slot_audit_gold_model_side")
+    require(slot_audit.get("gold_used_for_label_side_audit_only") is True, violations, "slot_audit_gold_not_label_side_only")
+    checks["semantic_slot_derivation_audit_recomputed"] = True
+
+    gold_spec = read_json(output_dir / "GOLD_PROGRAM_DERIVATION_SPEC.json")
+    post_spec = read_json(output_dir / "GOLD_POST_STATE_PROTOCOL.json")
+    require(gold_spec.get("compiler") == "INSERT INTO Table_<table_id>(col_i, ...) VALUES (?, ...)", violations, "gold_compiler_not_frozen")
+    require(gold_spec.get("gold_visible_to_model") is False, violations, "gold_program_visible_to_model")
+    require(post_spec.get("gold_visible_to_model") is False, violations, "gold_post_state_visible_to_model")
+    gold_audit = read_json(output_dir / "GOLD_PROGRAM_DERIVATION_AUDIT.json")
+    recomputed_gold_audit = gold_program_derivation_audit(output_dir, train_rows, dev_rows)
+    require(gold_audit == recomputed_gold_audit, violations, "gold_program_derivation_audit_mismatch")
+    require(gold_audit.get("status") == "PASS", violations, "gold_program_audit_not_pass")
+    require(gold_audit.get("splits", {}).get("train", {}).get("gold_derivation_pass_count") == EXPECTED_CREATE_COUNTS["train"], violations, "train_gold_derivation_not_1760")
+    require(gold_audit.get("splits", {}).get("dev", {}).get("gold_derivation_pass_count") == EXPECTED_CREATE_COUNTS["dev"], violations, "dev_gold_derivation_not_240")
+    require(gold_audit.get("splits", {}).get("train", {}).get("gold_execution_failure_count") == 0, violations, "train_gold_execution_failures")
+    require(gold_audit.get("splits", {}).get("dev", {}).get("gold_execution_failure_count") == 0, violations, "dev_gold_execution_failures")
+    checks["gold_program_derivation_audit_recomputed"] = True
 
     generation = read_json(output_dir / "GENERATION_PROTOCOL_SPEC.json")
     require(generation.get("core_v2_max_model_calls") == 2, violations, "hidden_third_model_call_allowed")
     require(generation.get("semantic_slot_inventory_model_call_allowed") is False, violations, "slot_inventory_model_call_allowed")
     require(generation.get("v2_generation_run") is False, violations, "v2_generation_already_run")
+    require(generation.get("config") == FROZEN_GENERATION_CONFIG, violations, "generation_config_not_frozen")
+    require("to_be_frozen" not in json.dumps(generation, ensure_ascii=False).casefold(), violations, "generation_config_contains_tbd")
+    environment = read_json(output_dir / "EVALUATION_ENVIRONMENT_SPEC.json")
+    require(environment.get("execution_timeout_seconds_per_sample") == FROZEN_GENERATION_CONFIG["execution_timeout_seconds_per_sample"], violations, "execution_timeout_not_frozen")
+    require("to_be_frozen" not in json.dumps(environment, ensure_ascii=False).casefold(), violations, "environment_contains_tbd")
+    checks["generation_config_validated"] = True
 
     dev = read_json(output_dir / "DEV_SELECTION_PROTOCOL.json")
     require(dev.get("primary_metric") == "Target-State Accuracy", violations, "dev_primary_metric_changed")
@@ -316,6 +354,10 @@ def validation_report_text(report: dict[str, Any]) -> str:
         "train_dev_create_manifests_recomputed",
         "model_input_leakage_recomputed",
         "split_contamination_recomputed",
+        "semantic_slot_derivation_audit_recomputed",
+        "gold_program_derivation_audit_recomputed",
+        "operation_mapping_validated",
+        "generation_config_validated",
         "selection_policy_validated",
         "reserved_benchmarks_validated",
     ):

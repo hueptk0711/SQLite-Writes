@@ -14,9 +14,12 @@ import pytest
 
 from scripts.data.audit_stage7c_dataset_splits import audit
 from scripts.data.build_stage7c_v2_development_data_protocol import (
-    DEFAULT_CRUDSQL_ROOT,
     EXPECTED_CREATE_COUNTS,
+    EXPECTED_TABLE_COUNTS,
+    FROZEN_GENERATION_CONFIG,
     LOCK_FILE,
+    OPERATION_LABEL_MAPPING,
+    RAW_SOURCE_RELS,
     STAGE6_TEST_INPUTS,
     STAGE7B_INPUTS,
     build_stage7c,
@@ -86,24 +89,26 @@ def _refresh_artifact_hash(package_root: Path, rel: str) -> None:
     _write_json(lock_path, lock)
 
 
-def test_validator_passes_current_stage7c_artifacts() -> None:
+def _write_jsonl(path: Path, rows: list[dict]) -> None:
+    path.write_text("".join(canonical_json(row) + "\n" for row in rows), encoding="utf-8")
+
+
+def test_validator_passes_current_stage7c_patch1_artifacts() -> None:
     report = validate(ARTIFACT_DIR)
     assert report["status"] == "PASS"
     assert report["violations"] == []
     assert report["train_create_count"] == 1760
     assert report["dev_create_count"] == 240
-    assert report["model_called"] is False
-    assert report["gpu_called"] is False
+    assert report["semantic_slot_derivation_audit_recomputed"] is True
+    assert report["gold_program_derivation_audit_recomputed"] is True
+    assert report["generation_config_validated"] is True
 
 
 def test_lock_is_pass_after_actual_validator() -> None:
     lock = _read_json(ARTIFACT_DIR / LOCK_FILE)
     assert lock["status"] == PASS_STATUS
-    assert lock["model_called"] is False
-    assert lock["gpu_called"] is False
-    assert lock["v2_implemented"] is False
-    assert lock["experiment_run"] is False
-    assert lock["live_sql_bench_gt_opened"] is False
+    for key in ("model_called", "gpu_called", "v2_implemented", "experiment_run", "live_sql_bench_gt_opened"):
+        assert lock[key] is False
 
 
 def test_stage7b_inputs_are_hash_locked() -> None:
@@ -121,76 +126,140 @@ def test_raw_crudsql_train_dev_only_are_packaged() -> None:
     assert source["included_splits"] == ["train", "dev"]
     assert source["excluded_splits"] == ["test"]
     assert not (ARTIFACT_DIR / "upstream_crudsql" / "data" / "test").exists()
-    assert {row["source_path"] for row in source["files"]} == {
-        "data/train/crud_train_sql.json",
-        "data/train/crud_train_table.json",
-        "data/train/train.db",
-        "data/dev/crud_dev_sql.json",
-        "data/dev/crud_dev_table.json",
-        "data/dev/dev.db",
-    }
+    assert {row["source_path"] for row in source["files"]} == set(RAW_SOURCE_RELS)
 
 
 def test_train_dev_create_counts_are_frozen() -> None:
     train = _read_jsonl(ARTIFACT_DIR / "TRAIN_CREATE_MANIFEST.jsonl")
     dev = _read_jsonl(ARTIFACT_DIR / "DEV_CREATE_MANIFEST.jsonl")
-    audit_payload = _read_json(ARTIFACT_DIR / "DATASET_ELIGIBILITY_AUDIT.json")
+    eligibility = _read_json(ARTIFACT_DIR / "DATASET_ELIGIBILITY_AUDIT.json")
     assert len(train) == EXPECTED_CREATE_COUNTS["train"] == 1760
     assert len(dev) == EXPECTED_CREATE_COUNTS["dev"] == 240
-    assert audit_payload["eligible_create_counts"] == {"train": 1760, "dev": 240}
-    assert audit_payload["source_split_counts"]["train"]["total_records"] == 7040
-    assert audit_payload["source_split_counts"]["dev"]["total_records"] == 960
+    assert eligibility["eligible_create_counts"] == {"train": 1760, "dev": 240}
+    assert eligibility["source_split_counts"]["train"]["total_records"] == 7040
+    assert eligibility["source_split_counts"]["dev"]["total_records"] == 960
+
+
+def test_operation_label_mapping_freezes_create_to_insert() -> None:
+    mapping = _read_json(ARTIFACT_DIR / "OPERATION_LABEL_MAPPING_SPEC.json")
+    assert mapping["mapping"] == OPERATION_LABEL_MAPPING
+    assert mapping["mapping"]["0"]["crudsql_label"] == "Create"
+    assert mapping["mapping"]["0"]["v2_operation"] == "INSERT"
+    assert mapping["mapping"]["1"]["v2_operation"] == "DELETE"
+    assert mapping["mapping"]["2"]["v2_operation"] == "UPDATE"
+    assert mapping["mapping"]["3"]["v2_operation"] == "OUT_OF_SCOPE_READ"
+    assert mapping["mapping"]["UPSERT"]["crudsql_label"] == "not_represented"
+
+
+def test_manifest_uses_insert_as_v2_gold_operation_not_literal_create() -> None:
+    rows = _read_jsonl(ARTIFACT_DIR / "TRAIN_CREATE_MANIFEST.jsonl")[:20] + _read_jsonl(ARTIFACT_DIR / "DEV_CREATE_MANIFEST.jsonl")[:20]
+    for row in rows:
+        assert row["operation_label_for_evaluation_only"] == "CREATE"
+        assert row["v2_gold_operation_for_evaluation_only"] == "INSERT"
+        assert row["operation_label_visible_to_phase_o"] is False
+        assert row["label_side_bookkeeping"]["v2_gold_operation"] == "INSERT"
 
 
 def test_model_side_input_excludes_gold_sql_operation_label_and_crudsql_conditions() -> None:
     rows = _read_jsonl(ARTIFACT_DIR / "TRAIN_CREATE_MANIFEST.jsonl")[:50] + _read_jsonl(ARTIFACT_DIR / "DEV_CREATE_MANIFEST.jsonl")[:50]
     forbidden = {"operation", "operation_label", "gold", "gold_sql", "crudsql_sql", "conds", "sel", "agg", "target_state", "post_state_hash", "dev_metric"}
     for row in rows:
-        assert row["operation_label_for_evaluation_only"] == "CREATE"
-        assert row["operation_label_visible_to_phase_o"] is False
         assert set(row["model_side_input"]) == {"question", "schema_inventory", "evidence_inventory", "semantic_slot_inventory"}
         text = canonical_json(row["model_side_input"]).casefold()
         for key in forbidden:
             assert f'"{key.casefold()}"' not in text
 
 
-def test_semantic_slot_inventory_is_question_only_and_model_free() -> None:
+def test_stage7d_prompt_contract_only_allows_model_side_input() -> None:
+    adapter = _read_json(ARTIFACT_DIR / "CRUDSQL_ADAPTER_SPEC.json")
+    policy = _read_json(ARTIFACT_DIR / "MODEL_INPUT_LEAKAGE_POLICY.json")
+    assert "only row['model_side_input']" in adapter["stage7d_prompt_input_contract"]
+    assert "only row['model_side_input']" in policy["stage7d_prompt_input_contract"]
+    assert policy["slot_inventory_gold_sql_use_allowed"] is False
+
+
+def test_semantic_slot_inventory_is_value_bearing_question_schema_only() -> None:
     row = _read_jsonl(ARTIFACT_DIR / "TRAIN_CREATE_MANIFEST.jsonl")[0]
     slots = row["model_side_input"]["semantic_slot_inventory"]
-    evidence_refs = {entry["evidence_ref"] for entry in row["model_side_input"]["evidence_inventory"]["evidence"]}
+    evidence = row["model_side_input"]["evidence_inventory"]
     assert row["semantic_slot_inventory_derivation_inputs"] == ["question"]
+    assert evidence["construction"] == "deterministic_value_bearing_span_extraction"
+    assert slots["construction"] == "deterministic_value_bearing_question_schema_extractor"
     assert slots["uses_gold_sql"] is False
     assert slots["model_call_used"] is False
     assert all(slot["required"] is True for slot in slots["slots"])
-    assert all(slot["source"] == "deterministic_question_span" for slot in slots["slots"])
-    assert {slot["evidence_ref"] for slot in slots["slots"]} <= evidence_refs
+    assert all(slot["source"] == "deterministic_value_bearing_question_schema_extractor" for slot in slots["slots"])
+    assert "我需要添加一条数据" not in {entry["text"] for entry in evidence["evidence"]}
 
 
-def test_model_side_input_hashes_are_canonical() -> None:
-    for path in (ARTIFACT_DIR / "TRAIN_CREATE_MANIFEST.jsonl", ARTIFACT_DIR / "DEV_CREATE_MANIFEST.jsonl"):
-        for row in _read_jsonl(path)[:25]:
-            assert row["model_side_input_sha256"] == sha256_text(canonical_json(row["model_side_input"]))
-            assert row["question_sha256"] == sha256_text(row["question"])
+def test_semantic_slot_derivation_audit_reports_quality_and_limitations() -> None:
+    audit_payload = _read_json(ARTIFACT_DIR / "SEMANTIC_SLOT_DERIVATION_AUDIT.json")
+    assert audit_payload["gold_used_for_model_side_inventory"] is False
+    assert audit_payload["gold_used_for_label_side_audit_only"] is True
+    for split in ("train", "dev"):
+        row = audit_payload[split]
+        assert row["sample_count"] == EXPECTED_CREATE_COUNTS[split]
+        assert row["gold_assignment_count_total_label_side_only"] > 0
+        assert 0 <= row["gold_value_coverage_rate"] <= 1
+        assert 0 <= row["spurious_required_slot_rate"] <= 1
+        assert row["cardinality_mismatch"] == row["slots_gt_gold_assignments"] + row["slots_lt_gold_assignments"]
+        assert "example_unresolved_records" in row
 
 
-def test_split_contamination_audit_has_zero_overlap() -> None:
+def test_gold_program_derivation_audit_executes_all_train_dev_create_labels() -> None:
+    audit_payload = _read_json(ARTIFACT_DIR / "GOLD_PROGRAM_DERIVATION_AUDIT.json")
+    assert audit_payload["status"] == "PASS"
+    assert audit_payload["splits"]["train"]["gold_derivation_pass_count"] == 1760
+    assert audit_payload["splits"]["dev"]["gold_derivation_pass_count"] == 240
+    assert audit_payload["splits"]["train"]["gold_execution_failure_count"] == 0
+    assert audit_payload["splits"]["dev"]["gold_execution_failure_count"] == 0
+
+
+def test_gold_program_hashes_are_label_side_only() -> None:
+    row = _read_jsonl(ARTIFACT_DIR / "DEV_CREATE_MANIFEST.jsonl")[0]
+    assert "gold_insert_program_sha256" in row["label_side_bookkeeping"]
+    assert "gold_insert_program_sha256" not in canonical_json(row["model_side_input"])
+    assert "gold_post_state_sha256" not in canonical_json(row["model_side_input"])
+
+
+def test_gold_post_state_protocol_is_frozen_and_model_hidden() -> None:
+    spec = _read_json(ARTIFACT_DIR / "GOLD_POST_STATE_PROTOCOL.json")
+    assert spec["database_policy"] == "open fresh in-memory copy from frozen CRUDSQL train/dev DB for each sample"
+    assert spec["gold_visible_to_model"] is False
+    assert "sha256" in spec["post_state_hash"]
+
+
+def test_split_contamination_audit_has_zero_question_and_table_overlap() -> None:
     report = _read_json(ARTIFACT_DIR / "SPLIT_CONTAMINATION_AUDIT.json")
     assert report["train_dev_question_hash_overlap"] == 0
     assert report["train_481_question_hash_overlap"] == 0
     assert report["dev_481_question_hash_overlap"] == 0
     assert report["train_dev_sample_id_overlap"] == 0
-    assert report["test_question_text_imported"] is False
-    assert report["model_input_leakage_counts"] == {}
+    assert report["train_table_id_count"] == EXPECTED_TABLE_COUNTS["train"]
+    assert report["dev_table_id_count"] == EXPECTED_TABLE_COUNTS["dev"]
+    assert report["confirmation_table_id_count"] == EXPECTED_TABLE_COUNTS["confirmation"]
+    assert report["train_dev_table_id_overlap"] == 0
+    assert report["train_confirmation_table_id_overlap"] == 0
+    assert report["dev_confirmation_table_id_overlap"] == 0
     assert report["model_input_leakage_status"] == "PASS"
 
 
-def test_generation_protocol_registers_no_hidden_model_calls_or_run() -> None:
+def test_generation_protocol_has_no_tbd_and_exact_config() -> None:
     spec = _read_json(ARTIFACT_DIR / "GENERATION_PROTOCOL_SPEC.json")
     assert spec["core_v2_max_model_calls"] == 2
     assert spec["phase_o_model_calls"] == 1
     assert spec["phase_m_model_calls"] == 1
     assert spec["semantic_slot_inventory_model_call_allowed"] is False
     assert spec["v2_generation_run"] is False
+    assert spec["config"] == FROZEN_GENERATION_CONFIG
+    assert "to_be_frozen" not in canonical_json(spec).casefold()
+
+
+def test_evaluation_timeout_is_frozen() -> None:
+    spec = _read_json(ARTIFACT_DIR / "EVALUATION_ENVIRONMENT_SPEC.json")
+    assert spec["generation_timeout_seconds_per_phase"] == 120
+    assert spec["execution_timeout_seconds_per_sample"] == 30
+    assert "to_be_frozen" not in canonical_json(spec).casefold()
 
 
 def test_dev_selection_and_reserved_benchmark_policies_are_frozen() -> None:
@@ -211,15 +280,15 @@ def test_audit_script_payload_matches_protocol() -> None:
     assert payload["manifest_counts"] == {"train_create": 1760, "dev_create": 240}
     assert payload["model_input_leakage_counts"] == {}
     assert payload["contamination"]["train_481_question_hash_overlap"] == 0
+    assert payload["contamination"]["train_table_id_count"] == 440
 
 
-def test_builder_creates_pending_lock_before_validator(workspace_tmp: Path) -> None:
-    if not DEFAULT_CRUDSQL_ROOT.exists():
-        pytest.skip("Frozen CRUDSQL source checkout is not available in this extraction.")
-    output = workspace_tmp / "stage7c_v2_development_data_protocol"
-    build_stage7c(output, force=True)
+def test_builder_rebuilds_from_packaged_source_without_external_git(workspace_tmp: Path) -> None:
+    package = _copy_stage7c_root(workspace_tmp)
+    output = package / "stage7c_v2_development_data_protocol"
+    build_stage7c(output, force=True, source_mode="packaged")
     assert _read_json(output / LOCK_FILE)["status"] == "BUILT_PENDING_VALIDATION"
-    report = validate(output)
+    report = validate(output, root=package)
     assert report["status"] == "PASS"
 
 
@@ -235,24 +304,13 @@ def test_validator_catches_stage7b_hash_drift(workspace_tmp: Path) -> None:
     assert "lock_input_hashes_mismatch" in report["violations"]
 
 
-def test_validator_catches_train_manifest_count_tamper(workspace_tmp: Path) -> None:
-    package = _copy_stage7c_root(workspace_tmp)
-    manifest_path = package / "stage7c_v2_development_data_protocol" / "TRAIN_CREATE_MANIFEST.jsonl"
-    rows = _read_jsonl(manifest_path)
-    manifest_path.write_text("".join(canonical_json(row) + "\n" for row in rows[:-1]), encoding="utf-8")
-    _refresh_artifact_hash(package, "TRAIN_CREATE_MANIFEST.jsonl")
-    report = validate(package / "stage7c_v2_development_data_protocol", root=package)
-    assert report["status"] == "FAIL"
-    assert "train_create_manifest_count_not_1760" in report["violations"]
-
-
 def test_validator_catches_model_side_gold_leakage(workspace_tmp: Path) -> None:
     package = _copy_stage7c_root(workspace_tmp)
     manifest_path = package / "stage7c_v2_development_data_protocol" / "DEV_CREATE_MANIFEST.jsonl"
     rows = _read_jsonl(manifest_path)
     rows[0]["model_side_input"]["conds"] = rows[0]["label_side_bookkeeping"]["gold_annotation_sha256"]
     rows[0]["model_side_input_sha256"] = sha256_text(canonical_json(rows[0]["model_side_input"]))
-    manifest_path.write_text("".join(canonical_json(row) + "\n" for row in rows), encoding="utf-8")
+    _write_jsonl(manifest_path, rows)
     _refresh_artifact_hash(package, "DEV_CREATE_MANIFEST.jsonl")
     report = validate(package / "stage7c_v2_development_data_protocol", root=package)
     assert report["status"] == "FAIL"
@@ -266,7 +324,7 @@ def test_validator_catches_semantic_slot_gold_sql_dependency(workspace_tmp: Path
     rows[0]["semantic_slot_inventory_derivation_inputs"] = ["question", "gold_sql"]
     rows[0]["model_side_input"]["semantic_slot_inventory"]["uses_gold_sql"] = True
     rows[0]["model_side_input_sha256"] = sha256_text(canonical_json(rows[0]["model_side_input"]))
-    manifest_path.write_text("".join(canonical_json(row) + "\n" for row in rows), encoding="utf-8")
+    _write_jsonl(manifest_path, rows)
     _refresh_artifact_hash(package, "DEV_CREATE_MANIFEST.jsonl")
     report = validate(package / "stage7c_v2_development_data_protocol", root=package)
     assert report["status"] == "FAIL"
@@ -288,6 +346,44 @@ def test_validator_catches_hidden_third_model_call(workspace_tmp: Path) -> None:
     assert "slot_inventory_model_call_allowed" in report["violations"]
 
 
+def test_validator_catches_tbd_generation_config(workspace_tmp: Path) -> None:
+    package = _copy_stage7c_root(workspace_tmp)
+    path = package / "stage7c_v2_development_data_protocol" / "GENERATION_PROTOCOL_SPEC.json"
+    spec = _read_json(path)
+    spec["config"]["model_revision"] = "to_be_frozen_before_stage7d_execution"
+    _write_json(path, spec)
+    _refresh_artifact_hash(package, "GENERATION_PROTOCOL_SPEC.json")
+    report = validate(package / "stage7c_v2_development_data_protocol", root=package)
+    assert report["status"] == "FAIL"
+    assert "generation_config_not_frozen" in report["violations"]
+    assert "generation_config_contains_tbd" in report["violations"]
+
+
+def test_validator_catches_gold_program_audit_tamper(workspace_tmp: Path) -> None:
+    package = _copy_stage7c_root(workspace_tmp)
+    path = package / "stage7c_v2_development_data_protocol" / "GOLD_PROGRAM_DERIVATION_AUDIT.json"
+    payload = _read_json(path)
+    payload["splits"]["dev"]["gold_derivation_pass_count"] = 239
+    _write_json(path, payload)
+    _refresh_artifact_hash(package, "GOLD_PROGRAM_DERIVATION_AUDIT.json")
+    report = validate(package / "stage7c_v2_development_data_protocol", root=package)
+    assert report["status"] == "FAIL"
+    assert "gold_program_derivation_audit_mismatch" in report["violations"]
+    assert "dev_gold_derivation_not_240" in report["violations"]
+
+
+def test_validator_catches_operation_mapping_tamper(workspace_tmp: Path) -> None:
+    package = _copy_stage7c_root(workspace_tmp)
+    path = package / "stage7c_v2_development_data_protocol" / "OPERATION_LABEL_MAPPING_SPEC.json"
+    mapping = _read_json(path)
+    mapping["mapping"]["0"]["v2_operation"] = "CREATE"
+    _write_json(path, mapping)
+    _refresh_artifact_hash(package, "OPERATION_LABEL_MAPPING_SPEC.json")
+    report = validate(package / "stage7c_v2_development_data_protocol", root=package)
+    assert report["status"] == "FAIL"
+    assert "operation_label_mapping_changed" in report["violations"]
+
+
 def test_validator_catches_test_split_copy(workspace_tmp: Path) -> None:
     package = _copy_stage7c_root(workspace_tmp)
     test_dir = package / "stage7c_v2_development_data_protocol" / "upstream_crudsql" / "data" / "test"
@@ -298,31 +394,22 @@ def test_validator_catches_test_split_copy(workspace_tmp: Path) -> None:
     assert "test_split_copied_into_stage7c" in report["violations"]
 
 
-def test_self_contained_reviewer_package_clean_extraction_runs(workspace_tmp: Path) -> None:
-    if os.environ.get("STAGE7C_SKIP_CLEAN_PACKAGE_TEST") == "1":
-        pytest.skip("Avoid recursive clean-package test.")
+def test_self_contained_reviewer_package_clean_extraction_builder_validator_tests(workspace_tmp: Path) -> None:
+    if os.environ.get("STAGE7C_IN_CLEAN_PACKAGE_TEST") == "1":
+        return
     package = _copy_stage7c_root(workspace_tmp)
     env = os.environ.copy()
-    env["STAGE7C_SKIP_CLEAN_PACKAGE_TEST"] = "1"
-    validator = subprocess.run(
+    env["STAGE7C_IN_CLEAN_PACKAGE_TEST"] = "1"
+    commands = [
+        [sys.executable, "scripts/data/build_stage7c_v2_development_data_protocol.py", "--source-mode", "packaged", "--force"],
         [sys.executable, "scripts/data/validate_stage7c_v2_development_data_protocol.py"],
-        cwd=package,
-        env=env,
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    assert validator.returncode == 0, validator.stdout + validator.stderr
-    assert '"status": "PASS"' in validator.stdout
-    tests = subprocess.run(
+        [sys.executable, "scripts/data/audit_stage7c_dataset_splits.py"],
         [sys.executable, "-m", "pytest", "-q", "tests/test_stage7c_v2_development_data_protocol.py"],
-        cwd=package,
-        env=env,
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    assert tests.returncode == 0, tests.stdout + tests.stderr
+    ]
+    for command in commands:
+        result = subprocess.run(command, cwd=package, env=env, text=True, capture_output=True, check=False)
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "skipped" not in result.stdout.casefold()
 
 
 def test_reviewer_zip_can_open_if_created(workspace_tmp: Path) -> None:

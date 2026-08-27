@@ -1,0 +1,27 @@
+{
+  "audit_uses_gold": "label_side_only_to_measure_extractor_quality_before_v2_generation",
+  "deterministic_rules_ordered": [
+    "object_before_insert_verb",
+    "entity_before_recruitment_verb",
+    "count_after_recruitment_verb",
+    "education_level_pattern",
+    "job_category_pattern",
+    "value_after_assignment_cue",
+    "schema_header_assignment_cue",
+    "fallback_non_request_segment_when_no_value_span_found"
+  ],
+  "forbidden_derivation_inputs": [
+    "sql.conds",
+    "gold_sql",
+    "gold_program",
+    "gold_post_state",
+    "target_state",
+    "dev_metric"
+  ],
+  "model_call_used": false,
+  "model_side_inputs": [
+    "question",
+    "schema_inventory"
+  ],
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
+}

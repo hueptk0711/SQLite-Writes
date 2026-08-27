@@ -1,0 +1,8 @@
+{
+  "database_policy": "open fresh in-memory copy from frozen CRUDSQL train/dev DB for each sample",
+  "execution": "execute deterministic gold INSERT program once",
+  "failure_policy": "any gold derivation or execution failure must be resolved before V2 generation",
+  "gold_visible_to_model": false,
+  "post_state_hash": "sha256(canonical_json(table_name, columns, rows ordered by rowid after gold insert))",
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
+}

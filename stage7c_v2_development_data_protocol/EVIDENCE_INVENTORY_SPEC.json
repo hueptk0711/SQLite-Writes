@@ -1,5 +1,5 @@
 {
-  "construction": "deterministic split on frozen punctuation delimiters",
+  "construction": "deterministic value-bearing span extraction from question using schema cues and frozen lexical patterns",
   "gold_sql_or_cond_values_used": false,
   "model_call_used": false,
   "source": "natural_language_question_only",

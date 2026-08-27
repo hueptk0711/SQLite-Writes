@@ -6,7 +6,9 @@ rules, and evaluation environment before V2 implementation.
 
 Commands:
 ```bash
+python scripts/data/build_stage7c_v2_development_data_protocol.py --source-mode packaged --force
 python scripts/data/validate_stage7c_v2_development_data_protocol.py
+python scripts/data/audit_stage7c_dataset_splits.py
 python -m pytest -q tests/test_stage7c_v2_development_data_protocol.py
 ```
 

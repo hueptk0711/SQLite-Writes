@@ -1,6 +1,9 @@
 {
+  "confirmation_table_id_count": 121,
   "dev_481_question_hash_overlap": 0,
+  "dev_confirmation_table_id_overlap": 0,
   "dev_sample_id_count": 240,
+  "dev_table_id_count": 60,
   "live_sql_bench_gt_opened": false,
   "model_input_leakage_counts": {},
   "model_input_leakage_status": "PASS",
@@ -8,7 +11,10 @@
   "status": "PASS",
   "test_question_text_imported": false,
   "train_481_question_hash_overlap": 0,
+  "train_confirmation_table_id_overlap": 0,
   "train_dev_question_hash_overlap": 0,
   "train_dev_sample_id_overlap": 0,
-  "train_sample_id_count": 1760
+  "train_dev_table_id_overlap": 0,
+  "train_sample_id_count": 1760,
+  "train_table_id_count": 440
 }

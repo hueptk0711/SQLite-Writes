@@ -28,6 +28,8 @@ def audit(output_dir: Path = PROJECT_ROOT / "stage7c_v2_development_data_protoco
     source_manifest = read_json(output_dir / "CRUDSQL_SOURCE_MANIFEST.json")
     contamination = contamination_audit(train_rows, dev_rows)
     leaks = leakage_counts(train_rows + dev_rows)
+    slot_audit = read_json(output_dir / "SEMANTIC_SLOT_DERIVATION_AUDIT.json")
+    gold_audit = read_json(output_dir / "GOLD_PROGRAM_DERIVATION_AUDIT.json")
     return {
         "stage": STAGE,
         "status": "PASS" if not leaks and contamination["status"] == "PASS" else "FAIL",
@@ -36,6 +38,20 @@ def audit(output_dir: Path = PROJECT_ROOT / "stage7c_v2_development_data_protoco
         "excluded_splits": source_manifest["excluded_splits"],
         "source_split_counts": {"train": source_split_counts(output_dir, "train"), "dev": source_split_counts(output_dir, "dev")},
         "manifest_counts": {"train_create": len(train_rows), "dev_create": len(dev_rows)},
+        "semantic_slot_derivation": {
+            "train_exact_cardinality_match": slot_audit["train"]["exact_cardinality_match"],
+            "train_gold_value_coverage_rate": slot_audit["train"]["gold_value_coverage_rate"],
+            "dev_exact_cardinality_match": slot_audit["dev"]["exact_cardinality_match"],
+            "dev_gold_value_coverage_rate": slot_audit["dev"]["gold_value_coverage_rate"],
+            "gold_used_for_model_side_inventory": slot_audit["gold_used_for_model_side_inventory"],
+        },
+        "gold_program_derivation": {
+            "status": gold_audit["status"],
+            "train_pass": gold_audit["splits"]["train"]["gold_derivation_pass_count"],
+            "dev_pass": gold_audit["splits"]["dev"]["gold_derivation_pass_count"],
+            "train_execution_failures": gold_audit["splits"]["train"]["gold_execution_failure_count"],
+            "dev_execution_failures": gold_audit["splits"]["dev"]["gold_execution_failure_count"],
+        },
         "contamination": contamination,
         "model_input_leakage_counts": dict(leaks),
         "model_called": False,

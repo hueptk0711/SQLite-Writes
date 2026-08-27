@@ -1,0 +1,9 @@
+{
+  "column_mapping": "CRUDSQL zero-based column_index maps to SQLite col_{index+1}",
+  "compiler": "INSERT INTO Table_<table_id>(col_i, ...) VALUES (?, ...)",
+  "gold_visible_to_model": false,
+  "input_annotation": "sql.conds label-side only",
+  "operator_requirement": "type0 values use conds values; operator field is retained in audit but not prompt-side",
+  "scope": "CRUDSQL type 0 Create only",
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
+}

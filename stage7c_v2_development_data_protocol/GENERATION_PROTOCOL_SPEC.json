@@ -1,12 +1,27 @@
 {
+  "config": {
+    "do_sample": false,
+    "execution_timeout_seconds_per_sample": 30,
+    "generation_timeout_seconds_per_phase": 120,
+    "model_id": "stage6i_same_exact_7b_model_family_for_v2_primary",
+    "model_revision": "reuse_stage6i_exact_revision_before_any_stage7d_generation",
+    "phase_m_max_new_tokens": 768,
+    "phase_o_max_new_tokens": 32,
+    "retry_count": 0,
+    "seed_policy": "deterministic_decoding_no_sampling_seed_not_used",
+    "stop_criteria": [
+      "single_json_object_complete",
+      "max_new_tokens"
+    ],
+    "temperature": 0.0,
+    "tokenizer_revision": "reuse_stage6i_exact_tokenizer_revision_before_any_stage7d_generation",
+    "top_p": 1.0
+  },
   "core_v2_max_model_calls": 2,
-  "max_tokens": "to_be_frozen_before_stage7d_execution",
-  "model_revision_selection_rule": "freeze exact model revision before Stage7D execution; if unavailable, record replacement before any generation",
   "phase_m_model_calls": 1,
   "phase_o_model_calls": 1,
   "retry_policy": "no hidden retry beyond registered protocol",
   "semantic_slot_inventory_model_call_allowed": false,
   "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL",
-  "temperature": "to_be_frozen_before_stage7d_execution",
   "v2_generation_run": false
 }

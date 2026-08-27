@@ -65,7 +65,8 @@
     "dataset": "CRUDSQL",
     "local_source_clean": true,
     "local_source_head": "63bfce67d8391185453a812751e115a499201363",
-    "repository": "https://github.com/bizard-lab/CRUDSQL.git"
+    "repository": "https://github.com/bizard-lab/CRUDSQL.git",
+    "source_mode": "git"
   },
   "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
 }

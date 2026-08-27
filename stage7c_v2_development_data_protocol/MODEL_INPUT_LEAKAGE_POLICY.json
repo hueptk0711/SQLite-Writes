@@ -13,5 +13,6 @@
   "gold_structured_annotation_use": "development_evaluation_only",
   "phase_o_must_predict_operation": true,
   "slot_inventory_gold_sql_use_allowed": false,
-  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL",
+  "stage7d_prompt_input_contract": "only row['model_side_input'] may enter Phase O/Phase M prompts; label_side_bookkeeping is evaluation-only"
 }

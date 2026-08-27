@@ -1,8 +1,8 @@
 {
-  "construction": "one required write_value SLOT_* per deterministic question span",
+  "construction": "one required write_value SLOT_* per extracted value-bearing evidence span",
   "hidden_third_llm_call_allowed": false,
   "model_call_used": false,
-  "required_flag_policy": "all deterministic question spans required before later dev redesign; no gold SQL is used to decide requiredness",
-  "source": "evidence_inventory_from_question_only",
+  "required_flag_policy": "all extracted value-bearing spans required; request/greeting/control phrases are excluded by frozen deterministic filters; no gold SQL is used to decide requiredness",
+  "source": "value_bearing_evidence_inventory_from_question_and_schema_only",
   "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
 }

@@ -1,0 +1,32 @@
+{
+  "literal_create_compared_to_phase_o_output": false,
+  "mapping": {
+    "0": {
+      "crudsql_label": "Create",
+      "stage7c_use": "train_dev_create_development",
+      "v2_operation": "INSERT"
+    },
+    "1": {
+      "crudsql_label": "Delete",
+      "stage7c_use": "reserved_after_v2_freeze",
+      "v2_operation": "DELETE"
+    },
+    "2": {
+      "crudsql_label": "Update",
+      "stage7c_use": "reserved_after_v2_freeze",
+      "v2_operation": "UPDATE"
+    },
+    "3": {
+      "crudsql_label": "Read",
+      "stage7c_use": "excluded_from_write_v2",
+      "v2_operation": "OUT_OF_SCOPE_READ"
+    },
+    "UPSERT": {
+      "crudsql_label": "not_represented",
+      "stage7c_use": "not_in_crudsql",
+      "v2_operation": "UPSERT"
+    }
+  },
+  "phase_o_dev_accuracy_gold_operation": "INSERT",
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
+}

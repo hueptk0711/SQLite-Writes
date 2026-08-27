@@ -1,0 +1,391 @@
+{
+  "dev": {
+    "cardinality_mismatch": 137,
+    "exact_cardinality_match": 103,
+    "example_unresolved_records": [
+      {
+        "covered_gold_values": 2,
+        "gold_assignment_count": 3,
+        "gold_values_label_side_only": [
+          "中创物流",
+          "12.84",
+          "39.37"
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0001",
+        "slot_count": 3,
+        "slot_texts": [
+          "可以再帮我加上一个公司",
+          "12.84亿元",
+          "39.37"
+        ],
+        "spurious_required_slots": 1
+      },
+      {
+        "covered_gold_values": 1,
+        "gold_assignment_count": 2,
+        "gold_values_label_side_only": [
+          "德邦股份",
+          "32.81"
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0004",
+        "slot_count": 2,
+        "slot_texts": [
+          "该公司1-11月",
+          "32.81亿件"
+        ],
+        "spurious_required_slots": 1
+      },
+      {
+        "covered_gold_values": 3,
+        "gold_assignment_count": 3,
+        "gold_values_label_side_only": [
+          "ST天顺",
+          "25.64",
+          "23.16"
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0005",
+        "slot_count": 4,
+        "slot_texts": [
+          "最新一家需要新增",
+          "ST天顺",
+          "25.64亿件",
+          "23.16"
+        ],
+        "spurious_required_slots": 1
+      },
+      {
+        "covered_gold_values": 2,
+        "gold_assignment_count": 3,
+        "gold_values_label_side_only": [
+          "京东物流",
+          "294.62",
+          "24.74"
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0006",
+        "slot_count": 2,
+        "slot_texts": [
+          "294.62亿元",
+          "24.74"
+        ],
+        "spurious_required_slots": 0
+      },
+      {
+        "covered_gold_values": 3,
+        "gold_assignment_count": 3,
+        "gold_values_label_side_only": [
+          "中通快递",
+          "2.74",
+          "-1.01%"
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0007",
+        "slot_count": 4,
+        "slot_texts": [
+          "最后一个我想加入到表中",
+          "中通快递",
+          "2.74",
+          "-1.01%"
+        ],
+        "spurious_required_slots": 1
+      },
+      {
+        "covered_gold_values": 2,
+        "gold_assignment_count": 3,
+        "gold_values_label_side_only": [
+          "达美航空",
+          "8.46",
+          "82.7"
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0009",
+        "slot_count": 2,
+        "slot_texts": [
+          "8.46",
+          "82.7"
+        ],
+        "spurious_required_slots": 0
+      },
+      {
+        "covered_gold_values": 2,
+        "gold_assignment_count": 5,
+        "gold_values_label_side_only": [
+          "昆明市图书馆",
+          "专业技术岗",
+          "3",
+          "本科及以上",
+          "外国语文学类"
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0013",
+        "slot_count": 3,
+        "slot_texts": [
+          "专业技术岗",
+          "本科及以上",
+          "这项记录"
+        ],
+        "spurious_required_slots": 1
+      },
+      {
+        "covered_gold_values": 2,
+        "gold_assignment_count": 6,
+        "gold_values_label_side_only": [
+          "云南省昆明市官渡区东华小区知春街115号(大树营地铁站D口步行480米)",
+          "5",
+          "编外",
+          "本科及以上",
+          "汉语言文学类",
+          "昆明市图书馆"
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0014",
+        "slot_count": 2,
+        "slot_texts": [
+          "5",
+          "本科及以上"
+        ],
+        "spurious_required_slots": 0
+      },
+      {
+        "covered_gold_values": 3,
+        "gold_assignment_count": 6,
+        "gold_values_label_side_only": [
+          "昆明市五华区翠湖南路141号",
+          "云南省图书馆",
+          "本科及以上",
+          "播音主持",
+          "2",
+          "年龄30周岁以下，具有相应学位"
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0015",
+        "slot_count": 4,
+        "slot_texts": [
+          "在昆明市五华区翠湖南路141号的云南省图书馆需要",
+          "本科及以上",
+          "另外要求年龄30周岁以下",
+          "相应学位"
+        ],
+        "spurious_required_slots": 2
+      },
+      {
+        "covered_gold_values": 0,
+        "gold_assignment_count": 3,
+        "gold_values_label_side_only": [
+          "钢铁是怎样炼成的",
+          "袁崇章",
+          "湖南文艺出版社"
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0016",
+        "slot_count": 1,
+        "slot_texts": [
+          "钢铁是怎样炼成"
+        ],
+        "spurious_required_slots": 1
+      }
+    ],
+    "gold_assignment_count_total_label_side_only": 845,
+    "gold_value_coverage_count": 639,
+    "gold_value_coverage_rate": 0.756213,
+    "over_segmentation_rate": 0.158333,
+    "sample_count": 240,
+    "slot_count_total": 728,
+    "slots_gt_gold_assignments": 38,
+    "slots_lt_gold_assignments": 99,
+    "spurious_required_slot_count": 161,
+    "spurious_required_slot_rate": 0.221154,
+    "spurious_required_slot_samples": 103,
+    "under_segmentation_rate": 0.4125,
+    "unresolved_samples": 118
+  },
+  "gold_used_for_label_side_audit_only": true,
+  "gold_used_for_model_side_inventory": false,
+  "metrics_are_protocol_audit_not_selection_metric": true,
+  "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL",
+  "train": {
+    "cardinality_mismatch": 1156,
+    "exact_cardinality_match": 604,
+    "example_unresolved_records": [
+      {
+        "covered_gold_values": 4,
+        "gold_assignment_count": 4,
+        "gold_values_label_side_only": [
+          "021291.BK",
+          "华为概念",
+          "76",
+          "1024"
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0024",
+        "slot_count": 5,
+        "slot_texts": [
+          "hello",
+          "021291.BK",
+          "华为概念",
+          "76元",
+          "1024"
+        ],
+        "spurious_required_slots": 1
+      },
+      {
+        "covered_gold_values": 4,
+        "gold_assignment_count": 5,
+        "gold_values_label_side_only": [
+          "600000.SH",
+          "浦发银行",
+          "18",
+          "123",
+          "16.66"
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0026",
+        "slot_count": 4,
+        "slot_texts": [
+          "600000.SH",
+          "18元",
+          "123",
+          "16.66"
+        ],
+        "spurious_required_slots": 0
+      },
+      {
+        "covered_gold_values": 3,
+        "gold_assignment_count": 3,
+        "gold_values_label_side_only": [
+          "湖北省",
+          "2018.10.01-2019.03.01",
+          "3个月"
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0028",
+        "slot_count": 4,
+        "slot_texts": [
+          "湖北省",
+          "2018.10.01-2019.03.01",
+          "今年",
+          "3个月"
+        ],
+        "spurious_required_slots": 1
+      },
+      {
+        "covered_gold_values": 1,
+        "gold_assignment_count": 2,
+        "gold_values_label_side_only": [
+          "云南省",
+          "至少5个月，计划增加1个月"
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0029",
+        "slot_count": 4,
+        "slot_texts": [
+          "些复杂啊",
+          "云南省",
+          "至少5个月",
+          "计划增加1个月"
+        ],
+        "spurious_required_slots": 3
+      },
+      {
+        "covered_gold_values": 2,
+        "gold_assignment_count": 2,
+        "gold_values_label_side_only": [
+          "湖南省",
+          "4个月"
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0031",
+        "slot_count": 3,
+        "slot_texts": [
+          "这段数据",
+          "湖南省今年",
+          "4个月"
+        ],
+        "spurious_required_slots": 1
+      },
+      {
+        "covered_gold_values": 2,
+        "gold_assignment_count": 3,
+        "gold_values_label_side_only": [
+          "江西元源",
+          "2019.6.13",
+          "3万吨无碱玻纤建成投产"
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0033",
+        "slot_count": 1,
+        "slot_texts": [
+          "3万吨无碱玻纤建成投产于2019.6.13点火"
+        ],
+        "spurious_required_slots": 0
+      },
+      {
+        "covered_gold_values": 3,
+        "gold_assignment_count": 3,
+        "gold_values_label_side_only": [
+          "河南",
+          "郑州三线",
+          "660"
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0037",
+        "slot_count": 4,
+        "slot_texts": [
+          "新的内容啦",
+          "河南",
+          "郑州三线",
+          "660吨"
+        ],
+        "spurious_required_slots": 1
+      },
+      {
+        "covered_gold_values": 0,
+        "gold_assignment_count": 2,
+        "gold_values_label_side_only": [
+          "广东",
+          "广州五线"
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0039",
+        "slot_count": 1,
+        "slot_texts": [
+          "我不会写SQL啊"
+        ],
+        "spurious_required_slots": 1
+      },
+      {
+        "covered_gold_values": 2,
+        "gold_assignment_count": 2,
+        "gold_values_label_side_only": [
+          "云南",
+          "红河一线"
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0040",
+        "slot_count": 4,
+        "slot_texts": [
+          "新",
+          "云南",
+          "产线",
+          "红河一线"
+        ],
+        "spurious_required_slots": 2
+      },
+      {
+        "covered_gold_values": 3,
+        "gold_assignment_count": 3,
+        "gold_values_label_side_only": [
+          "江苏",
+          "苏州一线",
+          "480"
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0042",
+        "slot_count": 4,
+        "slot_texts": [
+          "480吨",
+          "苏州一线",
+          "江苏",
+          "数据库吧"
+        ],
+        "spurious_required_slots": 1
+      }
+    ],
+    "gold_assignment_count_total_label_side_only": 5407,
+    "gold_value_coverage_count": 4283,
+    "gold_value_coverage_rate": 0.792121,
+    "over_segmentation_rate": 0.314773,
+    "sample_count": 1760,
+    "slot_count_total": 5311,
+    "slots_gt_gold_assignments": 554,
+    "slots_lt_gold_assignments": 602,
+    "spurious_required_slot_count": 1367,
+    "spurious_required_slot_rate": 0.25739,
+    "spurious_required_slot_samples": 878,
+    "under_segmentation_rate": 0.342045,
+    "unresolved_samples": 828
+  }
+}
