@@ -1,0 +1,7 @@
+{
+  "crudsql_update_delete": "reserved_until_after_v2_a1_freeze",
+  "current_481_crudsql_create": "post_hoc_only_not_selection",
+  "live_sql_bench_gt_opened": false,
+  "livesqlbench_sqlite": "untouched_external_no_gt_access",
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL"
+}

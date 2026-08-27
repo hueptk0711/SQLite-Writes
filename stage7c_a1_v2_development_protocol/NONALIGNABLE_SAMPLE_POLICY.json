@@ -1,0 +1,13 @@
+{
+  "add_post_hoc_normalization": false,
+  "dev_samples_with_gap": 33,
+  "diagnostic_flag": "source_gold_nonalignable_under_frozen_materializer",
+  "eligible": true,
+  "exclude_after_model_performance": false,
+  "modify_gold": false,
+  "retain_in_primary_dev_denominator": true,
+  "retain_in_primary_train_denominator": true,
+  "source": "Stage7B-A1 NONALIGNABLE_SOURCE_SPAN_POLICY.json",
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL",
+  "train_samples_with_gap": 93
+}

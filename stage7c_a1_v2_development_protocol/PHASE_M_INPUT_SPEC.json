@@ -1,0 +1,23 @@
+{
+  "all_phase_o_slots_required": true,
+  "forbidden_inputs": [
+    "gold_spans",
+    "gold_operation",
+    "gold_columns",
+    "sql.conds",
+    "gold_program",
+    "gold_post_state"
+  ],
+  "input_fields": [
+    "predicted_phase_o_operation",
+    "schema_inventory",
+    "phase_o_accepted_evidence_inventory",
+    "phase_o_accepted_semantic_slot_inventory",
+    "operation_specific_dynamic_schema"
+  ],
+  "model_call_count": 1,
+  "phase": "Phase M",
+  "slot_inventory_source": "accepted Phase O spans only",
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL",
+  "when_phase_o_is_wrong": "Phase M receives the predicted Phase O artifacts; no oracle substitution in primary V2-A1"
+}

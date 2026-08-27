@@ -1,0 +1,19 @@
+{
+  "allowed_splits": [
+    "CRUDSQL train Create",
+    "CRUDSQL dev Create"
+  ],
+  "dev_gold_value_denominator": 845,
+  "dev_source_selectable_gold_values": 810,
+  "diagnostic_only": true,
+  "forbidden_splits": [
+    "current 481 test",
+    "LiveSQLBench"
+  ],
+  "oracle_spans_used_for_training_or_selection": false,
+  "p_value_baseline_allowed": false,
+  "primary_v2_output_source": "predicted Phase O spans only",
+  "question": "If Phase M receives perfect source-alignable semantic spans, what mapping/materialization ceiling remains?",
+  "source_span_oracle_audit_sha256": "496faa5ab6e8dbfaf52ff406bf66f2e194b01dc3c94dea8945e3a5b0c67e4482",
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL"
+}

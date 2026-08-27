@@ -1,0 +1,18 @@
+{
+  "empty_value_spans_policy": "reject",
+  "json_schema_sha256": "2e6bf006b106e287bc3eb0ee4a3bf52b340c93d8ae34546c58be5d17ae3ec21c",
+  "model_generated_span_ids_policy": "reject",
+  "model_generated_value_text_policy": "reject",
+  "phase": "Phase O",
+  "span_validation_spec_sha256": "3cb55e73492a4e0a720ba7c14f47924f696929888cdc923163915d8895a5920b",
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL",
+  "validation_order": [
+    "validate Stage7B-A1 JSON schema",
+    "check offsets against exact original Q",
+    "derive text as Q[start_char:end_char]",
+    "reject duplicate exact offsets",
+    "reject nested or partially overlapping spans",
+    "sort by start_char then end_char",
+    "assign SPAN_i, EV_i, SLOT_i deterministically"
+  ]
+}

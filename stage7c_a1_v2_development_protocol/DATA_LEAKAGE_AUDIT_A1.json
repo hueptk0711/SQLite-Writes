@@ -1,0 +1,38 @@
+{
+  "example_violations": [],
+  "forbidden_model_side_fields": [
+    "agg",
+    "conds",
+    "crudsql_sql",
+    "gold_post_state",
+    "gold_program",
+    "gold_sql",
+    "operation_label",
+    "post_state_hash",
+    "sel",
+    "target_state"
+  ],
+  "gold_in_phase_m_input": false,
+  "gold_in_phase_o_input": false,
+  "gpu_called": false,
+  "hidden_third_llm_call": false,
+  "live_sql_bench_gt_opened": false,
+  "model_called": false,
+  "model_side_violation_count": 0,
+  "old_stage7c_regex_semantic_slot_inventory_status": "superseded_not_model_side_input_for_v2_a1_primary",
+  "oracle_spans_in_primary_v2": false,
+  "phase_m_input_sources": [
+    "predicted_phase_o_operation",
+    "schema_inventory",
+    "phase_o_accepted_evidence_inventory",
+    "phase_o_accepted_semantic_slot_inventory"
+  ],
+  "phase_o_input_sources": [
+    "model_side_input.question",
+    "model_side_input.schema_inventory",
+    "deterministic_offset_guide_from_exact_question"
+  ],
+  "sample_count": 2000,
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL",
+  "status": "PASS"
+}

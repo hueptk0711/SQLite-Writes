@@ -1,0 +1,30 @@
+{
+  "exact_original_question_preserved": true,
+  "excluded_stage7c_fields": [
+    "semantic_slot_inventory",
+    "label_side_bookkeeping",
+    "operation_label_for_evaluation_only",
+    "v2_gold_operation_for_evaluation_only"
+  ],
+  "forbidden_inputs": [
+    "gold_sql",
+    "sql.conds",
+    "gold_operation",
+    "gold_program",
+    "gold_post_state",
+    "481_test_labels",
+    "LiveSQLBench_ground_truth"
+  ],
+  "input_fields": [
+    "exact_original_question",
+    "schema_inventory",
+    "question_offset_guide",
+    "phase_o_json_schema"
+  ],
+  "model_call_count": 1,
+  "offset_guide_source": "deterministically derived from exact_original_question using Python code-point indices",
+  "phase": "Phase O",
+  "question_normalization_before_prompt": "none",
+  "schema_inventory_source": "reused Stage7C model_side_input.schema_inventory",
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL"
+}

@@ -1,0 +1,12 @@
+{
+  "metrics": {
+    "compiler_or_preflight_failure_rate": "deterministic SQLite compiler/preflight rejects the IR",
+    "completeness_rejection_rate": "accepted Phase O required SLOT ids omitted or used extra by Phase M",
+    "materialization_failure_rate": "accepted Phase M evidence cannot be typed under frozen materializer",
+    "reference_violation_rate": "invalid TAB/COL/EV/SLOT ids after dynamic membership validation",
+    "slot_to_column_grounding_accuracy": "label-side diagnostic against CRUDSQL cond column indices"
+  },
+  "oracle_phase_o_substitution": "diagnostic only and never primary",
+  "primary_metric_remains": "Target-State Accuracy",
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL"
+}

@@ -1,0 +1,48 @@
+{
+  "counts": {
+    "contamination": {
+      "confirmation_table_id_count": 121,
+      "dev_481_question_hash_overlap": 0,
+      "dev_confirmation_table_id_overlap": 0,
+      "dev_table_id_count": 60,
+      "train_481_question_hash_overlap": 0,
+      "train_confirmation_table_id_overlap": 0,
+      "train_dev_question_hash_overlap": 0,
+      "train_dev_table_id_overlap": 0,
+      "train_table_id_count": 440
+    },
+    "dev_create_count": 240,
+    "gold_derivation": {
+      "dev_failures": 0,
+      "dev_pass": 240,
+      "train_failures": 0,
+      "train_pass": 1760
+    },
+    "old_stage7c_status": "PASS_STAGE7C_DATA_PROTOCOL_LOCKED",
+    "operation_mapping_type0": "INSERT",
+    "source_span_oracle": {
+      "dev_denominator": 845,
+      "dev_samples_with_gap": 33,
+      "dev_source_selectable": 810,
+      "train_denominator": 5407,
+      "train_samples_with_gap": 93,
+      "train_source_selectable": 5295
+    },
+    "train_create_count": 1760
+  },
+  "reused_from": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL_PATCH2",
+  "reused_without_modification": [
+    "CRUDSQL source freeze",
+    "train/dev Create manifests",
+    "gold INSERT derivation",
+    "gold post-state protocol",
+    "Create/type0 to INSERT mapping",
+    "question/table contamination audit",
+    "reserved benchmark policy"
+  ],
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL",
+  "superseded_for_v2_a1_primary": [
+    "deterministic regex semantic_slot_inventory",
+    "required_optional_regex_confidence"
+  ]
+}

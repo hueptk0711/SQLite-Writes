@@ -1,0 +1,14 @@
+{
+  "metrics": {
+    "exact_span_precision": "accepted predicted spans matching label-side source-alignable gold spans over predicted spans",
+    "exact_span_recall_all_gold_values": "matched source spans over all label-side gold values",
+    "exact_span_recall_source_alignable": "matched source spans over source-alignable gold values only",
+    "invalid_offset_rate": "Phase O outputs rejected by offset/schema validation",
+    "operation_accuracy": "predicted INSERT/UPDATE/DELETE/UPSERT vs label-side V2 operation",
+    "overlap_rejection_rate": "Phase O outputs rejected for duplicate/nested/overlap offsets",
+    "spurious_span_rate": "accepted predicted spans not aligned to a label-side gold value"
+  },
+  "primary_end_to_end_denominator": "full train/dev Create denominator; non-alignable samples retained",
+  "source_alignable_subset": "diagnostic only",
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL"
+}
