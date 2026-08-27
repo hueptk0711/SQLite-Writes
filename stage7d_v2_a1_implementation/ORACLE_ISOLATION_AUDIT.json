@@ -1,0 +1,15 @@
+{
+  "forbidden_primary_imports": [
+    "SOURCE_SPAN_LABEL_MANIFEST",
+    "oracle_span_provider",
+    "gold_sql_conds",
+    "gold_spans"
+  ],
+  "oracle_artifacts_allowed_only_for": [
+    "diagnostic_protocol",
+    "label_side_evaluation_after_generation"
+  ],
+  "primary_pipeline_uses_oracle_spans": false,
+  "stage": "Stage7D_V2_A1_IMPLEMENTATION",
+  "status": "PASS_BUILT_PENDING_VALIDATION"
+}

@@ -1,0 +1,68 @@
+{
+  "artifact_hashes": {
+    "IMPLEMENTATION_COMPONENT_MANIFEST.json": "d7929a6c0b9d8cec84485586e064034c9130125dc8a04650ef2573474fc7f12b",
+    "IMPLEMENTATION_INVARIANTS.json": "7165d8f8ac643db06c2960c6b75a30c80731103ed13bd223170cfd587a8dcc95",
+    "NO_MODEL_EXECUTION_AUDIT.json": "1cb22542eb3af0764c325bf6a01074eed03a83956ab21b23ab265f0c1771e407",
+    "ORACLE_ISOLATION_AUDIT.json": "a38d808525255a6558c43db6bff2939b7420f46fac212146ad4c7a4102e1444d",
+    "REVIEWER_README.md": "4b661560f8a497b32a4d0ccb1b80b7c17488606103ed0529c23365ebcf427c09",
+    "SPEC_TO_CODE_TRACEABILITY.json": "314fadae07c99e6a1d4c0517b079c645aee3f8401f39778b8acc1d3bb029bcc4",
+    "STAGE7D_INPUT_MANIFEST.json": "977a048f67aae9cd771ce76da8950effd674e94264d25eda0c13785e9129c159",
+    "TEST_SUMMARY.json": "aba2cfc504fcf536f5001b25f99ded1e61e634b78c7d61665278575d38dbed4a",
+    "VALIDATION_REPORT.md": "3e10b525626c23fae6e0a4e843c84d9ca02709fa0477a897c3fe671969d0aee1"
+  },
+  "code_hashes": {
+    "src/nldbwrite_v3/v2_a1/__init__.py": "12f0b1bddf72c6ab80639378526a8b8dc3d0119b7e120797277a8c52ea0c0de4",
+    "src/nldbwrite_v3/v2_a1/compiler.py": "c2406116ac00586f728e0ceeeeb09c4ab3e1068f600ed0e4e0d2da9f44646234",
+    "src/nldbwrite_v3/v2_a1/completeness.py": "6eeab94a0a37bffe0b016e758642dd4206f7dbe8402dcf2e8090696628787603",
+    "src/nldbwrite_v3/v2_a1/diagnostics.py": "b5966fddd202621b2a86fcc9822722fbd5c0cd50904aac6bf5864f07f3a27804",
+    "src/nldbwrite_v3/v2_a1/inventories.py": "9dfed4d3b597041d8b2c2ec92cd3d612076156c88c0d9d90658f57de9f4343d6",
+    "src/nldbwrite_v3/v2_a1/phase_m_output.py": "a2ce513ecefc605959e12c3b74eb2e9b10c382a4087c2fc07f485ba9471fd0ed",
+    "src/nldbwrite_v3/v2_a1/phase_m_schema.py": "5a48ddc3168f39c5745d067d514c850c16eedeff0d820bc33e6f1d33e6fd2646",
+    "src/nldbwrite_v3/v2_a1/phase_o_output.py": "81f02babb9293b18c88ee2e7de9ba1703d424806ab858e8b025580d1cfdafc3d",
+    "src/nldbwrite_v3/v2_a1/phase_o_schema.py": "bcfe4f7f708d3711f1523a168838d37218999f15481a06025ff08303f1c147a6",
+    "src/nldbwrite_v3/v2_a1/pipeline.py": "37fda68f6f053e2227af143fd16b8c5c1db90fbfd0f514f5e90bfc24db177aee",
+    "src/nldbwrite_v3/v2_a1/preflight.py": "12f97a6f28165e2e83bd4c0e8753aebed0ff3df8e6fae899a50f08228d04d71c",
+    "src/nldbwrite_v3/v2_a1/prompt_rendering.py": "00e45cda9d3bcd8322858c642d0c9307e41dd5e8522b78309d2561506b774e5d",
+    "src/nldbwrite_v3/v2_a1/protocol.py": "ed71edad7e0573838db8b43f23ae30bc1511723fcf8cf4fdbcfbfce51c69164c",
+    "src/nldbwrite_v3/v2_a1/reference_validation.py": "f9e894d3f8524ef5297926814ae61db048f6273435c79397bc19b7182c65d9b6",
+    "src/nldbwrite_v3/v2_a1/slot_inventory.py": "6fa22b9f1b68b3bf2abd22b01b3cfd3340d183865974e257f130f64043cd5808",
+    "src/nldbwrite_v3/v2_a1/span_validation.py": "bdf83e64c7ec693889ac28932756ff8d999bb3cf3b3dd5538400599736a80a01",
+    "src/nldbwrite_v3/v2_a1/typed_materializer.py": "8c84e00c1e56b83d2cf021ad98bc40db47b05b45bf99079a21464efb406274c7",
+    "src/nldbwrite_v3/v2_a1/types.py": "e8d953164c06e0a545b77cb0059fef0d72e4118d8122531737328823310c3973"
+  },
+  "created_utc": "2026-08-27T00:00:00+00:00",
+  "experiment_run": false,
+  "gpu_called": false,
+  "input_hashes": {
+    "stage7b_a1_free_text_slot_discovery_amendment/COMPLETENESS_AMENDED_SPEC.json": "4933a5df0ffca308d6188beb55d93859404055a2a00c3bfcc0685d972bd854d9",
+    "stage7b_a1_free_text_slot_discovery_amendment/PHASE_O_JSON_SCHEMA.json": "92add4e9fb96423b4fda68d89341872843cbafe6792e699e9c8ac2d0ca1ece3c",
+    "stage7b_a1_free_text_slot_discovery_amendment/PHASE_O_SEMANTIC_SPAN_SPEC.json": "1a10ac2ab911d33632bdbc67d44af175807aac56850dd4595da28dcbb57af8e7",
+    "stage7b_a1_free_text_slot_discovery_amendment/SOURCE_SPAN_ORACLE_AUDIT.json": "cbaf13aaa3076314a3374da9f81c8a9e882a572ff824b1fd8555cafd3d6c1aa1",
+    "stage7b_a1_free_text_slot_discovery_amendment/SPAN_VALIDATION_SPEC.json": "67e7c0e4fa4d7f8e767eb68a3d914bf8dc32440676c912aca57613ae6a42f50e",
+    "stage7b_a1_free_text_slot_discovery_amendment/STAGE7B_A1_LOCK.json": "4cdd28b72eda0927041bb2cad5fb18abcc70f3531b9f374e9fe5c36d82a6f5b1",
+    "stage7b_v2_method_specification/DESIGN_TO_EVIDENCE_TRACEABILITY.json": "3ee94586663fe6f3102a166ccc680297ea86619f3b095cccf36be7ebd44d3b28",
+    "stage7b_v2_method_specification/STAGE7B_V2_SPECIFICATION_LOCK.json": "2dad42f8e9cf5733d6aa6cc65b48c337eeaf683aad777c46df614af6cfbd4e72",
+    "stage7b_v2_method_specification/V2_ARCHITECTURE_SPEC.json": "a1a48c39c4e928eb40f3f9696f08ed186fb7b5ecaf7c3f1479ecfd6dae1512e5",
+    "stage7c_a1_v2_development_protocol/DATA_LEAKAGE_AUDIT_A1.json": "e232d0f53f1e3de7803c36539c0aaf0fcd39d4dc62b11ab262c99ace6928c683",
+    "stage7c_a1_v2_development_protocol/GENERATION_PROTOCOL_A1.json": "8552b34746265c0990b1ae1882df5bcc5d06ee53bf7d1f8b74746ae97d975917",
+    "stage7c_a1_v2_development_protocol/PHASE_M_PROMPT_SPEC.json": "b04e67c0c3c9b7f27687891486a4d95b65bfab86a6208e5568d34c8f7acda279",
+    "stage7c_a1_v2_development_protocol/PHASE_O_OUTPUT_VALIDATION_SPEC.json": "c6df0f89e9fada502c535b632bf8b89c8fdca37c79276df204701b8591e233a2",
+    "stage7c_a1_v2_development_protocol/PHASE_O_PROMPT_SPEC.json": "da81ffa16d1209c300c95e959547e0dec34b9f99676ccf50fdf4f7b683926315",
+    "stage7c_a1_v2_development_protocol/QUESTION_OFFSET_GUIDE_SPEC.json": "3b573e188a368521b9ed259ae78120a0725ace028d2ce808af3f12049366b5d1",
+    "stage7c_a1_v2_development_protocol/RESERVED_BENCHMARK_POLICY.json": "888a7c86f286e999c9bdec2a3bf66100d59b559cbbb70675b4df7bf211f43bc7",
+    "stage7c_a1_v2_development_protocol/STAGE7C_A1_PROTOCOL_LOCK.json": "bc7ec58a9c5ac83bcca17869be91dc09a169315cfab4a64a715a101fd913d2db"
+  },
+  "model_called": false,
+  "script_hashes": {
+    "scripts/data/build_stage7d_v2_a1_implementation.py": "ad1cc0a014962d3975e27085729e1e45fd54d6e9f73a92c86172e95ef43f483d",
+    "scripts/data/validate_stage7d_v2_a1_implementation.py": "ae88de9b671a949bd53927319c969e2a4407475dee7de03346f45b11fb2d7088"
+  },
+  "stage": "Stage7D_V2_A1_IMPLEMENTATION",
+  "status": "PASS_STAGE7D_V2_A1_IMPLEMENTATION_LOCKED",
+  "test_hashes": {
+    "tests/v2_a1/test_stage7d_v2_a1.py": "1501933bed226b8ea2d2cd4e4168eae0611d57fecb079af163d831c855b8c012"
+  },
+  "v2_generation_run": false,
+  "validated_utc": "2026-08-27T00:00:00+00:00",
+  "violations": []
+}

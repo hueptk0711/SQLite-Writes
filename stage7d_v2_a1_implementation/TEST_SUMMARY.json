@@ -1,0 +1,14 @@
+{
+  "collected_test_cases": 100,
+  "declared_test_functions": 52,
+  "last_observed_result": "100 passed",
+  "py_compile_command": "python -m py_compile <all Stage7D modules and tests>",
+  "pytest_command": "python -m pytest -q tests/v2_a1/test_stage7d_v2_a1.py",
+  "stage": "Stage7D_V2_A1_IMPLEMENTATION",
+  "test_scope": [
+    "unit",
+    "synthetic integration",
+    "mocked Phase O/M pipeline",
+    "no model execution"
+  ]
+}
