@@ -1,0 +1,582 @@
+{
+  "amendment_trigger": {
+    "dev_materializable_coverage_below_viability": true,
+    "dev_required_slots_near_zero": true,
+    "regex_patch_not_recommended": true
+  },
+  "audit_contract": {
+    "INTEGER": "candidate evidence must be a strict integer literal equal to the gold value",
+    "REAL_OR_NUMERIC": "candidate evidence must be a strict finite numeric literal equal to the gold value",
+    "TEXT": "candidate evidence must exactly equal gold text because Stage7B materializer preserves raw TEXT evidence",
+    "substring_context_not_counted": true
+  },
+  "dev": {
+    "candidate_slot_count": 1720,
+    "example_missing_materializable_candidates": [
+      {
+        "candidate_examples": [
+          "11月份中通快递",
+          "11月份中通快递的业务量达到了7.39亿件",
+          "11月份中通快递的业务量达到了7.39亿件，业务量同比为32.16，我需要把该公司的业务数据",
+          "7.39亿件",
+          "业务量同比为32.16",
+          "32.16"
+        ],
+        "gold_assignment_count": 3,
+        "materializable_covered": 1,
+        "missing_values": [
+          {
+            "column_index": 0,
+            "gold_value": "中通快递",
+            "source_type": "text"
+          },
+          {
+            "column_index": 1,
+            "gold_value": "7.39",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0000"
+      },
+      {
+        "candidate_examples": [
+          "可以再帮我加上一个公司",
+          "可以再帮我加上一个公司的业务数据吗？是关于中创物流的快递业务营收为12.84亿元",
+          "可以再帮我加上一个公司的业务数据吗？是关于中创物流的快递业务营收为12.84亿元，快递业务营收同比为39.37",
+          "12.84亿元",
+          "快递业务营收同比为39.37",
+          "39.37"
+        ],
+        "gold_assignment_count": 3,
+        "materializable_covered": 1,
+        "missing_values": [
+          {
+            "column_index": 0,
+            "gold_value": "中创物流",
+            "source_type": "text"
+          },
+          {
+            "column_index": 3,
+            "gold_value": "12.84",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0001"
+      },
+      {
+        "candidate_examples": [
+          "我要在上表中插入一条新",
+          "我要在上表中插入一条新的业务数据，其中公司为华贸物流，业务量为3.02亿件，业务营收为9.29亿元",
+          "华贸物流",
+          "业务量为3.02亿件",
+          "3.02亿件",
+          "业务营收为9.29亿元",
+          "9.29亿元"
+        ],
+        "gold_assignment_count": 3,
+        "materializable_covered": 1,
+        "missing_values": [
+          {
+            "column_index": 1,
+            "gold_value": "3.02",
+            "source_type": "real"
+          },
+          {
+            "column_index": 3,
+            "gold_value": "9.29",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0002"
+      },
+      {
+        "candidate_examples": [
+          "请将德邦股份插入到表中，该公司1-11月的业务量为32.81亿件",
+          "该公司1-11月",
+          "该公司1-11月的业务量为32.81亿件",
+          "32.81亿件"
+        ],
+        "gold_assignment_count": 2,
+        "materializable_covered": 0,
+        "missing_values": [
+          {
+            "column_index": 0,
+            "gold_value": "德邦股份",
+            "source_type": "text"
+          },
+          {
+            "column_index": 1,
+            "gold_value": "32.81",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0004"
+      },
+      {
+        "candidate_examples": [
+          "最新一家需要新增",
+          "最新一家需要新增的公司为ST天顺",
+          "最新一家需要新增的公司为ST天顺，该公司的业务量为25.64亿件，业务量同比为23.16",
+          "ST天顺",
+          "该公司的业务量为25.64亿件",
+          "25.64亿件",
+          "业务量同比为23.16",
+          "23.16"
+        ],
+        "gold_assignment_count": 3,
+        "materializable_covered": 2,
+        "missing_values": [
+          {
+            "column_index": 1,
+            "gold_value": "25.64",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0005"
+      },
+      {
+        "candidate_examples": [
+          "如果可以的话",
+          "如果可以的话，我想加上京东物流，该公司的快递业务营收达到了294.62亿元，业务营收同比约为24.74",
+          "我想加上京东物流",
+          "该公司的快递业务营收达到了294.62亿元",
+          "294.62亿元",
+          "业务营收同比约为24.74",
+          "24.74"
+        ],
+        "gold_assignment_count": 3,
+        "materializable_covered": 1,
+        "missing_values": [
+          {
+            "column_index": 0,
+            "gold_value": "京东物流",
+            "source_type": "text"
+          },
+          {
+            "column_index": 3,
+            "gold_value": "294.62",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0006"
+      },
+      {
+        "candidate_examples": [
+          "请向表中插入关于华夏航空的月度数据，其中客座率为79.3，客座率同比增减为-1.14",
+          "关于华夏航空",
+          "其中客座率为79.3",
+          "79.3",
+          "客座率同比增减为-1.14",
+          "-1.14"
+        ],
+        "gold_assignment_count": 3,
+        "materializable_covered": 2,
+        "missing_values": [
+          {
+            "column_index": 0,
+            "gold_value": "华夏航空",
+            "source_type": "text"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0008"
+      },
+      {
+        "candidate_examples": [
+          "还可以加上达美航空",
+          "还可以加上达美航空的月度数据，该月RPK同比为8.46，累计客座率为82.7",
+          "该月RPK同比为8.46",
+          "8.46",
+          "累计客座率为82.7",
+          "82.7"
+        ],
+        "gold_assignment_count": 3,
+        "materializable_covered": 2,
+        "missing_values": [
+          {
+            "column_index": 0,
+            "gold_value": "达美航空",
+            "source_type": "text"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0009"
+      },
+      {
+        "candidate_examples": [
+          "刚刚得到通知",
+          "刚刚得到通知，昆明市图书馆的专业技术岗需要3个外国语文学类的本科及以上的人，赶快把这项记录加入到表中",
+          "昆明市图书馆的专业技术岗需要3个外国语文学类的本科及以上的人",
+          "专业技术岗",
+          "本科及以上",
+          "赶快把这项记录加入到表中",
+          "这项记录"
+        ],
+        "gold_assignment_count": 5,
+        "materializable_covered": 2,
+        "missing_values": [
+          {
+            "column_index": 1,
+            "gold_value": "昆明市图书馆",
+            "source_type": "text"
+          },
+          {
+            "column_index": 5,
+            "gold_value": "3",
+            "source_type": "real"
+          },
+          {
+            "column_index": 7,
+            "gold_value": "外国语文学类",
+            "source_type": "text"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0013"
+      },
+      {
+        "candidate_examples": [
+          "位于云南省昆明市官渡区东华小区知春街115号(大树营地铁站D口步行480米)的昆明市图书馆要招聘5个编外人员",
+          "位于云南省昆明市官渡区东华小区知春街115号(大树营地铁站D口步行480米)的昆明市图书馆要招聘5个编外人员，要求是本科及以上的汉语言文学类，请你把这条数据插入到表中",
+          "5",
+          "要求是本科及以上的汉语言文学类",
+          "本科及以上"
+        ],
+        "gold_assignment_count": 6,
+        "materializable_covered": 2,
+        "missing_values": [
+          {
+            "column_index": 10,
+            "gold_value": "云南省昆明市官渡区东华小区知春街115号(大树营地铁站D口步行480米)",
+            "source_type": "text"
+          },
+          {
+            "column_index": 11,
+            "gold_value": "编外",
+            "source_type": "text"
+          },
+          {
+            "column_index": 7,
+            "gold_value": "汉语言文学类",
+            "source_type": "text"
+          },
+          {
+            "column_index": 1,
+            "gold_value": "昆明市图书馆",
+            "source_type": "text"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_dev_create_0014"
+      }
+    ],
+    "gold_assignment_count": 845,
+    "materializable_candidate_coverage_count": 257,
+    "materializable_candidate_coverage_rate": 0.304142,
+    "required_slot_count": 4,
+    "required_slots_per_gold_assignment": 0.004734,
+    "sample_count": 240,
+    "samples_missing_materializable_candidate": 217,
+    "split": "dev",
+    "substring_candidate_coverage_count": 811,
+    "substring_candidate_coverage_rate": 0.959763
+  },
+  "source_artifact": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL_PATCH2",
+  "stage": "Stage7B_A1_FREE_TEXT_SLOT_DISCOVERY_AMENDMENT",
+  "train": {
+    "candidate_slot_count": 12571,
+    "example_missing_materializable_candidates": [
+      {
+        "candidate_examples": [
+          "我需要添加一条数据，股票的名称是科大讯飞，代码是002230.SZ，收盘价是68元，周涨跌达到了1.94%，市值有1560亿",
+          "股票的名称是科大讯飞",
+          "科大讯飞",
+          "代码是002230.SZ",
+          "002230.SZ",
+          "收盘价是68元",
+          "68元",
+          "周涨跌达到了1.94%",
+          "1.94%",
+          "市值有1560亿",
+          "1560亿"
+        ],
+        "gold_assignment_count": 5,
+        "materializable_covered": 2,
+        "missing_values": [
+          {
+            "column_index": 2,
+            "gold_value": "68",
+            "source_type": "real"
+          },
+          {
+            "column_index": 3,
+            "gold_value": "1.94",
+            "source_type": "real"
+          },
+          {
+            "column_index": 4,
+            "gold_value": "1560",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0000"
+      },
+      {
+        "candidate_examples": [
+          "帮我加上一条内容，股票名称是浦发银行，股票代码是600000.SH，市值为2134亿，它的本周收盘价是7.27元，周涨跌为-0.68%",
+          "股票名称是浦发银行",
+          "浦发银行",
+          "股票代码是600000.SH",
+          "600000.SH",
+          "市值为2134亿",
+          "2134亿",
+          "它的本周收盘价是7.27元",
+          "7.27元",
+          "周涨跌为-0.68%",
+          "-0.68%"
+        ],
+        "gold_assignment_count": 5,
+        "materializable_covered": 2,
+        "missing_values": [
+          {
+            "column_index": 2,
+            "gold_value": "7.27",
+            "source_type": "real"
+          },
+          {
+            "column_index": 3,
+            "gold_value": "-0.68",
+            "source_type": "real"
+          },
+          {
+            "column_index": 4,
+            "gold_value": "2134",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0001"
+      },
+      {
+        "candidate_examples": [
+          "可以帮我插入一条股票是小米概念",
+          "可以帮我插入一条股票是小米概念的数据吗，股票代码是061047.BK，总市值是25200亿",
+          "小米概念",
+          "股票代码是061047.BK",
+          "061047.BK",
+          "总市值是25200亿",
+          "25200亿"
+        ],
+        "gold_assignment_count": 3,
+        "materializable_covered": 2,
+        "missing_values": [
+          {
+            "column_index": 4,
+            "gold_value": "25200",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0002"
+      },
+      {
+        "candidate_examples": [
+          "我想加入这样一条数据",
+          "我想加入这样一条数据，股票名字为腾讯概念，其收盘价为918元",
+          "股票名字为腾讯概念",
+          "腾讯概念",
+          "其收盘价为918元",
+          "918元"
+        ],
+        "gold_assignment_count": 2,
+        "materializable_covered": 1,
+        "missing_values": [
+          {
+            "column_index": 2,
+            "gold_value": "918",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0003"
+      },
+      {
+        "candidate_examples": [
+          "帮我补充一个新内容吧，企业名称是华伟，证券代码为835629，收盘价为13元，目标价是15元",
+          "企业名称是华伟",
+          "华伟",
+          "证券代码为835629",
+          "835629",
+          "收盘价为13元",
+          "13元",
+          "目标价是15元",
+          "15元"
+        ],
+        "gold_assignment_count": 4,
+        "materializable_covered": 2,
+        "missing_values": [
+          {
+            "column_index": 2,
+            "gold_value": "13",
+            "source_type": "real"
+          },
+          {
+            "column_index": 3,
+            "gold_value": "15",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0004"
+      },
+      {
+        "candidate_examples": [
+          "我想加一条数据",
+          "我想加一条数据，企业的名字是黄腾化工，17A每股收益是1元，19E的每股收益是1.21元",
+          "企业的名字是黄腾化工",
+          "黄腾化工",
+          "17A每股收益是1元",
+          "1元",
+          "19E",
+          "19E的每股收益是1.21元",
+          "1.21元"
+        ],
+        "gold_assignment_count": 3,
+        "materializable_covered": 1,
+        "missing_values": [
+          {
+            "column_index": 4,
+            "gold_value": "1",
+            "source_type": "real"
+          },
+          {
+            "column_index": 6,
+            "gold_value": "1.21",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0005"
+      },
+      {
+        "candidate_examples": [
+          "请新增一条数据，其中企业名字填入中建西部建设，证券代码填入002302，收盘价填入7元，目标价是7.8元",
+          "中建西部建设",
+          "证券代码填入002302",
+          "002302",
+          "收盘价填入7元",
+          "7元",
+          "目标价是7.8元",
+          "7.8元"
+        ],
+        "gold_assignment_count": 4,
+        "materializable_covered": 2,
+        "missing_values": [
+          {
+            "column_index": 2,
+            "gold_value": "7",
+            "source_type": "real"
+          },
+          {
+            "column_index": 3,
+            "gold_value": "7.8",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0006"
+      },
+      {
+        "candidate_examples": [
+          "加入武汉",
+          "加入武汉的住宅库存去化数据，可售面积有700万平米，环比为1.23%，其他内容暂时没有",
+          "武汉",
+          "可售面积有700万平米",
+          "700万平米",
+          "环比为1.23%",
+          "1.23%",
+          "其他内容暂时没有"
+        ],
+        "gold_assignment_count": 3,
+        "materializable_covered": 1,
+        "missing_values": [
+          {
+            "column_index": 1,
+            "gold_value": "700",
+            "source_type": "real"
+          },
+          {
+            "column_index": 2,
+            "gold_value": "1.23",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0008"
+      },
+      {
+        "candidate_examples": [
+          "新加入的数据为南京的一手房住宅库存去化数据，其可售面积为699万平米，环比1.42%",
+          "南京",
+          "其可售面积为699万平米",
+          "699万平米",
+          "环比1.42%",
+          "1.42%"
+        ],
+        "gold_assignment_count": 3,
+        "materializable_covered": 1,
+        "missing_values": [
+          {
+            "column_index": 1,
+            "gold_value": "699",
+            "source_type": "real"
+          },
+          {
+            "column_index": 2,
+            "gold_value": "1.42",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0009"
+      },
+      {
+        "candidate_examples": [
+          "能帮我插入城市为苏州的指摘库存去化数据吗，可售面积有666万平米，环比为1.33%，三个月移动日均成交量是3.4万平米，环比达2.2%",
+          "苏州",
+          "可售面积有666万平米",
+          "666万平米",
+          "环比为1.33%",
+          "1.33%",
+          "三个月移动日均成交量是3.4万平米",
+          "3.4万平米",
+          "环比达2.2%",
+          "环比达2.2%"
+        ],
+        "gold_assignment_count": 5,
+        "materializable_covered": 1,
+        "missing_values": [
+          {
+            "column_index": 2,
+            "gold_value": "666",
+            "source_type": "real"
+          },
+          {
+            "column_index": 3,
+            "gold_value": "1.33",
+            "source_type": "real"
+          },
+          {
+            "column_index": 4,
+            "gold_value": "3.4",
+            "source_type": "real"
+          },
+          {
+            "column_index": 5,
+            "gold_value": "2.2",
+            "source_type": "real"
+          }
+        ],
+        "sample_id": "stage7c_crudsql_train_create_0010"
+      }
+    ],
+    "gold_assignment_count": 5407,
+    "materializable_candidate_coverage_count": 2366,
+    "materializable_candidate_coverage_rate": 0.437581,
+    "required_slot_count": 11,
+    "required_slots_per_gold_assignment": 0.002034,
+    "sample_count": 1760,
+    "samples_missing_materializable_candidate": 1477,
+    "split": "train",
+    "substring_candidate_coverage_count": 5302,
+    "substring_candidate_coverage_rate": 0.980581
+  }
+}

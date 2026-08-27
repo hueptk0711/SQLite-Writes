@@ -1,0 +1,17 @@
+{
+  "duplicate_span_policy": "reject",
+  "model_emitted_text_allowed": false,
+  "nested_span_policy": "reject",
+  "partial_overlap_policy": "reject",
+  "same_span_selected_twice_policy": "reject",
+  "span_text_source": "question[start_char:end_char] only",
+  "stage": "Stage7B_A1_FREE_TEXT_SLOT_DISCOVERY_AMENDMENT",
+  "validation_order": [
+    "validate_json_schema",
+    "check_offsets_within_question_bounds",
+    "derive_text_from_question_offsets",
+    "reject_duplicate_span_offsets",
+    "reject_nested_or_partially_overlapping_spans",
+    "assign_deterministic_EV_and_SLOT_refs"
+  ]
+}

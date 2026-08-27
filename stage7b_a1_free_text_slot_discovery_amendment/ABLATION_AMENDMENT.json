@@ -1,0 +1,14 @@
+{
+  "ablation_selection_after_dev_performance_allowed": false,
+  "amended_variants": {
+    "V2-A_MINUS_OPERATION_CONDITIONING": "remove operation conditioning while preserving Phase O span selection and all other components",
+    "V2-B_MINUS_CONSTRAINED_REFERENCES": "remove dynamic inventory membership gates while preserving Phase O span selection and all other components",
+    "V2-C_MINUS_DETERMINISTIC_MATERIALIZATION": "replace deterministic typed materializer with the pre-registered counterfactual from Stage7B while preserving Phase O span selection",
+    "V2-D_MINUS_COMPLETENESS_VERIFICATION": "bypass required SLOT_* completeness gate while preserving Phase O span selection and all other components",
+    "V2-FULL-A1": "Phase O selects operation plus grounded atomic semantic value spans; Phase M maps required SLOT_* refs to columns/predicates",
+    "V2-O_MINUS_SPAN_SELECTION": "diagnostic only: retain operation prediction but replace Phase O span inventory with deterministic Stage7C PATCH2 inventory to isolate the free-text slot discovery amendment"
+  },
+  "everything_else_held_constant": true,
+  "hidden_third_model_call_allowed": false,
+  "stage": "Stage7B_A1_FREE_TEXT_SLOT_DISCOVERY_AMENDMENT"
+}

@@ -1,0 +1,34 @@
+{
+  "accepted_slot_requiredness": "all accepted Phase O semantic value spans become required=true",
+  "accepted_spans_to_inventory": "deterministically create EV_i and SLOT_i from question[start_char:end_char]",
+  "forbidden_inputs": [
+    "gold_sql",
+    "sql.conds",
+    "gold_program",
+    "gold_post_state",
+    "dev_metric",
+    "481_test_labels",
+    "LiveSQLBench_ground_truth"
+  ],
+  "input_contract": [
+    "question",
+    "schema_inventory"
+  ],
+  "model_call_count": 1,
+  "new_phase_o": "operation_enum_plus_grounded_atomic_semantic_value_spans",
+  "offsets_only": true,
+  "old_phase_o": "operation_enum_only",
+  "output_contract": [
+    "operation",
+    "value_spans"
+  ],
+  "phase_m_receives": [
+    "operation",
+    "schema_inventory",
+    "evidence_inventory",
+    "semantic_slot_inventory"
+  ],
+  "stage": "Stage7B_A1_FREE_TEXT_SLOT_DISCOVERY_AMENDMENT",
+  "text_generation_for_values_allowed": false,
+  "value_span_semantics": "each accepted span is the model-selected atomic source text for one semantic write value"
+}
