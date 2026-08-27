@@ -21,6 +21,7 @@ from scripts.data.build_stage7c_a1_v2_development_protocol import (
     build_stage7c_a1,
     count_reused_data,
     input_hashes,
+    joint_source_span_oracle_audit,
     label_alignment_summary,
     leakage_audit,
     literal_gold_occurrence_audit,
@@ -31,6 +32,7 @@ from scripts.data.build_stage7c_a1_v2_development_protocol import (
     serialize_prompt_object,
     sha256_file,
     source_span_label_manifest,
+    unique_acceptable_source_spans,
 )
 from scripts.data.validate_stage7c_a1_v2_development_protocol import PASS_STATUS, validate, write_report_and_update_lock
 
@@ -249,6 +251,7 @@ def test_phase_o_evaluation_protocol_tracks_operation_and_spans() -> None:
     spec = _read_json(ARTIFACT_DIR / "PHASE_O_EVALUATION_PROTOCOL.json")
     assert spec["label_alignment_manifest"] == "SOURCE_SPAN_LABEL_MANIFEST.jsonl"
     assert spec["matching_policy"] == "maximum-cardinality bipartite one-to-one matching"
+    assert spec["joint_oracle_audit"] == "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json"
     assert "operation_accuracy" in spec["metrics"]
     assert "exact_span_precision" in spec["metrics"]
     assert "exact_span_recall_source_alignable" in spec["metrics"]
@@ -284,6 +287,51 @@ def test_gold_value_with_two_source_occurrences_keeps_both_as_acceptable() -> No
     assert len(multi["acceptable_source_spans"]) >= 2
     offsets = {(span["start_char"], span["end_char"]) for span in multi["acceptable_source_spans"]}
     assert len(offsets) == len(multi["acceptable_source_spans"])
+
+
+def test_oracle_span_construction_freezes_unique_one_to_one_matching() -> None:
+    spec = _read_json(ARTIFACT_DIR / "ORACLE_SPAN_CONSTRUCTION_SPEC.json")
+    assert spec["diagnostic_only"] is True
+    assert spec["label_side_only"] is True
+    assert spec["model_side_visible"] is False
+    assert "maximum-cardinality one-to-one" in spec["oracle_phase_o_span_set"]
+    assert spec["duplicate_source_span_policy"] == "do not duplicate a single source occurrence into multiple oracle SLOTs under A1"
+    assert spec["joint_gap_reason_code"] == "shared_source_span_requires_multiple_gold_assignments"
+
+
+def test_joint_source_span_oracle_audit_recomputes_counts() -> None:
+    manifest = _read_jsonl(ARTIFACT_DIR / "SOURCE_SPAN_LABEL_MANIFEST.jsonl")
+    audit = _read_json(ARTIFACT_DIR / "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json")
+    assert audit == joint_source_span_oracle_audit(manifest)
+    assert audit["splits"]["train"]["gold_assignment_count"] == 5407
+    assert audit["splits"]["train"]["individually_source_alignable"] == 5295
+    assert audit["splits"]["train"]["jointly_representable"] == 5272
+    assert audit["splits"]["train"]["joint_reuse_deficit"] == 23
+    assert audit["splits"]["train"]["samples_with_joint_reuse_gap"] == 22
+    assert audit["splits"]["train"]["source_nonalignable_and_joint_gap_overlap_samples"] == 1
+    assert audit["splits"]["train"]["unique_samples_with_any_representational_gap"] == 114
+    assert audit["splits"]["dev"]["gold_assignment_count"] == 845
+    assert audit["splits"]["dev"]["individually_source_alignable"] == 810
+    assert audit["splits"]["dev"]["jointly_representable"] == 809
+    assert audit["splits"]["dev"]["joint_reuse_deficit"] == 1
+    assert audit["splits"]["dev"]["samples_with_joint_reuse_gap"] == 1
+    assert audit["splits"]["dev"]["source_nonalignable_and_joint_gap_overlap_samples"] == 0
+    assert audit["splits"]["dev"]["unique_samples_with_any_representational_gap"] == 34
+
+
+def test_dev_0151_requires_shared_source_span_and_is_joint_gap() -> None:
+    manifest = _read_jsonl(ARTIFACT_DIR / "SOURCE_SPAN_LABEL_MANIFEST.jsonl")
+    sample_records = [record for record in manifest if record["sample_id"] == "stage7c_crudsql_dev_create_0151"]
+    assert len(sample_records) == 3
+    assert sum(1 for record in sample_records if record["source_alignable"]) == 3
+    unique_spans = unique_acceptable_source_spans(sample_records)
+    assert len(unique_spans) == 2
+    match = maximum_span_matching(unique_spans, sample_records)
+    assert match["matched"] == 2
+    audit = _read_json(ARTIFACT_DIR / "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json")
+    gap = next(record for record in audit["sample_gap_records"] if record["sample_id"] == "stage7c_crudsql_dev_create_0151")
+    assert gap["joint_reuse_deficit"] == 1
+    assert gap["diagnostic_reasons"] == ["shared_source_span_requires_multiple_gold_assignments"]
 
 
 def test_maximum_matching_prevents_one_prediction_matching_two_gold_assignments() -> None:
@@ -343,18 +391,32 @@ def test_oracle_span_diagnostic_is_separate_from_primary() -> None:
     assert spec["primary_v2_output_source"] == "predicted Phase O spans only"
     assert spec["dev_source_selectable_gold_values"] == 810
     assert spec["dev_gold_value_denominator"] == 845
+    assert spec["dev_jointly_representable"] == 809
+    assert spec["train_jointly_representable"] == 5272
+    assert spec["dev_samples_with_joint_reuse_gap"] == 1
+    assert spec["train_samples_with_joint_reuse_gap"] == 22
+    assert spec["oracle_span_construction_spec"] == "ORACLE_SPAN_CONSTRUCTION_SPEC.json"
+    assert spec["joint_source_span_oracle_audit"] == "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json"
     assert spec["oracle_spans_used_for_training_or_selection"] is False
     assert spec["p_value_baseline_allowed"] is False
 
 
 def test_nonalignable_policy_retains_denominators() -> None:
     policy = _read_json(ARTIFACT_DIR / "NONALIGNABLE_SAMPLE_POLICY.json")
+    assert "source_gold_nonalignable_under_frozen_materializer" in policy["diagnostic_flags"]
+    assert "joint_span_reuse_nonrepresentable" in policy["diagnostic_flags"]
     assert policy["dev_samples_with_gap"] == 33
     assert policy["train_samples_with_gap"] == 93
+    assert policy["dev_samples_with_joint_reuse_gap"] == 1
+    assert policy["train_samples_with_joint_reuse_gap"] == 22
+    assert policy["dev_unique_samples_with_any_representational_gap"] == 34
+    assert policy["train_unique_samples_with_any_representational_gap"] == 114
     assert policy["retain_in_primary_train_denominator"] is True
     assert policy["retain_in_primary_dev_denominator"] is True
     assert policy["eligible"] is True
     assert policy["exclude_after_model_performance"] is False
+    assert policy["duplicate_source_span_post_hoc"] is False
+    assert policy["allow_slot_reuse_after_model_performance"] is False
     assert policy["modify_gold"] is False
     assert policy["add_post_hoc_normalization"] is False
 
@@ -489,6 +551,31 @@ def test_validator_catches_oracle_diagnostic_tamper(workspace_tmp: Path) -> None
     assert report["status"] == "FAIL"
     assert "oracle_not_diagnostic_only" in report["violations"]
     assert "oracle_spans_used_for_selection" in report["violations"]
+
+
+def test_validator_catches_joint_oracle_audit_tamper(workspace_tmp: Path) -> None:
+    package = _copy_package_root(workspace_tmp)
+    path = package / "stage7c_a1_v2_development_protocol" / "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json"
+    audit = _read_json(path)
+    audit["splits"]["dev"]["jointly_representable"] = 810
+    _write_json(path, audit)
+    _refresh_artifact_hash(package, "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json")
+    report = validate(package / "stage7c_a1_v2_development_protocol", root=package)
+    assert report["status"] == "FAIL"
+    assert "joint_source_span_oracle_audit_mismatch" in report["violations"]
+    assert "joint_dev_representable_count_changed" in report["violations"]
+
+
+def test_validator_catches_oracle_construction_policy_tamper(workspace_tmp: Path) -> None:
+    package = _copy_package_root(workspace_tmp)
+    path = package / "stage7c_a1_v2_development_protocol" / "ORACLE_SPAN_CONSTRUCTION_SPEC.json"
+    spec = _read_json(path)
+    spec["duplicate_source_span_policy"] = "duplicate spans when useful"
+    _write_json(path, spec)
+    _refresh_artifact_hash(package, "ORACLE_SPAN_CONSTRUCTION_SPEC.json")
+    report = validate(package / "stage7c_a1_v2_development_protocol", root=package)
+    assert report["status"] == "FAIL"
+    assert "oracle_construction_duplicate_policy_changed" in report["violations"]
 
 
 def test_validator_catches_leakage_audit_tamper(workspace_tmp: Path) -> None:

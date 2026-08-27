@@ -1,4 +1,5 @@
 {
+  "joint_oracle_audit": "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json",
   "label_alignment_manifest": "SOURCE_SPAN_LABEL_MANIFEST.jsonl",
   "matching_policy": "maximum-cardinality bipartite one-to-one matching",
   "metrics": {

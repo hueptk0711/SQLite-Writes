@@ -4,7 +4,8 @@ This package freezes the V2-A1 development protocol after Stage7B-A1. It reuses
 the previously validated CRUDSQL source, train/dev Create manifests, gold INSERT
 derivation, operation mapping, and contamination audits, while replacing the
 superseded deterministic regex semantic-slot protocol with Phase O grounded
-offset span selection.
+offset span selection. PATCH2 additionally locks the joint source-span oracle
+ceiling under A1's one-source-span to one-SLOT contract.
 
 Commands:
 ```bash

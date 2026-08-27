@@ -1,0 +1,23 @@
+{
+  "construction_order": [
+    "group label-side acceptable source spans by sample",
+    "deduplicate identical (start_char, end_char) offsets before oracle construction",
+    "run deterministic maximum-cardinality bipartite matching from unique spans to gold assignments",
+    "retain matched source spans only",
+    "sort retained spans by (start_char, end_char)",
+    "assign SPAN_i, EV_i, SLOT_i deterministically from sorted matched spans"
+  ],
+  "diagnostic_only": true,
+  "duplicate_source_span_policy": "do not duplicate a single source occurrence into multiple oracle SLOTs under A1",
+  "joint_gap_reason_code": "shared_source_span_requires_multiple_gold_assignments",
+  "label_side_only": true,
+  "model_side_visible": false,
+  "one_to_one_constraints": {
+    "gold_assignment_max_source_spans": 1,
+    "source_span_max_gold_assignments": 1
+  },
+  "oracle_phase_o_span_set": "maximum-cardinality one-to-one matching between unique acceptable source spans and gold assignments",
+  "primary_v2_output_source": "predicted Phase O spans only; oracle construction is diagnostic only",
+  "source_label_manifest": "SOURCE_SPAN_LABEL_MANIFEST.jsonl",
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL"
+}

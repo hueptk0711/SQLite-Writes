@@ -75,6 +75,8 @@ ARTIFACTS = (
     "PHASE_O_OUTPUT_VALIDATION_SPEC.json",
     "PHASE_O_LABEL_ALIGNMENT_SPEC.json",
     "SOURCE_SPAN_LABEL_MANIFEST.jsonl",
+    "ORACLE_SPAN_CONSTRUCTION_SPEC.json",
+    "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json",
     "PHASE_O_EVALUATION_PROTOCOL.json",
     "PHASE_M_INPUT_SPEC.json",
     "PHASE_M_PROMPT_SPEC.json",
@@ -546,6 +548,86 @@ def maximum_span_matching(predicted_spans: list[dict[str, int]], label_records: 
     }
 
 
+def unique_acceptable_source_spans(label_records: list[dict[str, Any]]) -> list[dict[str, int]]:
+    spans = {
+        (span["start_char"], span["end_char"])
+        for record in label_records
+        for span in record["acceptable_source_spans"]
+    }
+    return [{"start_char": start, "end_char": end} for start, end in sorted(spans)]
+
+
+def joint_source_span_oracle_audit(records: list[dict[str, Any]]) -> dict[str, Any]:
+    audit: dict[str, Any] = {
+        "stage": STAGE,
+        "diagnostic_only": True,
+        "oracle_construction": "unique acceptable source spans -> maximum-cardinality one-to-one matching -> sorted matched spans",
+        "gap_reason_code": "shared_source_span_requires_multiple_gold_assignments",
+        "policy": {
+            "retain_all_samples_in_primary_denominator": True,
+            "exclude_samples_after_model_performance": False,
+            "duplicate_source_span_post_hoc": False,
+            "allow_slot_reuse_after_model_performance": False,
+            "modify_gold": False,
+        },
+        "splits": {},
+        "sample_gap_records": [],
+    }
+    for split in ("train", "dev"):
+        split_records = [record for record in records if record["split"] == split]
+        by_sample: dict[str, list[dict[str, Any]]] = {}
+        for record in split_records:
+            by_sample.setdefault(record["sample_id"], []).append(record)
+
+        individually_source_alignable = 0
+        jointly_representable = 0
+        nonalignable_samples: set[str] = set()
+        joint_gap_samples: set[str] = set()
+
+        for sample_id, sample_records in sorted(by_sample.items()):
+            individual = sum(1 for record in sample_records if record["source_alignable"])
+            nonalignable = any(not record["source_alignable"] for record in sample_records)
+            if nonalignable:
+                nonalignable_samples.add(sample_id)
+            oracle_spans = unique_acceptable_source_spans(sample_records)
+            match = maximum_span_matching(oracle_spans, sample_records)
+            joint = match["matched"]
+            deficit = individual - joint
+            individually_source_alignable += individual
+            jointly_representable += joint
+            if deficit > 0:
+                joint_gap_samples.add(sample_id)
+                audit["sample_gap_records"].append(
+                    {
+                        "split": split,
+                        "sample_id": sample_id,
+                        "gold_assignments": len(sample_records),
+                        "individually_source_alignable": individual,
+                        "jointly_representable": joint,
+                        "joint_reuse_deficit": deficit,
+                        "unique_acceptable_source_span_count": len(oracle_spans),
+                        "diagnostic_reasons": ["shared_source_span_requires_multiple_gold_assignments"],
+                    }
+                )
+
+        overlap = nonalignable_samples.intersection(joint_gap_samples)
+        union = nonalignable_samples.union(joint_gap_samples)
+        audit["splits"][split] = {
+            "sample_count": len(by_sample),
+            "gold_assignment_count": len(split_records),
+            "individually_source_alignable": individually_source_alignable,
+            "jointly_representable": jointly_representable,
+            "individual_source_alignability_rate": individually_source_alignable / len(split_records) if split_records else 1.0,
+            "joint_representability_rate": jointly_representable / len(split_records) if split_records else 1.0,
+            "joint_reuse_deficit": individually_source_alignable - jointly_representable,
+            "samples_with_joint_reuse_gap": len(joint_gap_samples),
+            "source_nonalignable_samples": len(nonalignable_samples),
+            "source_nonalignable_and_joint_gap_overlap_samples": len(overlap),
+            "unique_samples_with_any_representational_gap": len(union),
+        }
+    return audit
+
+
 def leakage_audit(root: Path = PROJECT_ROOT) -> dict[str, Any]:
     forbidden = {"operation_label", "gold_sql", "crudsql_sql", "conds", "sel", "agg", "target_state", "post_state_hash", "gold_program", "gold_post_state"}
     rows = read_jsonl(root / "stage7c_v2_development_data_protocol/TRAIN_CREATE_MANIFEST.jsonl") + read_jsonl(
@@ -581,6 +663,7 @@ def static_artifacts(root: Path = PROJECT_ROOT) -> dict[str, Any]:
     counts = count_reused_data(root)
     label_records = source_span_label_manifest(root)
     label_summary = label_alignment_summary(label_records)
+    joint_oracle = joint_source_span_oracle_audit(label_records)
     literal_occurrences = literal_gold_occurrence_audit(root)
     phase_o_schema_hash = sha256_file(root / "stage7b_a1_free_text_slot_discovery_amendment/PHASE_O_JSON_SCHEMA.json")
     span_validation_hash = sha256_file(root / "stage7b_a1_free_text_slot_discovery_amendment/SPAN_VALIDATION_SPEC.json")
@@ -701,10 +784,35 @@ def static_artifacts(root: Path = PROJECT_ROOT) -> dict[str, Any]:
             },
             "summary": label_summary,
         },
+        "ORACLE_SPAN_CONSTRUCTION_SPEC.json": {
+            "stage": STAGE,
+            "diagnostic_only": True,
+            "label_side_only": True,
+            "model_side_visible": False,
+            "source_label_manifest": "SOURCE_SPAN_LABEL_MANIFEST.jsonl",
+            "oracle_phase_o_span_set": "maximum-cardinality one-to-one matching between unique acceptable source spans and gold assignments",
+            "construction_order": [
+                "group label-side acceptable source spans by sample",
+                "deduplicate identical (start_char, end_char) offsets before oracle construction",
+                "run deterministic maximum-cardinality bipartite matching from unique spans to gold assignments",
+                "retain matched source spans only",
+                "sort retained spans by (start_char, end_char)",
+                "assign SPAN_i, EV_i, SLOT_i deterministically from sorted matched spans",
+            ],
+            "one_to_one_constraints": {
+                "source_span_max_gold_assignments": 1,
+                "gold_assignment_max_source_spans": 1,
+            },
+            "duplicate_source_span_policy": "do not duplicate a single source occurrence into multiple oracle SLOTs under A1",
+            "joint_gap_reason_code": "shared_source_span_requires_multiple_gold_assignments",
+            "primary_v2_output_source": "predicted Phase O spans only; oracle construction is diagnostic only",
+        },
+        "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json": joint_oracle,
         "PHASE_O_EVALUATION_PROTOCOL.json": {
             "stage": STAGE,
             "label_alignment_manifest": "SOURCE_SPAN_LABEL_MANIFEST.jsonl",
             "matching_policy": "maximum-cardinality bipartite one-to-one matching",
+            "joint_oracle_audit": "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json",
             "metrics": {
                 "operation_accuracy": "predicted INSERT/UPDATE/DELETE/UPSERT vs label-side V2 operation",
                 "exact_span_precision": "maximum matched predicted spans / accepted predicted spans",
@@ -752,27 +860,49 @@ def static_artifacts(root: Path = PROJECT_ROOT) -> dict[str, Any]:
             "stage": STAGE,
             "diagnostic_only": True,
             "primary_v2_output_source": "predicted Phase O spans only",
-            "question": "If Phase M receives perfect source-alignable semantic spans, what mapping/materialization ceiling remains?",
+            "question": "If Phase M receives the maximum one-to-one oracle span set allowed by A1, what mapping/materialization ceiling remains?",
             "allowed_splits": ["CRUDSQL train Create", "CRUDSQL dev Create"],
             "forbidden_splits": ["current 481 test", "LiveSQLBench"],
             "source_span_oracle_audit_sha256": sha256_file(root / "stage7b_a1_free_text_slot_discovery_amendment/SOURCE_SPAN_ORACLE_AUDIT.json"),
             "source_span_label_manifest": "SOURCE_SPAN_LABEL_MANIFEST.jsonl",
             "source_span_label_manifest_sha256": None,
+            "oracle_span_construction_spec": "ORACLE_SPAN_CONSTRUCTION_SPEC.json",
+            "oracle_span_construction_spec_sha256": None,
+            "joint_source_span_oracle_audit": "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json",
+            "joint_source_span_oracle_audit_sha256": None,
             "dev_source_selectable_gold_values": counts["source_span_oracle"]["dev_source_selectable"],
             "dev_gold_value_denominator": counts["source_span_oracle"]["dev_denominator"],
+            "train_individually_source_alignable": joint_oracle["splits"]["train"]["individually_source_alignable"],
+            "train_jointly_representable": joint_oracle["splits"]["train"]["jointly_representable"],
+            "train_joint_reuse_deficit": joint_oracle["splits"]["train"]["joint_reuse_deficit"],
+            "train_samples_with_joint_reuse_gap": joint_oracle["splits"]["train"]["samples_with_joint_reuse_gap"],
+            "dev_individually_source_alignable": joint_oracle["splits"]["dev"]["individually_source_alignable"],
+            "dev_jointly_representable": joint_oracle["splits"]["dev"]["jointly_representable"],
+            "dev_joint_reuse_deficit": joint_oracle["splits"]["dev"]["joint_reuse_deficit"],
+            "dev_samples_with_joint_reuse_gap": joint_oracle["splits"]["dev"]["samples_with_joint_reuse_gap"],
             "oracle_spans_used_for_training_or_selection": False,
             "p_value_baseline_allowed": False,
         },
         "NONALIGNABLE_SAMPLE_POLICY.json": {
             "stage": STAGE,
             "source": "Stage7B-A1 NONALIGNABLE_SOURCE_SPAN_POLICY.json",
-            "diagnostic_flag": "source_gold_nonalignable_under_frozen_materializer",
+            "diagnostic_flags": [
+                "source_gold_nonalignable_under_frozen_materializer",
+                "joint_span_reuse_nonrepresentable",
+            ],
+            "joint_source_span_oracle_audit": "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json",
             "dev_samples_with_gap": counts["source_span_oracle"]["dev_samples_with_gap"],
             "train_samples_with_gap": counts["source_span_oracle"]["train_samples_with_gap"],
+            "dev_samples_with_joint_reuse_gap": joint_oracle["splits"]["dev"]["samples_with_joint_reuse_gap"],
+            "train_samples_with_joint_reuse_gap": joint_oracle["splits"]["train"]["samples_with_joint_reuse_gap"],
+            "dev_unique_samples_with_any_representational_gap": joint_oracle["splits"]["dev"]["unique_samples_with_any_representational_gap"],
+            "train_unique_samples_with_any_representational_gap": joint_oracle["splits"]["train"]["unique_samples_with_any_representational_gap"],
             "retain_in_primary_train_denominator": True,
             "retain_in_primary_dev_denominator": True,
             "eligible": True,
             "exclude_after_model_performance": False,
+            "duplicate_source_span_post_hoc": False,
+            "allow_slot_reuse_after_model_performance": False,
             "modify_gold": False,
             "add_post_hoc_normalization": False,
         },
@@ -825,7 +955,8 @@ This package freezes the V2-A1 development protocol after Stage7B-A1. It reuses
 the previously validated CRUDSQL source, train/dev Create manifests, gold INSERT
 derivation, operation mapping, and contamination audits, while replacing the
 superseded deterministic regex semantic-slot protocol with Phase O grounded
-offset span selection.
+offset span selection. PATCH2 additionally locks the joint source-span oracle
+ceiling under A1's one-source-span to one-SLOT contract.
 
 Commands:
 ```bash
@@ -870,6 +1001,8 @@ def lock(output_dir: Path, inputs: dict[str, str]) -> dict[str, Any]:
 def finalize_cross_artifact_hashes(output_dir: Path) -> None:
     oracle = read_json(output_dir / "ORACLE_SPAN_DIAGNOSTIC_PROTOCOL.json")
     oracle["source_span_label_manifest_sha256"] = sha256_file(output_dir / "SOURCE_SPAN_LABEL_MANIFEST.jsonl")
+    oracle["oracle_span_construction_spec_sha256"] = sha256_file(output_dir / "ORACLE_SPAN_CONSTRUCTION_SPEC.json")
+    oracle["joint_source_span_oracle_audit_sha256"] = sha256_file(output_dir / "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json")
     write_json(output_dir / "ORACLE_SPAN_DIAGNOSTIC_PROTOCOL.json", oracle)
 
     generation = read_json(output_dir / "GENERATION_PROTOCOL_A1.json")

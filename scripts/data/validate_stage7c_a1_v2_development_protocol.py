@@ -25,6 +25,7 @@ from scripts.data.build_stage7c_a1_v2_development_protocol import (
     artifact_hashes,
     count_reused_data,
     input_hashes,
+    joint_source_span_oracle_audit,
     label_alignment_summary,
     leakage_audit,
     literal_gold_occurrence_audit,
@@ -60,6 +61,7 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
         "offset_guide_checked": False,
         "phase_o_validation_checked": False,
         "label_alignment_manifest_recomputed": False,
+        "joint_source_span_oracle_recomputed": False,
         "phase_m_protocol_checked": False,
         "oracle_diagnostic_checked": False,
         "generation_protocol_checked": False,
@@ -181,6 +183,37 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
     require(label_spec.get("one_to_one_constraints", {}).get("gold_assignment_max_predicted_spans") == 1, violations, "gold_assignment_not_one_to_one")
     checks["label_alignment_manifest_recomputed"] = True
 
+    joint_audit = read_json(output_dir / "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json")
+    recomputed_joint_audit = joint_source_span_oracle_audit(label_manifest)
+    require(joint_audit == recomputed_joint_audit, violations, "joint_source_span_oracle_audit_mismatch")
+    joint_train = joint_audit["splits"]["train"]
+    joint_dev = joint_audit["splits"]["dev"]
+    require(joint_train["gold_assignment_count"] == 5407, violations, "joint_train_denominator_changed")
+    require(joint_train["individually_source_alignable"] == 5295, violations, "joint_train_individual_count_changed")
+    require(joint_train["jointly_representable"] == 5272, violations, "joint_train_representable_count_changed")
+    require(joint_train["joint_reuse_deficit"] == 23, violations, "joint_train_reuse_deficit_changed")
+    require(joint_train["samples_with_joint_reuse_gap"] == 22, violations, "joint_train_gap_samples_changed")
+    require(joint_train["unique_samples_with_any_representational_gap"] == 114, violations, "joint_train_unique_gap_samples_changed")
+    require(joint_dev["gold_assignment_count"] == 845, violations, "joint_dev_denominator_changed")
+    require(joint_dev["individually_source_alignable"] == 810, violations, "joint_dev_individual_count_changed")
+    require(joint_dev["jointly_representable"] == 809, violations, "joint_dev_representable_count_changed")
+    require(joint_dev["joint_reuse_deficit"] == 1, violations, "joint_dev_reuse_deficit_changed")
+    require(joint_dev["samples_with_joint_reuse_gap"] == 1, violations, "joint_dev_gap_samples_changed")
+    require(joint_dev["unique_samples_with_any_representational_gap"] == 34, violations, "joint_dev_unique_gap_samples_changed")
+    require(
+        any(record["sample_id"] == "stage7c_crudsql_dev_create_0151" and record["joint_reuse_deficit"] == 1 for record in joint_audit["sample_gap_records"]),
+        violations,
+        "dev_0151_joint_gap_missing",
+    )
+    construction = read_json(output_dir / "ORACLE_SPAN_CONSTRUCTION_SPEC.json")
+    require(construction.get("diagnostic_only") is True, violations, "oracle_construction_not_diagnostic")
+    require(construction.get("label_side_only") is True, violations, "oracle_construction_not_label_side")
+    require(construction.get("model_side_visible") is False, violations, "oracle_construction_model_side_visible")
+    require("maximum-cardinality one-to-one" in construction.get("oracle_phase_o_span_set", ""), violations, "oracle_construction_matching_not_frozen")
+    require(construction.get("duplicate_source_span_policy") == "do not duplicate a single source occurrence into multiple oracle SLOTs under A1", violations, "oracle_construction_duplicate_policy_changed")
+    require(construction.get("joint_gap_reason_code") == "shared_source_span_requires_multiple_gold_assignments", violations, "oracle_joint_gap_reason_changed")
+    checks["joint_source_span_oracle_recomputed"] = True
+
     phase_m = read_json(output_dir / "PHASE_M_INPUT_SPEC.json")
     require(phase_m.get("model_call_count") == 1, violations, "phase_m_model_call_count_changed")
     require(phase_m.get("slot_inventory_source") == "accepted Phase O spans only", violations, "phase_m_slot_source_changed")
@@ -194,8 +227,14 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
     require(oracle.get("oracle_spans_used_for_training_or_selection") is False, violations, "oracle_spans_used_for_selection")
     require(oracle.get("p_value_baseline_allowed") is False, violations, "oracle_pvalue_allowed")
     require(oracle.get("dev_source_selectable_gold_values") == 810, violations, "oracle_dev_source_count_changed")
+    require(oracle.get("dev_jointly_representable") == 809, violations, "oracle_dev_joint_count_changed")
+    require(oracle.get("train_jointly_representable") == 5272, violations, "oracle_train_joint_count_changed")
     require(oracle.get("source_span_label_manifest") == "SOURCE_SPAN_LABEL_MANIFEST.jsonl", violations, "oracle_label_manifest_missing")
     require(oracle.get("source_span_label_manifest_sha256") == sha256_file(output_dir / "SOURCE_SPAN_LABEL_MANIFEST.jsonl"), violations, "oracle_label_manifest_hash_mismatch")
+    require(oracle.get("oracle_span_construction_spec") == "ORACLE_SPAN_CONSTRUCTION_SPEC.json", violations, "oracle_construction_spec_missing")
+    require(oracle.get("oracle_span_construction_spec_sha256") == sha256_file(output_dir / "ORACLE_SPAN_CONSTRUCTION_SPEC.json"), violations, "oracle_construction_spec_hash_mismatch")
+    require(oracle.get("joint_source_span_oracle_audit") == "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json", violations, "oracle_joint_audit_missing")
+    require(oracle.get("joint_source_span_oracle_audit_sha256") == sha256_file(output_dir / "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json"), violations, "oracle_joint_audit_hash_mismatch")
     checks["oracle_diagnostic_checked"] = True
 
     generation = read_json(output_dir / "GENERATION_PROTOCOL_A1.json")
@@ -223,6 +262,15 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
     require(leak.get("oracle_spans_in_primary_v2") is False, violations, "oracle_spans_in_primary")
     checks["leakage_audit_recomputed"] = True
 
+    policy = read_json(output_dir / "NONALIGNABLE_SAMPLE_POLICY.json")
+    require("joint_span_reuse_nonrepresentable" in policy.get("diagnostic_flags", []), violations, "joint_reuse_flag_missing")
+    require(policy.get("dev_samples_with_joint_reuse_gap") == 1, violations, "policy_dev_joint_gap_changed")
+    require(policy.get("train_samples_with_joint_reuse_gap") == 22, violations, "policy_train_joint_gap_changed")
+    require(policy.get("dev_unique_samples_with_any_representational_gap") == 34, violations, "policy_dev_unique_gap_changed")
+    require(policy.get("train_unique_samples_with_any_representational_gap") == 114, violations, "policy_train_unique_gap_changed")
+    require(policy.get("duplicate_source_span_post_hoc") is False, violations, "policy_allows_duplicate_source_span")
+    require(policy.get("allow_slot_reuse_after_model_performance") is False, violations, "policy_allows_slot_reuse_after_performance")
+
     reserved = read_json(output_dir / "RESERVED_BENCHMARK_POLICY.json")
     require(reserved.get("current_481_crudsql_create") == "post_hoc_only_not_selection", violations, "481_policy_changed")
     require(reserved.get("crudsql_update_delete") == "reserved_until_after_v2_a1_freeze", violations, "update_delete_not_reserved")
@@ -237,8 +285,10 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
         "train_create_count": recomputed_counts["train_create_count"],
         "dev_create_count": recomputed_counts["dev_create_count"],
         "dev_source_span_oracle": recomputed_counts["source_span_oracle"]["dev_source_selectable"],
+        "dev_joint_source_span_oracle": joint_dev["jointly_representable"],
         "dev_source_span_oracle_denominator": recomputed_counts["source_span_oracle"]["dev_denominator"],
         "dev_nonalignable_samples": recomputed_counts["source_span_oracle"]["dev_samples_with_gap"],
+        "dev_joint_reuse_gap_samples": joint_dev["samples_with_joint_reuse_gap"],
         "model_called": False,
         "gpu_called": False,
         "v2_implemented": False,
@@ -259,7 +309,9 @@ def report_text(report: dict[str, Any]) -> str:
         f"train_create_count: {report.get('train_create_count')}",
         f"dev_create_count: {report.get('dev_create_count')}",
         f"dev_source_span_oracle: {report.get('dev_source_span_oracle')} / {report.get('dev_source_span_oracle_denominator')}",
+        f"dev_joint_source_span_oracle: {report.get('dev_joint_source_span_oracle')} / {report.get('dev_source_span_oracle_denominator')}",
         f"dev_nonalignable_samples: {report.get('dev_nonalignable_samples')}",
+        f"dev_joint_reuse_gap_samples: {report.get('dev_joint_reuse_gap_samples')}",
         "",
     ]
     for key in (
@@ -273,6 +325,7 @@ def report_text(report: dict[str, Any]) -> str:
         "offset_guide_checked",
         "phase_o_validation_checked",
         "label_alignment_manifest_recomputed",
+        "joint_source_span_oracle_recomputed",
         "phase_m_protocol_checked",
         "oracle_diagnostic_checked",
         "generation_protocol_checked",

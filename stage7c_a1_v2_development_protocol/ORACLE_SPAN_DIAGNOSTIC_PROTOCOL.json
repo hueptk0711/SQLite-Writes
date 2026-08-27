@@ -4,18 +4,30 @@
     "CRUDSQL dev Create"
   ],
   "dev_gold_value_denominator": 845,
+  "dev_individually_source_alignable": 810,
+  "dev_joint_reuse_deficit": 1,
+  "dev_jointly_representable": 809,
+  "dev_samples_with_joint_reuse_gap": 1,
   "dev_source_selectable_gold_values": 810,
   "diagnostic_only": true,
   "forbidden_splits": [
     "current 481 test",
     "LiveSQLBench"
   ],
+  "joint_source_span_oracle_audit": "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json",
+  "joint_source_span_oracle_audit_sha256": "51b59c6d25bf840a47fabb6102bbf29b1277391423ae8c158ad4b243d122be14",
+  "oracle_span_construction_spec": "ORACLE_SPAN_CONSTRUCTION_SPEC.json",
+  "oracle_span_construction_spec_sha256": "b0fe1ce297f9e7cbf3cdaab4f1612740f2fc28e2f87e1cf9dbb4f79ddc054f38",
   "oracle_spans_used_for_training_or_selection": false,
   "p_value_baseline_allowed": false,
   "primary_v2_output_source": "predicted Phase O spans only",
-  "question": "If Phase M receives perfect source-alignable semantic spans, what mapping/materialization ceiling remains?",
+  "question": "If Phase M receives the maximum one-to-one oracle span set allowed by A1, what mapping/materialization ceiling remains?",
   "source_span_label_manifest": "SOURCE_SPAN_LABEL_MANIFEST.jsonl",
   "source_span_label_manifest_sha256": "48acb9bc830752979227cfc032b751a6a51b5dc6f9e69f08aeffe9e442c73d3e",
   "source_span_oracle_audit_sha256": "cbaf13aaa3076314a3374da9f81c8a9e882a572ff824b1fd8555cafd3d6c1aa1",
-  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL"
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL",
+  "train_individually_source_alignable": 5295,
+  "train_joint_reuse_deficit": 23,
+  "train_jointly_representable": 5272,
+  "train_samples_with_joint_reuse_gap": 22
 }

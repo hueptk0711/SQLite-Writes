@@ -7,7 +7,9 @@ violations: []
 train_create_count: 1760
 dev_create_count: 240
 dev_source_span_oracle: 810 / 845
+dev_joint_source_span_oracle: 809 / 845
 dev_nonalignable_samples: 33
+dev_joint_reuse_gap_samples: 1
 
 input_hashes_recomputed: true
 artifact_hashes_recomputed: true
@@ -19,6 +21,7 @@ chat_template_rendering_checked: true
 offset_guide_checked: true
 phase_o_validation_checked: true
 label_alignment_manifest_recomputed: true
+joint_source_span_oracle_recomputed: true
 phase_m_protocol_checked: true
 oracle_diagnostic_checked: true
 generation_protocol_checked: true
