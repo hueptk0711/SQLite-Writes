@@ -10,6 +10,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
+import re
 import sqlite3
 from pathlib import Path
 from typing import Any
@@ -18,7 +20,7 @@ from typing import Any
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 STAGE = "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL"
 DATE = "20260827"
-HASH_POLICY = "sha256_bytes_for_raw_inputs_text_sha256_canonical_lf_for_json_artifacts"
+HASH_POLICY = "sha256_canonical_lf_for_utf8_text_raw_bytes_for_binary_inputs"
 LOCK_FILE = "STAGE7C_A1_PROTOCOL_LOCK.json"
 PASS_STATUS = "PASS_STAGE7C_A1_V2_DEVELOPMENT_PROTOCOL_LOCKED"
 
@@ -67,8 +69,12 @@ ARTIFACTS = (
     "REUSED_DATA_PROTOCOL_MANIFEST.json",
     "PHASE_O_INPUT_SPEC.json",
     "PHASE_O_PROMPT_SPEC.json",
+    "PROMPT_SERIALIZATION_SPEC.json",
+    "CHAT_TEMPLATE_RENDERING_SPEC.json",
     "QUESTION_OFFSET_GUIDE_SPEC.json",
     "PHASE_O_OUTPUT_VALIDATION_SPEC.json",
+    "PHASE_O_LABEL_ALIGNMENT_SPEC.json",
+    "SOURCE_SPAN_LABEL_MANIFEST.jsonl",
     "PHASE_O_EVALUATION_PROTOCOL.json",
     "PHASE_M_INPUT_SPEC.json",
     "PHASE_M_PROMPT_SPEC.json",
@@ -96,9 +102,9 @@ FROZEN_MODEL_CONFIG = {
     "hf_model_config_sha256": "c0242402ad6a13b331ea320feea8c7e3776ffb7a4eff0757b9cd667e116d9a28",
     "hf_generation_config_sha256": "1a628a5775bc69cde01c6749a531150ca4d3189652c618a174f7077923acf3b1",
     "tokenizer_json_sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
-    "tokenizer_config_sha256": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
-    "chat_template_sha256": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
-    "chat_template_source": "Stage6I Qwen tokenizer_config.json; standalone chat-template file was not frozen separately",
+    "tokenizer_config_file_sha256": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
+    "actual_chat_template_string_sha256": None,
+    "actual_chat_template_string_sha256_status": "not_materialized_in_repository; Stage7D preflight must extract tokenizer.chat_template from the frozen tokenizer revision and record its hash before generation",
     "transformers_version": "5.5.3",
     "torch_version": "2.6.0+cu124",
     "torch_dtype": "auto",
@@ -136,6 +142,35 @@ PHASE_M_USER_PROMPT_TEMPLATE = (
     "Return the operation-specific slot-grounded IR."
 )
 
+TEXT_HASH_SUFFIXES = {".json", ".jsonl", ".md", ".py", ".txt", ".toml", ".yaml", ".yml"}
+PROMPT_SERIALIZATION_CONTRACT = {
+    "encoding": "UTF-8",
+    "newline": "LF",
+    "ensure_ascii": False,
+    "sort_keys": True,
+    "separators": [",", ":"],
+    "indent": None,
+    "forbidden_renderers": ["str(obj)", "repr(obj)", "json.dumps default", "ensure_ascii=True", "indent=2"],
+    "inventory_ordering": {
+        "tables": "sort by table_ref",
+        "columns": "sort by column_ref",
+        "constraints": "sort by constraint_ref",
+        "evidence": "sort by EV numeric order",
+        "slots": "sort by SLOT numeric order",
+    },
+}
+CHAT_TEMPLATE_RENDERING_CONTRACT = {
+    "tokenizer_method": "tokenizer.apply_chat_template",
+    "tokenize": False,
+    "add_generation_prompt": True,
+    "messages_format": "ordered list of role/content dictionaries",
+    "phase_o_messages": ["system", "user"],
+    "phase_m_messages": ["system", "user"],
+    "tokenizer_config_file_sha256": FROZEN_MODEL_CONFIG["tokenizer_config_file_sha256"],
+    "actual_chat_template_string_sha256": FROZEN_MODEL_CONFIG["actual_chat_template_string_sha256"],
+    "actual_chat_template_string_sha256_status": FROZEN_MODEL_CONFIG["actual_chat_template_string_sha256_status"],
+}
+
 
 def canonical_json(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
@@ -146,11 +181,17 @@ def sha256_bytes(data: bytes) -> str:
 
 
 def sha256_text(text: str) -> str:
-    return sha256_bytes(text.replace("\r\n", "\n").encode("utf-8"))
+    return sha256_bytes(canonical_lf(text).encode("utf-8"))
 
 
 def sha256_file(path: Path) -> str:
+    if path.suffix.casefold() in TEXT_HASH_SUFFIXES:
+        return sha256_bytes(canonical_lf(path.read_text(encoding="utf-8")).encode("utf-8"))
     return sha256_bytes(path.read_bytes())
+
+
+def canonical_lf(text: str) -> str:
+    return text.replace("\r\n", "\n").replace("\r", "\n")
 
 
 def read_json(path: Path) -> Any:
@@ -164,6 +205,11 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("".join(canonical_json(row) + "\n" for row in rows), encoding="utf-8")
 
 
 def input_hashes(root: Path = PROJECT_ROOT) -> dict[str, str]:
@@ -199,6 +245,59 @@ def reset_output_dir(output_dir: Path, force: bool) -> None:
 
 def offset_guide(question: str) -> str:
     return "\n".join(f"{index}\t{char}" for index, char in enumerate(question))
+
+
+def serialize_prompt_object(value: Any) -> str:
+    return canonical_json(value)
+
+
+def rendered_prompt_sha256(rendered_prompt: str) -> str:
+    return sha256_text(rendered_prompt)
+
+
+def render_phase_o_user_prompt(question: str, schema_inventory: dict[str, Any]) -> str:
+    return PHASE_O_USER_PROMPT_TEMPLATE.format(
+        question=question,
+        offset_guide=offset_guide(question),
+        schema_inventory=serialize_prompt_object(order_inventory(schema_inventory)),
+    )
+
+
+def render_phase_m_user_prompt(
+    operation: str,
+    schema_inventory: dict[str, Any],
+    evidence_inventory: dict[str, Any],
+    semantic_slot_inventory: dict[str, Any],
+) -> str:
+    return PHASE_M_USER_PROMPT_TEMPLATE.format(
+        operation=operation,
+        schema_inventory=serialize_prompt_object(order_inventory(schema_inventory)),
+        evidence_inventory=serialize_prompt_object(order_inventory(evidence_inventory)),
+        semantic_slot_inventory=serialize_prompt_object(order_inventory(semantic_slot_inventory)),
+    )
+
+
+def ref_number(value: str, prefix: str) -> int:
+    match = re.fullmatch(fr"{re.escape(prefix)}_([0-9]+)", str(value))
+    return int(match.group(1)) if match else 10**9
+
+
+def order_inventory(value: Any) -> Any:
+    if isinstance(value, dict):
+        ordered = {key: order_inventory(inner) for key, inner in value.items()}
+        for key, ref_key, prefix in (
+            ("tables", "table_ref", "TAB"),
+            ("columns", "column_ref", "COL"),
+            ("constraints", "constraint_ref", "CONSTRAINT"),
+            ("evidence", "evidence_ref", "EV"),
+            ("slots", "slot_ref", "SLOT"),
+        ):
+            if isinstance(ordered.get(key), list):
+                ordered[key] = sorted(ordered[key], key=lambda item: ref_number(item.get(ref_key, ""), prefix) if isinstance(item, dict) else 10**9)
+        return ordered
+    if isinstance(value, list):
+        return [order_inventory(item) for item in value]
+    return value
 
 
 def prompt_hash_payload() -> dict[str, str]:
@@ -251,6 +350,202 @@ def count_reused_data(root: Path = PROJECT_ROOT) -> dict[str, Any]:
     }
 
 
+def sqlite_affinity(source_type: str) -> str:
+    upper = str(source_type).upper()
+    if "INT" in upper:
+        return "INTEGER"
+    if any(token in upper for token in ("REAL", "FLOA", "DOUB")):
+        return "REAL"
+    if any(token in upper for token in ("CHAR", "CLOB", "TEXT")):
+        return "TEXT"
+    if "BLOB" in upper:
+        return "BLOB"
+    return "NUMERIC"
+
+
+def strict_number(value: str) -> float | None:
+    text = str(value).strip()
+    if not re.fullmatch(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)", text):
+        return None
+    try:
+        parsed = float(text)
+    except ValueError:
+        return None
+    return parsed if math.isfinite(parsed) else None
+
+
+def numeric_literal_spans(question: str) -> list[dict[str, Any]]:
+    return [
+        {"start_char": match.start(), "end_char": match.end(), "text": match.group(0)}
+        for match in re.finditer(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)", question)
+    ]
+
+
+def text_occurrence_spans(question: str, value: str) -> list[dict[str, Any]]:
+    if not value:
+        return []
+    spans = []
+    start = 0
+    while True:
+        index = question.find(value, start)
+        if index < 0:
+            break
+        spans.append({"start_char": index, "end_char": index + len(value), "text": value})
+        start = index + 1
+    return spans
+
+
+def acceptable_spans_for_gold(question: str, gold_value: str, source_type: str) -> list[dict[str, Any]]:
+    affinity = sqlite_affinity(source_type)
+    target = str(gold_value).strip()
+    if not target:
+        return []
+    if affinity == "TEXT":
+        return text_occurrence_spans(question, target)
+    if affinity == "INTEGER":
+        if not re.fullmatch(r"[+-]?\d+", target):
+            return []
+        return [
+            span
+            for span in numeric_literal_spans(question)
+            if re.fullmatch(r"[+-]?\d+", span["text"]) and int(span["text"]) == int(target)
+        ]
+    if affinity in {"REAL", "NUMERIC"}:
+        gold_number = strict_number(target)
+        if gold_number is None:
+            return []
+        return [span for span in numeric_literal_spans(question) if (parsed := strict_number(span["text"])) is not None and abs(parsed - gold_number) <= 1e-9]
+    return []
+
+
+def source_span_label_manifest(root: Path = PROJECT_ROOT) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    old_root = root / "stage7c_v2_development_data_protocol"
+    for split in ("train", "dev"):
+        rows = read_jsonl(old_root / f"{split.upper()}_CREATE_MANIFEST.jsonl")
+        raw_rows = read_json(old_root / "upstream_crudsql" / "data" / split / f"crud_{split}_sql.json")
+        tables = {row["id"]: row for row in read_json(old_root / "upstream_crudsql" / "data" / split / f"crud_{split}_table.json")}
+        for row in rows:
+            raw = raw_rows[row["source_sql_index"]]
+            table = tables[raw["table_id"]]
+            question = raw["question"]
+            for assignment_index, cond in enumerate(raw["sql"].get("conds", []), start=1):
+                column_index = int(cond[0])
+                gold_value = str(cond[2])
+                source_type = table["types"][column_index]
+                spans = acceptable_spans_for_gold(question, gold_value, source_type)
+                records.append(
+                    {
+                        "split": split,
+                        "sample_id": row["sample_id"],
+                        "gold_assignment_id": f"{row['sample_id']}::A{assignment_index:02d}",
+                        "assignment_index": assignment_index,
+                        "column_index": column_index,
+                        "column_ref_diagnostic": f"COL_{column_index + 1}",
+                        "gold_value": gold_value,
+                        "source_type": source_type,
+                        "source_alignable": bool(spans),
+                        "acceptable_source_spans": spans,
+                        "multi_occurrence": len(spans) > 1,
+                        "model_side_visible": False,
+                    }
+                )
+    return records
+
+
+def label_alignment_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
+    summary: dict[str, Any] = {"splits": {}}
+    for split in ("train", "dev"):
+        split_records = [record for record in records if record["split"] == split]
+        sample_ids = {record["sample_id"] for record in split_records}
+        multi_occurrence = [record for record in split_records if record["multi_occurrence"]]
+        sample_ids_with_multi = {record["sample_id"] for record in multi_occurrence}
+        nonalignable = [record for record in split_records if not record["source_alignable"]]
+        summary["splits"][split] = {
+            "gold_assignment_count": len(split_records),
+            "source_alignable_gold_assignment_count": sum(1 for record in split_records if record["source_alignable"]),
+            "non_source_alignable_gold_assignment_count": len(nonalignable),
+            "samples_with_non_source_alignable_gold": len({record["sample_id"] for record in nonalignable}),
+            "multi_occurrence_gold_assignment_count": len(multi_occurrence),
+            "samples_with_multi_occurrence_gold_assignment": len(sample_ids_with_multi),
+            "sample_count": len(sample_ids),
+        }
+    return summary
+
+
+def literal_gold_occurrence_audit(root: Path = PROJECT_ROOT) -> dict[str, Any]:
+    old_root = root / "stage7c_v2_development_data_protocol"
+    result: dict[str, Any] = {"splits": {}}
+    for split in ("train", "dev"):
+        rows = read_jsonl(old_root / f"{split.upper()}_CREATE_MANIFEST.jsonl")
+        raw_rows = read_json(old_root / "upstream_crudsql" / "data" / split / f"crud_{split}_sql.json")
+        multi_count = 0
+        sample_ids = set()
+        for row in rows:
+            raw = raw_rows[row["source_sql_index"]]
+            question = raw["question"]
+            for cond in raw["sql"].get("conds", []):
+                gold_value = str(cond[2])
+                if len(text_occurrence_spans(question, gold_value)) > 1:
+                    multi_count += 1
+                    sample_ids.add(row["sample_id"])
+        result["splits"][split] = {
+            "literal_gold_string_multi_occurrence_assignment_count": multi_count,
+            "samples_with_literal_gold_string_multi_occurrence": len(sample_ids),
+        }
+    return result
+
+
+def maximum_span_matching(predicted_spans: list[dict[str, int]], label_records: list[dict[str, Any]]) -> dict[str, Any]:
+    predicted = sorted(
+        [{"index": index, "start_char": span["start_char"], "end_char": span["end_char"]} for index, span in enumerate(predicted_spans)],
+        key=lambda span: (span["start_char"], span["end_char"], span["index"]),
+    )
+    gold = sorted(label_records, key=lambda record: record["gold_assignment_id"])
+    edges: dict[int, list[int]] = {}
+    for pred_index, pred in enumerate(predicted):
+        pred_offsets = (pred["start_char"], pred["end_char"])
+        edges[pred_index] = [
+            gold_index
+            for gold_index, record in enumerate(gold)
+            if pred_offsets in {(span["start_char"], span["end_char"]) for span in record["acceptable_source_spans"]}
+        ]
+    matched_gold_to_pred: dict[int, int] = {}
+
+    def augment(pred_index: int, seen: set[int]) -> bool:
+        for gold_index in edges[pred_index]:
+            if gold_index in seen:
+                continue
+            seen.add(gold_index)
+            if gold_index not in matched_gold_to_pred or augment(matched_gold_to_pred[gold_index], seen):
+                matched_gold_to_pred[gold_index] = pred_index
+                return True
+        return False
+
+    for pred_index in range(len(predicted)):
+        augment(pred_index, set())
+    matches = [
+        {
+            "predicted_span": {"start_char": predicted[pred_index]["start_char"], "end_char": predicted[pred_index]["end_char"]},
+            "gold_assignment_id": gold[gold_index]["gold_assignment_id"],
+        }
+        for gold_index, pred_index in sorted(matched_gold_to_pred.items())
+    ]
+    matched = len(matches)
+    source_alignable = sum(1 for record in gold if record["source_alignable"])
+    return {
+        "matched": matched,
+        "accepted_predicted_spans": len(predicted),
+        "gold_assignments": len(gold),
+        "source_alignable_gold_assignments": source_alignable,
+        "exact_span_precision": matched / len(predicted) if predicted else 1.0,
+        "exact_span_recall_all_gold_values": matched / len(gold) if gold else 1.0,
+        "exact_span_recall_source_alignable": matched / source_alignable if source_alignable else 1.0,
+        "spurious_span_rate": (len(predicted) - matched) / len(predicted) if predicted else 0.0,
+        "matches": matches,
+    }
+
+
 def leakage_audit(root: Path = PROJECT_ROOT) -> dict[str, Any]:
     forbidden = {"operation_label", "gold_sql", "crudsql_sql", "conds", "sel", "agg", "target_state", "post_state_hash", "gold_program", "gold_post_state"}
     rows = read_jsonl(root / "stage7c_v2_development_data_protocol/TRAIN_CREATE_MANIFEST.jsonl") + read_jsonl(
@@ -284,6 +579,9 @@ def leakage_audit(root: Path = PROJECT_ROOT) -> dict[str, Any]:
 
 def static_artifacts(root: Path = PROJECT_ROOT) -> dict[str, Any]:
     counts = count_reused_data(root)
+    label_records = source_span_label_manifest(root)
+    label_summary = label_alignment_summary(label_records)
+    literal_occurrences = literal_gold_occurrence_audit(root)
     phase_o_schema_hash = sha256_file(root / "stage7b_a1_free_text_slot_discovery_amendment/PHASE_O_JSON_SCHEMA.json")
     span_validation_hash = sha256_file(root / "stage7b_a1_free_text_slot_discovery_amendment/SPAN_VALIDATION_SPEC.json")
     prompt_hashes = prompt_hash_payload()
@@ -327,6 +625,26 @@ def static_artifacts(root: Path = PROJECT_ROOT) -> dict[str, Any]:
             "character_offset_instructions": "Use Python Unicode code-point offsets on exact Q; [start_char, end_char); return offsets only.",
             "gold_visible": False,
         },
+        "PROMPT_SERIALIZATION_SPEC.json": {
+            "stage": STAGE,
+            "contract": PROMPT_SERIALIZATION_CONTRACT,
+            "reference_python": "json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(',', ':'))",
+            "rendered_prompt_sha256_algorithm": "sha256(UTF-8 bytes after canonical CRLF/CR to LF normalization of the rendered prompt)",
+            "phase_o_rendered_prompt_inputs": ["system_prompt", "exact_question", "offset_guide", "canonical_schema_inventory_json"],
+            "phase_m_rendered_prompt_inputs": ["system_prompt", "predicted_operation", "canonical_schema_inventory_json", "canonical_evidence_inventory_json", "canonical_semantic_slot_inventory_json"],
+            "ensure_ascii_true_allowed": False,
+            "indentation_allowed": False,
+            "str_or_repr_serialization_allowed": False,
+        },
+        "CHAT_TEMPLATE_RENDERING_SPEC.json": {
+            "stage": STAGE,
+            "contract": CHAT_TEMPLATE_RENDERING_CONTRACT,
+            "rendering_call": "tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)",
+            "add_generation_prompt": True,
+            "tokenize": False,
+            "stage7d_preflight_required": "extract actual tokenizer.chat_template from frozen tokenizer revision and record actual_chat_template_string_sha256 before generation",
+            "free_choice_in_stage7d_allowed": False,
+        },
         "QUESTION_OFFSET_GUIDE_SPEC.json": {
             "stage": STAGE,
             "format": "one line per Python code point: '<zero_based_index>\\t<character>'",
@@ -356,11 +674,40 @@ def static_artifacts(root: Path = PROJECT_ROOT) -> dict[str, Any]:
             "model_generated_span_ids_policy": "reject",
             "model_generated_value_text_policy": "reject",
         },
+        "PHASE_O_LABEL_ALIGNMENT_SPEC.json": {
+            "stage": STAGE,
+            "label_manifest": "SOURCE_SPAN_LABEL_MANIFEST.jsonl",
+            "label_side_only": True,
+            "model_side_visible": False,
+            "acceptable_source_span_rule": {
+                "TEXT": "all exact occurrences of the gold text in the exact original question",
+                "INTEGER": "all strict numeric literal spans whose full literal parses losslessly to the gold integer",
+                "REAL_OR_NUMERIC": "all strict numeric literal spans whose full literal parses to the gold finite numeric value",
+                "BLOB_OR_UNSUPPORTED": "no acceptable source spans under A1 exact-span materializer",
+            },
+            "multi_occurrence_policy": "all acceptable source occurrences are retained as alternatives before model output exists",
+            "matching_policy": "maximum-cardinality bipartite matching from accepted predicted spans to gold assignments",
+            "literal_gold_string_multi_occurrence_audit": literal_occurrences,
+            "numeric_partial_substring_policy": "numeric matches must consume a full regex numeric literal; a single digit inside a longer numeric literal is not an acceptable span",
+            "one_to_one_constraints": {
+                "predicted_span_max_gold_assignments": 1,
+                "gold_assignment_max_predicted_spans": 1,
+            },
+            "metric_formulas": {
+                "exact_span_precision": "matched / accepted_predicted_spans",
+                "exact_span_recall_source_alignable": "matched / source_alignable_gold_assignments",
+                "exact_span_recall_all_gold_values": "matched / all_gold_assignments",
+                "spurious_span_rate": "unmatched_predicted / accepted_predicted_spans",
+            },
+            "summary": label_summary,
+        },
         "PHASE_O_EVALUATION_PROTOCOL.json": {
             "stage": STAGE,
+            "label_alignment_manifest": "SOURCE_SPAN_LABEL_MANIFEST.jsonl",
+            "matching_policy": "maximum-cardinality bipartite one-to-one matching",
             "metrics": {
                 "operation_accuracy": "predicted INSERT/UPDATE/DELETE/UPSERT vs label-side V2 operation",
-                "exact_span_precision": "accepted predicted spans matching label-side source-alignable gold spans over predicted spans",
+                "exact_span_precision": "maximum matched predicted spans / accepted predicted spans",
                 "exact_span_recall_all_gold_values": "matched source spans over all label-side gold values",
                 "exact_span_recall_source_alignable": "matched source spans over source-alignable gold values only",
                 "spurious_span_rate": "accepted predicted spans not aligned to a label-side gold value",
@@ -409,6 +756,8 @@ def static_artifacts(root: Path = PROJECT_ROOT) -> dict[str, Any]:
             "allowed_splits": ["CRUDSQL train Create", "CRUDSQL dev Create"],
             "forbidden_splits": ["current 481 test", "LiveSQLBench"],
             "source_span_oracle_audit_sha256": sha256_file(root / "stage7b_a1_free_text_slot_discovery_amendment/SOURCE_SPAN_ORACLE_AUDIT.json"),
+            "source_span_label_manifest": "SOURCE_SPAN_LABEL_MANIFEST.jsonl",
+            "source_span_label_manifest_sha256": None,
             "dev_source_selectable_gold_values": counts["source_span_oracle"]["dev_source_selectable"],
             "dev_gold_value_denominator": counts["source_span_oracle"]["dev_denominator"],
             "oracle_spans_used_for_training_or_selection": False,
@@ -433,7 +782,9 @@ def static_artifacts(root: Path = PROJECT_ROOT) -> dict[str, Any]:
             "phase_o_prompt_sha256": prompt_hashes["phase_o_user_prompt_template_sha256"],
             "phase_m_prompt_sha256": prompt_hashes["phase_m_user_prompt_template_sha256"],
             "phase_o_json_schema_sha256": phase_o_schema_hash,
-            "chat_template_sha256": FROZEN_MODEL_CONFIG["chat_template_sha256"],
+            "prompt_serialization_spec_sha256": None,
+            "chat_template_rendering_spec_sha256": None,
+            "tokenizer_config_file_sha256_for_chat_template": FROZEN_MODEL_CONFIG["tokenizer_config_file_sha256"],
             "phase_o_model_calls": 1,
             "phase_m_model_calls": 1,
             "total_model_calls": 2,
@@ -516,12 +867,25 @@ def lock(output_dir: Path, inputs: dict[str, str]) -> dict[str, Any]:
     }
 
 
+def finalize_cross_artifact_hashes(output_dir: Path) -> None:
+    oracle = read_json(output_dir / "ORACLE_SPAN_DIAGNOSTIC_PROTOCOL.json")
+    oracle["source_span_label_manifest_sha256"] = sha256_file(output_dir / "SOURCE_SPAN_LABEL_MANIFEST.jsonl")
+    write_json(output_dir / "ORACLE_SPAN_DIAGNOSTIC_PROTOCOL.json", oracle)
+
+    generation = read_json(output_dir / "GENERATION_PROTOCOL_A1.json")
+    generation["prompt_serialization_spec_sha256"] = sha256_file(output_dir / "PROMPT_SERIALIZATION_SPEC.json")
+    generation["chat_template_rendering_spec_sha256"] = sha256_file(output_dir / "CHAT_TEMPLATE_RENDERING_SPEC.json")
+    write_json(output_dir / "GENERATION_PROTOCOL_A1.json", generation)
+
+
 def build_stage7c_a1(output_dir: Path = PROJECT_ROOT / "stage7c_a1_v2_development_protocol", *, force: bool = False) -> dict[str, Any]:
     reset_output_dir(output_dir, force)
     inputs = input_hashes()
     write_json(output_dir / "STAGE7C_A1_INPUT_MANIFEST.json", {"stage": STAGE, "date": DATE, "hash_policy": HASH_POLICY, "input_hashes": inputs})
     for rel, payload in static_artifacts().items():
         write_json(output_dir / rel, payload)
+    write_jsonl(output_dir / "SOURCE_SPAN_LABEL_MANIFEST.jsonl", source_span_label_manifest())
+    finalize_cross_artifact_hashes(output_dir)
     write_json(output_dir / "DATA_LEAKAGE_AUDIT_A1.json", leakage_audit())
     (output_dir / "VALIDATION_REPORT.md").write_text(validation_report_text(), encoding="utf-8")
     (output_dir / "REVIEWER_README.md").write_text(reviewer_readme(), encoding="utf-8")

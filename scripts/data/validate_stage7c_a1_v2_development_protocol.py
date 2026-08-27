@@ -19,16 +19,23 @@ from scripts.data.build_stage7c_a1_v2_development_protocol import (
     FROZEN_MODEL_CONFIG,
     HASH_POLICY,
     LOCK_FILE,
+    PROMPT_SERIALIZATION_CONTRACT,
     PASS_STATUS,
     STAGE,
     artifact_hashes,
     count_reused_data,
     input_hashes,
+    label_alignment_summary,
     leakage_audit,
+    literal_gold_occurrence_audit,
     offset_guide,
     prompt_hash_payload,
     read_json,
+    read_jsonl,
+    rendered_prompt_sha256,
+    serialize_prompt_object,
     sha256_file,
+    source_span_label_manifest,
     validation_report_text,
     write_json,
 )
@@ -48,8 +55,11 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
         "stage7b_a1_lock_checked": False,
         "stage7c_reuse_checked": False,
         "phase_o_prompt_checked": False,
+        "prompt_serialization_checked": False,
+        "chat_template_rendering_checked": False,
         "offset_guide_checked": False,
         "phase_o_validation_checked": False,
+        "label_alignment_manifest_recomputed": False,
         "phase_m_protocol_checked": False,
         "oracle_diagnostic_checked": False,
         "generation_protocol_checked": False,
@@ -114,6 +124,24 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
     require("Python Unicode code-point offsets" in phase_o_prompt.get("character_offset_instructions", ""), violations, "phase_o_offset_instruction_missing")
     checks["phase_o_prompt_checked"] = True
 
+    serialization = read_json(output_dir / "PROMPT_SERIALIZATION_SPEC.json")
+    require(serialization.get("contract") == PROMPT_SERIALIZATION_CONTRACT, violations, "prompt_serialization_contract_changed")
+    require(serialization.get("reference_python") == "json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(',', ':'))", violations, "prompt_serialization_reference_changed")
+    require(serialization.get("ensure_ascii_true_allowed") is False, violations, "ensure_ascii_true_allowed")
+    require(serialization.get("indentation_allowed") is False, violations, "prompt_indentation_allowed")
+    require(serialization.get("str_or_repr_serialization_allowed") is False, violations, "str_repr_serialization_allowed")
+    require(serialize_prompt_object({"b": "北京", "a": 1}) == '{"a":1,"b":"北京"}', violations, "canonical_serialization_reference_failed")
+    require(rendered_prompt_sha256("x\r\ny") == rendered_prompt_sha256("x\ny"), violations, "rendered_prompt_hash_not_lf_canonical")
+    checks["prompt_serialization_checked"] = True
+
+    chat_template = read_json(output_dir / "CHAT_TEMPLATE_RENDERING_SPEC.json")
+    require(chat_template.get("rendering_call") == "tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)", violations, "chat_template_rendering_call_changed")
+    require(chat_template.get("add_generation_prompt") is True, violations, "chat_template_add_generation_prompt_not_true")
+    require(chat_template.get("tokenize") is False, violations, "chat_template_tokenize_not_false")
+    require(chat_template.get("contract", {}).get("tokenizer_config_file_sha256") == FROZEN_MODEL_CONFIG["tokenizer_config_file_sha256"], violations, "chat_template_tokenizer_config_hash_changed")
+    require(chat_template.get("free_choice_in_stage7d_allowed") is False, violations, "chat_template_free_choice_allowed")
+    checks["chat_template_rendering_checked"] = True
+
     guide = read_json(output_dir / "QUESTION_OFFSET_GUIDE_SPEC.json")
     require(guide.get("example_offset_guide") == offset_guide("A北京B上海C"), violations, "offset_guide_example_mismatch")
     require(guide.get("coordinate_system") == "Python Unicode code-point indexing", violations, "offset_coordinate_system_changed")
@@ -131,6 +159,28 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
     require(phase_o_validation.get("model_generated_value_text_policy") == "reject", violations, "model_value_text_not_rejected")
     checks["phase_o_validation_checked"] = True
 
+    label_manifest = read_jsonl(output_dir / "SOURCE_SPAN_LABEL_MANIFEST.jsonl")
+    recomputed_label_manifest = source_span_label_manifest(root)
+    require(label_manifest == recomputed_label_manifest, violations, "source_span_label_manifest_mismatch")
+    label_spec = read_json(output_dir / "PHASE_O_LABEL_ALIGNMENT_SPEC.json")
+    label_summary = label_alignment_summary(label_manifest)
+    require(label_spec.get("label_manifest") == "SOURCE_SPAN_LABEL_MANIFEST.jsonl", violations, "label_manifest_name_changed")
+    require(label_spec.get("label_side_only") is True, violations, "label_alignment_not_label_side_only")
+    require(label_spec.get("model_side_visible") is False, violations, "label_alignment_model_side_visible")
+    require(label_spec.get("summary") == label_summary, violations, "label_alignment_summary_mismatch")
+    require(label_summary["splits"]["train"]["source_alignable_gold_assignment_count"] == 5295, violations, "train_label_alignable_count_changed")
+    require(label_summary["splits"]["dev"]["source_alignable_gold_assignment_count"] == 810, violations, "dev_label_alignable_count_changed")
+    require(label_summary["splits"]["dev"]["gold_assignment_count"] == 845, violations, "dev_label_gold_count_changed")
+    require(label_summary["splits"]["dev"]["samples_with_non_source_alignable_gold"] == 33, violations, "dev_label_nonalignable_samples_changed")
+    literal_occurrences = literal_gold_occurrence_audit(root)
+    require(label_spec.get("literal_gold_string_multi_occurrence_audit") == literal_occurrences, violations, "literal_multi_occurrence_audit_mismatch")
+    require(literal_occurrences["splits"]["train"]["literal_gold_string_multi_occurrence_assignment_count"] == 144, violations, "train_literal_multi_occurrence_count_changed")
+    require(literal_occurrences["splits"]["dev"]["literal_gold_string_multi_occurrence_assignment_count"] == 36, violations, "dev_literal_multi_occurrence_count_changed")
+    require(label_spec.get("matching_policy") == "maximum-cardinality bipartite matching from accepted predicted spans to gold assignments", violations, "label_matching_policy_changed")
+    require(label_spec.get("one_to_one_constraints", {}).get("predicted_span_max_gold_assignments") == 1, violations, "predicted_span_not_one_to_one")
+    require(label_spec.get("one_to_one_constraints", {}).get("gold_assignment_max_predicted_spans") == 1, violations, "gold_assignment_not_one_to_one")
+    checks["label_alignment_manifest_recomputed"] = True
+
     phase_m = read_json(output_dir / "PHASE_M_INPUT_SPEC.json")
     require(phase_m.get("model_call_count") == 1, violations, "phase_m_model_call_count_changed")
     require(phase_m.get("slot_inventory_source") == "accepted Phase O spans only", violations, "phase_m_slot_source_changed")
@@ -144,6 +194,8 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
     require(oracle.get("oracle_spans_used_for_training_or_selection") is False, violations, "oracle_spans_used_for_selection")
     require(oracle.get("p_value_baseline_allowed") is False, violations, "oracle_pvalue_allowed")
     require(oracle.get("dev_source_selectable_gold_values") == 810, violations, "oracle_dev_source_count_changed")
+    require(oracle.get("source_span_label_manifest") == "SOURCE_SPAN_LABEL_MANIFEST.jsonl", violations, "oracle_label_manifest_missing")
+    require(oracle.get("source_span_label_manifest_sha256") == sha256_file(output_dir / "SOURCE_SPAN_LABEL_MANIFEST.jsonl"), violations, "oracle_label_manifest_hash_mismatch")
     checks["oracle_diagnostic_checked"] = True
 
     generation = read_json(output_dir / "GENERATION_PROTOCOL_A1.json")
@@ -155,7 +207,9 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
     require(generation["model_config"]["phase_o_max_new_tokens"] == 512, violations, "phase_o_capacity_not_512")
     require(generation["model_config"]["phase_m_max_new_tokens"] == 8192, violations, "phase_m_capacity_not_8192")
     require(generation["model_config"]["model_revision"] == "c03e6d358207e414f1eca0bb1891e29f1db0e242", violations, "model_revision_changed")
-    require(generation.get("chat_template_sha256") == FROZEN_MODEL_CONFIG["chat_template_sha256"], violations, "chat_template_hash_changed")
+    require(generation.get("prompt_serialization_spec_sha256") == sha256_file(output_dir / "PROMPT_SERIALIZATION_SPEC.json"), violations, "prompt_serialization_spec_hash_mismatch")
+    require(generation.get("chat_template_rendering_spec_sha256") == sha256_file(output_dir / "CHAT_TEMPLATE_RENDERING_SPEC.json"), violations, "chat_template_rendering_spec_hash_mismatch")
+    require(generation.get("tokenizer_config_file_sha256_for_chat_template") == FROZEN_MODEL_CONFIG["tokenizer_config_file_sha256"], violations, "tokenizer_config_hash_changed")
     for key in ("model_called", "gpu_called", "experiment_run"):
         require(generation.get(key) is False, violations, f"generation_flag_not_false:{key}")
     checks["generation_protocol_checked"] = True
@@ -214,8 +268,11 @@ def report_text(report: dict[str, Any]) -> str:
         "stage7b_a1_lock_checked",
         "stage7c_reuse_checked",
         "phase_o_prompt_checked",
+        "prompt_serialization_checked",
+        "chat_template_rendering_checked",
         "offset_guide_checked",
         "phase_o_validation_checked",
+        "label_alignment_manifest_recomputed",
         "phase_m_protocol_checked",
         "oracle_diagnostic_checked",
         "generation_protocol_checked",

@@ -10,7 +10,7 @@
     "phase_o_system_prompt_sha256": "0fbf9ebb8441b4292502bfbd62fe40275b8f1c649805a653a37e3d698e186ba4",
     "phase_o_user_prompt_template_sha256": "0a361ce0688919979661b149dc3351b514de0dfd64324a501eec4f408a7c0429"
   },
-  "schema_sha256": "2e6bf006b106e287bc3eb0ee4a3bf52b340c93d8ae34546c58be5d17ae3ec21c",
+  "schema_sha256": "92add4e9fb96423b4fda68d89341872843cbafe6792e699e9c8ac2d0ca1ece3c",
   "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL",
   "system_prompt": "You select the SQLite write operation and atomic semantic value spans from the original request. Return one JSON object that satisfies the supplied schema. Use Python Unicode code-point offsets over the exact original question string.",
   "user_prompt_template": "Original question Q, unchanged:\n{question}\n\nPython code-point offset guide derived from Q:\n{offset_guide}\n\nSchema inventory:\n{schema_inventory}\n\nReturn JSON with operation and value_spans only. Do not generate SPAN, EV, SLOT ids or value text."

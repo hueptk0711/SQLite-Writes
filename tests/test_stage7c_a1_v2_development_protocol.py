@@ -15,17 +15,24 @@ from scripts.data.build_stage7c_a1_v2_development_protocol import (
     ARTIFACTS,
     FROZEN_MODEL_CONFIG,
     LOCK_FILE,
+    PROMPT_SERIALIZATION_CONTRACT,
     REUSED_STAGE7C_INPUTS,
     STAGE7B_A1_INPUTS,
     build_stage7c_a1,
     count_reused_data,
     input_hashes,
+    label_alignment_summary,
     leakage_audit,
+    literal_gold_occurrence_audit,
+    maximum_span_matching,
     offset_guide,
     prompt_hash_payload,
+    rendered_prompt_sha256,
+    serialize_prompt_object,
     sha256_file,
+    source_span_label_manifest,
 )
-from scripts.data.validate_stage7c_a1_v2_development_protocol import PASS_STATUS, validate
+from scripts.data.validate_stage7c_a1_v2_development_protocol import PASS_STATUS, validate, write_report_and_update_lock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,6 +46,10 @@ def _read_json(path: Path) -> dict:
 
 def _write_json(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _read_jsonl(path: Path) -> list[dict]:
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
 @pytest.fixture
@@ -114,6 +125,25 @@ def test_input_manifest_hashes_all_upstreams() -> None:
         assert rel in manifest["input_hashes"]
 
 
+def test_lf_and_crlf_text_files_have_same_canonical_sha(workspace_tmp: Path) -> None:
+    lf = workspace_tmp / "same.json"
+    crlf = workspace_tmp / "same_crlf.json"
+    lf.write_text('{"a":1,"b":"北京"}\n', encoding="utf-8", newline="\n")
+    crlf.write_text('{"a":1,"b":"北京"}\r\n', encoding="utf-8", newline="")
+    assert sha256_file(lf) == sha256_file(crlf)
+
+
+def test_clean_rebuild_produces_identical_canonical_lock(workspace_tmp: Path) -> None:
+    output = workspace_tmp / "stage7c_a1_v2_development_protocol"
+    build_stage7c_a1(output, force=True)
+    report = validate(output)
+    assert report["status"] == "PASS"
+    write_report_and_update_lock(output, report)
+    rebuilt_lock = _read_json(output / LOCK_FILE)
+    current_lock = _read_json(ARTIFACT_DIR / LOCK_FILE)
+    assert rebuilt_lock == current_lock
+
+
 def test_all_declared_artifacts_exist() -> None:
     for rel in ARTIFACTS:
         assert (ARTIFACT_DIR / rel).is_file(), rel
@@ -172,6 +202,31 @@ def test_phase_o_prompt_spec_freezes_hashes_and_offset_instructions() -> None:
     assert spec["schema_sha256"] == sha256_file(ROOT / "stage7b_a1_free_text_slot_discovery_amendment/PHASE_O_JSON_SCHEMA.json")
 
 
+def test_prompt_serialization_contract_is_canonical_utf8_lf() -> None:
+    spec = _read_json(ARTIFACT_DIR / "PROMPT_SERIALIZATION_SPEC.json")
+    assert spec["contract"] == PROMPT_SERIALIZATION_CONTRACT
+    assert spec["contract"]["ensure_ascii"] is False
+    assert spec["contract"]["sort_keys"] is True
+    assert spec["contract"]["separators"] == [",", ":"]
+    assert spec["contract"]["indent"] is None
+    assert spec["ensure_ascii_true_allowed"] is False
+    assert spec["indentation_allowed"] is False
+    assert serialize_prompt_object({"b": "北京", "a": 1}) == '{"a":1,"b":"北京"}'
+    assert rendered_prompt_sha256("Q\r\n北京") == rendered_prompt_sha256("Q\n北京")
+
+
+def test_chat_template_rendering_is_frozen_without_misnamed_hash() -> None:
+    spec = _read_json(ARTIFACT_DIR / "CHAT_TEMPLATE_RENDERING_SPEC.json")
+    assert spec["rendering_call"] == "tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)"
+    assert spec["add_generation_prompt"] is True
+    assert spec["tokenize"] is False
+    assert spec["contract"]["tokenizer_config_file_sha256"] == FROZEN_MODEL_CONFIG["tokenizer_config_file_sha256"]
+    assert spec["free_choice_in_stage7d_allowed"] is False
+    protocol = _read_json(ARTIFACT_DIR / "GENERATION_PROTOCOL_A1.json")
+    assert "chat_template_sha256" not in protocol
+    assert protocol["tokenizer_config_file_sha256_for_chat_template"] == FROZEN_MODEL_CONFIG["tokenizer_config_file_sha256"]
+
+
 def test_question_offset_guide_uses_python_codepoints() -> None:
     assert offset_guide("A北京B上海C") == "0\tA\n1\t北\n2\t京\n3\tB\n4\t上\n5\t海\n6\tC"
     spec = _read_json(ARTIFACT_DIR / "QUESTION_OFFSET_GUIDE_SPEC.json")
@@ -192,12 +247,73 @@ def test_phase_o_output_validation_reuses_stage7b_a1_schema_and_rejects_bad_outp
 
 def test_phase_o_evaluation_protocol_tracks_operation_and_spans() -> None:
     spec = _read_json(ARTIFACT_DIR / "PHASE_O_EVALUATION_PROTOCOL.json")
+    assert spec["label_alignment_manifest"] == "SOURCE_SPAN_LABEL_MANIFEST.jsonl"
+    assert spec["matching_policy"] == "maximum-cardinality bipartite one-to-one matching"
     assert "operation_accuracy" in spec["metrics"]
     assert "exact_span_precision" in spec["metrics"]
     assert "exact_span_recall_source_alignable" in spec["metrics"]
     assert "invalid_offset_rate" in spec["metrics"]
     assert spec["primary_end_to_end_denominator"] == "full train/dev Create denominator; non-alignable samples retained"
     assert spec["source_alignable_subset"] == "diagnostic only"
+
+
+def test_source_span_label_manifest_recomputes_alignment() -> None:
+    manifest = _read_jsonl(ARTIFACT_DIR / "SOURCE_SPAN_LABEL_MANIFEST.jsonl")
+    assert manifest == source_span_label_manifest(ROOT)
+    summary = label_alignment_summary(manifest)
+    assert summary["splits"]["train"]["gold_assignment_count"] == 5407
+    assert summary["splits"]["train"]["source_alignable_gold_assignment_count"] == 5295
+    assert summary["splits"]["dev"]["gold_assignment_count"] == 845
+    assert summary["splits"]["dev"]["source_alignable_gold_assignment_count"] == 810
+    assert summary["splits"]["dev"]["samples_with_non_source_alignable_gold"] == 33
+
+
+def test_literal_multi_occurrence_audit_is_frozen() -> None:
+    spec = _read_json(ARTIFACT_DIR / "PHASE_O_LABEL_ALIGNMENT_SPEC.json")
+    audit = literal_gold_occurrence_audit(ROOT)
+    assert spec["literal_gold_string_multi_occurrence_audit"] == audit
+    assert audit["splits"]["train"]["literal_gold_string_multi_occurrence_assignment_count"] == 144
+    assert audit["splits"]["train"]["samples_with_literal_gold_string_multi_occurrence"] == 138
+    assert audit["splits"]["dev"]["literal_gold_string_multi_occurrence_assignment_count"] == 36
+    assert audit["splits"]["dev"]["samples_with_literal_gold_string_multi_occurrence"] == 33
+
+
+def test_gold_value_with_two_source_occurrences_keeps_both_as_acceptable() -> None:
+    manifest = _read_jsonl(ARTIFACT_DIR / "SOURCE_SPAN_LABEL_MANIFEST.jsonl")
+    multi = next(record for record in manifest if record["multi_occurrence"] and record["source_alignable"])
+    assert len(multi["acceptable_source_spans"]) >= 2
+    offsets = {(span["start_char"], span["end_char"]) for span in multi["acceptable_source_spans"]}
+    assert len(offsets) == len(multi["acceptable_source_spans"])
+
+
+def test_maximum_matching_prevents_one_prediction_matching_two_gold_assignments() -> None:
+    labels = [
+        {"gold_assignment_id": "A1", "source_alignable": True, "acceptable_source_spans": [{"start_char": 0, "end_char": 2}]},
+        {"gold_assignment_id": "A2", "source_alignable": True, "acceptable_source_spans": [{"start_char": 0, "end_char": 2}]},
+    ]
+    result = maximum_span_matching([{"start_char": 0, "end_char": 2}], labels)
+    assert result["matched"] == 1
+    assert result["exact_span_precision"] == 1.0
+    assert result["exact_span_recall_source_alignable"] == 0.5
+
+
+def test_maximum_matching_prevents_two_predictions_consuming_one_gold_assignment() -> None:
+    labels = [{"gold_assignment_id": "A1", "source_alignable": True, "acceptable_source_spans": [{"start_char": 0, "end_char": 2}]}]
+    result = maximum_span_matching([{"start_char": 0, "end_char": 2}, {"start_char": 0, "end_char": 2}], labels)
+    assert result["matched"] == 1
+    assert result["exact_span_precision"] == 0.5
+    assert result["spurious_span_rate"] == 0.5
+
+
+def test_maximum_bipartite_matching_is_deterministic() -> None:
+    labels = [
+        {"gold_assignment_id": "A1", "source_alignable": True, "acceptable_source_spans": [{"start_char": 0, "end_char": 2}, {"start_char": 5, "end_char": 7}]},
+        {"gold_assignment_id": "A2", "source_alignable": True, "acceptable_source_spans": [{"start_char": 5, "end_char": 7}]},
+    ]
+    first = maximum_span_matching([{"start_char": 5, "end_char": 7}, {"start_char": 0, "end_char": 2}], labels)
+    second = maximum_span_matching([{"start_char": 0, "end_char": 2}, {"start_char": 5, "end_char": 7}], labels)
+    assert first["matched"] == 2
+    assert first["matches"] == second["matches"]
 
 
 def test_phase_m_input_uses_predicted_phase_o_not_oracle() -> None:
@@ -254,7 +370,9 @@ def test_generation_protocol_a1_keeps_model_constant_and_hashes_prompts() -> Non
     assert protocol["phase_m_model_calls"] == 1
     assert protocol["total_model_calls"] == 2
     assert protocol["hidden_third_llm_call_allowed"] is False
-    assert protocol["chat_template_sha256"] == FROZEN_MODEL_CONFIG["chat_template_sha256"]
+    assert protocol["prompt_serialization_spec_sha256"] == sha256_file(ARTIFACT_DIR / "PROMPT_SERIALIZATION_SPEC.json")
+    assert protocol["chat_template_rendering_spec_sha256"] == sha256_file(ARTIFACT_DIR / "CHAT_TEMPLATE_RENDERING_SPEC.json")
+    assert protocol["tokenizer_config_file_sha256_for_chat_template"] == FROZEN_MODEL_CONFIG["tokenizer_config_file_sha256"]
     assert protocol["phase_o_prompt_sha256"] == prompt_hash_payload()["phase_o_user_prompt_template_sha256"]
 
 
@@ -305,6 +423,45 @@ def test_validator_catches_phase_o_prompt_tamper(workspace_tmp: Path) -> None:
     report = validate(package / "stage7c_a1_v2_development_protocol", root=package)
     assert report["status"] == "FAIL"
     assert "phase_o_fewshot_policy_changed" in report["violations"]
+
+
+def test_validator_catches_prompt_serialization_tamper(workspace_tmp: Path) -> None:
+    package = _copy_package_root(workspace_tmp)
+    path = package / "stage7c_a1_v2_development_protocol" / "PROMPT_SERIALIZATION_SPEC.json"
+    spec = _read_json(path)
+    spec["contract"]["ensure_ascii"] = True
+    spec["contract"]["inventory_ordering"]["columns"] = "original order"
+    _write_json(path, spec)
+    _refresh_artifact_hash(package, "PROMPT_SERIALIZATION_SPEC.json")
+    report = validate(package / "stage7c_a1_v2_development_protocol", root=package)
+    assert report["status"] == "FAIL"
+    assert "prompt_serialization_contract_changed" in report["violations"]
+
+
+def test_validator_catches_chat_template_rendering_tamper(workspace_tmp: Path) -> None:
+    package = _copy_package_root(workspace_tmp)
+    path = package / "stage7c_a1_v2_development_protocol" / "CHAT_TEMPLATE_RENDERING_SPEC.json"
+    spec = _read_json(path)
+    spec["add_generation_prompt"] = False
+    spec["rendering_call"] = "tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)"
+    _write_json(path, spec)
+    _refresh_artifact_hash(package, "CHAT_TEMPLATE_RENDERING_SPEC.json")
+    report = validate(package / "stage7c_a1_v2_development_protocol", root=package)
+    assert report["status"] == "FAIL"
+    assert "chat_template_rendering_call_changed" in report["violations"]
+    assert "chat_template_add_generation_prompt_not_true" in report["violations"]
+
+
+def test_validator_catches_label_manifest_tamper(workspace_tmp: Path) -> None:
+    package = _copy_package_root(workspace_tmp)
+    path = package / "stage7c_a1_v2_development_protocol" / "SOURCE_SPAN_LABEL_MANIFEST.jsonl"
+    rows = _read_jsonl(path)
+    rows[0]["acceptable_source_spans"] = []
+    path.write_text("".join(json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n" for row in rows), encoding="utf-8")
+    _refresh_artifact_hash(package, "SOURCE_SPAN_LABEL_MANIFEST.jsonl")
+    report = validate(package / "stage7c_a1_v2_development_protocol", root=package)
+    assert report["status"] == "FAIL"
+    assert "source_span_label_manifest_mismatch" in report["violations"]
 
 
 def test_validator_catches_generation_model_tamper(workspace_tmp: Path) -> None:

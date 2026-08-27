@@ -1,0 +1,59 @@
+{
+  "acceptable_source_span_rule": {
+    "BLOB_OR_UNSUPPORTED": "no acceptable source spans under A1 exact-span materializer",
+    "INTEGER": "all strict numeric literal spans whose full literal parses losslessly to the gold integer",
+    "REAL_OR_NUMERIC": "all strict numeric literal spans whose full literal parses to the gold finite numeric value",
+    "TEXT": "all exact occurrences of the gold text in the exact original question"
+  },
+  "label_manifest": "SOURCE_SPAN_LABEL_MANIFEST.jsonl",
+  "label_side_only": true,
+  "literal_gold_string_multi_occurrence_audit": {
+    "splits": {
+      "dev": {
+        "literal_gold_string_multi_occurrence_assignment_count": 36,
+        "samples_with_literal_gold_string_multi_occurrence": 33
+      },
+      "train": {
+        "literal_gold_string_multi_occurrence_assignment_count": 144,
+        "samples_with_literal_gold_string_multi_occurrence": 138
+      }
+    }
+  },
+  "matching_policy": "maximum-cardinality bipartite matching from accepted predicted spans to gold assignments",
+  "metric_formulas": {
+    "exact_span_precision": "matched / accepted_predicted_spans",
+    "exact_span_recall_all_gold_values": "matched / all_gold_assignments",
+    "exact_span_recall_source_alignable": "matched / source_alignable_gold_assignments",
+    "spurious_span_rate": "unmatched_predicted / accepted_predicted_spans"
+  },
+  "model_side_visible": false,
+  "multi_occurrence_policy": "all acceptable source occurrences are retained as alternatives before model output exists",
+  "numeric_partial_substring_policy": "numeric matches must consume a full regex numeric literal; a single digit inside a longer numeric literal is not an acceptable span",
+  "one_to_one_constraints": {
+    "gold_assignment_max_predicted_spans": 1,
+    "predicted_span_max_gold_assignments": 1
+  },
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL",
+  "summary": {
+    "splits": {
+      "dev": {
+        "gold_assignment_count": 845,
+        "multi_occurrence_gold_assignment_count": 26,
+        "non_source_alignable_gold_assignment_count": 35,
+        "sample_count": 240,
+        "samples_with_multi_occurrence_gold_assignment": 23,
+        "samples_with_non_source_alignable_gold": 33,
+        "source_alignable_gold_assignment_count": 810
+      },
+      "train": {
+        "gold_assignment_count": 5407,
+        "multi_occurrence_gold_assignment_count": 106,
+        "non_source_alignable_gold_assignment_count": 112,
+        "sample_count": 1760,
+        "samples_with_multi_occurrence_gold_assignment": 102,
+        "samples_with_non_source_alignable_gold": 93,
+        "source_alignable_gold_assignment_count": 5295
+      }
+    }
+  }
+}

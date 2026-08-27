@@ -14,8 +14,11 @@ artifact_hashes_recomputed: true
 stage7b_a1_lock_checked: true
 stage7c_reuse_checked: true
 phase_o_prompt_checked: true
+prompt_serialization_checked: true
+chat_template_rendering_checked: true
 offset_guide_checked: true
 phase_o_validation_checked: true
+label_alignment_manifest_recomputed: true
 phase_m_protocol_checked: true
 oracle_diagnostic_checked: true
 generation_protocol_checked: true

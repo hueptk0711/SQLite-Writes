@@ -1,12 +1,12 @@
 {
-  "chat_template_sha256": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
+  "chat_template_rendering_spec_sha256": "2ebd0a30b9bcc16fc33e9ffc445a3b46da17692ca066fefd874e41feb7867725",
   "experiment_run": false,
   "gpu_called": false,
   "hidden_third_llm_call_allowed": false,
   "model_called": false,
   "model_config": {
-    "chat_template_sha256": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
-    "chat_template_source": "Stage6I Qwen tokenizer_config.json; standalone chat-template file was not frozen separately",
+    "actual_chat_template_string_sha256": null,
+    "actual_chat_template_string_sha256_status": "not_materialized_in_repository; Stage7D preflight must extract tokenizer.chat_template from the frozen tokenizer revision and record its hash before generation",
     "do_sample": false,
     "execution_timeout_seconds_per_sample": 30,
     "generation_timeout_seconds_per_phase": 120,
@@ -29,7 +29,7 @@
       "max_new_tokens"
     ],
     "temperature": 0.0,
-    "tokenizer_config_sha256": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
+    "tokenizer_config_file_sha256": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
     "tokenizer_json_sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
     "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
     "top_p": 1.0,
@@ -39,9 +39,11 @@
   },
   "phase_m_model_calls": 1,
   "phase_m_prompt_sha256": "8c53626a3bca9f1af98cb5c73fa28505ba93ea2f33dcf6d7e52cb4c7d417b958",
-  "phase_o_json_schema_sha256": "2e6bf006b106e287bc3eb0ee4a3bf52b340c93d8ae34546c58be5d17ae3ec21c",
+  "phase_o_json_schema_sha256": "92add4e9fb96423b4fda68d89341872843cbafe6792e699e9c8ac2d0ca1ece3c",
   "phase_o_model_calls": 1,
   "phase_o_prompt_sha256": "0a361ce0688919979661b149dc3351b514de0dfd64324a501eec4f408a7c0429",
+  "prompt_serialization_spec_sha256": "ef7983223c7e5ae168270cd5b14e3037b3909cedcf880d36c1994559d7e400e0",
   "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL",
+  "tokenizer_config_file_sha256_for_chat_template": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
   "total_model_calls": 2
 }

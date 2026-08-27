@@ -1,6 +1,8 @@
 {
+  "label_alignment_manifest": "SOURCE_SPAN_LABEL_MANIFEST.jsonl",
+  "matching_policy": "maximum-cardinality bipartite one-to-one matching",
   "metrics": {
-    "exact_span_precision": "accepted predicted spans matching label-side source-alignable gold spans over predicted spans",
+    "exact_span_precision": "maximum matched predicted spans / accepted predicted spans",
     "exact_span_recall_all_gold_values": "matched source spans over all label-side gold values",
     "exact_span_recall_source_alignable": "matched source spans over source-alignable gold values only",
     "invalid_offset_rate": "Phase O outputs rejected by offset/schema validation",
