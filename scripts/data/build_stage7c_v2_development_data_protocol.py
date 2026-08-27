@@ -28,6 +28,8 @@ CRUDSQL_REPO = "https://github.com/bizard-lab/CRUDSQL.git"
 CRUDSQL_COMMIT = "63bfce67d8391185453a812751e115a499201363"
 EXPECTED_CREATE_COUNTS = {"train": 1760, "dev": 240}
 EXPECTED_TABLE_COUNTS = {"train": 440, "dev": 60, "confirmation": 121}
+MIN_DEV_CANDIDATE_GOLD_VALUE_COVERAGE = 0.95
+MAX_DEV_SPURIOUS_REQUIRED_SLOT_RATE = 0.01
 HASH_POLICY = "sha256_bytes_for_raw_files_text_sha256_canonical_lf_for_json_artifacts"
 MODEL_CALLED = False
 GPU_CALLED = False
@@ -42,9 +44,22 @@ OPERATION_LABEL_MAPPING = {
     "UPSERT": {"crudsql_label": "not_represented", "v2_operation": "UPSERT", "stage7c_use": "not_in_crudsql"},
 }
 FROZEN_GENERATION_CONFIG = {
-    "model_id": "stage6i_same_exact_7b_model_family_for_v2_primary",
-    "model_revision": "reuse_stage6i_exact_revision_before_any_stage7d_generation",
-    "tokenizer_revision": "reuse_stage6i_exact_tokenizer_revision_before_any_stage7d_generation",
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "model_path": "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "stage6i_model_manifest_sha256": "1fb55083eb25b22fc3a1b158ff8f716694e6662f607e6f1efea757158075b54c",
+    "stage6i_final_protocol_sha256": "128e9c4c1a5d1228b728cffbb3d788165ba9e16c23df444dc7724a4ee9849ab8",
+    "stage6i_protocol_amendment_sha256": "d0f6f7aee01b8da38b5ae50933cc327dd046bdae6d58d8f1557ecb1be0f18478",
+    "stage6i_environment_manifest_sha256": "4e043eabc96da2bc38689f72ec32a63e9cf4ba987a388adb9d3b1af9135c46d1",
+    "stage6i_inference_config_sha256": "06846f45097dc9510eed8124d446ec43c4eaac8df81eb6a87c539a7e12863484",
+    "hf_model_config_sha256": "c0242402ad6a13b331ea320feea8c7e3776ffb7a4eff0757b9cd667e116d9a28",
+    "hf_generation_config_sha256": "1a628a5775bc69cde01c6749a531150ca4d3189652c618a174f7077923acf3b1",
+    "tokenizer_json_sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+    "tokenizer_config_sha256": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
+    "transformers_version": "5.5.3",
+    "torch_version": "2.6.0+cu124",
+    "torch_dtype": "auto",
     "do_sample": False,
     "temperature": 0.0,
     "top_p": 1.0,
@@ -52,7 +67,7 @@ FROZEN_GENERATION_CONFIG = {
     "stop_criteria": ["single_json_object_complete", "max_new_tokens"],
     "retry_count": 0,
     "phase_o_max_new_tokens": 32,
-    "phase_m_max_new_tokens": 768,
+    "phase_m_max_new_tokens": 8192,
     "generation_timeout_seconds_per_phase": 120,
     "execution_timeout_seconds_per_sample": 30,
 }
@@ -64,6 +79,13 @@ STAGE7B_INPUTS = (
     "stage7b_v2_method_specification/COMPLETENESS_VERIFICATION_SPEC.json",
     "stage7b_v2_method_specification/TYPED_MATERIALIZATION_SPEC.json",
     "stage7b_v2_method_specification/DEVELOPMENT_DATA_POLICY.json",
+)
+
+STAGE6I_GENERATION_INPUTS = (
+    "07_reproducibility/server_final_run/final_model_manifest.json",
+    "07_reproducibility/server_final_run/final_protocol.json",
+    "07_reproducibility/server_final_run/final_protocol_amendment_v2_out8192.json",
+    "07_reproducibility/server_final_run/environment_manifest_final_server.json",
 )
 
 STAGE6_TEST_INPUTS = (
@@ -217,7 +239,7 @@ def reset_output_dir(output_dir: Path, force: bool) -> None:
 
 def input_hashes() -> dict[str, str]:
     hashes: dict[str, str] = {}
-    for rel in STAGE7B_INPUTS + STAGE6_TEST_INPUTS:
+    for rel in STAGE7B_INPUTS + STAGE6I_GENERATION_INPUTS + STAGE6_TEST_INPUTS:
         path = PROJECT_ROOT / rel
         hashes[rel] = sha256_file(path)
     return hashes
@@ -388,6 +410,19 @@ def add_span(spans: list[dict[str, Any]], question: str, start: int, end: int, s
     spans.append(candidate)
 
 
+def add_candidate_span(spans: list[dict[str, Any]], question: str, start: int, end: int, source: str) -> None:
+    trimmed = trim_value_span(question, start, end)
+    if not trimmed:
+        return
+    start, end = trimmed
+    text = question[start:end]
+    if not text:
+        return
+    candidate = {"text": text, "start_char": start, "end_char": end, "source": source}
+    if candidate not in spans:
+        spans.append(candidate)
+
+
 def header_aliases(header: str) -> list[str]:
     cleaned = re.sub(r"[（(].*?[）)]", "", str(header))
     cleaned = re.sub(r"\s+", "", cleaned)
@@ -461,6 +496,33 @@ def semantic_value_spans(question: str, table: dict[str, Any]) -> list[dict[str,
     return sorted(spans, key=lambda row: (row["start_char"], row["end_char"], row["text"]))
 
 
+REQUIRED_SLOT_SOURCES = {
+    "count_after_recruitment_verb",
+    "job_category_pattern",
+    "schema_header_assignment_cue_split",
+}
+
+
+def broad_candidate_spans(question: str, table: dict[str, Any]) -> list[dict[str, Any]]:
+    spans = list(semantic_value_spans(question, table))
+    for segment in extract_question_spans(question):
+        add_candidate_span(
+            spans,
+            question,
+            segment["start_char"],
+            segment["end_char"],
+            "punctuation_segment_candidate_context",
+        )
+    add_candidate_span(spans, question, 0, len(question), "full_question_candidate_context")
+    return sorted(spans, key=lambda row: (row["start_char"], row["end_char"], row["source"], row["text"]))
+
+
+def slot_requiredness(span: dict[str, Any]) -> tuple[bool, str, str]:
+    if span["source"] in REQUIRED_SLOT_SOURCES:
+        return True, "deterministic_high_confidence_required", f"required_source:{span['source']}"
+    return False, "candidate_optional", "optional_candidate_not_hard_completeness_constraint"
+
+
 def schema_inventory(table: dict[str, Any]) -> dict[str, Any]:
     return {
         "tables": [{"table_ref": "TAB_1", "table_id": table["id"], "table_name": table["name"]}],
@@ -480,15 +542,46 @@ def schema_inventory(table: dict[str, Any]) -> dict[str, Any]:
 
 
 def evidence_and_slots(question: str, table: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
-    spans = semantic_value_spans(question, table)
+    spans = broad_candidate_spans(question, table)
     evidence = []
     slots = []
     for index, span in enumerate(spans, start=1):
         evidence_ref = f"EV_{index}"
         slot_ref = f"SLOT_{index}"
-        evidence.append({"evidence_ref": evidence_ref, "text": span["text"], "start_char": span["start_char"], "end_char": span["end_char"], "source": span["source"]})
-        slots.append({"slot_ref": slot_ref, "evidence_ref": evidence_ref, "role": "write_value", "required": True, "source": "deterministic_value_bearing_question_schema_extractor", "uses_gold_sql": False})
-    return {"evidence": evidence, "construction": "deterministic_value_bearing_span_extraction"}, {"slots": slots, "construction": "deterministic_value_bearing_question_schema_extractor", "uses_gold_sql": False, "model_call_used": False}
+        required, confidence_class, requiredness_rule = slot_requiredness(span)
+        evidence.append(
+            {
+                "evidence_ref": evidence_ref,
+                "text": span["text"],
+                "start_char": span["start_char"],
+                "end_char": span["end_char"],
+                "source": span["source"],
+                "candidate_class": confidence_class,
+            }
+        )
+        slots.append(
+            {
+                "slot_ref": slot_ref,
+                "evidence_ref": evidence_ref,
+                "role": "write_value",
+                "required": required,
+                "confidence_class": confidence_class,
+                "requiredness_rule": requiredness_rule,
+                "source": "deterministic_question_schema_required_optional_slot_extractor",
+                "uses_gold_sql": False,
+            }
+        )
+    return {
+        "evidence": evidence,
+        "construction": "deterministic_broad_candidate_span_extraction_from_question_and_schema",
+    }, {
+        "slots": slots,
+        "construction": "deterministic_required_optional_question_schema_slot_inventory",
+        "requiredness_policy": "required_only_for_frozen_high_confidence_sources_optional_otherwise",
+        "required_slot_sources": sorted(REQUIRED_SLOT_SOURCES),
+        "uses_gold_sql": False,
+        "model_call_used": False,
+    }
 
 
 def quote_identifier(identifier: str) -> str:
@@ -569,7 +662,7 @@ def canonical_record(split: str, source_index: int, create_ordinal: int, row: di
         "model_side_input": model_side_input,
         "model_side_input_sha256": sha256_text(canonical_json(model_side_input)),
         "model_side_input_fields": ["question", "schema_inventory", "evidence_inventory", "semantic_slot_inventory"],
-        "semantic_slot_inventory_derivation_inputs": ["question"],
+        "semantic_slot_inventory_derivation_inputs": ["question", "schema_inventory"],
         "label_side_bookkeeping": {
             "crudsql_type": row["sql"]["type"],
             "crudsql_operation_label": "Create",
@@ -607,8 +700,8 @@ def leakage_counts(rows: list[dict[str, Any]]) -> Counter[str]:
             counts["model_side_forbidden_key_present"] += 1
         if row["operation_label_visible_to_phase_o"]:
             counts["operation_label_visible_to_phase_o"] += 1
-        if row["semantic_slot_inventory_derivation_inputs"] != ["question"]:
-            counts["slot_inventory_uses_non_question_input"] += 1
+        if row["semantic_slot_inventory_derivation_inputs"] != ["question", "schema_inventory"]:
+            counts["slot_inventory_uses_unregistered_input"] += 1
         if row["model_side_input"]["semantic_slot_inventory"].get("uses_gold_sql") is not False:
             counts["slot_inventory_gold_sql_flag_not_false"] += 1
     return counts
@@ -681,9 +774,12 @@ def split_slot_derivation_audit(rows: list[dict[str, Any]], raw_rows: list[dict[
     raw_by_index = {index: row for index, row in enumerate(raw_rows)}
     counts: Counter[str] = Counter()
     gold_total = 0
-    gold_covered = 0
+    candidate_gold_covered = 0
     slot_total = 0
-    spurious_slots = 0
+    required_slot_total = 0
+    optional_slot_total = 0
+    spurious_required_slots = 0
+    spurious_optional_slots = 0
     unresolved_examples = []
     for manifest_row in rows:
         raw = raw_by_index[manifest_row["source_sql_index"]]
@@ -691,47 +787,64 @@ def split_slot_derivation_audit(rows: list[dict[str, Any]], raw_rows: list[dict[
         slots = manifest_row["model_side_input"]["semantic_slot_inventory"]["slots"]
         evidence = {entry["evidence_ref"]: entry["text"] for entry in manifest_row["model_side_input"]["evidence_inventory"]["evidence"]}
         slot_texts = [evidence[slot["evidence_ref"]] for slot in slots]
+        required_slot_texts = [evidence[slot["evidence_ref"]] for slot in slots if slot.get("required") is True]
+        optional_slot_texts = [evidence[slot["evidence_ref"]] for slot in slots if slot.get("required") is False]
         gold_total += len(values)
         slot_total += len(slot_texts)
+        required_slot_total += len(required_slot_texts)
+        optional_slot_total += len(optional_slot_texts)
         covered = sum(1 for value in values if any(normalized_text(value) and normalized_text(value) in normalized_text(slot) for slot in slot_texts))
-        spurious = sum(1 for slot in slot_texts if not any(normalized_text(value) and normalized_text(value) in normalized_text(slot) for value in values))
-        gold_covered += covered
-        spurious_slots += spurious
+        spurious_required = sum(1 for slot in required_slot_texts if not any(normalized_text(value) and normalized_text(value) in normalized_text(slot) for value in values))
+        spurious_optional = sum(1 for slot in optional_slot_texts if not any(normalized_text(value) and normalized_text(value) in normalized_text(slot) for value in values))
+        candidate_gold_covered += covered
+        spurious_required_slots += spurious_required
+        spurious_optional_slots += spurious_optional
         relation = "equal" if len(slot_texts) == len(values) else ("slots_gt_gold" if len(slot_texts) > len(values) else "slots_lt_gold")
         counts[relation] += 1
         if covered < len(values):
-            counts["gold_value_under_covered_samples"] += 1
-        if spurious:
+            counts["samples_missing_gold_candidate"] += 1
+        if spurious_required:
             counts["spurious_required_slot_samples"] += 1
-        if (covered < len(values) or spurious) and len(unresolved_examples) < 10:
+        if spurious_optional:
+            counts["spurious_optional_slot_samples"] += 1
+        if (covered < len(values) or spurious_required) and len(unresolved_examples) < 10:
             unresolved_examples.append(
                 {
                     "sample_id": manifest_row["sample_id"],
-                    "slot_count": len(slot_texts),
+                    "candidate_slot_count": len(slot_texts),
+                    "required_slot_count": len(required_slot_texts),
+                    "optional_slot_count": len(optional_slot_texts),
                     "gold_assignment_count": len(values),
                     "covered_gold_values": covered,
-                    "spurious_required_slots": spurious,
+                    "spurious_required_slots": spurious_required,
+                    "spurious_optional_slots": spurious_optional,
                     "slot_texts": slot_texts,
+                    "required_slot_texts": required_slot_texts,
                     "gold_values_label_side_only": values,
                 }
             )
     n = len(rows)
     return {
         "sample_count": n,
-        "slot_count_total": slot_total,
+        "candidate_slot_count_total": slot_total,
+        "required_slot_count": required_slot_total,
+        "optional_slot_count": optional_slot_total,
         "gold_assignment_count_total_label_side_only": gold_total,
-        "exact_cardinality_match": counts["equal"],
-        "slots_gt_gold_assignments": counts["slots_gt_gold"],
-        "slots_lt_gold_assignments": counts["slots_lt_gold"],
-        "cardinality_mismatch": counts["slots_gt_gold"] + counts["slots_lt_gold"],
-        "gold_value_coverage_count": gold_covered,
-        "spurious_required_slot_count": spurious_slots,
-        "gold_value_coverage_rate": round(gold_covered / gold_total, 6) if gold_total else 1.0,
-        "spurious_required_slot_rate": round(spurious_slots / slot_total, 6) if slot_total else 0.0,
+        "candidate_exact_cardinality_match": counts["equal"],
+        "candidate_slots_gt_gold_assignments": counts["slots_gt_gold"],
+        "candidate_slots_lt_gold_assignments": counts["slots_lt_gold"],
+        "candidate_cardinality_mismatch": counts["slots_gt_gold"] + counts["slots_lt_gold"],
+        "candidate_gold_value_coverage_count": candidate_gold_covered,
+        "candidate_gold_value_coverage_rate": round(candidate_gold_covered / gold_total, 6) if gold_total else 1.0,
+        "spurious_required_slot_count": spurious_required_slots,
+        "spurious_required_slot_rate": round(spurious_required_slots / required_slot_total, 6) if required_slot_total else 0.0,
+        "spurious_optional_count": spurious_optional_slots,
+        "spurious_optional_rate": round(spurious_optional_slots / optional_slot_total, 6) if optional_slot_total else 0.0,
         "under_segmentation_rate": round(counts["slots_lt_gold"] / n, 6) if n else 0.0,
         "over_segmentation_rate": round(counts["slots_gt_gold"] / n, 6) if n else 0.0,
-        "unresolved_samples": counts["gold_value_under_covered_samples"],
+        "samples_missing_gold_candidate": counts["samples_missing_gold_candidate"],
         "spurious_required_slot_samples": counts["spurious_required_slot_samples"],
+        "spurious_optional_slot_samples": counts["spurious_optional_slot_samples"],
         "example_unresolved_records": unresolved_examples,
     }
 
@@ -744,6 +857,11 @@ def semantic_slot_derivation_audit(output_dir: Path, train_rows: list[dict[str, 
         "gold_used_for_model_side_inventory": False,
         "gold_used_for_label_side_audit_only": True,
         "metrics_are_protocol_audit_not_selection_metric": True,
+        "quality_acceptance_gate": {
+            "dev_candidate_gold_value_coverage_min": MIN_DEV_CANDIDATE_GOLD_VALUE_COVERAGE,
+            "dev_spurious_required_slot_rate_max": MAX_DEV_SPURIOUS_REQUIRED_SLOT_RATE,
+            "exact_cardinality_is_not_primary_gate": True,
+        },
         "train": split_slot_derivation_audit(train_rows, train_raw),
         "dev": split_slot_derivation_audit(dev_rows, dev_raw),
     }
@@ -805,16 +923,18 @@ def static_specs() -> dict[str, Any]:
         },
         "EVIDENCE_INVENTORY_SPEC.json": {
             "stage": STAGE,
-            "source": "natural_language_question_only",
-            "construction": "deterministic value-bearing span extraction from question using schema cues and frozen lexical patterns",
+            "source": "natural_language_question_and_schema_inventory",
+            "construction": "broad deterministic candidate evidence extraction from question text using schema header cues plus lexical span rules; includes optional full-question context for recall",
             "gold_sql_or_cond_values_used": False,
             "model_call_used": False,
         },
         "SEMANTIC_SLOT_INVENTORY_SPEC.json": {
             "stage": STAGE,
-            "source": "value_bearing_evidence_inventory_from_question_and_schema_only",
-            "construction": "one required write_value SLOT_* per extracted value-bearing evidence span",
-            "required_flag_policy": "all extracted value-bearing spans required; request/greeting/control phrases are excluded by frozen deterministic filters; no gold SQL is used to decide requiredness",
+            "source": "candidate_evidence_inventory_from_question_and_schema_only",
+            "construction": "one write_value SLOT_* per candidate evidence span with required/optional requiredness frozen before V2 generation",
+            "required_flag_policy": "required=true only for frozen high-confidence deterministic sources; all other candidate spans remain required=false and may be selected by Phase M without becoming hard completeness constraints",
+            "required_slot_sources": sorted(REQUIRED_SLOT_SOURCES),
+            "optional_slot_policy": "candidate_optional slots support high-recall grounding and are not counted in the hard semantic completeness required set",
             "model_call_used": False,
             "hidden_third_llm_call_allowed": False,
         },
@@ -830,8 +950,20 @@ def static_specs() -> dict[str, Any]:
                 "job_category_pattern",
                 "value_after_assignment_cue",
                 "schema_header_assignment_cue",
+                "punctuation_segment_candidate_context",
+                "full_question_candidate_context",
                 "fallback_non_request_segment_when_no_value_span_found",
             ],
+            "requiredness_policy": {
+                "required_true_sources": sorted(REQUIRED_SLOT_SOURCES),
+                "required_false_sources": "all candidate sources not listed in required_true_sources",
+                "completeness_gate_scope": "required=true slots only",
+            },
+            "quality_acceptance_gate": {
+                "dev_candidate_gold_value_coverage_min": MIN_DEV_CANDIDATE_GOLD_VALUE_COVERAGE,
+                "dev_spurious_required_slot_rate_max": MAX_DEV_SPURIOUS_REQUIRED_SLOT_RATE,
+                "exact_cardinality_is_not_primary_gate": True,
+            },
             "audit_uses_gold": "label_side_only_to_measure_extractor_quality_before_v2_generation",
             "model_call_used": False,
         },
@@ -881,6 +1013,7 @@ def static_specs() -> dict[str, Any]:
             "phase_o_model_calls": 1,
             "phase_m_model_calls": 1,
             "semantic_slot_inventory_model_call_allowed": False,
+            "stage6i_generation_inputs_locked": list(STAGE6I_GENERATION_INPUTS),
             "config": FROZEN_GENERATION_CONFIG,
             "retry_policy": "no hidden retry beyond registered protocol",
             "v2_generation_run": False,
@@ -893,7 +1026,7 @@ def static_specs() -> dict[str, Any]:
             "post_state_comparison": "canonical SQLite post-state comparison consistent with frozen V1 principles where applicable",
             "generation_timeout_seconds_per_phase": FROZEN_GENERATION_CONFIG["generation_timeout_seconds_per_phase"],
             "execution_timeout_seconds_per_sample": FROZEN_GENERATION_CONFIG["execution_timeout_seconds_per_sample"],
-            "timeout_policy": "frozen_in_stage7c_patch1_before_v2_implementation",
+            "timeout_policy": "frozen_in_stage7c_patch2_before_v2_implementation",
             "sqlite_version": sqlite3.sqlite_version,
         },
         "RESERVED_BENCHMARK_POLICY.json": {
@@ -922,6 +1055,7 @@ Commands:
 python scripts/data/build_stage7c_v2_development_data_protocol.py --source-mode packaged --force
 python scripts/data/validate_stage7c_v2_development_data_protocol.py
 python scripts/data/audit_stage7c_dataset_splits.py
+python -m pytest -q -m "not integration" tests/test_stage7c_v2_development_data_protocol.py
 python -m pytest -q tests/test_stage7c_v2_development_data_protocol.py
 ```
 

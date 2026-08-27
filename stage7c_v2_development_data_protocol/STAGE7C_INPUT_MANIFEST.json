@@ -2,6 +2,10 @@
   "date": "20260827",
   "hash_policy": "sha256_bytes_for_raw_files_text_sha256_canonical_lf_for_json_artifacts",
   "input_hashes": {
+    "07_reproducibility/server_final_run/environment_manifest_final_server.json": "4e043eabc96da2bc38689f72ec32a63e9cf4ba987a388adb9d3b1af9135c46d1",
+    "07_reproducibility/server_final_run/final_model_manifest.json": "1fb55083eb25b22fc3a1b158ff8f716694e6662f607e6f1efea757158075b54c",
+    "07_reproducibility/server_final_run/final_protocol.json": "128e9c4c1a5d1228b728cffbb3d788165ba9e16c23df444dc7724a4ee9849ab8",
+    "07_reproducibility/server_final_run/final_protocol_amendment_v2_out8192.json": "d0f6f7aee01b8da38b5ae50933cc327dd046bdae6d58d8f1557ecb1be0f18478",
     "stage6_final_registration_revision/artifacts/FINAL_CONFIRMATION_SAMPLE_MANIFEST.jsonl": "6a9fc9812d768001e3a8e8b87d2387a7b943c83237a4bca7603c304acf88bcc7",
     "stage7b_v2_method_specification/COMPLETENESS_VERIFICATION_SPEC.json": "c1bb956ea1dce2fe57fc526f25fda944a604bbd95b0226e0d63a30586f484bff",
     "stage7b_v2_method_specification/DEVELOPMENT_DATA_POLICY.json": "a1c32dd508ceb529064f2b28ed3451f7b879cf94d2f5db682ac285ba38e06817",

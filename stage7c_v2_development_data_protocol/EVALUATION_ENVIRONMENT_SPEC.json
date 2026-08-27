@@ -7,5 +7,5 @@
   "sqlite_foreign_keys": "ON",
   "sqlite_version": "3.50.4",
   "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL",
-  "timeout_policy": "frozen_in_stage7c_patch1_before_v2_implementation"
+  "timeout_policy": "frozen_in_stage7c_patch2_before_v2_implementation"
 }

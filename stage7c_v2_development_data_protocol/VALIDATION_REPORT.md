@@ -7,6 +7,8 @@ violations: []
 train_create_count: 1760
 dev_create_count: 240
 
+slot_quality: {"dev_candidate_gold_value_coverage_min": 0.95, "dev_candidate_gold_value_coverage_rate": 0.959763, "dev_spurious_required_slot_rate": 0.0, "dev_spurious_required_slot_rate_max": 0.01}
+
 input_hashes_recomputed: true
 raw_crudsql_hashes_recomputed: true
 train_dev_create_manifests_recomputed: true

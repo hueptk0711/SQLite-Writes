@@ -1,7 +1,7 @@
 {
-  "construction": "deterministic value-bearing span extraction from question using schema cues and frozen lexical patterns",
+  "construction": "broad deterministic candidate evidence extraction from question text using schema header cues plus lexical span rules; includes optional full-question context for recall",
   "gold_sql_or_cond_values_used": false,
   "model_call_used": false,
-  "source": "natural_language_question_only",
+  "source": "natural_language_question_and_schema_inventory",
   "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
 }

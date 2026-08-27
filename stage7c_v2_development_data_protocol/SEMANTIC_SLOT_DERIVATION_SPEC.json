@@ -8,6 +8,8 @@
     "job_category_pattern",
     "value_after_assignment_cue",
     "schema_header_assignment_cue",
+    "punctuation_segment_candidate_context",
+    "full_question_candidate_context",
     "fallback_non_request_segment_when_no_value_span_found"
   ],
   "forbidden_derivation_inputs": [
@@ -23,5 +25,19 @@
     "question",
     "schema_inventory"
   ],
+  "quality_acceptance_gate": {
+    "dev_candidate_gold_value_coverage_min": 0.95,
+    "dev_spurious_required_slot_rate_max": 0.01,
+    "exact_cardinality_is_not_primary_gate": true
+  },
+  "requiredness_policy": {
+    "completeness_gate_scope": "required=true slots only",
+    "required_false_sources": "all candidate sources not listed in required_true_sources",
+    "required_true_sources": [
+      "count_after_recruitment_verb",
+      "job_category_pattern",
+      "schema_header_assignment_cue_split"
+    ]
+  },
   "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
 }

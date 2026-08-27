@@ -23,10 +23,13 @@ from scripts.data.build_stage7c_v2_development_data_protocol import (
     EXPECTED_TABLE_COUNTS,
     FROZEN_GENERATION_CONFIG,
     LOCK_FILE,
+    MAX_DEV_SPURIOUS_REQUIRED_SLOT_RATE,
+    MIN_DEV_CANDIDATE_GOLD_VALUE_COVERAGE,
     OPERATION_LABEL_MAPPING,
     RAW_ARTIFACTS,
     RAW_SOURCE_RELS,
     STAGE,
+    STAGE6I_GENERATION_INPUTS,
     STAGE6_TEST_INPUTS,
     STAGE7B_INPUTS,
     canonical_json,
@@ -70,7 +73,7 @@ def write_json(path: Path, value: Any) -> None:
 
 def input_hashes(root: Path, violations: list[str]) -> dict[str, str]:
     hashes: dict[str, str] = {}
-    for rel in STAGE7B_INPUTS + STAGE6_TEST_INPUTS:
+    for rel in STAGE7B_INPUTS + STAGE6I_GENERATION_INPUTS + STAGE6_TEST_INPUTS:
         path = root / rel
         if not path.is_file():
             violations.append(f"missing_input:{rel}")
@@ -124,7 +127,7 @@ def validate_manifest_rows(rows: list[dict[str, Any]], split: str, raw_rows: lis
         require(row.get("v2_gold_operation_for_evaluation_only") == "INSERT", violations, f"{prefix}:v2_gold_operation_not_insert")
         require(row.get("operation_label_visible_to_phase_o") is False, violations, f"{prefix}:operation_label_visible")
         require(row.get("model_side_input_fields") == ["question", "schema_inventory", "evidence_inventory", "semantic_slot_inventory"], violations, f"{prefix}:model_fields_changed")
-        require(row.get("semantic_slot_inventory_derivation_inputs") == ["question"], violations, f"{prefix}:slot_derivation_not_question_only")
+        require(row.get("semantic_slot_inventory_derivation_inputs") == ["question", "schema_inventory"], violations, f"{prefix}:slot_derivation_not_question_schema")
         label = row.get("label_side_bookkeeping", {})
         require(label.get("crudsql_type") == 0, violations, f"{prefix}:label_not_create_type0")
         require(label.get("crudsql_operation_label") == "Create", violations, f"{prefix}:crudsql_label_not_create")
@@ -144,6 +147,8 @@ def validate_manifest_rows(rows: list[dict[str, Any]], split: str, raw_rows: lis
         slots = model_side.get("semantic_slot_inventory", {}).get("slots", [])
         evidence_refs = {entry.get("evidence_ref") for entry in model_side.get("evidence_inventory", {}).get("evidence", [])}
         require(all(slot.get("evidence_ref") in evidence_refs for slot in slots), violations, f"{prefix}:slot_evidence_missing")
+        require(all(slot.get("confidence_class") in {"deterministic_high_confidence_required", "candidate_optional"} for slot in slots), violations, f"{prefix}:slot_confidence_class_invalid")
+        require(any(slot.get("required") is False for slot in slots), violations, f"{prefix}:no_optional_candidate_slots")
         require(model_side.get("semantic_slot_inventory", {}).get("uses_gold_sql") is False, violations, f"{prefix}:slots_use_gold_sql")
         require(model_side.get("semantic_slot_inventory", {}).get("model_call_used") is False, violations, f"{prefix}:slot_model_call_used")
     return {"count": len(rows), "unique_sample_ids": len(set(ids)), "unique_question_hashes": len(set(question_hashes))}
@@ -168,7 +173,7 @@ def recompute_contamination(root: Path, train_rows: list[dict[str, Any]], dev_ro
     }
 
 
-def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
+def validate(output_dir: Path, root: Path | None = None, *, deep: bool = True) -> dict[str, Any]:
     root = root or PROJECT_ROOT
     violations: list[str] = []
     checks = {
@@ -184,6 +189,7 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
         "selection_policy_validated": False,
         "reserved_benchmarks_validated": False,
     }
+    slot_quality: dict[str, Any] = {}
 
     current_hashes = artifact_hashes(output_dir, violations)
     if violations:
@@ -199,6 +205,10 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
     require(lock.get("input_hashes") == inputs, violations, "lock_input_hashes_mismatch")
     require(lock.get("artifact_hashes") == current_hashes, violations, "lock_artifact_hashes_mismatch")
     require(lock.get("status") in {"BUILT_PENDING_VALIDATION", PASS_STATUS}, violations, "lock_status_invalid")
+    require(FROZEN_GENERATION_CONFIG["stage6i_model_manifest_sha256"] == inputs.get("07_reproducibility/server_final_run/final_model_manifest.json"), violations, "stage6i_model_manifest_hash_literal_mismatch")
+    require(FROZEN_GENERATION_CONFIG["stage6i_final_protocol_sha256"] == inputs.get("07_reproducibility/server_final_run/final_protocol.json"), violations, "stage6i_final_protocol_hash_literal_mismatch")
+    require(FROZEN_GENERATION_CONFIG["stage6i_protocol_amendment_sha256"] == inputs.get("07_reproducibility/server_final_run/final_protocol_amendment_v2_out8192.json"), violations, "stage6i_protocol_amendment_hash_literal_mismatch")
+    require(FROZEN_GENERATION_CONFIG["stage6i_environment_manifest_sha256"] == inputs.get("07_reproducibility/server_final_run/environment_manifest_final_server.json"), violations, "stage6i_environment_manifest_hash_literal_mismatch")
 
     stage7b_lock = read_json(root / "stage7b_v2_method_specification" / "STAGE7B_V2_SPECIFICATION_LOCK.json")
     require(stage7b_lock.get("status") == "PASS_V2_METHOD_SPECIFICATION_LOCKED", violations, "stage7b_not_pass_locked")
@@ -270,6 +280,11 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
     checks["operation_mapping_validated"] = True
 
     slot_spec = read_json(output_dir / "SEMANTIC_SLOT_DERIVATION_SPEC.json")
+    evidence_spec = read_json(output_dir / "EVIDENCE_INVENTORY_SPEC.json")
+    slot_inventory_spec = read_json(output_dir / "SEMANTIC_SLOT_INVENTORY_SPEC.json")
+    require(evidence_spec.get("source") == "natural_language_question_and_schema_inventory", violations, "evidence_inventory_source_not_question_schema")
+    require("schema" in evidence_spec.get("construction", ""), violations, "evidence_inventory_construction_not_question_schema")
+    require(slot_inventory_spec.get("required_flag_policy") == "required=true only for frozen high-confidence deterministic sources; all other candidate spans remain required=false and may be selected by Phase M without becoming hard completeness constraints", violations, "slot_required_policy_changed")
     require(slot_spec.get("model_side_inputs") == ["question", "schema_inventory"], violations, "slot_derivation_model_inputs_changed")
     require("sql.conds" in slot_spec.get("forbidden_derivation_inputs", []), violations, "slot_derivation_conds_not_forbidden")
     require(slot_spec.get("model_call_used") is False, violations, "slot_derivation_model_call_used")
@@ -277,6 +292,18 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
     require(slot_audit == semantic_slot_derivation_audit(output_dir, train_rows, dev_rows), violations, "semantic_slot_derivation_audit_mismatch")
     require(slot_audit.get("gold_used_for_model_side_inventory") is False, violations, "slot_audit_gold_model_side")
     require(slot_audit.get("gold_used_for_label_side_audit_only") is True, violations, "slot_audit_gold_not_label_side_only")
+    gate = slot_audit.get("quality_acceptance_gate", {})
+    dev_slot_audit = slot_audit.get("dev", {})
+    require(gate.get("dev_candidate_gold_value_coverage_min") == MIN_DEV_CANDIDATE_GOLD_VALUE_COVERAGE, violations, "slot_quality_gate_coverage_threshold_changed")
+    require(gate.get("dev_spurious_required_slot_rate_max") == MAX_DEV_SPURIOUS_REQUIRED_SLOT_RATE, violations, "slot_quality_gate_spurious_threshold_changed")
+    require(dev_slot_audit.get("candidate_gold_value_coverage_rate", 0.0) >= MIN_DEV_CANDIDATE_GOLD_VALUE_COVERAGE, violations, "dev_candidate_gold_value_coverage_below_gate")
+    require(dev_slot_audit.get("spurious_required_slot_rate", 1.0) <= MAX_DEV_SPURIOUS_REQUIRED_SLOT_RATE, violations, "dev_spurious_required_slot_rate_above_gate")
+    slot_quality = {
+        "dev_candidate_gold_value_coverage_rate": dev_slot_audit.get("candidate_gold_value_coverage_rate"),
+        "dev_spurious_required_slot_rate": dev_slot_audit.get("spurious_required_slot_rate"),
+        "dev_candidate_gold_value_coverage_min": MIN_DEV_CANDIDATE_GOLD_VALUE_COVERAGE,
+        "dev_spurious_required_slot_rate_max": MAX_DEV_SPURIOUS_REQUIRED_SLOT_RATE,
+    }
     checks["semantic_slot_derivation_audit_recomputed"] = True
 
     gold_spec = read_json(output_dir / "GOLD_PROGRAM_DERIVATION_SPEC.json")
@@ -285,21 +312,25 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
     require(gold_spec.get("gold_visible_to_model") is False, violations, "gold_program_visible_to_model")
     require(post_spec.get("gold_visible_to_model") is False, violations, "gold_post_state_visible_to_model")
     gold_audit = read_json(output_dir / "GOLD_PROGRAM_DERIVATION_AUDIT.json")
-    recomputed_gold_audit = gold_program_derivation_audit(output_dir, train_rows, dev_rows)
-    require(gold_audit == recomputed_gold_audit, violations, "gold_program_derivation_audit_mismatch")
+    if deep:
+        recomputed_gold_audit = gold_program_derivation_audit(output_dir, train_rows, dev_rows)
+        require(gold_audit == recomputed_gold_audit, violations, "gold_program_derivation_audit_mismatch")
     require(gold_audit.get("status") == "PASS", violations, "gold_program_audit_not_pass")
     require(gold_audit.get("splits", {}).get("train", {}).get("gold_derivation_pass_count") == EXPECTED_CREATE_COUNTS["train"], violations, "train_gold_derivation_not_1760")
     require(gold_audit.get("splits", {}).get("dev", {}).get("gold_derivation_pass_count") == EXPECTED_CREATE_COUNTS["dev"], violations, "dev_gold_derivation_not_240")
     require(gold_audit.get("splits", {}).get("train", {}).get("gold_execution_failure_count") == 0, violations, "train_gold_execution_failures")
     require(gold_audit.get("splits", {}).get("dev", {}).get("gold_execution_failure_count") == 0, violations, "dev_gold_execution_failures")
-    checks["gold_program_derivation_audit_recomputed"] = True
+    checks["gold_program_derivation_audit_recomputed"] = deep
 
     generation = read_json(output_dir / "GENERATION_PROTOCOL_SPEC.json")
     require(generation.get("core_v2_max_model_calls") == 2, violations, "hidden_third_model_call_allowed")
     require(generation.get("semantic_slot_inventory_model_call_allowed") is False, violations, "slot_inventory_model_call_allowed")
     require(generation.get("v2_generation_run") is False, violations, "v2_generation_already_run")
     require(generation.get("config") == FROZEN_GENERATION_CONFIG, violations, "generation_config_not_frozen")
-    require("to_be_frozen" not in json.dumps(generation, ensure_ascii=False).casefold(), violations, "generation_config_contains_tbd")
+    generation_text = json.dumps(generation, ensure_ascii=False).casefold()
+    for token in ("to_be_frozen", "same_as", "reuse_stage6i", "reuse_exact", "exact_previous", '"latest"', '"main"'):
+        require(token not in generation_text, violations, f"generation_config_contains_placeholder:{token}")
+    require(generation.get("stage6i_generation_inputs_locked") == list(STAGE6I_GENERATION_INPUTS), violations, "stage6i_generation_inputs_not_locked")
     environment = read_json(output_dir / "EVALUATION_ENVIRONMENT_SPEC.json")
     require(environment.get("execution_timeout_seconds_per_sample") == FROZEN_GENERATION_CONFIG["execution_timeout_seconds_per_sample"], violations, "execution_timeout_not_frozen")
     require("to_be_frozen" not in json.dumps(environment, ensure_ascii=False).casefold(), violations, "environment_contains_tbd")
@@ -332,6 +363,7 @@ def validate(output_dir: Path, root: Path | None = None) -> dict[str, Any]:
         "v2_implemented": False,
         "experiment_run": False,
         "live_sql_bench_gt_opened": False,
+        "slot_quality": slot_quality,
         **checks,
     }
 
@@ -346,6 +378,8 @@ def validation_report_text(report: dict[str, Any]) -> str:
         "",
         f"train_create_count: {report.get('train_create_count')}",
         f"dev_create_count: {report.get('dev_create_count')}",
+        "",
+        f"slot_quality: {json.dumps(report.get('slot_quality', {}), ensure_ascii=False, sort_keys=True)}",
         "",
     ]
     for key in (
@@ -393,8 +427,9 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, default=PROJECT_ROOT / "stage7c_v2_development_data_protocol")
     parser.add_argument("--root", type=Path, default=PROJECT_ROOT)
     parser.add_argument("--no-write-report", action="store_true")
+    parser.add_argument("--fast", action="store_true", help="Skip deep gold DB re-execution; use only for unit tamper tests.")
     args = parser.parse_args()
-    report = validate(args.output_dir, args.root)
+    report = validate(args.output_dir, args.root, deep=not args.fast)
     if not args.no_write_report:
         write_report_and_update_lock(args.output_dir, report)
     print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))

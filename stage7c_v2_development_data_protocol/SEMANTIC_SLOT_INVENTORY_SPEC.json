@@ -1,8 +1,14 @@
 {
-  "construction": "one required write_value SLOT_* per extracted value-bearing evidence span",
+  "construction": "one write_value SLOT_* per candidate evidence span with required/optional requiredness frozen before V2 generation",
   "hidden_third_llm_call_allowed": false,
   "model_call_used": false,
-  "required_flag_policy": "all extracted value-bearing spans required; request/greeting/control phrases are excluded by frozen deterministic filters; no gold SQL is used to decide requiredness",
-  "source": "value_bearing_evidence_inventory_from_question_and_schema_only",
+  "optional_slot_policy": "candidate_optional slots support high-recall grounding and are not counted in the hard semantic completeness required set",
+  "required_flag_policy": "required=true only for frozen high-confidence deterministic sources; all other candidate spans remain required=false and may be selected by Phase M without becoming hard completeness constraints",
+  "required_slot_sources": [
+    "count_after_recruitment_verb",
+    "job_category_pattern",
+    "schema_header_assignment_cue_split"
+  ],
+  "source": "candidate_evidence_inventory_from_question_and_schema_only",
   "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL"
 }

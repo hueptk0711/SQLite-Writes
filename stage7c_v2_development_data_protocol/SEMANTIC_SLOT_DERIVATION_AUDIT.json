@@ -1,391 +1,599 @@
 {
   "dev": {
-    "cardinality_mismatch": 137,
-    "exact_cardinality_match": 103,
+    "candidate_cardinality_mismatch": 234,
+    "candidate_exact_cardinality_match": 6,
+    "candidate_gold_value_coverage_count": 811,
+    "candidate_gold_value_coverage_rate": 0.959763,
+    "candidate_slot_count_total": 1720,
+    "candidate_slots_gt_gold_assignments": 230,
+    "candidate_slots_lt_gold_assignments": 4,
     "example_unresolved_records": [
       {
-        "covered_gold_values": 2,
-        "gold_assignment_count": 3,
+        "candidate_slot_count": 7,
+        "covered_gold_values": 5,
+        "gold_assignment_count": 6,
         "gold_values_label_side_only": [
-          "中创物流",
-          "12.84",
-          "39.37"
+          "利华集团",
+          "昆明",
+          "和路雪雪糕",
+          "80克/袋",
+          "2018/7/1",
+          "昆明食品安全局"
         ],
-        "sample_id": "stage7c_crudsql_dev_create_0001",
-        "slot_count": 3,
+        "optional_slot_count": 7,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_dev_create_0020",
         "slot_texts": [
-          "可以再帮我加上一个公司",
-          "12.84亿元",
-          "39.37"
+          "和路雪雪糕是联合利华集团旗下的著名冰淇淋品牌",
+          "和路雪雪糕是联合利华集团旗下的著名冰淇淋品牌，其规格是80克/袋，2018年7月1日在昆明被昆明食品安全局抽查，将该记录添加至数据库",
+          "联合利华集团旗下的著名冰淇淋品牌",
+          "其规格是80克/袋",
+          "80克/袋",
+          "2018年7月1日在昆明被昆明食品安全局抽查",
+          "2018年7月1日在昆明被昆明食品安全局抽查"
         ],
-        "spurious_required_slots": 1
-      },
-      {
-        "covered_gold_values": 1,
-        "gold_assignment_count": 2,
-        "gold_values_label_side_only": [
-          "德邦股份",
-          "32.81"
-        ],
-        "sample_id": "stage7c_crudsql_dev_create_0004",
-        "slot_count": 2,
-        "slot_texts": [
-          "该公司1-11月",
-          "32.81亿件"
-        ],
-        "spurious_required_slots": 1
-      },
-      {
-        "covered_gold_values": 3,
-        "gold_assignment_count": 3,
-        "gold_values_label_side_only": [
-          "ST天顺",
-          "25.64",
-          "23.16"
-        ],
-        "sample_id": "stage7c_crudsql_dev_create_0005",
-        "slot_count": 4,
-        "slot_texts": [
-          "最新一家需要新增",
-          "ST天顺",
-          "25.64亿件",
-          "23.16"
-        ],
-        "spurious_required_slots": 1
-      },
-      {
-        "covered_gold_values": 2,
-        "gold_assignment_count": 3,
-        "gold_values_label_side_only": [
-          "京东物流",
-          "294.62",
-          "24.74"
-        ],
-        "sample_id": "stage7c_crudsql_dev_create_0006",
-        "slot_count": 2,
-        "slot_texts": [
-          "294.62亿元",
-          "24.74"
-        ],
+        "spurious_optional_slots": 0,
         "spurious_required_slots": 0
       },
       {
-        "covered_gold_values": 3,
-        "gold_assignment_count": 3,
-        "gold_values_label_side_only": [
-          "中通快递",
-          "2.74",
-          "-1.01%"
-        ],
-        "sample_id": "stage7c_crudsql_dev_create_0007",
-        "slot_count": 4,
-        "slot_texts": [
-          "最后一个我想加入到表中",
-          "中通快递",
-          "2.74",
-          "-1.01%"
-        ],
-        "spurious_required_slots": 1
-      },
-      {
-        "covered_gold_values": 2,
-        "gold_assignment_count": 3,
-        "gold_values_label_side_only": [
-          "达美航空",
-          "8.46",
-          "82.7"
-        ],
-        "sample_id": "stage7c_crudsql_dev_create_0009",
-        "slot_count": 2,
-        "slot_texts": [
-          "8.46",
-          "82.7"
-        ],
-        "spurious_required_slots": 0
-      },
-      {
-        "covered_gold_values": 2,
+        "candidate_slot_count": 4,
+        "covered_gold_values": 4,
         "gold_assignment_count": 5,
         "gold_values_label_side_only": [
-          "昆明市图书馆",
-          "专业技术岗",
-          "3",
-          "本科及以上",
-          "外国语文学类"
+          "和路雪",
+          "昆明",
+          "MAGNUM梦龙",
+          "85克/袋",
+          "2019/6/5"
         ],
-        "sample_id": "stage7c_crudsql_dev_create_0013",
-        "slot_count": 3,
+        "optional_slot_count": 4,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_dev_create_0021",
         "slot_texts": [
-          "专业技术岗",
-          "本科及以上",
-          "这项记录"
+          "2019年6月5日在昆明抽查的85克/袋",
+          "2019年6月5日在昆明抽查的85克/袋的MAGNUM梦龙是和路雪旗下的知名冰淇淋品牌",
+          "2019年6月5日在昆明抽查的85克/袋的MAGNUM梦龙是和路雪旗下的知名冰淇淋品牌，这条记录插入数据库中",
+          "和路雪旗下的知名冰淇淋品牌"
         ],
-        "spurious_required_slots": 1
-      },
-      {
-        "covered_gold_values": 2,
-        "gold_assignment_count": 6,
-        "gold_values_label_side_only": [
-          "云南省昆明市官渡区东华小区知春街115号(大树营地铁站D口步行480米)",
-          "5",
-          "编外",
-          "本科及以上",
-          "汉语言文学类",
-          "昆明市图书馆"
-        ],
-        "sample_id": "stage7c_crudsql_dev_create_0014",
-        "slot_count": 2,
-        "slot_texts": [
-          "5",
-          "本科及以上"
-        ],
+        "spurious_optional_slots": 0,
         "spurious_required_slots": 0
       },
       {
+        "candidate_slot_count": 5,
         "covered_gold_values": 3,
-        "gold_assignment_count": 6,
+        "gold_assignment_count": 4,
         "gold_values_label_side_only": [
-          "昆明市五华区翠湖南路141号",
-          "云南省图书馆",
-          "本科及以上",
-          "播音主持",
-          "2",
-          "年龄30周岁以下，具有相应学位"
+          "通用磨坊(中国)投资有限公司",
+          "昆明",
+          "巧乐兹",
+          "2020/7/15"
         ],
-        "sample_id": "stage7c_crudsql_dev_create_0015",
-        "slot_count": 4,
+        "optional_slot_count": 5,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_dev_create_0022",
         "slot_texts": [
-          "在昆明市五华区翠湖南路141号的云南省图书馆需要",
-          "本科及以上",
-          "另外要求年龄30周岁以下",
-          "相应学位"
+          "昆明食品安全局在2020年7月15日抽查到巧乐兹",
+          "昆明食品安全局在2020年7月15日抽查到巧乐兹",
+          "昆明食品安全局在2020年7月15日抽查到巧乐兹，该雪糕是通用磨坊(中国)投资有限公司旗下的冰淇淋品牌，把这项记录插入表中",
+          "通用磨坊(中国)投资有限公司旗下的冰淇淋品牌",
+          "把这项记录插入表中"
         ],
-        "spurious_required_slots": 2
+        "spurious_optional_slots": 1,
+        "spurious_required_slots": 0
       },
       {
-        "covered_gold_values": 0,
-        "gold_assignment_count": 3,
+        "candidate_slot_count": 6,
+        "covered_gold_values": 4,
+        "gold_assignment_count": 5,
         "gold_values_label_side_only": [
-          "钢铁是怎样炼成的",
-          "袁崇章",
-          "湖南文艺出版社"
+          "沈阳中街冰点城食品有限公司",
+          "曲靖",
+          "中街1946",
+          "2021/6/15",
+          "曲靖市食品安全局"
         ],
-        "sample_id": "stage7c_crudsql_dev_create_0016",
-        "slot_count": 1,
+        "optional_slot_count": 6,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_dev_create_0023",
         "slot_texts": [
-          "钢铁是怎样炼成"
+          "接着帮我插入数据",
+          "接着帮我插入数据，中街1946是沈阳中街冰点城食品有限公司旗下的冰淇淋品牌，在2021年6月15日被曲靖市食品安全局抽查",
+          "中街1946是沈阳中街冰点城食品有限公司旗下的冰淇淋品牌",
+          "沈阳中街冰点城食品有限公司旗下的冰淇淋品牌",
+          "在2021年6月15日被曲靖市食品安全局抽查",
+          "在2021年6月15日被曲靖市食品安全局抽查"
         ],
-        "spurious_required_slots": 1
+        "spurious_optional_slots": 1,
+        "spurious_required_slots": 0
+      },
+      {
+        "candidate_slot_count": 7,
+        "covered_gold_values": 4,
+        "gold_assignment_count": 5,
+        "gold_values_label_side_only": [
+          "昆明理工大学运动会",
+          "11月",
+          "昆明市",
+          "500人",
+          "昆明理工大学"
+        ],
+        "optional_slot_count": 7,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_dev_create_0024",
+        "slot_texts": [
+          "你好，把11月在昆明举行的昆明理工大学运动会加入数据库中，其中参加的运动员有500人，主办单位就是昆明理工大学",
+          "把11月在昆明举行的昆明理工大学运动会加入数据库中",
+          "11月在昆明举行的昆明理工大学运动会",
+          "其中参加的运动员有500人",
+          "500人",
+          "主办单位就是昆明理工大学",
+          "昆明理工大学"
+        ],
+        "spurious_optional_slots": 0,
+        "spurious_required_slots": 0
+      },
+      {
+        "candidate_slot_count": 12,
+        "covered_gold_values": 6,
+        "gold_assignment_count": 7,
+        "gold_values_label_side_only": [
+          "昆明市大学生篮球竞赛",
+          "12月",
+          "待定",
+          "昆明市大学生",
+          "2000人",
+          "昆明理工大学",
+          "拓东体育馆"
+        ],
+        "optional_slot_count": 12,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_dev_create_0026",
+        "slot_texts": [
+          "还是插入数据",
+          "还是插入数据，12月将要举办昆明市大学生篮球竞赛，地点待定，参赛人员必须是昆明市大学生，总计将会有2000余人参加，由昆明理工大学主办，拓东体育馆承办",
+          "插入数据",
+          "12月将要举办昆明市大学生篮球竞赛",
+          "12月将要举办昆明市大学生篮球竞赛",
+          "地点待定",
+          "参赛人员必须是昆明市大学生",
+          "昆明市大学生",
+          "总计将会有2000余人参加",
+          "2000余人参加",
+          "由昆明理工大学主办",
+          "拓东体育馆承办"
+        ],
+        "spurious_optional_slots": 4,
+        "spurious_required_slots": 0
+      },
+      {
+        "candidate_slot_count": 8,
+        "covered_gold_values": 5,
+        "gold_assignment_count": 6,
+        "gold_values_label_side_only": [
+          "云南省大学生龙舟竞赛",
+          "6月",
+          "昆明市",
+          "236人",
+          "云南省教育厅",
+          "昆明市体育局"
+        ],
+        "optional_slot_count": 8,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_dev_create_0027",
+        "slot_texts": [
+          "最后再插入一条数据",
+          "最后再插入一条数据，6月在昆明捞鱼河举行云南省大学生龙舟竞赛，届时有236名运动员参加比赛，本次比赛由云南省教育厅主办，昆明市体育局承办",
+          "6月在昆明捞鱼河举行云南省大学生龙舟竞赛",
+          "6月在昆明捞鱼河举行云南省大学生龙舟竞赛",
+          "届时有236名运动员参加比赛",
+          "236名运动员参加比赛",
+          "本次比赛由云南省教育厅主办",
+          "昆明市体育局承办"
+        ],
+        "spurious_optional_slots": 3,
+        "spurious_required_slots": 0
+      },
+      {
+        "candidate_slot_count": 12,
+        "covered_gold_values": 4,
+        "gold_assignment_count": 5,
+        "gold_values_label_side_only": [
+          "长春市",
+          "2023年10月1日—2023年12月25日",
+          "长春百货商店(虹山南路店)",
+          "只要购买满200元则赠送10元购物券一张",
+          "数量有限，送完即止"
+        ],
+        "optional_slot_count": 12,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_dev_create_0037",
+        "slot_texts": [
+          "下面这条记录是要插入的内容",
+          "下面这条记录是要插入的内容，长春百货商店(虹山南路店)活动即开始，在2023年10月1日—2023年12月25日期间，活动内容是只要购买满200元则赠送10元购物券一张，再补充上活动细则：数量有限，送完即止",
+          "要插入的内容",
+          "长春百货商店(虹山南路店)活动即开始",
+          "在2023年10月1日—2023年12月25日期间",
+          "在2023年10月1日—2023年12月25日期间",
+          "活动内容是只要购买满200元则赠送10元购物券一张",
+          "只要购买满200元则赠送10元购物券一张",
+          "再补充上活动细则",
+          "数量有限",
+          "限",
+          "送完即止"
+        ],
+        "spurious_optional_slots": 6,
+        "spurious_required_slots": 0
+      },
+      {
+        "candidate_slot_count": 8,
+        "covered_gold_values": 3,
+        "gold_assignment_count": 4,
+        "gold_values_label_side_only": [
+          "昆明中心假日酒店",
+          "云南省昆明市盘龙区东风东路29号",
+          "5",
+          "120"
+        ],
+        "optional_slot_count": 8,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_dev_create_0044",
+        "slot_texts": [
+          "昆明中心假日酒店位于云南省昆明市盘龙区东风东路29号",
+          "昆明中心假日酒店位于云南省昆明市盘龙区东风东路29号",
+          "昆明中心假日酒店位于云南省昆明市盘龙区东风东路29号，是一家五星级酒店，总共有120个房间，将该信息",
+          "一家五星级酒店",
+          "一家五星级酒店",
+          "总共有120个房间",
+          "120个房间",
+          "将该信息"
+        ],
+        "spurious_optional_slots": 3,
+        "spurious_required_slots": 0
+      },
+      {
+        "candidate_slot_count": 7,
+        "covered_gold_values": 3,
+        "gold_assignment_count": 4,
+        "gold_values_label_side_only": [
+          "晟世仟和酒店",
+          "云南省昆明市盘龙区沣源路与小康大道交叉口",
+          "5",
+          "120"
+        ],
+        "optional_slot_count": 7,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_dev_create_0047",
+        "slot_texts": [
+          "最后要插入",
+          "最后要插入的是晟世仟和酒店",
+          "最后要插入的是晟世仟和酒店，它位于云南省昆明市盘龙区沣源路与小康大道交叉口，是一家有120间房间的五星级大酒店",
+          "晟世仟和酒店",
+          "它位于云南省昆明市盘龙区沣源路与小康大道交叉口",
+          "一家有120间房间的五星级大酒店",
+          "一家有120间房间的五星级大酒店"
+        ],
+        "spurious_optional_slots": 1,
+        "spurious_required_slots": 0
       }
     ],
     "gold_assignment_count_total_label_side_only": 845,
-    "gold_value_coverage_count": 639,
-    "gold_value_coverage_rate": 0.756213,
-    "over_segmentation_rate": 0.158333,
+    "optional_slot_count": 1716,
+    "over_segmentation_rate": 0.958333,
+    "required_slot_count": 4,
     "sample_count": 240,
-    "slot_count_total": 728,
-    "slots_gt_gold_assignments": 38,
-    "slots_lt_gold_assignments": 99,
-    "spurious_required_slot_count": 161,
-    "spurious_required_slot_rate": 0.221154,
-    "spurious_required_slot_samples": 103,
-    "under_segmentation_rate": 0.4125,
-    "unresolved_samples": 118
+    "samples_missing_gold_candidate": 32,
+    "spurious_optional_count": 346,
+    "spurious_optional_rate": 0.201632,
+    "spurious_optional_slot_samples": 153,
+    "spurious_required_slot_count": 0,
+    "spurious_required_slot_rate": 0.0,
+    "spurious_required_slot_samples": 0,
+    "under_segmentation_rate": 0.016667
   },
   "gold_used_for_label_side_audit_only": true,
   "gold_used_for_model_side_inventory": false,
   "metrics_are_protocol_audit_not_selection_metric": true,
+  "quality_acceptance_gate": {
+    "dev_candidate_gold_value_coverage_min": 0.95,
+    "dev_spurious_required_slot_rate_max": 0.01,
+    "exact_cardinality_is_not_primary_gate": true
+  },
   "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL",
   "train": {
-    "cardinality_mismatch": 1156,
-    "exact_cardinality_match": 604,
+    "candidate_cardinality_mismatch": 1713,
+    "candidate_exact_cardinality_match": 47,
+    "candidate_gold_value_coverage_count": 5302,
+    "candidate_gold_value_coverage_rate": 0.980581,
+    "candidate_slot_count_total": 12571,
+    "candidate_slots_gt_gold_assignments": 1686,
+    "candidate_slots_lt_gold_assignments": 27,
     "example_unresolved_records": [
       {
-        "covered_gold_values": 4,
+        "candidate_slot_count": 10,
+        "covered_gold_values": 3,
         "gold_assignment_count": 4,
         "gold_values_label_side_only": [
-          "021291.BK",
-          "华为概念",
-          "76",
-          "1024"
+          "600126.sh",
+          "杭钢股份",
+          "22.12",
+          "1.01"
         ],
-        "sample_id": "stage7c_crudsql_train_create_0024",
-        "slot_count": 5,
+        "optional_slot_count": 10,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_train_create_0095",
         "slot_texts": [
-          "hello",
-          "021291.BK",
-          "华为概念",
-          "76元",
-          "1024"
+          "我会给你一段数据",
+          "我会给你一段数据，你帮我把它加入到数据库中，好吗，其中证券是杭钢股份，其代码为00126.sh，接着是ROE和EPS指标分别为22.12和1.01",
+          "你帮我把它加入到数据库中",
+          "好",
+          "杭钢股份",
+          "其代码为00126.sh",
+          "00126.sh",
+          "接着是ROE和EPS指标分别为22.12和1.01",
+          "ROE和EPS指标分别为22.12",
+          "1.01"
         ],
-        "spurious_required_slots": 1
-      },
-      {
-        "covered_gold_values": 4,
-        "gold_assignment_count": 5,
-        "gold_values_label_side_only": [
-          "600000.SH",
-          "浦发银行",
-          "18",
-          "123",
-          "16.66"
-        ],
-        "sample_id": "stage7c_crudsql_train_create_0026",
-        "slot_count": 4,
-        "slot_texts": [
-          "600000.SH",
-          "18元",
-          "123",
-          "16.66"
-        ],
+        "spurious_optional_slots": 5,
         "spurious_required_slots": 0
       },
       {
-        "covered_gold_values": 3,
-        "gold_assignment_count": 3,
-        "gold_values_label_side_only": [
-          "湖北省",
-          "2018.10.01-2019.03.01",
-          "3个月"
-        ],
-        "sample_id": "stage7c_crudsql_train_create_0028",
-        "slot_count": 4,
-        "slot_texts": [
-          "湖北省",
-          "2018.10.01-2019.03.01",
-          "今年",
-          "3个月"
-        ],
-        "spurious_required_slots": 1
-      },
-      {
+        "candidate_slot_count": 4,
         "covered_gold_values": 1,
         "gold_assignment_count": 2,
         "gold_values_label_side_only": [
-          "云南省",
-          "至少5个月，计划增加1个月"
+          "互联网",
+          "5238"
         ],
-        "sample_id": "stage7c_crudsql_train_create_0029",
-        "slot_count": 4,
+        "optional_slot_count": 4,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_train_create_0104",
         "slot_texts": [
-          "些复杂啊",
-          "云南省",
-          "至少5个月",
-          "计划增加1个月"
+          "我想新增一条关于互联网行业收入的内容",
+          "我想新增一条关于互联网行业收入的内容，2018Q1-Q3为2238亿元",
+          "2018Q1-Q3为2238亿元",
+          "2238亿元"
         ],
-        "spurious_required_slots": 3
-      },
-      {
-        "covered_gold_values": 2,
-        "gold_assignment_count": 2,
-        "gold_values_label_side_only": [
-          "湖南省",
-          "4个月"
-        ],
-        "sample_id": "stage7c_crudsql_train_create_0031",
-        "slot_count": 3,
-        "slot_texts": [
-          "这段数据",
-          "湖南省今年",
-          "4个月"
-        ],
-        "spurious_required_slots": 1
-      },
-      {
-        "covered_gold_values": 2,
-        "gold_assignment_count": 3,
-        "gold_values_label_side_only": [
-          "江西元源",
-          "2019.6.13",
-          "3万吨无碱玻纤建成投产"
-        ],
-        "sample_id": "stage7c_crudsql_train_create_0033",
-        "slot_count": 1,
-        "slot_texts": [
-          "3万吨无碱玻纤建成投产于2019.6.13点火"
-        ],
+        "spurious_optional_slots": 2,
         "spurious_required_slots": 0
       },
       {
+        "candidate_slot_count": 9,
         "covered_gold_values": 3,
-        "gold_assignment_count": 3,
+        "gold_assignment_count": 4,
         "gold_values_label_side_only": [
-          "河南",
-          "郑州三线",
-          "660"
+          "688425.SH",
+          "铁建重工",
+          "4.75",
+          "253"
         ],
-        "sample_id": "stage7c_crudsql_train_create_0037",
-        "slot_count": 4,
+        "optional_slot_count": 9,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_train_create_0115",
         "slot_texts": [
-          "新的内容啦",
-          "河南",
-          "郑州三线",
-          "660吨"
+          "向表中添加以下数据：其中公司为铁建重工，它的股票代码是88425.SH，经过我们调查，其股价为4.75元，市值达253亿元",
+          "铁建重工",
+          "它的股票代码是88425.SH",
+          "88425.SH",
+          "经过我们调查",
+          "其股价为4.75元",
+          "4.75元",
+          "市值达253亿元",
+          "市值达253亿元"
         ],
-        "spurious_required_slots": 1
+        "spurious_optional_slots": 3,
+        "spurious_required_slots": 0
       },
       {
+        "candidate_slot_count": 13,
+        "covered_gold_values": 4,
+        "gold_assignment_count": 5,
+        "gold_values_label_side_only": [
+          "2012/9/22",
+          "22.8",
+          "46.2",
+          "33.5",
+          "23.5"
+        ],
+        "optional_slot_count": 13,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_train_create_0219",
+        "slot_texts": [
+          "我想添加2012/10/1的各个城市的房地产周均环比数据",
+          "我想添加2012/10/1的各个城市的房地产周均环比数据，但是这次我们只有北上广深这四个城市的数据，依次是22.8，46.2，33.5，23.5",
+          "2012/10/1",
+          "但是这次我们只有北上广深这四个城市",
+          "这次我们只有北上广深这四个城市",
+          "依次是22.8",
+          "22.8",
+          "46.2",
+          "46.2",
+          "33.5",
+          "33.5",
+          "23.5",
+          "23.5"
+        ],
+        "spurious_optional_slots": 4,
+        "spurious_required_slots": 0
+      },
+      {
+        "candidate_slot_count": 7,
+        "covered_gold_values": 2,
+        "gold_assignment_count": 3,
+        "gold_values_label_side_only": [
+          "南京",
+          "14.58",
+          "17.22"
+        ],
+        "optional_slot_count": 7,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_train_create_0226",
+        "slot_texts": [
+          "把上周和本周成交面积为14.58",
+          "把上周和本周成交面积为14.58，17，22的南京插入到表中吧，谢谢啦",
+          "14.58",
+          "17",
+          "17",
+          "22的南京插入到表中吧",
+          "谢谢啦"
+        ],
+        "spurious_optional_slots": 3,
+        "spurious_required_slots": 0
+      },
+      {
+        "candidate_slot_count": 7,
+        "covered_gold_values": 1,
+        "gold_assignment_count": 3,
+        "gold_values_label_side_only": [
+          "长春",
+          "63",
+          "58"
+        ],
+        "optional_slot_count": 7,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_train_create_0292",
+        "slot_texts": [
+          "按照我给出的内容进行插入操作",
+          "按照我给出的内容进行插入操作，城市为长春，11年H1和H2分别是842和888",
+          "城市为长春",
+          "长春",
+          "11年H1和H2分别是842和888",
+          "842",
+          "888"
+        ],
+        "spurious_optional_slots": 4,
+        "spurious_required_slots": 0
+      },
+      {
+        "candidate_slot_count": 5,
+        "covered_gold_values": 1,
+        "gold_assignment_count": 2,
+        "gold_values_label_side_only": [
+          "02423.HK",
+          "贝壳-W"
+        ],
+        "optional_slot_count": 5,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_train_create_0344",
+        "slot_texts": [
+          "看看可不可以加入贝壳控股有限公司",
+          "看看可不可以加入贝壳控股有限公司，它的代码是02423.HK",
+          "限公司",
+          "它的代码是02423.HK",
+          "02423.HK"
+        ],
+        "spurious_optional_slots": 2,
+        "spurious_required_slots": 0
+      },
+      {
+        "candidate_slot_count": 8,
+        "covered_gold_values": 2,
+        "gold_assignment_count": 3,
+        "gold_values_label_side_only": [
+          "2012.6",
+          "12",
+          "24"
+        ],
+        "optional_slot_count": 8,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_train_create_0377",
+        "slot_texts": [
+          "在2012年6月",
+          "在2012年6月",
+          "在2012年6月，西部建设的年利率是12%，期限为24个月，这条内容帮我插入到表中",
+          "西部建设",
+          "西部建设的年利率是12%",
+          "12%",
+          "期限为24个月",
+          "24个月"
+        ],
+        "spurious_optional_slots": 1,
+        "spurious_required_slots": 0
+      },
+      {
+        "candidate_slot_count": 7,
         "covered_gold_values": 0,
         "gold_assignment_count": 2,
         "gold_values_label_side_only": [
-          "广东",
-          "广州五线"
+          "500",
+          "150"
         ],
-        "sample_id": "stage7c_crudsql_train_create_0039",
-        "slot_count": 1,
+        "optional_slot_count": 7,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_train_create_0387",
         "slot_texts": [
-          "我不会写SQL啊"
+          "虽然有不少数据没有搜集到",
+          "虽然有不少数据没有搜集到，但还是先将假定总房价为210万元时，首付按30%需要支付63万元插入到表中，其它降息和还款信息我再去搜集一下",
+          "不少数据没有搜集到",
+          "但还是先将假定总房价为210万元时",
+          "210万元时",
+          "首付按30%需要支付63万元插入到表中",
+          "其它降息和还款信息我再去搜集一下"
         ],
-        "spurious_required_slots": 1
+        "spurious_optional_slots": 7,
+        "spurious_required_slots": 0
       },
       {
-        "covered_gold_values": 2,
-        "gold_assignment_count": 2,
-        "gold_values_label_side_only": [
-          "云南",
-          "红河一线"
-        ],
-        "sample_id": "stage7c_crudsql_train_create_0040",
-        "slot_count": 4,
-        "slot_texts": [
-          "新",
-          "云南",
-          "产线",
-          "红河一线"
-        ],
-        "spurious_required_slots": 2
-      },
-      {
+        "candidate_slot_count": 8,
         "covered_gold_values": 3,
-        "gold_assignment_count": 3,
+        "gold_assignment_count": 7,
         "gold_values_label_side_only": [
-          "江苏",
-          "苏州一线",
-          "480"
+          "2013-02-03",
+          "3.05",
+          "2.9",
+          "-0.05",
+          "6.15",
+          "6",
+          "-0.024"
         ],
-        "sample_id": "stage7c_crudsql_train_create_0042",
-        "slot_count": 4,
+        "optional_slot_count": 8,
+        "required_slot_count": 0,
+        "required_slot_texts": [],
+        "sample_id": "stage7c_crudsql_train_create_0391",
         "slot_texts": [
-          "480吨",
-          "苏州一线",
-          "江苏",
-          "数据库吧"
+          "请将2013-02-03最新的降息数据",
+          "请将2013-02-03最新的降息数据添加到表中，此次存款利率的调整幅度是-0.05，贷款利率的调整幅度是-0.024",
+          "此次存款利率",
+          "此次存款利率的调整幅度是-0.05",
+          "-0.05",
+          "贷款利率",
+          "贷款利率的调整幅度是-0.024",
+          "-0.024"
         ],
-        "spurious_required_slots": 1
+        "spurious_optional_slots": 2,
+        "spurious_required_slots": 0
       }
     ],
     "gold_assignment_count_total_label_side_only": 5407,
-    "gold_value_coverage_count": 4283,
-    "gold_value_coverage_rate": 0.792121,
-    "over_segmentation_rate": 0.314773,
+    "optional_slot_count": 12560,
+    "over_segmentation_rate": 0.957955,
+    "required_slot_count": 11,
     "sample_count": 1760,
-    "slot_count_total": 5311,
-    "slots_gt_gold_assignments": 554,
-    "slots_lt_gold_assignments": 602,
-    "spurious_required_slot_count": 1367,
-    "spurious_required_slot_rate": 0.25739,
-    "spurious_required_slot_samples": 878,
-    "under_segmentation_rate": 0.342045,
-    "unresolved_samples": 828
+    "samples_missing_gold_candidate": 86,
+    "spurious_optional_count": 2836,
+    "spurious_optional_rate": 0.225796,
+    "spurious_optional_slot_samples": 1319,
+    "spurious_required_slot_count": 0,
+    "spurious_required_slot_rate": 0.0,
+    "spurious_required_slot_samples": 0,
+    "under_segmentation_rate": 0.015341
   }
 }

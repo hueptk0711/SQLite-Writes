@@ -3,19 +3,32 @@
     "do_sample": false,
     "execution_timeout_seconds_per_sample": 30,
     "generation_timeout_seconds_per_phase": 120,
-    "model_id": "stage6i_same_exact_7b_model_family_for_v2_primary",
-    "model_revision": "reuse_stage6i_exact_revision_before_any_stage7d_generation",
-    "phase_m_max_new_tokens": 768,
+    "hf_generation_config_sha256": "1a628a5775bc69cde01c6749a531150ca4d3189652c618a174f7077923acf3b1",
+    "hf_model_config_sha256": "c0242402ad6a13b331ea320feea8c7e3776ffb7a4eff0757b9cd667e116d9a28",
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "model_path": "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "phase_m_max_new_tokens": 8192,
     "phase_o_max_new_tokens": 32,
     "retry_count": 0,
     "seed_policy": "deterministic_decoding_no_sampling_seed_not_used",
+    "stage6i_environment_manifest_sha256": "4e043eabc96da2bc38689f72ec32a63e9cf4ba987a388adb9d3b1af9135c46d1",
+    "stage6i_final_protocol_sha256": "128e9c4c1a5d1228b728cffbb3d788165ba9e16c23df444dc7724a4ee9849ab8",
+    "stage6i_inference_config_sha256": "06846f45097dc9510eed8124d446ec43c4eaac8df81eb6a87c539a7e12863484",
+    "stage6i_model_manifest_sha256": "1fb55083eb25b22fc3a1b158ff8f716694e6662f607e6f1efea757158075b54c",
+    "stage6i_protocol_amendment_sha256": "d0f6f7aee01b8da38b5ae50933cc327dd046bdae6d58d8f1557ecb1be0f18478",
     "stop_criteria": [
       "single_json_object_complete",
       "max_new_tokens"
     ],
     "temperature": 0.0,
-    "tokenizer_revision": "reuse_stage6i_exact_tokenizer_revision_before_any_stage7d_generation",
-    "top_p": 1.0
+    "tokenizer_config_sha256": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
+    "tokenizer_json_sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+    "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "top_p": 1.0,
+    "torch_dtype": "auto",
+    "torch_version": "2.6.0+cu124",
+    "transformers_version": "5.5.3"
   },
   "core_v2_max_model_calls": 2,
   "phase_m_model_calls": 1,
@@ -23,5 +36,11 @@
   "retry_policy": "no hidden retry beyond registered protocol",
   "semantic_slot_inventory_model_call_allowed": false,
   "stage": "Stage7C_V2_DEVELOPMENT_DATA_PROTOCOL",
+  "stage6i_generation_inputs_locked": [
+    "07_reproducibility/server_final_run/final_model_manifest.json",
+    "07_reproducibility/server_final_run/final_protocol.json",
+    "07_reproducibility/server_final_run/final_protocol_amendment_v2_out8192.json",
+    "07_reproducibility/server_final_run/environment_manifest_final_server.json"
+  ],
   "v2_generation_run": false
 }

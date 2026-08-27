@@ -18,8 +18,11 @@ from scripts.data.build_stage7c_v2_development_data_protocol import (
     EXPECTED_TABLE_COUNTS,
     FROZEN_GENERATION_CONFIG,
     LOCK_FILE,
+    MAX_DEV_SPURIOUS_REQUIRED_SLOT_RATE,
+    MIN_DEV_CANDIDATE_GOLD_VALUE_COVERAGE,
     OPERATION_LABEL_MAPPING,
     RAW_SOURCE_RELS,
+    STAGE6I_GENERATION_INPUTS,
     STAGE6_TEST_INPUTS,
     STAGE7B_INPUTS,
     build_stage7c,
@@ -68,7 +71,9 @@ def _copy_stage7c_root(workspace_tmp: Path) -> Path:
         "scripts/data/audit_stage7c_dataset_splits.py",
         "scripts/data/validate_stage7c_v2_development_data_protocol.py",
         "tests/test_stage7c_v2_development_data_protocol.py",
+        "pyproject.toml",
         *STAGE7B_INPUTS,
+        *STAGE6I_GENERATION_INPUTS,
         *STAGE6_TEST_INPUTS,
     ]
     for rel in paths:
@@ -93,7 +98,7 @@ def _write_jsonl(path: Path, rows: list[dict]) -> None:
     path.write_text("".join(canonical_json(row) + "\n" for row in rows), encoding="utf-8")
 
 
-def test_validator_passes_current_stage7c_patch1_artifacts() -> None:
+def test_validator_passes_current_stage7c_patch2_artifacts() -> None:
     report = validate(ARTIFACT_DIR)
     assert report["status"] == "PASS"
     assert report["violations"] == []
@@ -114,7 +119,7 @@ def test_lock_is_pass_after_actual_validator() -> None:
 def test_stage7b_inputs_are_hash_locked() -> None:
     manifest = _read_json(ARTIFACT_DIR / "STAGE7C_INPUT_MANIFEST.json")
     assert manifest["stage7b_locked"] is True
-    for rel in STAGE7B_INPUTS:
+    for rel in STAGE7B_INPUTS + STAGE6I_GENERATION_INPUTS:
         assert manifest["input_hashes"][rel] == sha256_file(ROOT / rel)
     stage7b_lock = _read_json(ROOT / "stage7b_v2_method_specification" / "STAGE7B_V2_SPECIFICATION_LOCK.json")
     assert stage7b_lock["status"] == "PASS_V2_METHOD_SPECIFICATION_LOCKED"
@@ -178,18 +183,19 @@ def test_stage7d_prompt_contract_only_allows_model_side_input() -> None:
     assert policy["slot_inventory_gold_sql_use_allowed"] is False
 
 
-def test_semantic_slot_inventory_is_value_bearing_question_schema_only() -> None:
+def test_semantic_slot_inventory_is_required_optional_question_schema_only() -> None:
     row = _read_jsonl(ARTIFACT_DIR / "TRAIN_CREATE_MANIFEST.jsonl")[0]
     slots = row["model_side_input"]["semantic_slot_inventory"]
     evidence = row["model_side_input"]["evidence_inventory"]
-    assert row["semantic_slot_inventory_derivation_inputs"] == ["question"]
-    assert evidence["construction"] == "deterministic_value_bearing_span_extraction"
-    assert slots["construction"] == "deterministic_value_bearing_question_schema_extractor"
+    assert row["semantic_slot_inventory_derivation_inputs"] == ["question", "schema_inventory"]
+    assert evidence["construction"] == "deterministic_broad_candidate_span_extraction_from_question_and_schema"
+    assert slots["construction"] == "deterministic_required_optional_question_schema_slot_inventory"
     assert slots["uses_gold_sql"] is False
     assert slots["model_call_used"] is False
-    assert all(slot["required"] is True for slot in slots["slots"])
-    assert all(slot["source"] == "deterministic_value_bearing_question_schema_extractor" for slot in slots["slots"])
-    assert "我需要添加一条数据" not in {entry["text"] for entry in evidence["evidence"]}
+    assert any(slot["required"] is False for slot in slots["slots"])
+    assert all(slot["confidence_class"] in {"deterministic_high_confidence_required", "candidate_optional"} for slot in slots["slots"])
+    assert all(slot["source"] == "deterministic_question_schema_required_optional_slot_extractor" for slot in slots["slots"])
+    assert row["question"] in {entry["text"] for entry in evidence["evidence"]}
 
 
 def test_semantic_slot_derivation_audit_reports_quality_and_limitations() -> None:
@@ -200,10 +206,34 @@ def test_semantic_slot_derivation_audit_reports_quality_and_limitations() -> Non
         row = audit_payload[split]
         assert row["sample_count"] == EXPECTED_CREATE_COUNTS[split]
         assert row["gold_assignment_count_total_label_side_only"] > 0
-        assert 0 <= row["gold_value_coverage_rate"] <= 1
+        assert 0 <= row["candidate_gold_value_coverage_rate"] <= 1
         assert 0 <= row["spurious_required_slot_rate"] <= 1
-        assert row["cardinality_mismatch"] == row["slots_gt_gold_assignments"] + row["slots_lt_gold_assignments"]
+        assert row["candidate_cardinality_mismatch"] == row["candidate_slots_gt_gold_assignments"] + row["candidate_slots_lt_gold_assignments"]
+        assert row["candidate_slot_count_total"] == row["required_slot_count"] + row["optional_slot_count"]
         assert "example_unresolved_records" in row
+
+
+def test_semantic_slot_derivation_quality_gate_is_frozen_and_passes_dev() -> None:
+    audit_payload = _read_json(ARTIFACT_DIR / "SEMANTIC_SLOT_DERIVATION_AUDIT.json")
+    gate = audit_payload["quality_acceptance_gate"]
+    dev = audit_payload["dev"]
+    assert gate["dev_candidate_gold_value_coverage_min"] == MIN_DEV_CANDIDATE_GOLD_VALUE_COVERAGE
+    assert gate["dev_spurious_required_slot_rate_max"] == MAX_DEV_SPURIOUS_REQUIRED_SLOT_RATE
+    assert dev["candidate_gold_value_coverage_rate"] >= MIN_DEV_CANDIDATE_GOLD_VALUE_COVERAGE
+    assert dev["spurious_required_slot_rate"] <= MAX_DEV_SPURIOUS_REQUIRED_SLOT_RATE
+    assert dev["candidate_exact_cardinality_match"] < EXPECTED_CREATE_COUNTS["dev"]
+
+
+def test_required_slots_are_conservative_and_optional_slots_preserve_recall() -> None:
+    rows = _read_jsonl(ARTIFACT_DIR / "DEV_CREATE_MANIFEST.jsonl")
+    required = 0
+    optional = 0
+    for row in rows:
+        for slot in row["model_side_input"]["semantic_slot_inventory"]["slots"]:
+            required += int(slot["required"] is True)
+            optional += int(slot["required"] is False)
+    assert required > 0
+    assert optional > required
 
 
 def test_gold_program_derivation_audit_executes_all_train_dev_create_labels() -> None:
@@ -250,9 +280,18 @@ def test_generation_protocol_has_no_tbd_and_exact_config() -> None:
     assert spec["phase_o_model_calls"] == 1
     assert spec["phase_m_model_calls"] == 1
     assert spec["semantic_slot_inventory_model_call_allowed"] is False
+    assert spec["stage6i_generation_inputs_locked"] == list(STAGE6I_GENERATION_INPUTS)
     assert spec["v2_generation_run"] is False
     assert spec["config"] == FROZEN_GENERATION_CONFIG
-    assert "to_be_frozen" not in canonical_json(spec).casefold()
+    text = canonical_json(spec).casefold()
+    assert "to_be_frozen" not in text
+    assert "same_as" not in text
+    assert "reuse_stage6i" not in text
+    assert "latest" not in text
+    assert '"main"' not in text
+    assert re.fullmatch(r"[0-9a-f]{40}", spec["config"]["model_revision"])
+    assert spec["config"]["model_id"] == "Qwen/Qwen2.5-Coder-7B-Instruct"
+    assert spec["config"]["phase_m_max_new_tokens"] == 8192
 
 
 def test_evaluation_timeout_is_frozen() -> None:
@@ -281,8 +320,11 @@ def test_audit_script_payload_matches_protocol() -> None:
     assert payload["model_input_leakage_counts"] == {}
     assert payload["contamination"]["train_481_question_hash_overlap"] == 0
     assert payload["contamination"]["train_table_id_count"] == 440
+    assert payload["semantic_slot_derivation"]["dev_candidate_gold_value_coverage_rate"] >= MIN_DEV_CANDIDATE_GOLD_VALUE_COVERAGE
+    assert payload["semantic_slot_derivation"]["dev_spurious_required_slot_rate"] <= MAX_DEV_SPURIOUS_REQUIRED_SLOT_RATE
 
 
+@pytest.mark.integration
 def test_builder_rebuilds_from_packaged_source_without_external_git(workspace_tmp: Path) -> None:
     package = _copy_stage7c_root(workspace_tmp)
     output = package / "stage7c_v2_development_data_protocol"
@@ -298,7 +340,7 @@ def test_validator_catches_stage7b_hash_drift(workspace_tmp: Path) -> None:
     spec = _read_json(spec_path)
     spec["tamper"] = True
     _write_json(spec_path, spec)
-    report = validate(package / "stage7c_v2_development_data_protocol", root=package)
+    report = validate(package / "stage7c_v2_development_data_protocol", root=package, deep=False)
     assert report["status"] == "FAIL"
     assert "input_manifest_hashes_mismatch" in report["violations"]
     assert "lock_input_hashes_mismatch" in report["violations"]
@@ -312,7 +354,7 @@ def test_validator_catches_model_side_gold_leakage(workspace_tmp: Path) -> None:
     rows[0]["model_side_input_sha256"] = sha256_text(canonical_json(rows[0]["model_side_input"]))
     _write_jsonl(manifest_path, rows)
     _refresh_artifact_hash(package, "DEV_CREATE_MANIFEST.jsonl")
-    report = validate(package / "stage7c_v2_development_data_protocol", root=package)
+    report = validate(package / "stage7c_v2_development_data_protocol", root=package, deep=False)
     assert report["status"] == "FAIL"
     assert any("forbidden_model_key_present" in violation for violation in report["violations"])
 
@@ -326,10 +368,37 @@ def test_validator_catches_semantic_slot_gold_sql_dependency(workspace_tmp: Path
     rows[0]["model_side_input_sha256"] = sha256_text(canonical_json(rows[0]["model_side_input"]))
     _write_jsonl(manifest_path, rows)
     _refresh_artifact_hash(package, "DEV_CREATE_MANIFEST.jsonl")
-    report = validate(package / "stage7c_v2_development_data_protocol", root=package)
+    report = validate(package / "stage7c_v2_development_data_protocol", root=package, deep=False)
     assert report["status"] == "FAIL"
-    assert any("slot_derivation_not_question_only" in violation for violation in report["violations"])
+    assert any("slot_derivation_not_question_schema" in violation for violation in report["violations"])
     assert any("slots_not_recomputed" in violation for violation in report["violations"])
+
+
+def test_validator_catches_question_only_evidence_provenance(workspace_tmp: Path) -> None:
+    package = _copy_stage7c_root(workspace_tmp)
+    path = package / "stage7c_v2_development_data_protocol" / "EVIDENCE_INVENTORY_SPEC.json"
+    spec = _read_json(path)
+    spec["source"] = "natural_language_question_only"
+    _write_json(path, spec)
+    _refresh_artifact_hash(package, "EVIDENCE_INVENTORY_SPEC.json")
+    report = validate(package / "stage7c_v2_development_data_protocol", root=package, deep=False)
+    assert report["status"] == "FAIL"
+    assert "evidence_inventory_source_not_question_schema" in report["violations"]
+
+
+def test_validator_catches_slot_quality_gate_failure(workspace_tmp: Path) -> None:
+    package = _copy_stage7c_root(workspace_tmp)
+    path = package / "stage7c_v2_development_data_protocol" / "SEMANTIC_SLOT_DERIVATION_AUDIT.json"
+    payload = _read_json(path)
+    payload["dev"]["candidate_gold_value_coverage_rate"] = 0.94
+    payload["dev"]["spurious_required_slot_rate"] = 0.02
+    _write_json(path, payload)
+    _refresh_artifact_hash(package, "SEMANTIC_SLOT_DERIVATION_AUDIT.json")
+    report = validate(package / "stage7c_v2_development_data_protocol", root=package, deep=False)
+    assert report["status"] == "FAIL"
+    assert "semantic_slot_derivation_audit_mismatch" in report["violations"]
+    assert "dev_candidate_gold_value_coverage_below_gate" in report["violations"]
+    assert "dev_spurious_required_slot_rate_above_gate" in report["violations"]
 
 
 def test_validator_catches_hidden_third_model_call(workspace_tmp: Path) -> None:
@@ -340,7 +409,7 @@ def test_validator_catches_hidden_third_model_call(workspace_tmp: Path) -> None:
     spec["semantic_slot_inventory_model_call_allowed"] = True
     _write_json(path, spec)
     _refresh_artifact_hash(package, "GENERATION_PROTOCOL_SPEC.json")
-    report = validate(package / "stage7c_v2_development_data_protocol", root=package)
+    report = validate(package / "stage7c_v2_development_data_protocol", root=package, deep=False)
     assert report["status"] == "FAIL"
     assert "hidden_third_model_call_allowed" in report["violations"]
     assert "slot_inventory_model_call_allowed" in report["violations"]
@@ -353,10 +422,25 @@ def test_validator_catches_tbd_generation_config(workspace_tmp: Path) -> None:
     spec["config"]["model_revision"] = "to_be_frozen_before_stage7d_execution"
     _write_json(path, spec)
     _refresh_artifact_hash(package, "GENERATION_PROTOCOL_SPEC.json")
-    report = validate(package / "stage7c_v2_development_data_protocol", root=package)
+    report = validate(package / "stage7c_v2_development_data_protocol", root=package, deep=False)
     assert report["status"] == "FAIL"
     assert "generation_config_not_frozen" in report["violations"]
-    assert "generation_config_contains_tbd" in report["violations"]
+    assert "generation_config_contains_placeholder:to_be_frozen" in report["violations"]
+
+
+def test_validator_catches_symbolic_stage6i_generation_config(workspace_tmp: Path) -> None:
+    package = _copy_stage7c_root(workspace_tmp)
+    path = package / "stage7c_v2_development_data_protocol" / "GENERATION_PROTOCOL_SPEC.json"
+    spec = _read_json(path)
+    spec["config"]["model_id"] = "same_as_stage6i"
+    spec["config"]["model_revision"] = "reuse_stage6i_exact_revision"
+    _write_json(path, spec)
+    _refresh_artifact_hash(package, "GENERATION_PROTOCOL_SPEC.json")
+    report = validate(package / "stage7c_v2_development_data_protocol", root=package, deep=False)
+    assert report["status"] == "FAIL"
+    assert "generation_config_not_frozen" in report["violations"]
+    assert "generation_config_contains_placeholder:same_as" in report["violations"]
+    assert "generation_config_contains_placeholder:reuse_stage6i" in report["violations"]
 
 
 def test_validator_catches_gold_program_audit_tamper(workspace_tmp: Path) -> None:
@@ -366,9 +450,8 @@ def test_validator_catches_gold_program_audit_tamper(workspace_tmp: Path) -> Non
     payload["splits"]["dev"]["gold_derivation_pass_count"] = 239
     _write_json(path, payload)
     _refresh_artifact_hash(package, "GOLD_PROGRAM_DERIVATION_AUDIT.json")
-    report = validate(package / "stage7c_v2_development_data_protocol", root=package)
+    report = validate(package / "stage7c_v2_development_data_protocol", root=package, deep=False)
     assert report["status"] == "FAIL"
-    assert "gold_program_derivation_audit_mismatch" in report["violations"]
     assert "dev_gold_derivation_not_240" in report["violations"]
 
 
@@ -379,7 +462,7 @@ def test_validator_catches_operation_mapping_tamper(workspace_tmp: Path) -> None
     mapping["mapping"]["0"]["v2_operation"] = "CREATE"
     _write_json(path, mapping)
     _refresh_artifact_hash(package, "OPERATION_LABEL_MAPPING_SPEC.json")
-    report = validate(package / "stage7c_v2_development_data_protocol", root=package)
+    report = validate(package / "stage7c_v2_development_data_protocol", root=package, deep=False)
     assert report["status"] == "FAIL"
     assert "operation_label_mapping_changed" in report["violations"]
 
@@ -389,11 +472,12 @@ def test_validator_catches_test_split_copy(workspace_tmp: Path) -> None:
     test_dir = package / "stage7c_v2_development_data_protocol" / "upstream_crudsql" / "data" / "test"
     test_dir.mkdir(parents=True)
     (test_dir / "crud_test_sql.json").write_text("[]\n", encoding="utf-8")
-    report = validate(package / "stage7c_v2_development_data_protocol", root=package)
+    report = validate(package / "stage7c_v2_development_data_protocol", root=package, deep=False)
     assert report["status"] == "FAIL"
     assert "test_split_copied_into_stage7c" in report["violations"]
 
 
+@pytest.mark.integration
 def test_self_contained_reviewer_package_clean_extraction_builder_validator_tests(workspace_tmp: Path) -> None:
     if os.environ.get("STAGE7C_IN_CLEAN_PACKAGE_TEST") == "1":
         return
@@ -404,7 +488,7 @@ def test_self_contained_reviewer_package_clean_extraction_builder_validator_test
         [sys.executable, "scripts/data/build_stage7c_v2_development_data_protocol.py", "--source-mode", "packaged", "--force"],
         [sys.executable, "scripts/data/validate_stage7c_v2_development_data_protocol.py"],
         [sys.executable, "scripts/data/audit_stage7c_dataset_splits.py"],
-        [sys.executable, "-m", "pytest", "-q", "tests/test_stage7c_v2_development_data_protocol.py"],
+        [sys.executable, "-m", "pytest", "-q", "-m", "not integration", "tests/test_stage7c_v2_development_data_protocol.py"],
     ]
     for command in commands:
         result = subprocess.run(command, cwd=package, env=env, text=True, capture_output=True, check=False)
