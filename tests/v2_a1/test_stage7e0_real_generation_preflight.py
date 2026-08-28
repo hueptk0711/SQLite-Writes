@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import importlib.util
+import shutil
 import sys
+import uuid
+import zipfile
 from pathlib import Path
 
 import pytest
@@ -16,10 +19,22 @@ from nldbwrite_v3.v2_a1.types import V2A1Error
 
 ROOT = Path(__file__).resolve().parents[2]
 RUNNER_PATH = ROOT / "scripts" / "server" / "run_stage7e0_v2_a1_preflight.py"
+PACKAGE_BUILDER_PATH = ROOT / "scripts" / "data" / "build_stage7e0_patch_package.py"
+TEST_TMP_ROOT = ROOT / "test_tmp" / "stage7e0_real_generation_preflight_tests"
 
 
 def load_runner():
     spec = importlib.util.spec_from_file_location("stage7e0_runner", RUNNER_PATH)
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_package_builder():
+    spec = importlib.util.spec_from_file_location("stage7e0_package_builder", PACKAGE_BUILDER_PATH)
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -108,3 +123,32 @@ def test_stage7e0_candidate_validation_enforces_phase_m_slot_evidence_coherence(
         runner.validate_candidate_json_objects("phase_m", [bad], schema, operation="INSERT", inventory=inventory, slots=slots)
 
     assert exc.value.reason_code == "phase_m_slot_evidence_mismatch"
+
+
+def test_stage7e0_package_builder_includes_import_closure_and_server_only_command() -> None:
+    builder = load_package_builder()
+    package_tmp = TEST_TMP_ROOT / f"package_builder_{uuid.uuid4().hex}"
+    package_tmp.mkdir(parents=True, exist_ok=False)
+
+    try:
+        result = builder.build_package(99, package_tmp)
+
+        reviewer_zip = Path(result["reviewer_zip"])
+        assert reviewer_zip.exists()
+        with zipfile.ZipFile(reviewer_zip) as archive:
+            names = set(archive.namelist())
+            assert archive.testzip() is None
+            assert "src/nldbwrite_v3/__init__.py" in names
+            assert "src/nldbwrite_v3/pipeline.py" in names
+            assert "src/nldbwrite_v3/v2_a1/compiler.py" in names
+            assert "RUN_COMMAND_SERVER_ONLY.sh" in names
+            assert not any("__pycache__" in name or name.endswith(".pyc") for name in names)
+            command_text = archive.read("RUN_COMMAND_SERVER_ONLY.sh").decode("utf-8")
+    finally:
+        resolved = package_tmp.resolve()
+        if TEST_TMP_ROOT.resolve() in resolved.parents and resolved.exists():
+            shutil.rmtree(resolved)
+
+    assert "ssh " not in command_text
+    assert "scp " not in command_text
+    assert "test_stage7e0_real_generation_preflight.py" in command_text
