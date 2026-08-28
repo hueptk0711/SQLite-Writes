@@ -30,15 +30,53 @@ PACKAGE_INPUTS = (
 )
 
 
-def git_output(*args: str) -> str:
+def packaged_git_value(label: str, default: str) -> str:
+    git_info_path = PROJECT_ROOT / "GIT_INFO.md"
+    if not git_info_path.exists():
+        return default
+    prefix = f"{label}:"
+    for line in git_info_path.read_text(encoding="utf-8").splitlines():
+        if line.startswith(prefix):
+            return line.removeprefix(prefix).strip() or default
+    return default
+
+
+def git_output(*args: str, fallback: str | None = None) -> str:
+    if not (PROJECT_ROOT / ".git").exists():
+        if fallback is not None:
+            return fallback
+        raise subprocess.CalledProcessError(128, ["git", *args], output="", stderr="not a package git root")
     result = subprocess.run(
         ["git", *args],
         cwd=PROJECT_ROOT,
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
     )
-    return result.stdout.strip()
+    if result.returncode == 0:
+        return result.stdout.strip()
+    if fallback is not None:
+        return fallback
+    raise subprocess.CalledProcessError(result.returncode, result.args, output=result.stdout, stderr=result.stderr)
+
+
+def git_branch() -> str:
+    return git_output("rev-parse", "--abbrev-ref", "HEAD", fallback=packaged_git_value("Branch", "NO_GIT_BRANCH"))
+
+
+def git_commit() -> str:
+    return git_output("rev-parse", "HEAD", fallback=packaged_git_value("Commit", "NO_GIT_COMMIT"))
+
+
+def git_short_commit() -> str:
+    commit = git_commit()
+    if commit.startswith("NO_GIT"):
+        return "nogit"
+    return git_output("rev-parse", "--short", "HEAD", fallback=commit[:7])
+
+
+def git_commit_message() -> str:
+    return git_output("log", "-1", "--pretty=%s", fallback=packaged_git_value("Commit message", "NO_GIT_COMMIT_MESSAGE"))
 
 
 def ignore_package_noise(_dir: str, names: list[str]) -> set[str]:
@@ -90,8 +128,8 @@ sha256sum {output_zip_name} > {output_zip_name}.sha256
 
 
 def reviewer_readme(patch: int, reviewer_zip_name: str, server_zip_name: str) -> str:
-    commit = git_output("rev-parse", "HEAD")
-    branch = git_output("rev-parse", "--abbrev-ref", "HEAD")
+    commit = git_commit()
+    branch = git_branch()
     return f"""# Stage7E0 PATCH{patch} Reviewer Package
 
 Scope: server/reviewer packaging fix for Stage7E0 real-generation preflight.
@@ -119,7 +157,7 @@ Commit: {commit}
 
 
 def validation_report(patch: int) -> str:
-    commit = git_output("rev-parse", "HEAD")
+    commit = git_commit()
     return f"""# Validation Report
 
 Stage: Stage7E0 V2-A1 Real Generation Preflight PATCH{patch}
@@ -171,11 +209,11 @@ def git_info() -> str:
         [
             "# Git Info",
             "",
-            f"Branch: {git_output('rev-parse', '--abbrev-ref', 'HEAD')}",
+            f"Branch: {git_branch()}",
             "",
-            f"Commit: {git_output('rev-parse', 'HEAD')}",
+            f"Commit: {git_commit()}",
             "",
-            f"Commit message: {git_output('log', '-1', '--pretty=%s')}",
+            f"Commit message: {git_commit_message()}",
             "",
             "Remote: https://github.com/hueptk0711/SQLite-Writes.git",
             "",
@@ -210,7 +248,7 @@ def build_package(patch: int, output_root: Path) -> dict[str, str]:
     output_dir_name = f"stage7e0_real_generation_preflight_patch{patch}"
     server_output_zip = f"{STAGE}_PATCH{patch}_SERVER_OUTPUT_{DATE_STAMP}.zip"
 
-    staging = output_root / f"stage7e0_patch{patch}_{git_output('rev-parse', '--short', 'HEAD')}"
+    staging = output_root / f"stage7e0_patch{patch}_{git_short_commit()}"
     if staging.exists():
         shutil.rmtree(staging)
     staging.mkdir(parents=True)
@@ -239,7 +277,7 @@ def build_package(patch: int, output_root: Path) -> dict[str, str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build Stage7E0 reviewer and server run packages.")
-    parser.add_argument("--patch", type=int, default=2)
+    parser.add_argument("--patch", type=int, default=4)
     parser.add_argument("--output-root", type=Path, default=PROJECT_ROOT / "reviewer_packages")
     args = parser.parse_args()
 

@@ -153,3 +153,37 @@ def test_stage7e0_package_builder_includes_import_closure_and_server_only_comman
     assert "ssh " not in command_text
     assert "scp " not in command_text
     assert "test_stage7e0_real_generation_preflight.py" in command_text
+
+
+def test_stage7e0_package_builder_uses_packaged_git_info_without_git_repo() -> None:
+    builder = load_package_builder()
+    original_root = builder.PROJECT_ROOT
+    package_root = TEST_TMP_ROOT / f"nogit_root_{uuid.uuid4().hex}"
+    package_root.mkdir(parents=True, exist_ok=False)
+    (package_root / "GIT_INFO.md").write_text(
+        "\n".join(
+            [
+                "# Git Info",
+                "",
+                "Branch: packaged/branch",
+                "",
+                "Commit: abcdef1234567890",
+                "",
+                "Commit message: packaged commit",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    try:
+        builder.PROJECT_ROOT = package_root
+        assert builder.git_branch() == "packaged/branch"
+        assert builder.git_commit() == "abcdef1234567890"
+        assert builder.git_short_commit() == "abcdef1"
+        assert builder.git_commit_message() == "packaged commit"
+    finally:
+        builder.PROJECT_ROOT = original_root
+        resolved = package_root.resolve()
+        if TEST_TMP_ROOT.resolve() in resolved.parents and resolved.exists():
+            shutil.rmtree(resolved)
