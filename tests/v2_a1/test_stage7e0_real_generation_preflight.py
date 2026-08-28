@@ -141,6 +141,7 @@ def test_stage7e0_package_builder_includes_import_closure_and_server_only_comman
             assert "src/nldbwrite_v3/__init__.py" in names
             assert "src/nldbwrite_v3/pipeline.py" in names
             assert "src/nldbwrite_v3/v2_a1/compiler.py" in names
+            assert "scripts/data/build_stage7d_v2_a1_implementation.py" in names
             assert "RUN_COMMAND_SERVER_ONLY.sh" in names
             assert not any("__pycache__" in name or name.endswith(".pyc") for name in names)
             command_text = archive.read("RUN_COMMAND_SERVER_ONLY.sh").decode("utf-8")

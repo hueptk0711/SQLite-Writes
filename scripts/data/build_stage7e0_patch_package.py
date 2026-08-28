@@ -15,6 +15,7 @@ STAGE = "Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT"
 
 PACKAGE_INPUTS = (
     "pyproject.toml",
+    "scripts/data/build_stage7d_v2_a1_implementation.py",
     "scripts/data/validate_stage7d_v2_a1_implementation.py",
     "scripts/data/build_stage7e0_patch_package.py",
     "scripts/server/RUN_STAGE7E0_V2_A1_PREFLIGHT_ON_SERVER.md",
