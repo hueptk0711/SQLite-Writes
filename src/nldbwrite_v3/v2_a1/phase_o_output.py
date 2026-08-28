@@ -1,22 +1,41 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
+from .json_schema import validate_schema_subset
 from .phase_o_schema import ALLOWED_OPERATIONS, PHASE_O_REQUIRED_KEYS, PHASE_O_SPAN_KEYS
 from .types import V2A1Error
 
 
-def parse_phase_o_output(text: str) -> dict[str, Any]:
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+
+
+def phase_o_json_schema(root: Path = PROJECT_ROOT) -> dict[str, Any]:
+    return json.loads((root / "stage7b_a1_free_text_slot_discovery_amendment/PHASE_O_JSON_SCHEMA.json").read_text(encoding="utf-8"))
+
+
+def parse_phase_o_output(text: str, *, root: Path = PROJECT_ROOT) -> dict[str, Any]:
     try:
         obj = json.loads(text)
     except json.JSONDecodeError as exc:
         raise V2A1Error("phase_o_parse", "Phase O output is not valid JSON", details={"error": str(exc)}) from exc
-    validate_phase_o_object(obj)
+    validate_phase_o_object(obj, root=root)
     return obj
 
 
-def validate_phase_o_object(obj: Any) -> None:
+def validate_phase_o_object(obj: Any, *, root: Path = PROJECT_ROOT) -> None:
+    try:
+        validate_schema_subset(phase_o_json_schema(root), obj, reason_code="phase_o_schema_failure")
+    except V2A1Error as exc:
+        if isinstance(obj, dict):
+            extra = sorted(set(obj) - PHASE_O_REQUIRED_KEYS)
+            if "span_ref" in extra:
+                raise V2A1Error("phase_o_schema_failure", "Model-generated span_ref is forbidden", details={"extra": extra}) from exc
+            if "value" in extra or "text" in extra:
+                raise V2A1Error("phase_o_schema_failure", "Model-generated value text is forbidden", details={"extra": extra}) from exc
+        raise
     if not isinstance(obj, dict):
         raise V2A1Error("phase_o_schema_failure", "Phase O output must be a JSON object")
     keys = set(obj)

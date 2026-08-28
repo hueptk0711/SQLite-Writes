@@ -11,5 +11,5 @@
   ],
   "primary_pipeline_uses_oracle_spans": false,
   "stage": "Stage7D_V2_A1_IMPLEMENTATION",
-  "status": "PASS_BUILT_PENDING_VALIDATION"
+  "status": "PASS"
 }

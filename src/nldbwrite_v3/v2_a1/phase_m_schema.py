@@ -1,16 +1,32 @@
 from __future__ import annotations
 
+import copy
+import json
+from pathlib import Path
 from typing import Any
 
+from .json_schema import validate_schema_subset
 from .reference_validation import column_refs, constraint_refs, evidence_refs, require_ref, slot_refs, table_refs
+from .slot_inventory import evidence_ref_for_slot
 from .types import SchemaInventory, SlotBundle, V2A1Error
 
 
 OPERATORS = {"EQ", "NE", "LT", "GT"}
 CONNECTORS = {"AND", "OR"}
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+SCHEMA_BY_OPERATION = {
+    "INSERT": "insert_ir.schema.json",
+    "UPDATE": "update_ir.schema.json",
+    "DELETE": "delete_ir.schema.json",
+    "UPSERT": "upsert_ir.schema.json",
+}
 
 
-def dynamic_schema(operation: str, inventory: SchemaInventory, slots: SlotBundle) -> dict[str, Any]:
+def dynamic_schema(operation: str, inventory: SchemaInventory, slots: SlotBundle, *, root: Path = PROJECT_ROOT) -> dict[str, Any]:
+    if operation not in SCHEMA_BY_OPERATION:
+        raise V2A1Error("phase_m_schema_failure", "Unsupported operation")
+    schema_path = root / "stage7b_v2_method_specification" / "schemas" / SCHEMA_BY_OPERATION[operation]
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
     base_refs = {
         "table_refs": sorted(table_refs(inventory)),
         "column_refs": sorted(column_refs(inventory)),
@@ -18,12 +34,15 @@ def dynamic_schema(operation: str, inventory: SchemaInventory, slots: SlotBundle
         "evidence_refs": sorted(evidence_refs(slots)),
         "slot_refs": sorted(slot_refs(slots)),
     }
-    return {"operation": operation, "dynamic_enums": base_refs, "additionalProperties": False}
+    schema = _instantiate_enums(copy.deepcopy(schema), base_refs)
+    schema["x-runtime-dynamic-enums"] = base_refs
+    return schema
 
 
-def validate_phase_m_ir(ir: Any, operation: str, inventory: SchemaInventory, slots: SlotBundle) -> dict[str, Any]:
+def validate_phase_m_ir(ir: Any, operation: str, inventory: SchemaInventory, slots: SlotBundle, *, root: Path = PROJECT_ROOT) -> dict[str, Any]:
     if not isinstance(ir, dict):
         raise V2A1Error("phase_m_schema_failure", "Phase M output must be a JSON object")
+    validate_schema_subset(dynamic_schema(operation, inventory, slots, root=root), ir, reason_code="phase_m_schema_failure")
     if ir.get("operation") != operation:
         raise V2A1Error("phase_m_schema_failure", "Phase M operation must equal predicted Phase O operation")
     if operation == "INSERT":
@@ -63,6 +82,7 @@ def _validate_assignment(item: Any, inventory: SchemaInventory, slots: SlotBundl
     require_ref(str(item["column_ref"]), column_refs(inventory), "column")
     require_ref(str(item["evidence_ref"]), evidence_refs(slots), "evidence")
     require_ref(str(item["slot_ref"]), slot_refs(slots), "slot")
+    _validate_slot_evidence_coherence(str(item["slot_ref"]), str(item["evidence_ref"]), slots)
     return str(item["column_ref"]), str(item["slot_ref"])
 
 
@@ -88,6 +108,7 @@ def _validate_predicate(item: Any, inventory: SchemaInventory, slots: SlotBundle
     require_ref(str(item["column_ref"]), column_refs(inventory), "column")
     require_ref(str(item["evidence_ref"]), evidence_refs(slots), "evidence")
     require_ref(str(item["slot_ref"]), slot_refs(slots), "slot")
+    _validate_slot_evidence_coherence(str(item["slot_ref"]), str(item["evidence_ref"]), slots)
     if item["operator"] not in OPERATORS:
         raise V2A1Error("phase_m_schema_failure", "Unsupported predicate operator")
     return str(item["slot_ref"])
@@ -128,3 +149,42 @@ def _validate_upsert(ir: dict[str, Any], inventory: SchemaInventory, slots: Slot
         _validate_assignments(ir["update_assignments"], inventory, slots, min_items=1)
     else:
         raise V2A1Error("phase_m_schema_failure", "Unsupported UPSERT update_policy")
+
+
+def _validate_slot_evidence_coherence(slot_ref: str, evidence_ref: str, slots: SlotBundle) -> None:
+    expected = evidence_ref_for_slot(slots, slot_ref)
+    if evidence_ref != expected:
+        raise V2A1Error("phase_m_slot_evidence_mismatch", "slot_ref must use its deterministic evidence_ref", details={"slot_ref": slot_ref, "expected_evidence_ref": expected, "actual_evidence_ref": evidence_ref})
+
+
+def _instantiate_enums(schema: dict[str, Any], refs: dict[str, list[str]]) -> dict[str, Any]:
+    if isinstance(schema, dict):
+        enum = schema.get("enum")
+        if isinstance(enum, list) and enum:
+            first = enum[0]
+            if isinstance(first, str):
+                replacement = _replacement_for_enum(first, refs)
+                if replacement is not None:
+                    schema["enum"] = replacement
+        for value in schema.values():
+            if isinstance(value, (dict, list)):
+                _instantiate_enums(value, refs)
+    elif isinstance(schema, list):
+        for value in schema:
+            if isinstance(value, (dict, list)):
+                _instantiate_enums(value, refs)
+    return schema
+
+
+def _replacement_for_enum(example: str, refs: dict[str, list[str]]) -> list[str] | None:
+    if example.startswith("TAB_"):
+        return refs["table_refs"]
+    if example.startswith("COL_"):
+        return refs["column_refs"]
+    if example.startswith("EV_"):
+        return refs["evidence_refs"]
+    if example.startswith("SLOT_"):
+        return refs["slot_refs"]
+    if example.startswith("CONSTRAINT_"):
+        return refs["constraint_refs"]
+    return None

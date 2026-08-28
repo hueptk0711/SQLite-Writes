@@ -3,8 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from .inventories import column, constraint, table_name
-from .typed_materializer import materialize_ir_values
-from .types import MaterializedValue, SQLiteProgram, SchemaInventory, SlotBundle
+from .types import MaterializedValue, SQLiteProgram, SchemaInventory
 
 
 OPERATOR_SQL = {"EQ": "=", "NE": "!=", "LT": "<", "GT": ">"}
@@ -14,8 +13,7 @@ def quote_identifier(identifier: str) -> str:
     return '"' + identifier.replace('"', '""') + '"'
 
 
-def compile_sqlite_program(ir: dict[str, Any], inventory: SchemaInventory, slots: SlotBundle) -> SQLiteProgram:
-    values = materialize_ir_values(ir, inventory, slots)
+def compile_sqlite_program(ir: dict[str, Any], inventory: SchemaInventory, values: dict[str, MaterializedValue]) -> SQLiteProgram:
     operation = ir["operation"]
     table = quote_identifier(table_name(inventory, ir["table_ref"]))
     if operation == "INSERT":

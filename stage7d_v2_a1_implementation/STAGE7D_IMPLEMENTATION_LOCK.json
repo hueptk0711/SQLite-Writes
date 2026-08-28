@@ -1,31 +1,32 @@
 {
   "artifact_hashes": {
-    "IMPLEMENTATION_COMPONENT_MANIFEST.json": "d7929a6c0b9d8cec84485586e064034c9130125dc8a04650ef2573474fc7f12b",
+    "IMPLEMENTATION_COMPONENT_MANIFEST.json": "a72e7ccc3120bb5893a746802c3fc00442a31f61a02f7048ab1934d5e6ea0edf",
     "IMPLEMENTATION_INVARIANTS.json": "7165d8f8ac643db06c2960c6b75a30c80731103ed13bd223170cfd587a8dcc95",
     "NO_MODEL_EXECUTION_AUDIT.json": "1cb22542eb3af0764c325bf6a01074eed03a83956ab21b23ab265f0c1771e407",
-    "ORACLE_ISOLATION_AUDIT.json": "a38d808525255a6558c43db6bff2939b7420f46fac212146ad4c7a4102e1444d",
+    "ORACLE_ISOLATION_AUDIT.json": "bb09934d807621b4982392366e661ea9bcbf8658e0feb6537bdf0c4f31d52a3b",
     "REVIEWER_README.md": "4b661560f8a497b32a4d0ccb1b80b7c17488606103ed0529c23365ebcf427c09",
     "SPEC_TO_CODE_TRACEABILITY.json": "314fadae07c99e6a1d4c0517b079c645aee3f8401f39778b8acc1d3bb029bcc4",
     "STAGE7D_INPUT_MANIFEST.json": "977a048f67aae9cd771ce76da8950effd674e94264d25eda0c13785e9129c159",
-    "TEST_SUMMARY.json": "aba2cfc504fcf536f5001b25f99ded1e61e634b78c7d61665278575d38dbed4a",
+    "TEST_SUMMARY.json": "9460063d6a456b0116ee9bf73fc68e830aafbe61202144269bbf9e588c9401e7",
     "VALIDATION_REPORT.md": "3e10b525626c23fae6e0a4e843c84d9ca02709fa0477a897c3fe671969d0aee1"
   },
   "code_hashes": {
     "src/nldbwrite_v3/v2_a1/__init__.py": "12f0b1bddf72c6ab80639378526a8b8dc3d0119b7e120797277a8c52ea0c0de4",
-    "src/nldbwrite_v3/v2_a1/compiler.py": "c2406116ac00586f728e0ceeeeb09c4ab3e1068f600ed0e4e0d2da9f44646234",
+    "src/nldbwrite_v3/v2_a1/compiler.py": "8cf9f54af93f02d75c257768ee2087c5d5ee0e3813848d94edc30141591f75b8",
     "src/nldbwrite_v3/v2_a1/completeness.py": "6eeab94a0a37bffe0b016e758642dd4206f7dbe8402dcf2e8090696628787603",
     "src/nldbwrite_v3/v2_a1/diagnostics.py": "b5966fddd202621b2a86fcc9822722fbd5c0cd50904aac6bf5864f07f3a27804",
     "src/nldbwrite_v3/v2_a1/inventories.py": "9dfed4d3b597041d8b2c2ec92cd3d612076156c88c0d9d90658f57de9f4343d6",
-    "src/nldbwrite_v3/v2_a1/phase_m_output.py": "a2ce513ecefc605959e12c3b74eb2e9b10c382a4087c2fc07f485ba9471fd0ed",
-    "src/nldbwrite_v3/v2_a1/phase_m_schema.py": "5a48ddc3168f39c5745d067d514c850c16eedeff0d820bc33e6f1d33e6fd2646",
-    "src/nldbwrite_v3/v2_a1/phase_o_output.py": "81f02babb9293b18c88ee2e7de9ba1703d424806ab858e8b025580d1cfdafc3d",
+    "src/nldbwrite_v3/v2_a1/json_schema.py": "4e9d9c37f6cf8926884999c55dac06837a7b9836fed139b8bb26d56e39351f02",
+    "src/nldbwrite_v3/v2_a1/phase_m_output.py": "9c8a6518eb3da9f866c53499c2c58a189315a4bda48fb9fc895f81c11e48dfec",
+    "src/nldbwrite_v3/v2_a1/phase_m_schema.py": "071d98e9210f9a7eac362c7d387e253f940002509cd0e149bce00abc68445b19",
+    "src/nldbwrite_v3/v2_a1/phase_o_output.py": "32d83b76600cc0ee0a8a789c16f46f3a5987484b2b759ace4ba514edbfc022b4",
     "src/nldbwrite_v3/v2_a1/phase_o_schema.py": "bcfe4f7f708d3711f1523a168838d37218999f15481a06025ff08303f1c147a6",
-    "src/nldbwrite_v3/v2_a1/pipeline.py": "37fda68f6f053e2227af143fd16b8c5c1db90fbfd0f514f5e90bfc24db177aee",
-    "src/nldbwrite_v3/v2_a1/preflight.py": "12f97a6f28165e2e83bd4c0e8753aebed0ff3df8e6fae899a50f08228d04d71c",
-    "src/nldbwrite_v3/v2_a1/prompt_rendering.py": "00e45cda9d3bcd8322858c642d0c9307e41dd5e8522b78309d2561506b774e5d",
-    "src/nldbwrite_v3/v2_a1/protocol.py": "ed71edad7e0573838db8b43f23ae30bc1511723fcf8cf4fdbcfbfce51c69164c",
+    "src/nldbwrite_v3/v2_a1/pipeline.py": "8736c378dcc732267e394ca408f56efa6b3822a00e68c214b2ac1341f7ed47a7",
+    "src/nldbwrite_v3/v2_a1/preflight.py": "d774fec2b6f69d257cef4829b01705f072ff8f88d13b7a6e1d66828fed6eaec3",
+    "src/nldbwrite_v3/v2_a1/prompt_rendering.py": "b2e76f7a8388e8cfa44fe08e8003bfee01c2b8b1e2f4b9c564da80fbad31487f",
+    "src/nldbwrite_v3/v2_a1/protocol.py": "3836bbef6e6907e1d2df6901ddb736447376460fb4fa28a56276f20e88764ab2",
     "src/nldbwrite_v3/v2_a1/reference_validation.py": "f9e894d3f8524ef5297926814ae61db048f6273435c79397bc19b7182c65d9b6",
-    "src/nldbwrite_v3/v2_a1/slot_inventory.py": "6fa22b9f1b68b3bf2abd22b01b3cfd3340d183865974e257f130f64043cd5808",
+    "src/nldbwrite_v3/v2_a1/slot_inventory.py": "71faa58c8faf04f844f615474949c2564214bc53c2765155e0a1108f257dda01",
     "src/nldbwrite_v3/v2_a1/span_validation.py": "bdf83e64c7ec693889ac28932756ff8d999bb3cf3b3dd5538400599736a80a01",
     "src/nldbwrite_v3/v2_a1/typed_materializer.py": "8c84e00c1e56b83d2cf021ad98bc40db47b05b45bf99079a21464efb406274c7",
     "src/nldbwrite_v3/v2_a1/types.py": "e8d953164c06e0a545b77cb0059fef0d72e4118d8122531737328823310c3973"
@@ -54,13 +55,13 @@
   },
   "model_called": false,
   "script_hashes": {
-    "scripts/data/build_stage7d_v2_a1_implementation.py": "ad1cc0a014962d3975e27085729e1e45fd54d6e9f73a92c86172e95ef43f483d",
-    "scripts/data/validate_stage7d_v2_a1_implementation.py": "ae88de9b671a949bd53927319c969e2a4407475dee7de03346f45b11fb2d7088"
+    "scripts/data/build_stage7d_v2_a1_implementation.py": "e188a1b5c793393d937041a75cfd288010c73f27b3a1d9ac400f41defbdaaae0",
+    "scripts/data/validate_stage7d_v2_a1_implementation.py": "8509797738d590bef12c2fefcd57ad9d0785ad92948fd4ecdca342377166aad1"
   },
   "stage": "Stage7D_V2_A1_IMPLEMENTATION",
   "status": "PASS_STAGE7D_V2_A1_IMPLEMENTATION_LOCKED",
   "test_hashes": {
-    "tests/v2_a1/test_stage7d_v2_a1.py": "1501933bed226b8ea2d2cd4e4168eae0611d57fecb079af163d831c855b8c012"
+    "tests/v2_a1/test_stage7d_v2_a1.py": "6d8ce4e50b90a1b840e7d0a72952b647fe1ad78a52ed7ff73c87817280938ba8"
   },
   "v2_generation_run": false,
   "validated_utc": "2026-08-27T00:00:00+00:00",

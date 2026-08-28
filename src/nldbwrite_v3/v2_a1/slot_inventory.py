@@ -20,3 +20,10 @@ def evidence_text(slots: SlotBundle, evidence_ref: str) -> str:
         if item.evidence_ref == evidence_ref:
             return item.text
     raise KeyError(evidence_ref)
+
+
+def evidence_ref_for_slot(slots: SlotBundle, slot_ref: str) -> str:
+    for item in slots.slots:
+        if item.slot_ref == slot_ref:
+            return item.evidence_ref
+    raise KeyError(slot_ref)

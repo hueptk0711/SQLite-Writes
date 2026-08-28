@@ -11,6 +11,7 @@ from .types import V2A1Error
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 TEXT_SUFFIXES = {".json", ".jsonl", ".md", ".py", ".txt", ".toml", ".yaml", ".yml"}
+STAGE7D_PASS_STATUS = "PASS_STAGE7D_V2_A1_IMPLEMENTATION_LOCKED"
 
 
 def sha256_file(path: Path) -> str:
@@ -46,6 +47,7 @@ class V2A1Protocol:
 
 
 def load_v2_a1_protocol(root: Path = PROJECT_ROOT) -> V2A1Protocol:
+    _verify_stage7d_runtime_integrity(root)
     stage7b = read_json(root / "stage7b_v2_method_specification/STAGE7B_V2_SPECIFICATION_LOCK.json")
     stage7b_a1 = read_json(root / "stage7b_a1_free_text_slot_discovery_amendment/STAGE7B_A1_LOCK.json")
     stage7c_a1 = read_json(root / "stage7c_a1_v2_development_protocol/STAGE7C_A1_PROTOCOL_LOCK.json")
@@ -61,3 +63,21 @@ def load_v2_a1_protocol(root: Path = PROJECT_ROOT) -> V2A1Protocol:
         if stage7c_a1.get(key) is not False:
             raise V2A1Error("protocol_forbidden_execution_flag", f"{key} must be false in Stage7C-A1")
     return V2A1Protocol(root=root, stage7b_lock=stage7b, stage7b_a1_lock=stage7b_a1, stage7c_a1_lock=stage7c_a1)
+
+
+def _verify_stage7d_runtime_integrity(root: Path) -> None:
+    lock_path = root / "stage7d_v2_a1_implementation/STAGE7D_IMPLEMENTATION_LOCK.json"
+    manifest_path = root / "stage7d_v2_a1_implementation/STAGE7D_INPUT_MANIFEST.json"
+    if not lock_path.exists() or not manifest_path.exists():
+        raise V2A1Error("protocol_stage7d_lock_missing", "Stage7D runtime lock and input manifest are required")
+    lock = read_json(lock_path)
+    if lock.get("status") != STAGE7D_PASS_STATUS:
+        raise V2A1Error("protocol_stage7d_not_locked", "Stage7D lock is not accepted")
+    manifest = read_json(manifest_path)
+    for rel_path, expected_hash in manifest.get("input_hashes", {}).items():
+        path = root / rel_path
+        if not path.exists():
+            raise V2A1Error("protocol_hash_mismatch", "Locked upstream input is missing", details={"path": rel_path})
+        actual_hash = sha256_file(path)
+        if actual_hash != expected_hash:
+            raise V2A1Error("protocol_hash_mismatch", "Locked upstream input hash mismatch", details={"path": rel_path, "expected": expected_hash, "actual": actual_hash})
