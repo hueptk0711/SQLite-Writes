@@ -15,6 +15,10 @@ OUT_DIR = ROOT / "stage7d_v2_a1_implementation"
 LOCK = OUT_DIR / "STAGE7D_IMPLEMENTATION_LOCK.json"
 PASS_STATUS = "PASS_STAGE7D_V2_A1_IMPLEMENTATION_LOCKED"
 FROZEN_VALIDATED_UTC = "2026-08-27T00:00:00+00:00"
+FROZEN_MODEL_ID = "Qwen/Qwen2.5-Coder-7B-Instruct"
+FROZEN_MODEL_REVISION = "c03e6d358207e414f1eca0bb1891e29f1db0e242"
+FROZEN_TOKENIZER_CONFIG_SHA256 = "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4"
+FROZEN_CHAT_TEMPLATE_SHA256 = "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f"
 
 from nldbwrite_v3.v2_a1.diagnostics import primary_pipeline_source_uses_oracle  # noqa: E402
 
@@ -59,6 +63,7 @@ def validate() -> dict[str, Any]:
     component_manifest = read_json(OUT_DIR / "IMPLEMENTATION_COMPONENT_MANIFEST.json")
     no_model = read_json(OUT_DIR / "NO_MODEL_EXECUTION_AUDIT.json")
     tests = read_json(OUT_DIR / "TEST_SUMMARY.json")
+    chat_template_preflight = read_json(OUT_DIR / "CHAT_TEMPLATE_PREFLIGHT.json")
 
     stage7b = read_json(ROOT / "stage7b_v2_method_specification/STAGE7B_V2_SPECIFICATION_LOCK.json")
     stage7b_a1 = read_json(ROOT / "stage7b_a1_free_text_slot_discovery_amendment/STAGE7B_A1_LOCK.json")
@@ -76,10 +81,28 @@ def validate() -> dict[str, Any]:
 
     if stage7c_a1.get("phase_o_model_calls") != 1 or stage7c_a1.get("phase_m_model_calls") != 1:
         violations.append("stage7c_a1_model_call_count_changed")
-    if generation.get("model_config", {}).get("model_id") != "Qwen/Qwen2.5-Coder-7B-Instruct":
+    model_config = generation.get("model_config", {})
+    if model_config.get("model_id") != FROZEN_MODEL_ID:
         violations.append("model_id_not_stage6i_qwen_7b")
-    if generation.get("model_config", {}).get("model_revision") != "c03e6d358207e414f1eca0bb1891e29f1db0e242":
+    if model_config.get("model_revision") != FROZEN_MODEL_REVISION:
         violations.append("model_revision_not_literal_stage6i_revision")
+    if chat_template_preflight.get("status") != "PASS_CHAT_TEMPLATE_PREFLIGHT_LOCKED":
+        violations.append("chat_template_preflight_not_locked")
+    if chat_template_preflight.get("model_id") != model_config.get("model_id") or chat_template_preflight.get("model_id") != FROZEN_MODEL_ID:
+        violations.append("chat_template_model_id_mismatch")
+    if chat_template_preflight.get("tokenizer_revision") != model_config.get("tokenizer_revision") or chat_template_preflight.get("tokenizer_revision") != FROZEN_MODEL_REVISION:
+        violations.append("chat_template_tokenizer_revision_mismatch")
+    if chat_template_preflight.get("tokenizer_config_file_sha256") != model_config.get("tokenizer_config_file_sha256") or chat_template_preflight.get("tokenizer_config_file_sha256") != FROZEN_TOKENIZER_CONFIG_SHA256:
+        violations.append("chat_template_tokenizer_config_hash_mismatch")
+    if chat_template_preflight.get("actual_chat_template_string_sha256") != FROZEN_CHAT_TEMPLATE_SHA256:
+        violations.append("chat_template_hash_missing_or_mismatch")
+    if chat_template_preflight.get("actual_chat_template_string_sha256") in {None, "", "same_as_stage6i", "reuse_stage6i_exact_revision"}:
+        violations.append("chat_template_hash_placeholder")
+    if chat_template_preflight.get("apply_chat_template_parameters") != {"tokenize": False, "add_generation_prompt": True}:
+        violations.append("chat_template_apply_parameters_changed")
+    for key in ("model_called", "gpu_called", "generation_run"):
+        if chat_template_preflight.get(key) is not False:
+            violations.append(f"chat_template_forbidden_execution_flag_true:{key}")
 
     for rel_path, expected_hash in input_manifest.get("input_hashes", {}).items():
         path = ROOT / rel_path
@@ -144,6 +167,7 @@ def validate() -> dict[str, Any]:
         "Checks:\n"
         "- upstream Stage7B/Stage7B-A1/Stage7C-A1 locks recomputed\n"
         "- input/code/test hashes recomputed\n"
+        "- chat-template preflight hash and apply_chat_template parameters checked\n"
         "- model/GPU/experiment forbidden flags checked\n"
         "- primary pipeline oracle isolation checked\n"
         "- Stage7D test-count gate checked\n"

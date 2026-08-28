@@ -85,6 +85,18 @@ class MaterializedValue:
 
 
 @dataclass(frozen=True)
+class MaterializedBinding:
+    binding_key: str
+    context: str
+    index: int
+    column_ref: str
+    evidence_ref: str
+    slot_ref: str
+    value: Any
+    sqlite_affinity: str
+
+
+@dataclass(frozen=True)
 class SQLiteProgram:
     operation: str
     sql: str

@@ -75,7 +75,7 @@ def _validate_table(ir: dict[str, Any], inventory: SchemaInventory) -> None:
     require_ref(str(ir.get("table_ref")), table_refs(inventory), "table")
 
 
-def _validate_assignment(item: Any, inventory: SchemaInventory, slots: SlotBundle) -> tuple[str, str]:
+def _validate_assignment(item: Any, inventory: SchemaInventory, slots: SlotBundle) -> None:
     if not isinstance(item, dict):
         raise V2A1Error("phase_m_schema_failure", "Assignment must be an object")
     _require_keys(item, {"column_ref", "evidence_ref", "slot_ref"})
@@ -83,25 +83,16 @@ def _validate_assignment(item: Any, inventory: SchemaInventory, slots: SlotBundl
     require_ref(str(item["evidence_ref"]), evidence_refs(slots), "evidence")
     require_ref(str(item["slot_ref"]), slot_refs(slots), "slot")
     _validate_slot_evidence_coherence(str(item["slot_ref"]), str(item["evidence_ref"]), slots)
-    return str(item["column_ref"]), str(item["slot_ref"])
 
 
 def _validate_assignments(assignments: Any, inventory: SchemaInventory, slots: SlotBundle, *, min_items: int) -> None:
     if not isinstance(assignments, list) or len(assignments) < min_items:
         raise V2A1Error("phase_m_schema_failure", "assignments must be a non-empty list")
-    seen_columns: set[str] = set()
-    seen_slots: set[str] = set()
     for item in assignments:
-        column_ref, slot_ref = _validate_assignment(item, inventory, slots)
-        if column_ref in seen_columns:
-            raise V2A1Error("completeness_duplicate_column", "Target columns must be unique within assignments")
-        if slot_ref in seen_slots:
-            raise V2A1Error("completeness_duplicate_slot", "A slot may be assigned at most once")
-        seen_columns.add(column_ref)
-        seen_slots.add(slot_ref)
+        _validate_assignment(item, inventory, slots)
 
 
-def _validate_predicate(item: Any, inventory: SchemaInventory, slots: SlotBundle) -> str:
+def _validate_predicate(item: Any, inventory: SchemaInventory, slots: SlotBundle) -> None:
     if not isinstance(item, dict):
         raise V2A1Error("phase_m_schema_failure", "Predicate must be an object")
     _require_keys(item, {"column_ref", "operator", "evidence_ref", "slot_ref"})
@@ -111,7 +102,6 @@ def _validate_predicate(item: Any, inventory: SchemaInventory, slots: SlotBundle
     _validate_slot_evidence_coherence(str(item["slot_ref"]), str(item["evidence_ref"]), slots)
     if item["operator"] not in OPERATORS:
         raise V2A1Error("phase_m_schema_failure", "Unsupported predicate operator")
-    return str(item["slot_ref"])
 
 
 def _validate_selector(selector: Any, inventory: SchemaInventory, slots: SlotBundle) -> None:
@@ -123,12 +113,8 @@ def _validate_selector(selector: Any, inventory: SchemaInventory, slots: SlotBun
     predicates = selector["predicates"]
     if not isinstance(predicates, list) or not predicates:
         raise V2A1Error("phase_m_schema_failure", "row_selector.predicates must be non-empty")
-    seen_slots: set[str] = set()
     for item in predicates:
-        slot_ref = _validate_predicate(item, inventory, slots)
-        if slot_ref in seen_slots:
-            raise V2A1Error("completeness_duplicate_slot", "Predicate slot_ref values must be unique")
-        seen_slots.add(slot_ref)
+        _validate_predicate(item, inventory, slots)
 
 
 def _validate_upsert(ir: dict[str, Any], inventory: SchemaInventory, slots: SlotBundle) -> None:

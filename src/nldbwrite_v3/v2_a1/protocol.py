@@ -65,6 +65,14 @@ def load_v2_a1_protocol(root: Path = PROJECT_ROOT) -> V2A1Protocol:
     return V2A1Protocol(root=root, stage7b_lock=stage7b, stage7b_a1_lock=stage7b_a1, stage7c_a1_lock=stage7c_a1)
 
 
+def initialize_v2_a1_runtime(root: Path = PROJECT_ROOT) -> V2A1Protocol:
+    protocol = load_v2_a1_protocol(root)
+    from .prompt_rendering import validate_frozen_prompt_hashes
+
+    validate_frozen_prompt_hashes(root)
+    return protocol
+
+
 def _verify_stage7d_runtime_integrity(root: Path) -> None:
     lock_path = root / "stage7d_v2_a1_implementation/STAGE7D_IMPLEMENTATION_LOCK.json"
     manifest_path = root / "stage7d_v2_a1_implementation/STAGE7D_INPUT_MANIFEST.json"

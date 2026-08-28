@@ -10,6 +10,10 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / "stage7d_v2_a1_implementation"
 STAGE = "Stage7D_V2_A1_IMPLEMENTATION"
 FROZEN_TIMESTAMP_UTC = "2026-08-27T00:00:00+00:00"
+FROZEN_MODEL_ID = "Qwen/Qwen2.5-Coder-7B-Instruct"
+FROZEN_MODEL_REVISION = "c03e6d358207e414f1eca0bb1891e29f1db0e242"
+FROZEN_TOKENIZER_CONFIG_SHA256 = "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4"
+FROZEN_CHAT_TEMPLATE_SHA256 = "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f"
 
 UPSTREAM_INPUTS = [
     "stage7b_v2_method_specification/STAGE7B_V2_SPECIFICATION_LOCK.json",
@@ -157,8 +161,8 @@ def build(force: bool = False) -> None:
                 "slot_inventory": "Derives deterministic SPAN/EV/SLOT IDs after sorted accepted offsets.",
                 "phase_m_schema_and_output": "Instantiates real operation-specific Draft 2020-12 schemas with dynamic enums and enforces SLOT/EVIDENCE coherence.",
                 "typed_materializer": "Applies conservative SQLite-affinity materialization without implicit date/unit normalization.",
-                "completeness": "Requires every Phase O semantic slot to be mapped exactly once.",
-                "compiler": "Compiles already-materialized accepted IR to parameterized SQLite write programs.",
+                "completeness": "Checks missing required slots and duplicate SLOT/COL bindings after materialization, scoped by mapping context.",
+                "compiler": "Compiles binding-specific materialized values to parameterized SQLite write programs.",
                 "preflight": "Runs SQLite execution checks on a copied DB with rollback and a wall-clock progress-handler deadline.",
                 "pipeline": "Orchestrates the V2-A1 state machine with injected mocked Phase O/M outputs only.",
                 "diagnostics": "Audits primary pipeline oracle isolation.",
@@ -184,7 +188,8 @@ def build(force: bool = False) -> None:
                 {"spec": "Structured predicates for UPDATE/DELETE", "code": ["phase_m_schema.py", "compiler.py"], "tests": ["multi-predicate selector and compiler tests"]},
                 {"spec": "UPSERT conditional semantics", "code": ["phase_m_schema.py", "compiler.py"], "tests": ["DO_NOTHING/DO_UPDATE policy regression tests"]},
                 {"spec": "Conservative typed materialization", "code": ["typed_materializer.py"], "tests": ["INTEGER/REAL/TEXT/BLOB/NUMERIC strictness tests"]},
-                {"spec": "Semantic completeness", "code": ["completeness.py"], "tests": ["missing/duplicate/unknown slot tests"]},
+                {"spec": "Semantic completeness after materialization", "code": ["typed_materializer.py", "completeness.py"], "tests": ["materialization-before-completeness and context-scoped duplicate tests"]},
+                {"spec": "Binding-specific UPSERT values", "code": ["typed_materializer.py", "compiler.py"], "tests": ["same EV/SLOT reused across UPSERT insert/update contexts"]},
                 {"spec": "No oracle spans in primary path", "code": ["pipeline.py", "diagnostics.py"], "tests": ["oracle isolation tests"]},
             ],
         },
@@ -199,7 +204,10 @@ def build(force: bool = False) -> None:
                 "Model-generated span_ref, evidence_ref, slot_ref, or value text is forbidden in Phase O.",
                 "Offsets use Python Unicode code-point indexing over the exact original question.",
                 "Accepted spans are sorted by start_char then end_char before deterministic ID assignment.",
-                "Every Phase O semantic slot is required and must be mapped exactly once by Phase M.",
+                "Every Phase O semantic slot is required and must be mapped at least once, with duplicate use rejected within each mapping context.",
+                "Duplicate SLOT and target-column checks run after materialization so value conversion failures keep precedence.",
+                "SLOT reuse is forbidden within a single mapping context but permitted across distinct UPSERT insert/update contexts.",
+                "Materialized values are keyed by binding occurrence, not evidence_ref alone.",
                 "All table, column, evidence, slot, and constraint references must be members of the supplied dynamic inventory.",
                 "Typed materialization does not perform implicit date, currency, percentage, or unit conversion.",
                 "SQLite programs are parameterized; identifiers are quoted only after inventory validation.",
@@ -232,6 +240,26 @@ def build(force: bool = False) -> None:
             "live_sql_bench_gt_opened": False,
             "confirmation_481_evaluated": False,
             "stage_scope": "implementation with synthetic fixtures and mocked LLM outputs only",
+        },
+    )
+
+    write_json(
+        OUT_DIR / "CHAT_TEMPLATE_PREFLIGHT.json",
+        {
+            "stage": STAGE,
+            "status": "PASS_CHAT_TEMPLATE_PREFLIGHT_LOCKED",
+            "model_id": FROZEN_MODEL_ID,
+            "model_revision": FROZEN_MODEL_REVISION,
+            "tokenizer_revision": FROZEN_MODEL_REVISION,
+            "tokenizer_config_file_sha256": FROZEN_TOKENIZER_CONFIG_SHA256,
+            "actual_chat_template_string_sha256": FROZEN_CHAT_TEMPLATE_SHA256,
+            "source": "HuggingFace tokenizer_config.json at the frozen tokenizer revision",
+            "source_url": f"https://huggingface.co/{FROZEN_MODEL_ID}/raw/{FROZEN_MODEL_REVISION}/tokenizer_config.json",
+            "hash_method": "sha256(canonical_lf(tokenizer_config_json['chat_template']).encode('utf-8'))",
+            "apply_chat_template_parameters": {"tokenize": False, "add_generation_prompt": True},
+            "model_called": False,
+            "gpu_called": False,
+            "generation_run": False,
         },
     )
 

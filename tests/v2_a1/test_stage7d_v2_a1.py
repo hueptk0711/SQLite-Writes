@@ -19,7 +19,7 @@ from nldbwrite_v3.v2_a1.phase_o_output import parse_phase_o_output, phase_o_json
 from nldbwrite_v3.v2_a1.pipeline import STATES, run_mocked_pipeline
 from nldbwrite_v3.v2_a1.preflight import preflight_sqlite
 from nldbwrite_v3.v2_a1.prompt_rendering import offset_guide, rendered_prompt_sha256, render_chat_prompt_with_tokenizer, render_phase_m_prompt, render_phase_o_prompt, serialize_prompt_object, sha256_text, validate_frozen_prompt_hashes
-from nldbwrite_v3.v2_a1.protocol import load_v2_a1_protocol
+from nldbwrite_v3.v2_a1.protocol import initialize_v2_a1_runtime, load_v2_a1_protocol
 from nldbwrite_v3.v2_a1.slot_inventory import build_slot_bundle
 from nldbwrite_v3.v2_a1.span_validation import validate_and_sort_spans
 from nldbwrite_v3.v2_a1.typed_materializer import materialize_ir_values, materialize_value, sqlite_affinity
@@ -113,6 +113,10 @@ def test_protocol_loader_reads_locked_upstreams() -> None:
     assert protocol.model_revision == "c03e6d358207e414f1eca0bb1891e29f1db0e242"
 
 
+def test_runtime_initializer_checks_frozen_prompt_hashes() -> None:
+    assert initialize_v2_a1_runtime(ROOT).phase_o_model_calls == 1
+
+
 def copy_protocol_tree(target: Path) -> Path:
     for dirname in (
         "stage7b_v2_method_specification",
@@ -132,6 +136,23 @@ def test_protocol_loader_rejects_tampered_phase_o_prompt_spec(workspace_tmp: Pat
     path.write_text(json.dumps(spec, ensure_ascii=False, indent=2), encoding="utf-8")
     with pytest.raises(V2A1Error) as exc:
         load_v2_a1_protocol(root)
+    assert_code(exc, "protocol_hash_mismatch")
+
+
+def test_primary_pipeline_rejects_tampered_phase_o_prompt_spec(workspace_tmp: Path) -> None:
+    root = copy_protocol_tree(workspace_tmp)
+    path = root / "stage7c_a1_v2_development_protocol/PHASE_O_PROMPT_SPEC.json"
+    spec = json.loads(path.read_text(encoding="utf-8"))
+    spec["system_prompt"] = "TAMPERED"
+    path.write_text(json.dumps(spec, ensure_ascii=False, indent=2), encoding="utf-8")
+    with pytest.raises(V2A1Error) as exc:
+        run_mocked_pipeline(
+            question="Alice 20",
+            model_side_input=schema_input(),
+            phase_o_output_json='{"operation":"INSERT","value_spans":[{"start_char":0,"end_char":5},{"start_char":6,"end_char":8}]}',
+            phase_m_output_json=json.dumps(insert_ir()),
+            root=root,
+        )
     assert_code(exc, "protocol_hash_mismatch")
 
 
@@ -244,6 +265,25 @@ def test_chat_template_adapter_uses_tokenizer_apply_chat_template() -> None:
     messages, _ = render_phase_o_prompt("Alice", inv())
     assert render_chat_prompt_with_tokenizer(tokenizer, messages) == "CHAT_TEMPLATE_RENDERED"
     assert tokenizer.called_with == (messages, False, True)
+
+
+def test_chat_template_preflight_hash_is_materialized() -> None:
+    preflight = json.loads((ROOT / "stage7d_v2_a1_implementation/CHAT_TEMPLATE_PREFLIGHT.json").read_text(encoding="utf-8"))
+    assert preflight["actual_chat_template_string_sha256"] == "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f"
+    assert preflight["tokenizer_config_file_sha256"] == "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4"
+    assert preflight["apply_chat_template_parameters"] == {"tokenize": False, "add_generation_prompt": True}
+    assert preflight["model_called"] is False
+
+
+def test_messages_hash_is_distinct_from_rendered_chat_hash() -> None:
+    class DummyTokenizer:
+        def apply_chat_template(self, messages, *, tokenize, add_generation_prompt):
+            return "<|im_start|>system\n" + messages[0]["content"] + "<|im_end|>\n<|im_start|>user\n" + messages[1]["content"] + "<|im_end|>\n<|im_start|>assistant\n"
+
+    messages, messages_hash = render_phase_o_prompt("Alice 20", inv())
+    rendered_hash = rendered_prompt_sha256(render_chat_prompt_with_tokenizer(DummyTokenizer(), messages))
+    assert messages_hash == sha256_text(serialize_prompt_object(messages))
+    assert messages_hash != rendered_hash
 
 
 def test_phase_o_parse_valid_insert() -> None:
@@ -397,17 +437,24 @@ def test_phase_m_insert_rejects_invalid_refs_and_extra_keys(mutation) -> None:
 def test_phase_m_insert_rejects_duplicate_column() -> None:
     ir = insert_ir()
     ir["assignments"][1]["column_ref"] = "COL_1"
+    bundle = slots_for("Alice 20", [{"start_char": 0, "end_char": 5}, {"start_char": 6, "end_char": 8}])
+    validate_phase_m_ir(ir, "INSERT", inv(), bundle)
+    materialize_ir_values(ir, inv(), bundle)
     with pytest.raises(V2A1Error) as exc:
-        validate_phase_m_ir(ir, "INSERT", inv(), slots_for("Alice 20", [{"start_char": 0, "end_char": 5}, {"start_char": 6, "end_char": 8}]))
+        verify_completeness(ir, bundle)
     assert_code(exc, "completeness_duplicate_column")
 
 
 def test_phase_m_insert_rejects_duplicate_slot() -> None:
     ir = insert_ir()
+    ir["assignments"][1]["column_ref"] = "COL_3"
     ir["assignments"][1]["slot_ref"] = "SLOT_1"
     ir["assignments"][1]["evidence_ref"] = "EV_1"
+    bundle = slots_for("Alice 20", [{"start_char": 0, "end_char": 5}, {"start_char": 6, "end_char": 8}])
+    validate_phase_m_ir(ir, "INSERT", inv(), bundle)
+    materialize_ir_values(ir, inv(), bundle)
     with pytest.raises(V2A1Error) as exc:
-        validate_phase_m_ir(ir, "INSERT", inv(), slots_for("Alice 20", [{"start_char": 0, "end_char": 5}, {"start_char": 6, "end_char": 8}]))
+        verify_completeness(ir, bundle)
     assert_code(exc, "completeness_duplicate_slot")
 
 
@@ -470,6 +517,45 @@ def test_upsert_do_nothing_and_do_update_contracts() -> None:
     base = {"operation": "UPSERT", "table_ref": "TAB_1", "conflict_target_ref": "CONSTRAINT_1", "insert_assignments": [{"column_ref": "COL_1", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"}]}
     validate_phase_m_ir({**base, "update_policy": "DO_NOTHING"}, "UPSERT", inv(), bundle)
     validate_phase_m_ir({**base, "update_policy": "DO_UPDATE", "update_assignments": [{"column_ref": "COL_2", "evidence_ref": "EV_2", "slot_ref": "SLOT_2"}]}, "UPSERT", inv(), bundle)
+
+
+def test_upsert_allows_same_slot_reused_across_insert_and_update_contexts() -> None:
+    bundle = slots_for("001", [{"start_char": 0, "end_char": 3}])
+    ir = {
+        "operation": "UPSERT",
+        "table_ref": "TAB_1",
+        "conflict_target_ref": "CONSTRAINT_1",
+        "insert_assignments": [{"column_ref": "COL_1", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"}],
+        "update_policy": "DO_UPDATE",
+        "update_assignments": [{"column_ref": "COL_2", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"}],
+    }
+    validate_phase_m_ir(ir, "UPSERT", inv(), bundle)
+    values = materialize_ir_values(ir, inv(), bundle)
+    verify_completeness(ir, bundle)
+    program = compile_sqlite_program(ir, inv(), values)
+    assert program.parameters == ("001", 1)
+
+
+@pytest.mark.parametrize("branch", ["insert_assignments", "update_assignments"])
+def test_upsert_rejects_duplicate_slot_within_same_branch(branch: str) -> None:
+    bundle = slots_for("Alice 20", [{"start_char": 0, "end_char": 5}, {"start_char": 6, "end_char": 8}])
+    ir = {
+        "operation": "UPSERT",
+        "table_ref": "TAB_1",
+        "conflict_target_ref": "CONSTRAINT_1",
+        "insert_assignments": [{"column_ref": "COL_1", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"}],
+        "update_policy": "DO_UPDATE",
+        "update_assignments": [{"column_ref": "COL_3", "evidence_ref": "EV_2", "slot_ref": "SLOT_2"}],
+    }
+    ir[branch] = [
+        {"column_ref": "COL_1", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"},
+        {"column_ref": "COL_3", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"},
+    ]
+    validate_phase_m_ir(ir, "UPSERT", inv(), bundle)
+    materialize_ir_values(ir, inv(), bundle)
+    with pytest.raises(V2A1Error) as exc:
+        verify_completeness(ir, bundle)
+    assert_code(exc, "completeness_duplicate_slot")
 
 
 @pytest.mark.parametrize(
@@ -593,6 +679,21 @@ def test_compile_upsert_do_nothing_and_update() -> None:
     assert "DO UPDATE SET" in update.sql
 
 
+def test_materialized_values_are_binding_specific_not_evidence_keyed() -> None:
+    bundle = slots_for("001", [{"start_char": 0, "end_char": 3}])
+    ir = {
+        "operation": "UPSERT",
+        "table_ref": "TAB_1",
+        "conflict_target_ref": "CONSTRAINT_1",
+        "insert_assignments": [{"column_ref": "COL_1", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"}],
+        "update_policy": "DO_UPDATE",
+        "update_assignments": [{"column_ref": "COL_2", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"}],
+    }
+    values = materialize_ir_values(ir, inv(), bundle)
+    assert values["insert_assignments[0]"].value == "001"
+    assert values["update_assignments[0]"].value == 1
+
+
 def test_preflight_success_and_rollback_preserves_db(workspace_tmp: Path) -> None:
     db = make_db(workspace_tmp)
     bundle = slots_for("Alice 20", [{"start_char": 0, "end_char": 5}, {"start_char": 6, "end_char": 8}])
@@ -707,6 +808,58 @@ def test_mocked_pipeline_materialization_precedes_completeness() -> None:
             phase_m_output_json=json.dumps(ir),
         )
     assert_code(exc, "materialization_failure")
+
+
+def test_mocked_pipeline_duplicate_slot_with_invalid_numeric_reports_materialization_first() -> None:
+    ir = {
+        "operation": "INSERT",
+        "table_ref": "TAB_1",
+        "assignments": [
+            {"column_ref": "COL_2", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"},
+            {"column_ref": "COL_3", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"},
+        ],
+    }
+    with pytest.raises(V2A1Error) as exc:
+        run_mocked_pipeline(
+            question="bad 20",
+            model_side_input=schema_input(),
+            phase_o_output_json='{"operation":"INSERT","value_spans":[{"start_char":0,"end_char":3},{"start_char":4,"end_char":6}]}',
+            phase_m_output_json=json.dumps(ir),
+        )
+    assert_code(exc, "materialization_failure")
+
+
+def test_mocked_pipeline_duplicate_column_with_invalid_numeric_reports_materialization_first() -> None:
+    ir = {
+        "operation": "INSERT",
+        "table_ref": "TAB_1",
+        "assignments": [
+            {"column_ref": "COL_2", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"},
+            {"column_ref": "COL_2", "evidence_ref": "EV_2", "slot_ref": "SLOT_2"},
+        ],
+    }
+    with pytest.raises(V2A1Error) as exc:
+        run_mocked_pipeline(
+            question="bad 20",
+            model_side_input=schema_input(),
+            phase_o_output_json='{"operation":"INSERT","value_spans":[{"start_char":0,"end_char":3},{"start_char":4,"end_char":6}]}',
+            phase_m_output_json=json.dumps(ir),
+        )
+    assert_code(exc, "materialization_failure")
+
+
+def test_mocked_pipeline_result_names_message_hash_separately() -> None:
+    result = run_mocked_pipeline(
+        question="Alice 20",
+        model_side_input=schema_input(),
+        phase_o_output_json='{"operation":"INSERT","value_spans":[{"start_char":0,"end_char":5},{"start_char":6,"end_char":8}]}',
+        phase_m_output_json=json.dumps(insert_ir()),
+    )
+    assert result.phase_o_messages_sha256
+    assert result.phase_m_messages_sha256
+    assert result.phase_o_rendered_chat_prompt_sha256 is None
+    assert result.phase_m_rendered_chat_prompt_sha256 is None
+    assert not hasattr(result, "phase_o_rendered_prompt_sha256")
 
 
 def test_primary_pipeline_does_not_import_oracle_provider() -> None:

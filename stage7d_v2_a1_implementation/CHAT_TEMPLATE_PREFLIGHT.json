@@ -1,0 +1,19 @@
+{
+  "actual_chat_template_string_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+  "apply_chat_template_parameters": {
+    "add_generation_prompt": true,
+    "tokenize": false
+  },
+  "generation_run": false,
+  "gpu_called": false,
+  "hash_method": "sha256(canonical_lf(tokenizer_config_json['chat_template']).encode('utf-8'))",
+  "model_called": false,
+  "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "source": "HuggingFace tokenizer_config.json at the frozen tokenizer revision",
+  "source_url": "https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct/raw/c03e6d358207e414f1eca0bb1891e29f1db0e242/tokenizer_config.json",
+  "stage": "Stage7D_V2_A1_IMPLEMENTATION",
+  "status": "PASS_CHAT_TEMPLATE_PREFLIGHT_LOCKED",
+  "tokenizer_config_file_sha256": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
+  "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242"
+}

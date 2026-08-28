@@ -63,11 +63,22 @@
     },
     {
       "code": [
+        "typed_materializer.py",
         "completeness.py"
       ],
-      "spec": "Semantic completeness",
+      "spec": "Semantic completeness after materialization",
       "tests": [
-        "missing/duplicate/unknown slot tests"
+        "materialization-before-completeness and context-scoped duplicate tests"
+      ]
+    },
+    {
+      "code": [
+        "typed_materializer.py",
+        "compiler.py"
+      ],
+      "spec": "Binding-specific UPSERT values",
+      "tests": [
+        "same EV/SLOT reused across UPSERT insert/update contexts"
       ]
     },
     {

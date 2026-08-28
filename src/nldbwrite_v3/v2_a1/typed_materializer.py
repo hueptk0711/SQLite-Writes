@@ -6,7 +6,7 @@ from typing import Any
 
 from .inventories import column
 from .slot_inventory import evidence_text
-from .types import MaterializedValue, SchemaInventory, SlotBundle, V2A1Error
+from .types import MaterializedBinding, MaterializedValue, SchemaInventory, SlotBundle, V2A1Error
 
 
 STRICT_INT = re.compile(r"[+-]?\d+")
@@ -46,26 +46,35 @@ def materialize_value(raw: str, declared_type: str, *, evidence_ref: str = "") -
     raise V2A1Error("materialization_failure", "BLOB or unsupported affinity requires a frozen representation")
 
 
-def materialize_ir_values(ir: dict[str, Any], inventory: SchemaInventory, slots: SlotBundle) -> dict[str, MaterializedValue]:
-    values: dict[str, MaterializedValue] = {}
-    for assignment in _assignments(ir):
-        evidence_ref = assignment["evidence_ref"]
-        col = column(inventory, assignment["column_ref"])
-        values[evidence_ref] = materialize_value(evidence_text(slots, evidence_ref), col.source_type, evidence_ref=evidence_ref)
-    for predicate in _predicates(ir):
-        evidence_ref = predicate["evidence_ref"]
-        col = column(inventory, predicate["column_ref"])
-        values[evidence_ref] = materialize_value(evidence_text(slots, evidence_ref), col.source_type, evidence_ref=evidence_ref)
+def binding_key(context: str, index: int) -> str:
+    return f"{context}[{index}]"
+
+
+def materialize_ir_values(ir: dict[str, Any], inventory: SchemaInventory, slots: SlotBundle) -> dict[str, MaterializedBinding]:
+    values: dict[str, MaterializedBinding] = {}
+    for context, index, item in iter_value_bindings(ir):
+        evidence_ref = item["evidence_ref"]
+        col = column(inventory, item["column_ref"])
+        materialized = materialize_value(evidence_text(slots, evidence_ref), col.source_type, evidence_ref=evidence_ref)
+        key = binding_key(context, index)
+        values[key] = MaterializedBinding(
+            binding_key=key,
+            context=context,
+            index=index,
+            column_ref=item["column_ref"],
+            evidence_ref=evidence_ref,
+            slot_ref=item["slot_ref"],
+            value=materialized.value,
+            sqlite_affinity=materialized.sqlite_affinity,
+        )
     return values
 
 
-def _assignments(ir: dict[str, Any]) -> list[dict[str, str]]:
-    items: list[dict[str, str]] = []
+def iter_value_bindings(ir: dict[str, Any]) -> list[tuple[str, int, dict[str, str]]]:
+    items: list[tuple[str, int, dict[str, str]]] = []
     for key in ("assignments", "insert_assignments", "update_assignments"):
-        items.extend(ir.get(key, []))
-    return items
-
-
-def _predicates(ir: dict[str, Any]) -> list[dict[str, str]]:
+        items.extend((key, index, item) for index, item in enumerate(ir.get(key, [])))
     selector = ir.get("row_selector")
-    return [] if not selector else list(selector.get("predicates", []))
+    if selector:
+        items.extend(("row_selector.predicates", index, item) for index, item in enumerate(selector.get("predicates", [])))
+    return items

@@ -1,6 +1,6 @@
 {
-  "collected_test_cases": 116,
-  "declared_test_functions": 68,
+  "collected_test_cases": 127,
+  "declared_test_functions": 78,
   "last_observed_result": "not_run_by_builder",
   "py_compile_command": "python -m py_compile <all Stage7D modules and tests>",
   "pytest_command": "python -m pytest -q tests/v2_a1/test_stage7d_v2_a1.py",
