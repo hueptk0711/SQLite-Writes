@@ -144,9 +144,12 @@ Why PATCH{patch} exists:
 
 PATCH{patch} changes:
 - Removes precomputed answer candidates from the primary generation API.
-- Builds decoder constraint spaces from the frozen Phase O schema, dynamic Phase M schema, and runtime domains rather than label-side answers.
+- Replaces finite complete-object enumeration with an incremental JSON/schema grammar decoder for the Stage7E0 smoke schemas.
+- Builds decoder constraints from the frozen Phase O schema, dynamic Phase M schema, and runtime domains rather than label-side answers.
 - Keeps synthetic expected labels only for post-generation evaluation.
 - Adds `ANSWER_INJECTION_AUDIT.json` and tests for label-independence and non-singleton constraint spaces.
+- Adds `CONSTRAINT_CAPACITY_AUDIT.json` and tests that Phase O can represent 3/5/7/13 spans without a hard max-2 cap.
+- Adds a diagnostic-only Phase M real-generation smoke using deterministic synthetic slots; this does not rescue or replace the primary end-to-end smoke.
 - Packages server output ZIP/SHA even when the real-generation preflight returns FAIL, then exits with the original runner status.
 - Reports downstream phase violations only for phases that actually ran, so a Phase O label mismatch is not misreported as a Phase M/preflight failure.
 - Keeps `fallback_to_unconstrained=false`, `automatic_repair=false`, and `retry=0`.
@@ -282,7 +285,7 @@ def build_package(patch: int, output_root: Path) -> dict[str, str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build Stage7E0 reviewer and server run packages.")
-    parser.add_argument("--patch", type=int, default=6)
+    parser.add_argument("--patch", type=int, default=7)
     parser.add_argument("--output-root", type=Path, default=PROJECT_ROOT / "reviewer_packages")
     args = parser.parse_args()
 

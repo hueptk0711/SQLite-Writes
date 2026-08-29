@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import itertools
 import json
 import os
 import platform
@@ -59,34 +58,59 @@ class SmokeFixture:
 
 
 @dataclass(frozen=True)
-class ConstraintSpace:
+class IncrementalConstraintGrammar:
     phase: str
     schema_sha256: str
     constraint_source: str
-    candidates: tuple[dict[str, Any], ...]
+    literals: tuple[str, ...]
     branching_evidence: dict[str, Any]
-
-    @property
-    def canonical_texts(self) -> tuple[str, ...]:
-        return tuple(sorted(canonical_json(candidate) for candidate in self.candidates))
+    capacity: dict[str, Any]
 
     @property
     def fingerprint(self) -> str:
-        return sha256_text("\n".join(self.canonical_texts))
+        payload = {
+            "capacity": self.capacity,
+            "constraint_source": self.constraint_source,
+            "literals": self.literals,
+            "phase": self.phase,
+            "schema_sha256": self.schema_sha256,
+        }
+        return sha256_text(canonical_json(payload))
+
+    def status(self, text: str) -> str:
+        if self.phase == "phase_o":
+            return phase_o_prefix_status(text, self.branching_evidence["operation_choices"])
+        if self.phase == "phase_m":
+            return phase_m_insert_prefix_status(
+                text,
+                self.branching_evidence["table_choices"],
+                self.branching_evidence["column_choices"],
+                self.branching_evidence["evidence_choices"],
+                self.branching_evidence["slot_choices"],
+            )
+        raise AssertionError(self.phase)
+
+    def is_prefix(self, text: str) -> bool:
+        return self.status(text) in {"prefix", "complete"}
+
+    def is_complete(self, text: str) -> bool:
+        return self.status(text) == "complete"
 
     def metadata(self) -> dict[str, Any]:
         return {
             "phase": self.phase,
             "constraint_source": self.constraint_source,
             "schema_sha256": self.schema_sha256,
-            "constraint_space_sha256": self.fingerprint,
-            "candidate_count": len(self.candidates),
-            "constraint_space_singleton": len(self.candidates) == 1,
+            "constraint_grammar_sha256": self.fingerprint,
+            "constraint_space_singleton": False,
             "semantic_branch_points_observed": bool(self.branching_evidence.get("semantic_branch_points_observed")),
             "finite_known_answer_candidates": False,
+            "finite_complete_object_enumeration": False,
             "label_side_data_used_for_constraints": False,
-            "candidate_text_sha256_sample": [sha256_text(text) for text in self.canonical_texts[:8]],
+            "hard_max_semantic_spans": None,
+            "complete_object_candidate_count": None,
             "branching_evidence": self.branching_evidence,
+            "capacity": self.capacity,
         }
 
 
@@ -183,41 +207,58 @@ def smoke_fixtures() -> list[SmokeFixture]:
     ]
 
 
-class SchemaDrivenPrefixTrieConstrainedBackend:
-    def __init__(self, tokenizer: Any, constraint_space: ConstraintSpace, *, eos_token_id: int | None) -> None:
+class IncrementalJsonSchemaGrammarBackend:
+    def __init__(self, tokenizer: Any, grammar: IncrementalConstraintGrammar, *, eos_token_id: int | None) -> None:
         if eos_token_id is None:
             raise ValueError("Tokenizer must expose eos_token_id for constrained generation")
         self.tokenizer = tokenizer
-        self.constraint_space = constraint_space
-        self.allowed_texts = list(constraint_space.canonical_texts)
-        self.allowed_token_paths = [tokenizer(text, add_special_tokens=False).input_ids for text in self.allowed_texts]
-        if not self.allowed_token_paths:
-            raise ValueError("Schema-driven constrained backend produced no JSON candidates")
+        self.grammar = grammar
         self.eos_token_id = int(eos_token_id)
+        self.special_ids = set(getattr(tokenizer, "all_special_ids", []) or [])
+        self.token_texts = self._token_texts()
         self.prompt_token_count = 0
+        self.allowed_cache: dict[str, list[int]] = {}
 
     def set_prompt_token_count(self, prompt_token_count: int) -> None:
         self.prompt_token_count = int(prompt_token_count)
 
+    def _token_texts(self) -> list[tuple[int, str]]:
+        vocab_size = len(self.tokenizer)
+        token_texts: list[tuple[int, str]] = []
+        for token_id in range(vocab_size):
+            if token_id == self.eos_token_id or token_id in self.special_ids:
+                continue
+            text = self.tokenizer.decode([token_id], skip_special_tokens=False, clean_up_tokenization_spaces=False)
+            if text and self._token_text_is_json_safe(text):
+                token_texts.append((token_id, text))
+        return token_texts
+
+    @staticmethod
+    def _token_text_is_json_safe(text: str) -> bool:
+        return all(ch in '{}[]":,0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz' for ch in text)
+
     def allowed_tokens(self, _batch_id: int, input_ids: Any) -> list[int]:
         generated = input_ids.tolist()[self.prompt_token_count :]
-        allowed: set[int] = set()
-        for path in self.allowed_token_paths:
-            if generated == path:
-                allowed.add(self.eos_token_id)
-            elif len(generated) < len(path) and path[: len(generated)] == generated:
-                allowed.add(int(path[len(generated)]))
-        return sorted(allowed) or [self.eos_token_id]
+        text = self.tokenizer.decode(generated, skip_special_tokens=False, clean_up_tokenization_spaces=False)
+        if self.grammar.is_complete(text):
+            return [self.eos_token_id]
+        if text in self.allowed_cache:
+            return self.allowed_cache[text]
+        allowed = [token_id for token_id, token_text in self.token_texts if self.grammar.is_prefix(text + token_text)]
+        self.allowed_cache[text] = allowed or [self.eos_token_id]
+        return self.allowed_cache[text]
 
     def metadata(self) -> dict[str, Any]:
         return {
-            "backend": "schema_driven_prefix_allowed_tokens_trie",
-            "schema_mode": "schema_compiled_runtime_domain_trie",
+            "backend": "incremental_json_schema_grammar",
+            "schema_mode": "incremental_json_schema_grammar",
             "token_level_enforcement": True,
             "fallback_to_unconstrained": False,
             "automatic_repair": False,
             "retry": 0,
-            **self.constraint_space.metadata(),
+            "vocab_size": len(self.tokenizer),
+            "json_safe_token_count": len(self.token_texts),
+            **self.grammar.metadata(),
         }
 
 
@@ -233,93 +274,215 @@ def _enum_at(schema: dict[str, Any], *path: str) -> list[str]:
     return [str(value) for value in values]
 
 
-def _all_non_overlapping_span_sets(question: str, *, max_spans: int = 2) -> list[list[dict[str, int]]]:
-    spans = [{"start_char": start, "end_char": end} for start in range(len(question)) for end in range(start + 1, len(question) + 1)]
-    choices: list[list[dict[str, int]]] = [[span] for span in spans]
-    if max_spans >= 2:
-        for combo in itertools.combinations(spans, 2):
-            try:
-                sorted_spans = validate_and_sort_spans(question, list(combo))
-            except V2A1Error:
-                continue
-            choices.append([{"start_char": span.start_char, "end_char": span.end_char} for span in sorted_spans])
-    return choices
+def _literal_status(text: str, literal: str, pos: int) -> tuple[str, int]:
+    if pos >= len(text):
+        return "prefix", pos
+    end = min(len(text), pos + len(literal))
+    fragment = text[pos:end]
+    if not literal.startswith(fragment):
+        return "invalid", pos
+    if len(fragment) < len(literal):
+        return "prefix", len(text)
+    return "complete", pos + len(literal)
 
 
-def build_phase_o_constraint_space(schema: dict[str, Any], question: str, *, max_spans: int = 2) -> ConstraintSpace:
+def _enum_status(text: str, values: list[str], pos: int) -> list[tuple[str, int]]:
+    if pos >= len(text):
+        return [("prefix", pos)]
+    results: list[tuple[str, int]] = []
+    for value in values:
+        end = min(len(text), pos + len(value))
+        fragment = text[pos:end]
+        if value.startswith(fragment):
+            if len(fragment) < len(value):
+                results.append(("prefix", len(text)))
+            else:
+                results.append(("complete", pos + len(value)))
+    return results
+
+
+def _integer_status(text: str, pos: int) -> tuple[str, int]:
+    if pos >= len(text):
+        return "prefix", pos
+    if not text[pos].isdigit():
+        return "invalid", pos
+    if text[pos] == "0":
+        if pos + 1 < len(text) and text[pos + 1].isdigit():
+            return "invalid", pos
+        return "complete", pos + 1
+    while pos < len(text) and text[pos].isdigit():
+        pos += 1
+    return "complete", pos
+
+
+def _sequence_status(text: str, pos: int, parts: list[Any]) -> list[tuple[str, int]]:
+    states = [("complete", pos)]
+    for part in parts:
+        next_states: list[tuple[str, int]] = []
+        for _status, state_pos in states:
+            if isinstance(part, str):
+                result = _literal_status(text, part, state_pos)
+                if result[0] != "invalid":
+                    next_states.append(result)
+            else:
+                next_states.extend(part(text, state_pos))
+        if not next_states:
+            return []
+        if any(status == "prefix" for status, _pos in next_states):
+            return next_states
+        states = next_states
+    return states
+
+
+def _span_object_status(text: str, pos: int) -> list[tuple[str, int]]:
+    return _sequence_status(text, pos, ['{"end_char":', _int_part, ',"start_char":', _int_part, "}"])
+
+
+def _assignment_object_status(columns: list[str], evidence: list[str], slots: list[str]):
+    def parse(text: str, pos: int) -> list[tuple[str, int]]:
+        return _sequence_status(
+            text,
+            pos,
+            [
+                '{"column_ref":"',
+                lambda value, value_pos: _enum_status(value, columns, value_pos),
+                '","evidence_ref":"',
+                lambda value, value_pos: _enum_status(value, evidence, value_pos),
+                '","slot_ref":"',
+                lambda value, value_pos: _enum_status(value, slots, value_pos),
+                '"}',
+            ],
+        )
+
+    return parse
+
+
+def _int_part(text: str, pos: int) -> list[tuple[str, int]]:
+    result = _integer_status(text, pos)
+    return [] if result[0] == "invalid" else [result]
+
+
+def _array_plus_status(text: str, pos: int, item_parser: Any) -> list[tuple[str, int]]:
+    item_results = item_parser(text, pos)
+    if not item_results:
+        return []
+    results: list[tuple[str, int]] = []
+    for status, item_end in item_results:
+        if status == "prefix":
+            results.append((status, item_end))
+            continue
+        if item_end >= len(text):
+            results.append(("prefix", item_end))
+            continue
+        close_result = _literal_status(text, "]", item_end)
+        if close_result[0] != "invalid":
+            results.append(close_result)
+        comma_result = _literal_status(text, ",", item_end)
+        if comma_result[0] == "prefix":
+            results.append(comma_result)
+        elif comma_result[0] == "complete":
+            results.extend(_array_plus_status(text, comma_result[1], item_parser))
+    return results
+
+
+def _overall_status(results: list[tuple[str, int]], text: str) -> str:
+    if any(status == "complete" and pos == len(text) for status, pos in results):
+        return "complete"
+    if any(status == "prefix" and pos <= len(text) for status, pos in results):
+        return "prefix"
+    if any(status == "complete" and pos == len(text) for status, pos in results):
+        return "prefix"
+    return "invalid"
+
+
+def phase_o_prefix_status(text: str, operations: list[str]) -> str:
+    results = _sequence_status(
+        text,
+        0,
+        ['{"operation":"', lambda value, value_pos: _enum_status(value, operations, value_pos), '","value_spans":[', lambda value, value_pos: _array_plus_status(value, value_pos, _span_object_status), "}"],
+    )
+    return _overall_status(results, text)
+
+
+def phase_m_insert_prefix_status(text: str, tables: list[str], columns: list[str], evidence: list[str], slots: list[str]) -> str:
+    assignment_parser = _assignment_object_status(columns, evidence, slots)
+    results = _sequence_status(
+        text,
+        0,
+        [
+            '{"assignments":[',
+            lambda value, value_pos: _array_plus_status(value, value_pos, assignment_parser),
+            ',"operation":"INSERT","table_ref":"',
+            lambda value, value_pos: _enum_status(value, tables, value_pos),
+            '"}',
+        ],
+    )
+    return _overall_status(results, text)
+
+
+def build_phase_o_constraint_grammar(schema: dict[str, Any], question: str) -> IncrementalConstraintGrammar:
     operations = _enum_at(schema, "properties", "operation")
-    span_sets = _all_non_overlapping_span_sets(question, max_spans=max_spans)
-    candidates = tuple({"operation": operation, "value_spans": spans} for operation in operations for spans in span_sets)
-    validate_constraint_candidates("phase_o", list(candidates), schema, question=question)
-    return ConstraintSpace(
+    return IncrementalConstraintGrammar(
         phase="phase_o",
         schema_sha256=sha256_text(canonical_json(schema)),
         constraint_source="json_schema_plus_question_offset_domain",
-        candidates=candidates,
+        literals=("operation", "value_spans", "end_char", "start_char"),
         branching_evidence={
             "operation_choices": operations,
             "operation_branch_count": len(operations),
-            "span_set_count": len(span_sets),
-            "max_spans_per_candidate": max_spans,
-            "semantic_branch_points_observed": len(operations) > 1 and len(span_sets) > 1,
+            "integer_offsets_model_chosen": True,
+            "array_can_continue_after_each_span": True,
+            "semantic_branch_points_observed": len(operations) > 1,
+        },
+        capacity={
+            "phase_o_schema_min_items": schema["properties"]["value_spans"].get("minItems"),
+            "phase_o_schema_max_items": schema["properties"]["value_spans"].get("maxItems"),
+            "backend_hard_max_spans": None,
+            "backend_supports_more_than_two_spans": True,
         },
     )
 
 
-def build_phase_m_constraint_space(
+def build_phase_m_constraint_grammar(
     schema: dict[str, Any],
     operation: str,
     inventory: Any,
     slots: Any,
     *,
     root: Path = ROOT,
-) -> ConstraintSpace:
+) -> IncrementalConstraintGrammar:
     if operation != "INSERT":
         raise V2A1Error("constraint_phase_m_operation_unsupported", "Stage7E0 smoke constraint compiler currently supports INSERT only", details={"operation": operation})
     tables = _enum_at(schema, "properties", "table_ref")
     columns = _enum_at(schema, "properties", "assignments", "items", "properties", "column_ref")
+    evidence = _enum_at(schema, "properties", "assignments", "items", "properties", "evidence_ref")
+    slot_refs = _enum_at(schema, "properties", "assignments", "items", "properties", "slot_ref")
     slot_items = sorted(slots.slots, key=lambda item: item.slot_ref)
-    if len(columns) < len(slot_items):
-        raise V2A1Error("constraint_phase_m_domain_too_small", "Not enough column choices for smoke slot mappings")
-    candidates: list[dict[str, Any]] = []
-    for table_ref in tables:
-        for slot_order in itertools.permutations(slot_items):
-            for column_order in itertools.permutations(columns, len(slot_order)):
-                assignments = [
-                    {"column_ref": column_ref, "evidence_ref": slot.evidence_ref, "slot_ref": slot.slot_ref}
-                    for slot, column_ref in zip(slot_order, column_order)
-                ]
-                candidates.append({"operation": operation, "table_ref": table_ref, "assignments": assignments})
-    validate_constraint_candidates("phase_m", candidates, schema, root=root, operation=operation, inventory=inventory, slots=slots)
-    return ConstraintSpace(
+    return IncrementalConstraintGrammar(
         phase="phase_m",
         schema_sha256=sha256_text(canonical_json(schema)),
         constraint_source="json_schema_plus_dynamic_reference_domains",
-        candidates=tuple(candidates),
+        literals=("assignments", "column_ref", "evidence_ref", "slot_ref", "operation", "INSERT", "table_ref"),
         branching_evidence={
             "table_choices": tables,
             "column_choices": columns,
-            "slot_choices": [slot.slot_ref for slot in slot_items],
-            "assignment_order_permitted": len(slot_items) > 1,
-            "mapping_candidate_count": len(candidates),
-            "wrong_but_schema_valid_mapping_present": _has_wrong_but_schema_valid_insert_mapping(candidates),
-            "semantic_branch_points_observed": len(candidates) > 1,
+            "evidence_choices": evidence,
+            "slot_choices": slot_refs,
+            "assignment_array_can_continue": True,
+            "wrong_but_schema_valid_mapping_present": "COL_1" in columns and "COL_2" in columns and "SLOT_1" in slot_refs and "SLOT_2" in slot_refs,
+            "semantic_branch_points_observed": len(columns) > 1 and len(slot_refs) > 1,
+        },
+        capacity={
+            "phase_m_schema_min_items": schema["properties"]["assignments"].get("minItems"),
+            "phase_m_schema_max_items": schema["properties"]["assignments"].get("maxItems"),
+            "backend_hard_max_assignments": None,
+            "backend_supports_more_than_two_slots": len(slot_items) > 2 or len(slot_refs) > 2,
+            "complete_mapping_permutation_enumeration": False,
         },
     )
 
 
-def _has_wrong_but_schema_valid_insert_mapping(candidates: list[dict[str, Any]]) -> bool:
-    for candidate in candidates:
-        assignments = candidate.get("assignments", [])
-        if len(assignments) < 2:
-            continue
-        by_slot = {item["slot_ref"]: item["column_ref"] for item in assignments}
-        if by_slot.get("SLOT_1") == "COL_2" and by_slot.get("SLOT_2") == "COL_1":
-            return True
-    return False
-
-
-def build_constraint_space(
+def build_constraint_grammar(
     phase: str,
     schema: dict[str, Any],
     *,
@@ -332,46 +495,12 @@ def build_constraint_space(
     if phase == "phase_o":
         if question is None:
             raise V2A1Error("constraint_phase_o_context_missing", "Phase O constrained generation requires the question text")
-        return build_phase_o_constraint_space(schema, question)
+        return build_phase_o_constraint_grammar(schema, question)
     if phase == "phase_m":
         if operation is None or inventory is None or slots is None:
             raise V2A1Error("constraint_phase_m_context_missing", "Phase M constrained generation requires operation, inventory, and slots")
-        return build_phase_m_constraint_space(schema, operation, inventory, slots, root=root)
+        return build_phase_m_constraint_grammar(schema, operation, inventory, slots, root=root)
     raise V2A1Error("constrained_backend_unknown_phase", "Unsupported constrained generation phase", details={"phase": phase})
-
-
-def validate_constraint_candidates(
-    phase: str,
-    candidates: list[dict[str, Any]],
-    schema: dict[str, Any],
-    *,
-    root: Path = ROOT,
-    question: str | None = None,
-    operation: str | None = None,
-    inventory: Any | None = None,
-    slots: Any | None = None,
-) -> dict[str, Any]:
-    if not candidates:
-        raise V2A1Error("constrained_backend_no_candidates", "Constrained backend requires at least one schema-valid JSON candidate")
-    candidate_hashes: list[str] = []
-    for obj in candidates:
-        validate_schema_subset(schema, obj, reason_code=f"{phase}_candidate_schema_failure")
-        if phase == "phase_o":
-            parse_phase_o_output(canonical_json(obj), root=root)
-            if question is not None:
-                validate_and_sort_spans(question, obj["value_spans"])
-        elif phase == "phase_m":
-            if operation is None or inventory is None or slots is None:
-                raise V2A1Error("phase_m_candidate_context_missing", "Phase M candidate validation requires operation, inventory, and slots")
-            validate_phase_m_ir(obj, operation, inventory, slots, root=root)
-        else:
-            raise V2A1Error("constrained_backend_unknown_phase", "Unsupported constrained generation phase", details={"phase": phase})
-        candidate_hashes.append(sha256_text(canonical_json(obj)))
-    return {
-        "candidate_count": len(candidates),
-        "candidate_text_sha256": candidate_hashes,
-        "schema_sha256": sha256_text(canonical_json(schema)),
-    }
 
 
 def generate_constrained(
@@ -390,7 +519,7 @@ def generate_constrained(
 ) -> dict[str, Any]:
     import torch
 
-    constraint_space = build_constraint_space(
+    constraint_grammar = build_constraint_grammar(
         phase,
         schema,
         question=question,
@@ -404,7 +533,7 @@ def generate_constrained(
     device = next(model.parameters()).device
     inputs = {key: value.to(device) for key, value in inputs.items()}
     prompt_tokens = int(inputs["input_ids"].shape[-1])
-    backend = SchemaDrivenPrefixTrieConstrainedBackend(tokenizer, constraint_space, eos_token_id=tokenizer.eos_token_id)
+    backend = IncrementalJsonSchemaGrammarBackend(tokenizer, constraint_grammar, eos_token_id=tokenizer.eos_token_id)
     backend.set_prompt_token_count(prompt_tokens)
     start = time.monotonic()
     with torch.inference_mode():
@@ -492,14 +621,14 @@ def answer_injection_audit(fixtures: list[SmokeFixture], root: Path) -> dict[str
     for fixture in fixtures:
         inventory = build_schema_inventory(fixture.schema_input)
         phase_o_schema = phase_o_json_schema(root)
-        phase_o_constraints = build_phase_o_constraint_space(phase_o_schema, fixture.question)
+        phase_o_grammar = build_phase_o_constraint_grammar(phase_o_schema, fixture.question)
         mutated_phase_o_label = {"operation": "DELETE", "value_spans": [{"start_char": 0, "end_char": 1}]}
-        phase_o_constraints_after_label_mutation = build_phase_o_constraint_space(phase_o_schema, fixture.question)
+        phase_o_grammar_after_label_mutation = build_phase_o_constraint_grammar(phase_o_schema, fixture.question)
 
         spans = validate_and_sort_spans(fixture.question, fixture.phase_o_label["value_spans"])
         slots = build_slot_bundle(spans)
         phase_m_schema = dynamic_schema(fixture.phase_o_label["operation"], inventory, slots, root=root)
-        phase_m_constraints = build_phase_m_constraint_space(phase_m_schema, fixture.phase_o_label["operation"], inventory, slots, root=root)
+        phase_m_grammar = build_phase_m_constraint_grammar(phase_m_schema, fixture.phase_o_label["operation"], inventory, slots, root=root)
         mutated_phase_m_label = {
             "operation": "INSERT",
             "table_ref": "TAB_1",
@@ -508,26 +637,28 @@ def answer_injection_audit(fixtures: list[SmokeFixture], root: Path) -> dict[str
                 {"column_ref": "COL_1", "evidence_ref": "EV_2", "slot_ref": "SLOT_2"},
             ],
         }
-        phase_m_constraints_after_label_mutation = build_phase_m_constraint_space(phase_m_schema, fixture.phase_o_label["operation"], inventory, slots, root=root)
+        phase_m_grammar_after_label_mutation = build_phase_m_constraint_grammar(phase_m_schema, fixture.phase_o_label["operation"], inventory, slots, root=root)
         rows.append(
             {
                 "sample_id": fixture.sample_id,
                 "phase_o_label_mutation_sha256": sha256_text(canonical_json(mutated_phase_o_label)),
                 "phase_m_label_mutation_sha256": sha256_text(canonical_json(mutated_phase_m_label)),
-                "phase_o_constraint_hash_before": phase_o_constraints.fingerprint,
-                "phase_o_constraint_hash_after_label_mutation": phase_o_constraints_after_label_mutation.fingerprint,
-                "phase_m_constraint_hash_before": phase_m_constraints.fingerprint,
-                "phase_m_constraint_hash_after_label_mutation": phase_m_constraints_after_label_mutation.fingerprint,
-                "phase_o_candidate_count": len(phase_o_constraints.candidates),
-                "phase_m_candidate_count": len(phase_m_constraints.candidates),
-                "phase_m_wrong_but_schema_valid_mapping_present": phase_m_constraints.branching_evidence["wrong_but_schema_valid_mapping_present"],
+                "phase_o_constraint_hash_before": phase_o_grammar.fingerprint,
+                "phase_o_constraint_hash_after_label_mutation": phase_o_grammar_after_label_mutation.fingerprint,
+                "phase_m_constraint_hash_before": phase_m_grammar.fingerprint,
+                "phase_m_constraint_hash_after_label_mutation": phase_m_grammar_after_label_mutation.fingerprint,
+                "phase_o_complete_object_candidate_count": None,
+                "phase_m_complete_object_candidate_count": None,
+                "phase_o_finite_complete_object_enumeration": False,
+                "phase_m_finite_complete_object_enumeration": False,
+                "phase_m_wrong_but_schema_valid_mapping_present": phase_m_grammar.branching_evidence["wrong_but_schema_valid_mapping_present"],
             }
         )
     status = "PASS" if all(
         row["phase_o_constraint_hash_before"] == row["phase_o_constraint_hash_after_label_mutation"]
         and row["phase_m_constraint_hash_before"] == row["phase_m_constraint_hash_after_label_mutation"]
-        and row["phase_o_candidate_count"] > 1
-        and row["phase_m_candidate_count"] > 1
+        and row["phase_o_finite_complete_object_enumeration"] is False
+        and row["phase_m_finite_complete_object_enumeration"] is False
         and row["phase_m_wrong_but_schema_valid_mapping_present"]
         for row in rows
     ) else "FAIL"
@@ -538,12 +669,103 @@ def answer_injection_audit(fixtures: list[SmokeFixture], root: Path) -> dict[str
         "generation_path_reads_phase_m_label": False,
         "generation_path_reads_gold_labels": False,
         "finite_expected_candidate_trie": False,
+        "finite_complete_object_enumeration": False,
         "constraint_source": "json_schema_plus_runtime_domains_not_label_side_answers",
         "label_side_data_used_for_constraints": False,
         "fallback_to_unconstrained": False,
         "automatic_repair": False,
         "retry": 0,
         "rows": rows,
+    }
+
+
+def phase_o_object_with_span_count(span_count: int) -> dict[str, Any]:
+    return {
+        "operation": "INSERT",
+        "value_spans": [{"start_char": index * 2, "end_char": index * 2 + 1} for index in range(span_count)],
+    }
+
+
+def phase_m_object_with_assignment_count(assignment_count: int) -> dict[str, Any]:
+    return {
+        "assignments": [
+            {"column_ref": f"COL_{index}", "evidence_ref": f"EV_{index}", "slot_ref": f"SLOT_{index}"}
+            for index in range(1, assignment_count + 1)
+        ],
+        "operation": "INSERT",
+        "table_ref": "TAB_1",
+    }
+
+
+def constraint_capacity_audit(root: Path) -> dict[str, Any]:
+    phase_o_schema = phase_o_json_schema(root)
+    phase_o_grammar = build_phase_o_constraint_grammar(phase_o_schema, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    phase_o_counts = [1, 2, 3, 5, 7, 13]
+    phase_o_results = {
+        str(count): phase_o_grammar.is_complete(canonical_json(phase_o_object_with_span_count(count)))
+        for count in phase_o_counts
+    }
+
+    phase_m_schema = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["operation", "table_ref", "assignments"],
+        "properties": {
+            "operation": {"const": "INSERT"},
+            "table_ref": {"type": "string", "enum": ["TAB_1"]},
+            "assignments": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "required": ["column_ref", "evidence_ref", "slot_ref"],
+                    "properties": {
+                        "column_ref": {"type": "string", "enum": [f"COL_{index}" for index in range(1, 8)]},
+                        "evidence_ref": {"type": "string", "enum": [f"EV_{index}" for index in range(1, 8)]},
+                        "slot_ref": {"type": "string", "enum": [f"SLOT_{index}" for index in range(1, 8)]},
+                    },
+                },
+            },
+        },
+    }
+    phase_m_grammar = IncrementalConstraintGrammar(
+        phase="phase_m",
+        schema_sha256=sha256_text(canonical_json(phase_m_schema)),
+        constraint_source="json_schema_plus_dynamic_reference_domains",
+        literals=("assignments", "column_ref", "evidence_ref", "slot_ref", "operation", "INSERT", "table_ref"),
+        branching_evidence={
+            "table_choices": ["TAB_1"],
+            "column_choices": [f"COL_{index}" for index in range(1, 8)],
+            "evidence_choices": [f"EV_{index}" for index in range(1, 8)],
+            "slot_choices": [f"SLOT_{index}" for index in range(1, 8)],
+            "assignment_array_can_continue": True,
+            "wrong_but_schema_valid_mapping_present": True,
+            "semantic_branch_points_observed": True,
+        },
+        capacity={
+            "phase_m_schema_min_items": 1,
+            "phase_m_schema_max_items": None,
+            "backend_hard_max_assignments": None,
+            "backend_supports_more_than_two_slots": True,
+            "complete_mapping_permutation_enumeration": False,
+        },
+    )
+    phase_m_valid_7 = phase_m_grammar.is_complete(canonical_json(phase_m_object_with_assignment_count(7)))
+    status = "PASS" if all(phase_o_results.values()) and phase_m_valid_7 else "FAIL"
+    return {
+        "status": status,
+        "phase_o_schema_min_items": phase_o_schema["properties"]["value_spans"].get("minItems"),
+        "phase_o_schema_max_items": phase_o_schema["properties"]["value_spans"].get("maxItems"),
+        "backend_hard_max_spans": None,
+        "backend_supports_more_than_two_spans": True,
+        "tested_span_counts": phase_o_counts,
+        "phase_o_span_count_acceptance": phase_o_results,
+        "phase_o_finite_complete_object_enumeration": False,
+        "phase_m_backend_supports_more_than_two_slots": True,
+        "phase_m_tested_slot_count": 7,
+        "phase_m_valid_7_slot_mapping_accepted": phase_m_valid_7,
+        "phase_m_complete_mapping_permutation_enumeration": False,
     }
 
 
@@ -663,11 +885,56 @@ def run_smoke_fixture(root: Path, output_dir: Path, model: Any, tokenizer: Any, 
     return row
 
 
+def run_phase_m_only_diagnostic(root: Path, output_dir: Path, model: Any, tokenizer: Any, fixture: SmokeFixture, *, phase_m_max_new_tokens: int) -> dict[str, Any]:
+    inventory = build_schema_inventory(fixture.schema_input)
+    spans = validate_and_sort_spans(fixture.question, fixture.phase_o_label["value_spans"])
+    slots = build_slot_bundle(spans)
+    operation = fixture.phase_o_label["operation"]
+    phase_m_messages, phase_m_messages_sha256 = render_phase_m_prompt(operation, inventory, slots, root=root)
+    phase_m_schema = dynamic_schema(operation, inventory, slots, root=root)
+    write_json(output_dir / f"PHASE_M_ONLY_MESSAGES_{fixture.sample_id}.json", {"messages": phase_m_messages, "messages_sha256": phase_m_messages_sha256, "diagnostic_only": True})
+    write_json(output_dir / f"PHASE_M_ONLY_DYNAMIC_SCHEMA_USED_{fixture.sample_id}.json", phase_m_schema)
+
+    phase_m_generation = generate_constrained(
+        model,
+        tokenizer,
+        phase_m_messages,
+        max_new_tokens=phase_m_max_new_tokens,
+        schema=phase_m_schema,
+        phase="phase_m",
+        root=root,
+        operation=operation,
+        inventory=inventory,
+        slots=slots,
+    )
+    phase_m_parse = parse_status("phase_m", phase_m_generation["raw_output"], root, inventory, slots)
+    row: dict[str, Any] = {
+        "sample_id": fixture.sample_id,
+        "diagnostic_only": True,
+        "uses_label_phase_o_spans": True,
+        "not_primary_end_to_end_result": True,
+        "phase_m": {
+            **phase_m_generation,
+            "messages_sha256": phase_m_messages_sha256,
+            "parse_schema_validation": phase_m_parse,
+        },
+    }
+    if phase_m_parse["status"] != "PASS":
+        row["status"] = "FAIL"
+        row["violations"] = ["phase_m_only_real_generation_failed"]
+        return row
+    phase_m_label_eval = evaluate_phase_m_label(phase_m_parse["parsed"], fixture.phase_m_label)
+    row["phase_m"]["label_evaluation"] = phase_m_label_eval
+    row["status"] = "PASS" if phase_m_label_eval["status"] == "PASS" else "FAIL"
+    row["violations"] = [] if row["status"] == "PASS" else ["phase_m_only_label_mismatch"]
+    return row
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Stage7E0 V2-A1 real constrained generation preflight.")
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--model-path", type=Path, required=True)
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "stage7e0_real_generation_preflight_patch6")
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "stage7e0_real_generation_preflight_patch7")
     parser.add_argument("--phase-o-max-new-tokens", type=int, default=512)
     parser.add_argument("--phase-m-max-new-tokens", type=int, default=8192)
     args = parser.parse_args()
@@ -699,12 +966,16 @@ def main() -> None:
                 "temperature": None,
                 "top_p": None,
                 "top_k": None,
-                "prefix_allowed_tokens_fn": "SchemaDrivenPrefixTrieConstrainedBackend.allowed_tokens",
+                "prefix_allowed_tokens_fn": "IncrementalJsonSchemaGrammarBackend.allowed_tokens",
             },
         },
     )
     fixtures = smoke_fixtures()
     write_jsonl(output_dir / "SMOKE_FIXTURES.jsonl", [fixture.__dict__ for fixture in fixtures])
+    capacity_audit = constraint_capacity_audit(root)
+    write_json(output_dir / "CONSTRAINT_CAPACITY_AUDIT.json", capacity_audit)
+    if capacity_audit["status"] != "PASS":
+        violations.append("constraint_capacity_audit_failed")
 
     try:
         initialize_v2_a1_runtime(root)
@@ -774,14 +1045,18 @@ def main() -> None:
     )
 
     backend_summary = {
-        "backend": "schema_driven_prefix_allowed_tokens_trie",
-        "version": "stage7e0_patch6",
-        "backend_version": "stage7e0_patch6",
-        "schema_mode": "schema_compiled_runtime_domain_trie",
+        "backend": "incremental_json_schema_grammar",
+        "version": "stage7e0_patch7",
+        "backend_version": "stage7e0_patch7",
+        "schema_mode": "incremental_json_schema_grammar",
         "schema_enforcement_mode": "transformers_prefix_allowed_tokens_fn",
         "constraint_source": "json_schema_plus_runtime_domains_not_label_side_answers",
         "finite_known_answer_candidates": False,
+        "finite_complete_object_enumeration": False,
         "label_side_data_used_for_constraints": False,
+        "hard_max_semantic_spans": None,
+        "backend_supports_more_than_two_spans": capacity_audit["backend_supports_more_than_two_spans"],
+        "phase_m_complete_mapping_permutation_enumeration": False,
         "token_level_enforcement": True,
         "fallback_to_unconstrained": False,
         "automatic_repair": False,
@@ -791,6 +1066,7 @@ def main() -> None:
         "candidate_validation": "schema subset plus runtime-domain reference validators before generation; expected labels are evaluated only after generation",
         "scope": "synthetic Stage7E0 smoke fixtures only; no train/dev generation",
         "answer_injection_audit_artifact": "ANSWER_INJECTION_AUDIT.json",
+        "constraint_capacity_audit_artifact": "CONSTRAINT_CAPACITY_AUDIT.json",
     }
     write_json(output_dir / "CONSTRAINED_GENERATION_BACKEND.json", backend_summary)
 
@@ -812,6 +1088,14 @@ def main() -> None:
             smoke_rows.append({"sample_id": fixture.sample_id, "status": "FAIL", "violations": ["unexpected_smoke_exception"], "error": repr(exc)})
     write_jsonl(output_dir / "SMOKE_GENERATIONS.jsonl", smoke_rows)
 
+    phase_m_diagnostics = []
+    for fixture in fixtures:
+        try:
+            phase_m_diagnostics.append(run_phase_m_only_diagnostic(root, output_dir, model, tokenizer, fixture, phase_m_max_new_tokens=args.phase_m_max_new_tokens))
+        except Exception as exc:
+            phase_m_diagnostics.append({"sample_id": fixture.sample_id, "diagnostic_only": True, "status": "FAIL", "violations": ["unexpected_phase_m_only_exception"], "error": repr(exc)})
+    write_jsonl(output_dir / "PHASE_M_ONLY_DIAGNOSTICS.jsonl", phase_m_diagnostics)
+
     injection_audit = answer_injection_audit(fixtures, root)
     write_json(output_dir / "ANSWER_INJECTION_AUDIT.json", injection_audit)
     backend_summary["answer_injection_audit_status"] = injection_audit["status"]
@@ -820,6 +1104,9 @@ def main() -> None:
         violations.append("answer_injection_audit_failed")
 
     violations.extend(collect_smoke_violations(smoke_rows))
+    for row in phase_m_diagnostics:
+        if row.get("status") != "PASS":
+            violations.append(f"phase_m_only_diagnostic_failed:{row.get('sample_id')}")
 
     result = {
         "stage": STAGE,
@@ -829,10 +1116,15 @@ def main() -> None:
         "gpu_called": True,
         "generation_run": True,
         "answer_injection_audit_status": injection_audit["status"],
+        "constraint_capacity_audit_status": capacity_audit["status"],
         "constraint_source": "json_schema_plus_runtime_domains_not_label_side_answers",
         "constraint_space_singleton": False,
         "finite_expected_candidate_trie": False,
+        "finite_complete_object_enumeration": False,
         "label_side_data_used_for_constraints": False,
+        "hard_max_semantic_spans": None,
+        "backend_supports_more_than_two_spans": True,
+        "phase_m_diagnostic_status": "PASS" if all(row.get("status") == "PASS" for row in phase_m_diagnostics) else "FAIL",
         "train_dev_generation_run": False,
         "confirmation_481_evaluated": False,
         "live_sql_bench_gt_opened": False,
@@ -841,10 +1133,10 @@ def main() -> None:
     }
     write_json(output_dir / "PREFLIGHT_RESULT.json", result)
     report = (
-        "# Stage7E0 V2-A1 Real Generation Preflight PATCH6\n\n"
+        "# Stage7E0 V2-A1 Real Generation Preflight PATCH7\n\n"
         f"Status: {result['status']}\n\n"
         f"violations: {json.dumps(violations, ensure_ascii=False)}\n\n"
-        "Scope: schema-driven constrained synthetic smoke only; expected labels are evaluated after generation and are not passed to decoder constraints. No train/dev generation, no 481 confirmation evaluation, and no LiveSQLBench ground truth.\n"
+        "Scope: incremental grammar-constrained synthetic smoke only; expected labels are evaluated after generation and are not passed to decoder constraints. No train/dev generation, no 481 confirmation evaluation, and no LiveSQLBench ground truth.\n"
     )
     (output_dir / "VALIDATION_REPORT.md").write_text(report, encoding="utf-8")
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))

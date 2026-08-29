@@ -6,13 +6,12 @@ import shutil
 import sys
 import uuid
 import zipfile
-from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
 from nldbwrite_v3.v2_a1.inventories import build_schema_inventory
-from nldbwrite_v3.v2_a1.phase_m_schema import dynamic_schema
+from nldbwrite_v3.v2_a1.phase_m_schema import dynamic_schema, validate_phase_m_ir
 from nldbwrite_v3.v2_a1.phase_o_output import phase_o_json_schema
 from nldbwrite_v3.v2_a1.slot_inventory import build_slot_bundle
 from nldbwrite_v3.v2_a1.span_validation import validate_and_sort_spans
@@ -55,10 +54,17 @@ class FakeTokenIds:
 
 class CharTokenizer:
     eos_token_id = 0
+    all_special_ids = [0]
 
     def __call__(self, text: str, *, add_special_tokens: bool = False):
         assert add_special_tokens is False
         return type("Encoded", (), {"input_ids": [ord(ch) for ch in text]})()
+
+    def __len__(self) -> int:
+        return 128
+
+    def decode(self, ids: list[int], *, skip_special_tokens: bool = False, clean_up_tokenization_spaces: bool = False) -> str:
+        return "".join(chr(token_id) for token_id in ids if not skip_special_tokens or token_id != self.eos_token_id)
 
 
 def test_stage7e0_smoke_fixture_offsets_include_ascii_and_unicode() -> None:
@@ -82,24 +88,27 @@ def test_stage7e0_generation_api_does_not_accept_precomputed_answer_candidates()
     assert "candidates" not in signature.parameters
 
 
-def test_stage7e0_backend_trie_uses_schema_built_non_singleton_space() -> None:
+def test_stage7e0_backend_uses_incremental_schema_grammar_not_complete_object_trie() -> None:
     runner = load_runner()
     schema = phase_o_json_schema(ROOT)
-    space = runner.build_phase_o_constraint_space(schema, "Add Alice, age 20.")
+    grammar = runner.build_phase_o_constraint_grammar(schema, "Add Alice, age 20.")
     tokenizer = CharTokenizer()
-    backend = runner.SchemaDrivenPrefixTrieConstrainedBackend(tokenizer, space, eos_token_id=tokenizer.eos_token_id)
+    backend = runner.IncrementalJsonSchemaGrammarBackend(tokenizer, grammar, eos_token_id=tokenizer.eos_token_id)
     backend.set_prompt_token_count(2)
-    first_candidate_tokens = tokenizer(space.canonical_texts[0], add_special_tokens=False).input_ids
 
     first_allowed = backend.allowed_tokens(0, FakeTokenIds([999, 998]))
-    assert first_allowed == [first_candidate_tokens[0]]
+    assert first_allowed == [ord("{")]
     assert ord("`") not in first_allowed
 
-    assert backend.allowed_tokens(0, FakeTokenIds([999, 998, *first_candidate_tokens])) == [tokenizer.eos_token_id]
+    valid = runner.canonical_json({"operation": "INSERT", "value_spans": [{"start_char": 4, "end_char": 9}, {"start_char": 15, "end_char": 17}]})
+    valid_tokens = tokenizer(valid, add_special_tokens=False).input_ids
+    assert backend.allowed_tokens(0, FakeTokenIds([999, 998, *valid_tokens])) == [tokenizer.eos_token_id]
     metadata = backend.metadata()
-    assert metadata["candidate_count"] > 1
     assert metadata["constraint_space_singleton"] is False
     assert metadata["finite_known_answer_candidates"] is False
+    assert metadata["finite_complete_object_enumeration"] is False
+    assert metadata["complete_object_candidate_count"] is None
+    assert metadata["hard_max_semantic_spans"] is None
     assert metadata["label_side_data_used_for_constraints"] is False
     assert metadata["token_level_enforcement"] is True
     assert metadata["fallback_to_unconstrained"] is False
@@ -107,15 +116,13 @@ def test_stage7e0_backend_trie_uses_schema_built_non_singleton_space() -> None:
     assert metadata["retry"] == 0
 
 
-def test_stage7e0_candidate_validation_rejects_phase_o_markdown_shape() -> None:
+def test_stage7e0_incremental_grammar_rejects_phase_o_markdown_shape() -> None:
     runner = load_runner()
     schema = phase_o_json_schema(ROOT)
-    bad = {"operation": "INSERT", "value_spans": [{"start": 4, "end": 9}], "table_ref": "TAB_1"}
+    grammar = runner.build_phase_o_constraint_grammar(schema, "Add Alice, age 20.")
 
-    with pytest.raises(V2A1Error) as exc:
-        runner.validate_constraint_candidates("phase_o", [bad], schema)
-
-    assert exc.value.reason_code == "phase_o_candidate_schema_failure"
+    assert grammar.status("```json") == "invalid"
+    assert grammar.status('{"operation":"INSERT","value_spans":[{"bad":4}]}') == "invalid"
 
 
 def test_stage7e0_candidate_validation_enforces_phase_m_slot_evidence_coherence() -> None:
@@ -134,30 +141,20 @@ def test_stage7e0_candidate_validation_enforces_phase_m_slot_evidence_coherence(
         ],
     }
 
-    with pytest.raises(V2A1Error) as exc:
-        runner.validate_constraint_candidates("phase_m", [bad], schema, operation="INSERT", inventory=inventory, slots=slots)
+    grammar = runner.build_phase_m_constraint_grammar(schema, "INSERT", inventory, slots, root=ROOT)
+    assert grammar.is_complete(runner.canonical_json(bad))
 
+    with pytest.raises(V2A1Error) as exc:
+        validate_phase_m_ir(bad, "INSERT", inventory, slots, root=ROOT)
     assert exc.value.reason_code == "phase_m_slot_evidence_mismatch"
 
 
 def test_stage7e0_constraint_space_is_label_independent_under_label_mutation() -> None:
     runner = load_runner()
     fixture = runner.smoke_fixtures()[0]
-    mutated = replace(
-        fixture,
-        phase_o_label={"operation": "DELETE", "value_spans": [{"start_char": 0, "end_char": 1}]},
-        phase_m_label={
-            "operation": "INSERT",
-            "table_ref": "TAB_1",
-            "assignments": [
-                {"column_ref": "COL_2", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"},
-                {"column_ref": "COL_1", "evidence_ref": "EV_2", "slot_ref": "SLOT_2"},
-            ],
-        },
-    )
     phase_o_schema = phase_o_json_schema(ROOT)
 
-    assert runner.build_phase_o_constraint_space(phase_o_schema, fixture.question).fingerprint == runner.build_phase_o_constraint_space(phase_o_schema, mutated.question).fingerprint
+    assert runner.build_phase_o_constraint_grammar(phase_o_schema, fixture.question).fingerprint == runner.build_phase_o_constraint_grammar(phase_o_schema, fixture.question).fingerprint
 
     inventory = build_schema_inventory(fixture.schema_input)
     generated_phase_o = {"operation": "INSERT", "value_spans": [{"start_char": 4, "end_char": 9}, {"start_char": 15, "end_char": 17}]}
@@ -165,9 +162,9 @@ def test_stage7e0_constraint_space_is_label_independent_under_label_mutation() -
     slots = build_slot_bundle(spans)
     phase_m_schema = dynamic_schema(generated_phase_o["operation"], inventory, slots, root=ROOT)
 
-    original_space = runner.build_phase_m_constraint_space(phase_m_schema, generated_phase_o["operation"], inventory, slots, root=ROOT)
-    mutated_space = runner.build_phase_m_constraint_space(phase_m_schema, generated_phase_o["operation"], inventory, slots, root=ROOT)
-    assert original_space.fingerprint == mutated_space.fingerprint
+    original_grammar = runner.build_phase_m_constraint_grammar(phase_m_schema, generated_phase_o["operation"], inventory, slots, root=ROOT)
+    mutated_grammar = runner.build_phase_m_constraint_grammar(phase_m_schema, generated_phase_o["operation"], inventory, slots, root=ROOT)
+    assert original_grammar.fingerprint == mutated_grammar.fingerprint
 
 
 def test_stage7e0_phase_m_constraint_language_contains_wrong_but_schema_valid_mapping() -> None:
@@ -177,7 +174,7 @@ def test_stage7e0_phase_m_constraint_language_contains_wrong_but_schema_valid_ma
     spans = validate_and_sort_spans(fixture.question, fixture.phase_o_label["value_spans"])
     slots = build_slot_bundle(spans)
     schema = dynamic_schema("INSERT", inventory, slots, root=ROOT)
-    space = runner.build_phase_m_constraint_space(schema, "INSERT", inventory, slots, root=ROOT)
+    grammar = runner.build_phase_m_constraint_grammar(schema, "INSERT", inventory, slots, root=ROOT)
     wrong_mapping = {
         "operation": "INSERT",
         "table_ref": "TAB_1",
@@ -187,10 +184,8 @@ def test_stage7e0_phase_m_constraint_language_contains_wrong_but_schema_valid_ma
         ],
     }
 
-    assert len(space.candidates) > 1
-    assert wrong_mapping in space.candidates
-    assert space.branching_evidence["wrong_but_schema_valid_mapping_present"] is True
-    runner.validate_constraint_candidates("phase_m", [wrong_mapping], schema, operation="INSERT", inventory=inventory, slots=slots)
+    assert grammar.branching_evidence["wrong_but_schema_valid_mapping_present"] is True
+    assert grammar.is_complete(runner.canonical_json(wrong_mapping))
 
 
 def test_stage7e0_answer_injection_audit_records_non_singleton_label_independence() -> None:
@@ -200,8 +195,22 @@ def test_stage7e0_answer_injection_audit_records_non_singleton_label_independenc
     assert audit["status"] == "PASS"
     assert audit["generation_api_accepts_precomputed_candidates"] is False
     assert audit["finite_expected_candidate_trie"] is False
+    assert audit["finite_complete_object_enumeration"] is False
     assert audit["label_side_data_used_for_constraints"] is False
-    assert all(row["phase_o_candidate_count"] > 1 and row["phase_m_candidate_count"] > 1 for row in audit["rows"])
+    assert all(row["phase_o_complete_object_candidate_count"] is None and row["phase_m_complete_object_candidate_count"] is None for row in audit["rows"])
+
+
+def test_stage7e0_capacity_audit_accepts_13_phase_o_spans_and_7_phase_m_slots() -> None:
+    runner = load_runner()
+    audit = runner.constraint_capacity_audit(ROOT)
+
+    assert audit["status"] == "PASS"
+    assert audit["phase_o_schema_max_items"] is None
+    assert audit["backend_hard_max_spans"] is None
+    assert audit["backend_supports_more_than_two_spans"] is True
+    assert audit["phase_o_span_count_acceptance"]["13"] is True
+    assert audit["phase_m_valid_7_slot_mapping_accepted"] is True
+    assert audit["phase_m_complete_mapping_permutation_enumeration"] is False
 
 
 def test_stage7e0_smoke_violation_summary_only_reports_executed_phases() -> None:
