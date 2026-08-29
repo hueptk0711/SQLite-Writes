@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DATE_STAMP = "20260828"
+DATE_STAMP = "20260829"
 STAGE = "Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT"
 
 
@@ -132,19 +132,20 @@ def reviewer_readme(patch: int, reviewer_zip_name: str, server_zip_name: str) ->
     branch = git_branch()
     return f"""# Stage7E0 PATCH{patch} Reviewer Package
 
-Scope: server/reviewer packaging fix for Stage7E0 real-generation preflight.
+Scope: constrained-generation backend correction for Stage7E0 real-generation preflight.
 
 This patch does not modify the V2-A1 method, prompts, frozen schemas, dataset inputs, gold labels, metrics, historical results, train/dev generation, the 481 confirmation set, or LiveSQLBench ground truth.
 
 Why PATCH{patch} exists:
-- PATCH1 server execution failed because the ZIP contained only `src/nldbwrite_v3/v2_a1` plus `src/nldbwrite_v3/__init__.py`; importing `nldbwrite_v3` then required the missing `src/nldbwrite_v3/pipeline.py`.
-- The pasted command also executed a nested `ssh` from inside the server because `RUN_COMMAND.txt` mixed local upload/login steps with server-side commands.
+- PATCH4 proved server packaging, GPU plumbing, tokenizer/chat-template integrity, and strict JSON output.
+- PATCH4 still constrained decoding with singleton known-answer candidates, so real Phase O span/operation selection and Phase M grounding were not tested.
 
-PATCH{patch} packaging changes:
-- Includes full `src/nldbwrite_v3` so package imports are self-contained.
-- Adds `RUN_COMMAND_SERVER_ONLY.sh` for commands to run after SSH login and unzip.
-- Keeps upload/login instructions separate in `UPLOAD_AND_RUN_FROM_LOCAL.md`.
-- Adds this packaging builder so future reviewer/server packages are reproducible.
+PATCH{patch} backend changes:
+- Removes precomputed answer candidates from the primary generation API.
+- Builds decoder constraint spaces from the frozen Phase O schema, dynamic Phase M schema, and runtime domains rather than label-side answers.
+- Keeps synthetic expected labels only for post-generation evaluation.
+- Adds `ANSWER_INJECTION_AUDIT.json` and tests for label-independence and non-singleton constraint spaces.
+- Keeps `fallback_to_unconstrained=false`, `automatic_repair=false`, and `retry=0`.
 
 Reviewer ZIP: `{reviewer_zip_name}`
 
@@ -277,7 +278,7 @@ def build_package(patch: int, output_root: Path) -> dict[str, str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build Stage7E0 reviewer and server run packages.")
-    parser.add_argument("--patch", type=int, default=4)
+    parser.add_argument("--patch", type=int, default=5)
     parser.add_argument("--output-root", type=Path, default=PROJECT_ROOT / "reviewer_packages")
     args = parser.parse_args()
 

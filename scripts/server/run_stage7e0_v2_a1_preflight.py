@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import itertools
 import json
 import os
 import platform
@@ -53,8 +54,40 @@ class SmokeFixture:
     sample_id: str
     question: str
     schema_input: dict[str, Any]
-    phase_o_expected: dict[str, Any]
-    phase_m_expected: dict[str, Any]
+    phase_o_label: dict[str, Any]
+    phase_m_label: dict[str, Any]
+
+
+@dataclass(frozen=True)
+class ConstraintSpace:
+    phase: str
+    schema_sha256: str
+    constraint_source: str
+    candidates: tuple[dict[str, Any], ...]
+    branching_evidence: dict[str, Any]
+
+    @property
+    def canonical_texts(self) -> tuple[str, ...]:
+        return tuple(sorted(canonical_json(candidate) for candidate in self.candidates))
+
+    @property
+    def fingerprint(self) -> str:
+        return sha256_text("\n".join(self.canonical_texts))
+
+    def metadata(self) -> dict[str, Any]:
+        return {
+            "phase": self.phase,
+            "constraint_source": self.constraint_source,
+            "schema_sha256": self.schema_sha256,
+            "constraint_space_sha256": self.fingerprint,
+            "candidate_count": len(self.candidates),
+            "constraint_space_singleton": len(self.candidates) == 1,
+            "semantic_branch_points_observed": bool(self.branching_evidence.get("semantic_branch_points_observed")),
+            "finite_known_answer_candidates": False,
+            "label_side_data_used_for_constraints": False,
+            "candidate_text_sha256_sample": [sha256_text(text) for text in self.canonical_texts[:8]],
+            "branching_evidence": self.branching_evidence,
+        }
 
 
 def canonical_text(text: str) -> str:
@@ -123,8 +156,8 @@ def smoke_fixtures() -> list[SmokeFixture]:
             sample_id="stage7e0_ascii_smoke_0001",
             question="Add Alice, age 20.",
             schema_input={"question": "Add Alice, age 20.", **schema},
-            phase_o_expected={"operation": "INSERT", "value_spans": [{"start_char": 4, "end_char": 9}, {"start_char": 15, "end_char": 17}]},
-            phase_m_expected={
+            phase_o_label={"operation": "INSERT", "value_spans": [{"start_char": 4, "end_char": 9}, {"start_char": 15, "end_char": 17}]},
+            phase_m_label={
                 "operation": "INSERT",
                 "table_ref": "TAB_1",
                 "assignments": [
@@ -137,8 +170,8 @@ def smoke_fixtures() -> list[SmokeFixture]:
             sample_id="stage7e0_unicode_smoke_0002",
             question="添加员工爱丽丝，年龄20岁。",
             schema_input={"question": "添加员工爱丽丝，年龄20岁。", **schema},
-            phase_o_expected={"operation": "INSERT", "value_spans": [{"start_char": 4, "end_char": 7}, {"start_char": 10, "end_char": 12}]},
-            phase_m_expected={
+            phase_o_label={"operation": "INSERT", "value_spans": [{"start_char": 4, "end_char": 7}, {"start_char": 10, "end_char": 12}]},
+            phase_m_label={
                 "operation": "INSERT",
                 "table_ref": "TAB_1",
                 "assignments": [
@@ -150,15 +183,16 @@ def smoke_fixtures() -> list[SmokeFixture]:
     ]
 
 
-class PrefixTrieConstrainedBackend:
-    def __init__(self, tokenizer: Any, allowed_json_objects: list[dict[str, Any]], *, eos_token_id: int | None) -> None:
+class SchemaDrivenPrefixTrieConstrainedBackend:
+    def __init__(self, tokenizer: Any, constraint_space: ConstraintSpace, *, eos_token_id: int | None) -> None:
         if eos_token_id is None:
             raise ValueError("Tokenizer must expose eos_token_id for constrained generation")
         self.tokenizer = tokenizer
-        self.allowed_texts = [canonical_json(obj) for obj in allowed_json_objects]
+        self.constraint_space = constraint_space
+        self.allowed_texts = list(constraint_space.canonical_texts)
         self.allowed_token_paths = [tokenizer(text, add_special_tokens=False).input_ids for text in self.allowed_texts]
         if not self.allowed_token_paths:
-            raise ValueError("At least one allowed JSON object is required")
+            raise ValueError("Schema-driven constrained backend produced no JSON candidates")
         self.eos_token_id = int(eos_token_id)
         self.prompt_token_count = 0
 
@@ -177,34 +211,155 @@ class PrefixTrieConstrainedBackend:
 
     def metadata(self) -> dict[str, Any]:
         return {
-            "backend": "prefix_allowed_tokens_trie",
-            "schema_mode": "json_schema_validated_finite_candidate_trie",
+            "backend": "schema_driven_prefix_allowed_tokens_trie",
+            "schema_mode": "schema_compiled_runtime_domain_trie",
             "token_level_enforcement": True,
             "fallback_to_unconstrained": False,
             "automatic_repair": False,
             "retry": 0,
-            "candidate_count": len(self.allowed_texts),
-            "candidate_text_sha256": [sha256_text(text) for text in self.allowed_texts],
+            **self.constraint_space.metadata(),
         }
 
 
-def validate_candidate_json_objects(
+def _enum_at(schema: dict[str, Any], *path: str) -> list[str]:
+    node: Any = schema
+    for part in path:
+        node = node[part]
+    values = node.get("enum")
+    if values is None and "const" in node:
+        values = [node["const"]]
+    if not isinstance(values, list) or not values:
+        raise V2A1Error("constraint_schema_enum_missing", "Constrained generation requires finite enum/const choices", details={"path": list(path)})
+    return [str(value) for value in values]
+
+
+def _all_non_overlapping_span_sets(question: str, *, max_spans: int = 2) -> list[list[dict[str, int]]]:
+    spans = [{"start_char": start, "end_char": end} for start in range(len(question)) for end in range(start + 1, len(question) + 1)]
+    choices: list[list[dict[str, int]]] = [[span] for span in spans]
+    if max_spans >= 2:
+        for combo in itertools.combinations(spans, 2):
+            try:
+                sorted_spans = validate_and_sort_spans(question, list(combo))
+            except V2A1Error:
+                continue
+            choices.append([{"start_char": span.start_char, "end_char": span.end_char} for span in sorted_spans])
+    return choices
+
+
+def build_phase_o_constraint_space(schema: dict[str, Any], question: str, *, max_spans: int = 2) -> ConstraintSpace:
+    operations = _enum_at(schema, "properties", "operation")
+    span_sets = _all_non_overlapping_span_sets(question, max_spans=max_spans)
+    candidates = tuple({"operation": operation, "value_spans": spans} for operation in operations for spans in span_sets)
+    validate_constraint_candidates("phase_o", list(candidates), schema, question=question)
+    return ConstraintSpace(
+        phase="phase_o",
+        schema_sha256=sha256_text(canonical_json(schema)),
+        constraint_source="json_schema_plus_question_offset_domain",
+        candidates=candidates,
+        branching_evidence={
+            "operation_choices": operations,
+            "operation_branch_count": len(operations),
+            "span_set_count": len(span_sets),
+            "max_spans_per_candidate": max_spans,
+            "semantic_branch_points_observed": len(operations) > 1 and len(span_sets) > 1,
+        },
+    )
+
+
+def build_phase_m_constraint_space(
+    schema: dict[str, Any],
+    operation: str,
+    inventory: Any,
+    slots: Any,
+    *,
+    root: Path = ROOT,
+) -> ConstraintSpace:
+    if operation != "INSERT":
+        raise V2A1Error("constraint_phase_m_operation_unsupported", "Stage7E0 smoke constraint compiler currently supports INSERT only", details={"operation": operation})
+    tables = _enum_at(schema, "properties", "table_ref")
+    columns = _enum_at(schema, "properties", "assignments", "items", "properties", "column_ref")
+    slot_items = sorted(slots.slots, key=lambda item: item.slot_ref)
+    if len(columns) < len(slot_items):
+        raise V2A1Error("constraint_phase_m_domain_too_small", "Not enough column choices for smoke slot mappings")
+    candidates: list[dict[str, Any]] = []
+    for table_ref in tables:
+        for slot_order in itertools.permutations(slot_items):
+            for column_order in itertools.permutations(columns, len(slot_order)):
+                assignments = [
+                    {"column_ref": column_ref, "evidence_ref": slot.evidence_ref, "slot_ref": slot.slot_ref}
+                    for slot, column_ref in zip(slot_order, column_order)
+                ]
+                candidates.append({"operation": operation, "table_ref": table_ref, "assignments": assignments})
+    validate_constraint_candidates("phase_m", candidates, schema, root=root, operation=operation, inventory=inventory, slots=slots)
+    return ConstraintSpace(
+        phase="phase_m",
+        schema_sha256=sha256_text(canonical_json(schema)),
+        constraint_source="json_schema_plus_dynamic_reference_domains",
+        candidates=tuple(candidates),
+        branching_evidence={
+            "table_choices": tables,
+            "column_choices": columns,
+            "slot_choices": [slot.slot_ref for slot in slot_items],
+            "assignment_order_permitted": len(slot_items) > 1,
+            "mapping_candidate_count": len(candidates),
+            "wrong_but_schema_valid_mapping_present": _has_wrong_but_schema_valid_insert_mapping(candidates),
+            "semantic_branch_points_observed": len(candidates) > 1,
+        },
+    )
+
+
+def _has_wrong_but_schema_valid_insert_mapping(candidates: list[dict[str, Any]]) -> bool:
+    for candidate in candidates:
+        assignments = candidate.get("assignments", [])
+        if len(assignments) < 2:
+            continue
+        by_slot = {item["slot_ref"]: item["column_ref"] for item in assignments}
+        if by_slot.get("SLOT_1") == "COL_2" and by_slot.get("SLOT_2") == "COL_1":
+            return True
+    return False
+
+
+def build_constraint_space(
     phase: str,
-    allowed_json_objects: list[dict[str, Any]],
     schema: dict[str, Any],
     *,
+    question: str | None = None,
     root: Path = ROOT,
     operation: str | None = None,
     inventory: Any | None = None,
     slots: Any | None = None,
+) -> ConstraintSpace:
+    if phase == "phase_o":
+        if question is None:
+            raise V2A1Error("constraint_phase_o_context_missing", "Phase O constrained generation requires the question text")
+        return build_phase_o_constraint_space(schema, question)
+    if phase == "phase_m":
+        if operation is None or inventory is None or slots is None:
+            raise V2A1Error("constraint_phase_m_context_missing", "Phase M constrained generation requires operation, inventory, and slots")
+        return build_phase_m_constraint_space(schema, operation, inventory, slots, root=root)
+    raise V2A1Error("constrained_backend_unknown_phase", "Unsupported constrained generation phase", details={"phase": phase})
+
+
+def validate_constraint_candidates(
+    phase: str,
+    candidates: list[dict[str, Any]],
+    schema: dict[str, Any],
+    *,
+    root: Path = ROOT,
+    question: str | None = None,
+    operation: str | None = None,
+    inventory: Any | None = None,
+    slots: Any | None = None,
 ) -> dict[str, Any]:
-    if not allowed_json_objects:
+    if not candidates:
         raise V2A1Error("constrained_backend_no_candidates", "Constrained backend requires at least one schema-valid JSON candidate")
     candidate_hashes: list[str] = []
-    for obj in allowed_json_objects:
+    for obj in candidates:
         validate_schema_subset(schema, obj, reason_code=f"{phase}_candidate_schema_failure")
         if phase == "phase_o":
             parse_phase_o_output(canonical_json(obj), root=root)
+            if question is not None:
+                validate_and_sort_spans(question, obj["value_spans"])
         elif phase == "phase_m":
             if operation is None or inventory is None or slots is None:
                 raise V2A1Error("phase_m_candidate_context_missing", "Phase M candidate validation requires operation, inventory, and slots")
@@ -213,7 +368,7 @@ def validate_candidate_json_objects(
             raise V2A1Error("constrained_backend_unknown_phase", "Unsupported constrained generation phase", details={"phase": phase})
         candidate_hashes.append(sha256_text(canonical_json(obj)))
     return {
-        "candidate_count": len(allowed_json_objects),
+        "candidate_count": len(candidates),
         "candidate_text_sha256": candidate_hashes,
         "schema_sha256": sha256_text(canonical_json(schema)),
     }
@@ -223,11 +378,11 @@ def generate_constrained(
     model: Any,
     tokenizer: Any,
     messages: list[dict[str, str]],
-    allowed_json_objects: list[dict[str, Any]],
     *,
     max_new_tokens: int,
     schema: dict[str, Any],
     phase: str,
+    question: str | None = None,
     root: Path = ROOT,
     operation: str | None = None,
     inventory: Any | None = None,
@@ -235,10 +390,10 @@ def generate_constrained(
 ) -> dict[str, Any]:
     import torch
 
-    candidate_validation = validate_candidate_json_objects(
+    constraint_space = build_constraint_space(
         phase,
-        allowed_json_objects,
         schema,
+        question=question,
         root=root,
         operation=operation,
         inventory=inventory,
@@ -249,7 +404,7 @@ def generate_constrained(
     device = next(model.parameters()).device
     inputs = {key: value.to(device) for key, value in inputs.items()}
     prompt_tokens = int(inputs["input_ids"].shape[-1])
-    backend = PrefixTrieConstrainedBackend(tokenizer, allowed_json_objects, eos_token_id=tokenizer.eos_token_id)
+    backend = SchemaDrivenPrefixTrieConstrainedBackend(tokenizer, constraint_space, eos_token_id=tokenizer.eos_token_id)
     backend.set_prompt_token_count(prompt_tokens)
     start = time.monotonic()
     with torch.inference_mode():
@@ -268,7 +423,7 @@ def generate_constrained(
     generated_ids = output[0][prompt_tokens:]
     raw = tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
     return {
-        "backend": {**backend.metadata(), **candidate_validation},
+        "backend": backend.metadata(),
         "rendered_chat_prompt_sha256": rendered_prompt_sha256(rendered),
         "prompt_tokens": prompt_tokens,
         "output_tokens": int(generated_ids.shape[-1]),
@@ -298,6 +453,100 @@ def parse_status(kind: str, raw: str, root: Path, inventory: Any | None = None, 
         return {"status": "FAIL", "reason_code": "unexpected_exception", "message": repr(exc)}
 
 
+def normalize_phase_o_for_label(obj: dict[str, Any], question: str) -> dict[str, Any]:
+    spans = validate_and_sort_spans(question, obj["value_spans"])
+    return {
+        "operation": obj["operation"],
+        "value_spans": [{"start_char": span.start_char, "end_char": span.end_char} for span in spans],
+    }
+
+
+def normalize_phase_m_for_label(obj: dict[str, Any]) -> dict[str, Any]:
+    normalized = dict(obj)
+    for key in ("assignments", "insert_assignments", "update_assignments"):
+        if key in normalized:
+            normalized[key] = sorted(normalized[key], key=lambda item: (item["slot_ref"], item["evidence_ref"], item["column_ref"]))
+    selector = normalized.get("row_selector")
+    if isinstance(selector, dict) and "predicates" in selector:
+        normalized["row_selector"] = {
+            **selector,
+            "predicates": sorted(selector["predicates"], key=lambda item: (item["slot_ref"], item["evidence_ref"], item["column_ref"], item["operator"])),
+        }
+    return normalized
+
+
+def evaluate_phase_o_label(generated: dict[str, Any], label: dict[str, Any], question: str) -> dict[str, Any]:
+    generated_norm = normalize_phase_o_for_label(generated, question)
+    label_norm = normalize_phase_o_for_label(label, question)
+    return {"status": "PASS" if generated_norm == label_norm else "FAIL", "generated_normalized": generated_norm, "label_normalized": label_norm}
+
+
+def evaluate_phase_m_label(generated: dict[str, Any], label: dict[str, Any]) -> dict[str, Any]:
+    generated_norm = normalize_phase_m_for_label(generated)
+    label_norm = normalize_phase_m_for_label(label)
+    return {"status": "PASS" if generated_norm == label_norm else "FAIL", "generated_normalized": generated_norm, "label_normalized": label_norm}
+
+
+def answer_injection_audit(fixtures: list[SmokeFixture], root: Path) -> dict[str, Any]:
+    rows: list[dict[str, Any]] = []
+    for fixture in fixtures:
+        inventory = build_schema_inventory(fixture.schema_input)
+        phase_o_schema = phase_o_json_schema(root)
+        phase_o_constraints = build_phase_o_constraint_space(phase_o_schema, fixture.question)
+        mutated_phase_o_label = {"operation": "DELETE", "value_spans": [{"start_char": 0, "end_char": 1}]}
+        phase_o_constraints_after_label_mutation = build_phase_o_constraint_space(phase_o_schema, fixture.question)
+
+        spans = validate_and_sort_spans(fixture.question, fixture.phase_o_label["value_spans"])
+        slots = build_slot_bundle(spans)
+        phase_m_schema = dynamic_schema(fixture.phase_o_label["operation"], inventory, slots, root=root)
+        phase_m_constraints = build_phase_m_constraint_space(phase_m_schema, fixture.phase_o_label["operation"], inventory, slots, root=root)
+        mutated_phase_m_label = {
+            "operation": "INSERT",
+            "table_ref": "TAB_1",
+            "assignments": [
+                {"column_ref": "COL_2", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"},
+                {"column_ref": "COL_1", "evidence_ref": "EV_2", "slot_ref": "SLOT_2"},
+            ],
+        }
+        phase_m_constraints_after_label_mutation = build_phase_m_constraint_space(phase_m_schema, fixture.phase_o_label["operation"], inventory, slots, root=root)
+        rows.append(
+            {
+                "sample_id": fixture.sample_id,
+                "phase_o_label_mutation_sha256": sha256_text(canonical_json(mutated_phase_o_label)),
+                "phase_m_label_mutation_sha256": sha256_text(canonical_json(mutated_phase_m_label)),
+                "phase_o_constraint_hash_before": phase_o_constraints.fingerprint,
+                "phase_o_constraint_hash_after_label_mutation": phase_o_constraints_after_label_mutation.fingerprint,
+                "phase_m_constraint_hash_before": phase_m_constraints.fingerprint,
+                "phase_m_constraint_hash_after_label_mutation": phase_m_constraints_after_label_mutation.fingerprint,
+                "phase_o_candidate_count": len(phase_o_constraints.candidates),
+                "phase_m_candidate_count": len(phase_m_constraints.candidates),
+                "phase_m_wrong_but_schema_valid_mapping_present": phase_m_constraints.branching_evidence["wrong_but_schema_valid_mapping_present"],
+            }
+        )
+    status = "PASS" if all(
+        row["phase_o_constraint_hash_before"] == row["phase_o_constraint_hash_after_label_mutation"]
+        and row["phase_m_constraint_hash_before"] == row["phase_m_constraint_hash_after_label_mutation"]
+        and row["phase_o_candidate_count"] > 1
+        and row["phase_m_candidate_count"] > 1
+        and row["phase_m_wrong_but_schema_valid_mapping_present"]
+        for row in rows
+    ) else "FAIL"
+    return {
+        "status": status,
+        "generation_api_accepts_precomputed_candidates": False,
+        "generation_path_reads_phase_o_label": False,
+        "generation_path_reads_phase_m_label": False,
+        "generation_path_reads_gold_labels": False,
+        "finite_expected_candidate_trie": False,
+        "constraint_source": "json_schema_plus_runtime_domains_not_label_side_answers",
+        "label_side_data_used_for_constraints": False,
+        "fallback_to_unconstrained": False,
+        "automatic_repair": False,
+        "retry": 0,
+        "rows": rows,
+    }
+
+
 def run_smoke_fixture(root: Path, output_dir: Path, model: Any, tokenizer: Any, fixture: SmokeFixture, *, phase_o_max_new_tokens: int, phase_m_max_new_tokens: int) -> dict[str, Any]:
     inventory = build_schema_inventory(fixture.schema_input)
     phase_o_messages, phase_o_messages_sha256 = render_phase_o_prompt(fixture.question, inventory, root=root)
@@ -309,10 +558,10 @@ def run_smoke_fixture(root: Path, output_dir: Path, model: Any, tokenizer: Any, 
         model,
         tokenizer,
         phase_o_messages,
-        [fixture.phase_o_expected],
         max_new_tokens=phase_o_max_new_tokens,
         schema=phase_o_schema,
         phase="phase_o",
+        question=fixture.question,
         root=root,
     )
     phase_o_parse = parse_status("phase_o", phase_o_generation["raw_output"], root)
@@ -330,6 +579,12 @@ def run_smoke_fixture(root: Path, output_dir: Path, model: Any, tokenizer: Any, 
         row["status"] = "FAIL"
         row["violations"] = ["phase_o_real_generation_failed"]
         return row
+    phase_o_label_eval = evaluate_phase_o_label(phase_o_parse["parsed"], fixture.phase_o_label, fixture.question)
+    row["phase_o"]["label_evaluation"] = phase_o_label_eval
+    if phase_o_label_eval["status"] != "PASS":
+        row["status"] = "FAIL"
+        row["violations"] = ["phase_o_label_mismatch"]
+        return row
 
     spans = validate_and_sort_spans(fixture.question, phase_o_parse["parsed"]["value_spans"])
     slots = build_slot_bundle(spans)
@@ -342,7 +597,6 @@ def run_smoke_fixture(root: Path, output_dir: Path, model: Any, tokenizer: Any, 
         model,
         tokenizer,
         phase_m_messages,
-        [fixture.phase_m_expected],
         max_new_tokens=phase_m_max_new_tokens,
         schema=phase_m_schema,
         phase="phase_m",
@@ -356,6 +610,12 @@ def run_smoke_fixture(root: Path, output_dir: Path, model: Any, tokenizer: Any, 
     if phase_m_parse["status"] != "PASS":
         row["status"] = "FAIL"
         row["violations"] = ["phase_m_real_generation_failed"]
+        return row
+    phase_m_label_eval = evaluate_phase_m_label(phase_m_parse["parsed"], fixture.phase_m_label)
+    row["phase_m"]["label_evaluation"] = phase_m_label_eval
+    if phase_m_label_eval["status"] != "PASS":
+        row["status"] = "FAIL"
+        row["violations"] = ["phase_m_label_mismatch"]
         return row
 
     materialized = materialize_ir_values(phase_m_parse["parsed"], inventory, slots)
@@ -381,7 +641,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Stage7E0 V2-A1 real constrained generation preflight.")
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--model-path", type=Path, required=True)
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "stage7e0_real_generation_preflight_patch1")
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "stage7e0_real_generation_preflight_patch5")
     parser.add_argument("--phase-o-max-new-tokens", type=int, default=512)
     parser.add_argument("--phase-m-max-new-tokens", type=int, default=8192)
     args = parser.parse_args()
@@ -413,11 +673,12 @@ def main() -> None:
                 "temperature": None,
                 "top_p": None,
                 "top_k": None,
-                "prefix_allowed_tokens_fn": "PrefixTrieConstrainedBackend.allowed_tokens",
+                "prefix_allowed_tokens_fn": "SchemaDrivenPrefixTrieConstrainedBackend.allowed_tokens",
             },
         },
     )
-    write_jsonl(output_dir / "SMOKE_FIXTURES.jsonl", [fixture.__dict__ for fixture in smoke_fixtures()])
+    fixtures = smoke_fixtures()
+    write_jsonl(output_dir / "SMOKE_FIXTURES.jsonl", [fixture.__dict__ for fixture in fixtures])
 
     try:
         initialize_v2_a1_runtime(root)
@@ -487,24 +748,28 @@ def main() -> None:
     )
 
     backend_summary = {
-        "backend": "prefix_allowed_tokens_trie",
-        "version": "stage7e0_patch1",
-        "backend_version": "stage7e0_patch1",
-        "schema_mode": "json_schema_validated_finite_candidate_trie",
+        "backend": "schema_driven_prefix_allowed_tokens_trie",
+        "version": "stage7e0_patch5",
+        "backend_version": "stage7e0_patch5",
+        "schema_mode": "schema_compiled_runtime_domain_trie",
         "schema_enforcement_mode": "transformers_prefix_allowed_tokens_fn",
+        "constraint_source": "json_schema_plus_runtime_domains_not_label_side_answers",
+        "finite_known_answer_candidates": False,
+        "label_side_data_used_for_constraints": False,
         "token_level_enforcement": True,
         "fallback_to_unconstrained": False,
         "automatic_repair": False,
         "retry": 0,
         "aborts_on_backend_fallback": True,
         "uses_transformers_prefix_allowed_tokens_fn": True,
-        "candidate_validation": "schema subset plus V2-A1 phase semantic validators before generation",
+        "candidate_validation": "schema subset plus runtime-domain reference validators before generation; expected labels are evaluated only after generation",
         "scope": "synthetic Stage7E0 smoke fixtures only; no train/dev generation",
+        "answer_injection_audit_artifact": "ANSWER_INJECTION_AUDIT.json",
     }
     write_json(output_dir / "CONSTRAINED_GENERATION_BACKEND.json", backend_summary)
 
     smoke_rows = []
-    for fixture in smoke_fixtures():
+    for fixture in fixtures:
         try:
             smoke_rows.append(
                 run_smoke_fixture(
@@ -521,13 +786,24 @@ def main() -> None:
             smoke_rows.append({"sample_id": fixture.sample_id, "status": "FAIL", "violations": ["unexpected_smoke_exception"], "error": repr(exc)})
     write_jsonl(output_dir / "SMOKE_GENERATIONS.jsonl", smoke_rows)
 
+    injection_audit = answer_injection_audit(fixtures, root)
+    write_json(output_dir / "ANSWER_INJECTION_AUDIT.json", injection_audit)
+    backend_summary["answer_injection_audit_status"] = injection_audit["status"]
+    write_json(output_dir / "CONSTRAINED_GENERATION_BACKEND.json", backend_summary)
+    if injection_audit["status"] != "PASS":
+        violations.append("answer_injection_audit_failed")
+
     for row in smoke_rows:
         if row.get("status") != "PASS":
             violations.append(f"smoke_failed:{row.get('sample_id')}")
         if row.get("phase_o", {}).get("parse_schema_validation", {}).get("status") != "PASS":
             violations.append(f"phase_o_real_generation_failed:{row.get('sample_id')}")
+        if row.get("phase_o", {}).get("label_evaluation", {}).get("status") not in {"PASS", None}:
+            violations.append(f"phase_o_label_mismatch:{row.get('sample_id')}")
         if row.get("phase_m", {}).get("parse_schema_validation", {}).get("status") != "PASS":
             violations.append(f"phase_m_real_generation_failed:{row.get('sample_id')}")
+        if row.get("phase_m", {}).get("label_evaluation", {}).get("status") not in {"PASS", None}:
+            violations.append(f"phase_m_label_mismatch:{row.get('sample_id')}")
         if row.get("downstream", {}).get("preflight", {}).get("admitted") is not True:
             violations.append(f"synthetic_preflight_not_admitted:{row.get('sample_id')}")
 
@@ -538,6 +814,11 @@ def main() -> None:
         "model_called": True,
         "gpu_called": True,
         "generation_run": True,
+        "answer_injection_audit_status": injection_audit["status"],
+        "constraint_source": "json_schema_plus_runtime_domains_not_label_side_answers",
+        "constraint_space_singleton": False,
+        "finite_expected_candidate_trie": False,
+        "label_side_data_used_for_constraints": False,
         "train_dev_generation_run": False,
         "confirmation_481_evaluated": False,
         "live_sql_bench_gt_opened": False,
@@ -546,10 +827,10 @@ def main() -> None:
     }
     write_json(output_dir / "PREFLIGHT_RESULT.json", result)
     report = (
-        "# Stage7E0 V2-A1 Real Generation Preflight PATCH1\n\n"
+        "# Stage7E0 V2-A1 Real Generation Preflight PATCH5\n\n"
         f"Status: {result['status']}\n\n"
         f"violations: {json.dumps(violations, ensure_ascii=False)}\n\n"
-        "Scope: constrained synthetic infrastructure smoke only; no train/dev generation, no 481 confirmation evaluation, and no LiveSQLBench ground truth.\n"
+        "Scope: schema-driven constrained synthetic smoke only; expected labels are evaluated after generation and are not passed to decoder constraints. No train/dev generation, no 481 confirmation evaluation, and no LiveSQLBench ground truth.\n"
     )
     (output_dir / "VALIDATION_REPORT.md").write_text(report, encoding="utf-8")
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))

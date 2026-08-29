@@ -4,17 +4,17 @@ This server package is for the GPU infrastructure smoke only. It does not run
 the 1,760 train generation pass, does not run dev, does not evaluate the 481
 confirmation set, and does not open LiveSQLBench ground truth.
 
-Expected PATCH4 server location:
+Expected PATCH5 server location:
 
 ```bash
-/home/uet/hue_ptk/Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH4_SERVER_RUN_PACKAGE_20260828.zip
+/home/uet/hue_ptk/Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH5_SERVER_RUN_PACKAGE_20260829.zip
 ```
 
 Upload from local PowerShell:
 
 ```powershell
-scp "D:\paper kltn\text to sql\w\s6c_exec\reviewer_packages\Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH4_SERVER_RUN_PACKAGE_20260828.zip" uet@222.255.250.24:/home/uet/hue_ptk/
-scp "D:\paper kltn\text to sql\w\s6c_exec\reviewer_packages\Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH4_SERVER_RUN_PACKAGE_20260828.zip.sha256" uet@222.255.250.24:/home/uet/hue_ptk/
+scp "D:\paper kltn\text to sql\w\s6c_exec\reviewer_packages\Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH5_SERVER_RUN_PACKAGE_20260829.zip" uet@222.255.250.24:/home/uet/hue_ptk/
+scp "D:\paper kltn\text to sql\w\s6c_exec\reviewer_packages\Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH5_SERVER_RUN_PACKAGE_20260829.zip.sha256" uet@222.255.250.24:/home/uet/hue_ptk/
 ssh uet@222.255.250.24
 ```
 
@@ -23,10 +23,10 @@ Run after SSH login:
 ```bash
 cd /home/uet/hue_ptk
 
-rm -rf stage7e0_v2_a1_preflight_patch4_run_20260828
-mkdir -p stage7e0_v2_a1_preflight_patch4_run_20260828
-unzip -q Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH4_SERVER_RUN_PACKAGE_20260828.zip -d stage7e0_v2_a1_preflight_patch4_run_20260828
-cd stage7e0_v2_a1_preflight_patch4_run_20260828
+rm -rf stage7e0_v2_a1_preflight_patch5_run_20260829
+mkdir -p stage7e0_v2_a1_preflight_patch5_run_20260829
+unzip -q Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH5_SERVER_RUN_PACKAGE_20260829.zip -d stage7e0_v2_a1_preflight_patch5_run_20260829
+cd stage7e0_v2_a1_preflight_patch5_run_20260829
 bash RUN_COMMAND_SERVER_ONLY.sh
 ```
 
@@ -44,15 +44,15 @@ $PY -m pytest -q tests/v2_a1/test_stage7d_v2_a1.py tests/v2_a1/test_stage7e0_rea
 
 $PY scripts/server/run_stage7e0_v2_a1_preflight.py \
   --model-path "$MODEL_PATH" \
-  --output-dir stage7e0_real_generation_preflight_patch4
+  --output-dir stage7e0_real_generation_preflight_patch5
 
-zip -r Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH4_SERVER_OUTPUT_20260828.zip stage7e0_real_generation_preflight_patch4
-sha256sum Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH4_SERVER_OUTPUT_20260828.zip > Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH4_SERVER_OUTPUT_20260828.zip.sha256
+zip -r Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH5_SERVER_OUTPUT_20260829.zip stage7e0_real_generation_preflight_patch5
+sha256sum Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH5_SERVER_OUTPUT_20260829.zip > Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH5_SERVER_OUTPUT_20260829.zip.sha256
 ```
 
 Copy output back to local if needed:
 
 ```bash
-scp uet@222.255.250.24:/home/uet/hue_ptk/stage7e0_v2_a1_preflight_patch4_run_20260828/Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH4_SERVER_OUTPUT_20260828.zip .
-scp uet@222.255.250.24:/home/uet/hue_ptk/stage7e0_v2_a1_preflight_patch4_run_20260828/Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH4_SERVER_OUTPUT_20260828.zip.sha256 .
+scp uet@222.255.250.24:/home/uet/hue_ptk/stage7e0_v2_a1_preflight_patch5_run_20260829/Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH5_SERVER_OUTPUT_20260829.zip .
+scp uet@222.255.250.24:/home/uet/hue_ptk/stage7e0_v2_a1_preflight_patch5_run_20260829/Stage7E0_V2_A1_REAL_GENERATION_PREFLIGHT_PATCH5_SERVER_OUTPUT_20260829.zip.sha256 .
 ```

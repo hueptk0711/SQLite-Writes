@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import importlib.util
+import inspect
 import shutil
 import sys
 import uuid
 import zipfile
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -64,28 +66,41 @@ def test_stage7e0_smoke_fixture_offsets_include_ascii_and_unicode() -> None:
     fixtures = runner.smoke_fixtures()
 
     ascii_fixture = fixtures[0]
-    ascii_spans = validate_and_sort_spans(ascii_fixture.question, ascii_fixture.phase_o_expected["value_spans"])
+    ascii_spans = validate_and_sort_spans(ascii_fixture.question, ascii_fixture.phase_o_label["value_spans"])
     assert [span.text for span in ascii_spans] == ["Alice", "20"]
 
     unicode_fixture = fixtures[1]
-    unicode_spans = validate_and_sort_spans(unicode_fixture.question, unicode_fixture.phase_o_expected["value_spans"])
+    unicode_spans = validate_and_sort_spans(unicode_fixture.question, unicode_fixture.phase_o_label["value_spans"])
     assert [span.text for span in unicode_spans] == ["爱丽丝", "20"]
 
 
-def test_stage7e0_backend_trie_allows_only_schema_valid_candidate_tokens() -> None:
+def test_stage7e0_generation_api_does_not_accept_precomputed_answer_candidates() -> None:
     runner = load_runner()
-    candidate = {"operation": "INSERT", "value_spans": [{"start_char": 4, "end_char": 9}]}
+    signature = inspect.signature(runner.generate_constrained)
+
+    assert "allowed_json_" + "objects" not in signature.parameters
+    assert "candidates" not in signature.parameters
+
+
+def test_stage7e0_backend_trie_uses_schema_built_non_singleton_space() -> None:
+    runner = load_runner()
+    schema = phase_o_json_schema(ROOT)
+    space = runner.build_phase_o_constraint_space(schema, "Add Alice, age 20.")
     tokenizer = CharTokenizer()
-    backend = runner.PrefixTrieConstrainedBackend(tokenizer, [candidate], eos_token_id=tokenizer.eos_token_id)
+    backend = runner.SchemaDrivenPrefixTrieConstrainedBackend(tokenizer, space, eos_token_id=tokenizer.eos_token_id)
     backend.set_prompt_token_count(2)
-    candidate_tokens = tokenizer(runner.canonical_json(candidate), add_special_tokens=False).input_ids
+    first_candidate_tokens = tokenizer(space.canonical_texts[0], add_special_tokens=False).input_ids
 
     first_allowed = backend.allowed_tokens(0, FakeTokenIds([999, 998]))
-    assert first_allowed == [candidate_tokens[0]]
+    assert first_allowed == [first_candidate_tokens[0]]
     assert ord("`") not in first_allowed
 
-    assert backend.allowed_tokens(0, FakeTokenIds([999, 998, *candidate_tokens])) == [tokenizer.eos_token_id]
+    assert backend.allowed_tokens(0, FakeTokenIds([999, 998, *first_candidate_tokens])) == [tokenizer.eos_token_id]
     metadata = backend.metadata()
+    assert metadata["candidate_count"] > 1
+    assert metadata["constraint_space_singleton"] is False
+    assert metadata["finite_known_answer_candidates"] is False
+    assert metadata["label_side_data_used_for_constraints"] is False
     assert metadata["token_level_enforcement"] is True
     assert metadata["fallback_to_unconstrained"] is False
     assert metadata["automatic_repair"] is False
@@ -98,7 +113,7 @@ def test_stage7e0_candidate_validation_rejects_phase_o_markdown_shape() -> None:
     bad = {"operation": "INSERT", "value_spans": [{"start": 4, "end": 9}], "table_ref": "TAB_1"}
 
     with pytest.raises(V2A1Error) as exc:
-        runner.validate_candidate_json_objects("phase_o", [bad], schema)
+        runner.validate_constraint_candidates("phase_o", [bad], schema)
 
     assert exc.value.reason_code == "phase_o_candidate_schema_failure"
 
@@ -107,7 +122,7 @@ def test_stage7e0_candidate_validation_enforces_phase_m_slot_evidence_coherence(
     runner = load_runner()
     fixture = runner.smoke_fixtures()[0]
     inventory = build_schema_inventory(fixture.schema_input)
-    spans = validate_and_sort_spans(fixture.question, fixture.phase_o_expected["value_spans"])
+    spans = validate_and_sort_spans(fixture.question, fixture.phase_o_label["value_spans"])
     slots = build_slot_bundle(spans)
     schema = dynamic_schema("INSERT", inventory, slots, root=ROOT)
     bad = {
@@ -120,9 +135,73 @@ def test_stage7e0_candidate_validation_enforces_phase_m_slot_evidence_coherence(
     }
 
     with pytest.raises(V2A1Error) as exc:
-        runner.validate_candidate_json_objects("phase_m", [bad], schema, operation="INSERT", inventory=inventory, slots=slots)
+        runner.validate_constraint_candidates("phase_m", [bad], schema, operation="INSERT", inventory=inventory, slots=slots)
 
     assert exc.value.reason_code == "phase_m_slot_evidence_mismatch"
+
+
+def test_stage7e0_constraint_space_is_label_independent_under_label_mutation() -> None:
+    runner = load_runner()
+    fixture = runner.smoke_fixtures()[0]
+    mutated = replace(
+        fixture,
+        phase_o_label={"operation": "DELETE", "value_spans": [{"start_char": 0, "end_char": 1}]},
+        phase_m_label={
+            "operation": "INSERT",
+            "table_ref": "TAB_1",
+            "assignments": [
+                {"column_ref": "COL_2", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"},
+                {"column_ref": "COL_1", "evidence_ref": "EV_2", "slot_ref": "SLOT_2"},
+            ],
+        },
+    )
+    phase_o_schema = phase_o_json_schema(ROOT)
+
+    assert runner.build_phase_o_constraint_space(phase_o_schema, fixture.question).fingerprint == runner.build_phase_o_constraint_space(phase_o_schema, mutated.question).fingerprint
+
+    inventory = build_schema_inventory(fixture.schema_input)
+    generated_phase_o = {"operation": "INSERT", "value_spans": [{"start_char": 4, "end_char": 9}, {"start_char": 15, "end_char": 17}]}
+    spans = validate_and_sort_spans(fixture.question, generated_phase_o["value_spans"])
+    slots = build_slot_bundle(spans)
+    phase_m_schema = dynamic_schema(generated_phase_o["operation"], inventory, slots, root=ROOT)
+
+    original_space = runner.build_phase_m_constraint_space(phase_m_schema, generated_phase_o["operation"], inventory, slots, root=ROOT)
+    mutated_space = runner.build_phase_m_constraint_space(phase_m_schema, generated_phase_o["operation"], inventory, slots, root=ROOT)
+    assert original_space.fingerprint == mutated_space.fingerprint
+
+
+def test_stage7e0_phase_m_constraint_language_contains_wrong_but_schema_valid_mapping() -> None:
+    runner = load_runner()
+    fixture = runner.smoke_fixtures()[0]
+    inventory = build_schema_inventory(fixture.schema_input)
+    spans = validate_and_sort_spans(fixture.question, fixture.phase_o_label["value_spans"])
+    slots = build_slot_bundle(spans)
+    schema = dynamic_schema("INSERT", inventory, slots, root=ROOT)
+    space = runner.build_phase_m_constraint_space(schema, "INSERT", inventory, slots, root=ROOT)
+    wrong_mapping = {
+        "operation": "INSERT",
+        "table_ref": "TAB_1",
+        "assignments": [
+            {"column_ref": "COL_2", "evidence_ref": "EV_1", "slot_ref": "SLOT_1"},
+            {"column_ref": "COL_1", "evidence_ref": "EV_2", "slot_ref": "SLOT_2"},
+        ],
+    }
+
+    assert len(space.candidates) > 1
+    assert wrong_mapping in space.candidates
+    assert space.branching_evidence["wrong_but_schema_valid_mapping_present"] is True
+    runner.validate_constraint_candidates("phase_m", [wrong_mapping], schema, operation="INSERT", inventory=inventory, slots=slots)
+
+
+def test_stage7e0_answer_injection_audit_records_non_singleton_label_independence() -> None:
+    runner = load_runner()
+    audit = runner.answer_injection_audit(runner.smoke_fixtures(), ROOT)
+
+    assert audit["status"] == "PASS"
+    assert audit["generation_api_accepts_precomputed_candidates"] is False
+    assert audit["finite_expected_candidate_trie"] is False
+    assert audit["label_side_data_used_for_constraints"] is False
+    assert all(row["phase_o_candidate_count"] > 1 and row["phase_m_candidate_count"] > 1 for row in audit["rows"])
 
 
 def test_stage7e0_package_builder_includes_import_closure_and_server_only_command() -> None:
