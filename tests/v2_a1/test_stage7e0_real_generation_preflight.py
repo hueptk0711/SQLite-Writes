@@ -245,6 +245,7 @@ def test_stage7e0_phase_o_invalid_offset_keeps_raw_generation_context() -> None:
     assert evaluation["status"] == "FAIL"
     assert evaluation["reason_code"] == "phase_o_invalid_offset"
     assert evaluation["generated"] == generated
+    assert runner.phase_o_label_violation(evaluation) == "phase_o_deterministic_validation_failed"
 
 
 def test_stage7e0_smoke_violation_summary_reports_invalid_phase_o_offsets() -> None:
