@@ -28,6 +28,7 @@ PACKAGE_INPUTS = (
     "stage7c_a1_v2_development_protocol/QUESTION_OFFSET_GUIDE_SPEC.json",
     "stage7c_a1_v2_development_protocol/PHASE_O_OUTPUT_VALIDATION_SPEC.json",
     "stage7d_v2_a1_implementation/STAGE7D_IMPLEMENTATION_LOCK.json",
+    "src/nldbwrite_v3",
     "scripts/data/build_stage7c_a2_phase_o_prompt_amendment.py",
     "scripts/data/validate_stage7c_a2_phase_o_prompt_amendment.py",
     "scripts/data/build_stage7c_a2_prompt_package.py",

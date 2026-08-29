@@ -4,6 +4,7 @@ import json
 import os
 import re
 import shutil
+import sqlite3
 import subprocess
 import sys
 import uuid
@@ -26,6 +27,12 @@ from scripts.data.build_stage7c_a2_phase_o_prompt_amendment import (
 )
 from scripts.data.build_stage7c_a2_prompt_package import build_package
 from scripts.data.validate_stage7c_a2_phase_o_prompt_amendment import validate, write_report_and_update_lock
+from nldbwrite_v3.v2_a1.compiler import compile_sqlite_program
+from nldbwrite_v3.v2_a1.inventories import build_schema_inventory
+from nldbwrite_v3.v2_a1.preflight import preflight_sqlite
+from nldbwrite_v3.v2_a1.slot_inventory import build_slot_bundle
+from nldbwrite_v3.v2_a1.typed_materializer import materialize_ir_values
+from nldbwrite_v3.v2_a1.types import AcceptedSpan
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,6 +77,7 @@ def _copy_package_root(workspace_tmp: Path) -> Path:
         "stage7c_a1_v2_development_protocol/QUESTION_OFFSET_GUIDE_SPEC.json",
         "stage7c_a1_v2_development_protocol/PHASE_O_OUTPUT_VALIDATION_SPEC.json",
         "stage7d_v2_a1_implementation/STAGE7D_IMPLEMENTATION_LOCK.json",
+        "src/nldbwrite_v3",
         "scripts/data/build_stage7c_a2_phase_o_prompt_amendment.py",
         "scripts/data/validate_stage7c_a2_phase_o_prompt_amendment.py",
         "scripts/data/build_stage7c_a2_prompt_package.py",
@@ -158,8 +166,9 @@ def test_fresh_smoke_set_is_locked_and_offsets_extract_expected_texts() -> None:
         question = row["model_side_input"]["question"]
         extracted = [question[span["start_char"] : span["end_char"]] for span in spans]
         schema_columns = row["model_side_input"]["schema_inventory"]["columns"]
-        expected_values = [row["label_side_expected"]["target_state"]["inserted_row"][column["column_name"]] for column in schema_columns]
-        assert extracted == expected_values
+        expected_columns = [column["column_name"] for column in schema_columns]
+        assert row["label_side_expected"]["target_state"]["columns"] == expected_columns
+        assert extracted == [str(value) for value in row["label_side_expected"]["target_state"]["rows"][0]]
         assert set(row["model_side_input"]) == {"question", "schema_inventory"}
         assert row["label_side_expected"]["model_side_visible"] is False
         assert row["locked_before_model_run"] is True
@@ -184,11 +193,27 @@ def test_fresh_smoke_set_locks_model_side_schema_db_and_phase_m_labels() -> None
         assert [column["name"] for column in db_spec["columns"]] == column_names
         assert [column["source_type"] for column in db_spec["columns"]] == affinities
         assert db_spec["initial_rows"] == []
+        assert row["label_side_expected"]["target_state"]["format"] == "canonical_sqlite_post_state"
+        assert row["label_side_expected"]["target_state"]["table_name"] == table_name
+        assert row["label_side_expected"]["target_state"]["columns"] == column_names
         expected_assignments = [
             {"slot_ref": f"SLOT_{index}", "evidence_ref": f"EV_{index}", "column_ref": f"COL_{index}"}
             for index in range(1, len(column_names) + 1)
         ]
         assert row["label_side_expected"]["phase_m"] == {"operation": "INSERT", "table_ref": "TAB_1", "assignments": expected_assignments}
+
+
+def test_integer_locked_target_values_are_typed_not_strings() -> None:
+    rows = _read_jsonl(OUT_DIR / "FRESH_SYNTHETIC_SMOKE_SET.jsonl")
+    integer_values = []
+    for row in rows:
+        columns = row["model_side_input"]["schema_inventory"]["columns"]
+        target_row = row["label_side_expected"]["target_state"]["rows"][0]
+        for column, value in zip(columns, target_row):
+            if column["source_type"] == "INTEGER":
+                integer_values.append(value)
+    assert integer_values == [5000, 100, 31, 28]
+    assert all(isinstance(value, int) and not isinstance(value, bool) for value in integer_values)
 
 
 def test_smoke_lock_hash_scope_includes_full_model_and_label_fixture() -> None:
@@ -199,6 +224,66 @@ def test_smoke_lock_hash_scope_includes_full_model_and_label_fixture() -> None:
     assert "label_side_expected.phase_o" in lock["full_fixture_hash_scope"]
     assert "label_side_expected.phase_m" in lock["full_fixture_hash_scope"]
     assert "label_side_expected.target_state" in lock["full_fixture_hash_scope"]
+
+
+def test_acceptance_policy_requires_end_to_end_success() -> None:
+    lock = _read_json(OUT_DIR / "SMOKE_SET_LOCK.json")
+    requirements = set(lock["acceptance_requirements"])
+    assert "phase_o_operation_exact_match" in requirements
+    assert "phase_o_atomic_spans_exact_match" in requirements
+    assert "phase_m_exact_expected_mapping_pass" in requirements
+    assert "slot_evidence_coherence_pass" in requirements
+    assert "typed_materialization_pass" in requirements
+    assert "completeness_pass" in requirements
+    assert "compilation_pass" in requirements
+    assert "transactional_preflight_admitted" in requirements
+    assert "canonical_sqlite_target_state_equals_locked_target_state" in requirements
+    assert "Phase M" in lock["acceptance_policy"]
+    assert "target state" in lock["acceptance_policy"]
+
+
+def _oracle_program_for_row(row: dict) -> tuple[dict, object]:
+    question = row["model_side_input"]["question"]
+    phase_o = row["label_side_expected"]["phase_o"]
+    spans = tuple(
+        AcceptedSpan(
+            start_char=item["start_char"],
+            end_char=item["end_char"],
+            text=question[item["start_char"] : item["end_char"]],
+        )
+        for item in phase_o["value_spans"]
+    )
+    inventory = build_schema_inventory(row["model_side_input"])
+    slots = build_slot_bundle(spans)
+    ir = row["label_side_expected"]["phase_m"]
+    values = materialize_ir_values(ir, inventory, slots)
+    return ir, compile_sqlite_program(ir, inventory, values)
+
+
+def test_oracle_fixtures_execute_to_locked_canonical_target_state(workspace_tmp: Path) -> None:
+    rows = _read_jsonl(OUT_DIR / "FRESH_SYNTHETIC_SMOKE_SET.jsonl")
+    for row in rows:
+        db_path = workspace_tmp / f"{row['sample_id']}.sqlite"
+        conn = sqlite3.connect(db_path)
+        try:
+            conn.execute(row["synthetic_db_spec"]["create_sql"])
+            conn.commit()
+        finally:
+            conn.close()
+
+        _ir, program = _oracle_program_for_row(row)
+        assert preflight_sqlite(db_path, program).admitted is True
+
+        conn = sqlite3.connect(db_path)
+        try:
+            conn.execute(program.sql, program.parameters)
+            conn.commit()
+            target = row["label_side_expected"]["target_state"]
+            columns_sql = ", ".join(f'"{column}"' for column in target["columns"])
+            fetched = [list(item) for item in conn.execute(f'SELECT {columns_sql} FROM "{target["table_name"]}"').fetchall()]
+        finally:
+            conn.close()
+        assert fetched == target["rows"]
 
 
 def test_no_train_dev_tuning_audit_blocks_data_or_label_changes() -> None:
@@ -325,6 +410,31 @@ def test_validator_catches_phase_m_expected_mapping_tamper(workspace_tmp: Path) 
     report = validate(package / "stage7c_a2_phase_o_prompt_feasibility_amendment", root=package)
     assert report["status"] == "FAIL"
     assert "fresh_smoke_rows_mismatch" in report["violations"]
+
+
+def test_validator_catches_target_state_type_tamper(workspace_tmp: Path) -> None:
+    package = _copy_package_root(workspace_tmp)
+    path = package / "stage7c_a2_phase_o_prompt_feasibility_amendment" / "FRESH_SYNTHETIC_SMOKE_SET.jsonl"
+    rows = _read_jsonl(path)
+    rows[0]["label_side_expected"]["target_state"]["rows"][0][1] = "5000"
+    path.write_text("".join(json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n" for row in rows), encoding="utf-8")
+    _refresh_artifact_hash(package, "FRESH_SYNTHETIC_SMOKE_SET.jsonl")
+    report = validate(package / "stage7c_a2_phase_o_prompt_feasibility_amendment", root=package)
+    assert report["status"] == "FAIL"
+    assert "fresh_smoke_rows_mismatch" in report["violations"]
+    assert "fresh_target_state_typed_values_mismatch:stage7c_a2_fresh_en_two_value_0001" in report["violations"]
+
+
+def test_validator_catches_acceptance_policy_tamper(workspace_tmp: Path) -> None:
+    package = _copy_package_root(workspace_tmp)
+    path = package / "stage7c_a2_phase_o_prompt_feasibility_amendment" / "SMOKE_SET_LOCK.json"
+    lock = _read_json(path)
+    lock["acceptance_requirements"].remove("transactional_preflight_admitted")
+    _write_json(path, lock)
+    _refresh_artifact_hash(package, "SMOKE_SET_LOCK.json")
+    report = validate(package / "stage7c_a2_phase_o_prompt_feasibility_amendment", root=package)
+    assert report["status"] == "FAIL"
+    assert "acceptance_requirement_missing:transactional_preflight_admitted" in report["violations"]
 
 
 def test_validator_catches_no_tuning_audit_tamper(workspace_tmp: Path) -> None:

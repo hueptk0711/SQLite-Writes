@@ -178,6 +178,15 @@ def synthetic_db_spec(table_name: str, columns: list[tuple[str, str]]) -> dict[s
     }
 
 
+def typed_sqlite_value(raw: str, source_type: str) -> str | int | float:
+    upper = source_type.upper()
+    if "INT" in upper:
+        return int(raw)
+    if any(token in upper for token in ("REAL", "FLOA", "DOUB")):
+        return float(raw)
+    return raw
+
+
 def fresh_smoke_rows() -> list[dict[str, Any]]:
     specs = [
         {
@@ -222,6 +231,11 @@ def fresh_smoke_rows() -> list[dict[str, Any]]:
             {"slot_ref": f"SLOT_{index}", "evidence_ref": f"EV_{index}", "column_ref": f"COL_{index}"}
             for index in range(1, len(expected_texts) + 1)
         ]
+        column_names = [column_name for column_name, _source_type in spec["columns"]]
+        typed_row = [
+            typed_sqlite_value(expected_texts[index], source_type)
+            for index, (_column_name, source_type) in enumerate(spec["columns"])
+        ]
         rows.append(
             {
                 "sample_id": spec["sample_id"],
@@ -238,11 +252,10 @@ def fresh_smoke_rows() -> list[dict[str, Any]]:
                     "phase_o": {"operation": "INSERT", "value_spans": spans},
                     "phase_m": {"operation": "INSERT", "table_ref": "TAB_1", "assignments": assignments},
                     "target_state": {
-                        "table": spec["table_name"],
-                        "inserted_row": {
-                            column_name: expected_texts[index]
-                            for index, (column_name, _source_type) in enumerate(spec["columns"])
-                        },
+                        "format": "canonical_sqlite_post_state",
+                        "table_name": spec["table_name"],
+                        "columns": column_names,
+                        "rows": [typed_row],
                     },
                 },
             }
@@ -428,7 +441,20 @@ def smoke_set_lock(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "two_value_cases": 2,
         "three_value_cases": 2,
         "old_stage7e0_failed_smokes_are_diagnostic_regression_only": True,
-        "acceptance_policy": "operation exact match, all atomic spans exact, no extra spans, deterministic validation PASS",
+        "acceptance_policy": "fresh A2 smoke PASS iff Phase O exact operation/spans pass, Phase M expected mapping passes, SLOT/EV coherence passes, typed materialization passes, completeness passes, compilation passes, transactional preflight is ADMITTED, and canonical SQLite target state equals the locked target_state",
+        "acceptance_requirements": [
+            "phase_o_operation_exact_match",
+            "phase_o_atomic_spans_exact_match",
+            "phase_o_no_extra_spans",
+            "phase_o_deterministic_validation_pass",
+            "phase_m_exact_expected_mapping_pass",
+            "slot_evidence_coherence_pass",
+            "typed_materialization_pass",
+            "completeness_pass",
+            "compilation_pass",
+            "transactional_preflight_admitted",
+            "canonical_sqlite_target_state_equals_locked_target_state",
+        ],
         "full_fixture_hash_scope": [
             "model_side_input.question",
             "model_side_input.schema_inventory",

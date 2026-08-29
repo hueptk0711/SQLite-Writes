@@ -1,5 +1,18 @@
 {
-  "acceptance_policy": "operation exact match, all atomic spans exact, no extra spans, deterministic validation PASS",
+  "acceptance_policy": "fresh A2 smoke PASS iff Phase O exact operation/spans pass, Phase M expected mapping passes, SLOT/EV coherence passes, typed materialization passes, completeness passes, compilation passes, transactional preflight is ADMITTED, and canonical SQLite target state equals the locked target_state",
+  "acceptance_requirements": [
+    "phase_o_operation_exact_match",
+    "phase_o_atomic_spans_exact_match",
+    "phase_o_no_extra_spans",
+    "phase_o_deterministic_validation_pass",
+    "phase_m_exact_expected_mapping_pass",
+    "slot_evidence_coherence_pass",
+    "typed_materialization_pass",
+    "completeness_pass",
+    "compilation_pass",
+    "transactional_preflight_admitted",
+    "canonical_sqlite_target_state_equals_locked_target_state"
+  ],
   "fresh_synthetic_smoke_count": 4,
   "full_fixture_hash_scope": [
     "model_side_input.question",
@@ -16,7 +29,7 @@
   ],
   "model_called": false,
   "old_stage7e0_failed_smokes_are_diagnostic_regression_only": true,
-  "smoke_set_sha256": "baa10fc662133b3dd2278ac618d0500a73a59c14c47a2a505905a12439af9d9b",
+  "smoke_set_sha256": "987129d53ef87da7a644f5151702d2bc89dbe1c38392ada5e7498bce7499da26",
   "stage": "Stage7C_A2_PHASE_O_PROMPT_FEASIBILITY_AMENDMENT",
   "status": "LOCKED_BEFORE_MODEL_RUN",
   "three_value_cases": 2,

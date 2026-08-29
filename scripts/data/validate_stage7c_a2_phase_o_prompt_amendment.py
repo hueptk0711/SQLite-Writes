@@ -30,6 +30,7 @@ from scripts.data.build_stage7c_a2_phase_o_prompt_amendment import (
     prompt_hashes,
     sha256_file,
     sha256_text,
+    typed_sqlite_value,
     validation_report_text,
     write_json,
 )
@@ -131,12 +132,11 @@ def validate(output_dir: Path = OUT_DIR, root: Path = PROJECT_ROOT) -> dict[str,
         question = model_side["question"]
         extracted = [question[span["start_char"] : span["end_char"]] for span in label_side["phase_o"]["value_spans"]]
         schema = model_side["schema_inventory"]
-        try:
-            target_values = [label_side["target_state"]["inserted_row"][column["column_name"]] for column in schema["columns"]]
-        except KeyError:
-            target_values = []
-            violations.append(f"fresh_target_state_schema_key_mismatch:{row['sample_id']}")
-        require(extracted == target_values, violations, f"fresh_smoke_span_text_mismatch:{row['sample_id']}")
+        target_state = label_side["target_state"]
+        require(target_state.get("format") == "canonical_sqlite_post_state", violations, f"fresh_target_state_format_changed:{row['sample_id']}")
+        require(target_state.get("table_name") == schema["tables"][0]["table_name"], violations, f"fresh_target_state_table_changed:{row['sample_id']}")
+        require(target_state.get("columns") == [column["column_name"] for column in schema["columns"]], violations, f"fresh_target_state_columns_changed:{row['sample_id']}")
+        require(len(target_state.get("rows", [])) == 1, violations, f"fresh_target_state_row_count_changed:{row['sample_id']}")
         require(set(model_side) == {"question", "schema_inventory"}, violations, f"fresh_model_side_keys_changed:{row['sample_id']}")
         require("label_side_expected" not in model_side, violations, f"fresh_label_leaked_to_model_side:{row['sample_id']}")
         db_spec = row["synthetic_db_spec"]
@@ -151,6 +151,11 @@ def validate(output_dir: Path = OUT_DIR, root: Path = PROJECT_ROOT) -> dict[str,
             require(column["table_ref"] == "TAB_1", violations, f"fresh_column_table_ref_changed:{row['sample_id']}:{index}")
             require(column["column_name"] == db_column["name"], violations, f"fresh_column_name_db_mismatch:{row['sample_id']}:{index}")
             require(column["source_type"] == db_column["source_type"], violations, f"fresh_column_affinity_db_mismatch:{row['sample_id']}:{index}")
+        typed_values = [
+            typed_sqlite_value(extracted[index], column["source_type"])
+            for index, column in enumerate(schema["columns"])
+        ]
+        require(target_state.get("rows") == [typed_values], violations, f"fresh_target_state_typed_values_mismatch:{row['sample_id']}")
         require(label_side["phase_m"]["operation"] == "INSERT", violations, f"fresh_phase_m_operation_changed:{row['sample_id']}")
         require(label_side["phase_m"]["table_ref"] == "TAB_1", violations, f"fresh_phase_m_table_ref_changed:{row['sample_id']}")
         expected_assignments = [
@@ -167,6 +172,14 @@ def validate(output_dir: Path = OUT_DIR, root: Path = PROJECT_ROOT) -> dict[str,
     require("model_side_input.schema_inventory" in smoke_lock.get("full_fixture_hash_scope", []), violations, "smoke_lock_schema_not_hashed")
     require("synthetic_db_spec" in smoke_lock.get("full_fixture_hash_scope", []), violations, "smoke_lock_db_not_hashed")
     require("label_side_expected.phase_m" in smoke_lock.get("full_fixture_hash_scope", []), violations, "smoke_lock_phase_m_not_hashed")
+    for requirement in (
+        "phase_m_exact_expected_mapping_pass",
+        "typed_materialization_pass",
+        "compilation_pass",
+        "transactional_preflight_admitted",
+        "canonical_sqlite_target_state_equals_locked_target_state",
+    ):
+        require(requirement in smoke_lock.get("acceptance_requirements", []), violations, f"acceptance_requirement_missing:{requirement}")
     checks["fresh_smoke_lock_checked"] = True
 
     audit = read_json(output_dir / "NO_TRAIN_DEV_TUNING_AUDIT.json")
