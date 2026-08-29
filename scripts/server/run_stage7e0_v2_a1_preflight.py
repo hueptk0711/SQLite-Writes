@@ -605,7 +605,17 @@ def normalize_phase_m_for_label(obj: dict[str, Any]) -> dict[str, Any]:
 
 
 def evaluate_phase_o_label(generated: dict[str, Any], label: dict[str, Any], question: str) -> dict[str, Any]:
-    generated_norm = normalize_phase_o_for_label(generated, question)
+    try:
+        generated_norm = normalize_phase_o_for_label(generated, question)
+    except V2A1Error as exc:
+        return {
+            "status": "FAIL",
+            "reason_code": exc.reason_code,
+            "message": str(exc),
+            "details": exc.details,
+            "generated": generated,
+            "label_normalized": normalize_phase_o_for_label(label, question),
+        }
     label_norm = normalize_phase_o_for_label(label, question)
     return {"status": "PASS" if generated_norm == label_norm else "FAIL", "generated_normalized": generated_norm, "label_normalized": label_norm}
 
@@ -779,7 +789,10 @@ def collect_smoke_violations(smoke_rows: list[dict[str, Any]]) -> list[str]:
         if isinstance(phase_o, dict):
             if phase_o.get("parse_schema_validation", {}).get("status") != "PASS":
                 violations.append(f"phase_o_real_generation_failed:{sample_id}")
-            if phase_o.get("label_evaluation", {}).get("status") == "FAIL":
+            phase_o_label_eval = phase_o.get("label_evaluation", {})
+            if phase_o_label_eval.get("reason_code") == "phase_o_invalid_offset":
+                violations.append(f"phase_o_deterministic_validation_failed:{sample_id}")
+            elif phase_o_label_eval.get("status") == "FAIL":
                 violations.append(f"phase_o_label_mismatch:{sample_id}")
         elif row.get("status") != "PASS":
             violations.append(f"phase_o_not_run:{sample_id}")
@@ -934,7 +947,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Stage7E0 V2-A1 real constrained generation preflight.")
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--model-path", type=Path, required=True)
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "stage7e0_real_generation_preflight_patch7")
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "stage7e0_real_generation_preflight_patch8")
     parser.add_argument("--phase-o-max-new-tokens", type=int, default=512)
     parser.add_argument("--phase-m-max-new-tokens", type=int, default=8192)
     args = parser.parse_args()
@@ -1046,8 +1059,8 @@ def main() -> None:
 
     backend_summary = {
         "backend": "incremental_json_schema_grammar",
-        "version": "stage7e0_patch7",
-        "backend_version": "stage7e0_patch7",
+        "version": "stage7e0_patch8",
+        "backend_version": "stage7e0_patch8",
         "schema_mode": "incremental_json_schema_grammar",
         "schema_enforcement_mode": "transformers_prefix_allowed_tokens_fn",
         "constraint_source": "json_schema_plus_runtime_domains_not_label_side_answers",
@@ -1133,7 +1146,7 @@ def main() -> None:
     }
     write_json(output_dir / "PREFLIGHT_RESULT.json", result)
     report = (
-        "# Stage7E0 V2-A1 Real Generation Preflight PATCH7\n\n"
+        "# Stage7E0 V2-A1 Real Generation Preflight PATCH8\n\n"
         f"Status: {result['status']}\n\n"
         f"violations: {json.dumps(violations, ensure_ascii=False)}\n\n"
         "Scope: incremental grammar-constrained synthetic smoke only; expected labels are evaluated after generation and are not passed to decoder constraints. No train/dev generation, no 481 confirmation evaluation, and no LiveSQLBench ground truth.\n"

@@ -235,6 +235,40 @@ def test_stage7e0_smoke_violation_summary_only_reports_executed_phases() -> None
     ]
 
 
+def test_stage7e0_phase_o_invalid_offset_keeps_raw_generation_context() -> None:
+    runner = load_runner()
+    label = {"operation": "INSERT", "value_spans": [{"start_char": 4, "end_char": 7}, {"start_char": 10, "end_char": 12}]}
+    generated = {"operation": "INSERT", "value_spans": [{"start_char": 0, "end_char": 999}]}
+
+    evaluation = runner.evaluate_phase_o_label(generated, label, "添加员工爱丽丝，年龄20岁。")
+
+    assert evaluation["status"] == "FAIL"
+    assert evaluation["reason_code"] == "phase_o_invalid_offset"
+    assert evaluation["generated"] == generated
+
+
+def test_stage7e0_smoke_violation_summary_reports_invalid_phase_o_offsets() -> None:
+    runner = load_runner()
+    rows = [
+        {
+            "sample_id": "stage7e0_unicode_smoke_0002",
+            "status": "FAIL",
+            "phase_o": {
+                "parse_schema_validation": {"status": "PASS"},
+                "label_evaluation": {"status": "FAIL", "reason_code": "phase_o_invalid_offset"},
+            },
+            "violations": ["phase_o_label_mismatch"],
+        }
+    ]
+
+    violations = runner.collect_smoke_violations(rows)
+
+    assert violations == [
+        "smoke_failed:stage7e0_unicode_smoke_0002",
+        "phase_o_deterministic_validation_failed:stage7e0_unicode_smoke_0002",
+    ]
+
+
 def test_stage7e0_package_builder_includes_import_closure_and_server_only_command() -> None:
     builder = load_package_builder()
     package_tmp = TEST_TMP_ROOT / f"package_builder_{uuid.uuid4().hex}"

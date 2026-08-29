@@ -152,6 +152,7 @@ PATCH{patch} changes:
 - Adds a diagnostic-only Phase M real-generation smoke using deterministic synthetic slots; this does not rescue or replace the primary end-to-end smoke.
 - Packages server output ZIP/SHA even when the real-generation preflight returns FAIL, then exits with the original runner status.
 - Reports downstream phase violations only for phases that actually ran, so a Phase O label mismatch is not misreported as a Phase M/preflight failure.
+- Preserves raw Phase O generation artifacts when deterministic offset validation fails after JSON schema parsing.
 - Keeps `fallback_to_unconstrained=false`, `automatic_repair=false`, and `retry=0`.
 
 Reviewer ZIP: `{reviewer_zip_name}`
@@ -285,7 +286,7 @@ def build_package(patch: int, output_root: Path) -> dict[str, str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build Stage7E0 reviewer and server run packages.")
-    parser.add_argument("--patch", type=int, default=7)
+    parser.add_argument("--patch", type=int, default=8)
     parser.add_argument("--output-root", type=Path, default=PROJECT_ROOT / "reviewer_packages")
     args = parser.parse_args()
 
