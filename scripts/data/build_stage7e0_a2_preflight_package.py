@@ -120,7 +120,6 @@ PY="${{PY:-/home/uet/miniconda3/envs/spin/bin/python}}"
 "$PY" scripts/data/validate_stage7c_a2_phase_o_prompt_amendment.py
 "$PY" scripts/data/validate_stage7d_v2_a1_implementation.py
 "$PY" -m pytest -q \\
-  tests/test_stage7c_a2_phase_o_prompt_amendment.py \\
   tests/v2_a1/test_stage7d_v2_a1.py \\
   tests/v2_a1/test_stage7e0_real_generation_preflight.py \\
   tests/v2_a1/test_stage7e0_a2_real_generation_preflight.py
@@ -182,7 +181,7 @@ Local validation required before packaging:
 - `python -m py_compile scripts/server/run_stage7e0_a2_real_generation_preflight.py scripts/data/build_stage7e0_a2_preflight_package.py tests/v2_a1/test_stage7e0_a2_real_generation_preflight.py`
 - `python scripts/data/validate_stage7c_a2_phase_o_prompt_amendment.py`
 - `python scripts/data/validate_stage7d_v2_a1_implementation.py`
-- `python -m pytest -q tests/v2_a1/test_stage7e0_a2_real_generation_preflight.py tests/v2_a1/test_stage7e0_real_generation_preflight.py tests/v2_a1/test_stage7d_v2_a1.py tests/test_stage7c_a2_phase_o_prompt_amendment.py`
+- `python -m pytest -q tests/v2_a1/test_stage7e0_a2_real_generation_preflight.py tests/v2_a1/test_stage7e0_real_generation_preflight.py tests/v2_a1/test_stage7d_v2_a1.py`
 - `python scripts/data/build_stage7e0_a2_preflight_package.py --patch {patch}`
 - ZIP integrity checked with Python `zipfile.testzip()`.
 

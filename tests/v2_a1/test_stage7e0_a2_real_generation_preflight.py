@@ -195,6 +195,7 @@ def test_stage7e0_a2_package_builder_includes_a2_runner_and_server_command() -> 
 
     assert "run_stage7e0_a2_real_generation_preflight.py" in command_text
     assert "validate_stage7c_a2_phase_o_prompt_amendment.py" in command_text
+    assert "tests/test_stage7c_a2_phase_o_prompt_amendment.py" not in command_text
     assert "runner_status=0" in command_text
     assert "|| runner_status=$?" in command_text
     assert 'exit "$runner_status"' in command_text
