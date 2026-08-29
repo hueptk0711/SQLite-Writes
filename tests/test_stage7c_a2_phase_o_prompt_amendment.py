@@ -149,17 +149,56 @@ def test_fresh_smoke_set_is_locked_and_offsets_extract_expected_texts() -> None:
     rows = _read_jsonl(OUT_DIR / "FRESH_SYNTHETIC_SMOKE_SET.jsonl")
     assert rows == fresh_smoke_rows()
     assert len(rows) == 4
-    assert sum(len(row["expected_value_texts"]) == 2 for row in rows) == 2
-    assert sum(len(row["expected_value_texts"]) == 3 for row in rows) == 2
+    assert sum(len(row["label_side_expected"]["phase_o"]["value_spans"]) == 2 for row in rows) == 2
+    assert sum(len(row["label_side_expected"]["phase_o"]["value_spans"]) == 3 for row in rows) == 2
     assert {row["language"] for row in rows} == {"en", "zh"}
     for row in rows:
         assert row["sample_id"] not in {"stage7e0_ascii_smoke_0001", "stage7e0_unicode_smoke_0002"}
-        spans = row["expected_phase_o_label"]["value_spans"]
-        extracted = [row["question"][span["start_char"] : span["end_char"]] for span in spans]
-        assert extracted == row["expected_value_texts"]
-        assert row["label_side_only"] is True
-        assert row["model_side_visible"] is False
+        spans = row["label_side_expected"]["phase_o"]["value_spans"]
+        question = row["model_side_input"]["question"]
+        extracted = [question[span["start_char"] : span["end_char"]] for span in spans]
+        schema_columns = row["model_side_input"]["schema_inventory"]["columns"]
+        expected_values = [row["label_side_expected"]["target_state"]["inserted_row"][column["column_name"]] for column in schema_columns]
+        assert extracted == expected_values
+        assert set(row["model_side_input"]) == {"question", "schema_inventory"}
+        assert row["label_side_expected"]["model_side_visible"] is False
         assert row["locked_before_model_run"] is True
+
+
+def test_fresh_smoke_set_locks_model_side_schema_db_and_phase_m_labels() -> None:
+    rows = _read_jsonl(OUT_DIR / "FRESH_SYNTHETIC_SMOKE_SET.jsonl")
+    expected_tables = {
+        "stage7c_a2_fresh_en_two_value_0001": ("people", ["name", "salary"], ["TEXT", "INTEGER"]),
+        "stage7c_a2_fresh_zh_two_value_0002": ("company", ["company_name", "employee_count"], ["TEXT", "INTEGER"]),
+        "stage7c_a2_fresh_en_three_value_0003": ("people", ["name", "age", "city"], ["TEXT", "INTEGER", "TEXT"]),
+        "stage7c_a2_fresh_zh_three_value_0004": ("employee", ["name", "age", "city"], ["TEXT", "INTEGER", "TEXT"]),
+    }
+    for row in rows:
+        table_name, column_names, affinities = expected_tables[row["sample_id"]]
+        schema = row["model_side_input"]["schema_inventory"]
+        db_spec = row["synthetic_db_spec"]
+        assert schema["tables"] == [{"table_ref": "TAB_1", "table_name": table_name}]
+        assert [column["column_name"] for column in schema["columns"]] == column_names
+        assert [column["source_type"] for column in schema["columns"]] == affinities
+        assert db_spec["table"] == table_name
+        assert [column["name"] for column in db_spec["columns"]] == column_names
+        assert [column["source_type"] for column in db_spec["columns"]] == affinities
+        assert db_spec["initial_rows"] == []
+        expected_assignments = [
+            {"slot_ref": f"SLOT_{index}", "evidence_ref": f"EV_{index}", "column_ref": f"COL_{index}"}
+            for index in range(1, len(column_names) + 1)
+        ]
+        assert row["label_side_expected"]["phase_m"] == {"operation": "INSERT", "table_ref": "TAB_1", "assignments": expected_assignments}
+
+
+def test_smoke_lock_hash_scope_includes_full_model_and_label_fixture() -> None:
+    lock = _read_json(OUT_DIR / "SMOKE_SET_LOCK.json")
+    assert "model_side_input.question" in lock["full_fixture_hash_scope"]
+    assert "model_side_input.schema_inventory" in lock["full_fixture_hash_scope"]
+    assert "synthetic_db_spec" in lock["full_fixture_hash_scope"]
+    assert "label_side_expected.phase_o" in lock["full_fixture_hash_scope"]
+    assert "label_side_expected.phase_m" in lock["full_fixture_hash_scope"]
+    assert "label_side_expected.target_state" in lock["full_fixture_hash_scope"]
 
 
 def test_no_train_dev_tuning_audit_blocks_data_or_label_changes() -> None:
@@ -232,7 +271,55 @@ def test_validator_catches_smoke_set_tamper(workspace_tmp: Path) -> None:
     package = _copy_package_root(workspace_tmp)
     path = package / "stage7c_a2_phase_o_prompt_feasibility_amendment" / "FRESH_SYNTHETIC_SMOKE_SET.jsonl"
     rows = _read_jsonl(path)
-    rows[0]["expected_phase_o_label"]["value_spans"][0]["start_char"] = 0
+    rows[0]["label_side_expected"]["phase_o"]["value_spans"][0]["start_char"] = 0
+    path.write_text("".join(json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n" for row in rows), encoding="utf-8")
+    _refresh_artifact_hash(package, "FRESH_SYNTHETIC_SMOKE_SET.jsonl")
+    report = validate(package / "stage7c_a2_phase_o_prompt_feasibility_amendment", root=package)
+    assert report["status"] == "FAIL"
+    assert "fresh_smoke_rows_mismatch" in report["violations"]
+
+
+def test_validator_catches_smoke_schema_column_name_tamper(workspace_tmp: Path) -> None:
+    package = _copy_package_root(workspace_tmp)
+    path = package / "stage7c_a2_phase_o_prompt_feasibility_amendment" / "FRESH_SYNTHETIC_SMOKE_SET.jsonl"
+    rows = _read_jsonl(path)
+    rows[0]["model_side_input"]["schema_inventory"]["columns"][0]["column_name"] = "full_name"
+    path.write_text("".join(json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n" for row in rows), encoding="utf-8")
+    _refresh_artifact_hash(package, "FRESH_SYNTHETIC_SMOKE_SET.jsonl")
+    report = validate(package / "stage7c_a2_phase_o_prompt_feasibility_amendment", root=package)
+    assert report["status"] == "FAIL"
+    assert "fresh_smoke_rows_mismatch" in report["violations"]
+
+
+def test_validator_catches_smoke_schema_affinity_tamper(workspace_tmp: Path) -> None:
+    package = _copy_package_root(workspace_tmp)
+    path = package / "stage7c_a2_phase_o_prompt_feasibility_amendment" / "FRESH_SYNTHETIC_SMOKE_SET.jsonl"
+    rows = _read_jsonl(path)
+    rows[0]["model_side_input"]["schema_inventory"]["columns"][1]["source_type"] = "TEXT"
+    path.write_text("".join(json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n" for row in rows), encoding="utf-8")
+    _refresh_artifact_hash(package, "FRESH_SYNTHETIC_SMOKE_SET.jsonl")
+    report = validate(package / "stage7c_a2_phase_o_prompt_feasibility_amendment", root=package)
+    assert report["status"] == "FAIL"
+    assert "fresh_smoke_rows_mismatch" in report["violations"]
+
+
+def test_validator_catches_smoke_db_spec_tamper(workspace_tmp: Path) -> None:
+    package = _copy_package_root(workspace_tmp)
+    path = package / "stage7c_a2_phase_o_prompt_feasibility_amendment" / "FRESH_SYNTHETIC_SMOKE_SET.jsonl"
+    rows = _read_jsonl(path)
+    rows[0]["synthetic_db_spec"]["table"] = "people_easy"
+    path.write_text("".join(json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n" for row in rows), encoding="utf-8")
+    _refresh_artifact_hash(package, "FRESH_SYNTHETIC_SMOKE_SET.jsonl")
+    report = validate(package / "stage7c_a2_phase_o_prompt_feasibility_amendment", root=package)
+    assert report["status"] == "FAIL"
+    assert "fresh_smoke_rows_mismatch" in report["violations"]
+
+
+def test_validator_catches_phase_m_expected_mapping_tamper(workspace_tmp: Path) -> None:
+    package = _copy_package_root(workspace_tmp)
+    path = package / "stage7c_a2_phase_o_prompt_feasibility_amendment" / "FRESH_SYNTHETIC_SMOKE_SET.jsonl"
+    rows = _read_jsonl(path)
+    rows[0]["label_side_expected"]["phase_m"]["assignments"][0]["column_ref"] = "COL_2"
     path.write_text("".join(json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n" for row in rows), encoding="utf-8")
     _refresh_artifact_hash(package, "FRESH_SYNTHETIC_SMOKE_SET.jsonl")
     report = validate(package / "stage7c_a2_phase_o_prompt_feasibility_amendment", root=package)

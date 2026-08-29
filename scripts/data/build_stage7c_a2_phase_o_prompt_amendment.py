@@ -155,45 +155,98 @@ def span(question: str, text: str) -> dict[str, Any]:
     return {"start_char": start, "end_char": start + len(text)}
 
 
+def schema_inventory(table_name: str, columns: list[tuple[str, str]]) -> dict[str, Any]:
+    return {
+        "tables": [{"table_ref": "TAB_1", "table_name": table_name}],
+        "columns": [
+            {"column_ref": f"COL_{index}", "table_ref": "TAB_1", "column_name": name, "source_type": source_type}
+            for index, (name, source_type) in enumerate(columns, start=1)
+        ],
+        "constraints": [],
+    }
+
+
+def synthetic_db_spec(table_name: str, columns: list[tuple[str, str]]) -> dict[str, Any]:
+    quoted_cols = ", ".join(f'"{name}" {source_type}' for name, source_type in columns)
+    return {
+        "engine": "sqlite",
+        "initial_rows": [],
+        "table": table_name,
+        "columns": [{"name": name, "source_type": source_type, "nullable": True} for name, source_type in columns],
+        "create_sql": f'CREATE TABLE "{table_name}" ({quoted_cols});',
+        "deterministic_fixture_policy": "derive empty SQLite fixture directly from this locked spec before Stage7E0-A2 model run",
+    }
+
+
 def fresh_smoke_rows() -> list[dict[str, Any]]:
-    rows = [
+    specs = [
         {
             "sample_id": "stage7c_a2_fresh_en_two_value_0001",
             "language": "en",
             "question": "Create a record for Bob with salary 5000.",
-            "expected_operation": "INSERT",
+            "table_name": "people",
+            "columns": [("name", "TEXT"), ("salary", "INTEGER")],
             "expected_value_texts": ["Bob", "5000"],
         },
         {
             "sample_id": "stage7c_a2_fresh_zh_two_value_0002",
             "language": "zh",
             "question": "新增公司华为，员工数100。",
-            "expected_operation": "INSERT",
+            "table_name": "company",
+            "columns": [("company_name", "TEXT"), ("employee_count", "INTEGER")],
             "expected_value_texts": ["华为", "100"],
         },
         {
             "sample_id": "stage7c_a2_fresh_en_three_value_0003",
             "language": "en",
             "question": "Add Carol, age 31, city Paris.",
-            "expected_operation": "INSERT",
+            "table_name": "people",
+            "columns": [("name", "TEXT"), ("age", "INTEGER"), ("city", "TEXT")],
             "expected_value_texts": ["Carol", "31", "Paris"],
         },
         {
             "sample_id": "stage7c_a2_fresh_zh_three_value_0004",
             "language": "zh",
             "question": "新增员工王伟，年龄28岁，城市北京。",
-            "expected_operation": "INSERT",
+            "table_name": "employee",
+            "columns": [("name", "TEXT"), ("age", "INTEGER"), ("city", "TEXT")],
             "expected_value_texts": ["王伟", "28", "北京"],
         },
     ]
-    for row in rows:
-        question = row["question"]
-        spans = [span(question, text) for text in row["expected_value_texts"]]
-        row["expected_phase_o_label"] = {"operation": row["expected_operation"], "value_spans": spans}
-        row["label_side_only"] = True
-        row["model_side_visible"] = False
-        row["locked_before_model_run"] = True
-        row["source"] = "fresh_synthetic_phase_o_prompt_amendment_acceptance_candidate"
+    rows = []
+    for spec in specs:
+        question = spec["question"]
+        expected_texts = spec["expected_value_texts"]
+        spans = [span(question, text) for text in expected_texts]
+        assignments = [
+            {"slot_ref": f"SLOT_{index}", "evidence_ref": f"EV_{index}", "column_ref": f"COL_{index}"}
+            for index in range(1, len(expected_texts) + 1)
+        ]
+        rows.append(
+            {
+                "sample_id": spec["sample_id"],
+                "language": spec["language"],
+                "source": "fresh_synthetic_phase_o_prompt_amendment_acceptance_candidate",
+                "locked_before_model_run": True,
+                "model_side_input": {
+                    "question": question,
+                    "schema_inventory": schema_inventory(spec["table_name"], spec["columns"]),
+                },
+                "synthetic_db_spec": synthetic_db_spec(spec["table_name"], spec["columns"]),
+                "label_side_expected": {
+                    "model_side_visible": False,
+                    "phase_o": {"operation": "INSERT", "value_spans": spans},
+                    "phase_m": {"operation": "INSERT", "table_ref": "TAB_1", "assignments": assignments},
+                    "target_state": {
+                        "table": spec["table_name"],
+                        "inserted_row": {
+                            column_name: expected_texts[index]
+                            for index, (column_name, _source_type) in enumerate(spec["columns"])
+                        },
+                    },
+                },
+            }
+        )
     return rows
 
 
@@ -376,6 +429,14 @@ def smoke_set_lock(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "three_value_cases": 2,
         "old_stage7e0_failed_smokes_are_diagnostic_regression_only": True,
         "acceptance_policy": "operation exact match, all atomic spans exact, no extra spans, deterministic validation PASS",
+        "full_fixture_hash_scope": [
+            "model_side_input.question",
+            "model_side_input.schema_inventory",
+            "synthetic_db_spec",
+            "label_side_expected.phase_o",
+            "label_side_expected.phase_m",
+            "label_side_expected.target_state",
+        ],
         "model_called": MODEL_CALLED,
         "gpu_called": GPU_CALLED,
         "train_dev_generation_run": TRAIN_DEV_GENERATION_RUN,

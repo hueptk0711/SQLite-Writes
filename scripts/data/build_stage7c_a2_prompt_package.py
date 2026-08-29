@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import shutil
 import subprocess
 import zipfile
@@ -35,12 +36,46 @@ PACKAGE_INPUTS = (
 
 
 def git_output(*args: str) -> str:
+    if not (PROJECT_ROOT / ".git").exists():
+        raise subprocess.CalledProcessError(128, ["git", *args], output="", stderr="not a git repository")
     result = subprocess.run(["git", *args], cwd=PROJECT_ROOT, check=True, capture_output=True, text=True)
     return result.stdout.strip()
 
 
+def packaged_git_value(label: str, default: str) -> str:
+    git_info_path = PROJECT_ROOT / "GIT_INFO.md"
+    prefix = f"{label}:"
+    if git_info_path.is_file():
+        for line in git_info_path.read_text(encoding="utf-8").splitlines():
+            if line.startswith(prefix):
+                return line.removeprefix(prefix).strip() or default
+    lock_path = PROJECT_ROOT / "stage7c_a2_phase_o_prompt_feasibility_amendment" / "STAGE7C_A2_LOCK.json"
+    if lock_path.is_file():
+        try:
+            source_git = json.loads(lock_path.read_text(encoding="utf-8")).get("source_git", {})
+        except json.JSONDecodeError:
+            source_git = {}
+        key = {"Branch": "branch", "Commit": "commit", "Commit message": "commit_message"}.get(label)
+        if key and source_git.get(key):
+            return str(source_git[key])
+    return default
+
+
+def git_value(*args: str, label: str, default: str) -> str:
+    try:
+        return git_output(*args)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return packaged_git_value(label, default)
+
+
 def git_short_commit() -> str:
-    return git_output("rev-parse", "--short", "HEAD")
+    commit = git_value("rev-parse", "HEAD", label="Commit", default="nogit")
+    if commit in {"", "not_available_in_clean_package", "nogit"}:
+        return "nogit"
+    try:
+        return git_output("rev-parse", "--short", "HEAD")
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return commit[:7]
 
 
 def ignore_noise(_dir: str, names: list[str]) -> set[str]:
@@ -67,11 +102,11 @@ def git_info() -> str:
         [
             "# Git Info",
             "",
-            f"Branch: {git_output('rev-parse', '--abbrev-ref', 'HEAD')}",
+            f"Branch: {git_value('rev-parse', '--abbrev-ref', 'HEAD', label='Branch', default='not_available_in_clean_package')}",
             "",
-            f"Commit: {git_output('rev-parse', 'HEAD')}",
+            f"Commit: {git_value('rev-parse', 'HEAD', label='Commit', default='not_available_in_clean_package')}",
             "",
-            f"Commit message: {git_output('log', '-1', '--pretty=%s')}",
+            f"Commit message: {git_value('log', '-1', '--pretty=%s', label='Commit message', default='not_available_in_clean_package')}",
             "",
             "Remote: https://github.com/hueptk0711/SQLite-Writes.git",
             "",

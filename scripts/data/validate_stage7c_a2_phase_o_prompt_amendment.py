@@ -121,18 +121,52 @@ def validate(output_dir: Path = OUT_DIR, root: Path = PROJECT_ROOT) -> dict[str,
     require(smoke_rows == expected_smoke_rows, violations, "fresh_smoke_rows_mismatch")
     require(len(smoke_rows) == 4, violations, "fresh_smoke_count_not_4")
     require({row["language"] for row in smoke_rows} == {"en", "zh"}, violations, "fresh_smoke_languages_changed")
-    require(sum(len(row["expected_value_texts"]) == 2 for row in smoke_rows) == 2, violations, "fresh_two_value_count_changed")
-    require(sum(len(row["expected_value_texts"]) == 3 for row in smoke_rows) == 2, violations, "fresh_three_value_count_changed")
-    require(all(row["label_side_only"] and not row["model_side_visible"] and row["locked_before_model_run"] for row in smoke_rows), violations, "fresh_smoke_visibility_or_lock_changed")
+    require(sum(len(row["label_side_expected"]["phase_o"]["value_spans"]) == 2 for row in smoke_rows) == 2, violations, "fresh_two_value_count_changed")
+    require(sum(len(row["label_side_expected"]["phase_o"]["value_spans"]) == 3 for row in smoke_rows) == 2, violations, "fresh_three_value_count_changed")
+    require(all(row["locked_before_model_run"] and row["label_side_expected"]["model_side_visible"] is False for row in smoke_rows), violations, "fresh_smoke_visibility_or_lock_changed")
     require(all(row["sample_id"] not in {"stage7e0_ascii_smoke_0001", "stage7e0_unicode_smoke_0002"} for row in smoke_rows), violations, "old_stage7e0_smoke_reused_as_fresh")
     for row in smoke_rows:
-        question = row["question"]
-        extracted = [question[span["start_char"] : span["end_char"]] for span in row["expected_phase_o_label"]["value_spans"]]
-        require(extracted == row["expected_value_texts"], violations, f"fresh_smoke_span_text_mismatch:{row['sample_id']}")
+        model_side = row["model_side_input"]
+        label_side = row["label_side_expected"]
+        question = model_side["question"]
+        extracted = [question[span["start_char"] : span["end_char"]] for span in label_side["phase_o"]["value_spans"]]
+        schema = model_side["schema_inventory"]
+        try:
+            target_values = [label_side["target_state"]["inserted_row"][column["column_name"]] for column in schema["columns"]]
+        except KeyError:
+            target_values = []
+            violations.append(f"fresh_target_state_schema_key_mismatch:{row['sample_id']}")
+        require(extracted == target_values, violations, f"fresh_smoke_span_text_mismatch:{row['sample_id']}")
+        require(set(model_side) == {"question", "schema_inventory"}, violations, f"fresh_model_side_keys_changed:{row['sample_id']}")
+        require("label_side_expected" not in model_side, violations, f"fresh_label_leaked_to_model_side:{row['sample_id']}")
+        db_spec = row["synthetic_db_spec"]
+        require(len(schema["tables"]) == 1, violations, f"fresh_schema_table_count_changed:{row['sample_id']}")
+        require(schema["tables"][0]["table_ref"] == "TAB_1", violations, f"fresh_schema_table_ref_changed:{row['sample_id']}")
+        require(schema["tables"][0]["table_name"] == db_spec["table"], violations, f"fresh_schema_db_table_mismatch:{row['sample_id']}")
+        require(len(schema["columns"]) == len(label_side["phase_o"]["value_spans"]), violations, f"fresh_schema_column_count_mismatch:{row['sample_id']}")
+        require(len(db_spec["columns"]) == len(schema["columns"]), violations, f"fresh_db_column_count_mismatch:{row['sample_id']}")
+        for index, column in enumerate(schema["columns"], start=1):
+            db_column = db_spec["columns"][index - 1]
+            require(column["column_ref"] == f"COL_{index}", violations, f"fresh_column_ref_changed:{row['sample_id']}:{index}")
+            require(column["table_ref"] == "TAB_1", violations, f"fresh_column_table_ref_changed:{row['sample_id']}:{index}")
+            require(column["column_name"] == db_column["name"], violations, f"fresh_column_name_db_mismatch:{row['sample_id']}:{index}")
+            require(column["source_type"] == db_column["source_type"], violations, f"fresh_column_affinity_db_mismatch:{row['sample_id']}:{index}")
+        require(label_side["phase_m"]["operation"] == "INSERT", violations, f"fresh_phase_m_operation_changed:{row['sample_id']}")
+        require(label_side["phase_m"]["table_ref"] == "TAB_1", violations, f"fresh_phase_m_table_ref_changed:{row['sample_id']}")
+        expected_assignments = [
+            {"slot_ref": f"SLOT_{index}", "evidence_ref": f"EV_{index}", "column_ref": f"COL_{index}"}
+            for index in range(1, len(schema["columns"]) + 1)
+        ]
+        require(label_side["phase_m"]["assignments"] == expected_assignments, violations, f"fresh_phase_m_mapping_changed:{row['sample_id']}")
+        require(db_spec["create_sql"].startswith(f'CREATE TABLE "{db_spec["table"]}"'), violations, f"fresh_db_create_sql_changed:{row['sample_id']}")
+        require(db_spec["initial_rows"] == [], violations, f"fresh_db_initial_rows_changed:{row['sample_id']}")
     smoke_payload = "".join(canonical_json(row) + "\n" for row in smoke_rows)
     require(smoke_lock.get("smoke_set_sha256") == sha256_text(smoke_payload), violations, "smoke_set_hash_mismatch")
     require(smoke_lock.get("status") == "LOCKED_BEFORE_MODEL_RUN", violations, "smoke_set_not_locked_before_model")
     require(smoke_lock.get("old_stage7e0_failed_smokes_are_diagnostic_regression_only") is True, violations, "old_smoke_policy_changed")
+    require("model_side_input.schema_inventory" in smoke_lock.get("full_fixture_hash_scope", []), violations, "smoke_lock_schema_not_hashed")
+    require("synthetic_db_spec" in smoke_lock.get("full_fixture_hash_scope", []), violations, "smoke_lock_db_not_hashed")
+    require("label_side_expected.phase_m" in smoke_lock.get("full_fixture_hash_scope", []), violations, "smoke_lock_phase_m_not_hashed")
     checks["fresh_smoke_lock_checked"] = True
 
     audit = read_json(output_dir / "NO_TRAIN_DEV_TUNING_AUDIT.json")
