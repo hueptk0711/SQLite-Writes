@@ -1,0 +1,18 @@
+{
+  "amendment_scope": "Phase O zero-shot prompt wording and fresh synthetic smoke lock only",
+  "architecture_modified": false,
+  "backend_modified": false,
+  "confirmation_481_evaluated": false,
+  "crudsql_dev_outputs_inspected_for_prompt_tuning": false,
+  "crudsql_train_outputs_inspected_for_prompt_tuning": false,
+  "datasets_modified": false,
+  "gold_labels_modified": false,
+  "gpu_called": false,
+  "live_sql_bench_gt_opened": false,
+  "metrics_modified": false,
+  "model_called": false,
+  "phase_m_modified": false,
+  "stage": "Stage7C_A2_PHASE_O_PROMPT_FEASIBILITY_AMENDMENT",
+  "status": "PASS",
+  "train_dev_generation_run": false
+}

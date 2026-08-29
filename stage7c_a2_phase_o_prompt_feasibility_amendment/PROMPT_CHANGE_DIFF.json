@@ -1,0 +1,31 @@
+{
+  "backend_changed": false,
+  "changed_component": "Phase O prompt only",
+  "dataset_or_gold_changed": false,
+  "examples_added_to_prompt": false,
+  "old_stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL",
+  "phase_m_system_prompt_sha256": {
+    "changed": false,
+    "new": "1d9b423cfea7b0de7dc329a707fccd7ff820cda7404d9b6d449420b348781781",
+    "old": "1d9b423cfea7b0de7dc329a707fccd7ff820cda7404d9b6d449420b348781781"
+  },
+  "phase_m_user_prompt_template_sha256": {
+    "changed": false,
+    "new": "8c53626a3bca9f1af98cb5c73fa28505ba93ea2f33dcf6d7e52cb4c7d417b958",
+    "old": "8c53626a3bca9f1af98cb5c73fa28505ba93ea2f33dcf6d7e52cb4c7d417b958"
+  },
+  "phase_o_system_prompt": {
+    "new_sha256": "7dc6322ea44cba7a0f5b45dee2d20608a900959e60d92f4eff0f6bcc0fb106c5",
+    "new_text": "You select the SQLite write operation and the atomic semantic value spans from the exact original request. Return one JSON object that satisfies the supplied schema. Use Python Unicode code-point offsets over the exact original question string. A value span must be the smallest contiguous source span that corresponds to exactly one literal database value required by the write request. Do not select operation or instruction words, schema or field labels, surrounding punctuation, or a whole clause or sentence that contains multiple database values. If a phrase contains multiple database values, return one separate span per value. Select only text that appears verbatim in the original question.",
+    "old_sha256": "0fbf9ebb8441b4292502bfbd62fe40275b8f1c649805a653a37e3d698e186ba4",
+    "old_text": "You select the SQLite write operation and atomic semantic value spans from the original request. Return one JSON object that satisfies the supplied schema. Use Python Unicode code-point offsets over the exact original question string."
+  },
+  "phase_o_user_prompt_template": {
+    "new_sha256": "f20a56efba45c4807b26abf5d9b413967c2d66ee2bc0c6fde3632ae109fcca42",
+    "new_text": "Original question Q, unchanged:\n{question}\n\nPython code-point offset guide derived from Q:\n{offset_guide}\n\nSchema inventory:\n{schema_inventory}\n\nReturn JSON with operation and value_spans only. Do not generate SPAN, EV, SLOT ids or value text.\nFor value_spans, select the smallest verbatim source span for each atomic database value. Exclude instruction words, field labels, punctuation, and any larger phrase containing more than one value.",
+    "old_sha256": "0a361ce0688919979661b149dc3351b514de0dfd64324a501eec4f408a7c0429",
+    "old_text": "Original question Q, unchanged:\n{question}\n\nPython code-point offset guide derived from Q:\n{offset_guide}\n\nSchema inventory:\n{schema_inventory}\n\nReturn JSON with operation and value_spans only. Do not generate SPAN, EV, SLOT ids or value text."
+  },
+  "schemas_changed": false,
+  "stage": "Stage7C_A2_PHASE_O_PROMPT_FEASIBILITY_AMENDMENT"
+}

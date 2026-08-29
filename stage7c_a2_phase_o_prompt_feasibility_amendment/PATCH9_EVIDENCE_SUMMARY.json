@@ -1,0 +1,76 @@
+{
+  "backend_status": {
+    "answer_injection_audit_status": "PASS",
+    "backend_supports_more_than_two_spans": true,
+    "constraint_capacity_audit_status": "PASS",
+    "finite_complete_object_enumeration": false,
+    "hard_max_semantic_spans": null,
+    "label_side_data_used_for_constraints": false,
+    "phase_m_diagnostic_status": "PASS"
+  },
+  "decision": "do_not_patch_backend_further; open formal zero-shot Phase O prompt amendment before any train/dev generation",
+  "observed_failures": [
+    {
+      "expected": {
+        "operation": "INSERT",
+        "value_spans": [
+          {
+            "end_char": 9,
+            "start_char": 4
+          },
+          {
+            "end_char": 17,
+            "start_char": 15
+          }
+        ]
+      },
+      "failure_type": "phase_o_semantic_span_not_atomic",
+      "generated": {
+        "operation": "INSERT",
+        "value_spans": [
+          {
+            "end_char": 17,
+            "start_char": 0
+          }
+        ]
+      },
+      "question": "Add Alice, age 20.",
+      "sample_id": "stage7e0_ascii_smoke_0001"
+    },
+    {
+      "expected": {
+        "operation": "INSERT",
+        "value_spans": [
+          {
+            "end_char": 7,
+            "start_char": 4
+          },
+          {
+            "end_char": 12,
+            "start_char": 10
+          }
+        ]
+      },
+      "failure_type": "phase_o_invalid_or_non_atomic_offsets_after_json_schema_validation",
+      "generated": {
+        "operation": "INSERT",
+        "value_spans": [
+          {
+            "end_char": 13,
+            "start_char": 0
+          },
+          {
+            "end_char": 12,
+            "start_char": 14
+          }
+        ]
+      },
+      "question": "添加员工爱丽丝，年龄20岁。",
+      "sample_id": "stage7e0_unicode_smoke_0002"
+    }
+  ],
+  "patch9_commit": "89d549c5d5560d256610639acd43d2883af32585",
+  "server_output_sha256": "766c408f55daeac3fd77de2bd91232178df41018724312aecbce0c2a3d9a39d2",
+  "source": "Stage7E0 PATCH9 reviewer/server-output evidence",
+  "stage": "Stage7C_A2_PHASE_O_PROMPT_FEASIBILITY_AMENDMENT"
+}
