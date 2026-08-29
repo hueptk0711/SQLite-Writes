@@ -118,12 +118,14 @@ PY="${{PY:-/home/uet/miniconda3/envs/spin/bin/python}}"
 "$PY" scripts/data/validate_stage7d_v2_a1_implementation.py
 "$PY" -m pytest -q tests/v2_a1/test_stage7d_v2_a1.py tests/v2_a1/test_stage7e0_real_generation_preflight.py
 
+runner_status=0
 "$PY" scripts/server/run_stage7e0_v2_a1_preflight.py \\
   --model-path "$MODEL_PATH" \\
-  --output-dir {output_dir_name}
+  --output-dir {output_dir_name} || runner_status=$?
 
 zip -r {output_zip_name} {output_dir_name}
 sha256sum {output_zip_name} > {output_zip_name}.sha256
+exit "$runner_status"
 """
 
 
@@ -140,11 +142,13 @@ Why PATCH{patch} exists:
 - PATCH4 proved server packaging, GPU plumbing, tokenizer/chat-template integrity, and strict JSON output.
 - PATCH4 still constrained decoding with singleton known-answer candidates, so real Phase O span/operation selection and Phase M grounding were not tested.
 
-PATCH{patch} backend changes:
+PATCH{patch} changes:
 - Removes precomputed answer candidates from the primary generation API.
 - Builds decoder constraint spaces from the frozen Phase O schema, dynamic Phase M schema, and runtime domains rather than label-side answers.
 - Keeps synthetic expected labels only for post-generation evaluation.
 - Adds `ANSWER_INJECTION_AUDIT.json` and tests for label-independence and non-singleton constraint spaces.
+- Packages server output ZIP/SHA even when the real-generation preflight returns FAIL, then exits with the original runner status.
+- Reports downstream phase violations only for phases that actually ran, so a Phase O label mismatch is not misreported as a Phase M/preflight failure.
 - Keeps `fallback_to_unconstrained=false`, `automatic_repair=false`, and `retry=0`.
 
 Reviewer ZIP: `{reviewer_zip_name}`
@@ -278,7 +282,7 @@ def build_package(patch: int, output_root: Path) -> dict[str, str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build Stage7E0 reviewer and server run packages.")
-    parser.add_argument("--patch", type=int, default=5)
+    parser.add_argument("--patch", type=int, default=6)
     parser.add_argument("--output-root", type=Path, default=PROJECT_ROOT / "reviewer_packages")
     args = parser.parse_args()
 

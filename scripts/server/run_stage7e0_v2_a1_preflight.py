@@ -547,6 +547,32 @@ def answer_injection_audit(fixtures: list[SmokeFixture], root: Path) -> dict[str
     }
 
 
+def collect_smoke_violations(smoke_rows: list[dict[str, Any]]) -> list[str]:
+    violations: list[str] = []
+    for row in smoke_rows:
+        sample_id = row.get("sample_id")
+        if row.get("status") != "PASS":
+            violations.append(f"smoke_failed:{sample_id}")
+        phase_o = row.get("phase_o")
+        if isinstance(phase_o, dict):
+            if phase_o.get("parse_schema_validation", {}).get("status") != "PASS":
+                violations.append(f"phase_o_real_generation_failed:{sample_id}")
+            if phase_o.get("label_evaluation", {}).get("status") == "FAIL":
+                violations.append(f"phase_o_label_mismatch:{sample_id}")
+        elif row.get("status") != "PASS":
+            violations.append(f"phase_o_not_run:{sample_id}")
+        phase_m = row.get("phase_m")
+        if isinstance(phase_m, dict):
+            if phase_m.get("parse_schema_validation", {}).get("status") != "PASS":
+                violations.append(f"phase_m_real_generation_failed:{sample_id}")
+            if phase_m.get("label_evaluation", {}).get("status") == "FAIL":
+                violations.append(f"phase_m_label_mismatch:{sample_id}")
+        downstream = row.get("downstream")
+        if isinstance(downstream, dict) and downstream.get("preflight", {}).get("admitted") is not True:
+            violations.append(f"synthetic_preflight_not_admitted:{sample_id}")
+    return violations
+
+
 def run_smoke_fixture(root: Path, output_dir: Path, model: Any, tokenizer: Any, fixture: SmokeFixture, *, phase_o_max_new_tokens: int, phase_m_max_new_tokens: int) -> dict[str, Any]:
     inventory = build_schema_inventory(fixture.schema_input)
     phase_o_messages, phase_o_messages_sha256 = render_phase_o_prompt(fixture.question, inventory, root=root)
@@ -641,7 +667,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Stage7E0 V2-A1 real constrained generation preflight.")
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--model-path", type=Path, required=True)
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "stage7e0_real_generation_preflight_patch5")
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "stage7e0_real_generation_preflight_patch6")
     parser.add_argument("--phase-o-max-new-tokens", type=int, default=512)
     parser.add_argument("--phase-m-max-new-tokens", type=int, default=8192)
     args = parser.parse_args()
@@ -749,8 +775,8 @@ def main() -> None:
 
     backend_summary = {
         "backend": "schema_driven_prefix_allowed_tokens_trie",
-        "version": "stage7e0_patch5",
-        "backend_version": "stage7e0_patch5",
+        "version": "stage7e0_patch6",
+        "backend_version": "stage7e0_patch6",
         "schema_mode": "schema_compiled_runtime_domain_trie",
         "schema_enforcement_mode": "transformers_prefix_allowed_tokens_fn",
         "constraint_source": "json_schema_plus_runtime_domains_not_label_side_answers",
@@ -793,19 +819,7 @@ def main() -> None:
     if injection_audit["status"] != "PASS":
         violations.append("answer_injection_audit_failed")
 
-    for row in smoke_rows:
-        if row.get("status") != "PASS":
-            violations.append(f"smoke_failed:{row.get('sample_id')}")
-        if row.get("phase_o", {}).get("parse_schema_validation", {}).get("status") != "PASS":
-            violations.append(f"phase_o_real_generation_failed:{row.get('sample_id')}")
-        if row.get("phase_o", {}).get("label_evaluation", {}).get("status") not in {"PASS", None}:
-            violations.append(f"phase_o_label_mismatch:{row.get('sample_id')}")
-        if row.get("phase_m", {}).get("parse_schema_validation", {}).get("status") != "PASS":
-            violations.append(f"phase_m_real_generation_failed:{row.get('sample_id')}")
-        if row.get("phase_m", {}).get("label_evaluation", {}).get("status") not in {"PASS", None}:
-            violations.append(f"phase_m_label_mismatch:{row.get('sample_id')}")
-        if row.get("downstream", {}).get("preflight", {}).get("admitted") is not True:
-            violations.append(f"synthetic_preflight_not_admitted:{row.get('sample_id')}")
+    violations.extend(collect_smoke_violations(smoke_rows))
 
     result = {
         "stage": STAGE,
@@ -827,7 +841,7 @@ def main() -> None:
     }
     write_json(output_dir / "PREFLIGHT_RESULT.json", result)
     report = (
-        "# Stage7E0 V2-A1 Real Generation Preflight PATCH5\n\n"
+        "# Stage7E0 V2-A1 Real Generation Preflight PATCH6\n\n"
         f"Status: {result['status']}\n\n"
         f"violations: {json.dumps(violations, ensure_ascii=False)}\n\n"
         "Scope: schema-driven constrained synthetic smoke only; expected labels are evaluated after generation and are not passed to decoder constraints. No train/dev generation, no 481 confirmation evaluation, and no LiveSQLBench ground truth.\n"

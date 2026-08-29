@@ -204,6 +204,28 @@ def test_stage7e0_answer_injection_audit_records_non_singleton_label_independenc
     assert all(row["phase_o_candidate_count"] > 1 and row["phase_m_candidate_count"] > 1 for row in audit["rows"])
 
 
+def test_stage7e0_smoke_violation_summary_only_reports_executed_phases() -> None:
+    runner = load_runner()
+    rows = [
+        {
+            "sample_id": "stage7e0_ascii_smoke_0001",
+            "status": "FAIL",
+            "phase_o": {
+                "parse_schema_validation": {"status": "PASS"},
+                "label_evaluation": {"status": "FAIL"},
+            },
+            "violations": ["phase_o_label_mismatch"],
+        }
+    ]
+
+    violations = runner.collect_smoke_violations(rows)
+
+    assert violations == [
+        "smoke_failed:stage7e0_ascii_smoke_0001",
+        "phase_o_label_mismatch:stage7e0_ascii_smoke_0001",
+    ]
+
+
 def test_stage7e0_package_builder_includes_import_closure_and_server_only_command() -> None:
     builder = load_package_builder()
     package_tmp = TEST_TMP_ROOT / f"package_builder_{uuid.uuid4().hex}"
@@ -231,6 +253,9 @@ def test_stage7e0_package_builder_includes_import_closure_and_server_only_comman
 
     assert "ssh " not in command_text
     assert "scp " not in command_text
+    assert "runner_status=0" in command_text
+    assert "|| runner_status=$?" in command_text
+    assert 'exit "$runner_status"' in command_text
     assert "test_stage7e0_real_generation_preflight.py" in command_text
 
 
