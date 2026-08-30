@@ -1,0 +1,16 @@
+{
+  "backend": "hf",
+  "diagnostics_run": false,
+  "gpu_called": true,
+  "gretel_pilot_opened": false,
+  "mock_uses_label_side_expected": false,
+  "model_called": true,
+  "primary_case_results_sha256": "b13b4ad9f613d6bfe886b9d235b586a1e76ee8c527f22217d0296f283f646ce9",
+  "primary_pass_count": "0/8",
+  "raw_phase_m_sha256": "3e0724d430d6212685135fa369f7549aea16cb579cb97487338e6984646b54b6",
+  "raw_phase_o_sha256": "cfc8f185f5a0e4c71b0e7578a5ba11b45bb527247de06e1efdf2f86822c4a152",
+  "required_pass_count": "8/8",
+  "seven_of_eight_allowed": false,
+  "stage": "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT",
+  "status": "FAIL"
+}
