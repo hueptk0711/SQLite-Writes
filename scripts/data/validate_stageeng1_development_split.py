@@ -91,6 +91,17 @@ def validate(
     expected_pilot_target = int(policy.get("split", {}).get("development_dev_target_count", PILOT_TARGET))
     if strict_counts and expected_pilot_target != PILOT_TARGET:
         failures.append("policy_pilot_target_mismatch")
+    if policy.get("split", {}).get("development_dev_role") != "held_out_development_evaluation":
+        failures.append("policy_development_dev_role_mismatch")
+    if policy.get("split", {}).get("development_dev_model_access_before_pre_dev_freeze") is not False:
+        failures.append("policy_allows_pre_dev_model_access")
+    pilot_policy = policy.get("pilot_pool", {})
+    if pilot_policy.get("pilot_target_count") != expected_pilot_target:
+        failures.append("policy_pilot_target_mismatch")
+    if pilot_policy.get("pilot_source") != "development_train":
+        failures.append("policy_pilot_source_mismatch")
+    if pilot_policy.get("included_in_development_dev") is not False:
+        failures.append("policy_includes_pilot_in_development_dev")
     if policy.get("official_test_policy", {}).get("included_in_stageeng1_split") is not False:
         failures.append("policy_includes_official_test")
     if policy.get("leakage_component_signatures") != SIGNATURE_FIELDS:
@@ -144,8 +155,10 @@ def validate(
         failures.append("development_train_intersects_development_dev")
     if train_ids | dev_ids != stage0_dev_ids:
         failures.append("stageeng1_split_ids_do_not_match_stage0_development_candidates")
-    if dev_ids != pilot_ids:
-        failures.append("pilot_pool_ids_do_not_match_development_dev")
+    if not pilot_ids <= train_ids:
+        failures.append("pilot_pool_ids_not_subset_of_development_train")
+    if pilot_ids & dev_ids:
+        failures.append("pilot_pool_intersects_development_dev")
     if confirmation_ids & (train_ids | dev_ids | pilot_ids):
         failures.append("official_test_confirmation_ids_in_stageeng1_split")
     if len(dev_rows) != expected_pilot_target or len(pilot_rows) != expected_pilot_target:
@@ -154,6 +167,18 @@ def validate(
         failures.append("development_train_count_mismatch")
     if not strict_counts and len(train_rows) != len(stage0_dev) - expected_pilot_target:
         failures.append("development_train_count_mismatch")
+
+    for row in train_rows:
+        if bool(row.get("development_pilot_pool")) != (str(row["sample_id"]) in pilot_ids):
+            failures.append(f"train_row_pilot_flag_mismatch:{row.get('sample_id')}")
+    for row in dev_rows:
+        if row.get("development_pilot_pool") is not False:
+            failures.append(f"development_dev_row_marked_pilot:{row.get('sample_id')}")
+    for row in pilot_rows:
+        if row.get("stageeng1_split") != "development_train":
+            failures.append(f"pilot_row_not_in_development_train:{row.get('sample_id')}")
+        if row.get("development_pilot_pool") is not True:
+            failures.append(f"pilot_row_flag_not_true:{row.get('sample_id')}")
 
     for row in [*train_rows, *dev_rows, *pilot_rows]:
         expected_split = "development_dev" if row["sample_id"] in dev_ids else "development_train"

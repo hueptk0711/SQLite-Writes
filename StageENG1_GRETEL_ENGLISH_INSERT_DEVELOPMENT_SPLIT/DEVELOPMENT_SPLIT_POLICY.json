@@ -25,12 +25,23 @@
   "official_test_policy": {
     "count": 51,
     "included_in_stageeng1_split": false,
+    "role": "final_confirmation_only",
     "source_split": "test",
     "usage": "confirmation_only_after_development_freeze"
   },
+  "pilot_pool": {
+    "group_selection": "deterministic_subset_sum_over_development_train_leakage_components",
+    "included_in_development_dev": false,
+    "may_be_used_after_synthetic_feasibility_pass": true,
+    "pilot_role": "development_train_pilot_for_method_diagnostics",
+    "pilot_seed": "StageENG1_GRETEL_ENGLISH_INSERT_PILOT_V1",
+    "pilot_source": "development_train",
+    "pilot_target_count": 100
+  },
   "source_stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION",
   "split": {
-    "development_dev_role": "locked_pilot_pool_no_model_run_in_stageeng1",
+    "development_dev_model_access_before_pre_dev_freeze": false,
+    "development_dev_role": "held_out_development_evaluation",
     "development_dev_target_count": 100,
     "development_train_role": "available_for_later_analysis_or_tuning_after_review",
     "group_selection": "deterministic_subset_sum_over_leakage_components",

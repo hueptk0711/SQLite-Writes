@@ -4,6 +4,7 @@
   "dataset_revision": "740ab236e64503fba51be1101df7a1be83bf455d",
   "development_dev_count": 100,
   "development_pilot_pool_count": 100,
+  "development_pilot_pool_source": "development_train",
   "development_train_count": 828,
   "gpu_called": false,
   "model_called": false,

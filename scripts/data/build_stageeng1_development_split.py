@@ -16,9 +16,8 @@ import re
 import shutil
 import subprocess
 import sys
-import tempfile
 import zipfile
-from collections import Counter, defaultdict
+from collections import defaultdict
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -38,6 +37,7 @@ from scripts.data.build_stageeng0_gretel_qualification import (
 
 STAGE_NAME = "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
 SPLIT_SEED = "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT_V1"
+PILOT_SEED = "StageENG1_GRETEL_ENGLISH_INSERT_PILOT_V1"
 PILOT_TARGET = 100
 EXPECTED_STAGE0_DEVELOPMENT_COUNT = 928
 EXPECTED_STAGE0_CONFIRMATION_COUNT = 51
@@ -200,15 +200,26 @@ def split_policy(pilot_target: int) -> dict[str, Any]:
         "official_test_policy": {
             "source_split": "test",
             "count": EXPECTED_STAGE0_CONFIRMATION_COUNT,
+            "role": "final_confirmation_only",
             "usage": "confirmation_only_after_development_freeze",
             "included_in_stageeng1_split": False,
         },
         "split": {
             "development_dev_target_count": pilot_target,
-            "development_dev_role": "locked_pilot_pool_no_model_run_in_stageeng1",
+            "development_dev_role": "held_out_development_evaluation",
+            "development_dev_model_access_before_pre_dev_freeze": False,
             "development_train_role": "available_for_later_analysis_or_tuning_after_review",
             "split_seed": SPLIT_SEED,
             "group_selection": "deterministic_subset_sum_over_leakage_components",
+        },
+        "pilot_pool": {
+            "pilot_target_count": pilot_target,
+            "pilot_role": "development_train_pilot_for_method_diagnostics",
+            "pilot_source": "development_train",
+            "pilot_seed": PILOT_SEED,
+            "may_be_used_after_synthetic_feasibility_pass": True,
+            "included_in_development_dev": False,
+            "group_selection": "deterministic_subset_sum_over_development_train_leakage_components",
         },
         "leakage_component_signatures": SIGNATURE_FIELDS,
         "leakage_rule": "no signature value may appear in both development_train and development_dev",
@@ -293,7 +304,7 @@ def leakage_components(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return sorted(components, key=lambda row: (row["selection_score"], row["split_group_id"]))
 
 
-def select_dev_group_ids(groups: list[dict[str, Any]], target: int) -> set[str]:
+def select_group_ids(groups: list[dict[str, Any]], target: int) -> set[str]:
     dp: dict[int, list[dict[str, Any]]] = {0: []}
     for group in groups:
         size = int(group["count"])
@@ -305,6 +316,19 @@ def select_dev_group_ids(groups: list[dict[str, Any]], target: int) -> set[str]:
     if target not in dp:
         raise ValueError(f"Cannot select exactly {target} rows from {len(groups)} leakage groups")
     return {str(group["split_group_id"]) for group in dp[target]}
+
+
+def pilot_order(groups: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return sorted(
+        (
+            {
+                **group,
+                "pilot_selection_score": sha256_text(f"{PILOT_SEED}:{group['split_group_id']}"),
+            }
+            for group in groups
+        ),
+        key=lambda row: (row["pilot_selection_score"], row["split_group_id"]),
+    )
 
 
 def duplicate_groups(rows: list[dict[str, Any]], field: str) -> list[dict[str, Any]]:
@@ -346,13 +370,14 @@ def build_duplicate_audit(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def manifest_row(row: dict[str, Any], group: dict[str, Any], split: str) -> dict[str, Any]:
+def manifest_row(row: dict[str, Any], group: dict[str, Any], split: str, pilot: bool) -> dict[str, Any]:
     output = dict(row)
     output["stageeng1_split"] = split
-    output["development_pilot_pool"] = split == "development_dev"
+    output["development_pilot_pool"] = pilot
     output["split_group_id"] = group["split_group_id"]
     output["split_group_size"] = group["count"]
     output["split_group_selection_score"] = group["selection_score"]
+    output["pilot_group_selection_score"] = sha256_text(f"{PILOT_SEED}:{group['split_group_id']}") if pilot else ""
     return output
 
 
@@ -381,15 +406,19 @@ def build_run(
         for sample_id in group["sample_ids"]:
             group_by_sample[sample_id] = group
 
-    dev_group_ids = select_dev_group_ids(groups, pilot_target)
+    dev_group_ids = select_group_ids(groups, pilot_target)
+    train_groups = [group for group in groups if group["split_group_id"] not in dev_group_ids]
+    pilot_group_ids = select_group_ids(pilot_order(train_groups), pilot_target)
     split_rows: list[dict[str, Any]] = []
     for row in sorted(candidates, key=lambda item: str(item["sample_id"])):
         group = group_by_sample[str(row["sample_id"])]
         split = "development_dev" if group["split_group_id"] in dev_group_ids else "development_train"
-        split_rows.append(manifest_row(row, group, split))
+        pilot = split == "development_train" and group["split_group_id"] in pilot_group_ids
+        split_rows.append(manifest_row(row, group, split, pilot))
 
     train_rows = [row for row in split_rows if row["stageeng1_split"] == "development_train"]
     dev_rows = [row for row in split_rows if row["stageeng1_split"] == "development_dev"]
+    pilot_rows = [row for row in train_rows if row["development_pilot_pool"]]
     group_audit = {
         "stage": STAGE_NAME,
         "split_seed": SPLIT_SEED,
@@ -402,6 +431,13 @@ def build_run(
         "selected_development_dev_group_count": len(dev_group_ids),
         "selected_development_dev_groups": [
             group for group in groups if group["split_group_id"] in dev_group_ids
+        ],
+        "pilot_seed": PILOT_SEED,
+        "development_pilot_target_count": pilot_target,
+        "development_pilot_count": len(pilot_rows),
+        "selected_development_pilot_group_count": len(pilot_group_ids),
+        "selected_development_pilot_groups": [
+            group for group in pilot_order(train_groups) if group["split_group_id"] in pilot_group_ids
         ],
         "all_groups": groups,
     }
@@ -431,7 +467,8 @@ def build_run(
         "stage0_official_confirmation_count": len(stage0_confirmation),
         "development_train_count": len(train_rows),
         "development_dev_count": len(dev_rows),
-        "development_pilot_pool_count": len(dev_rows),
+        "development_pilot_pool_count": len(pilot_rows),
+        "development_pilot_pool_source": "development_train",
         "split_group_count": len(groups),
         "cross_split_signature_violation_count": len(duplicate_audit["cross_split_signature_violations"]),
     }
@@ -440,7 +477,7 @@ def build_run(
     write_json(out_dir / "STAGE0_INPUT_HASHES.json", stage0_hashes)
     write_jsonl(out_dir / "DEVELOPMENT_TRAIN_SPLIT_MANIFEST.jsonl", train_rows)
     write_jsonl(out_dir / "DEVELOPMENT_DEV_SPLIT_MANIFEST.jsonl", dev_rows)
-    write_jsonl(out_dir / "DEVELOPMENT_PILOT_POOL_MANIFEST.jsonl", dev_rows)
+    write_jsonl(out_dir / "DEVELOPMENT_PILOT_POOL_MANIFEST.jsonl", pilot_rows)
     write_text(
         out_dir / "DEVELOPMENT_SPLIT_IDS.tsv",
         "sample_id\tstageeng1_split\tsplit_group_id\tdevelopment_pilot_pool\n"
@@ -517,7 +554,8 @@ does not include the 51 official-test confirmation rows.
 StageENG0 development candidates     {summary['stage0_development_candidate_count']}
 StageENG0 official confirmation       {summary['stage0_official_confirmation_count']}
 Development train                     {summary['development_train_count']}
-Development dev / pilot pool          {summary['development_dev_count']}
+Development dev                       {summary['development_dev_count']}
+Development train pilot pool          {summary['development_pilot_pool_count']}
 Leakage components                    {summary['split_group_count']}
 Cross-split signature violations      {summary['cross_split_signature_violation_count']}
 ```
@@ -531,11 +569,11 @@ Cross-split signature violations      {summary['cross_split_signature_violation_
 ## Validation Commands
 
 ```text
-uv run --with pyarrow python scripts/data/build_stageeng1_development_split.py --stage0-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION --raw-dir <raw_dir> --out-dir StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT --package StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT_PATCH0_FINAL_REVIEWER_PACKAGE_20260830.zip
+uv run --with pyarrow python scripts/data/build_stageeng1_development_split.py --stage0-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION --raw-dir <raw_dir> --out-dir StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT --package StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT_PATCH1_FINAL_REVIEWER_PACKAGE_20260830.zip
 uv run --with pyarrow python scripts/data/validate_stageeng1_development_split.py --stage1-dir StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT --stage0-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION --raw-dir <raw_dir>
 PYTHONPATH=tests/support/windows_py314_pytest_tempdir python -m pytest -q tests/test_stageeng1_development_split.py
 PYTHONPATH=tests/support/windows_py314_pytest_tempdir python -m pytest -q -m "not integration"
-python -m zipfile --test StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT_PATCH0_FINAL_REVIEWER_PACKAGE_20260830.zip
+python -m zipfile --test StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT_PATCH1_FINAL_REVIEWER_PACKAGE_20260830.zip
 ```
 
 ## Guardrails
@@ -545,6 +583,8 @@ model_called=false
 gpu_called=false
 official_test_tuning=false
 official_test_confirmation_rows_in_split=0
+pilot_subset_of_development_train=true
+pilot_intersects_development_dev=false
 ```
 """
 
@@ -572,9 +612,10 @@ Review order:
 13. `tests/test_stageeng1_development_split.py`
 14. `StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT/VALIDATION_REPORT.md`
 
-The split contains 828 development-train samples and a locked 100-sample
-development-dev/pilot pool. The 51 official-test confirmation rows remain
-excluded and confirmation-only.
+The split contains 828 development-train samples, a held-out 100-sample
+development-dev split, and a locked 100-sample pilot pool selected from
+development-train. The 51 official-test confirmation rows remain excluded and
+confirmation-only.
 
 Rerun:
 
@@ -608,7 +649,9 @@ def package_reviewer(stage0_dir: Path, stage1_dir: Path, package_path: Path) -> 
         *(stage0_dir / name for name in STAGE0_INPUT_FILES),
         PROJECT_ROOT / "scripts" / "data" / "build_stageeng1_development_split.py",
         PROJECT_ROOT / "scripts" / "data" / "validate_stageeng1_development_split.py",
+        PROJECT_ROOT / "scripts" / "data" / "build_stageeng0_gretel_qualification.py",
         PROJECT_ROOT / "tests" / "test_stageeng1_development_split.py",
+        PROJECT_ROOT / "tests" / "support" / "windows_py314_pytest_tempdir" / "sitecustomize.py",
     ]
     with zipfile.ZipFile(package_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in sorted({p for p in include_files if p.is_file()}):

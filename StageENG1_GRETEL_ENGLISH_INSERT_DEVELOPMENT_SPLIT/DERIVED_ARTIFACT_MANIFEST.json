@@ -2,9 +2,9 @@
   "artifact_count": 10,
   "artifacts": [
     {
-      "bytes": 1533,
+      "bytes": 2053,
       "path": "DEVELOPMENT_SPLIT_POLICY.json",
-      "sha256": "40268c34f486d48687b24be4825519a0783ec167b4cb82208e394cb903cee569"
+      "sha256": "71d80a4db310cdc02a97d583faee338de41f46f957b6deca7ebbbfdf3f56acc7"
     },
     {
       "bytes": 732,
@@ -12,29 +12,29 @@
       "sha256": "0cb63f9c512ecf69b4f01e23df19b0c9da754fc601fea4e7e6297110ea00697c"
     },
     {
-      "bytes": 1153965,
+      "bytes": 1187589,
       "path": "DEVELOPMENT_TRAIN_SPLIT_MANIFEST.jsonl",
-      "sha256": "15773835603366e54d6db7e9f0c53c70d9e3877db7da7f632f9c51949086f5d7"
+      "sha256": "40cde0e64b4953a353e5c783ed676be952b486ac43fbcad4384a6e0cc2ffc7bb"
     },
     {
-      "bytes": 139068,
+      "bytes": 142468,
       "path": "DEVELOPMENT_DEV_SPLIT_MANIFEST.jsonl",
-      "sha256": "7452bca7f2b065c53ce093dcbbfe39e0397cbe894e90e3c12deac5a271affdc5"
+      "sha256": "94924145b89a86ada55e4b4da9a71d4cea10fe46da2cd7d44a94434e3924679a"
     },
     {
-      "bytes": 139068,
+      "bytes": 148950,
       "path": "DEVELOPMENT_PILOT_POOL_MANIFEST.jsonl",
-      "sha256": "7452bca7f2b065c53ce093dcbbfe39e0397cbe894e90e3c12deac5a271affdc5"
+      "sha256": "2fe1d967dec93c25aff1c30104913a86b2e930f4ab5accc8bb04d0a4380024df"
     },
     {
       "bytes": 61847,
       "path": "DEVELOPMENT_SPLIT_IDS.tsv",
-      "sha256": "a7c16d40ef82f3a32d37b3b2a20f4c4d5b34c5c0e596d0f25ff1f01cb3bba6cc"
+      "sha256": "1a1c1d5531f1e50929fefa88a51b16a311491742aa8501a339eaa18cb74a0115"
     },
     {
-      "bytes": 823612,
+      "bytes": 909636,
       "path": "SPLIT_GROUP_AUDIT.json",
-      "sha256": "73671b60a6f953eaf16f828f5d4bb6012ac538196d003533cadbcd59b80c2dfa"
+      "sha256": "80cf2a040f1c6ac8b9c567497b2d1db595afdc55383da38ce51313ab1123cf64"
     },
     {
       "bytes": 117448,
@@ -47,11 +47,11 @@
       "sha256": "8af15df5feba4435ffcadbbbbcf648a88d4c485a99b80771238f8564befdad04"
     },
     {
-      "bytes": 783,
+      "bytes": 840,
       "path": "STAGEENG1_SPLIT_SUMMARY.json",
-      "sha256": "e20085a160d1398bfb317b82d7816a3b69c7feda7f68445096ba8d4a1697bf7b"
+      "sha256": "2d78390ccedbada6412e860470029cffaff74ac159274cbc9114279780cff12b"
     }
   ],
-  "combined_scientific_artifacts_sha256": "a67f4a384eda7f8f7c47a14eb51086956b83d3d52afc033a978cf73c20a5d2c6",
+  "combined_scientific_artifacts_sha256": "36de141251686f46b6c647038700487116995e9bd660f894d3da5e1333256e3a",
   "stage": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
 }

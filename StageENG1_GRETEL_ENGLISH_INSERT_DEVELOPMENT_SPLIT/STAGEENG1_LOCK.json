@@ -1,9 +1,9 @@
 {
-  "created_utc": "2026-08-30T08:15:55.391833+00:00",
+  "created_utc": "2026-08-30T08:30:43.585464+00:00",
   "dataset_id": "gretelai/synthetic_text_to_sql",
-  "derived_artifact_manifest_sha256": "e2e6220b725f68a783c39a77ec9f30ac0342647584ef6504ee0845bc528ef4f7",
+  "derived_artifact_manifest_sha256": "18dce65eb262bfd668e9d52b71d2e2b4d3420f303a6f1a05d4b83af1b99f0225",
   "git_branch": "stage6/crudsql-eligibility-audit",
-  "git_commit": "f9b8585676cb4ce01b6c77c42ae16400faeb9981",
+  "git_commit": "e114147abd47f99e7f15cd8e51762613bebd2c22",
   "gpu_called": false,
   "model_called": false,
   "revision": "740ab236e64503fba51be1101df7a1be83bf455d",

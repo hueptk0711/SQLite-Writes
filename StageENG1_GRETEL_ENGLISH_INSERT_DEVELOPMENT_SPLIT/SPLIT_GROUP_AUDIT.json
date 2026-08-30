@@ -21159,8 +21159,11 @@
   "component_count": 791,
   "development_dev_count": 100,
   "development_dev_target_count": 100,
+  "development_pilot_count": 100,
+  "development_pilot_target_count": 100,
   "development_train_count": 828,
   "max_component_size": 4,
+  "pilot_seed": "StageENG1_GRETEL_ENGLISH_INSERT_PILOT_V1",
   "selected_development_dev_group_count": 85,
   "selected_development_dev_groups": [
     {
@@ -23437,6 +23440,2281 @@
       ],
       "sql_template_hashes": [
         "bb6a14b75b0bdb5429437aef9a9536aa9b578f1273b6d29d8103e550fa5f7346"
+      ]
+    }
+  ],
+  "selected_development_pilot_group_count": 81,
+  "selected_development_pilot_groups": [
+    {
+      "context_hashes": [
+        "86efe86509d9e5079fdf22a39cd6cf4646f8e1fc0d76243d746683f5c059f433"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "3b0795e2ff47d7f388bf71bc7792aec9631bf607a1f93a11ae10e5d8c0ad94c5"
+      ],
+      "pilot_selection_score": "00092d6a57b463fdb7b447f7d16c4fddfa3c9031a3dd6146af00cdf19f891cad",
+      "prompt_hashes": [
+        "777d058fb8121d4900a7f03d3629534f635d00fed66aa3b12eac8df581765158"
+      ],
+      "sample_ids": [
+        "gretel:train:51297:005929"
+      ],
+      "schema_database_groups": [
+        "26c18562b07d7f7c"
+      ],
+      "selection_score": "c9ff4acd87abc486afc1d57b9b5de4452324dfbee7946c476fc85eaa60e6f989",
+      "split_group_id": "2b67bbdd46490bd9",
+      "sql_hashes": [
+        "86e1c182d1fc6ce8b35af6332f31e70af5d94f122dec70ee45431c95b629a853"
+      ],
+      "sql_template_hashes": [
+        "02eb56e6951d6198e4d60dbff6e5d4d956de661e0bf6d19ae053a28069810319"
+      ]
+    },
+    {
+      "context_hashes": [
+        "29c173e6c4d03d82a7aa737e6c6ba1881d8b2736ada2471f3d60d370cf554e08"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "13934c6b30f243a332a69214f82539730c51fa473bb205612b511cb705f13029"
+      ],
+      "pilot_selection_score": "0018e542368d262d025a40696f6a83102a494617e0d3219eb5cdede6d39c1617",
+      "prompt_hashes": [
+        "314b94cb4f697b855c871b0b21d93717c5f3d2c455f11f1739cc25279ae7ee7c"
+      ],
+      "sample_ids": [
+        "gretel:train:69890:091647"
+      ],
+      "schema_database_groups": [
+        "65c994a8dfd0ae32"
+      ],
+      "selection_score": "4ba27d1baa87b77e520c9eb275e5572514a93a8c5bb35c156bb2b15ffdd71013",
+      "split_group_id": "b274dd09c9f7cb3b",
+      "sql_hashes": [
+        "83b67910a0050fbfa39687ed337adfe0834f5a091236f1977f29b5faabf1865b"
+      ],
+      "sql_template_hashes": [
+        "bc9ea6bb103951239aac02d4041762a75dae45c6d65271c3d0cc448a99f84700"
+      ]
+    },
+    {
+      "context_hashes": [
+        "63a96f6f34c90f1a2207edca84a8bb8fc7cb3bfe4a109bbf237052f1538124dc"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "eb98cbfbb4947d48b19720adae241902e10795cf3f7ac75e3dbd8e4845e108df"
+      ],
+      "pilot_selection_score": "0060232e16a43372b45daff855d2aaf801506bc689a56d83a67b54ac1847d1c0",
+      "prompt_hashes": [
+        "1336530dd7683d25c0d2e96822be86e16261f9dd26936715f892a962e66de449"
+      ],
+      "sample_ids": [
+        "gretel:train:12755:026742"
+      ],
+      "schema_database_groups": [
+        "c035fed79fc7e276"
+      ],
+      "selection_score": "8fcb7808a8f5e4fc8c81a35d9834273005813de7da1acef93e718a1926445f57",
+      "split_group_id": "525691dc356f7734",
+      "sql_hashes": [
+        "476d02425708705de42113fa0d3cf28e4fed67540a719e09426f506ca4f1a076"
+      ],
+      "sql_template_hashes": [
+        "863e84e6ab999086b7c62395b410a6d04f783d93de057454cbffe547d1038196"
+      ]
+    },
+    {
+      "context_hashes": [
+        "9fdbadb85479ebb1ea5efe3afd0c851992867ca3ac5de8dfcc5632514bc247ed"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "d46fa52ae42294a9fe1ad2ed6a0f98ccb2a4bc582ad169c59e56ad7f85ab729f"
+      ],
+      "pilot_selection_score": "009ea33ea7244f7a29e1fa13e12830ed9d49ccbc87417c707b43c069f8b17522",
+      "prompt_hashes": [
+        "19251dad1b29082bb2bbb51a801a626d358aa5a9a2e32928516354716e1f047d"
+      ],
+      "sample_ids": [
+        "gretel:train:7338:019371"
+      ],
+      "schema_database_groups": [
+        "eb9633f37fd37b66"
+      ],
+      "selection_score": "5e8c05b8008b10cd74e6e82c9711b5d3bb6547d2674b7281242fcaa8e71a7535",
+      "split_group_id": "32f68f182079835c",
+      "sql_hashes": [
+        "5d900ef74f6cf6f7830a477f721b9ed0e8447fcfb246a37a95f1fb1bb548ca26"
+      ],
+      "sql_template_hashes": [
+        "bd84790bfac83689feb9972466ca45d0392c263e89d366e718467dbf7a7ae518"
+      ]
+    },
+    {
+      "context_hashes": [
+        "1a436a7d47d10455565a278ab13fd340253ace0731ba9760c0f366efd52a7a56"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "7f285394d35953f02371213ee5c987464d7e1fbbbe8a432c336a7fe11f883e11"
+      ],
+      "pilot_selection_score": "0240584d34d5a3b8e669893ed823b4d658088885986e6d1a5920e477212c7c27",
+      "prompt_hashes": [
+        "32cf83b3383891c40974b3e92dfd12019470e017c522d551c54cedd86b8a5d62"
+      ],
+      "sample_ids": [
+        "gretel:train:28253:004035"
+      ],
+      "schema_database_groups": [
+        "485ecb8ef5b9ed7a"
+      ],
+      "selection_score": "22a4b0359573a2643c869427f742e6ff502e675add5c1fcae382ecffe0fec601",
+      "split_group_id": "23f225fc4d343451",
+      "sql_hashes": [
+        "5a4329dc70559c5a68e268a5c9d80438cd281c4d0ea89fca4993f4d8e8f62e34"
+      ],
+      "sql_template_hashes": [
+        "cc8d6fb0124b42dcf07ba3250a2fbb147b27226ff23d11479e9e3f12a7ff5e11"
+      ]
+    },
+    {
+      "context_hashes": [
+        "f47033d55317bca95916862e3fcf324ac52ea6c55f5ca83cba21d34179520ddf"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "fc382752748790b5e7e77edbef4bbf76d9d285e8836df9a75025a71a02f79e86"
+      ],
+      "pilot_selection_score": "028836fe7bbb84040ba88ec7d035ebbc523783264e45ab3f3739cff92dc1f626",
+      "prompt_hashes": [
+        "4e345fa0793a32d016fdab7b3f455aa750d53ae567a1d47c86d240c819594627"
+      ],
+      "sample_ids": [
+        "gretel:train:22676:077014"
+      ],
+      "schema_database_groups": [
+        "0be48fe22d276cf0"
+      ],
+      "selection_score": "ec2b3555946604e0a9ebab90c3421c9e2e3b9497ac90da9bfea4eb21cfb7d76a",
+      "split_group_id": "4ce8d44dfa1d5e16",
+      "sql_hashes": [
+        "dad8b9211ef9092f4129fcd295b4f40f82d42431133a8510e8d1f9393a232894"
+      ],
+      "sql_template_hashes": [
+        "d85d2f69a658518e9b4a8939d44b2557d973cd3c587e7bef8f7f7d5018de6f21"
+      ]
+    },
+    {
+      "context_hashes": [
+        "317d29fcb9e0f58c0b036675dfb8a262f4f7750d452448fd8235c95f3f704beb"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "a66caded3c5c378be4a99198161591438631b2b1bca0d75cfceb5651c9060ade"
+      ],
+      "pilot_selection_score": "03ca0bd16c814044ad2f3bf5c33e9d5be4d8b92f3de404d96c269c43423de22b",
+      "prompt_hashes": [
+        "4526ef6fb069af4aa0167e57d42618141f4fc27264887dc1615a54ae63e1a019"
+      ],
+      "sample_ids": [
+        "gretel:train:6251:001154"
+      ],
+      "schema_database_groups": [
+        "61e60fb464a0b636"
+      ],
+      "selection_score": "6d0324fddf3e850f451b4160018738d050a5f48630f1f183919e2e052b4234b3",
+      "split_group_id": "34684dc22c9f39c2",
+      "sql_hashes": [
+        "21d6a12c5fdc96f0d2e325840e309f93685aef1663f7bef46f6d12d22985714b"
+      ],
+      "sql_template_hashes": [
+        "3ef0a7a6e709b31bed2c08123221347b71d86a2c4bbe5d899df0efdc8164bc00"
+      ]
+    },
+    {
+      "context_hashes": [
+        "9420990487dec00030dcab6cef00f1b57c886ad8ca4bdaed4e3abc7e2ead3a4b"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "aa76ca6ef35a603c509b8d8207665ef8aca60d8ae64ac8972f30689ce3077673"
+      ],
+      "pilot_selection_score": "04963623233000f4189b2289f590076e0f41eaac1d7193fdcc405e6ddf91eb29",
+      "prompt_hashes": [
+        "c0d45bae29ce273ce5437b1ab0f4ff371ed07ca8b74b67b8e0d943cd8a324eb2"
+      ],
+      "sample_ids": [
+        "gretel:train:56275:048711"
+      ],
+      "schema_database_groups": [
+        "39575a1cec86431d"
+      ],
+      "selection_score": "ed3fe00da17008272194bad9eac78f1078a5d5d5cc90e01cbe280cb488027e7a",
+      "split_group_id": "4a6b2242176ca72b",
+      "sql_hashes": [
+        "8f64e6fd53dfc74e07887be3eef1f16ff1bc6e17b2fad63247a7857b400c0a03"
+      ],
+      "sql_template_hashes": [
+        "8fe1af840d6a81cf3ed9cf0bdaaf30b9acff711cabbcd84b585ce817710576be"
+      ]
+    },
+    {
+      "context_hashes": [
+        "6f0dfab4eec94b3263a9fc0a1811b7389d8a6f71a55f19eb2d874fe2b540bb1c"
+      ],
+      "count": 2,
+      "normalized_prompt_hashes": [
+        "2c798b46b469f16bc7101df5d83798612e45c16bc71b86841534bc9484ad4ee7",
+        "87257032f67fccbf38f5486354e1578f4d85fbd5de0d4483e649dcf2dd2940d9"
+      ],
+      "pilot_selection_score": "0508bd73e2eaf5ebf54aef64cd95f7dc826c6ddc40076145718c0f3d50bb6bc6",
+      "prompt_hashes": [
+        "def5ff734a99c67f665d785e3d7530dcee18edc72b53c6d7939eb9958ebe09b9",
+        "ebe991e83b9fa4f3a51d8b5b3992fe0def3cc8278a8bb85c67c7658bceae75f9"
+      ],
+      "sample_ids": [
+        "gretel:train:54633:055023",
+        "gretel:train:9744:017734"
+      ],
+      "schema_database_groups": [
+        "345d96bdb1bb11c0"
+      ],
+      "selection_score": "4ff688181f1531b227d6602db65c473ca0478e9bc56192ae4742d8758a6f1ce1",
+      "split_group_id": "c72277998e85b847",
+      "sql_hashes": [
+        "255aa3b86bf93d646ad81a662a47897aa8e5f4952a312861439dfdd9105f1c94",
+        "cfd21d42f86e8f18e309cc45fbcc747d65f9dd199ce404e9d874f1aba3c427ab"
+      ],
+      "sql_template_hashes": [
+        "0e2cccd0a03bbfd89282ab482f0468bb7b072180d58891ad6b61b856564fee46"
+      ]
+    },
+    {
+      "context_hashes": [
+        "012d999211b4ecd3d6ab92f0db995f3219558c284e98b40fbe7311e119e20307"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "cfbf66fa6c5f03c6a0f8860cd5a2352942ab004b622ccf5cfd0cbd3a83802262"
+      ],
+      "pilot_selection_score": "0539c1fcdb65d977b37c5f2818ca86e263ebbdff0301d06d199a0e32d763ebb5",
+      "prompt_hashes": [
+        "650a168854b5caa1b9c3218cce6fcab5cdc7197497290e02441b94876e628503"
+      ],
+      "sample_ids": [
+        "gretel:train:71196:085027"
+      ],
+      "schema_database_groups": [
+        "d940b0d0a59113f6"
+      ],
+      "selection_score": "4fce71acfaa6d448752a2bd0d24cc36a6b46d973c433f4605bc374afab68dff5",
+      "split_group_id": "79a2f17c92bcb91f",
+      "sql_hashes": [
+        "0e75ebf73f0e49df1a6bb2717ae63d1f0f50fca3a0356448f5a84f37ab26bdd9"
+      ],
+      "sql_template_hashes": [
+        "f1084bb4234e678c3a298afa2735b9e62eb7561b69604f5105483fcd12c8fb23"
+      ]
+    },
+    {
+      "context_hashes": [
+        "8d75fe81bd2e02c673907cc1e9bd1c80978f64b33ff7ae9b4b2a92a34a8667df"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "71e33d3e2e70f80dcb5e0fae2aa118909c989736e490a76cd185168cc94817a5"
+      ],
+      "pilot_selection_score": "054567c893aab6c293e2faa13f4e27a9db3ef9ef0d3b0efd962bd2b706988f69",
+      "prompt_hashes": [
+        "d25741f124e568a5efe4281226fcc4ae8d1cfa6e886d9e26c67b7612b1ac07ee"
+      ],
+      "sample_ids": [
+        "gretel:train:43635:027457"
+      ],
+      "schema_database_groups": [
+        "cda409bc45ea453b"
+      ],
+      "selection_score": "77cfd02e87a9372aab19301bb4de46c44e8ce82337609904830c25be99e958b3",
+      "split_group_id": "f7f905041b1cd2fe",
+      "sql_hashes": [
+        "30e59ea460d2877c70fc2d00bd538f39eca7a4bd8ab350273b3137b62d2c2618"
+      ],
+      "sql_template_hashes": [
+        "6685c9bd6af764a39635adf43aea5184ac6e4e5654833316eb21755e858aaa1a"
+      ]
+    },
+    {
+      "context_hashes": [
+        "84f27022d58c04838979546a509460baa83fec5cd255cd50f295679257f0bb6d"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "ba3d10b2ee5e08212348f9267b50a72702682c06b240990fa390f8e343108307"
+      ],
+      "pilot_selection_score": "0582b76e8f3b53fe86c8b9b6464f8054d41bb84c563f0467ec4bfec259096a5b",
+      "prompt_hashes": [
+        "0a53b626597b4b53beb42b121f97d868caba2cd937c6284054282c4b99c4691e"
+      ],
+      "sample_ids": [
+        "gretel:train:51806:006438"
+      ],
+      "schema_database_groups": [
+        "7e6f2147fc0d31ef"
+      ],
+      "selection_score": "e6efb442dc0bb2e18957297f16ffd36165de814a4860768c730040574fe3599c",
+      "split_group_id": "29251d3a5a566964",
+      "sql_hashes": [
+        "94bc5bad6f07fcd882481389dcf003be26316ea65b299474ca55d69394ebcc3a"
+      ],
+      "sql_template_hashes": [
+        "6787414948905e667b56d60880f67dd041826d192a439d21eaf3851003ca5d9e"
+      ]
+    },
+    {
+      "context_hashes": [
+        "62249d5dde584d04bd7fa9bbce58a7a26b3a4723ae44ff15802ef7c9bac76238"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "f12497e8b23762423a3cdea5ae83a27980baa004db7a7e67b447f23a1a91d367"
+      ],
+      "pilot_selection_score": "05958b4f62ababd8a0f32d4dec3b4f863c688468ecd217d5893a698f94d6b5a1",
+      "prompt_hashes": [
+        "a570707c277fc3b1e8b436cc3f82ab49b900afd437a18801f75dc2a2b70582e5"
+      ],
+      "sample_ids": [
+        "gretel:train:95063:093553"
+      ],
+      "schema_database_groups": [
+        "ec7c2ca6b0ae8132"
+      ],
+      "selection_score": "ea7eaabbd875549e11bcec03a013bc03dc5d1df0a75447af169c8e6fcec7a278",
+      "split_group_id": "efe1548a22bfa79c",
+      "sql_hashes": [
+        "53a52bb028d1068f77735b6a682be87a1405e15737dabbbbfbe2dd9b50b719ed"
+      ],
+      "sql_template_hashes": [
+        "aa03e9f616992e122dc365b8af3a034d3477b858eab9ed35e88a1963f06c9437"
+      ]
+    },
+    {
+      "context_hashes": [
+        "76ba5dc9d57a36adaba5125cdaf2e24ba7c8fc5d863dc86fa4d41818ca897c30",
+        "c08f4c0fbdfa830da8b73dc7095ed64d0b6c857bab0e7a2c83cd6ce09a5a9b20"
+      ],
+      "count": 2,
+      "normalized_prompt_hashes": [
+        "8bdc32838e8fab3ee51bcf55b5c038671cc9adce979a56eb81395f7c4b4fc37a",
+        "9bdeb8b684eeb026a20746a36a0c5fc2fbc836437bd64ec798aaaa542c3b441a"
+      ],
+      "pilot_selection_score": "059cba03d41c4d6d9c5206d5ac79ba14558c3c247d6e75815e156b85f431550e",
+      "prompt_hashes": [
+        "0f05cafadbdf332709717a851cc4816992bfb2c0de1a56e147b4887f75d67c1e",
+        "a6aa89c83ef94dec881c591a08af9becd9162be7a4b9a0481a85678248c458ad"
+      ],
+      "sample_ids": [
+        "gretel:train:236:043414",
+        "gretel:train:90532:063511"
+      ],
+      "schema_database_groups": [
+        "4d109232a8c39f0b",
+        "7d459fd0570860cd"
+      ],
+      "selection_score": "75d00f95441d0e0b76be2db2d2cb5ee18f6331ff5b403b8699720a2d4448e0c4",
+      "split_group_id": "43a8b200d341112e",
+      "sql_hashes": [
+        "0f60a2023c62a43e426394033bb9bb9e27a0f79bbe56da32e093fe6e12701443",
+        "678d74ca4c62aae6b7a67b6fbdd3dace28e91a9ed72a17304a66c2a836202b7e"
+      ],
+      "sql_template_hashes": [
+        "45cc348d1071ee716c27f090f388c4ed1ec1a41bb30000edfddbbd91752ec10f"
+      ]
+    },
+    {
+      "context_hashes": [
+        "2a0fc192c609d6cb00b32ae6fe42f4eaf864dd27b33c215c4fe9baa73431f905",
+        "bba420b443ce105949343f7ebe94b331ea33c78b54a1db09f825c7acfc9062c5",
+        "d44c52223967f612c6530b6a642ebc1165bf664d4afdd5842dd38826a84fda37"
+      ],
+      "count": 3,
+      "normalized_prompt_hashes": [
+        "1bcde08e05cdac2c90141299ea80879bdbfb7ae9c205557d32a86aca9ab8fd9c",
+        "a90e3533b9ada6a23d5de8443aea7669553ecd902d8c94698bc600e4c64232b7",
+        "d03be90d4cd06ebf6706829f6763823b5f0138f0744189b28454bce2275591a3"
+      ],
+      "pilot_selection_score": "05acbda71606070c0b7b177bf33ea48d2b52d03095ce5cfda9d58c9ac9063b3f",
+      "prompt_hashes": [
+        "0a4638c537969115a96c8104e518fb24551a98e001df854bbbfcb638e007a408",
+        "347b72ab369b057b64f5e80d4db059f62c968cec60b2f7131eb531151604a403",
+        "a4d11a3784b240aae574556c0d2d0365df13de6c77c34b5858a4d52f60acc6bc"
+      ],
+      "sample_ids": [
+        "gretel:train:18148:037202",
+        "gretel:train:57598:059926",
+        "gretel:train:75182:008390"
+      ],
+      "schema_database_groups": [
+        "1abade92ddcdb7db",
+        "4d91782e081a91d0",
+        "d1b3f1eca7774a6c"
+      ],
+      "selection_score": "bfef9166a04a6199ffdafd5887cb27f790343e714593f7b4005d8956387e936a",
+      "split_group_id": "90da57a663a34be0",
+      "sql_hashes": [
+        "164952b82e2040db91e29033a67826adf192903cbabeddc858930c3a6c6b8558",
+        "7619a1f117714fff961537559f9ab58fd73f42ba48c0f0cd92079b7d26a89614",
+        "9fbea092d04be3d6cddd9b73013af153bf84067a423349dd279e806c9cffc754"
+      ],
+      "sql_template_hashes": [
+        "abd73a8c81e6a3d4af31dadb19f9db5aefbd0e11910ed4c8fa64562bc78df3c0"
+      ]
+    },
+    {
+      "context_hashes": [
+        "60ab3e233fc7b04c35b44e32f5609a124267bf60f95db316b4b4b937dc3f11b6"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "904df19fca6dc4f7c3f53a02de08c8773845bd893c3cca809c25d7903d3ddccf"
+      ],
+      "pilot_selection_score": "063f9928cc216a3d86ce4893c5d99a08f3eb6465e4b76a3fbd1311653795d31d",
+      "prompt_hashes": [
+        "c120b4a88a2c400a44696b87845c57c1235f417d62e3899850e7898b3c564859"
+      ],
+      "sample_ids": [
+        "gretel:train:24664:055601"
+      ],
+      "schema_database_groups": [
+        "38addbe645e9ed92"
+      ],
+      "selection_score": "fd8cd65df8f1e81921893c0104e0a5bed7fcf3e48eb9492451fdf54742ed4500",
+      "split_group_id": "97fd80ec63dda404",
+      "sql_hashes": [
+        "c67cd9d75c80a435ccb850743c54203d5d5c554991b8105e97b4506268ff0cf6"
+      ],
+      "sql_template_hashes": [
+        "dd983ed678ac2e8ff677a12086f8c6086eac7b0023a7d59dffada176222b3bdd"
+      ]
+    },
+    {
+      "context_hashes": [
+        "8f5197d1cc0e460b640b87994d33d2603244e1342898a308ad36c00c0454d381",
+        "97707a1a315e98f71ca7976bfcdf52e484683f006157301b63e4b142e44a4628"
+      ],
+      "count": 2,
+      "normalized_prompt_hashes": [
+        "170f9cd985b94c9dbf0b5bde4fe4448683bfe1110518f1e1ce6aa1e0116323d3",
+        "6079a8c8644ad1340d47092f36e3eb19d6524c3c615139052976160c6b5bd17c"
+      ],
+      "pilot_selection_score": "06d31009db296f88ce1b7985a35dacac502728e56687fcec5bc7b05d084e5ce2",
+      "prompt_hashes": [
+        "7907f3f22e96f87852d3b8e7a9ec8aae72f733d3d8561e19bf4691e27cb1c370",
+        "abeec57df85d6d0ebe1d15efce1b0cb2020db6764194a57cb37d3119cbee2b85"
+      ],
+      "sample_ids": [
+        "gretel:train:30676:035110",
+        "gretel:train:57916:060244"
+      ],
+      "schema_database_groups": [
+        "0d3ecb7515ef7414",
+        "56cd086e46872c39"
+      ],
+      "selection_score": "8af3024e09c72084902cb49b1f4e3a34ef55dbdb7c6277b4a2ef5c3a520bf5ab",
+      "split_group_id": "21b02538c62f818f",
+      "sql_hashes": [
+        "a1e8ca47378688b336d4ac2356ac54d71b3b31c6a081c1fda539c36171b862a0",
+        "b4d4388b3f4e5328122eda79964ace8f14f6852b72ad410c67319b3bcd6be44d"
+      ],
+      "sql_template_hashes": [
+        "681102e518d69b81564020aeda26c27ff8452569d91ffda5f897f5286bead5e4"
+      ]
+    },
+    {
+      "context_hashes": [
+        "ec5371b14ec5617ec686d6b591c3a06e582c7c1470b7fc14a70db01248b6f5c8"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "301176b37177c3cab9bfcbe2784cdb9445efa128b411c57d965dde41f5aea05c"
+      ],
+      "pilot_selection_score": "06f73f0e9553f0ce4d307062fa18cc5ac141a7f32aad814531e32bea994e1c48",
+      "prompt_hashes": [
+        "e0747f8dca5283a86653e7a78a91d45d82f669156f995e6d56fef700fbf3aa93"
+      ],
+      "sample_ids": [
+        "gretel:train:50283:016516"
+      ],
+      "schema_database_groups": [
+        "564c91a4a78e8b95"
+      ],
+      "selection_score": "d7bd46f29386cec8c3c9ad87fe592e2126230e9b0597777879436f7326fc313c",
+      "split_group_id": "e060d72183149c23",
+      "sql_hashes": [
+        "12773feff09a8056e417186726e8e58fd6716743ae775c038e8aec8f2a0f0e55"
+      ],
+      "sql_template_hashes": [
+        "9d88da6ad7c58f55d7b1a2a68a204b9deb884c48fc70a3904bc5b121250142f9"
+      ]
+    },
+    {
+      "context_hashes": [
+        "4ada0281358b5658af4f24325d616c406a6c0678112dfe214634c6b6024afaff"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "704591c4c24a45d9d2cc80c2ca08a7f4dcc660055cf70b067439f329f953272d"
+      ],
+      "pilot_selection_score": "06f8e32b0fc69146fe15562699e63a28199a0cbc2508363fe1becc7cbb6c13ba",
+      "prompt_hashes": [
+        "8fe0daeb6b9d113cace3b480c0b31f6a3db7e0d85f3a1eb5fb440522c8a22959"
+      ],
+      "sample_ids": [
+        "gretel:train:35457:049422"
+      ],
+      "schema_database_groups": [
+        "f5f2dedfb11b3a9e"
+      ],
+      "selection_score": "4da71bcd3338ead8559a07a08fefbfa069fc7fe6ccc82cdfda6454e1fe9d06dd",
+      "split_group_id": "7600858cda74a1f1",
+      "sql_hashes": [
+        "0f9a0178e58615064e8352388927bec7da8ebf1dd09c053a4bb4ca32b4070276"
+      ],
+      "sql_template_hashes": [
+        "3a49162a23718bf1b454a21ae0f8e1c8c2da23d1e344dbf9fe5dab80d5924891"
+      ]
+    },
+    {
+      "context_hashes": [
+        "1ae205e8ad32f634d4a6908fe28927fb891fb933f77ff89e7b3ba8a19bfec21b"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "28232a4d9e956eb4f37dc49fb7fc5a387108843493e1b3cc8411068f84092f37"
+      ],
+      "pilot_selection_score": "0767b1b8bd36b24e5e832f28f0723ba6731fa33f1db29097794d931561da0971",
+      "prompt_hashes": [
+        "f10f7f7b9cb8b7141e57c987bd36c86bf677cbfd04bc40385fe886e74b81e4f8"
+      ],
+      "sample_ids": [
+        "gretel:train:77133:061962"
+      ],
+      "schema_database_groups": [
+        "9c2855e816ebc647"
+      ],
+      "selection_score": "3a04444c4fa28569ae31fcc098ae8a35f3be7629594577ff27796b6d411bac21",
+      "split_group_id": "e918b64225c1909c",
+      "sql_hashes": [
+        "db607a7730b263ab7d3e47d1b2680b2d608ff69b7defd4430955d2ace29e5c31"
+      ],
+      "sql_template_hashes": [
+        "be3ea996e60f628e2424d90e28a3b6ea2c7a621e6dc683c05029fe1409265d6a"
+      ]
+    },
+    {
+      "context_hashes": [
+        "a9dc303665271f4649fd00fc716a22d9ff98fcea724014e4880be9bbac36a3bb"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "fb73b3dfbef9e224f23d76918e29a012a070639a79f85a78d036f4f671a2bc45"
+      ],
+      "pilot_selection_score": "07bf9d51365710b6437e6e91d002a1938c64b3125ad56b918a964ad9d3ec28be",
+      "prompt_hashes": [
+        "900c01d1b1437efabe30077fa11093c76aeee925ffaf3dbeca4c3fdf1ba567aa"
+      ],
+      "sample_ids": [
+        "gretel:train:35201:049166"
+      ],
+      "schema_database_groups": [
+        "bda4611fe64cc410"
+      ],
+      "selection_score": "8b98c7bb86f68f822531bcfaee4d2ab7e6517b1612732d6e07d5f425fc73eaf0",
+      "split_group_id": "a5c0ea5efa456d40",
+      "sql_hashes": [
+        "616d9407b05f947382934df7eb530cbb646cf001aecac93b5e5cbba46754d911"
+      ],
+      "sql_template_hashes": [
+        "342c24bb55b92f7ca28b6e530a645251ed5733c4f2762a2ff6a4a24ad74883b0"
+      ]
+    },
+    {
+      "context_hashes": [
+        "1b863776becf11d6521d8aa75a5bd7fea744cf0114f4306d1639b149e023ac0c"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "8215ada5b0d2ba33fd8b1193094f6e1a2b7a220bb11c985beb6a1f947a6865ef"
+      ],
+      "pilot_selection_score": "082a874e9ca8ec698873b138a5dc4abcd254931181d8c4ed156501687c9b7003",
+      "prompt_hashes": [
+        "799583a3736d7f1297bd0b38c269dfc661d87bc50e90b573d8a5aabeaa49dbfa"
+      ],
+      "sample_ids": [
+        "gretel:train:95011:093501"
+      ],
+      "schema_database_groups": [
+        "e53a9a149d651bea"
+      ],
+      "selection_score": "34ca2c7dd8cd43cd57a7323266e5d54d95b1b1dda2eb4f82a46c8581bfe1c280",
+      "split_group_id": "7dcf5e77658538b8",
+      "sql_hashes": [
+        "211d52db9e3ef7b1a0aea6816c89daba5a3069947dbe208d1b004bb39c75473d"
+      ],
+      "sql_template_hashes": [
+        "0012f5263412c8704d100d01a8fc6541b097a69f8f6b4157ecd69277f9e011b8"
+      ]
+    },
+    {
+      "context_hashes": [
+        "efbbc0841fa711b9ab89099f52368bbc362a1246b76270296fbb0cd419cae06d"
+      ],
+      "count": 2,
+      "normalized_prompt_hashes": [
+        "e7bb7ca81d9ac201ca277cad073309e6959353de9a9b902cdb3f40d1d070dbcc",
+        "e8eca463d0a4877e42493ddeca8a715da3998f85e4b4f73a7120014c6acc7835"
+      ],
+      "pilot_selection_score": "082c5882b0db0d5a27cdcb0d5d2f2335073af1cc381e752bee249f02ca5cdc4a",
+      "prompt_hashes": [
+        "0319d0e20d5a870db0c196fb8674585182801b34615e997d0d9374549421499a",
+        "dfb9f70abf933ba3919233aaced4cd0188851b2292cf87d018d169b0d4b3866f"
+      ],
+      "sample_ids": [
+        "gretel:train:95353:093843",
+        "gretel:train:97977:009941"
+      ],
+      "schema_database_groups": [
+        "f27a66eb5b0de8c9"
+      ],
+      "selection_score": "aad69b42b8ddeae138a8528de86b123e021cdabd50640fd1a78f5b4c4200cb0b",
+      "split_group_id": "ae53c51ab9cfd517",
+      "sql_hashes": [
+        "bd934e7323a88176b5194495d1d4adafc8f8948522742a183674c8405b3bf590",
+        "fff5ad902f11ea7f56d53fd0dff550ba6e50ae06d603476f37acf3db3c0ecf49"
+      ],
+      "sql_template_hashes": [
+        "21a5fe63f3da24bc12bef9089f4f19dd5a6340490453f9a858c8b30c66202aa3",
+        "5e604fd15f5ee7f3f50d903ede5cf5de5812cf1c8ccba7e76a1d3cbbb510ec2b"
+      ]
+    },
+    {
+      "context_hashes": [
+        "32ca801c38cd105bbf7de1020e89ccf3f8aaafa0870e1421aee22c7a6edea7d8"
+      ],
+      "count": 2,
+      "normalized_prompt_hashes": [
+        "1140273a5dea79f104d5c5eb438e755219707cbab17910d4f963cc1f2d824273",
+        "3d0934a917992a83067321fef0c7ad68db7cca035b3a10c0a08f148ed4e8c364"
+      ],
+      "pilot_selection_score": "0898c918b10c0b030c6fd8e655a582aca6ea5743ba8374735fb001db1f7ff307",
+      "prompt_hashes": [
+        "589454e89cbd06f4cdf7bc2da63e55e06f716636c6048e8dd1bf1ee10134f820",
+        "6a9d5edad471267f98bfd9fe1dc46620ff83fed6fe4f3dd22736d7983cab4800"
+      ],
+      "sample_ids": [
+        "gretel:train:19577:052138",
+        "gretel:train:63725:081534"
+      ],
+      "schema_database_groups": [
+        "ed69ed1a181af4a6"
+      ],
+      "selection_score": "da5f7ef1bd24bdb02da9a6cec0a92cf76b3effe33f43a3ae2203486c6fdde54a",
+      "split_group_id": "7107c60178b6a62c",
+      "sql_hashes": [
+        "0f02ee416c34d4bdf5c173e3908b39ea0d147c14285fca11d826c5d8016c95e6",
+        "c71cf9e2f5fba77066e8674da3203b68d263c6a4f97429d9b4777524f36c1581"
+      ],
+      "sql_template_hashes": [
+        "f7af5d12180696b39fdcc5c18a7b8614566b32c35c2306530133d54b608f039f"
+      ]
+    },
+    {
+      "context_hashes": [
+        "16c6f3135f182b8c91694139a55c3d295f2052d82b3de4722d433cf8b2a66cbf"
+      ],
+      "count": 2,
+      "normalized_prompt_hashes": [
+        "617ce10f2e7d4da9b75f3b987a145b94fe02cb935d441273b4adc55ab2ff3818",
+        "eed6f337b51c4d1e0a9c308be4bff5241d00e311baf91260875a28970737e6ef"
+      ],
+      "pilot_selection_score": "08c1b3eaf0f7efab938080296cecd568006d99cc3fdf0e391529bc5de4aae1bc",
+      "prompt_hashes": [
+        "77a40c8fb74997e7ef0344d296805491402b5ccb6501bf4570d674693f47cf3b",
+        "d573c7402db7c2a286b6d0b191be0697a6e327a928cc0ce5b5a6121e633dbe69"
+      ],
+      "sample_ids": [
+        "gretel:train:13493:021504",
+        "gretel:train:73519:029895"
+      ],
+      "schema_database_groups": [
+        "79d7506177afd19d"
+      ],
+      "selection_score": "700888e1ab55b0fb4e1102284fcfab399ed9f9d823f6afd23721456081274314",
+      "split_group_id": "2acecfd23009631e",
+      "sql_hashes": [
+        "8add592526980a2deda9ab243f9aa4ac6cc0be1c09738e19a011716eb78f4a4d",
+        "b15378c3c03f28971bede251c196f538e743eca194817f677e22f0127a7d9606"
+      ],
+      "sql_template_hashes": [
+        "895b4e44ac3d08c4385b068e481d4679273281f54b6ebe3afc8abf7893a23f93"
+      ]
+    },
+    {
+      "context_hashes": [
+        "2f50e586e73be53245cf1e2f37bd0fe8d5ababe5f3f3339fc8eaf93426514022"
+      ],
+      "count": 2,
+      "normalized_prompt_hashes": [
+        "a7933d1ebcb34d0ec7f437fe0e8933966a3e0241741d26de9942707cb720f3c3",
+        "d2c77630f0e51bd48dc5b3c281cf4d86271af08aaa238831921be3759451d675"
+      ],
+      "pilot_selection_score": "08c482fc1dd1906f71b225fabe5fb3d810173dad90557047be5e254a31bd4880",
+      "prompt_hashes": [
+        "26df06d9506add37156840cdc84b5117e891283f43444950a16e080765c97890",
+        "6b217d366d6feeeda6e4863f900c5a51fda31d73990167abf1ffb879489ac3ab"
+      ],
+      "sample_ids": [
+        "gretel:train:50812:017045",
+        "gretel:train:74270:007478"
+      ],
+      "schema_database_groups": [
+        "4775283d72d10d27"
+      ],
+      "selection_score": "807e51422c87c03a0bb96056d9e449ba439a4b479d0805e52faf39b37fcafe99",
+      "split_group_id": "e1613acdcff91e02",
+      "sql_hashes": [
+        "00715b358fc109d28aca8b2be983b9451f6c197cf552cbc30c8d547caf1dd227",
+        "3a3903cbf65c1ab2873af1e7393faeae0215f11d4b3899872b3a82f119970390"
+      ],
+      "sql_template_hashes": [
+        "b8d6cdb0bdaed735d12bc844b996b8d829eab82a88733ca3f921f742e569d93e"
+      ]
+    },
+    {
+      "context_hashes": [
+        "bb0789d7e42914acf43337016bd58d8135704c71c1b6d285893074ddbacaa4b5"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "a618083b1cffe8b6f7df095e0820fa84bea5a9fffd6105405b5476c2599395d8"
+      ],
+      "pilot_selection_score": "0a1e4bd4532153ad6372da3be097216282f72c3fa6da8ad24f6559a5aec876a5",
+      "prompt_hashes": [
+        "7dcfb9657618ce1a7b57f62cf07eef3d9d49b0dab68ce87fce144749a6d4426e"
+      ],
+      "sample_ids": [
+        "gretel:train:78887:058201"
+      ],
+      "schema_database_groups": [
+        "a0fe046cdcc6809b"
+      ],
+      "selection_score": "4bb1b5e3fb9d92ce0bbaf0583965dcf79a550210e6b8b6a002882db7b02cbf17",
+      "split_group_id": "b33669078958ba4f",
+      "sql_hashes": [
+        "825a418485528f631c124774a8fa021b210f2f7c27d2b6cbb445aa06b5a50549"
+      ],
+      "sql_template_hashes": [
+        "0476cf4ad14937b1059bc22a9ead9d29d3f33990ba542a0f991aa875e3e6d894"
+      ]
+    },
+    {
+      "context_hashes": [
+        "0ac8f2a408ac5fcf9cee1d6677087d00b525273b826adbaa76a649218f79e4fd"
+      ],
+      "count": 2,
+      "normalized_prompt_hashes": [
+        "19ca4facf6c73a45966fbacb7cff965ef52e3cfbd5bae8f3aaaf0786db57fa66",
+        "d078d8c89bba2b4e4ccefd483adb7c82e3c09bfba672142e88cda6b37ceb71df"
+      ],
+      "pilot_selection_score": "0a530034f79dbb03b419fd50276ee881d4c015ecd1a9fb0aeb68a9b6bf78170a",
+      "prompt_hashes": [
+        "06edb17430cde8f59561d77228a41e2e044d32d11fe28b3b19a255501ba65cc8",
+        "672ac859b895821564f8babc6e3d5f61274b8808f9c58f6bafbf6d43a45c2af1"
+      ],
+      "sample_ids": [
+        "gretel:train:90058:063037",
+        "gretel:train:99059:011023"
+      ],
+      "schema_database_groups": [
+        "fc9c097a7bd14318"
+      ],
+      "selection_score": "da611ac20722219a77e328acda83070e7a6d3ed8a8e540708d79ab3e9596e543",
+      "split_group_id": "7ee35978923dc092",
+      "sql_hashes": [
+        "672de5e1345f0069a377dc22ad8e2a9c928b90f1e200c78d7dcab1ef1f23c58e",
+        "a46aacc55f5625fd129e70d12a08c8c43fcb6b4c5e73ae67297ceab6a8b1b743"
+      ],
+      "sql_template_hashes": [
+        "a6e9a6575307b5e56a6a51c9b8537cdb96e0f4f6ebe605560eb70dda64ac16b1"
+      ]
+    },
+    {
+      "context_hashes": [
+        "b07c6f5efe051f3c1f8f4df4fa63221c4831275ee6635bf843d50e7adee218e2"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "f7486a02330edee0502937a6b0ccc6facddc08e1f6d0fb6794093773b53e44dc"
+      ],
+      "pilot_selection_score": "0ac01129ad3d84fe2fba33bb6fd9e03b9bb8cb61f1c31aa7bbf0ef9fb7221875",
+      "prompt_hashes": [
+        "88bc4983eb03c8bdccb079e25a6183a529ae93b2cbd266eb5a87a99317c4b00a"
+      ],
+      "sample_ids": [
+        "gretel:train:26953:012735"
+      ],
+      "schema_database_groups": [
+        "e640459041419fcb"
+      ],
+      "selection_score": "761f2046c4ebd885a02079279b852b06bf061a46e42ed4bf0dbe0bab91b09f77",
+      "split_group_id": "06c590ef6a2c79d9",
+      "sql_hashes": [
+        "e345865e7caac480ecf49b5b9c826d5de2024cf7449a7a46b25c1c36fe87fbd7"
+      ],
+      "sql_template_hashes": [
+        "13549e90fe60e6539c80bbe5d10ac235b9a6b131820e42712f7c05a415f40b3e"
+      ]
+    },
+    {
+      "context_hashes": [
+        "339545319d3f753b74b2cc117759ea5496fb15a7eba610e268d15074f8c18af8"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "68f1f41ccfe1d8f670d53a17dccb811b0e615f8dbb7fdaed5f5bd3805964ae94"
+      ],
+      "pilot_selection_score": "0ae381224e6b78546e759841b905269654114f82f69858cc00b9856260d6f6d5",
+      "prompt_hashes": [
+        "6d5b72f826f1bc38df9eb93c5864ccbe54cf4005a7c7c513d0fbb0008bc5e0ad"
+      ],
+      "sample_ids": [
+        "gretel:train:75420:008628"
+      ],
+      "schema_database_groups": [
+        "43759ed4465d8b3b"
+      ],
+      "selection_score": "41f9fb224c034dbef0f082e0563112b761328b67a8ea2f6fddf9d0845fdda268",
+      "split_group_id": "c4f5d34a38c34ee5",
+      "sql_hashes": [
+        "5836110f8ff42e74186a4797e355156981939c143e2ff60fefd99e47dc06c980"
+      ],
+      "sql_template_hashes": [
+        "87f894c5731e39eee524fb25eae28746ab54c6e6e2b6bdfec264f4ef2de3f8b3"
+      ]
+    },
+    {
+      "context_hashes": [
+        "d98343950057641524a1470f6bbe030c882384469e19e44a32e63f9ab439726f"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "1fe6798da38f5f4f9e8f6ce6cb8805871c8e11791cc98048a4a9d25471e35427"
+      ],
+      "pilot_selection_score": "0b23533efa762378a56cb755513c6a6b20adf67a82e0a6d76cf265f8561f1bfb",
+      "prompt_hashes": [
+        "fd0ce17321817b3dda9b6c6dc96cb3d8d960cdf67ebd2ebb7aa1cd4b57cde9d1"
+      ],
+      "sample_ids": [
+        "gretel:train:72713:029089"
+      ],
+      "schema_database_groups": [
+        "e1f1afac5561d3f6"
+      ],
+      "selection_score": "e2c7f140e2bf7cbcb30cdb09ea28fb97754b9e6b3c87f8e3f0e31bcf88b25b62",
+      "split_group_id": "050de31ce34343ca",
+      "sql_hashes": [
+        "216c00cab0a0dbb16d39fe222f85ea339c2afa68de7ec2a463fc1b002b136a11"
+      ],
+      "sql_template_hashes": [
+        "0884369b5834c3e5fadae204aaf9393165ecc25b43fa1017ad332df53d92ad95"
+      ]
+    },
+    {
+      "context_hashes": [
+        "241d354f18ebc794dd5e88ae1ec862e6095da092081cc23ee82b66440559e7d7"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "ed2d221a79309339a018a62a1198941fa9392806780b8c3b642f299a62a4324e"
+      ],
+      "pilot_selection_score": "0bb6cac314d17afd682da32577a51df3008b2cfdb78046d4244d641f7820dc58",
+      "prompt_hashes": [
+        "cfe2708342a8c5c88f57c89df6d31c166493eca7f68d33a41bfdcc9c8dfd2d4d"
+      ],
+      "sample_ids": [
+        "gretel:train:67233:046084"
+      ],
+      "schema_database_groups": [
+        "8927ee2598f79a09"
+      ],
+      "selection_score": "bb5127c0beffa70459a906e567da67b7d2c017060e1c14bdcc6e4ce8497c265e",
+      "split_group_id": "43ecca828e1569ce",
+      "sql_hashes": [
+        "7042188ba927e236939ab6c227fcce2885d71f72e4c1e62d9944b08ace362706"
+      ],
+      "sql_template_hashes": [
+        "b2f5b8422c5285eb2f900b8e1d90c089205dce00f6968404b47c107d4c5605bb"
+      ]
+    },
+    {
+      "context_hashes": [
+        "7e1d6118dfda32bf6046897fe7f4d4d50a2274348bb46efb6eeb45f512ee46fd"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "8cc3c72c5d867c8441ab123d854ad58e1388c55362dbe4476e1ed6fe77b2a42d"
+      ],
+      "pilot_selection_score": "0c7f0b85df01bc69ba7df2b7227a1c213e39925d4d6b8e9241142992112abd86",
+      "prompt_hashes": [
+        "615846da664402450de2556d0eb015bf6fb57a25c5b2608b84dfe9f139f3d7e8"
+      ],
+      "sample_ids": [
+        "gretel:train:36096:050061"
+      ],
+      "schema_database_groups": [
+        "dd47fe8da2d97720"
+      ],
+      "selection_score": "65c056d7ce01d7f1d29e92af1d257231469255317c3652939788fd8595f67e4a",
+      "split_group_id": "af84ae9411f75e89",
+      "sql_hashes": [
+        "d3aeb7256bcf47926ce4dcf174dd9a3b82f3cbd4860128dbd967c3c8ec917d68"
+      ],
+      "sql_template_hashes": [
+        "201fb14fae8fa7e7a24654a175a4cfb375f5a8236472cd23abafb60fe05bd7f4"
+      ]
+    },
+    {
+      "context_hashes": [
+        "a5b355e0196fe6ca04f3a25e6712627ab514083010c96fe4ed64d0ac856531ff"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "cb1618fe916e3e3e918f2c39337459fc29660efa7929a6f725bd9e665baad54a"
+      ],
+      "pilot_selection_score": "0d1a2b2b61a75a6e261677f774c86d234bb250dde448095332b31d6c35bc6067",
+      "prompt_hashes": [
+        "495a6aed81f81225845801ade07525f1c52429e076b4ff7298fc6f744aa4dcde"
+      ],
+      "sample_ids": [
+        "gretel:train:79693:059007"
+      ],
+      "schema_database_groups": [
+        "e3855e96ac5cb79a"
+      ],
+      "selection_score": "874077621beae142a6b4f305fd8e341f153e044be383192ac3f8cfa5c935288c",
+      "split_group_id": "2fc37d814155c8d8",
+      "sql_hashes": [
+        "17c180aca39fbf70fd1e820befb9ab56d594c79e787cbd6bc53caac5e3755742"
+      ],
+      "sql_template_hashes": [
+        "b59aecde33a4ab26ab3909844904babdc9e1cedcdcf0b009d33fda645b26c951"
+      ]
+    },
+    {
+      "context_hashes": [
+        "273b5e94d8d7f58916b314af079b3924e92e3b3224dfb33f81319394f992620b"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "9b85074323b3017a198da8de6e01f9802093db7b3cdfc8f696bff1c15312abd5"
+      ],
+      "pilot_selection_score": "0d6083804374852869e42a1f7575eca487dfb133413b6712f82ddc1b475003b2",
+      "prompt_hashes": [
+        "0bdffaad746f8c3452d7f74f5da7361f71b0a4b1fa38483e68a013fb8f18d16e"
+      ],
+      "sample_ids": [
+        "gretel:train:91348:064327"
+      ],
+      "schema_database_groups": [
+        "97c29c9fb756fca8"
+      ],
+      "selection_score": "d55131594fb09f5515bcef36bcd6026082cc1a8fbfcdc6ed039ad3d3e04645ab",
+      "split_group_id": "658806f55303c440",
+      "sql_hashes": [
+        "20f504dc4dcb078fab6ac26ca329ea01bf50a5ac216b3ff72a099463ff378a5d"
+      ],
+      "sql_template_hashes": [
+        "89d1fc0906670d02ae6f84a6b1fe2e5c6244e0e084e0f3ead6f229073f383ad8"
+      ]
+    },
+    {
+      "context_hashes": [
+        "626503d74e6185156ed06e248411d80631100b66ef869d31043fa7d2b50d7f79"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "407aa0a1886170a209b27928235130352b0fe0a97cae8374892d310fb4919ec7"
+      ],
+      "pilot_selection_score": "0d79b5d4cee417e52dd3866055586b82681c9a91673c995030679d9794d30107",
+      "prompt_hashes": [
+        "ad6b14923e7847babedc704fb5eb18aaadb98bba8e698840919fb671774e01d8"
+      ],
+      "sample_ids": [
+        "gretel:train:9379:017369"
+      ],
+      "schema_database_groups": [
+        "c77fbcf6f612fa79"
+      ],
+      "selection_score": "8cb4aa3a8a33ab8e2e84a2e07836c1a1884e98040c5c1983fe11333040f4f08a",
+      "split_group_id": "da14aa9d731288a1",
+      "sql_hashes": [
+        "52ea35b5fc6143e02a788c977e73f295334e88f5c42d29eed6a047aeae592570"
+      ],
+      "sql_template_hashes": [
+        "f383f213f1eded7c80639938f2ae4fca25bf13a182eed608f9052836bcdb3a8f"
+      ]
+    },
+    {
+      "context_hashes": [
+        "dc0c493d83ceefad0d77052ed8207bf469bc7c00527359f03894e35dbac6b1d9"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "99e6669c96b51d00f46c1e5d8704937dfa67cb60386440c882f5f38368bc0a59"
+      ],
+      "pilot_selection_score": "0d9b1a704c7d645ca637ab76418b6204682e27b2559972a3b76883bed7d0a177",
+      "prompt_hashes": [
+        "6e498f134edae55bc44fd96f917e65aff0fdc79ef7896f12b33705f4ef9eb09b"
+      ],
+      "sample_ids": [
+        "gretel:train:33518:033980"
+      ],
+      "schema_database_groups": [
+        "6aa7d14c9facc9f3"
+      ],
+      "selection_score": "1d4ec04be6231e9ba30422999a7c89ea2dca39c25f8bfc7e8d2d5473ffc4f0b2",
+      "split_group_id": "94f77898168822a3",
+      "sql_hashes": [
+        "86fd32600726999ba3be04243ba1934b8db91826a541653fca86358cfbc89fb2"
+      ],
+      "sql_template_hashes": [
+        "48a1fba0929bbfc958770041fec012e6bb49f0313b001bc81118b36931d657bc"
+      ]
+    },
+    {
+      "context_hashes": [
+        "689f5c4786e94387052a8ee991e1cf1477250fcbc3d1c7eb1b93b68daff7baa4"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "8e09dadff013a2567b6da5eb0756e7db4f3969a76051d5eeeb9dac0d040e3b09"
+      ],
+      "pilot_selection_score": "0dd978917e9252dbf90ca92a39b9230c31b9f2f3bcf9dc5a512f3478a610d4de",
+      "prompt_hashes": [
+        "ff9437aa9c05498c768f054add928fa13e012a54e017e7d1ceda6d408dff552c"
+      ],
+      "sample_ids": [
+        "gretel:train:93412:095826"
+      ],
+      "schema_database_groups": [
+        "c6b0ee52462b556c"
+      ],
+      "selection_score": "c245f56c06923d024467e6dbd62323af97c7c831c3ac3f78955b78d0596f3b9b",
+      "split_group_id": "6dfb79e743b43b1f",
+      "sql_hashes": [
+        "e7972aa289ce07f4135708d0d82c712a6307121978eace2d82dcb91530871bf6"
+      ],
+      "sql_template_hashes": [
+        "5c743beeac1e7ba54cc09fbbe4badb4db1bad15e0eab41b310ea19266441b590"
+      ]
+    },
+    {
+      "context_hashes": [
+        "a182b5bd462d900d3eaab110dec121f39a6ae6e1dd1426ba7f43ad2428068da6"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "0d115cefb7f7520c2fa691b4b7a4a31e914a89068ae5737ec84e9f471d8f2cc2"
+      ],
+      "pilot_selection_score": "0e38e12d74ea1a66e0c1bee7a4913cc63d3481aceb45f00ba850be484e5d3f98",
+      "prompt_hashes": [
+        "529a418c83bcb8bb96ac1e8e1e571b7460a16d4cde135b785110fad9f5aeeb1d"
+      ],
+      "sample_ids": [
+        "gretel:train:51769:006401"
+      ],
+      "schema_database_groups": [
+        "e565682a8ad162ff"
+      ],
+      "selection_score": "afd701bb398e113cc7ad989a3563b2a6268f9b07195bba75bd55af7e502fe22d",
+      "split_group_id": "2c0b27a1f7deb3ad",
+      "sql_hashes": [
+        "630fddc71a7a90cbf021ab47928a6e78db3d6678154334a147294b90a87cf7c1"
+      ],
+      "sql_template_hashes": [
+        "cb1d80ce4d09008d5e2ca90b8903b7a4f86ef53ae0bce6ad9f5ea78c7f6eea6b"
+      ]
+    },
+    {
+      "context_hashes": [
+        "6c1d91617ea1da0ab5a7082f18d9396e7c514dab4483f32cfa119a266ae01933"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "f527d38f610fabaed9065713d4fbf0cb68095616ec569aa342bcc2f4694d4435"
+      ],
+      "pilot_selection_score": "0e4c3b8628347a86ae2e664975a8d9fccbae366debc9cdf95d9c3dd0b4c18be9",
+      "prompt_hashes": [
+        "54a58c774e1bd6f4e4e8138234758f3cf34b921eb45bb206785d2c1ee29f348e"
+      ],
+      "sample_ids": [
+        "gretel:train:3751:002174"
+      ],
+      "schema_database_groups": [
+        "813349ef173bbc24"
+      ],
+      "selection_score": "84de8303d80edddc2e704dfa11f9b827146fed716a7814542146cc2bd189463f",
+      "split_group_id": "b7fe7e7c98c8df1d",
+      "sql_hashes": [
+        "67a6014f607540c1c8c2b49f92c92a51b75d783f83aaaec60743305cc1929fa1"
+      ],
+      "sql_template_hashes": [
+        "646fa762d2b8e90c128da61bda30f7215ae8d14669e63ec25c7a5acee2f24ce3"
+      ]
+    },
+    {
+      "context_hashes": [
+        "8675091fa2456dc0b427e1ce09945ae59c606a4aba8a9a54d9ef0aaa66187d76"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "ca2b5a06be5c612742c8d573ebd2fa60064ce79ac036e4604d885b2b82887977"
+      ],
+      "pilot_selection_score": "0e83066e5245da028a014abda4f4f942cf1fe6b02300f2f6cf77d472fc8ed89f",
+      "prompt_hashes": [
+        "546a3b23008f4df4354fd150d722b3b0ed93b46533daf84129c1c1049f4306ec"
+      ],
+      "sample_ids": [
+        "gretel:train:17011:025022"
+      ],
+      "schema_database_groups": [
+        "83e8e4194e985f35"
+      ],
+      "selection_score": "8d28971da098779d35249a1439e24cdceaaa8eba545d4622c5c07126b9bedf8d",
+      "split_group_id": "3c86bd9abfc1f27f",
+      "sql_hashes": [
+        "501162ded802e607d40b6c22ad1f7d94c168c338d18f14e33ea6790a30833c59"
+      ],
+      "sql_template_hashes": [
+        "e3b866e4fb57bb4e119ef15731cf3da7a11b713558a889383c76f13bebef7f66"
+      ]
+    },
+    {
+      "context_hashes": [
+        "7eb8f8d543b145ac03b467d4e302a69c17df4389f15ef159a8afce85e1f0808e"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "5a8b04220a0ababa2a9610455184fa6b0c7893a3f2ea3ed592502f3b175ec758"
+      ],
+      "pilot_selection_score": "0ed91ee7677266582b2b6718838856e258927e3b81d2ce0d631f45d43ff7ee75",
+      "prompt_hashes": [
+        "1a7f65c8e878ccd4649f28995fb89e3421cbd347181fc73f40d1b01037f925a0"
+      ],
+      "sample_ids": [
+        "gretel:train:38843:042821"
+      ],
+      "schema_database_groups": [
+        "af3c3775aa099369"
+      ],
+      "selection_score": "e5b5b4958df856f906bf7221154d4699f8502b9dea6766a15680a77d084aabc6",
+      "split_group_id": "acf7db58deda6a50",
+      "sql_hashes": [
+        "5223b4b93a67fe92208c329c66d05a12c2d3a0e872445b591cd2e108e5700f34"
+      ],
+      "sql_template_hashes": [
+        "ce9d953ab0e8e28e0a8fdda62ea95d9acc3ff334cfa799a138cff802d30ddeae"
+      ]
+    },
+    {
+      "context_hashes": [
+        "ef9f4b2d7a96c342fe7e3e9480527b898686754763f2a67f55fd68a9b0bc1f41"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "6460eb363f2dc8f3e6673ab84896bc3992594cbd46d90679ff803a601c3d3a7d"
+      ],
+      "pilot_selection_score": "0ee13d2dc6da864a3e0134aa7634adaaf43ec10df62d10c0d79d372bd57b6821",
+      "prompt_hashes": [
+        "8eab772602681a50fb6dfc7c18771f83787139fe096f324b407a49de65b6416f"
+      ],
+      "sample_ids": [
+        "gretel:train:76628:061457"
+      ],
+      "schema_database_groups": [
+        "c644c123626560f5"
+      ],
+      "selection_score": "b3c50b48a9afc4014748001f9664dd405fcf3328cd8dd2f1430ba73c23a0d56b",
+      "split_group_id": "254ee02a6ff4a042",
+      "sql_hashes": [
+        "c9e132f7fbf4bf72a305b065d2c95b82938acd802fe49eaa5f146445a9098baf"
+      ],
+      "sql_template_hashes": [
+        "d617261c03c71e8db499367807a17e22e138109d1011a3a38bc6c3df964e013d"
+      ]
+    },
+    {
+      "context_hashes": [
+        "374a0a6f6e472e6b06c2612f023576981711ed57e01b2624fb0e51f5ef4a780a"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "ba284d17acbe040b5c3c3b7ec9f3b62ca620dfe4816e71d18f99e39fd35e7e4e"
+      ],
+      "pilot_selection_score": "0f3a2cc1e375b285220cabfdf94cfe5b0b7bd82da48237fd8f39ae95cb827842",
+      "prompt_hashes": [
+        "c7bb0290a5c35d795283f58f72d4fa77210648406c07220d9f7446f07aaeabaf"
+      ],
+      "sample_ids": [
+        "gretel:train:70937:084768"
+      ],
+      "schema_database_groups": [
+        "7ba8fc5b2d756dd1"
+      ],
+      "selection_score": "8179501a2fdf868f38408848c497169508aaa62ccdf1c92f02b4dcd05e2f0d9d",
+      "split_group_id": "49a0f4c0c7cf40d9",
+      "sql_hashes": [
+        "ffa8145603fe44d58969813b97dd72b30adf4f1e169fbc20bdb884e26e2c7183"
+      ],
+      "sql_template_hashes": [
+        "34f128d12c491b79644fbb60463efc02e2f9ef8e94299b1c0581ef2531bbe36b"
+      ]
+    },
+    {
+      "context_hashes": [
+        "48b24c16afd072ef0ac6ddb27b36e998c10d0d7c907f40139289c7f53a9769a6"
+      ],
+      "count": 2,
+      "normalized_prompt_hashes": [
+        "1dccfefecb113d7ce81e230cf39ec77b93d35f8efb358467361418f31eff4235",
+        "4054f4adaed5504b48d9f6d44c1ceec87d8494767db902e93859dd834af81df3"
+      ],
+      "pilot_selection_score": "0f6c79753813e124b25d3dcf680446c0ba70bfe51844b94891b80883edf3c5ae",
+      "prompt_hashes": [
+        "23b17deef88ef4f961c0b86777eb088e2d2741b2cfd474da0f7bb69e0bcf13a1",
+        "2d651f219fc99a10f4013e4e627f7da2f7b5b8694666622b93675b33d8ef1c3f"
+      ],
+      "sample_ids": [
+        "gretel:train:55699:048135",
+        "gretel:train:9934:017924"
+      ],
+      "schema_database_groups": [
+        "6f79c7bce57d0952"
+      ],
+      "selection_score": "aca620798b0c7624f2f074b1e231d0af75ac2d120370d41667a3b32c3134da9a",
+      "split_group_id": "0cac6dbdc3a69504",
+      "sql_hashes": [
+        "27bcb23531043adb4e4d3b5c5ac8bf97a02cf02e7bd242f5cc5b01247feb5314",
+        "287675f66de0b3b3fd4216e85e362e28400c80a1112eee42571035348cb862eb"
+      ],
+      "sql_template_hashes": [
+        "e7c123516890dfbe4cc225359469a1f768d1d2e0971eb7ecfaeeb1e8556ffa93"
+      ]
+    },
+    {
+      "context_hashes": [
+        "61f690cd43d367b6c7fc0a03fc5d0ee3b1885d7ed26d2a125545365ebfddce6a"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "97b6dd300e82f78cd5f4c9a2b1a8ad88abcbc185138ad574c555fe66b2e08739"
+      ],
+      "pilot_selection_score": "0f7fdd25d5b3d1e3a7f559ebe16958744c8376ea062d80586deed94618f35b7a",
+      "prompt_hashes": [
+        "4b5a4f4db68475855e5f3968c0582642654247fac94d1122d302de2823d8beb0"
+      ],
+      "sample_ids": [
+        "gretel:train:70170:091927"
+      ],
+      "schema_database_groups": [
+        "5ad8a351dff62831"
+      ],
+      "selection_score": "26bab1be07e6104b11054a54d719bfe7824a4eb9b324a6f0dc7e5b94c94d1f4d",
+      "split_group_id": "63a3a6a2134b5597",
+      "sql_hashes": [
+        "c162260c7fdf17a99926aa0efb49a183984aae0b24974e72757431a50b17a969"
+      ],
+      "sql_template_hashes": [
+        "a59ddc00bed792881fd8fffcc6e70612b8a12f8b871a74d5606cd587b2b3246f"
+      ]
+    },
+    {
+      "context_hashes": [
+        "8e10e9be893a3ab3789072e3e24b8ec42c0837bc655b2a7dc9c60614a080d6be"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "795556b3dcf7aba0c797079cb57cae72c5db2bf441890f9891e75065b1b76703"
+      ],
+      "pilot_selection_score": "106156f1659363ba516cf8cf0d4b4cc06eb3c7b8d06cf2fadc419a9c965f383b",
+      "prompt_hashes": [
+        "acc54172d1ace44d74d032afc8c9947767258a71fd7c732080d4e572c97845fc"
+      ],
+      "sample_ids": [
+        "gretel:train:92985:095399"
+      ],
+      "schema_database_groups": [
+        "e13f87b4b4ab7832"
+      ],
+      "selection_score": "202b994d0f97d4629921e9f927f20c1a0b74103b53773086e156a47a3d26463d",
+      "split_group_id": "82b60b4e5e7eef57",
+      "sql_hashes": [
+        "c1a488deae11c02df9db24048b5c7e1eba2441603b34e28090de0ead9bcf90f9"
+      ],
+      "sql_template_hashes": [
+        "817cee6affe16ae235102b1bae51c250a58431e864f53fe13dc4c1fd3e26de9d"
+      ]
+    },
+    {
+      "context_hashes": [
+        "c50733358c6a4a2b1c35814b0c235760ff3d27a2a81b0a6caddbe65ce8657c0f"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "d0803a3ee5d4240de65345358af90b78a5a84ddeafb753f98972965295462f87"
+      ],
+      "pilot_selection_score": "106fbd64b5c30be5499bc2cb1da17e73a5900577f4233f130f43cd0f0c056642",
+      "prompt_hashes": [
+        "1ca34e69af3b062f6f879ee47280af983e8ca224461b153b23b639e7c508b8f0"
+      ],
+      "sample_ids": [
+        "gretel:train:99272:011236"
+      ],
+      "schema_database_groups": [
+        "c7dc504ba8b1b6f5"
+      ],
+      "selection_score": "494ee55033b87ddba15142451703026a49522dde253d865035ba2d3301cbcf58",
+      "split_group_id": "6157a7a00f3cfa73",
+      "sql_hashes": [
+        "0ad055748ab3b46af7ec50935d4743fc1d88f34dbee21bf9cd6a2d72b5770bdb"
+      ],
+      "sql_template_hashes": [
+        "9fc67a82ca9259e9aced76767c7f133e7fab43ca1a0427a04ff7ed81e877c0f7"
+      ]
+    },
+    {
+      "context_hashes": [
+        "41f94643001192e3f040184f5bf237726854ce57321534b547d1bf86198b8a40"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "8d304ec8a00fd14a98a318e55d3636c7e6f0f757ad60d09cc2ff2b146434cec1"
+      ],
+      "pilot_selection_score": "10aabe166c8b87c3357a46f8ea58049fa35e30054a9c07f69c7cad95f4ca9a75",
+      "prompt_hashes": [
+        "0be200fc7023f2138ada345c4d12ccf522c6545c091ecccade18a4b2913e616b"
+      ],
+      "sample_ids": [
+        "gretel:train:49231:015464"
+      ],
+      "schema_database_groups": [
+        "3fa3abd89617200b"
+      ],
+      "selection_score": "5cef51ee3032514b70ad2c60d26cb25c2fd1a5a5b36b6087076e6054c1f6ac39",
+      "split_group_id": "184caeac2e96e0df",
+      "sql_hashes": [
+        "371bb8bd5daf1d1c7d00f71d5640b73aa25380c46696f4a2af3212f7ea3c574e"
+      ],
+      "sql_template_hashes": [
+        "99afc0b17805b6e8d349038599185dc1c0c43bd29445ae32cfffc6eb6ecb82f5"
+      ]
+    },
+    {
+      "context_hashes": [
+        "2566a0ff2b4d4abe583d0c25294ee6a41caf284082bae4617c2b97f28c0f4372"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "a05c46749e8c1f1a8baeaf0bfcd233d718bc4181b792ae92012c3408a95338ee"
+      ],
+      "pilot_selection_score": "11a6792fdb109ffd7c8d153a9765915994fa193ba78f7bc90db7ad2f816d0890",
+      "prompt_hashes": [
+        "424b98ab27f71a5440af8fa5f61215fed3c774e3d40ddb3d05f07596c2468135"
+      ],
+      "sample_ids": [
+        "gretel:train:5965:000868"
+      ],
+      "schema_database_groups": [
+        "8c0655a6b2a58d70"
+      ],
+      "selection_score": "aa6d47bb2c51a2235ca84dfee04fc1615e09b6973b50185ef2f4ae2cbdbd1174",
+      "split_group_id": "797348163d1ed181",
+      "sql_hashes": [
+        "c63a1de1506c1a7061129acd6b713a8c2cf2240694d781a979923b1e35567149"
+      ],
+      "sql_template_hashes": [
+        "cb2cafa653077771d5d4492c239bae109981c4629d74e75d278bde3d0c161cdb"
+      ]
+    },
+    {
+      "context_hashes": [
+        "03ba9123e5707cdf3ee43dfcb0db3ad5b8f2dc77dd71b4c898dbdd12433a0646"
+      ],
+      "count": 2,
+      "normalized_prompt_hashes": [
+        "89022cbad4b01a2d7fa8097dc857a09439df55e0b7f98f650bc9c3ff78b7416f",
+        "9198eae3cba154767f9804cc3ccc1f673b4a9feecbde3364d3dbd5e17baa6e32"
+      ],
+      "pilot_selection_score": "11eba5b1864e94e93fd58bd16fdd1fee7ab0e8209c0704c5be72c105968a4f84",
+      "prompt_hashes": [
+        "17deb6661e260a23773a08f52da426a6f7bdd0d9b8116f51ccb5d0f151741133",
+        "3400d471e09e50206c3a41881d67ad9c127040979c2161589894f01fbd835b59"
+      ],
+      "sample_ids": [
+        "gretel:train:42718:083586",
+        "gretel:train:99202:011166"
+      ],
+      "schema_database_groups": [
+        "fdc86ae3c1c37bc1"
+      ],
+      "selection_score": "66753556a4c70f19841242e44a4b431e2f3d704e354254e1a1ba3704eac08423",
+      "split_group_id": "b031308870e59dc9",
+      "sql_hashes": [
+        "078a55604dadbf13cfdde7ef55b4735bb90cee33803d4eb9e204b761f776cc2a",
+        "432fa1dc6f67db42622ded08b2ea3a68ee40cf7db4f5e13c9bc1f0c12297cdb3"
+      ],
+      "sql_template_hashes": [
+        "fc5b595c5295b064271824ba1e1a6fbc5aa2ea93a671665c98fa0954ea948732"
+      ]
+    },
+    {
+      "context_hashes": [
+        "0a2a1d1921a4e27c2850d83a7c8432c49b23629bde5509fe62a050d0ca2c7e13"
+      ],
+      "count": 3,
+      "normalized_prompt_hashes": [
+        "6bd9fa0dbfa428619859c5132a73bbba5ee701dbe4aae196b2e83b9de08b5e2c",
+        "c09c9739da2b2033f3c766e09ea7a712760dfb311aae7bedcf3ad05eca0ed786",
+        "fc8c1ecb79d651339fb5f0a08ac916ff8fac9986fabd638cda221f704d50d96c"
+      ],
+      "pilot_selection_score": "120689f95f111b877cc95a7b86bb6f4b505721cca160050419f7b2c2f084db30",
+      "prompt_hashes": [
+        "5886dde8095ceddce80b8d0ea93c1dd4c0b1e5ef02bbe748b7b337851780ec6f",
+        "6050390fd434eeb21257ffdbb28d5e75468d19b84a025066a31ab9d207d5e3b3",
+        "79d83dfd9e14bab5b32a5794230a2ae8cb936f6cf3f25a5b3be272ba7cb4be2c"
+      ],
+      "sample_ids": [
+        "gretel:train:12420:026407",
+        "gretel:train:42097:082965",
+        "gretel:train:90620:063599"
+      ],
+      "schema_database_groups": [
+        "8f5cce0557762a74"
+      ],
+      "selection_score": "4897f24ee54369eb078db9a28d76bbabaac3bfdcb8278adb50bb84e8464edd7e",
+      "split_group_id": "90f66dfdce4d4e77",
+      "sql_hashes": [
+        "21f0835ad08c8389189a3d95d307e1e4f97613579e2fbc09a844b7dd7a3fd869",
+        "8122682107f7ae5ad9740e28fd98250708c61ceb310b1d678df7074126db0beb",
+        "b685daa26186f30f69bafc6225ff95f9c028d762b20fbd3f9de83926c0bf8904"
+      ],
+      "sql_template_hashes": [
+        "b732896e3e31c0b41521a80fc163676f197b283ad3595fc9f05950f19c0bf9ec"
+      ]
+    },
+    {
+      "context_hashes": [
+        "52dc24a1ba88c6c9ccac0f4147f45436c53fb693286d14ea3c9a703f3073905e"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "c7d3f9983c399009609c7bf65c2dfa7f39c2ea159a92efb35358ab73f0737960"
+      ],
+      "pilot_selection_score": "122bdf7b56d15e3d09bb77622a751b4b0b2e7ef96122f9f5a8f67f9961dc52bb",
+      "prompt_hashes": [
+        "f50b8df5b75de1223fccf2acbf17ff5add8e66145d417f15837f02bafdd0949b"
+      ],
+      "sample_ids": [
+        "gretel:train:41663:082531"
+      ],
+      "schema_database_groups": [
+        "fe37872a0a902c2c"
+      ],
+      "selection_score": "b550ff8c9ea5ede02818862d8ff3957b2dd0d85e95b4e957b86b5fedf15ddda1",
+      "split_group_id": "2fb00e92f51e098c",
+      "sql_hashes": [
+        "42f35e57b6c6e20006c1c33844544ebc4f1df05e9919db4f1c51c29ba8352322"
+      ],
+      "sql_template_hashes": [
+        "998b31c12b74c15f887a4c3f0ac20d07df8d0d730fba35f260c2369737707316"
+      ]
+    },
+    {
+      "context_hashes": [
+        "a5390edc58edb7ca1b33c2e58168b408816a8879d46c98c3b611c99112cd36b0"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "0702dc02cb4c1537a5b35050411d49f498c4de72252eaf2dd095071054c00779"
+      ],
+      "pilot_selection_score": "1269a93cc9970f3eb8c5a39890b2c874c0b84c177a7113c1435a8e84d0281d47",
+      "prompt_hashes": [
+        "d6720beb9c9268fb63d6d85b0c39ad9524122ebef0a982d20976aea85efcc3f4"
+      ],
+      "sample_ids": [
+        "gretel:train:98327:010291"
+      ],
+      "schema_database_groups": [
+        "ca999779a45bfd1a"
+      ],
+      "selection_score": "b1729d90ea2cb7ff5451b77a3472b4663d5762a19da43491e9bb7c6bd75b8f41",
+      "split_group_id": "d4418f49705175b1",
+      "sql_hashes": [
+        "d92dcb832287e4915ae972c845337436e2091a8afac1f3e3f0db52d9de1c92a1"
+      ],
+      "sql_template_hashes": [
+        "a429c63d8c95e57bcc2720a9bfcc6428ca4e37072f1972b291aebe88e7b14086"
+      ]
+    },
+    {
+      "context_hashes": [
+        "5164928107aeaacd2a69d97f598855fd88ab635e96cc0bc5f0e1cb3a69a8d98c"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "07cf4a6abb03a018f654e67589d05d610dbc6ed746c3f683e1c342755a06af80"
+      ],
+      "pilot_selection_score": "12a074d51772e8f19109c264b7a40eebee5eacbd274bd2753ff7462d0f9991d4",
+      "prompt_hashes": [
+        "db117475175dda85ebf7f14ad773997125285b71ca01ab1bba5d8bc6661636f8"
+      ],
+      "sample_ids": [
+        "gretel:train:12097:026084"
+      ],
+      "schema_database_groups": [
+        "7999561c9a01111a"
+      ],
+      "selection_score": "6660fc154701e79f429e952060ce6a1f3a1776c1216e4aaba02ff2bca902dc64",
+      "split_group_id": "a64d134261778abd",
+      "sql_hashes": [
+        "7741c37eb5fcc2170ef16a891c38a1bf425f69de92310e13408a00bc120f4bd7"
+      ],
+      "sql_template_hashes": [
+        "6a42bee2231bd8eec3f9b47f0538bde2c2b6462dac2155e31d4480716d4e4e55"
+      ]
+    },
+    {
+      "context_hashes": [
+        "5f70affc907b7ae30fdf61c3e0f220a6599c14e00e37623d928e8a3ad211f7c1"
+      ],
+      "count": 2,
+      "normalized_prompt_hashes": [
+        "679dab4c450a325afe827d7525b926db3afc1eee69e48aa973b503fae07c7423",
+        "a42420282cd462ca2edcc227f958b94abbefbc73d86421ebe8c4959ff84b649c"
+      ],
+      "pilot_selection_score": "12ac09bb5509122ad74f3b83059edefe12382e90c5f64734648bbfe4ff1d4655",
+      "prompt_hashes": [
+        "42fa5452b86d183011763b8a1df0152e3f89fd650af0b0007b663712d2755ca3",
+        "d600de2d82d38f7e2adf51eb8c3e43898226771679e43fce4497b66623d366dc"
+      ],
+      "sample_ids": [
+        "gretel:train:41981:082849",
+        "gretel:train:53680:054070"
+      ],
+      "schema_database_groups": [
+        "4c842e93ba1dc4cd"
+      ],
+      "selection_score": "63d5756c89d62e06b20357f8bf9adf9430137dff1ce84399d6f661a0744fabeb",
+      "split_group_id": "4a8b29d7bd71ef2d",
+      "sql_hashes": [
+        "48e7d67314ba59ff9c40e1c4ecefee89df46a54438aa1accd873f671e57f795c",
+        "aef21fd22a3154500c257138b79339dacc19085c3514e6f5b92fb20b61f5dec3"
+      ],
+      "sql_template_hashes": [
+        "dbdf491ea395be15627d415c9b1849bfc2c076d86ed808cc8ce050abcced3565"
+      ]
+    },
+    {
+      "context_hashes": [
+        "d102fdcebf76bbe4fedd540a890a3c70092f82ea83da308d73e7c026182508fd"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "c3f6b683ba849a0a82310bd0e88b6c95ec8b5948664d6fad5338fddeffc67a98"
+      ],
+      "pilot_selection_score": "12b109586a12487acf8dcecbc3395a53d8ee64b12ce5d00206b623f2fe694006",
+      "prompt_hashes": [
+        "97786d30162b181ac696b7be8af31dcde79a7af1cd60df8312bcf44eb117b0f3"
+      ],
+      "sample_ids": [
+        "gretel:train:19913:052474"
+      ],
+      "schema_database_groups": [
+        "183b068db1f6be1b"
+      ],
+      "selection_score": "6197e15707ad38f073ab5ed11d6df79a9eaf68dc15b9eb3f250fefec6b75f8d9",
+      "split_group_id": "6d4cde78981c45a0",
+      "sql_hashes": [
+        "6adc0d4ee530383be4cefa64ade72bcdca249b79847d6cd7b317ecaf4af3ea2f"
+      ],
+      "sql_template_hashes": [
+        "0f114995667c365479200b96c46a73ac6ff143cb0f94987514103dc26bb73bf2"
+      ]
+    },
+    {
+      "context_hashes": [
+        "58478c721f0d7a4c832f5dd74686695fd0e682509b9ab73e53321d631ca95ca3"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "48c97aec8212286b70e875c535c1cdb4d4f2c0459f1d70fa5735c2d224af75e6"
+      ],
+      "pilot_selection_score": "133b2bba3a24a782a1d2473a0d3ed8b311c108e596a2ba89fc682c259eaadcbd",
+      "prompt_hashes": [
+        "9f5658526a5f3c5da261e0e8775cf8fde65b6d4b971d00573c511ab96bf94021"
+      ],
+      "sample_ids": [
+        "gretel:train:49007:015240"
+      ],
+      "schema_database_groups": [
+        "56ec9393683e44df"
+      ],
+      "selection_score": "a8dbdd7c2ccdc926fa8c97330cfa4d7afb8ee951dddce8826142256b385eab71",
+      "split_group_id": "e547d0a242ea2409",
+      "sql_hashes": [
+        "1d4fd117ad2c7f78979641eadbba9caccbf746290fbbc1197c63ebd0a490375b"
+      ],
+      "sql_template_hashes": [
+        "0ddb9baa104f54bc911f5aa9b5b992f56efa9e23453ad27214fb9fa44388d933"
+      ]
+    },
+    {
+      "context_hashes": [
+        "8e8ba884ee905e3bc317a0bf5398995de8cf14992a6644a942e851dc0cc803fb"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "677bbe0938dea9be6891f9fd34b868daf9c425a6651e1751279ba7ce5d8854aa"
+      ],
+      "pilot_selection_score": "13a40f9602002ed3abd18737595a4eefa68ddbc4c5027d880fe5675a6e1fb408",
+      "prompt_hashes": [
+        "ee21fa95fbd419d23f853d6d1b8a382dfda234e3a50cf42055077da2af8fbd99"
+      ],
+      "sample_ids": [
+        "gretel:train:63953:081762"
+      ],
+      "schema_database_groups": [
+        "2a0dbd9b1692f537"
+      ],
+      "selection_score": "65ac8232cd6a011a3fa9dd84d242bea30cae617153ed446f02f0908276484895",
+      "split_group_id": "79d5af1d644268df",
+      "sql_hashes": [
+        "8642d8f747551a5f5844af00c09750875d94c607feab17096e531e233f5579ea"
+      ],
+      "sql_template_hashes": [
+        "d5890881af5520e6c3d017f93b7c46860e277c36bf5247f96a3ba7998536e4f5"
+      ]
+    },
+    {
+      "context_hashes": [
+        "3a995f0b09386b514f8e14e05a3e53bf9cba1f42a4f6b05107124c3e3f39d2cd"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "1cb423af904a342b9e3885d33ec208ebd1f2cd75f40c6ef146260a1dc1315137"
+      ],
+      "pilot_selection_score": "13c85c07b98e175294a6ef39e7a8c9988af27463efa924d35b1777db788294b7",
+      "prompt_hashes": [
+        "cdaeb1be186967a029b42a55f7d5cb44c54b8b0c37b93e6e0e19736afdaac112"
+      ],
+      "sample_ids": [
+        "gretel:train:22063:014967"
+      ],
+      "schema_database_groups": [
+        "b39f767901d0a2e1"
+      ],
+      "selection_score": "d3495a78515cce73b7bde09324e7c697357d49709fac6f447698dc02f11e7522",
+      "split_group_id": "b7bc2ffd8e36c859",
+      "sql_hashes": [
+        "4d04144f475a881fadaaae88d75223c293834f27a54ad22f175b3297e6550768"
+      ],
+      "sql_template_hashes": [
+        "1687ad4fe539f40c5a77ced1ce206f408e9a37588ceb851d505c8467f57401c7"
+      ]
+    },
+    {
+      "context_hashes": [
+        "9fdeed6714f4b986cf78101c901f22e28afd0e50fd8274adedf8a9c3793eaae7"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "814ec647be0f9164ce352f89a4073b0a9d0a3538e4e8aa754df5c583bcfd3631"
+      ],
+      "pilot_selection_score": "14b9162c30887c422f384afc1fad4507a17e5e2db20f9eb7a6d6e93b4f277fc9",
+      "prompt_hashes": [
+        "d194527a9c5f0d54ca3188e09c6ccab8a02869124af8eebd022b002bf2e10097"
+      ],
+      "sample_ids": [
+        "gretel:train:19571:052132"
+      ],
+      "schema_database_groups": [
+        "5402ba83028ebef1"
+      ],
+      "selection_score": "8013466485c191a6d53b706ebc67c529180f38e7d96d1a8cb1209b5ce385d7c0",
+      "split_group_id": "934535b54538efb3",
+      "sql_hashes": [
+        "cc4107ec1b61c2d194c46b9f06bb2de5ec33aaed0a8ee98874a5b30be7141caa"
+      ],
+      "sql_template_hashes": [
+        "8c6d53c990c29d30f4e50c2862fd7d8d410e79e7bcfb78f69ddfecf19c1a597d"
+      ]
+    },
+    {
+      "context_hashes": [
+        "48088c613c26282bcaad93c6b53d913f680af8fd35fb832989325a3cf9d22a84"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "3b44d5701440b5fe583ec33210f22144ab3ce23fdd81f6fe0797e44b55adcd73"
+      ],
+      "pilot_selection_score": "159aeebdb7c6a35ae8144dbc279464e938c752a3c9db97d52cf18038205a89a4",
+      "prompt_hashes": [
+        "3c6cb5ffcbbaca644a13efce2bd234383621a029c09c4d3c3c7359bc8f4da437"
+      ],
+      "sample_ids": [
+        "gretel:train:57236:059564"
+      ],
+      "schema_database_groups": [
+        "3dd0964ecffe9d79"
+      ],
+      "selection_score": "31e719bdf83d97e316f88adb72a9702736cfa5343bb953bcdf58644e096d39c1",
+      "split_group_id": "1f869a782bd1ea68",
+      "sql_hashes": [
+        "be1b42a71ef5576b6c5216149da34ed781b9c5912376add26e61b2336b902b39"
+      ],
+      "sql_template_hashes": [
+        "10b27ed318629fdc43797bf6b6855cfcb8e86b088019795aa7fdea045b914722"
+      ]
+    },
+    {
+      "context_hashes": [
+        "b9a1267a66d5826139f3396665604d1ceeab145cc142733be9b5b3170bf66819"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "48fa208e72bbd853a25c076f64d472dfb7daa711373982ab938f56d9f422332d"
+      ],
+      "pilot_selection_score": "17a69b555c39a6be39adebb33f9e54c7821cf67daadff3f156a27dd5621888b0",
+      "prompt_hashes": [
+        "3bc885933dd4c4ee247944bc8199072114ed9d4128153962f035e622340bd0b2"
+      ],
+      "sample_ids": [
+        "gretel:train:76610:061439"
+      ],
+      "schema_database_groups": [
+        "925b8e5bb7089c2a"
+      ],
+      "selection_score": "5ecfa4de2619320c1019c4cce1b114e3db227245135d8f0a604e0af93d74bbea",
+      "split_group_id": "3f16aa4881ddfca0",
+      "sql_hashes": [
+        "fbfdafcef2fe9b955bb642df2ec9b90613759f52924d23768f34a085245a8536"
+      ],
+      "sql_template_hashes": [
+        "9a6b5626644be902f36d8528617dc50aff6da4a51f66721f2279baec7bd47cd9"
+      ]
+    },
+    {
+      "context_hashes": [
+        "848f69a4d6c62bb9aba1d7af48959c6c361d1bca9f7002e584ab585f4e39de0c"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "1381bd9926c6442a676ab6b496ed637707eda9ea8e17c9e100e4606e80a42274"
+      ],
+      "pilot_selection_score": "17e3f2e8377c26b2e5d0fed13cd080ea930442155baa3fe77fb1d6d22c115f6e",
+      "prompt_hashes": [
+        "70c389a69552c6ac05032699176e0d7bb3b25f21305295f8c4cf4d5429f6cfe4"
+      ],
+      "sample_ids": [
+        "gretel:train:41003:070347"
+      ],
+      "schema_database_groups": [
+        "057a7db60940459f"
+      ],
+      "selection_score": "93a4d57ad0c1bfac81ab1dc3f49c6491f6a111e2cc7de8ac755e16153483d346",
+      "split_group_id": "86897fb827793364",
+      "sql_hashes": [
+        "08d11f52f9b1ab8427d96ae4e9c2fc852e3386cb118767c3bbe27b41876e22d9"
+      ],
+      "sql_template_hashes": [
+        "c3ede698884b586869f3022147fb5f5e4bc201dc584fa40c55b910eea44f3658"
+      ]
+    },
+    {
+      "context_hashes": [
+        "e4789161e472ed55e8c6b17bc4a8411bc6f4a54b2b9d61fac5b6e0ce20ebf408"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "d385d28769b5c276d17e70e7b729ad48c1bf92e3efe3138df19959ff88db35ae"
+      ],
+      "pilot_selection_score": "19183429f7a24fcfe2c2a5643f061894e79f68b8a96811c208b8f9230b2f278e",
+      "prompt_hashes": [
+        "44d0ebc18e6ef0e7cfbe291f54a5ad76f407a0a43c9aed40504ca79d3a2334ce"
+      ],
+      "sample_ids": [
+        "gretel:train:46607:087884"
+      ],
+      "schema_database_groups": [
+        "14c9fe250be5997e"
+      ],
+      "selection_score": "26f6b9303a9e20eab50490328f40faae3a45e9301a632b98027280701b90afed",
+      "split_group_id": "3af7a33a0a275bf1",
+      "sql_hashes": [
+        "edaf470ef8267b70be5f84501205f6ea455559fd7246713f3177dcb79efecb2b"
+      ],
+      "sql_template_hashes": [
+        "cbd261a44dd295af72033f8741406ded444c520856959ae3007cbb7eed0844ff"
+      ]
+    },
+    {
+      "context_hashes": [
+        "4fdf0979fd70f479620c4b4b2d43413650d58c02d169b57c980348296fb847b7"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "86aafbcd12729fdd74b493f44e1a5e3424ef387b9ce615dd35f6321063c041db"
+      ],
+      "pilot_selection_score": "195dba4836d1e1d08cc392b4a027651abdd2f15d09e3124f35dae5090eabcdd5",
+      "prompt_hashes": [
+        "2a6fd3164373478ad17df6afab891a88cf9471b3326be8ce24328a42300cb801"
+      ],
+      "sample_ids": [
+        "gretel:train:28061:003843"
+      ],
+      "schema_database_groups": [
+        "beb76b162608f2ed"
+      ],
+      "selection_score": "f024aad4643d06900e49ff83afd33b5d0daf9dc6284583d7bba75420be413738",
+      "split_group_id": "c9bfb1a7d339df25",
+      "sql_hashes": [
+        "f01dbb0f1cf454ea995a6d74922a559061c9eefa4bf6a0ef6e98cbfce0a0e2db"
+      ],
+      "sql_template_hashes": [
+        "d32030ed06e7c38c36d2a45768b081ed027e13d5f833aa94f0e860b1e39d3bff"
+      ]
+    },
+    {
+      "context_hashes": [
+        "c55f6979e32cc230b4a94af91701c800865a01cedc1e4958e96cf6eb27a49d38"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "e6776f1c67d1deac99b02fe7ce54c1f98f7b694822cfb296520f90585f0abf5f"
+      ],
+      "pilot_selection_score": "197e68252246769bdc34873b17d21bcb252150bcedebb8f279e8876db8628ec0",
+      "prompt_hashes": [
+        "84726286c9e274d9a582a9cc53ac764af0e4e964fa3d807bb68be6107a5b2e9b"
+      ],
+      "sample_ids": [
+        "gretel:train:60579:066404"
+      ],
+      "schema_database_groups": [
+        "8e90dc3939ffe85f"
+      ],
+      "selection_score": "f1f9c3d8b3b4e5ab64f34546b57cfe2c855b3593a70ced07f597a2dd1abb239a",
+      "split_group_id": "5cc362c50842e824",
+      "sql_hashes": [
+        "20c5a960e72e4e18e27ea71b858c4ce6aed9724ffa5536f94d5cffe20aab3431"
+      ],
+      "sql_template_hashes": [
+        "01dc62349369d18d1310714ae81847662c02f25359a3724bf240283d4a2be2d2"
+      ]
+    },
+    {
+      "context_hashes": [
+        "624bbaa860200d1384bfb4c39f0793eac202bb4a77512b5be62118f4f22f4333"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "637c34276fe79dc89974f36afd931cd24bef4bbba7fb17a33615975b8b5888b3"
+      ],
+      "pilot_selection_score": "199a6a640ae8bf3ea4cf667b425abbb6f32db91b1a9865be87d303604919775f",
+      "prompt_hashes": [
+        "44a46604b5e63a6f39e9ca312d62aebf194689827379c595b07549168ba9fd9e"
+      ],
+      "sample_ids": [
+        "gretel:train:51344:005976"
+      ],
+      "schema_database_groups": [
+        "9960eb42edae1f5b"
+      ],
+      "selection_score": "3be9b9463a4fc4880f3b07b325b917c8a82384aee65bf3386327fd10d6b51f1f",
+      "split_group_id": "ebd8f5b968654e7c",
+      "sql_hashes": [
+        "ec770b444d99272a474acbde6271c7c10f70ee34d59a69cab0e96534fe3c14c2"
+      ],
+      "sql_template_hashes": [
+        "65b0265df1d16319786736298856ded22dd62f03f7bdaf824102f9faecc6c39e"
+      ]
+    },
+    {
+      "context_hashes": [
+        "ca7cf3c9741989c6608284a92c19848f55fe256ed1e40ac6e114bec1ae909518"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "ca9af42f20f80ef918c04648452b6604de609465de521e320727c8dc3df80894"
+      ],
+      "pilot_selection_score": "1a191edf699f265b1d08b7d640f63cf1751f29e22dd6c3752959d8b18ade261a",
+      "prompt_hashes": [
+        "30b9f494ce49cf1fb1f9fb406f2a1aee3f5d6af23f71194a5a01cf151f1a0923"
+      ],
+      "sample_ids": [
+        "gretel:train:96728:040438"
+      ],
+      "schema_database_groups": [
+        "d335b8ca2bdf9a1d"
+      ],
+      "selection_score": "e9983c7300b3d6e7411f1075bfec42fff509d5a155bbd7508006855be286e44e",
+      "split_group_id": "ebf7f3b8c93b9322",
+      "sql_hashes": [
+        "082b53e06d12edf9e942f6e6a1b568af686adf9a1ef4b162aa47afb4f69f85cf"
+      ],
+      "sql_template_hashes": [
+        "37f59ef2fe42893f85b782ac6c987f4ea5a166d06040ba6cdc899dad78de2875"
+      ]
+    },
+    {
+      "context_hashes": [
+        "138ef2904970c59f37c6f036ebf1976336dc7894d7b5f98365b6794aeb68f7a5"
+      ],
+      "count": 2,
+      "normalized_prompt_hashes": [
+        "a07f0360547d0d00c9c882c2eb3668c2385af14fb3d33b696e8530003aec8f87",
+        "b6eb78b1c7c3cd7e7c5f7e42fd2d84499fc3debf84302b23e3da40630174dafe"
+      ],
+      "pilot_selection_score": "1a331abbe9246a4d6258cda69e85a18bd2f84e6897ab3f4498212ec963ad80f4",
+      "prompt_hashes": [
+        "5c65a77902dec442ed8ea19f2a75550bb7e408aa80fe8f172ddef23e0e74dbfe",
+        "e570095b080f4faf7e598cfd7ef14890c67c61efab9b1bf18d1569bd406738d5"
+      ],
+      "sample_ids": [
+        "gretel:train:17565:036619",
+        "gretel:train:82140:079001"
+      ],
+      "schema_database_groups": [
+        "26c54cd0cde55f6a"
+      ],
+      "selection_score": "c9c3f3d8e4700c65b4afa4d3497a83f1e8c69413abc306e98bef05acfbfd8541",
+      "split_group_id": "401b04a6dadb0a73",
+      "sql_hashes": [
+        "3b4435b3d60f846df7efb860c2a8a7fe396535781eb872a95648cd49891de951",
+        "693d200819a8cef8f4264c942a15901ee0af17d1a0f47ce5fe2315e32e1e6131"
+      ],
+      "sql_template_hashes": [
+        "6f3581454b6dbbda22ee5580ef0b131de2ebe279f48322877c309c436f37b198"
+      ]
+    },
+    {
+      "context_hashes": [
+        "8f3858f10510181f62aef29711af8a9f95c08c1e025bdc3fce58bdb476479e25"
+      ],
+      "count": 3,
+      "normalized_prompt_hashes": [
+        "27a97d4f3cf90aa624340fc7b67ffff64dcf8e6edaa34bc5ff4a99e7f8ed8679",
+        "4042e9e4cd1fa1f99bae91495eea2f8f49529c3697a316de9c26bc9d8420b88b",
+        "761220e1f7fb0ea1fb4ed654f68ff7e25737b82753fd111f40a0c2c543081c50"
+      ],
+      "pilot_selection_score": "1a5b23ccb84c44941f4f58f981b96fd3439e8f48ba6b3661b9560b52b48f4eb2",
+      "prompt_hashes": [
+        "7f856953089690696fe37c9bcdec8517583956c0fa10ed901ed9f80015e26d4a",
+        "8e5e26f4bd97dab8b8dbbddc91b3041ddab0276622b20865927d1ec72bcec7df",
+        "9d84a7e6f37ebaa72e53a92e90c722a0f0425b99631b2b9dc8855181821d26c1"
+      ],
+      "sample_ids": [
+        "gretel:train:41454:082322",
+        "gretel:train:7025:001928",
+        "gretel:train:91797:094211"
+      ],
+      "schema_database_groups": [
+        "dd1b30d300edfa2c"
+      ],
+      "selection_score": "b18321c1c405f2e29ad6ed61dc0c7e37f965f29f466d6717f936ba78746cfd1d",
+      "split_group_id": "264184c9c4cada82",
+      "sql_hashes": [
+        "025755952acc8ee556f65db309e4397b8cd6aacc25005b9b3bae4e7d5fb3d469",
+        "2242ab1f4894635b037b8be9fc254aa8a6634954e8d68dc18947d973be022031",
+        "e1ccdaf9b899337a70ea9bffc4ee1b07243230cd9e760ca9d71cc02176814448"
+      ],
+      "sql_template_hashes": [
+        "f378935f389e3837a635ae900828ca1ec18e219858b6324c2ec9510b4886c226"
+      ]
+    },
+    {
+      "context_hashes": [
+        "b1cd6347406da2c462fb34da16cb46de0e24793d85397d5b5e873efbe111d60c"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "217919cf8a13ff43d92bf44caee9cc7073d39241875ae5ee4f74f300d2a0d82f"
+      ],
+      "pilot_selection_score": "1aaf2a06744e50634aba500dde8ff4462c84e7130910f73ffb567e3e3dc7b0e4",
+      "prompt_hashes": [
+        "5e9f94981825bf6b89f8770ec032c3042544a4965be8d9e8d3f0bc838a15857c"
+      ],
+      "sample_ids": [
+        "gretel:train:28063:003845"
+      ],
+      "schema_database_groups": [
+        "b6723bc88431e6dc"
+      ],
+      "selection_score": "ee1825beeee4f484babce1813ff9b2f5a4be6caf88d59edcdcfb0d7cc05553d5",
+      "split_group_id": "84068db432f0e802",
+      "sql_hashes": [
+        "2f2ef9acacf3c801cc1f648d7fcec1e86f97211b98a44249b4acf77229f2b13b"
+      ],
+      "sql_template_hashes": [
+        "b9ac482ac82361de99839106f47480fabcd790fd4a72123582b306f91e4a6982"
+      ]
+    },
+    {
+      "context_hashes": [
+        "c0464a7a633feffa658c704c3a35e16debd82edd70f09fea27ac6519ac2d51f1"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "249e93b20f77e5d03f86f6938847ef1a6a7efae953859525ff434c2923f0949e"
+      ],
+      "pilot_selection_score": "1ae1c6f90ca36eda9040a436144e088844ae4bc7599232ecbdd0a14bf7a20899",
+      "prompt_hashes": [
+        "b01af3cb7318df60a2eb831751efbde9dd20cee520c444de19a1cbfe572ab542"
+      ],
+      "sample_ids": [
+        "gretel:train:20813:013717"
+      ],
+      "schema_database_groups": [
+        "6911fb38f157e165"
+      ],
+      "selection_score": "f0721bb262a92841b8292f08e0b2740bf0895e5602f991a311386af481c3ed82",
+      "split_group_id": "76c0613ce186df4c",
+      "sql_hashes": [
+        "fbd578e614e1678d9ca4dba92ad0305cfb1b653403260663f5486a35dd749216"
+      ],
+      "sql_template_hashes": [
+        "e1c33f7b9b552e9bf5f61df21be4f4a3c68b1bb6e4ec64abdcdf7bfd19fc4e1e"
+      ]
+    },
+    {
+      "context_hashes": [
+        "e80ba4b3545c139980012cc9161b18700e70478ac3752cc6c792e666c89f4805"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "115a28977e310a89808cd5c7da826d7ed854b68ff606f2ac24ff44e489727314"
+      ],
+      "pilot_selection_score": "1ba20dc8d08654c99902eb24629412d7aa6d8568ed2253bc63fd765dc7ad96a6",
+      "prompt_hashes": [
+        "22525cd770c61e858cf6c009bc094c30b8089b90879235ce585226ecb8dc727c"
+      ],
+      "sample_ids": [
+        "gretel:train:27126:012908"
+      ],
+      "schema_database_groups": [
+        "13e1383fb3e927c0"
+      ],
+      "selection_score": "556448c7a20954302a5df536a7c637374cdea1e4f51568a5ae7b113fc5b917ba",
+      "split_group_id": "f9d6df3399fa736f",
+      "sql_hashes": [
+        "2be9fcb517df0320ebc3c956780466fe5e1d4c36bd68e6a3614613c97a0d3126"
+      ],
+      "sql_template_hashes": [
+        "fb3654d50d72ecc53dcd71b6f914c55f08647aa141cefd0051a33249b4da0606"
+      ]
+    },
+    {
+      "context_hashes": [
+        "bb25ce2b243b18412bc01a45c4feb70b9ce2d01b5da8b8d50c66ac5bcec01a6d"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "58cd96d669b6d6c83db8cb02956fb77cb3d00008fca5db197acc88dd5e5797cc"
+      ],
+      "pilot_selection_score": "1bb86c2401d2099add907da53992aa25e2c789b842b3a6bbf5bc94bd28c9393e",
+      "prompt_hashes": [
+        "f707cf5c91f7213b842c4160c3d7b6845dd5b6215b9ea07b3913011b4fcdaaa1"
+      ],
+      "sample_ids": [
+        "gretel:train:4100:002523"
+      ],
+      "schema_database_groups": [
+        "c07bdbd912182328"
+      ],
+      "selection_score": "a2dab39c8dba400b211e231f1f4b2c5f375165a5821e1ef3689fcad666338a2e",
+      "split_group_id": "268baf4284199a43",
+      "sql_hashes": [
+        "7ae9e1ebc1f218eca80c83c1e8333cb9f01f7d0130bd50b064026e71615bc94c"
+      ],
+      "sql_template_hashes": [
+        "509f109baaa87e93f3eeb74d66c7dbb8d7a25a1a7151b7390f18fe94d8a81a75"
+      ]
+    },
+    {
+      "context_hashes": [
+        "0e4568b6edc34279913c276bbd5ca0d32e05848c8ef056b52b0af8a7cb9e2086"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "68586a42f99c17c85f6baea8cab4ce9e2ca7465b1fdfd50b7c3f1c3e1579fb55"
+      ],
+      "pilot_selection_score": "1bef83efe501ee7ab740efcc64720be9c90c7254af3256fef0b12fa188f467fc",
+      "prompt_hashes": [
+        "9ae35e01696a76bd3b93112b197326eb5d6cc5770ccf78c8a2eb406bece9e156"
+      ],
+      "sample_ids": [
+        "gretel:train:71474:085305"
+      ],
+      "schema_database_groups": [
+        "53f07a1611694b21"
+      ],
+      "selection_score": "996f5121039ec7dd4343e96ec657e5924351ff01c760ace9d187530040e1047e",
+      "split_group_id": "67f9d66184215667",
+      "sql_hashes": [
+        "bcbcf4ec79678d59f31c907b2d8f14f793176542526cd704e03309e657cc0d75"
+      ],
+      "sql_template_hashes": [
+        "e4453a8f9e5ecf8df4e960e8a409f691a3713464b7a0f102c8006320b757b97b"
+      ]
+    },
+    {
+      "context_hashes": [
+        "0c76a2783b4ce5d5a2b4b0ac0d5a057d73a30366a124e5fe8493d618a0e658be"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "f4718fbd4183d84327a71c2cd38e875c26e869e5cba3cca80ded10a73302152c"
+      ],
+      "pilot_selection_score": "1c7e65a78347615474291cbb878c1f14250590a560f109ec7edf58c565e62a1d",
+      "prompt_hashes": [
+        "be24b0663c8f7b3c3030a7e0952a6a2734daaae6c3a94203c2089379e8fcbc8a"
+      ],
+      "sample_ids": [
+        "gretel:train:74968:008176"
+      ],
+      "schema_database_groups": [
+        "a594a0c9c4d6a025"
+      ],
+      "selection_score": "be1d54111a05fc3e9325cd684219aa8a6862418cdc25807f0d645f14545e4988",
+      "split_group_id": "2a9c0ebf82d6b250",
+      "sql_hashes": [
+        "64f231e35caa7e987e0a9ddfc97df67913091dcce883283599808ad0a86f0eaa"
+      ],
+      "sql_template_hashes": [
+        "260d773110676b8ee74f7d48d43269a858a1b8c82812b9874409ad5537214771"
+      ]
+    },
+    {
+      "context_hashes": [
+        "2915ee41341c0c33fca117374f4f0edf923a139c75afd0e4bd140b5503294de6"
+      ],
+      "count": 2,
+      "normalized_prompt_hashes": [
+        "3393eea98a26f811db81020a115e107eb62a9d716600e0bc2f60901d90af865c",
+        "4c4173b3f8b5eafeb415d915d64da164fa3f855d0c1f945d5a224aaf862ca5bb"
+      ],
+      "pilot_selection_score": "1d83c19bdd7b14a06b3ce9f98de0e12d7bd0554a2cdf8442901483dc806027dd",
+      "prompt_hashes": [
+        "042bcfa8d1f88d6f4c67c14dfcdec3e2f2b8cfa959f1351905b42ea851332036",
+        "e9572b2a273dada6242419708de4168732d7342d376d39a97b85f4c9140cabc9"
+      ],
+      "sample_ids": [
+        "gretel:train:65099:096804",
+        "gretel:train:7213:019246"
+      ],
+      "schema_database_groups": [
+        "bfa321c75e5a16ce"
+      ],
+      "selection_score": "52ccc015fcdcdc80c7d353a3dc3e62b3792b94576d8d16de284e02740341b7ad",
+      "split_group_id": "7701a11b118e416a",
+      "sql_hashes": [
+        "3bfc74367c3e67b886e2077f20957337ced5fa13565fa0eef19ae5cec3d5f2d0",
+        "ccc35fd27dd1f86c5fb7633d636fa30a3dfeeba77b8623c9307f628a362c50f4"
+      ],
+      "sql_template_hashes": [
+        "1298f3c5d445e986d6a49d47b0cf1236f47cdbfe245cb95784d13aac9f6de831"
+      ]
+    },
+    {
+      "context_hashes": [
+        "f964aa6223879558b352210c454d496614705eae8edca159b1a2ed42ce4e9c80"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "a772d5e70c7e5ed6864b3ea1fcea3e2c58823eb543a6504651cbd6635d6fff2b"
+      ],
+      "pilot_selection_score": "1d9a5b288c96363257acca2d1756acf7b8585a8333dde4e3f6f2d3016349f1ba",
+      "prompt_hashes": [
+        "69a647c582bbd5dfd072b01edcdf48f6abbd6dc91640ad937aca7b97d46418fc"
+      ],
+      "sample_ids": [
+        "gretel:train:28631:004413"
+      ],
+      "schema_database_groups": [
+        "71c5f91e7da9da05"
+      ],
+      "selection_score": "42290708aee3fc404dfebe2e524f3eadeaaa789333fd56491e7748ceddd3d14f",
+      "split_group_id": "e08184aafb2dbbab",
+      "sql_hashes": [
+        "9d62f074aae54ee861b1c69fb3ecf430d8e3397861abe80b46e377f5c9d6f237"
+      ],
+      "sql_template_hashes": [
+        "a0f3e6a9a7e186e644d1ee19565f88fd7fa74dcd574ee028aebcca12dee1b046"
+      ]
+    },
+    {
+      "context_hashes": [
+        "febce9ecf17916dc89b9626178fa242995b10f234dd84881a7cff70af46ef72b"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "faa55a107c2e38097bca9fe714b76b2d72352ddcef1db305945ef011b7d514a5"
+      ],
+      "pilot_selection_score": "1e8c3bbcb8a1d05d57c26bb4d5749016755bfd153639e3495926e4f5df52f14e",
+      "prompt_hashes": [
+        "4cd55961c038578ca46fbde3d74f0c827f544dc8d5811f7c9f09ed8fced13e51"
+      ],
+      "sample_ids": [
+        "gretel:train:54651:055041"
+      ],
+      "schema_database_groups": [
+        "ecb4edf0196eaf68"
+      ],
+      "selection_score": "af573475f45496b7d32480ee2c9e7f2e272da8dde3fdfdc91aadce6f1264ab4c",
+      "split_group_id": "dfad7f728a8c0d1a",
+      "sql_hashes": [
+        "968aa495540f0fb7fa8d69991886aad7f72c5d83ea2d03f5f9d3aceec974935c"
+      ],
+      "sql_template_hashes": [
+        "afbc8dd191c0f5833ceaa962342a71ce94043802ead61b7735b2dbed9268eaff"
+      ]
+    },
+    {
+      "context_hashes": [
+        "08565ba1f43b4b15dd898d1593de98a44422f7f78b0b69b44aaa3e7e63f01d24"
+      ],
+      "count": 1,
+      "normalized_prompt_hashes": [
+        "f526e549e96ddc593b5a901c6b33e7236fc78b41f6269ac4321b78ed773fee66"
+      ],
+      "pilot_selection_score": "1ee06070c806948782aa9cf6fb0d2488302a53af498bac7c93e37a90915a9164",
+      "prompt_hashes": [
+        "c2844a4032fabd2c570c2be3c25a225149b7f0039f5839df5b1141608736ef66"
+      ],
+      "sample_ids": [
+        "gretel:train:13069:027056"
+      ],
+      "schema_database_groups": [
+        "be6c60fbed67f6e0"
+      ],
+      "selection_score": "57862dc5d536dcce3d3da6dfd38e7068772487e3d96401a54efa217348b4e41d",
+      "split_group_id": "564762bee50e258b",
+      "sql_hashes": [
+        "22c5a1e1163640a2af3422fdd45fd5eae1957ce54409696af4054a50f7e03ab0"
+      ],
+      "sql_template_hashes": [
+        "85cb684ed88b03317b121bc2263314a1310585ad35e0d6d4f4d0e12c0a216874"
       ]
     }
   ],

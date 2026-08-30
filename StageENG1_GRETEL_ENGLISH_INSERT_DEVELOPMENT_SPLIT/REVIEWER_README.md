@@ -20,9 +20,10 @@ Review order:
 13. `tests/test_stageeng1_development_split.py`
 14. `StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT/VALIDATION_REPORT.md`
 
-The split contains 828 development-train samples and a locked 100-sample
-development-dev/pilot pool. The 51 official-test confirmation rows remain
-excluded and confirmation-only.
+The split contains 828 development-train samples, a held-out 100-sample
+development-dev split, and a locked 100-sample pilot pool selected from
+development-train. The 51 official-test confirmation rows remain excluded and
+confirmation-only.
 
 Rerun:
 
