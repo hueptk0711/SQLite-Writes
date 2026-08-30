@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import tempfile
 import sys
 from collections import Counter
 from pathlib import Path
@@ -18,7 +19,10 @@ from scripts.data.build_stageeng0_gretel_qualification import (
     DATASET_ID,
     DATASET_REVISION,
     RAW_FILES,
+    SCIENTIFIC_ARTIFACTS,
     STAGE_NAME,
+    build_run,
+    load_parquet_rows,
     sha256_file,
 )
 
@@ -35,6 +39,8 @@ REQUIRED_STAGE_FILES = [
     "GOLD_EXECUTION_AUDIT.jsonl",
     "SOURCE_ALIGNABILITY_AUDIT.jsonl",
     "SOURCE_ALIGNABILITY_SUMMARY.json",
+    "INSERT_ASSIGNMENT_GROUNDING_AUDIT.jsonl",
+    "INSERT_GROUNDING_SUMMARY.json",
     "EXCLUSION_LEDGER.jsonl",
     "EXCLUSION_REASON_COUNTS.json",
     "DATA_LEAKAGE_AUDIT.json",
@@ -42,6 +48,9 @@ REQUIRED_STAGE_FILES = [
     "ELIGIBLE_INSERT_MANIFEST.jsonl",
     "ELIGIBLE_UPDATE_MANIFEST.jsonl",
     "ELIGIBLE_DELETE_MANIFEST.jsonl",
+    "DEVELOPMENT_TRAIN_CANDIDATE_MANIFEST.jsonl",
+    "OFFICIAL_TEST_CONFIRMATION_MANIFEST.jsonl",
+    "DERIVED_ARTIFACT_MANIFEST.json",
     "STAGEENG0_LOCK.json",
     "VALIDATION_REPORT.md",
     "REVIEWER_README.md",
@@ -58,7 +67,12 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
 
 
-def validate(stage_dir: Path, raw_dir: Path | None = None) -> dict[str, Any]:
+def validate(
+    stage_dir: Path,
+    raw_dir: Path | None = None,
+    *,
+    rebuild_from_raw: bool = True,
+) -> dict[str, Any]:
     failures: list[str] = []
     for name in REQUIRED_STAGE_FILES:
         if not (stage_dir / name).is_file():
@@ -76,12 +90,16 @@ def validate(stage_dir: Path, raw_dir: Path | None = None) -> dict[str, Any]:
     context_rows = read_jsonl(stage_dir / "SQLITE_CONTEXT_AUDIT.jsonl")
     gold_rows = read_jsonl(stage_dir / "GOLD_EXECUTION_AUDIT.jsonl")
     align_rows = read_jsonl(stage_dir / "SOURCE_ALIGNABILITY_AUDIT.jsonl")
+    assignment_rows = read_jsonl(stage_dir / "INSERT_ASSIGNMENT_GROUNDING_AUDIT.jsonl")
     ledger_rows = read_jsonl(stage_dir / "EXCLUSION_LEDGER.jsonl")
     manifests = {
         "INSERT": read_jsonl(stage_dir / "ELIGIBLE_INSERT_MANIFEST.jsonl"),
         "UPDATE": read_jsonl(stage_dir / "ELIGIBLE_UPDATE_MANIFEST.jsonl"),
         "DELETE": read_jsonl(stage_dir / "ELIGIBLE_DELETE_MANIFEST.jsonl"),
     }
+    development_candidates = read_jsonl(stage_dir / "DEVELOPMENT_TRAIN_CANDIDATE_MANIFEST.jsonl")
+    confirmation_candidates = read_jsonl(stage_dir / "OFFICIAL_TEST_CONFIRMATION_MANIFEST.jsonl")
+    derived_manifest = read_json(stage_dir / "DERIVED_ARTIFACT_MANIFEST.json")
 
     if source_lock.get("dataset_id") != DATASET_ID:
         failures.append("dataset_id_mismatch")
@@ -93,6 +111,21 @@ def validate(stage_dir: Path, raw_dir: Path | None = None) -> dict[str, Any]:
         failures.append("gpu_called_not_false")
     if policy.get("model_outputs_allowed") is not False:
         failures.append("eligibility_policy_allows_model_outputs")
+    if lock.get("derived_artifact_manifest_sha256") != sha256_file(
+        stage_dir / "DERIVED_ARTIFACT_MANIFEST.json"
+    ):
+        failures.append("derived_artifact_manifest_hash_mismatch")
+    manifest_by_path = {row["path"]: row for row in derived_manifest.get("artifacts", [])}
+    for name in SCIENTIFIC_ARTIFACTS:
+        path = stage_dir / name
+        if name not in manifest_by_path:
+            failures.append(f"derived_manifest_missing_artifact:{name}")
+            continue
+        if not path.exists():
+            failures.append(f"derived_artifact_missing:{name}")
+            continue
+        if sha256_file(path) != manifest_by_path[name].get("sha256"):
+            failures.append(f"derived_artifact_hash_mismatch:{name}")
 
     raw_total = int(dml_counts["raw_total"])
     if sum(schema["split_counts"].values()) != raw_total:
@@ -128,6 +161,31 @@ def validate(stage_dir: Path, raw_dir: Path | None = None) -> dict[str, Any]:
         failures.append("sample_id_in_multiple_manifests")
     if set(manifest_ids) != eligible_ledger_ids:
         failures.append("manifest_ids_do_not_match_eligible_ledger")
+    primary_insert_ids = {
+        row["sample_id"]
+        for row in manifests["INSERT"]
+        if row.get("v2_literal_grounded_primary_eligible")
+    }
+    development_ids = {row["sample_id"] for row in development_candidates}
+    confirmation_ids = {row["sample_id"] for row in confirmation_candidates}
+    if development_ids & confirmation_ids:
+        failures.append("development_candidate_intersects_official_test_confirmation")
+    if development_ids | confirmation_ids != primary_insert_ids:
+        failures.append("primary_insert_ids_do_not_match_dev_plus_confirmation")
+    for row in development_candidates:
+        if row.get("source_split") != "train" or row.get("development_allowed") is not True:
+            failures.append(f"development_candidate_not_train_allowed:{row.get('sample_id')}")
+    for row in confirmation_candidates:
+        if row.get("source_split") != "test" or row.get("official_test_confirmation_only") is not True:
+            failures.append(f"confirmation_candidate_not_test_only:{row.get('sample_id')}")
+    for row in manifests["INSERT"]:
+        if row.get("source_split") == "test" and row.get("development_allowed"):
+            failures.append(f"official_test_insert_marked_development_allowed:{row.get('sample_id')}")
+
+    assignment_ids = {row["sample_id"] for row in assignment_rows}
+    for row in manifests["INSERT"]:
+        if row.get("complexity_class") == "single_row_insert" and row["sample_id"] not in assignment_ids:
+            failures.append(f"single_row_insert_missing_assignment_audit:{row['sample_id']}")
 
     gold_by_id = {row["sample_id"]: row for row in gold_rows}
     for sample_id in eligible_ledger_ids:
@@ -153,6 +211,17 @@ def validate(stage_dir: Path, raw_dir: Path | None = None) -> dict[str, Any]:
             expected = raw_hashes[split]["sha256"]
             if sha256_file(path) != expected:
                 failures.append(f"raw_file_hash_mismatch:{filename}")
+        if rebuild_from_raw and not failures:
+            with tempfile.TemporaryDirectory(prefix="stageeng0_rebuild_", dir=stage_dir.parent) as temp:
+                temp_stage = Path(temp) / STAGE_NAME
+                try:
+                    rows_by_split, parquet_schemas = load_parquet_rows(raw_dir)
+                    build_run(rows_by_split, temp_stage, raw_dir, parquet_schemas)
+                    for name in [*SCIENTIFIC_ARTIFACTS, "DERIVED_ARTIFACT_MANIFEST.json"]:
+                        if sha256_file(stage_dir / name) != sha256_file(temp_stage / name):
+                            failures.append(f"raw_rebuild_artifact_mismatch:{name}")
+                except Exception as exc:
+                    failures.append(f"raw_rebuild_failed:{type(exc).__name__}:{exc}")
 
     return {
         "status": "PASS" if not failures else "FAIL",
@@ -160,6 +229,8 @@ def validate(stage_dir: Path, raw_dir: Path | None = None) -> dict[str, Any]:
         "raw_total": raw_total,
         "dml_total": dml_total,
         "eligible_manifest_counts": {operation: len(rows) for operation, rows in manifests.items()},
+        "primary_insert_development_train_candidates": len(development_candidates),
+        "primary_insert_official_test_confirmation_candidates": len(confirmation_candidates),
         "ledger_status_counts": dict(status_counts),
     }
 
@@ -168,8 +239,9 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--stage-dir", type=Path, default=Path(STAGE_NAME))
     parser.add_argument("--raw-dir", type=Path)
+    parser.add_argument("--no-rebuild", action="store_true")
     args = parser.parse_args()
-    result = validate(args.stage_dir, args.raw_dir)
+    result = validate(args.stage_dir, args.raw_dir, rebuild_from_raw=not args.no_rebuild)
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     if result["status"] != "PASS":
         sys.exit(1)

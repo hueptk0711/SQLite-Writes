@@ -71,7 +71,37 @@ CONTROLLED_EXCLUSION_REASONS = {
     "implicit_value_not_supported",
     "nonalignable_normalization",
     "ambiguous_multiple_occurrences",
+    "expression_value_not_supported",
+    "joint_source_not_representable",
 }
+SUPPORTED_PRIMARY_LITERAL_KINDS = {
+    "direct_string_literal",
+    "direct_integer_literal",
+    "direct_real_literal",
+}
+SCIENTIFIC_ARTIFACTS = [
+    "RAW_DATA_HASHES.json",
+    "RAW_SCHEMA_AUDIT.json",
+    "ELIGIBILITY_POLICY.json",
+    "DML_OPERATION_COUNTS.json",
+    "WRITE_COMPLEXITY_AUDIT.json",
+    "SQLITE_CONTEXT_AUDIT.jsonl",
+    "SQLITE_COMPATIBILITY_SUMMARY.json",
+    "GOLD_EXECUTION_AUDIT.jsonl",
+    "SOURCE_ALIGNABILITY_AUDIT.jsonl",
+    "SOURCE_ALIGNABILITY_SUMMARY.json",
+    "INSERT_ASSIGNMENT_GROUNDING_AUDIT.jsonl",
+    "INSERT_GROUNDING_SUMMARY.json",
+    "EXCLUSION_LEDGER.jsonl",
+    "EXCLUSION_REASON_COUNTS.json",
+    "DATA_LEAKAGE_AUDIT.json",
+    "SPLIT_CANDIDATE_AUDIT.json",
+    "ELIGIBLE_INSERT_MANIFEST.jsonl",
+    "ELIGIBLE_UPDATE_MANIFEST.jsonl",
+    "ELIGIBLE_DELETE_MANIFEST.jsonl",
+    "DEVELOPMENT_TRAIN_CANDIDATE_MANIFEST.jsonl",
+    "OFFICIAL_TEST_CONFIRMATION_MANIFEST.jsonl",
+]
 
 
 @dataclass(frozen=True)
@@ -87,6 +117,16 @@ class SQLClassification:
 class TargetReference:
     table: str | None
     columns: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class InsertAssignment:
+    assignment_index: int
+    column_ref_or_name: str
+    value_expression: str
+    gold_value_kind: str
+    gold_value: Any
+    source_literal_text: str
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -657,6 +697,38 @@ def count_top_level_value_tuples(value: str) -> int:
     return count
 
 
+def is_ident_char(ch: str) -> bool:
+    return ch.isalnum() or ch in {"_", "$"}
+
+
+def is_number_boundary(sql: str, start: int, end: int) -> bool:
+    before = sql[start - 1] if start > 0 else ""
+    after = sql[end] if end < len(sql) else ""
+    if before and (is_ident_char(before) or before in {".", "+", "-"}):
+        return False
+    if after and (is_ident_char(after) or after == "."):
+        return False
+    return True
+
+
+def parse_single_quoted_literal(expr: str) -> str | None:
+    if len(expr) < 2 or expr[0] != "'" or expr[-1] != "'":
+        return None
+    i = 1
+    value: list[str] = []
+    while i < len(expr) - 1:
+        ch = expr[i]
+        if ch == "'":
+            if i + 1 < len(expr) - 1 and expr[i + 1] == "'":
+                value.append("'")
+                i += 2
+                continue
+            return None
+        value.append(ch)
+        i += 1
+    return "".join(value)
+
+
 def sql_literals(statement: str) -> list[str]:
     clean = strip_sql_comments(statement)
     literals: list[str] = []
@@ -678,32 +750,270 @@ def sql_literals(statement: str) -> list[str]:
                 i += 1
             literals.append("".join(buf))
             continue
-        number = re.match(r"(?<![A-Za-z_])[+-]?\d+(?:\.\d+)?(?![A-Za-z_])", clean[i:])
+        number = re.match(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", clean[i:])
         if number:
-            literals.append(number.group(0))
-            i += len(number.group(0))
+            end = i + len(number.group(0))
+            if is_number_boundary(clean, i, end):
+                literals.append(number.group(0))
+                i = end
+                continue
+        identifier = re.match(r"[A-Za-z_][A-Za-z0-9_$]*", clean[i:])
+        if identifier:
+            i += len(identifier.group(0))
             continue
+        if ch in {'"', "`", "["}:
+            close = "]" if ch == "[" else ch
+            end = clean.find(close, i + 1)
+            if end != -1:
+                i = end + 1
+                continue
         i += 1
     return literals
+
+
+def source_occurrences(prompt: str, literal: str, *, numeric: bool | None = None) -> list[dict[str, Any]]:
+    if literal == "":
+        return []
+    literal_lower = literal.lower()
+    prompt_lower = prompt.lower()
+    if numeric is None:
+        numeric = bool(re.fullmatch(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?", literal))
+    spans: list[dict[str, Any]] = []
+    start = 0
+    while True:
+        index = prompt_lower.find(literal_lower, start)
+        if index == -1:
+            break
+        end = index + len(literal)
+        if source_span_boundary_ok(prompt, index, end, numeric=numeric):
+            spans.append({"start_char": index, "end_char": end, "text": prompt[index:end]})
+        start = index + 1
+    return spans
+
+
+def source_span_boundary_ok(prompt: str, start: int, end: int, *, numeric: bool) -> bool:
+    before = prompt[start - 1] if start > 0 else ""
+    after = prompt[end] if end < len(prompt) else ""
+    if numeric:
+        before_before = prompt[start - 2] if start > 1 else ""
+        after_after = prompt[end + 1] if end + 1 < len(prompt) else ""
+        if before and (before.isalnum() or before in {"+", "-"}):
+            return False
+        if before == "." and before_before.isdigit():
+            return False
+        if after and after.isalnum():
+            return False
+        if after == "." and after_after.isdigit():
+            return False
+        return True
+    first = prompt[start]
+    last = prompt[end - 1]
+    if (first.isalnum() or first == "_") and before and (before.isalnum() or before == "_"):
+        return False
+    if (last.isalnum() or last == "_") and after and (after.isalnum() or after == "_"):
+        return False
+    return True
+
+
+def extract_values_tuples(statement: str) -> list[list[str]]:
+    clean = strip_sql_comments(statement)
+    match = re.search(r"\bVALUES\b", clean, re.I)
+    if not match:
+        return []
+    tail = clean[match.end() :]
+    tuples: list[list[str]] = []
+    i = 0
+    while i < len(tail):
+        if tail[i].isspace() or tail[i] == ",":
+            i += 1
+            continue
+        if tail[i] != "(":
+            break
+        start = i + 1
+        depth = 1
+        quote: str | None = None
+        i += 1
+        while i < len(tail):
+            ch = tail[i]
+            nxt = tail[i + 1] if i + 1 < len(tail) else ""
+            if quote:
+                if ch == quote:
+                    if quote == "'" and nxt == "'":
+                        i += 2
+                        continue
+                    quote = None
+                i += 1
+                continue
+            if ch in {"'", '"', "`"}:
+                quote = ch
+                i += 1
+                continue
+            if ch == "(":
+                depth += 1
+            elif ch == ")":
+                depth -= 1
+                if depth == 0:
+                    tuples.append(split_top_level_commas(tail[start:i]))
+                    i += 1
+                    break
+            i += 1
+        else:
+            return []
+    return tuples
+
+
+def classify_value_expression(expression: str) -> tuple[str, Any, str]:
+    expr = expression.strip()
+    upper = expr.upper()
+    if upper == "NULL":
+        return "explicit_null", None, "NULL"
+    if upper == "DEFAULT":
+        return "default", None, "DEFAULT"
+    string_value = parse_single_quoted_literal(expr)
+    if string_value is not None:
+        return "direct_string_literal", string_value, string_value
+    if re.fullmatch(r"[+-]?\d+", expr):
+        return "direct_integer_literal", int(expr), expr
+    if re.fullmatch(r"[+-]?(?:\d+\.\d*|\.\d+|\d+[eE][+-]?\d+|\d+\.\d*[eE][+-]?\d+|\.\d+[eE][+-]?\d+)", expr):
+        return "direct_real_literal", float(expr), expr
+    if re.search(r"\bSELECT\b", upper):
+        return "subquery", None, ""
+    if re.match(r"^[A-Za-z_][A-Za-z0-9_]*\s*\(", expr):
+        return "function_expression", None, ""
+    if re.search(r"(?<![eE])(?:\+|-|\*|/|\|\|)", expr):
+        return "arithmetic_expression", None, ""
+    return "other_expression", None, ""
+
+
+def parse_insert_assignments(
+    statement: str, schema_columns: list[str] | None = None
+) -> list[InsertAssignment]:
+    ref = target_reference(statement, "INSERT")
+    tuples = extract_values_tuples(statement)
+    if len(tuples) != 1:
+        return []
+    expressions = tuples[0]
+    if ref.columns:
+        columns = list(ref.columns)
+    elif schema_columns and len(schema_columns) >= len(expressions):
+        columns = schema_columns[: len(expressions)]
+    else:
+        columns = [f"column_{index + 1}" for index in range(len(expressions))]
+    assignments: list[InsertAssignment] = []
+    for index, expr in enumerate(expressions):
+        kind, value, source_text = classify_value_expression(expr)
+        column = columns[index] if index < len(columns) else f"column_{index + 1}"
+        assignments.append(
+            InsertAssignment(
+                assignment_index=index,
+                column_ref_or_name=column,
+                value_expression=expr.strip(),
+                gold_value_kind=kind,
+                gold_value=value,
+                source_literal_text=source_text,
+            )
+        )
+    return assignments
+
+
+def maximum_bipartite_matching(edges: list[list[int]]) -> dict[int, int]:
+    assignment_for_span: dict[int, int] = {}
+
+    def augment(assignment_index: int, seen: set[int]) -> bool:
+        for span_index in edges[assignment_index]:
+            if span_index in seen:
+                continue
+            seen.add(span_index)
+            if span_index not in assignment_for_span or augment(assignment_for_span[span_index], seen):
+                assignment_for_span[span_index] = assignment_index
+                return True
+        return False
+
+    for assignment_index in range(len(edges)):
+        augment(assignment_index, set())
+    return {assignment: span for span, assignment in assignment_for_span.items()}
+
+
+def insert_assignment_grounding(
+    prompt: str,
+    statement: str,
+    source_split: str,
+    schema_columns: list[str] | None = None,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    assignments = parse_insert_assignments(statement, schema_columns)
+    unique_spans: list[tuple[int, int, str]] = []
+    span_index_by_key: dict[tuple[int, int, str], int] = {}
+    edges: list[list[int]] = []
+    rows: list[dict[str, Any]] = []
+    for assignment in assignments:
+        numeric = assignment.gold_value_kind in {"direct_integer_literal", "direct_real_literal"}
+        spans = (
+            source_occurrences(prompt, assignment.source_literal_text, numeric=numeric)
+            if assignment.gold_value_kind in SUPPORTED_PRIMARY_LITERAL_KINDS
+            else []
+        )
+        edge: list[int] = []
+        for span in spans:
+            key = (int(span["start_char"]), int(span["end_char"]), str(span["text"]))
+            if key not in span_index_by_key:
+                span_index_by_key[key] = len(unique_spans)
+                unique_spans.append(key)
+            edge.append(span_index_by_key[key])
+        edges.append(edge)
+        rows.append(
+            {
+                "assignment_index": assignment.assignment_index,
+                "column_ref_or_name": assignment.column_ref_or_name,
+                "value_expression": assignment.value_expression,
+                "gold_value_kind": assignment.gold_value_kind,
+                "gold_value": assignment.gold_value,
+                "source_literal_text": assignment.source_literal_text,
+                "acceptable_source_spans": spans,
+                "individually_source_alignable": bool(spans),
+                "supported_direct_literal": assignment.gold_value_kind in SUPPORTED_PRIMARY_LITERAL_KINDS,
+            }
+        )
+    matching = maximum_bipartite_matching(edges) if assignments else {}
+    all_supported = bool(assignments) and all(row["supported_direct_literal"] for row in rows)
+    all_individual = bool(assignments) and all(row["individually_source_alignable"] for row in rows)
+    joint = bool(assignments) and len(matching) == len(assignments)
+    for row in rows:
+        assigned_span = matching.get(int(row["assignment_index"]))
+        row["jointly_source_representable"] = joint
+        row["matched_source_span"] = (
+            {
+                "start_char": unique_spans[assigned_span][0],
+                "end_char": unique_spans[assigned_span][1],
+                "text": unique_spans[assigned_span][2],
+            }
+            if assigned_span is not None
+            else None
+        )
+        row["development_allowed"] = source_split == "train"
+        row["official_test_confirmation_only"] = source_split == "test"
+    sample = {
+        "assignment_count": len(assignments),
+        "all_assignments_supported_direct_literal": all_supported,
+        "all_assignments_individually_source_alignable": all_individual,
+        "jointly_source_representable": joint,
+        "development_allowed": source_split == "train",
+        "official_test_confirmation_only": source_split == "test",
+    }
+    return rows, sample
 
 
 def source_alignability(prompt: str, statement: str, operation: str, complexity: str) -> dict[str, Any]:
     literals = sql_literals(statement)
     if not literals:
-        return {"status": "no_gold_literals", "literals": [], "missing_literals": []}
-    prompt_lower = prompt.lower()
+        return {"status": "no_gold_literals", "literals": [], "missing_literals": [], "literal_source_spans": []}
     missing: list[str] = []
-    ambiguous: list[str] = []
+    spans_by_literal: list[dict[str, Any]] = []
     for literal in literals:
-        needle = str(literal).lower()
-        count = prompt_lower.count(needle)
-        if count == 0:
+        spans = source_occurrences(prompt, str(literal))
+        spans_by_literal.append({"literal": str(literal), "acceptable_source_spans": spans})
+        if not spans:
             missing.append(str(literal))
-        elif count > 1:
-            ambiguous.append(str(literal))
-    if ambiguous:
-        status = "ambiguous_multiple_occurrences"
-    elif not missing:
+    if not missing:
         status = "source_alignable_literal"
     elif operation == "UPDATE" and complexity in {"update_expression", "update_subquery"}:
         status = "derived_value"
@@ -713,7 +1023,7 @@ def source_alignability(prompt: str, statement: str, operation: str, complexity:
         "status": status,
         "literals": literals,
         "missing_literals": missing,
-        "ambiguous_literals": ambiguous,
+        "literal_source_spans": spans_by_literal,
     }
 
 
@@ -857,8 +1167,11 @@ def build_run(
     context_rows: list[dict[str, Any]] = []
     gold_rows: list[dict[str, Any]] = []
     align_rows: list[dict[str, Any]] = []
+    insert_assignment_rows: list[dict[str, Any]] = []
     ledger_rows: list[dict[str, Any]] = []
     manifests: dict[str, list[dict[str, Any]]] = {"INSERT": [], "UPDATE": [], "DELETE": []}
+    development_train_candidates: list[dict[str, Any]] = []
+    official_test_confirmation_candidates: list[dict[str, Any]] = []
     complexity_counter: Counter[str] = Counter()
     operation_counter: Counter[str] = Counter()
     scanner_status_counter: Counter[str] = Counter()
@@ -881,8 +1194,9 @@ def build_run(
         context_record, gold_record = audit_context_and_gold(row, classification)
         context_rows.append(context_record)
         gold_rows.append(gold_record)
+        prompt = str(row.get("sql_prompt") or "")
         align = source_alignability(
-            str(row.get("sql_prompt") or ""),
+            prompt,
             classification.primary_statement,
             classification.operation,
             complexity,
@@ -895,6 +1209,36 @@ def build_run(
             **align,
         }
         align_rows.append(align_row)
+        insert_grounding = {
+            "assignment_count": 0,
+            "all_assignments_supported_direct_literal": False,
+            "all_assignments_individually_source_alignable": False,
+            "jointly_source_representable": False,
+            "development_allowed": row["source_split"] == "train",
+            "official_test_confirmation_only": row["source_split"] == "test",
+        }
+        if classification.operation == "INSERT":
+            schema_columns = None
+            tables = context_record.get("tables") or {}
+            target_table = context_record.get("target_table")
+            if isinstance(tables, dict) and isinstance(target_table, str):
+                schema_columns = tables.get(target_table)
+            assignment_rows, insert_grounding = insert_assignment_grounding(
+                prompt,
+                classification.primary_statement,
+                str(row["source_split"]),
+                schema_columns if isinstance(schema_columns, list) else None,
+            )
+            for assignment_row in assignment_rows:
+                insert_assignment_rows.append(
+                    {
+                        "sample_id": row["sample_id"],
+                        "source_split": row["source_split"],
+                        "operation": classification.operation,
+                        "complexity_class": complexity,
+                        **assignment_row,
+                    }
+                )
         exclusions: list[str] = []
         if classification.operation not in {"INSERT", "UPDATE", "DELETE"}:
             continue
@@ -924,21 +1268,35 @@ def build_run(
             funnel["source_alignable"] += 1
         elif sqlite_write_eligible:
             funnel["source_nonalignable"] += 1
+        if sqlite_write_eligible and classification.operation == "INSERT" and complexity == "single_row_insert":
+            funnel["single_row_insert_eligible"] += 1
+            if insert_grounding["all_assignments_supported_direct_literal"]:
+                funnel["direct_literal_insert"] += 1
+            if insert_grounding["all_assignments_individually_source_alignable"]:
+                funnel["individual_source_alignable_insert"] += 1
+            if insert_grounding["jointly_source_representable"]:
+                funnel["joint_source_representable_insert"] += 1
         v2_primary = bool(
             sqlite_write_eligible
             and classification.operation == "INSERT"
             and complexity == "single_row_insert"
-            and align_status == "source_alignable_literal"
+            and insert_grounding["all_assignments_supported_direct_literal"]
+            and insert_grounding["all_assignments_individually_source_alignable"]
+            and insert_grounding["jointly_source_representable"]
         )
         primary_scope_exclusions: list[str] = []
         if sqlite_write_eligible and not v2_primary:
-            if align_status == "derived_value":
-                primary_scope_exclusions.append("derived_value_not_supported")
-            elif align_status == "implicit_value":
-                primary_scope_exclusions.append("implicit_value_not_supported")
-            elif align_status in CONTROLLED_EXCLUSION_REASONS:
-                primary_scope_exclusions.append(str(align_status))
-            if complexity != "single_row_insert" or classification.operation != "INSERT":
+            if classification.operation == "INSERT" and complexity == "single_row_insert":
+                if not insert_grounding["all_assignments_supported_direct_literal"]:
+                    primary_scope_exclusions.append("expression_value_not_supported")
+                if not insert_grounding["all_assignments_individually_source_alignable"]:
+                    primary_scope_exclusions.append("implicit_value_not_supported")
+                if (
+                    insert_grounding["all_assignments_individually_source_alignable"]
+                    and not insert_grounding["jointly_source_representable"]
+                ):
+                    primary_scope_exclusions.append("joint_source_not_representable")
+            else:
                 primary_scope_exclusions.append("multirow_not_in_primary_scope" if complexity == "multi_row_insert" else "not_primary_insert_scope")
         status = "eligible" if sqlite_write_eligible else "excluded"
         ledger_row = {
@@ -948,6 +1306,9 @@ def build_run(
             "status": status,
             "sqlite_write_eligible": sqlite_write_eligible,
             "v2_literal_grounded_primary_eligible": v2_primary,
+            "development_allowed": bool(v2_primary and row["source_split"] == "train"),
+            "official_test_confirmation_only": bool(v2_primary and row["source_split"] == "test"),
+            "insert_assignment_grounding": insert_grounding if classification.operation == "INSERT" else None,
             "exclusion_reasons": sorted(set(exclusions)),
             "primary_scope_exclusion_reasons": sorted(set(primary_scope_exclusions)),
         }
@@ -968,10 +1329,17 @@ def build_run(
                 "gold_post_state_hash": gold_record["after_state_hash"],
                 "complexity_class": complexity,
                 "source_alignability_status": align_status,
+                "insert_assignment_grounding": insert_grounding if classification.operation == "INSERT" else None,
                 "sqlite_write_eligible": True,
                 "v2_literal_grounded_primary_eligible": v2_primary,
+                "development_allowed": bool(v2_primary and row["source_split"] == "train"),
+                "official_test_confirmation_only": bool(v2_primary and row["source_split"] == "test"),
             }
             manifests[classification.operation].append(manifest_row)
+            if v2_primary and row["source_split"] == "train":
+                development_train_candidates.append(manifest_row)
+            elif v2_primary and row["source_split"] == "test":
+                official_test_confirmation_candidates.append(manifest_row)
         leakage_payloads.append(
             {
                 "sample_id": row["sample_id"],
@@ -984,6 +1352,12 @@ def build_run(
             }
         )
 
+    funnel["dml_leading_multi_statement"] = sum(
+        1
+        for classification in class_by_id.values()
+        if classification.operation in {"INSERT", "UPDATE", "DELETE"}
+        and classification.status == "multi_statement"
+    )
     write_json(out_dir / "DATASET_SOURCE_LOCK.json", build_source_lock(raw_dir, rows_by_split))
     write_json(
         out_dir / "RAW_DATA_HASHES.json",
@@ -1005,6 +1379,9 @@ def build_run(
             "by_operation": dict(sorted(operation_counter.items())),
             "scanner_status_counts": dict(sorted(scanner_status_counter.items())),
             "dml_total": funnel["dml"],
+            "dml_leading_candidate_population": funnel["dml"],
+            "single_statement_dml": scanner_status_counter["dml"],
+            "dml_leading_multi_statement": funnel["dml_leading_multi_statement"],
             "unsupported_or_other": operation_counter["OTHER"],
             "multi_statement": scanner_status_counter["multi_statement"],
             "malformed": scanner_status_counter["malformed"],
@@ -1024,6 +1401,19 @@ def build_run(
         row["status"] for row in align_rows if row["operation"] in {"INSERT", "UPDATE", "DELETE"}
     )
     write_json(out_dir / "SOURCE_ALIGNABILITY_SUMMARY.json", dict(sorted(align_summary.items())))
+    write_jsonl(out_dir / "INSERT_ASSIGNMENT_GROUNDING_AUDIT.jsonl", insert_assignment_rows)
+    insert_grounding_summary = {
+        "single_row_insert_eligible": funnel["single_row_insert_eligible"],
+        "direct_literal_representable": funnel["direct_literal_insert"],
+        "individually_source_alignable": funnel["individual_source_alignable_insert"],
+        "jointly_source_representable": funnel["joint_source_representable_insert"],
+        "development_train_candidates": len(development_train_candidates),
+        "official_test_confirmation_candidates": len(official_test_confirmation_candidates),
+        "assignment_value_kind_counts": dict(
+            sorted(Counter(row["gold_value_kind"] for row in insert_assignment_rows).items())
+        ),
+    }
+    write_json(out_dir / "INSERT_GROUNDING_SUMMARY.json", insert_grounding_summary)
     write_jsonl(out_dir / "EXCLUSION_LEDGER.jsonl", ledger_rows)
     exclusion_counts = Counter(reason for row in ledger_rows for reason in row["exclusion_reasons"])
     primary_exclusion_counts = Counter(reason for row in ledger_rows for reason in row["primary_scope_exclusion_reasons"])
@@ -1039,10 +1429,19 @@ def build_run(
     write_jsonl(out_dir / "ELIGIBLE_INSERT_MANIFEST.jsonl", manifests["INSERT"])
     write_jsonl(out_dir / "ELIGIBLE_UPDATE_MANIFEST.jsonl", manifests["UPDATE"])
     write_jsonl(out_dir / "ELIGIBLE_DELETE_MANIFEST.jsonl", manifests["DELETE"])
+    write_jsonl(out_dir / "DEVELOPMENT_TRAIN_CANDIDATE_MANIFEST.jsonl", development_train_candidates)
+    write_jsonl(out_dir / "OFFICIAL_TEST_CONFIRMATION_MANIFEST.jsonl", official_test_confirmation_candidates)
     leakage = leakage_audit(leakage_payloads)
     write_json(out_dir / "DATA_LEAKAGE_AUDIT.json", leakage)
-    split_audit = split_candidate_audit(leakage_payloads, manifests)
+    split_audit = split_candidate_audit(
+        leakage_payloads,
+        manifests,
+        development_train_candidates,
+        official_test_confirmation_candidates,
+    )
     write_json(out_dir / "SPLIT_CANDIDATE_AUDIT.json", split_audit)
+    derived_manifest = build_derived_artifact_manifest(out_dir)
+    write_json(out_dir / "DERIVED_ARTIFACT_MANIFEST.json", derived_manifest)
     lock = {
         "stage": STAGE_NAME,
         "status": "PASS_QUALIFICATION_ARTIFACTS_BUILT",
@@ -1053,6 +1452,7 @@ def build_run(
         "dml_total": funnel["dml"],
         "model_called": False,
         "gpu_called": False,
+        "derived_artifact_manifest_sha256": sha256_file(out_dir / "DERIVED_ARTIFACT_MANIFEST.json"),
         "git_branch": git_output(PROJECT_ROOT, "branch", "--show-current"),
         "git_commit": git_output(PROJECT_ROOT, "rev-parse", "HEAD"),
     }
@@ -1065,6 +1465,7 @@ def build_run(
         manifests=manifests,
         context_summary=context_summary,
         align_summary=align_summary,
+        insert_grounding_summary=insert_grounding_summary,
     )
     write_text(out_dir / "VALIDATION_REPORT.md", report)
     write_text(out_dir / "REVIEWER_README.md", reviewer_readme(out_dir))
@@ -1073,6 +1474,8 @@ def build_run(
         "dml_total": funnel["dml"],
         "operation_counts": dict(operation_counter),
         "manifest_counts": {operation: len(rows) for operation, rows in manifests.items()},
+        "development_train_candidates": len(development_train_candidates),
+        "official_test_confirmation_candidates": len(official_test_confirmation_candidates),
         "out_dir": str(out_dir),
     }
 
@@ -1105,7 +1508,31 @@ def leakage_audit(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def split_candidate_audit(rows: list[dict[str, Any]], manifests: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+def build_derived_artifact_manifest(stage_dir: Path) -> dict[str, Any]:
+    artifacts = []
+    for name in SCIENTIFIC_ARTIFACTS:
+        path = stage_dir / name
+        artifacts.append(
+            {
+                "path": name,
+                "sha256": sha256_file(path),
+                "bytes": path.stat().st_size,
+            }
+        )
+    return {
+        "stage": STAGE_NAME,
+        "artifact_count": len(artifacts),
+        "artifacts": artifacts,
+        "combined_scientific_artifacts_sha256": sha256_text(canonical_json(artifacts)),
+    }
+
+
+def split_candidate_audit(
+    rows: list[dict[str, Any]],
+    manifests: dict[str, list[dict[str, Any]]],
+    development_train_candidates: list[dict[str, Any]],
+    official_test_confirmation_candidates: list[dict[str, Any]],
+) -> dict[str, Any]:
     group_counts = Counter(row["schema_group"] for row in rows)
     eligible_groups = Counter(row["schema_database_group"] for values in manifests.values() for row in values)
     split_by_group: dict[str, set[str]] = defaultdict(set)
@@ -1122,6 +1549,12 @@ def split_candidate_audit(rows: list[dict[str, Any]], manifests: dict[str, list[
         "cross_official_split_schema_group_count": len(cross_split_groups),
         "proposed_next_stage": "StageENG1 should freeze group-level development split; no model run in StageENG0.",
         "eligible_counts_by_operation": {operation: len(values) for operation, values in manifests.items()},
+        "primary_insert_development_train_candidate_count": len(development_train_candidates),
+        "primary_insert_official_test_confirmation_candidate_count": len(official_test_confirmation_candidates),
+        "test_ids_intersect_development_candidates": sorted(
+            {row["sample_id"] for row in official_test_confirmation_candidates}
+            & {row["sample_id"] for row in development_train_candidates}
+        ),
     }
 
 
@@ -1134,6 +1567,7 @@ def validation_report(
     manifests: dict[str, list[dict[str, Any]]],
     context_summary: Counter[str],
     align_summary: Counter[str],
+    insert_grounding_summary: dict[str, Any],
 ) -> str:
     return f"""# StageENG0 Gretel English SQLite Write Qualification Validation Report
 
@@ -1152,7 +1586,9 @@ SHA-256 outside the repository; derived audit artifacts are written here.
 
 ```text
 Raw total                         {raw_total}
-DML                              {funnel['dml']}
+DML-leading candidate population  {funnel['dml']}
+Single-statement DML              {funnel['dml'] - funnel.get('dml_leading_multi_statement', 0)}
+DML-leading multi-statement       {funnel.get('dml_leading_multi_statement', 0)}
 +-- INSERT                       {operation_counter['INSERT']}
 +-- UPDATE                       {operation_counter['UPDATE']}
 +-- DELETE                       {operation_counter['DELETE']}
@@ -1167,6 +1603,17 @@ Derived/non-alignable            {funnel['source_nonalignable']}
 Primary eligible INSERT          {sum(row['v2_literal_grounded_primary_eligible'] for row in manifests['INSERT'])}
 Secondary eligible UPDATE        {len(manifests['UPDATE'])}
 Secondary eligible DELETE        {len(manifests['DELETE'])}
+```
+
+## PATCH1 INSERT Grounding Funnel
+
+```text
+Single-row INSERT eligible              {insert_grounding_summary['single_row_insert_eligible']}
+Direct-literal representable            {insert_grounding_summary['direct_literal_representable']}
+Individually source-alignable            {insert_grounding_summary['individually_source_alignable']}
+Jointly source-representable             {insert_grounding_summary['jointly_source_representable']}
+Development train candidates             {insert_grounding_summary['development_train_candidates']}
+Official test confirmation candidates    {insert_grounding_summary['official_test_confirmation_candidates']}
 ```
 
 ## Counts
@@ -1186,11 +1633,11 @@ Source alignability:
 ## Validation Commands
 
 ```text
-uv run --with pyarrow python scripts/data/build_stageeng0_gretel_qualification.py --raw-dir <raw_dir> --out-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION --package StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION_PATCH0_FINAL_REVIEWER_PACKAGE_20260830.zip
-python scripts/data/validate_stageeng0_gretel_qualification.py --stage-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION --raw-dir <raw_dir>
+uv run --with pyarrow python scripts/data/build_stageeng0_gretel_qualification.py --raw-dir <raw_dir> --out-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION --package StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION_PATCH1_FINAL_REVIEWER_PACKAGE_20260830.zip
+uv run --with pyarrow python scripts/data/validate_stageeng0_gretel_qualification.py --stage-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION --raw-dir <raw_dir>
 PYTHONPATH=tests/support/windows_py314_pytest_tempdir python -m pytest -q tests/test_stageeng0_gretel_qualification.py --basetemp .codex_tmp/pytest_stageeng0_tests5
 PYTHONPATH=tests/support/windows_py314_pytest_tempdir python -m pytest -q -m "not integration" --basetemp .codex_tmp/pytest_stageeng0_regression
-python -m zipfile --test StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION_PATCH0_FINAL_REVIEWER_PACKAGE_20260830.zip
+python -m zipfile --test StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION_PATCH1_FINAL_REVIEWER_PACKAGE_20260830.zip
 ```
 
 Results:
@@ -1198,9 +1645,10 @@ Results:
 ```text
 build: PASS
 validator: PASS
-dedicated tests: PASS, 40 tests
+dedicated tests: PASS, 68 tests
 regression tests: PASS, non-integration suite
 zip integrity: PASS
+derived artifact manifest: PASS
 ```
 
 ## Guardrails
@@ -1229,12 +1677,17 @@ Review order:
 4. `StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/SQLITE_COMPATIBILITY_SUMMARY.json`
 5. `StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/GOLD_EXECUTION_AUDIT.jsonl`
 6. `StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/SOURCE_ALIGNABILITY_SUMMARY.json`
-7. `StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/EXCLUSION_LEDGER.jsonl`
-8. `StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/ELIGIBLE_INSERT_MANIFEST.jsonl`
-9. `scripts/data/build_stageeng0_gretel_qualification.py`
-10. `scripts/data/validate_stageeng0_gretel_qualification.py`
-11. `tests/test_stageeng0_gretel_qualification.py`
-12. `StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/VALIDATION_REPORT.md`
+7. `StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/INSERT_ASSIGNMENT_GROUNDING_AUDIT.jsonl`
+8. `StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/INSERT_GROUNDING_SUMMARY.json`
+9. `StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/EXCLUSION_LEDGER.jsonl`
+10. `StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/ELIGIBLE_INSERT_MANIFEST.jsonl`
+11. `StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/DEVELOPMENT_TRAIN_CANDIDATE_MANIFEST.jsonl`
+12. `StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/OFFICIAL_TEST_CONFIRMATION_MANIFEST.jsonl`
+13. `StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/DERIVED_ARTIFACT_MANIFEST.json`
+14. `scripts/data/build_stageeng0_gretel_qualification.py`
+15. `scripts/data/validate_stageeng0_gretel_qualification.py`
+16. `tests/test_stageeng0_gretel_qualification.py`
+17. `StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/VALIDATION_REPORT.md`
 
 Rerun:
 
@@ -1243,7 +1696,7 @@ uv run --with pyarrow python scripts/data/build_stageeng0_gretel_qualification.p
   --raw-dir /path/to/gretel_raw \\
   --out-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION \\
   --download
-python scripts/data/validate_stageeng0_gretel_qualification.py \\
+uv run --with pyarrow python scripts/data/validate_stageeng0_gretel_qualification.py \\
   --stage-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION \\
   --raw-dir /path/to/gretel_raw
 python -m pytest -q tests/test_stageeng0_gretel_qualification.py

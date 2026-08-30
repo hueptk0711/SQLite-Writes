@@ -5,6 +5,8 @@
     "OTHER": 95942,
     "UPDATE": 3028
   },
+  "dml_leading_candidate_population": 9909,
+  "dml_leading_multi_statement": 213,
   "dml_total": 9909,
   "malformed": 46,
   "multi_statement": 496,
@@ -15,5 +17,6 @@
     "multi_statement": 496,
     "other": 95613
   },
+  "single_statement_dml": 9696,
   "unsupported_or_other": 95942
 }

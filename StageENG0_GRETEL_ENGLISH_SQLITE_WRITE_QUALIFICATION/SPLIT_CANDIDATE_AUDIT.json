@@ -13,6 +13,9 @@
     "train"
   ],
   "official_test_policy": "hold_out_from_phase_o_tuning",
+  "primary_insert_development_train_candidate_count": 928,
+  "primary_insert_official_test_confirmation_candidate_count": 51,
   "proposed_next_stage": "StageENG1 should freeze group-level development split; no model run in StageENG0.",
-  "stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION"
+  "stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION",
+  "test_ids_intersect_development_candidates": []
 }

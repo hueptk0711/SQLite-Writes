@@ -1,9 +1,10 @@
 {
-  "created_utc": "2026-08-30T02:39:53.090391+00:00",
+  "created_utc": "2026-08-30T03:11:26.511650+00:00",
   "dataset_id": "gretelai/synthetic_text_to_sql",
+  "derived_artifact_manifest_sha256": "1100124eaa8b401d710fcc77027de933c634fdb46aec18d5565f99faaba56f03",
   "dml_total": 9909,
   "git_branch": "stage6/crudsql-eligibility-audit",
-  "git_commit": "6aba9a40de238f272ae7d4a907f797ef65bf875a",
+  "git_commit": "0164eeb7a14ca87b9417858abafae35591ec881e",
   "gpu_called": false,
   "model_called": false,
   "raw_total": 105851,

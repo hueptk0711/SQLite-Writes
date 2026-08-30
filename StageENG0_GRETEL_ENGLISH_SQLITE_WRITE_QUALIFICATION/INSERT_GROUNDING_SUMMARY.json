@@ -1,0 +1,19 @@
+{
+  "assignment_value_kind_counts": {
+    "arithmetic_expression": 4,
+    "default": 3,
+    "direct_integer_literal": 3467,
+    "direct_real_literal": 458,
+    "direct_string_literal": 5756,
+    "explicit_null": 47,
+    "function_expression": 43,
+    "other_expression": 110,
+    "subquery": 110
+  },
+  "development_train_candidates": 928,
+  "direct_literal_representable": 2290,
+  "individually_source_alignable": 984,
+  "jointly_source_representable": 979,
+  "official_test_confirmation_candidates": 51,
+  "single_row_insert_eligible": 2410
+}

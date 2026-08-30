@@ -11,6 +11,9 @@ from scripts.data.build_stageeng0_gretel_qualification import (
     classify_gold_sql,
     classify_write_complexity,
     has_nondeterministic_sql,
+    insert_assignment_grounding,
+    parse_insert_assignments,
+    source_occurrences,
     source_alignability,
     sql_literals,
     sql_statements,
@@ -96,7 +99,7 @@ def test_write_complexity_classes(statement: str, operation: str, expected: str)
         ("Set Bob age to 25.", "UPDATE people SET age = 25 WHERE name = 'Bob'", "UPDATE", "simple_update_literal", "source_alignable_literal"),
         ("Increase salary by 10 percent.", "UPDATE people SET salary = salary * 1.1", "UPDATE", "update_expression", "derived_value"),
         ("Add the default row.", "INSERT INTO t(flag) VALUES (1)", "INSERT", "single_row_insert", "implicit_value"),
-        ("Delete Bob Bob duplicate.", "DELETE FROM people WHERE name = 'Bob'", "DELETE", "simple_delete_predicate", "ambiguous_multiple_occurrences"),
+        ("Delete Bob Bob duplicate.", "DELETE FROM people WHERE name = 'Bob'", "DELETE", "simple_delete_predicate", "source_alignable_literal"),
     ],
 )
 def test_source_alignability_is_deterministic(
@@ -107,6 +110,115 @@ def test_source_alignability_is_deterministic(
 
 def test_sql_literals_skip_comments_and_unescape_strings() -> None:
     assert sql_literals("-- 'hidden' 7\nINSERT INTO t VALUES ('Bob''s', -2.5)") == ["Bob's", "-2.5"]
+
+
+@pytest.mark.parametrize(
+    ("statement", "expected"),
+    [
+        ("INSERT INTO table_2024 (col1, name) VALUES (10, 'Bob')", ["10", "Bob"]),
+        ("UPDATE t SET score2 = 5 WHERE id1 = 10", ["5", "10"]),
+        ("DELETE FROM t2024 WHERE col9 = 1", ["1"]),
+        ("INSERT INTO t(v) VALUES (1e-3)", ["1e-3"]),
+        ("INSERT INTO t(v) VALUES (-2.5)", ["-2.5"]),
+    ],
+)
+def test_sql_literals_do_not_read_numbers_from_identifiers(statement: str, expected: list[str]) -> None:
+    assert sql_literals(statement) == expected
+
+
+@pytest.mark.parametrize(
+    ("prompt", "literal"),
+    [
+        ("set value to 10", "1"),
+        ("open a business account", "US"),
+        ("use value 1.25", "1"),
+        ("item A10 should stay", "10"),
+    ],
+)
+def test_source_occurrences_reject_substring_false_alignment(prompt: str, literal: str) -> None:
+    assert source_occurrences(prompt, literal) == []
+
+
+def test_source_occurrences_returns_exact_offsets_and_all_occurrences() -> None:
+    spans = source_occurrences("Add Bob, then Bob again.", "Bob")
+
+    assert spans == [
+        {"start_char": 4, "end_char": 7, "text": "Bob"},
+        {"start_char": 14, "end_char": 17, "text": "Bob"},
+    ]
+
+
+@pytest.mark.parametrize(
+    ("expression", "kind"),
+    [
+        ("'Bob'", "direct_string_literal"),
+        ("25", "direct_integer_literal"),
+        ("-2.5", "direct_real_literal"),
+        ("NULL", "explicit_null"),
+        ("DEFAULT", "default"),
+        ("UPPER('bob')", "function_expression"),
+        ("5 + 2", "arithmetic_expression"),
+        ("CAST('12' AS INTEGER)", "function_expression"),
+        ("(SELECT max(id) FROM s)", "subquery"),
+    ],
+)
+def test_parse_insert_assignments_classifies_value_expression(expression: str, kind: str) -> None:
+    assignments = parse_insert_assignments(f"INSERT INTO t(a) VALUES ({expression})")
+
+    assert assignments[0].gold_value_kind == kind
+
+
+def test_insert_assignment_grounding_allows_multiple_occurrences() -> None:
+    rows, sample = insert_assignment_grounding(
+        "Add Bob and keep Bob visible.",
+        "INSERT INTO people(name) VALUES ('Bob')",
+        "train",
+    )
+
+    assert len(rows[0]["acceptable_source_spans"]) == 2
+    assert rows[0]["individually_source_alignable"] is True
+    assert sample["jointly_source_representable"] is True
+
+
+def test_insert_assignment_grounding_rejects_one_span_for_two_assignments() -> None:
+    rows, sample = insert_assignment_grounding(
+        "Set both fields to 5.",
+        "INSERT INTO t(a,b) VALUES (5,5)",
+        "train",
+    )
+
+    assert [row["individually_source_alignable"] for row in rows] == [True, True]
+    assert sample["jointly_source_representable"] is False
+
+
+def test_insert_assignment_grounding_accepts_two_spans_for_two_assignments() -> None:
+    rows, sample = insert_assignment_grounding(
+        "Set a to 5 and b to 5.",
+        "INSERT INTO t(a,b) VALUES (5,5)",
+        "train",
+    )
+
+    assert [row["individually_source_alignable"] for row in rows] == [True, True]
+    assert sample["jointly_source_representable"] is True
+
+
+@pytest.mark.parametrize("expression", ["UPPER('Bob')", "5 + 2", "CAST('12' AS INTEGER)"])
+def test_expression_insert_values_are_not_primary(tmp_path: Path, expression: str) -> None:
+    context = "CREATE TABLE people(name TEXT, age INT);"
+    rows = {
+        "train": [_row(1, "Add Bob 12.", context, f"INSERT INTO people(name) VALUES ({expression});")],
+        "test": [],
+    }
+
+    build_run(rows, tmp_path / "stage", _raw_dir(tmp_path))
+    ledger = [
+        json.loads(line)
+        for line in (tmp_path / "stage" / "EXCLUSION_LEDGER.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+
+    assert ledger[0]["sqlite_write_eligible"] is True
+    assert ledger[0]["v2_literal_grounded_primary_eligible"] is False
+    assert "expression_value_not_supported" in ledger[0]["primary_scope_exclusion_reasons"]
 
 
 @pytest.mark.parametrize(
@@ -155,7 +267,7 @@ def test_build_run_writes_manifests_and_validator_passes(tmp_path: Path) -> None
     context = "CREATE TABLE people(id INT, name TEXT, age INT); INSERT INTO people VALUES (1, 'Ann', 20);"
     rows = {
         "train": [
-            _row(1, "Add Bob age 25.", context, "INSERT INTO people(id, name, age) VALUES (2, 'Bob', 25);"),
+            _row(1, "Add Bob id 2 age 25.", context, "INSERT INTO people(id, name, age) VALUES (2, 'Bob', 25);"),
             _row(2, "Set Ann age to 21.", context, "UPDATE people SET age = 21 WHERE name = 'Ann';"),
             _row(3, "Delete Ann.", context, "DELETE FROM people WHERE name = 'Ann';"),
             _row(4, "Find Ann.", context, "SELECT * FROM people WHERE name = 'Ann';", "analytics and reporting"),
@@ -168,11 +280,15 @@ def test_build_run_writes_manifests_and_validator_passes(tmp_path: Path) -> None
     }
 
     summary = build_run(rows, tmp_path / "stage", _raw_dir(tmp_path), {"train": "fixture", "test": "fixture"})
-    result = validate(tmp_path / "stage", tmp_path / "raw")
+    result = validate(tmp_path / "stage", tmp_path / "raw", rebuild_from_raw=False)
 
     assert result["status"] == "PASS"
     assert summary["manifest_counts"] == {"INSERT": 1, "UPDATE": 1, "DELETE": 1}
     assert (tmp_path / "stage" / "ELIGIBLE_INSERT_MANIFEST.jsonl").is_file()
+    dev_rows = (tmp_path / "stage" / "DEVELOPMENT_TRAIN_CANDIDATE_MANIFEST.jsonl").read_text(
+        encoding="utf-8"
+    ).splitlines()
+    assert len(dev_rows) == 1
 
 
 def test_exclusion_ledger_records_all_dml_failures(tmp_path: Path) -> None:
@@ -204,3 +320,54 @@ def test_validator_rejects_mutated_raw_hash(tmp_path: Path) -> None:
     (tmp_path / "raw" / RAW_FILES["train"]).write_bytes(b"mutated")
 
     assert validate(tmp_path / "stage", tmp_path / "raw")["status"] == "FAIL"
+
+
+def test_validator_rejects_mutated_derived_artifact(tmp_path: Path) -> None:
+    context = "CREATE TABLE people(name TEXT);"
+    rows = {"train": [_row(1, "Add Bob.", context, "INSERT INTO people(name) VALUES ('Bob');")], "test": []}
+    build_run(rows, tmp_path / "stage", _raw_dir(tmp_path))
+    path = tmp_path / "stage" / "SOURCE_ALIGNABILITY_AUDIT.jsonl"
+    payload = path.read_text(encoding="utf-8")
+    path.write_text(payload.replace("source_alignable_literal", "implicit_value", 1), encoding="utf-8")
+
+    result = validate(tmp_path / "stage")
+
+    assert result["status"] == "FAIL"
+    assert any("SOURCE_ALIGNABILITY_AUDIT.jsonl" in failure for failure in result["failures"])
+
+
+def test_validator_rejects_mutated_manifest_state_hash(tmp_path: Path) -> None:
+    context = "CREATE TABLE people(name TEXT);"
+    rows = {"train": [_row(1, "Add Bob.", context, "INSERT INTO people(name) VALUES ('Bob');")], "test": []}
+    build_run(rows, tmp_path / "stage", _raw_dir(tmp_path))
+    path = tmp_path / "stage" / "ELIGIBLE_INSERT_MANIFEST.jsonl"
+    row = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
+    row["gold_post_state_hash"] = "mutated"
+    path.write_text(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
+
+    result = validate(tmp_path / "stage")
+
+    assert result["status"] == "FAIL"
+    assert any("ELIGIBLE_INSERT_MANIFEST.jsonl" in failure for failure in result["failures"])
+
+
+def test_official_test_primary_candidate_is_confirmation_only(tmp_path: Path) -> None:
+    context = "CREATE TABLE people(name TEXT);"
+    rows = {
+        "train": [],
+        "test": [_row(1, "Add Bob.", context, "INSERT INTO people(name) VALUES ('Bob');")],
+    }
+    build_run(rows, tmp_path / "stage", _raw_dir(tmp_path))
+
+    dev = (tmp_path / "stage" / "DEVELOPMENT_TRAIN_CANDIDATE_MANIFEST.jsonl").read_text(encoding="utf-8")
+    confirmation = [
+        json.loads(line)
+        for line in (tmp_path / "stage" / "OFFICIAL_TEST_CONFIRMATION_MANIFEST.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+    ]
+
+    assert dev == ""
+    assert len(confirmation) == 1
+    assert confirmation[0]["development_allowed"] is False
+    assert confirmation[0]["official_test_confirmation_only"] is True

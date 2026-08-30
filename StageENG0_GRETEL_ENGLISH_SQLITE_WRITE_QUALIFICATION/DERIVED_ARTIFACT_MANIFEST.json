@@ -1,0 +1,112 @@
+{
+  "artifact_count": 21,
+  "artifacts": [
+    {
+      "bytes": 380,
+      "path": "RAW_DATA_HASHES.json",
+      "sha256": "6ce06da46e73446a4310e8f4560c0b1b9aefde4f5b3fc5b1fddbe108c7d1bc4e"
+    },
+    {
+      "bytes": 6666,
+      "path": "RAW_SCHEMA_AUDIT.json",
+      "sha256": "16a6326ae8827ef132d2d657b5e80533034222fcb63efee73e49953b01452d5f"
+    },
+    {
+      "bytes": 1322,
+      "path": "ELIGIBILITY_POLICY.json",
+      "sha256": "99c22bf30b27d45d4710560aca2d955b3bf0657c814bb9f1165608de1591c47f"
+    },
+    {
+      "bytes": 484,
+      "path": "DML_OPERATION_COUNTS.json",
+      "sha256": "c278b0702c6b02f5c335a5439d12ae6c2d2aecc084a5b0e052bf437aa20b9bd0"
+    },
+    {
+      "bytes": 265,
+      "path": "WRITE_COMPLEXITY_AUDIT.json",
+      "sha256": "2d15c5959db256be45ed6ca808a1ea8976858989bc4d25c47fa49bbb54c54f17"
+    },
+    {
+      "bytes": 20309245,
+      "path": "SQLITE_CONTEXT_AUDIT.jsonl",
+      "sha256": "6a50372be4b7f520cd69c51520b55ac6ef8ee006ba028d6abe1fdc481484164f"
+    },
+    {
+      "bytes": 261,
+      "path": "SQLITE_COMPATIBILITY_SUMMARY.json",
+      "sha256": "ef7bf162f255c86fef2b28eed8a1d3551e76cc9c8e397a67a6609af3c3a03ccb"
+    },
+    {
+      "bytes": 25484325,
+      "path": "GOLD_EXECUTION_AUDIT.jsonl",
+      "sha256": "78d29c808409230379dbad2b7650e3daa5f42fab03c256519712b40599578d49"
+    },
+    {
+      "bytes": 36718127,
+      "path": "SOURCE_ALIGNABILITY_AUDIT.jsonl",
+      "sha256": "55bb5e414cdeb541db52c26cb105f6d2d6a95f2754c75b6374db8a52aca4f75a"
+    },
+    {
+      "bytes": 122,
+      "path": "SOURCE_ALIGNABILITY_SUMMARY.json",
+      "sha256": "9a55e6911fe9a40a7aa90f3f56242502a7d46d51fc04cde38d1037c36c86b124"
+    },
+    {
+      "bytes": 5885671,
+      "path": "INSERT_ASSIGNMENT_GROUNDING_AUDIT.jsonl",
+      "sha256": "6812615cbad85db9454ea5528749563daf7c4baf9e36b77695744ccdc000e3ea"
+    },
+    {
+      "bytes": 564,
+      "path": "INSERT_GROUNDING_SUMMARY.json",
+      "sha256": "226d3eeb9392630950c845a9873c17c702f2427ade43c6304fe73a65d81ce30e"
+    },
+    {
+      "bytes": 4405411,
+      "path": "EXCLUSION_LEDGER.jsonl",
+      "sha256": "0c2c6577c6d6bfc458dd85e1dc0a71999ac092d7d9ff6ef1f153d1127015e16a"
+    },
+    {
+      "bytes": 532,
+      "path": "EXCLUSION_REASON_COUNTS.json",
+      "sha256": "3dcdfc6208143b835cbb243d2f502591a92262477f044132ad7dadaa31ea4495"
+    },
+    {
+      "bytes": 63100,
+      "path": "DATA_LEAKAGE_AUDIT.json",
+      "sha256": "6b8d789c5fe9a3a2deb051bef7f55d4cb882752fa7bdded9ad9fc003e068f040"
+    },
+    {
+      "bytes": 765,
+      "path": "SPLIT_CANDIDATE_AUDIT.json",
+      "sha256": "9957a4d7ff86409f24b932503dd3dc5f4438306a56685fafc94df83a913e2bb4"
+    },
+    {
+      "bytes": 3497195,
+      "path": "ELIGIBLE_INSERT_MANIFEST.jsonl",
+      "sha256": "3a5d6a4c5b3f48a86f8b16c1e623467e651fd09e95779167446f2b53001e0ba7"
+    },
+    {
+      "bytes": 2536965,
+      "path": "ELIGIBLE_UPDATE_MANIFEST.jsonl",
+      "sha256": "cae70baf8fc5999e585fdc96f1bec1c01883b5edc18f1a0d9445583cacd13e3d"
+    },
+    {
+      "bytes": 2675476,
+      "path": "ELIGIBLE_DELETE_MANIFEST.jsonl",
+      "sha256": "6af3edf75ee050832e05381aefef0d8de18bc01aabb33b9eb27c3965f10e5fb0"
+    },
+    {
+      "bytes": 1086492,
+      "path": "DEVELOPMENT_TRAIN_CANDIDATE_MANIFEST.jsonl",
+      "sha256": "cc450324d0105ae8bc3c1b34559a2a50f43d03ef1ff07463c5853967a3250210"
+    },
+    {
+      "bytes": 59495,
+      "path": "OFFICIAL_TEST_CONFIRMATION_MANIFEST.jsonl",
+      "sha256": "28b9ddbc89521679914df88431ed5c6741f39edf2ffb43a70f7f4e218f64fd8c"
+    }
+  ],
+  "combined_scientific_artifacts_sha256": "84c1c161e267fe615db122bb109cc0c87de8e52cf266559eb62dd5fd36019dd1",
+  "stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION"
+}
