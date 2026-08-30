@@ -10,6 +10,21 @@ from .evidence import extract_evidence_candidates
 from .grounding import collection_grounding
 
 
+PHASE_O_OFFSET_SEMANTICS_AMENDMENT = (
+    "Offsets follow Python slicing exactly.\n\n"
+    "start_char is inclusive.\n"
+    "end_char is exclusive.\n\n"
+    "The selected text is exactly:\n\n"
+    "Q[start_char:end_char]\n\n"
+    "If a value occupies character positions i through j inclusive:\n"
+    "start_char = i\n"
+    "end_char = j + 1.\n\n"
+    "Before returning JSON, verify that Q[start_char:end_char] is exactly "
+    "one complete atomic database value and contains no surrounding "
+    "punctuation or field label."
+)
+
+
 def _compact_schema(profile: dict[str, Any]) -> list[dict[str, Any]]:
     return serialize_prompt_schema(profile)
 
@@ -363,6 +378,7 @@ def build_free_text_prompt(
             "Return JSON only. Predict an MP-FS+ reference Write Plan.\n"
             "Select only enumerated table, column, constraint, and evidence "
             "IDs. Never write a database identifier or extracted value.\n"
+            f"{PHASE_O_OFFSET_SEMANTICS_AMENDMENT}\n"
             "Rules:\n"
             "1. Every cell is {value_from:evidence_id, normalization:rule}.\n"
             "2. Allowed normalization rules are identity, "

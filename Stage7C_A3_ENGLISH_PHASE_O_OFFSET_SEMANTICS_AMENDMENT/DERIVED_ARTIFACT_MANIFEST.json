@@ -1,0 +1,82 @@
+{
+  "artifact_count": 15,
+  "artifacts": [
+    {
+      "bytes": 9071,
+      "path": "FRESH_ENGLISH_SYNTHETIC_CASES.jsonl",
+      "sha256": "8843add88522720cd1d85d70f8a3c188a7e1f001d972f647105174d0fb2ecbdb"
+    },
+    {
+      "bytes": 4120,
+      "path": "PHASE_M_EXPECTED_MAPPINGS.jsonl",
+      "sha256": "1551e75ba27396eec229cd62ed7a9780157bc13b342dcba6e913df80bec40e12"
+    },
+    {
+      "bytes": 5799,
+      "path": "PHASE_O_EXPECTED_SPANS.jsonl",
+      "sha256": "5138455b5e9a81d61897720d59fa6184b95155e67e2d3c5cefb59c06ce8cb0d3"
+    },
+    {
+      "bytes": 401,
+      "path": "PHASE_O_PROMPT_AMENDMENT.md",
+      "sha256": "034cc42a6d667a843f7feea981037b81e3984f1f183e46c46ac14c33582ef3f1"
+    },
+    {
+      "bytes": 1148,
+      "path": "PHASE_O_PROMPT_AUDIT.json",
+      "sha256": "e4d42ad3fbfd81213aad64df1851199921bdfa09a2da394bfe58f37b64cf3424"
+    },
+    {
+      "bytes": 6827,
+      "path": "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl",
+      "sha256": "f362bb06edfdda87d300c1e41ec63a8ffc703e58689598eec01c25ab2aa2e73a"
+    },
+    {
+      "bytes": 1922,
+      "path": "TYPED_TARGET_STATES.jsonl",
+      "sha256": "2e77250b29be68ed040755c3b793b3f2dc3923ac4865ba06e1685dab297ae159"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_fresh_english_001.sqlite",
+      "sha256": "a231b6467bec6e12928316f820d3e70c4c2229014b20b1ffc1ce86823b1d6564"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_fresh_english_002.sqlite",
+      "sha256": "fd48f392b50c81c2a6714273fbde66f33b9aa64f2c0c9112072b5b778ebebbab"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_fresh_english_003.sqlite",
+      "sha256": "0661ce3ad0614016ddc6203f3927ead1a3e3000197799160b6ca58afdade5c9a"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_fresh_english_004.sqlite",
+      "sha256": "6c4914a4c1d582650b6fd7baa128ac50867ab158e4dfda2dc9c7a3aab025e45c"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_fresh_english_005.sqlite",
+      "sha256": "d7b4fa83ef67caf9c3506f91e962cefb3f27f0bead6da82620414cceed677461"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_fresh_english_006.sqlite",
+      "sha256": "1f4c8ea71ec78af74304e2e932bf1f49c9364da97b62783c1bf3e91b6fcd0c95"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_fresh_english_007.sqlite",
+      "sha256": "5b7dae16eb47913f4973fa5566ed5f9eb1c659ef56747ae3f37cb7fb1d26b46d"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_fresh_english_008.sqlite",
+      "sha256": "c74e68d33928461fac8ffe721abdc139119ddf5eee0fde2aa6c417f803a5663f"
+    }
+  ],
+  "combined_scientific_artifacts_sha256": "f4b2ef3e68a045b93ae4dafa36abe14f6790581c6cea6b924203f55aa9c9473f",
+  "stage": "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT"
+}

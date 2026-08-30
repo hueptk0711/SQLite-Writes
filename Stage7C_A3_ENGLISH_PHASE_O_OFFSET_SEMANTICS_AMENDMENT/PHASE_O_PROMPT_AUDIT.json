@@ -1,0 +1,31 @@
+{
+  "amendment_present_in_prompt_source": true,
+  "amendment_sha256": "b7992e7b163703cf082993201158fc3582f4a3e7d42a30c56fc517b21e6cf8be",
+  "phase_o_semantics": {
+    "end_char": "exclusive",
+    "slice": "Q[start_char:end_char]",
+    "start_char": "inclusive"
+  },
+  "prompt_source_path": "src/nldbwrite_v3/planner/prompt.py",
+  "prompt_source_sha256": "c48b6a6b0ebfab708f2bb377e41cd62a4369eea9b096656bc7e99bbcf68c6b39",
+  "required_prompt_source_snippets": [
+    "PHASE_O_OFFSET_SEMANTICS_AMENDMENT",
+    "Offsets follow Python slicing exactly.",
+    "start_char is inclusive.",
+    "end_char is exclusive.",
+    "Q[start_char:end_char]",
+    "end_char = j + 1.",
+    "Before returning JSON, verify that"
+  ],
+  "stage": "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT",
+  "unchanged_protocol": {
+    "architecture": "same_2_call_phase_o_phase_m",
+    "backend": "same_PATCH9_incremental_backend",
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "phase_m": "unchanged",
+    "repair": "none",
+    "retry": 0,
+    "zero_shot": true
+  }
+}

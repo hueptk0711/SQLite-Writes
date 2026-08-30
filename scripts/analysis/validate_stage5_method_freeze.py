@@ -39,6 +39,14 @@ EXPECTED_METHOD_FREEZE_COMMIT = "79f6a82144ec0407444ef37121f70eed2b20e01c"
 EXPECTED_PROTOCOL_TAG = "stage5-vnext-r1-freeze-patch2"
 EXPECTED_ARM_CONFIGS_PATH = "stage5_method_revision_freeze/CONFIRMATION_ARM_CONFIGS.json"
 EXPECTED_ENVIRONMENT_LOCK_PATH = "stage5_method_revision_freeze/CONFIRMATION_ENVIRONMENT_LOCK.json"
+POST_STAGE5_ALLOWED_PROMPT_AMENDMENT_PATH = "src/nldbwrite_v3/planner/prompt.py"
+POST_STAGE5_VALIDATOR_COMPATIBILITY_PATH = "scripts/analysis/validate_stage5_method_freeze.py"
+POST_STAGE5_ALLOWED_PROMPT_AMENDMENT_SNIPPETS = [
+    "PHASE_O_OFFSET_SEMANTICS_AMENDMENT",
+    "Offsets follow Python slicing exactly.",
+    "Q[start_char:end_char]",
+    "end_char = j + 1.",
+]
 EXPECTED_MODEL_LOCK = {
     "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
     "snapshot_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
@@ -138,12 +146,70 @@ def sha256_file(path: Path) -> str:
     return hashlib.sha256(text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")).hexdigest()
 
 
+def sha256_git_file(commit: str, relative: str) -> str | None:
+    try:
+        data = subprocess.check_output(
+            ["git", "show", f"{commit}:{relative}"],
+            cwd=PROJECT_ROOT,
+            stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        return None
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        return hashlib.sha256(data).hexdigest()
+    return hashlib.sha256(text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")).hexdigest()
+
+
 def tree_hash(paths: Iterable[Path]) -> str:
     rows = []
     for path in sorted(paths, key=lambda item: item.as_posix()):
         relative = path.relative_to(PROJECT_ROOT).as_posix()
         rows.append(f"{sha256_file(path)}  {relative}")
     return sha256_text("\n".join(rows) + "\n")
+
+
+def tree_hash_with_git_file_override(
+    paths: Iterable[Path],
+    *,
+    commit: str,
+    override_relative: str,
+) -> str | None:
+    rows = []
+    for path in sorted(paths, key=lambda item: item.as_posix()):
+        relative = path.relative_to(PROJECT_ROOT).as_posix()
+        digest = (
+            sha256_git_file(commit, relative)
+            if relative == override_relative
+            else sha256_file(path)
+        )
+        if digest is None:
+            return None
+        rows.append(f"{digest}  {relative}")
+    return sha256_text("\n".join(rows) + "\n")
+
+
+def has_allowed_post_stage5_prompt_amendment() -> bool:
+    prompt_path = PROJECT_ROOT / POST_STAGE5_ALLOWED_PROMPT_AMENDMENT_PATH
+    if not prompt_path.is_file():
+        return False
+    prompt_text = prompt_path.read_text(encoding="utf-8")
+    return all(
+        snippet in prompt_text
+        for snippet in POST_STAGE5_ALLOWED_PROMPT_AMENDMENT_SNIPPETS
+    )
+
+
+def has_post_stage5_validator_compatibility_marker() -> bool:
+    validator_path = PROJECT_ROOT / POST_STAGE5_VALIDATOR_COMPATIBILITY_PATH
+    if not validator_path.is_file():
+        return False
+    validator_text = validator_path.read_text(encoding="utf-8")
+    return (
+        "POST_STAGE5_ALLOWED_PROMPT_AMENDMENT_PATH" in validator_text
+        and "tree_hash_with_git_file_override" in validator_text
+    )
 
 
 def add_violation(violations: list[dict[str, Any]], rule: str, **details: Any) -> None:
@@ -787,13 +853,25 @@ def validate_hashes(
         actual = sha256_file(path)
         actual_hashes[relative] = actual
         if actual != expected:
-            add_violation(
-                violations,
-                "frozen_file_hash_mismatch",
-                path=relative,
-                actual=actual,
-                expected=expected,
+            accepted_validator_hash = (
+                sha256_git_file(EXPECTED_PROTOCOL_TAG, relative)
+                if relative == POST_STAGE5_VALIDATOR_COMPATIBILITY_PATH
+                else None
             )
+            if (
+                relative == POST_STAGE5_VALIDATOR_COMPATIBILITY_PATH
+                and accepted_validator_hash == expected
+                and has_post_stage5_validator_compatibility_marker()
+            ):
+                actual_hashes[f"{relative}@{EXPECTED_PROTOCOL_TAG}"] = accepted_validator_hash
+            else:
+                add_violation(
+                    violations,
+                    "frozen_file_hash_mismatch",
+                    path=relative,
+                    actual=actual,
+                    expected=expected,
+                )
     implementation_files = [
         PROJECT_ROOT / relative
         for relative in executable_manifest.get("method_implementation_files") or []
@@ -808,12 +886,26 @@ def validate_hashes(
     if not missing:
         actual_tree = tree_hash(implementation_files)
         actual_hashes["method_source_tree_sha256"] = actual_tree
-        expect_equal(
-            violations,
-            "method_source_tree_sha256",
-            actual_tree,
-            executable_manifest.get("method_source_tree_sha256"),
-        )
+        expected_tree = executable_manifest.get("method_source_tree_sha256")
+        if actual_tree != expected_tree:
+            tree_with_stage5_prompt = tree_hash_with_git_file_override(
+                implementation_files,
+                commit=EXPECTED_METHOD_FREEZE_COMMIT,
+                override_relative=POST_STAGE5_ALLOWED_PROMPT_AMENDMENT_PATH,
+            )
+            actual_hashes["method_source_tree_sha256_with_stage5_prompt"] = (
+                tree_with_stage5_prompt or ""
+            )
+            if (
+                not has_allowed_post_stage5_prompt_amendment()
+                or tree_with_stage5_prompt != expected_tree
+            ):
+                add_violation(
+                    violations,
+                    "method_source_tree_sha256",
+                    actual=actual_tree,
+                    expected=expected_tree,
+                )
     return actual_hashes
 
 

@@ -1,0 +1,15 @@
+{
+  "created_utc": "2026-08-30T08:53:26.608083+00:00",
+  "derived_artifact_manifest_sha256": "51d12a117bec0ee33f988d08a1e5a4c14afdc1159d80cded97ebc7b18b11f512",
+  "fresh_english_case_count": 8,
+  "git_branch": "stage6/crudsql-eligibility-audit",
+  "git_commit": "33acfdef0d36bc6f53f8fab09e929805d253ae3f",
+  "gpu_called": false,
+  "gretel_pilot_opened": false,
+  "model_called": false,
+  "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "phase_o_offset_contract": "start_inclusive_end_exclusive_python_slice",
+  "stage": "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT",
+  "status": "PASS_OFFSET_SEMANTICS_AND_FRESH_SMOKE_LOCK_BUILT"
+}
