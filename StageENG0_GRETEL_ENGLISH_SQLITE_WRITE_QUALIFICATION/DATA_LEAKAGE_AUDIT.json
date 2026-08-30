@@ -1,0 +1,2912 @@
+{
+  "exact_prompt_sql_duplicates": [],
+  "note": "Official Gretel test split is audited but must remain untouched for confirmation; StageENG0 does not tune on model performance.",
+  "prompt_duplicates": [],
+  "schema_group_duplicates": [
+    {
+      "count": 3,
+      "hash": "004a1c74ce5f6dec",
+      "sample_ids": [
+        "gretel:train:10231:018221",
+        "gretel:train:77729:062558",
+        "gretel:train:48814:074559"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "0061c16c5f40fb7b",
+      "sample_ids": [
+        "gretel:train:13941:021952",
+        "gretel:train:30381:034815",
+        "gretel:train:36808:050773"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "008e49b4bae21555",
+      "sample_ids": [
+        "gretel:train:13764:021775",
+        "gretel:train:31041:035475",
+        "gretel:train:81644:076477"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "00de5b1feea78887",
+      "sample_ids": [
+        "gretel:train:49444:015677",
+        "gretel:train:58336:060664"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "00e59503094a3cdb",
+      "sample_ids": [
+        "gretel:train:12062:026049",
+        "gretel:train:32359:032821",
+        "gretel:train:45103:086380"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 6,
+      "hash": "00f2cc2c12f48942",
+      "sample_ids": [
+        "gretel:train:9191:017181",
+        "gretel:train:32570:033032",
+        "gretel:train:32990:033452",
+        "gretel:train:36946:050911",
+        "gretel:train:23261:077599",
+        "gretel:train:88328:098672"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "00f5c948798b9f3a",
+      "sample_ids": [
+        "gretel:train:62146:067971",
+        "gretel:train:62290:068115"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "0139aa660d1389ac",
+      "sample_ids": [
+        "gretel:test:2467:002466",
+        "gretel:train:49413:015646",
+        "gretel:train:49476:015709"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "017a96c0d668ed8f",
+      "sample_ids": [
+        "gretel:train:6699:001602",
+        "gretel:train:68961:090718"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "022b1c1f5b6573fb",
+      "sample_ids": [
+        "gretel:test:2917:002916",
+        "gretel:train:47819:073564",
+        "gretel:train:44864:086141"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "023f5c9e074ee135",
+      "sample_ids": [
+        "gretel:test:3810:003809",
+        "gretel:train:56769:059097",
+        "gretel:train:82223:079084"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "025cfebcdb3de754",
+      "sample_ids": [
+        "gretel:train:10003:017993",
+        "gretel:train:35769:049734",
+        "gretel:train:82199:079060"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 5,
+      "hash": "0294fcf6b8ebd99c",
+      "sample_ids": [
+        "gretel:train:38096:042074",
+        "gretel:train:588:043766",
+        "gretel:train:39621:068965",
+        "gretel:train:48770:074515",
+        "gretel:train:80124:074957"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "030670b15ec015e6",
+      "sample_ids": [
+        "gretel:train:33851:037882",
+        "gretel:train:91301:064280",
+        "gretel:train:83956:070841"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0319158551fe6bb7",
+      "sample_ids": [
+        "gretel:train:28522:004304",
+        "gretel:train:23683:078021"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0359c4b9f81b3845",
+      "sample_ids": [
+        "gretel:test:4014:004013",
+        "gretel:train:81148:075981"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "03629dd2f44071c9",
+      "sample_ids": [
+        "gretel:train:20951:013855",
+        "gretel:train:95487:093977"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "037255e915461d5e",
+      "sample_ids": [
+        "gretel:train:348:043526",
+        "gretel:train:87667:098011"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 4,
+      "hash": "037a2b0114e3b176",
+      "sample_ids": [
+        "gretel:test:4552:004551",
+        "gretel:train:51134:005766",
+        "gretel:train:51710:006342",
+        "gretel:train:36166:050131"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "0381a9d2583abb07",
+      "sample_ids": [
+        "gretel:train:76192:009400",
+        "gretel:train:55589:048025",
+        "gretel:train:46903:072648"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "03cad871709f8522",
+      "sample_ids": [
+        "gretel:train:35369:049334",
+        "gretel:train:54307:054697",
+        "gretel:train:76840:061669"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "040cd5a40a18b39a",
+      "sample_ids": [
+        "gretel:train:1742:044920",
+        "gretel:train:25571:056508"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "042a529444590667",
+      "sample_ids": [
+        "gretel:train:21637:014541",
+        "gretel:train:56487:048923"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0430018c0f2b5af7",
+      "sample_ids": [
+        "gretel:train:30700:035134",
+        "gretel:train:77996:057310"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "043da2f6726d1c9e",
+      "sample_ids": [
+        "gretel:train:4646:003069",
+        "gretel:train:79464:058778"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0472930ef72016f1",
+      "sample_ids": [
+        "gretel:train:97745:009709",
+        "gretel:train:73334:029710"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "04dd777fa86b9a68",
+      "sample_ids": [
+        "gretel:train:11764:025751",
+        "gretel:train:55693:048129",
+        "gretel:train:19626:052187"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "05171a57de671078",
+      "sample_ids": [
+        "gretel:train:6176:001079",
+        "gretel:train:59683:065508",
+        "gretel:train:62977:080786"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 5,
+      "hash": "053b4271fae18852",
+      "sample_ids": [
+        "gretel:test:2906:002905",
+        "gretel:train:37882:041860",
+        "gretel:train:25446:056383",
+        "gretel:train:76837:061666",
+        "gretel:train:86465:088882"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "05a028c7da072366",
+      "sample_ids": [
+        "gretel:train:62089:067914",
+        "gretel:train:64055:081864",
+        "gretel:train:92587:095001"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "05f5063cf2cad095",
+      "sample_ids": [
+        "gretel:train:175:043353",
+        "gretel:train:54976:047412",
+        "gretel:train:84829:071714"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "060b0d07fbe86810",
+      "sample_ids": [
+        "gretel:train:12198:026185",
+        "gretel:train:94012:092502"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "060f4db930c096c6",
+      "sample_ids": [
+        "gretel:train:76033:009241",
+        "gretel:train:37663:041641"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 4,
+      "hash": "06aed7798d576872",
+      "sample_ids": [
+        "gretel:train:304:043482",
+        "gretel:train:58201:060529",
+        "gretel:train:48163:073908",
+        "gretel:train:64575:096280"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "06d0f7a5941a3f7f",
+      "sample_ids": [
+        "gretel:test:3677:003676",
+        "gretel:train:8220:020253"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "06db927052cd2332",
+      "sample_ids": [
+        "gretel:train:31752:032214",
+        "gretel:train:59030:064855",
+        "gretel:train:70842:084673"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "06ff75bc418bf50f",
+      "sample_ids": [
+        "gretel:train:10757:018747",
+        "gretel:train:55381:047817",
+        "gretel:train:63075:080884"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "07189e9ab2dfc739",
+      "sample_ids": [
+        "gretel:train:38508:042486",
+        "gretel:train:88478:098822"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "078de8e3f9188937",
+      "sample_ids": [
+        "gretel:train:28400:004182",
+        "gretel:train:90896:063875"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "07e3409a933b6da0",
+      "sample_ids": [
+        "gretel:test:4579:004578",
+        "gretel:train:39451:068795"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "082345ae9f52d443",
+      "sample_ids": [
+        "gretel:train:27211:012993",
+        "gretel:train:56085:048521",
+        "gretel:train:20441:053002"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0855feb555568b1d",
+      "sample_ids": [
+        "gretel:train:72475:028851",
+        "gretel:train:37415:041393"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "08ab8e9089caf7aa",
+      "sample_ids": [
+        "gretel:train:14443:022454",
+        "gretel:train:1516:044694"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "08d8d0b1a6059e79",
+      "sample_ids": [
+        "gretel:train:4425:002848",
+        "gretel:train:91180:064159"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "091552fba8035993",
+      "sample_ids": [
+        "gretel:train:35001:039032",
+        "gretel:train:52874:053264",
+        "gretel:train:76865:061694"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0968a4d63f928b1b",
+      "sample_ids": [
+        "gretel:train:72379:028755",
+        "gretel:train:53939:054329"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 4,
+      "hash": "09a137b7d8ed391c",
+      "sample_ids": [
+        "gretel:train:21618:014522",
+        "gretel:train:504:043682",
+        "gretel:train:79293:058607",
+        "gretel:train:64659:096364"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0a044d7b488154f3",
+      "sample_ids": [
+        "gretel:train:8373:020406",
+        "gretel:train:44504:028326"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0a393eeca584e2e9",
+      "sample_ids": [
+        "gretel:train:80703:075536",
+        "gretel:train:63123:080932"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 4,
+      "hash": "0a40f71f20e06c68",
+      "sample_ids": [
+        "gretel:train:9920:017910",
+        "gretel:train:1220:044398",
+        "gretel:train:20356:052917",
+        "gretel:train:60555:066380"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "0a6af24f0c617bbe",
+      "sample_ids": [
+        "gretel:train:52149:006781",
+        "gretel:train:42040:082908",
+        "gretel:train:42977:083845"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "0a6ece86baf004b1",
+      "sample_ids": [
+        "gretel:test:1768:001767",
+        "gretel:train:3397:032018",
+        "gretel:train:84235:071120"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0abe38fb7ac7eca2",
+      "sample_ids": [
+        "gretel:train:4060:002483",
+        "gretel:train:92364:094778"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 6,
+      "hash": "0b1976fa2563a6a5",
+      "sample_ids": [
+        "gretel:test:3929:003928",
+        "gretel:test:4480:004479",
+        "gretel:train:16674:024685",
+        "gretel:train:32875:033337",
+        "gretel:train:22230:076568",
+        "gretel:train:69719:091476"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0b370333b105f023",
+      "sample_ids": [
+        "gretel:test:1399:001398",
+        "gretel:train:5180:000083"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0b4163c5584ca950",
+      "sample_ids": [
+        "gretel:train:34974:039005",
+        "gretel:train:57212:059540"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0b62fbb59e61ddf5",
+      "sample_ids": [
+        "gretel:train:43238:084106",
+        "gretel:train:91711:094125"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0bb6c99bd958576d",
+      "sample_ids": [
+        "gretel:train:417:043595",
+        "gretel:train:69115:090872"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0bf3b872858d8805",
+      "sample_ids": [
+        "gretel:test:3215:003214",
+        "gretel:train:2059:030680"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "0c1165afd208d622",
+      "sample_ids": [
+        "gretel:train:96476:040186",
+        "gretel:train:25348:056285",
+        "gretel:train:41708:082576"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0c298ce1b06bcf1c",
+      "sample_ids": [
+        "gretel:train:9368:017358",
+        "gretel:train:47232:072977"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0c566936ee779554",
+      "sample_ids": [
+        "gretel:train:18731:051292",
+        "gretel:train:25331:056268"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0cd027b0561ab332",
+      "sample_ids": [
+        "gretel:train:52134:006766",
+        "gretel:train:39243:068587"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0ce565d83f25c168",
+      "sample_ids": [
+        "gretel:train:16032:024043",
+        "gretel:train:58415:060743"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0d197df0f660666e",
+      "sample_ids": [
+        "gretel:test:4930:004929",
+        "gretel:train:36879:050844"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 6,
+      "hash": "0d3ecb7515ef7414",
+      "sample_ids": [
+        "gretel:test:1008:001007",
+        "gretel:train:33038:033500",
+        "gretel:train:33260:033722",
+        "gretel:train:30676:035110",
+        "gretel:train:19500:052061",
+        "gretel:train:61551:067376"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "0d8340c8832d1a13",
+      "sample_ids": [
+        "gretel:train:99221:011185",
+        "gretel:train:828:044006",
+        "gretel:train:39558:068902"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "0d90bca07744bc95",
+      "sample_ids": [
+        "gretel:train:51060:005692",
+        "gretel:train:75471:008679",
+        "gretel:train:18122:037176"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0d931eb52f332b6a",
+      "sample_ids": [
+        "gretel:train:16861:024872",
+        "gretel:train:60382:066207"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "0e07c8c911624c30",
+      "sample_ids": [
+        "gretel:train:97640:009604",
+        "gretel:train:12914:026901",
+        "gretel:train:86151:088568"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "0e168fcd2ea6c9a1",
+      "sample_ids": [
+        "gretel:train:99095:011059",
+        "gretel:train:50372:016605",
+        "gretel:train:90951:063930"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0e540b7a899c465e",
+      "sample_ids": [
+        "gretel:train:11504:025491",
+        "gretel:train:73891:030267"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "0e70f0dc3a2def81",
+      "sample_ids": [
+        "gretel:train:29524:005306",
+        "gretel:train:31714:032176",
+        "gretel:train:86027:088444"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0f47e5c9d14528c4",
+      "sample_ids": [
+        "gretel:train:74457:007665",
+        "gretel:train:43512:027334"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0f6819c3280abd56",
+      "sample_ids": [
+        "gretel:test:60:000059",
+        "gretel:train:36632:050597"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "0f7fd6eb09e5815a",
+      "sample_ids": [
+        "gretel:train:72716:029092",
+        "gretel:train:36555:050520",
+        "gretel:train:77293:062122"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0fa7bbe1c00c151c",
+      "sample_ids": [
+        "gretel:test:3073:003072",
+        "gretel:train:53076:053466"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 4,
+      "hash": "0fb5c5b7c9a72d9f",
+      "sample_ids": [
+        "gretel:train:2860:031481",
+        "gretel:train:95680:039390",
+        "gretel:train:90909:063888",
+        "gretel:train:71383:085214"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "0fc9b2217011f2bb",
+      "sample_ids": [
+        "gretel:train:35002:039033",
+        "gretel:train:39282:068626",
+        "gretel:train:47185:072930"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 4,
+      "hash": "1091ddbc625a324a",
+      "sample_ids": [
+        "gretel:train:32971:033433",
+        "gretel:train:37025:050990",
+        "gretel:train:19951:052512",
+        "gretel:train:84618:071503"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "10b6d53b9ca5182b",
+      "sample_ids": [
+        "gretel:train:5757:000660",
+        "gretel:train:54386:054776"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "10d48b633bc3aa9c",
+      "sample_ids": [
+        "gretel:train:66553:045404",
+        "gretel:train:59678:065503",
+        "gretel:train:39862:069206"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "10df7164225c6a4f",
+      "sample_ids": [
+        "gretel:train:60151:065976",
+        "gretel:train:87312:089729"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "10e8a67a05690703",
+      "sample_ids": [
+        "gretel:train:49866:016099",
+        "gretel:train:80809:075642"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "11271eb290ae1e88",
+      "sample_ids": [
+        "gretel:train:9396:017386",
+        "gretel:train:94453:092943",
+        "gretel:train:92614:095028"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1131c417ef60843e",
+      "sample_ids": [
+        "gretel:train:51683:006315",
+        "gretel:train:32027:032489"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1154b9bc64c4e36c",
+      "sample_ids": [
+        "gretel:train:44801:028623",
+        "gretel:train:35630:049595"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "117cff64188261c5",
+      "sample_ids": [
+        "gretel:train:32763:033225",
+        "gretel:train:19068:051629"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "11bfd5967506bf55",
+      "sample_ids": [
+        "gretel:train:8638:020671",
+        "gretel:train:57058:059386",
+        "gretel:train:47033:072778"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "11d581ece3111569",
+      "sample_ids": [
+        "gretel:train:84621:071506",
+        "gretel:train:83066:079927"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "11e7c02f29fa3f7c",
+      "sample_ids": [
+        "gretel:train:49774:016007",
+        "gretel:train:55994:048430"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "122b4ae86af33c52",
+      "sample_ids": [
+        "gretel:train:39093:043071",
+        "gretel:train:91296:064275"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1240336b79d769e9",
+      "sample_ids": [
+        "gretel:train:1928:045106",
+        "gretel:train:90525:063504"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1285ed1229fb18e7",
+      "sample_ids": [
+        "gretel:train:4265:002688",
+        "gretel:train:34224:038255",
+        "gretel:train:84888:071773"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "128bbc3de90dfd68",
+      "sample_ids": [
+        "gretel:train:27236:013018",
+        "gretel:train:79197:058511",
+        "gretel:train:77696:062525"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "129efb95944ac148",
+      "sample_ids": [
+        "gretel:train:10560:018550",
+        "gretel:train:77459:062288"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "12b6468df8d991be",
+      "sample_ids": [
+        "gretel:train:26205:011987",
+        "gretel:train:998:044176",
+        "gretel:train:60566:066391"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 4,
+      "hash": "12ed7e4581f2e972",
+      "sample_ids": [
+        "gretel:train:52124:006756",
+        "gretel:train:30723:035157",
+        "gretel:train:96585:040295",
+        "gretel:train:91263:064242"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "130f3cda506afe67",
+      "sample_ids": [
+        "gretel:train:13100:021111",
+        "gretel:train:24453:055390",
+        "gretel:train:88799:099143"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "133605302da85765",
+      "sample_ids": [
+        "gretel:train:56117:048553",
+        "gretel:train:36084:050049",
+        "gretel:train:39629:068973"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "133a971a1b6549a3",
+      "sample_ids": [
+        "gretel:train:8495:020528",
+        "gretel:train:72504:028880",
+        "gretel:train:90926:063905"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "134d6b41e21c3bd7",
+      "sample_ids": [
+        "gretel:train:21121:014025",
+        "gretel:train:45826:087103"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1352c27ff38d683b",
+      "sample_ids": [
+        "gretel:train:22123:015027",
+        "gretel:train:90045:063024"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1377f21a39a895c8",
+      "sample_ids": [
+        "gretel:train:6756:001659",
+        "gretel:train:25712:056649"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "13936c56994d9fd2",
+      "sample_ids": [
+        "gretel:train:39304:068648",
+        "gretel:train:84359:071244"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "13c18c15477bcef9",
+      "sample_ids": [
+        "gretel:test:3267:003266",
+        "gretel:test:5532:005531",
+        "gretel:train:93097:095511"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "13cd7dd05407ba47",
+      "sample_ids": [
+        "gretel:train:10202:018192",
+        "gretel:train:92993:095407"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "13cf067c36a11b11",
+      "sample_ids": [
+        "gretel:train:90569:063548",
+        "gretel:train:46301:087578"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "13dfb1cb6876a297",
+      "sample_ids": [
+        "gretel:train:26466:012248",
+        "gretel:train:94611:093101"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "13e1383fb3e927c0",
+      "sample_ids": [
+        "gretel:train:27126:012908",
+        "gretel:train:76822:061651"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "13f5dd62f3ce842f",
+      "sample_ids": [
+        "gretel:train:28867:004649",
+        "gretel:train:8846:020879"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "13f99baf91c92565",
+      "sample_ids": [
+        "gretel:train:73222:029598",
+        "gretel:train:84554:071439"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "141f217d4723c7ff",
+      "sample_ids": [
+        "gretel:train:46083:087360",
+        "gretel:train:85778:088195"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "14431933f8db21cd",
+      "sample_ids": [
+        "gretel:train:90209:063188",
+        "gretel:train:64537:096242"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "147a69b110251492",
+      "sample_ids": [
+        "gretel:train:39216:068560",
+        "gretel:train:23398:077736"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "14f1b700fea072f6",
+      "sample_ids": [
+        "gretel:train:4719:003142",
+        "gretel:train:59044:064869"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "14f8c735e6b5ccc0",
+      "sample_ids": [
+        "gretel:train:15394:023405",
+        "gretel:train:72725:029101"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "150399a93a599acd",
+      "sample_ids": [
+        "gretel:train:51985:006617",
+        "gretel:train:99346:011310",
+        "gretel:train:95579:039289"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1576048776699db7",
+      "sample_ids": [
+        "gretel:train:33744:037775",
+        "gretel:train:18854:051415"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "157d4394c84babe5",
+      "sample_ids": [
+        "gretel:train:53004:053394",
+        "gretel:train:89612:099956"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "15ba5d78c07ba5ac",
+      "sample_ids": [
+        "gretel:train:70753:084584",
+        "gretel:train:86767:089184"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "15c90feb02d12880",
+      "sample_ids": [
+        "gretel:test:1075:001074",
+        "gretel:train:96032:039742"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "15d48ab88427bc26",
+      "sample_ids": [
+        "gretel:train:98402:010366",
+        "gretel:train:7654:019687",
+        "gretel:train:23759:078097"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 4,
+      "hash": "15d4b7b3465baed0",
+      "sample_ids": [
+        "gretel:train:97329:041039",
+        "gretel:train:79201:058515",
+        "gretel:train:57377:059705",
+        "gretel:train:80598:075431"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "169b77c91219f7f5",
+      "sample_ids": [
+        "gretel:train:12426:026413",
+        "gretel:train:86536:088953"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "16f8b7296a9ff9e2",
+      "sample_ids": [
+        "gretel:train:72853:029229",
+        "gretel:train:70522:084353"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "172c70fccbba7b45",
+      "sample_ids": [
+        "gretel:train:52377:007009",
+        "gretel:train:67941:046792"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "17317be217396bbe",
+      "sample_ids": [
+        "gretel:train:16668:024679",
+        "gretel:train:60992:066817"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "174d72d9e80d8c45",
+      "sample_ids": [
+        "gretel:train:3657:002080",
+        "gretel:train:10451:018441",
+        "gretel:train:2763:031384"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1773e5a5a8968dfb",
+      "sample_ids": [
+        "gretel:train:28957:004739",
+        "gretel:train:36758:050723"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "17ea8b636ae47f81",
+      "sample_ids": [
+        "gretel:train:78716:058030",
+        "gretel:train:63758:081567"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "180952b824e98186",
+      "sample_ids": [
+        "gretel:train:26437:012219",
+        "gretel:train:93610:092100"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "18165fe19ceddd64",
+      "sample_ids": [
+        "gretel:train:35661:049626",
+        "gretel:train:60633:066458"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1825bcf700435144",
+      "sample_ids": [
+        "gretel:test:2903:002902",
+        "gretel:train:27398:013180",
+        "gretel:train:89661:062640"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 4,
+      "hash": "183b068db1f6be1b",
+      "sample_ids": [
+        "gretel:test:3995:003994",
+        "gretel:train:19913:052474",
+        "gretel:train:59508:065333",
+        "gretel:train:87701:098045"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "186952fbb74f7676",
+      "sample_ids": [
+        "gretel:train:28856:004638",
+        "gretel:train:35401:049366",
+        "gretel:train:81900:078761"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1895c7038ab8c42e",
+      "sample_ids": [
+        "gretel:train:61796:067621",
+        "gretel:train:68876:090633"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "18a6a9f2e802bae0",
+      "sample_ids": [
+        "gretel:train:8531:020564",
+        "gretel:train:2132:030753"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "18dfb03c9be610be",
+      "sample_ids": [
+        "gretel:train:26801:012583",
+        "gretel:train:76846:061675"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "18e3c7be39b1546e",
+      "sample_ids": [
+        "gretel:train:52308:006940",
+        "gretel:train:31539:035973",
+        "gretel:train:20521:053082"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "18f463600084fc98",
+      "sample_ids": [
+        "gretel:test:3675:003674",
+        "gretel:train:37029:050994"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "193ffa06a3a1a571",
+      "sample_ids": [
+        "gretel:train:12223:026210",
+        "gretel:train:38077:042055"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1993f3ac6c533c60",
+      "sample_ids": [
+        "gretel:test:650:000649",
+        "gretel:train:35780:049745",
+        "gretel:train:22818:077156"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "19b783d31662d4fb",
+      "sample_ids": [
+        "gretel:train:7128:019161",
+        "gretel:train:36203:050168"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "19d35ef50eb10c9a",
+      "sample_ids": [
+        "gretel:train:68231:047082",
+        "gretel:train:65868:097573"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "19dfe09c2bae5e00",
+      "sample_ids": [
+        "gretel:train:3040:031661",
+        "gretel:train:25205:056142"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1a3350e847c5e711",
+      "sample_ids": [
+        "gretel:train:56230:048666",
+        "gretel:train:87705:098049"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1a3fc527dd7a888b",
+      "sample_ids": [
+        "gretel:train:29995:034429",
+        "gretel:train:34848:038879"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1a4bf12f05d4be9d",
+      "sample_ids": [
+        "gretel:train:44317:028139",
+        "gretel:train:43026:083894"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1aac5110cc1b49f6",
+      "sample_ids": [
+        "gretel:train:74337:007545",
+        "gretel:train:75164:008372",
+        "gretel:train:207:043385"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1ab64996fa227848",
+      "sample_ids": [
+        "gretel:train:2543:031164",
+        "gretel:train:89854:062833",
+        "gretel:train:86709:089126"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1ab7119ac79cc44e",
+      "sample_ids": [
+        "gretel:train:99140:011104",
+        "gretel:train:31758:032220"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1ac6958d4a06a018",
+      "sample_ids": [
+        "gretel:train:7103:019136",
+        "gretel:train:70554:084385",
+        "gretel:train:88150:098494"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1b23f1650d7cad51",
+      "sample_ids": [
+        "gretel:train:32802:033264",
+        "gretel:train:67569:046420"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1b3313345f822a2f",
+      "sample_ids": [
+        "gretel:train:43606:027428",
+        "gretel:train:32124:032586",
+        "gretel:train:94934:093424"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1b4f3d113e3e4765",
+      "sample_ids": [
+        "gretel:train:3110:031731",
+        "gretel:train:18517:037571",
+        "gretel:train:80348:075181"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1b67e5226c22ea76",
+      "sample_ids": [
+        "gretel:train:50724:016957",
+        "gretel:train:17626:036680",
+        "gretel:train:1180:044358"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1b6d9ed2cabe99e3",
+      "sample_ids": [
+        "gretel:train:49296:015529",
+        "gretel:train:35387:049352"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1bb34eab3cf159b7",
+      "sample_ids": [
+        "gretel:train:15256:023267",
+        "gretel:train:72876:029252",
+        "gretel:train:53525:053915"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1bd94e7629ce1d31",
+      "sample_ids": [
+        "gretel:train:61982:067807",
+        "gretel:train:72020:085851"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1c05ef91246b2a63",
+      "sample_ids": [
+        "gretel:test:4228:004227",
+        "gretel:train:303:043481"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1c5d392a4ac562c1",
+      "sample_ids": [
+        "gretel:train:38065:042043",
+        "gretel:train:77037:061866"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1c8e7188a9d58a5b",
+      "sample_ids": [
+        "gretel:train:4120:002543",
+        "gretel:train:10556:018546"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1cdaa8bca8510c9c",
+      "sample_ids": [
+        "gretel:train:14511:022522",
+        "gretel:train:93027:095441"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1cf4423a68bc01ec",
+      "sample_ids": [
+        "gretel:train:79112:058426",
+        "gretel:train:39295:068639",
+        "gretel:train:42016:082884"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1d43f1485032e7b3",
+      "sample_ids": [
+        "gretel:train:51146:005778",
+        "gretel:train:18278:037332"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1d70d0a728ddf3d8",
+      "sample_ids": [
+        "gretel:train:5241:000144",
+        "gretel:train:12119:026106"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1d7a6ce295a2177e",
+      "sample_ids": [
+        "gretel:train:34807:038838",
+        "gretel:train:67591:046442",
+        "gretel:train:42701:083569"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1d9eda1c4aaca2e3",
+      "sample_ids": [
+        "gretel:train:19116:051677",
+        "gretel:train:68585:090342"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1da45877dfbfd257",
+      "sample_ids": [
+        "gretel:train:53247:053637",
+        "gretel:train:77211:062040"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1db426f533db2aec",
+      "sample_ids": [
+        "gretel:train:31370:035804",
+        "gretel:train:68695:090452"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1e0c7d274a63cb8f",
+      "sample_ids": [
+        "gretel:train:50823:017056",
+        "gretel:train:88940:099284"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1e0eb63d0652397f",
+      "sample_ids": [
+        "gretel:train:10306:018296",
+        "gretel:train:13736:021747",
+        "gretel:train:76700:061529"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1e41ef1319f94035",
+      "sample_ids": [
+        "gretel:test:4013:004012",
+        "gretel:train:88005:098349"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 4,
+      "hash": "1e608d54d88c3597",
+      "sample_ids": [
+        "gretel:train:50343:016576",
+        "gretel:train:73852:030228",
+        "gretel:train:58155:060483",
+        "gretel:train:89592:099936"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1e965309f32acf54",
+      "sample_ids": [
+        "gretel:train:31813:032275",
+        "gretel:train:77427:062256",
+        "gretel:train:62486:068311"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1ea28e97b58c7abe",
+      "sample_ids": [
+        "gretel:train:29666:005448",
+        "gretel:train:66739:045590"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1ea2953468d2bd57",
+      "sample_ids": [
+        "gretel:train:34976:039007",
+        "gretel:train:60955:066780",
+        "gretel:train:64066:081875"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1eaaaf04a610a982",
+      "sample_ids": [
+        "gretel:train:13469:021480",
+        "gretel:train:96010:039720",
+        "gretel:train:65714:097419"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1eeb78911ec417f9",
+      "sample_ids": [
+        "gretel:test:326:000325",
+        "gretel:train:49284:015517"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1f3e555e015190b8",
+      "sample_ids": [
+        "gretel:train:34114:038145",
+        "gretel:train:48442:074187",
+        "gretel:train:22929:077267"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1f5d476d045fa218",
+      "sample_ids": [
+        "gretel:train:6219:001122",
+        "gretel:train:23902:078240",
+        "gretel:train:92922:095336"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1f9aeff3d17b1f4b",
+      "sample_ids": [
+        "gretel:test:2975:002974",
+        "gretel:train:84489:071374"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1fc50fed2a6c6838",
+      "sample_ids": [
+        "gretel:test:1003:001002",
+        "gretel:train:97337:041047"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1fc58d0cc1d25ec0",
+      "sample_ids": [
+        "gretel:test:776:000775",
+        "gretel:train:791:043969"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "1fc72ede24580a76",
+      "sample_ids": [
+        "gretel:train:5850:000753",
+        "gretel:train:96235:039945",
+        "gretel:train:24954:055891"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "1fee50ae8733b2a3",
+      "sample_ids": [
+        "gretel:train:77334:062163",
+        "gretel:train:62237:068062"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "200d32f9e8ba7afe",
+      "sample_ids": [
+        "gretel:train:82451:079312",
+        "gretel:train:82650:079511"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "2058d930bea9bbe5",
+      "sample_ids": [
+        "gretel:test:2725:002724",
+        "gretel:train:56361:048797",
+        "gretel:train:88686:099030"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "20d3dd353e4c4745",
+      "sample_ids": [
+        "gretel:train:74578:007786",
+        "gretel:train:92965:095379",
+        "gretel:train:89413:099757"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "20d82e8feba86e32",
+      "sample_ids": [
+        "gretel:train:72490:028866",
+        "gretel:train:18598:037652"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 6,
+      "hash": "211256e01240f1b8",
+      "sample_ids": [
+        "gretel:train:8907:020940",
+        "gretel:train:13311:021322",
+        "gretel:train:16414:024425",
+        "gretel:train:35122:039153",
+        "gretel:train:82178:079039",
+        "gretel:train:88495:098839"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 6,
+      "hash": "2130109bda5d1b1c",
+      "sample_ids": [
+        "gretel:train:49477:015710",
+        "gretel:train:8736:020769",
+        "gretel:train:2404:031025",
+        "gretel:train:91213:064192",
+        "gretel:train:23109:077447",
+        "gretel:train:63563:081372"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "2152dd434b191c3b",
+      "sample_ids": [
+        "gretel:train:99804:011768",
+        "gretel:train:7825:019858",
+        "gretel:train:76474:061303"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "219dfad5953824a8",
+      "sample_ids": [
+        "gretel:train:6415:001318",
+        "gretel:train:1665:044843"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 4,
+      "hash": "21cc6ac6093ed01c",
+      "sample_ids": [
+        "gretel:train:29029:004811",
+        "gretel:train:16860:024871",
+        "gretel:train:57407:059735",
+        "gretel:train:77125:061954"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "21eb0e61b462cb65",
+      "sample_ids": [
+        "gretel:train:4479:002902",
+        "gretel:train:46624:087901"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "2217f2c4d08bd5ab",
+      "sample_ids": [
+        "gretel:train:75986:009194",
+        "gretel:train:50522:016755"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "22433f6b7942b3ff",
+      "sample_ids": [
+        "gretel:train:27469:013251",
+        "gretel:train:41932:082800"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "225f3177634f4652",
+      "sample_ids": [
+        "gretel:train:4771:003194",
+        "gretel:train:51808:006440",
+        "gretel:train:33937:037968"
+      ],
+      "splits": [
+        "train"
+      ]
+    }
+  ],
+  "sql_duplicates": [
+    {
+      "count": 2,
+      "hash": "009a8ed2c2a9f062211e71c353ee142dee4ce28bc0ed831ca3948050f9eb3674",
+      "sample_ids": [
+        "gretel:train:53633:054023",
+        "gretel:train:86359:088776"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "01368b1c4f64f0fcb61d5c7fb85a495c2f6634329b43dcc195326a5c73d2f3e5",
+      "sample_ids": [
+        "gretel:train:38254:042232",
+        "gretel:train:91948:094362"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "0558b668abf58ba382285bc5defd1201266c0da815f415a518a2716e71bbd98b",
+      "sample_ids": [
+        "gretel:train:99314:011278",
+        "gretel:train:78224:057538"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "237e37d8d356c909a8e98ce63c3969f2c73d410a9d78019d7d34504b15b6670a",
+      "sample_ids": [
+        "gretel:train:4479:002902",
+        "gretel:train:69721:091478"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "23d530c1c5f99d05ddedc325bafa2b3a5ddc3ab7980a593b678c793aa92262a3",
+      "sample_ids": [
+        "gretel:train:24361:055298",
+        "gretel:train:86823:089240"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "2825ceb3b20226f726675ff87aa7852d75f590f95a118c703a5073be1923946f",
+      "sample_ids": [
+        "gretel:train:55381:047817",
+        "gretel:train:77459:062288"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "30ca7cbf6e63077b9bab90975dbbc64343b8fdded2f6449a1d0d1260c813be8b",
+      "sample_ids": [
+        "gretel:train:42337:083205",
+        "gretel:train:88478:098822"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "3142e3a334bb4e75533af523bec9694735301781d2ca2177c48f6102460472f8",
+      "sample_ids": [
+        "gretel:train:43312:027134",
+        "gretel:train:45506:086783"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "331d35a42db6c3bb0b63b4d75ff45dc9b8a9e3743fd8a0c7c06b79923ce82dbf",
+      "sample_ids": [
+        "gretel:train:38077:042055",
+        "gretel:train:55682:048118"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "434916f3e54f3dc38f33f693273789fb214f68d6f2832c9e8a9b35efc0c2d78d",
+      "sample_ids": [
+        "gretel:train:26699:012481",
+        "gretel:train:59147:064972",
+        "gretel:train:80657:075490"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "4f0f214521d501e520973b3c8d02b212c6c56cb13d12cb3eaf780f2266047939",
+      "sample_ids": [
+        "gretel:train:75514:008722",
+        "gretel:train:98442:010406"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "50a8d7ea28cc99db5327a0b2db7b7f55f7605d46a063c77eb63110551edf4e6b",
+      "sample_ids": [
+        "gretel:train:32576:033038",
+        "gretel:train:90409:063388"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "56b75c181f96427619db029dc0d0b5e9fdd0fbea4f6a6285ad6cc78f43896bf1",
+      "sample_ids": [
+        "gretel:train:73487:029863",
+        "gretel:train:36237:050202"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "5c1ac1ab45e6d0b5e8890ff650938ca3fc47bc990f09dfbb45df87657d7d0631",
+      "sample_ids": [
+        "gretel:train:52647:007279",
+        "gretel:train:18273:037327"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "5e7e7368d659257ec0d26aa00c19cbb25eb2b2ad4ab58304a388748e30d821e9",
+      "sample_ids": [
+        "gretel:train:71383:085214",
+        "gretel:train:88550:098894"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "621d059bfae952bced183fc39cc2bad8716dcc57f93b839ce04839a8789cdae2",
+      "sample_ids": [
+        "gretel:train:68231:047082",
+        "gretel:train:65868:097573"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "6d23c673668cc0e8d25e227fe607a2b2f34b556acf1f6fb990795ae65863812b",
+      "sample_ids": [
+        "gretel:train:18255:037309",
+        "gretel:train:22868:077206"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "6f4e9023633046a7e7ae3774a423966504b31e48de1739cba43c960540b7cba9",
+      "sample_ids": [
+        "gretel:train:96234:039944",
+        "gretel:train:39986:069330"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "71ba194cde384b4ab9b9174975fc5399b27b8ef3e7a18f3643dfc7819f227cd7",
+      "sample_ids": [
+        "gretel:train:57824:060152",
+        "gretel:train:58968:064793"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "767f739a3cb3e7d67413652f8338230e3d79cce5a79fe2101c0190679c510cbb",
+      "sample_ids": [
+        "gretel:train:8760:020793",
+        "gretel:train:90872:063851"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "77ecfb15dcd0c95e71468d40f45d874b18c7fadc467eb2a25301315364918574",
+      "sample_ids": [
+        "gretel:test:536:000535",
+        "gretel:train:19008:051569"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "7caf4b1f42eb8cb90410bda65dc410fe67eda8dc946ff00cdb2d1455c9e4a943",
+      "sample_ids": [
+        "gretel:train:75524:008732",
+        "gretel:train:41953:082821"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "80afc16d38d45d405430c910c78bb09623a130c950b642ec8499e9e7bb6d0cc9",
+      "sample_ids": [
+        "gretel:test:2467:002466",
+        "gretel:train:76286:061115"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "88c7b5fb39f68ca602483e0000f04c5f5217c35a026c8cbebef900cca0961e31",
+      "sample_ids": [
+        "gretel:test:3966:003965",
+        "gretel:train:98642:010606"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "98522cd11cf96db6c63f948c19e4a7247d86363ed01f37df5f4b63fb5896afd4",
+      "sample_ids": [
+        "gretel:train:59185:065010",
+        "gretel:train:64713:096418"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "9d1605f37a464e5ebe7cabf74a931dac9cb1a37e25cb271fafa8176460bec805",
+      "sample_ids": [
+        "gretel:train:27085:012867",
+        "gretel:train:78709:058023"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "a07de01921fa1f5937e0d9f74f4bcb3d99d99d06f547c4772ee3e30e31715e77",
+      "sample_ids": [
+        "gretel:test:5259:005258",
+        "gretel:train:52660:007292"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "a0ba2857840d6007803e2be753ed0205acc5c29033a8df58f28299f3cf736364",
+      "sample_ids": [
+        "gretel:train:16099:024110",
+        "gretel:train:77069:061898"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "a265716697cae5fadfd01e9c2da15dd624ba380790c615615bba80340e8e2179",
+      "sample_ids": [
+        "gretel:train:60858:066683",
+        "gretel:train:23426:077764"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "a4c6c998870b33937879571ff90c6c9493ccbce62dda739149106c967113e9f5",
+      "sample_ids": [
+        "gretel:train:73617:029993",
+        "gretel:train:54682:055072"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "b04c77e51c82ebdc5c6617206bdb3471e6eb1bed97996e798012b4b59f1d30d6",
+      "sample_ids": [
+        "gretel:test:5008:005007",
+        "gretel:train:71436:085267"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 3,
+      "hash": "b2487f1fd8bc086cbff7483d3bb67b39f6f508388cca4c976fc5ceb89413a48c",
+      "sample_ids": [
+        "gretel:train:52388:007020",
+        "gretel:train:49591:015824",
+        "gretel:train:47574:073319"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "b9aa150ff0524c31f8739eca1d60c037b651d11b8a723e195b0b813e09d45adf",
+      "sample_ids": [
+        "gretel:train:7654:019687",
+        "gretel:train:88529:098873"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "ba69febad8f9c4ff926fbb4769066fcc08b47205a677816f1f2d4792f3f957a6",
+      "sample_ids": [
+        "gretel:train:23013:077351",
+        "gretel:train:87630:090047"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "bc967056c33fba110951d45c10d67eb521cdacd59d98a51bcc28a35e445c4b80",
+      "sample_ids": [
+        "gretel:train:77911:057225",
+        "gretel:train:78815:058129"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "c9274b5d1f85f80fa9f121cebb87cb4996a1a26ba9940a3a67b68fd879faf360",
+      "sample_ids": [
+        "gretel:train:39548:068892",
+        "gretel:train:63848:081657"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "cf8248176331fcce5c4fbf63dac9e03753cf2644a81ef75172a64ca646a7db71",
+      "sample_ids": [
+        "gretel:train:51538:006170",
+        "gretel:train:17237:036291"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "cf9fd96645a18dec9d637d66f5d95b6f8faf910df008ce60845106e6dac5b678",
+      "sample_ids": [
+        "gretel:train:5840:000743",
+        "gretel:train:24527:055464"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 4,
+      "hash": "d0f9b7679ae6b3dacc470afca61a73ab8c0b002b43718b09749d13d57d6a242b",
+      "sample_ids": [
+        "gretel:train:44682:028504",
+        "gretel:train:17188:036242",
+        "gretel:train:53867:054257",
+        "gretel:train:26014:056951"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "d29a586823d92dab31b9273357ddca899dd87388f07a19fdc3bfd8f6c4862360",
+      "sample_ids": [
+        "gretel:train:17321:036375",
+        "gretel:train:94088:092578"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "d2a41b17a97501aa1dadbfd9bf87c731ae25fad91a8630e3e85749e3b10c8d68",
+      "sample_ids": [
+        "gretel:train:47222:072967",
+        "gretel:train:45425:086702"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "d6a6279f7db4b5067f02934b9022ffb4469335e9e39426b9da9c2b7331d02204",
+      "sample_ids": [
+        "gretel:test:3378:003377",
+        "gretel:train:63496:081305"
+      ],
+      "splits": [
+        "test",
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "dd0b0f57170c9f093b2cf828b9120bad7a157c10f04e3fc78ead2890f30c199a",
+      "sample_ids": [
+        "gretel:train:72493:028869",
+        "gretel:train:94395:092885"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "de2864bb1b85d369f6c1f0200bac7616f9e22c748a6b11e5a5382365b6f26400",
+      "sample_ids": [
+        "gretel:train:36758:050723",
+        "gretel:train:89153:099497"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "e72c908bdb5c7a982e0157693872ac519507aaa617eb54acb67d99b793e2fccf",
+      "sample_ids": [
+        "gretel:train:8399:020432",
+        "gretel:train:39450:068794"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "eb80901cc7da49b18c4f7e16c8ef543b8dacfbdf4555c58bbb7a293ed2e4fcfc",
+      "sample_ids": [
+        "gretel:train:98347:010311",
+        "gretel:train:53015:053405"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "ec33b20d85ebd977cb945fff19cf0af5aa3a4cdfa0d0562ea628fe1eba8dbff1",
+      "sample_ids": [
+        "gretel:train:31094:035528",
+        "gretel:train:56033:048469"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "eebd92d7b4d54485b271d0cfa6bd6b0b461987cc5cf6cd8ab2b09312c5e6a3ad",
+      "sample_ids": [
+        "gretel:train:19215:051776",
+        "gretel:train:91895:094309"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "f0b030fecd7b1172a26f5bd3dac54fb96fe2e858f56ae9b3f648d458aee6b629",
+      "sample_ids": [
+        "gretel:train:44716:028538",
+        "gretel:train:72415:028791"
+      ],
+      "splits": [
+        "train"
+      ]
+    },
+    {
+      "count": 2,
+      "hash": "f1d6378cd33825f877782a2c61b3036fa4c8a474a2184f63c7aaca348ea546d9",
+      "sample_ids": [
+        "gretel:train:1412:044590",
+        "gretel:train:53323:053713"
+      ],
+      "splits": [
+        "train"
+      ]
+    }
+  ]
+}

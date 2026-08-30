@@ -1,0 +1,13 @@
+{
+  "failure_reason_counts": {
+    "gold_execution_failure": 64,
+    "missing_column": 20,
+    "missing_table": 213,
+    "sqlite_dialect_incompatible": 241
+  },
+  "status_counts": {
+    "failure": 538,
+    "not_run": 213,
+    "success": 9158
+  }
+}

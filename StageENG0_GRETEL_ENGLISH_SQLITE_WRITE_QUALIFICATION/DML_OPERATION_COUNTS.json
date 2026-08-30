@@ -1,0 +1,19 @@
+{
+  "by_operation": {
+    "DELETE": 3427,
+    "INSERT": 3454,
+    "OTHER": 95942,
+    "UPDATE": 3028
+  },
+  "dml_total": 9909,
+  "malformed": 46,
+  "multi_statement": 496,
+  "raw_total": 105851,
+  "scanner_status_counts": {
+    "dml": 9696,
+    "malformed": 46,
+    "multi_statement": 496,
+    "other": 95613
+  },
+  "unsupported_or_other": 95942
+}

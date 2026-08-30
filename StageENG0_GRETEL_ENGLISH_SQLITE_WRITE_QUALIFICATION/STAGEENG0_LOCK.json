@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-08-30T02:39:53.090391+00:00",
+  "dataset_id": "gretelai/synthetic_text_to_sql",
+  "dml_total": 9909,
+  "git_branch": "stage6/crudsql-eligibility-audit",
+  "git_commit": "6aba9a40de238f272ae7d4a907f797ef65bf875a",
+  "gpu_called": false,
+  "model_called": false,
+  "raw_total": 105851,
+  "revision": "740ab236e64503fba51be1101df7a1be83bf455d",
+  "stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION",
+  "status": "PASS_QUALIFICATION_ARTIFACTS_BUILT"
+}

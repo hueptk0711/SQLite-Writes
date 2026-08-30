@@ -1,0 +1,35 @@
+{
+  "dataset_id": "gretelai/synthetic_text_to_sql",
+  "dataset_url": "https://huggingface.co/datasets/gretelai/synthetic_text_to_sql",
+  "download_date_utc": "2026-08-30",
+  "downloaded_with": {
+    "parquet_reader": "pyarrow.parquet",
+    "raw_file_transport": "urllib.request or pre-downloaded Hugging Face resolve URLs"
+  },
+  "gpu_called": false,
+  "license": "apache-2.0",
+  "model_called": false,
+  "raw_dir": "D:\\paper kltn\\text to sql\\external_sources\\gretel_synthetic_text_to_sql_740ab236",
+  "raw_files": {
+    "test": {
+      "bytes": 1901018,
+      "filename": "synthetic_text_to_sql_test.snappy.parquet",
+      "row_count": 5851,
+      "sha256": "f2056edcd897db59c89d12bde149a36d4e242ac0d2c6d4d42b1f2bc764318993",
+      "url": "https://huggingface.co/datasets/gretelai/synthetic_text_to_sql/resolve/740ab236e64503fba51be1101df7a1be83bf455d/synthetic_text_to_sql_test.snappy.parquet"
+    },
+    "train": {
+      "bytes": 32363736,
+      "filename": "synthetic_text_to_sql_train.snappy.parquet",
+      "row_count": 100000,
+      "sha256": "2bee9ac07cf5057d36b5ea30fb47d948697e882f42bd1cc661185396287c0180",
+      "url": "https://huggingface.co/datasets/gretelai/synthetic_text_to_sql/resolve/740ab236e64503fba51be1101df7a1be83bf455d/synthetic_text_to_sql_train.snappy.parquet"
+    }
+  },
+  "revision": "740ab236e64503fba51be1101df7a1be83bf455d",
+  "splits": [
+    "test",
+    "train"
+  ],
+  "stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION"
+}

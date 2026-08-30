@@ -1,0 +1,12 @@
+{
+  "test": {
+    "bytes": 1901018,
+    "filename": "synthetic_text_to_sql_test.snappy.parquet",
+    "sha256": "f2056edcd897db59c89d12bde149a36d4e242ac0d2c6d4d42b1f2bc764318993"
+  },
+  "train": {
+    "bytes": 32363736,
+    "filename": "synthetic_text_to_sql_train.snappy.parquet",
+    "sha256": "2bee9ac07cf5057d36b5ea30fb47d948697e882f42bd1cc661185396287c0180"
+  }
+}

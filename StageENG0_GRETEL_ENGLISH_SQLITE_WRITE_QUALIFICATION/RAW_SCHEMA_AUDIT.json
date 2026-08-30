@@ -1,0 +1,169 @@
+{
+  "dataset_id": "gretelai/synthetic_text_to_sql",
+  "duplicate_id_rows_by_split": {
+    "test": 0,
+    "train": 0
+  },
+  "exact_duplicate_prompt_sql_pairs": 0,
+  "exact_duplicate_prompts": 0,
+  "exact_duplicate_sql": 809,
+  "expected_fields": [
+    "id",
+    "domain",
+    "domain_description",
+    "sql_complexity",
+    "sql_complexity_description",
+    "sql_task_type",
+    "sql_task_type_description",
+    "sql_prompt",
+    "sql_context",
+    "sql",
+    "sql_explanation"
+  ],
+  "field_count": 11,
+  "fields": {
+    "domain": {
+      "examples": [
+        "forestry",
+        "defense industry",
+        "marine biology"
+      ],
+      "non_null": 105851,
+      "types": {
+        "str": 105851
+      }
+    },
+    "domain_description": {
+      "examples": [
+        "Comprehensive data on sustainable forest management, timber production, wildlife habitat, and carbon sequestration in forestry.",
+        "Defense contract data, military equipment maintenance, threat intelligence metrics, and veteran employment stats.",
+        "Comprehensive data on marine species, oceanography, conservation efforts, and climate change impacts in marine biology."
+      ],
+      "non_null": 105851,
+      "types": {
+        "str": 105851
+      }
+    },
+    "id": {
+      "examples": [
+        5097,
+        5098,
+        5099
+      ],
+      "non_null": 105851,
+      "types": {
+        "int": 105851
+      }
+    },
+    "sql": {
+      "examples": [
+        "SELECT salesperson_id, name, SUM(volume) as total_volume FROM timber_sales JOIN salesperson ON timber_sales.salesperson_id = salesperson.salesperson_id GROUP BY salesperson_id, name ORDER BY total_volume DESC;",
+        "SELECT equipment_type, SUM(maintenance_frequency) AS total_maintenance_frequency FROM equipment_maintenance GROUP BY equipment_type;",
+        "SELECT COUNT(*) FROM marine_species WHERE location = 'Southern Ocean';"
+      ],
+      "non_null": 105851,
+      "types": {
+        "str": 105851
+      }
+    },
+    "sql_complexity": {
+      "examples": [
+        "single join",
+        "aggregation",
+        "basic SQL"
+      ],
+      "non_null": 105851,
+      "types": {
+        "str": 105851
+      }
+    },
+    "sql_complexity_description": {
+      "examples": [
+        "only one join (specify inner, outer, cross)",
+        "aggregation functions (COUNT, SUM, AVG, MIN, MAX, etc.), and HAVING clause",
+        "basic SQL with a simple select statement"
+      ],
+      "non_null": 105851,
+      "types": {
+        "str": 105851
+      }
+    },
+    "sql_context": {
+      "examples": [
+        "CREATE TABLE salesperson (salesperson_id INT, name TEXT, region TEXT); INSERT INTO salesperson (salesperson_id, name, region) VALUES (1, 'John Doe', 'North'), (2, 'Jane Smith', 'South'); CREATE TABLE timber_sales (sales_id INT, salesperson_id INT, volume REAL, sale_date DATE); INSERT INTO timber_sales (sales_id, salesperson_id, volume, sale_date) VALUES (1, 1, 120, '2021-01-01'), (2, 1, 150, '2021-02-01'), (3, 2, 180, '2021-01-01');",
+        "CREATE TABLE equipment_maintenance (equipment_type VARCHAR(255), maintenance_frequency INT);",
+        "CREATE TABLE marine_species (name VARCHAR(50), common_name VARCHAR(50), location VARCHAR(50));"
+      ],
+      "non_null": 105851,
+      "types": {
+        "str": 105851
+      }
+    },
+    "sql_explanation": {
+      "examples": [
+        "Joins timber_sales and salesperson tables, groups sales by salesperson, calculates total volume sold by each salesperson, and orders the results by total volume in descending order.",
+        "This query groups the equipment_maintenance table by equipment_type and calculates the sum of maintenance_frequency for each group, then returns the equipment_type and the corresponding total_maintenance_frequency.",
+        "This query counts the number of marine species found in the Southern Ocean by using the COUNT() function with a WHERE clause."
+      ],
+      "non_null": 105851,
+      "types": {
+        "str": 105851
+      }
+    },
+    "sql_prompt": {
+      "examples": [
+        "What is the total volume of timber sold by each salesperson, sorted by salesperson?",
+        "List all the unique equipment types and their corresponding total maintenance frequency from the equipment_maintenance table.",
+        "How many marine species are found in the Southern Ocean?"
+      ],
+      "non_null": 105851,
+      "types": {
+        "str": 105851
+      }
+    },
+    "sql_task_type": {
+      "examples": [
+        "analytics and reporting",
+        "analytics and reporting",
+        "analytics and reporting"
+      ],
+      "non_null": 105851,
+      "types": {
+        "str": 105851
+      }
+    },
+    "sql_task_type_description": {
+      "examples": [
+        "generating reports, dashboards, and analytical insights",
+        "generating reports, dashboards, and analytical insights",
+        "generating reports, dashboards, and analytical insights"
+      ],
+      "non_null": 105851,
+      "types": {
+        "str": 105851
+      }
+    }
+  },
+  "observed_fields": [
+    "domain",
+    "domain_description",
+    "id",
+    "sql",
+    "sql_complexity",
+    "sql_complexity_description",
+    "sql_context",
+    "sql_explanation",
+    "sql_prompt",
+    "sql_task_type",
+    "sql_task_type_description"
+  ],
+  "parquet_schemas": {
+    "test": "id: int32 not null\ndomain: string\ndomain_description: string\nsql_complexity: string not null\nsql_complexity_description: string not null\nsql_task_type: string not null\nsql_task_type_description: string not null\nsql_prompt: string\nsql_context: string\nsql: string\nsql_explanation: string\n-- schema metadata --\norg.apache.spark.timeZone: 'Etc/UTC'\norg.apache.spark.legacyINT96: ''\norg.apache.spark.version: '3.5.0'\norg.apache.spark.sql.parquet.row.metadata: '{\"type\":\"struct\",\"fields\":[{\"' + 786\norg.apache.spark.legacyDateTime: ''",
+    "train": "id: int32\ndomain: string\ndomain_description: string\nsql_complexity: string\nsql_complexity_description: string\nsql_task_type: string\nsql_task_type_description: string\nsql_prompt: string\nsql_context: string\nsql: string\nsql_explanation: string\n-- schema metadata --\norg.apache.spark.timeZone: 'Etc/UTC'\norg.apache.spark.legacyINT96: ''\norg.apache.spark.version: '3.5.0'\norg.apache.spark.sql.parquet.row.metadata: '{\"type\":\"struct\",\"fields\":[{\"' + 781\norg.apache.spark.legacyDateTime: ''"
+  },
+  "revision": "740ab236e64503fba51be1101df7a1be83bf455d",
+  "split_counts": {
+    "test": 5851,
+    "train": 100000
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "dataset_exclusion_reasons": {
+    "gold_execution_failure": 221,
+    "missing_column": 97,
+    "missing_table": 321,
+    "multi_statement": 213,
+    "nondeterministic": 248,
+    "sqlite_dialect_incompatible": 365
+  },
+  "eligible": 8476,
+  "excluded": 1433,
+  "primary_scope_exclusion_reasons": {
+    "ambiguous_multiple_occurrences": 489,
+    "derived_value_not_supported": 267,
+    "implicit_value_not_supported": 3000,
+    "multirow_not_in_primary_scope": 463,
+    "not_primary_insert_scope": 5603
+  }
+}

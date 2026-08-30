@@ -1,0 +1,11 @@
+{
+  "complex_delete": 454,
+  "delete_all_rows": 47,
+  "insert_select": 240,
+  "multi_row_insert": 525,
+  "simple_delete_predicate": 2926,
+  "simple_update_literal": 2479,
+  "single_row_insert": 2689,
+  "update_expression": 504,
+  "update_subquery": 45
+}

@@ -1,0 +1,18 @@
+{
+  "all_group_count": 7613,
+  "candidate_grouping_key": "sha256(domain + sql_context)",
+  "cross_official_split_schema_group_count": 203,
+  "eligible_counts_by_operation": {
+    "DELETE": 2808,
+    "INSERT": 2997,
+    "UPDATE": 2671
+  },
+  "eligible_group_count": 6455,
+  "official_splits_observed": [
+    "test",
+    "train"
+  ],
+  "official_test_policy": "hold_out_from_phase_o_tuning",
+  "proposed_next_stage": "StageENG1 should freeze group-level development split; no model run in StageENG0.",
+  "stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION"
+}

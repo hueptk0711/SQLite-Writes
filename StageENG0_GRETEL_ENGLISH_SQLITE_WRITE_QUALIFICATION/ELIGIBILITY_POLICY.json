@@ -1,0 +1,36 @@
+{
+  "controlled_exclusion_reasons": [
+    "ambiguous_multiple_occurrences",
+    "context_parse_failure",
+    "derived_value_not_supported",
+    "gold_execution_failure",
+    "implicit_value_not_supported",
+    "malformed_sql",
+    "missing_column",
+    "missing_table",
+    "multi_statement",
+    "non_english",
+    "nonalignable_normalization",
+    "nondeterministic",
+    "sqlite_dialect_incompatible"
+  ],
+  "frozen_before_manifest_generation": true,
+  "model_outputs_allowed": false,
+  "primary_eligible_requires": [
+    "English natural-language prompt",
+    "exactly one gold write statement",
+    "operation in INSERT, UPDATE, DELETE",
+    "sql_context executes directly in SQLite without dialect rewrite",
+    "target table and referenced target columns exist in SQLite schema",
+    "gold write executes with PRAGMA foreign_keys=ON",
+    "D0 and D* snapshots are reproducible from fresh context",
+    "no external time/random state dependency",
+    "source-alignability is derived from gold SQL and prompt only"
+  ],
+  "stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION",
+  "v2_literal_grounded_primary_scope": [
+    "INSERT",
+    "single_row_insert",
+    "source_alignable_literal"
+  ]
+}
