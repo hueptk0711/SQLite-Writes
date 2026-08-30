@@ -1,0 +1,22 @@
+{
+  "created_utc": "2026-08-30T13:49:49.187709+00:00",
+  "derived_artifact_manifest_sha256": "784749bac126078b146a9fcd5632f6433e940406f431c32643486c43cfebf7b9",
+  "git_branch": "stage6/crudsql-eligibility-audit",
+  "git_commit": "ab006242bc498c343fe9573c893283a9733bcc1f",
+  "gpu_called": false,
+  "gretel_pilot_opened": false,
+  "mock_dry_run_only": true,
+  "model_called": false,
+  "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "patch": "PATCH0",
+  "phase_o_prompt_spec_path": "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT/PHASE_O_PROMPT_SPEC_A3_ENGLISH.json",
+  "primary_acceptance": "8/8 required; no average and no 7/8 acceptance",
+  "primary_case_count": 8,
+  "repair": "none",
+  "retry": 0,
+  "stage": "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT",
+  "status": "PASS_PROTOCOL_READY_FOR_REAL_QWEN_RUN",
+  "two_call_architecture": true,
+  "zero_shot": true
+}

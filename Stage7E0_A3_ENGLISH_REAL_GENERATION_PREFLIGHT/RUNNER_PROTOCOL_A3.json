@@ -1,0 +1,44 @@
+{
+  "acceptance": {
+    "averaging_allowed": false,
+    "diagnostics_after_primary_freeze_only": [
+      "4 A2 fresh English cases",
+      "2 old PATCH9/Alice diagnostics"
+    ],
+    "gretel_pilot_gate": "open 100-sample Gretel development-train pilot only after 8/8 primary PASS",
+    "required_pass_count": "8/8",
+    "seven_of_eight_allowed": false
+  },
+  "accepted_protocol_commit": "ab006242bc498c343fe9573c893283a9733bcc1f",
+  "generation_contract": {
+    "backend": "same PATCH9 incremental parser/materializer/compiler/preflight path",
+    "calls_per_successful_case": 2,
+    "examples": [],
+    "phase_m_calls": 1,
+    "phase_o_calls": 1,
+    "primary_cases": "8 fresh Stage7C-A3 English cases",
+    "repair": "none",
+    "retry": 0,
+    "zero_shot": true
+  },
+  "model": {
+    "default_server_model_path": "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "deterministic_decoding": {
+      "do_sample": false,
+      "seed": 42
+    },
+    "expected_chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "quantization_default": "4bit"
+  },
+  "patch": "PATCH0",
+  "prompt_contract": {
+    "offset_guide_serializer_changed": false,
+    "phase_m_changed": false,
+    "phase_m_prompt_spec_path": "stage7c_a1_v2_development_protocol/PHASE_M_PROMPT_SPEC.json",
+    "phase_o_load_policy": "load exact Stage7C-A3 prompt spec directly before generation",
+    "phase_o_prompt_spec_path": "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT/PHASE_O_PROMPT_SPEC_A3_ENGLISH.json"
+  },
+  "stage": "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT"
+}

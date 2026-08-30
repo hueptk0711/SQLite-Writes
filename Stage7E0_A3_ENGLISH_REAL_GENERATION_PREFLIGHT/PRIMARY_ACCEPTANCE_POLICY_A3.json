@@ -1,0 +1,10 @@
+{
+  "averaging_allowed": false,
+  "diagnostics_after_primary_freeze_only": [
+    "4 A2 fresh English cases",
+    "2 old PATCH9/Alice diagnostics"
+  ],
+  "gretel_pilot_gate": "open 100-sample Gretel development-train pilot only after 8/8 primary PASS",
+  "required_pass_count": "8/8",
+  "seven_of_eight_allowed": false
+}

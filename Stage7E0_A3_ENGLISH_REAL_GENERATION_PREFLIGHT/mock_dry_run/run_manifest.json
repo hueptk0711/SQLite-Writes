@@ -1,0 +1,21 @@
+{
+  "accepted_protocol_commit": "ab006242bc498c343fe9573c893283a9733bcc1f",
+  "git": null,
+  "model": {
+    "backend": "mock",
+    "mock_uses_label_side_expected": true,
+    "model_called": false
+  },
+  "phase_m_prompt_spec_path": "stage7c_a1_v2_development_protocol/PHASE_M_PROMPT_SPEC.json",
+  "phase_o_prompt_spec_path": "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT/PHASE_O_PROMPT_SPEC_A3_ENGLISH.json",
+  "primary_case_count": 8,
+  "primary_first_diagnostics_forbidden_until_freeze": true,
+  "repair": "none",
+  "retry": 0,
+  "stage": "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT",
+  "stage7c_a3_inputs": {
+    "a3_prompt_spec_sha256": "84fece4a8bf64ace7c87fbc3d3425a568ea8ed920ae0461c4892007c2af4f200",
+    "stage7c_lock_sha256": "057b14925cc615d9563dd5c88313a7c91bb03df868a1f3eb9917d6a49f56d105"
+  },
+  "zero_shot": true
+}
