@@ -1,0 +1,319 @@
+{
+  "diagnostic_only": true,
+  "gap_reason_code": "shared_source_span_requires_multiple_gold_assignments",
+  "oracle_construction": "unique acceptable source spans -> maximum-cardinality one-to-one matching -> sorted matched spans",
+  "policy": {
+    "allow_slot_reuse_after_model_performance": false,
+    "duplicate_source_span_post_hoc": false,
+    "exclude_samples_after_model_performance": false,
+    "modify_gold": false,
+    "retain_all_samples_in_primary_denominator": true
+  },
+  "sample_gap_records": [
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 4,
+      "individually_source_alignable": 4,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 3,
+      "sample_id": "stage7c_crudsql_train_create_0123",
+      "split": "train",
+      "unique_acceptable_source_span_count": 3
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 3,
+      "individually_source_alignable": 3,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 2,
+      "sample_id": "stage7c_crudsql_train_create_0248",
+      "split": "train",
+      "unique_acceptable_source_span_count": 2
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 3,
+      "individually_source_alignable": 3,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 2,
+      "sample_id": "stage7c_crudsql_train_create_0249",
+      "split": "train",
+      "unique_acceptable_source_span_count": 2
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 3,
+      "individually_source_alignable": 3,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 2,
+      "sample_id": "stage7c_crudsql_train_create_0278",
+      "split": "train",
+      "unique_acceptable_source_span_count": 2
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 3,
+      "individually_source_alignable": 3,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 2,
+      "sample_id": "stage7c_crudsql_train_create_0301",
+      "split": "train",
+      "unique_acceptable_source_span_count": 2
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 4,
+      "individually_source_alignable": 4,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 3,
+      "sample_id": "stage7c_crudsql_train_create_0315",
+      "split": "train",
+      "unique_acceptable_source_span_count": 3
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 3,
+      "individually_source_alignable": 3,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 2,
+      "sample_id": "stage7c_crudsql_train_create_0394",
+      "split": "train",
+      "unique_acceptable_source_span_count": 2
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 3,
+      "individually_source_alignable": 3,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 2,
+      "sample_id": "stage7c_crudsql_train_create_0905",
+      "split": "train",
+      "unique_acceptable_source_span_count": 2
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 4,
+      "individually_source_alignable": 4,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 3,
+      "sample_id": "stage7c_crudsql_train_create_0939",
+      "split": "train",
+      "unique_acceptable_source_span_count": 3
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 3,
+      "individually_source_alignable": 3,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 2,
+      "sample_id": "stage7c_crudsql_train_create_1227",
+      "split": "train",
+      "unique_acceptable_source_span_count": 2
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 6,
+      "individually_source_alignable": 6,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 5,
+      "sample_id": "stage7c_crudsql_train_create_1427",
+      "split": "train",
+      "unique_acceptable_source_span_count": 5
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 5,
+      "individually_source_alignable": 5,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 4,
+      "sample_id": "stage7c_crudsql_train_create_1472",
+      "split": "train",
+      "unique_acceptable_source_span_count": 4
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 5,
+      "individually_source_alignable": 5,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 4,
+      "sample_id": "stage7c_crudsql_train_create_1473",
+      "split": "train",
+      "unique_acceptable_source_span_count": 4
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 5,
+      "individually_source_alignable": 5,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 4,
+      "sample_id": "stage7c_crudsql_train_create_1474",
+      "split": "train",
+      "unique_acceptable_source_span_count": 4
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 5,
+      "individually_source_alignable": 5,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 4,
+      "sample_id": "stage7c_crudsql_train_create_1475",
+      "split": "train",
+      "unique_acceptable_source_span_count": 4
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 6,
+      "individually_source_alignable": 6,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 5,
+      "sample_id": "stage7c_crudsql_train_create_1492",
+      "split": "train",
+      "unique_acceptable_source_span_count": 5
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 6,
+      "individually_source_alignable": 5,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 4,
+      "sample_id": "stage7c_crudsql_train_create_1493",
+      "split": "train",
+      "unique_acceptable_source_span_count": 4
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 6,
+      "individually_source_alignable": 6,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 5,
+      "sample_id": "stage7c_crudsql_train_create_1494",
+      "split": "train",
+      "unique_acceptable_source_span_count": 5
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 6,
+      "individually_source_alignable": 6,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 5,
+      "sample_id": "stage7c_crudsql_train_create_1495",
+      "split": "train",
+      "unique_acceptable_source_span_count": 5
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 5,
+      "individually_source_alignable": 5,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 4,
+      "sample_id": "stage7c_crudsql_train_create_1554",
+      "split": "train",
+      "unique_acceptable_source_span_count": 4
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 5,
+      "individually_source_alignable": 5,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 4,
+      "sample_id": "stage7c_crudsql_train_create_1555",
+      "split": "train",
+      "unique_acceptable_source_span_count": 4
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 5,
+      "individually_source_alignable": 5,
+      "joint_reuse_deficit": 2,
+      "jointly_representable": 3,
+      "sample_id": "stage7c_crudsql_train_create_1651",
+      "split": "train",
+      "unique_acceptable_source_span_count": 3
+    },
+    {
+      "diagnostic_reasons": [
+        "shared_source_span_requires_multiple_gold_assignments"
+      ],
+      "gold_assignments": 3,
+      "individually_source_alignable": 3,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 2,
+      "sample_id": "stage7c_crudsql_dev_create_0151",
+      "split": "dev",
+      "unique_acceptable_source_span_count": 2
+    }
+  ],
+  "splits": {
+    "dev": {
+      "gold_assignment_count": 845,
+      "individual_source_alignability_rate": 0.9585798816568047,
+      "individually_source_alignable": 810,
+      "joint_representability_rate": 0.9573964497041421,
+      "joint_reuse_deficit": 1,
+      "jointly_representable": 809,
+      "sample_count": 240,
+      "samples_with_joint_reuse_gap": 1,
+      "source_nonalignable_and_joint_gap_overlap_samples": 0,
+      "source_nonalignable_samples": 33,
+      "unique_samples_with_any_representational_gap": 34
+    },
+    "train": {
+      "gold_assignment_count": 5407,
+      "individual_source_alignability_rate": 0.9792861105973738,
+      "individually_source_alignable": 5295,
+      "joint_representability_rate": 0.9750323654521916,
+      "joint_reuse_deficit": 23,
+      "jointly_representable": 5272,
+      "sample_count": 1760,
+      "samples_with_joint_reuse_gap": 22,
+      "source_nonalignable_and_joint_gap_overlap_samples": 1,
+      "source_nonalignable_samples": 93,
+      "unique_samples_with_any_representational_gap": 114
+    }
+  },
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL"
+}

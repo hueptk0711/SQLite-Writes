@@ -1,0 +1,82 @@
+{
+  "code_files": [
+    "src/nldbwrite_v3/v2_a1/__init__.py",
+    "src/nldbwrite_v3/v2_a1/types.py",
+    "src/nldbwrite_v3/v2_a1/protocol.py",
+    "src/nldbwrite_v3/v2_a1/inventories.py",
+    "src/nldbwrite_v3/v2_a1/json_schema.py",
+    "src/nldbwrite_v3/v2_a1/prompt_rendering.py",
+    "src/nldbwrite_v3/v2_a1/phase_o_schema.py",
+    "src/nldbwrite_v3/v2_a1/phase_o_output.py",
+    "src/nldbwrite_v3/v2_a1/span_validation.py",
+    "src/nldbwrite_v3/v2_a1/slot_inventory.py",
+    "src/nldbwrite_v3/v2_a1/phase_m_schema.py",
+    "src/nldbwrite_v3/v2_a1/phase_m_output.py",
+    "src/nldbwrite_v3/v2_a1/reference_validation.py",
+    "src/nldbwrite_v3/v2_a1/typed_materializer.py",
+    "src/nldbwrite_v3/v2_a1/completeness.py",
+    "src/nldbwrite_v3/v2_a1/compiler.py",
+    "src/nldbwrite_v3/v2_a1/preflight.py",
+    "src/nldbwrite_v3/v2_a1/pipeline.py",
+    "src/nldbwrite_v3/v2_a1/diagnostics.py"
+  ],
+  "code_hashes": {
+    "src/nldbwrite_v3/v2_a1/__init__.py": "12f0b1bddf72c6ab80639378526a8b8dc3d0119b7e120797277a8c52ea0c0de4",
+    "src/nldbwrite_v3/v2_a1/compiler.py": "d56ad05f60c10f2a24259cd58597695f7ba52bb235efc5a91bb4c1937a257275",
+    "src/nldbwrite_v3/v2_a1/completeness.py": "47db2a40a9601780239b226c33c4cdb6ff6b274a591112e4f965fd465165edd6",
+    "src/nldbwrite_v3/v2_a1/diagnostics.py": "b5966fddd202621b2a86fcc9822722fbd5c0cd50904aac6bf5864f07f3a27804",
+    "src/nldbwrite_v3/v2_a1/inventories.py": "9dfed4d3b597041d8b2c2ec92cd3d612076156c88c0d9d90658f57de9f4343d6",
+    "src/nldbwrite_v3/v2_a1/json_schema.py": "4e9d9c37f6cf8926884999c55dac06837a7b9836fed139b8bb26d56e39351f02",
+    "src/nldbwrite_v3/v2_a1/phase_m_output.py": "9c8a6518eb3da9f866c53499c2c58a189315a4bda48fb9fc895f81c11e48dfec",
+    "src/nldbwrite_v3/v2_a1/phase_m_schema.py": "24f3a2bf8b8f3d53f3cdf0ab97d54fdd6caca8681c16a0c2450fcd2b48dc106b",
+    "src/nldbwrite_v3/v2_a1/phase_o_output.py": "32d83b76600cc0ee0a8a789c16f46f3a5987484b2b759ace4ba514edbfc022b4",
+    "src/nldbwrite_v3/v2_a1/phase_o_schema.py": "bcfe4f7f708d3711f1523a168838d37218999f15481a06025ff08303f1c147a6",
+    "src/nldbwrite_v3/v2_a1/pipeline.py": "4fbc4851195f7d7b8ee67d360d1de11dada270ee01f50ec949504f94b11cc8eb",
+    "src/nldbwrite_v3/v2_a1/preflight.py": "d774fec2b6f69d257cef4829b01705f072ff8f88d13b7a6e1d66828fed6eaec3",
+    "src/nldbwrite_v3/v2_a1/prompt_rendering.py": "b2e76f7a8388e8cfa44fe08e8003bfee01c2b8b1e2f4b9c564da80fbad31487f",
+    "src/nldbwrite_v3/v2_a1/protocol.py": "4cb053dd072345c98f4ee99f7d6af3864ec21a0b041cfec094ada9b0fa47e9e9",
+    "src/nldbwrite_v3/v2_a1/reference_validation.py": "f9e894d3f8524ef5297926814ae61db048f6273435c79397bc19b7182c65d9b6",
+    "src/nldbwrite_v3/v2_a1/slot_inventory.py": "71faa58c8faf04f844f615474949c2564214bc53c2765155e0a1108f257dda01",
+    "src/nldbwrite_v3/v2_a1/span_validation.py": "bdf83e64c7ec693889ac28932756ff8d999bb3cf3b3dd5538400599736a80a01",
+    "src/nldbwrite_v3/v2_a1/typed_materializer.py": "23aa962fdf959fb801452771025f502368f8df436ea8f5a35dd3e8ad28c488c8",
+    "src/nldbwrite_v3/v2_a1/types.py": "784812256b77629368240c6c63d9504bf936805ba7442986f1df592a4427d0db"
+  },
+  "implemented_components": {
+    "compiler": "Compiles binding-specific materialized values to parameterized SQLite write programs.",
+    "completeness": "Checks missing required slots and duplicate SLOT/COL bindings after materialization, scoped by mapping context.",
+    "diagnostics": "Audits primary pipeline oracle isolation.",
+    "inventories": "Builds model-side schema inventories and rejects gold-side leakage keys.",
+    "json_schema": "Validates the frozen Draft 2020-12 schema subset needed by Phase O and dynamic Phase M schemas without adding runtime dependencies.",
+    "phase_m_schema_and_output": "Instantiates real operation-specific Draft 2020-12 schemas with dynamic enums and enforces SLOT/EVIDENCE coherence.",
+    "phase_o_schema_and_output": "Validates against frozen Phase O JSON Schema, parses operation plus value-span offsets, and forbids span_ref/text emission.",
+    "pipeline": "Orchestrates the V2-A1 state machine with injected mocked Phase O/M outputs only.",
+    "preflight": "Runs SQLite execution checks on a copied DB with rollback and a wall-clock progress-handler deadline.",
+    "prompt_rendering": "Renders exact frozen Stage7C-A1 role/content messages and exposes the tokenizer.apply_chat_template contract adapter.",
+    "protocol": "Loads locked Stage7B, Stage7B-A1, Stage7C-A1, and Stage7D protocols and fail-fast verifies upstream input hashes.",
+    "slot_inventory": "Derives deterministic SPAN/EV/SLOT IDs after sorted accepted offsets.",
+    "span_validation": "Validates Python Unicode code-point [start,end) offsets and rejects duplicate/overlapping spans.",
+    "typed_materializer": "Applies conservative SQLite-affinity materialization without implicit date/unit normalization."
+  },
+  "not_implemented_in_stage7d": [
+    "model_runner",
+    "qwen_generation",
+    "train_dev_experiment",
+    "accuracy_reporting",
+    "ablation_execution"
+  ],
+  "script_files": [
+    "scripts/data/build_stage7d_v2_a1_implementation.py",
+    "scripts/data/validate_stage7d_v2_a1_implementation.py"
+  ],
+  "script_hashes": {
+    "scripts/data/build_stage7d_v2_a1_implementation.py": "c3c13615bdebf103b545a13d5f8e2170543c9fd585ff2d017bab9e64e36ad020",
+    "scripts/data/validate_stage7d_v2_a1_implementation.py": "7b7a72220e8f0879ee82d17fb30ea7deafed1667322155ad6934e289e2bf3379"
+  },
+  "stage": "Stage7D_V2_A1_IMPLEMENTATION",
+  "test_files": [
+    "tests/v2_a1/test_stage7d_v2_a1.py"
+  ],
+  "test_hashes": {
+    "tests/v2_a1/test_stage7d_v2_a1.py": "91f82b9912af1bf7b251ba24ce6f844b2e84b3c384f5ad7775e26ee7c792e1b5"
+  }
+}

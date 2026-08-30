@@ -1,0 +1,18 @@
+{
+  "invariants": [
+    "Phase O model output contains operation and value_spans only.",
+    "Model-generated span_ref, evidence_ref, slot_ref, or value text is forbidden in Phase O.",
+    "Offsets use Python Unicode code-point indexing over the exact original question.",
+    "Accepted spans are sorted by start_char then end_char before deterministic ID assignment.",
+    "Every Phase O semantic slot is required and must be mapped at least once, with duplicate use rejected within each mapping context.",
+    "Duplicate SLOT and target-column checks run after materialization so value conversion failures keep precedence.",
+    "SLOT reuse is forbidden within a single mapping context but permitted across distinct UPSERT insert/update contexts.",
+    "Materialized values are keyed by binding occurrence, not evidence_ref alone.",
+    "All table, column, evidence, slot, and constraint references must be members of the supplied dynamic inventory.",
+    "Typed materialization does not perform implicit date, currency, percentage, or unit conversion.",
+    "SQLite programs are parameterized; identifiers are quoted only after inventory validation.",
+    "Preflight runs against a copied database and rolls back.",
+    "Primary Stage7D pipeline accepts mocked outputs only and does not call a model or GPU."
+  ],
+  "stage": "Stage7D_V2_A1_IMPLEMENTATION"
+}

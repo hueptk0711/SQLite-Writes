@@ -1,0 +1,11 @@
+{
+  "coordinate_system": "Python Unicode code-point indexing",
+  "example_offset_guide": "0\tA\n1\t北\n2\t京\n3\tB\n4\t上\n5\t海\n6\tC",
+  "example_question": "A北京B上海C",
+  "format": "one line per Python code point: '<zero_based_index>\\t<character>'",
+  "guide_is_deterministic": true,
+  "guide_uses_gold": false,
+  "normalization_before_guide": "none",
+  "range_convention": "[start_char, end_char)",
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL"
+}

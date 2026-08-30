@@ -1,0 +1,95 @@
+{
+  "stage": "Stage7D_V2_A1_IMPLEMENTATION",
+  "traceability": [
+    {
+      "code": [
+        "phase_o_schema.py",
+        "phase_o_output.py",
+        "span_validation.py"
+      ],
+      "spec": "Phase O operation + grounded spans",
+      "tests": [
+        "Phase O schema/output and Unicode span tests"
+      ]
+    },
+    {
+      "code": [
+        "slot_inventory.py"
+      ],
+      "spec": "Deterministic EV/SLOT inventory creation",
+      "tests": [
+        "sorted SPAN/EV/SLOT derivation tests"
+      ]
+    },
+    {
+      "code": [
+        "inventories.py",
+        "reference_validation.py",
+        "phase_m_schema.py"
+      ],
+      "spec": "Dynamic inventory membership validation",
+      "tests": [
+        "TAB/COL/EV/SLOT out-of-inventory rejection tests"
+      ]
+    },
+    {
+      "code": [
+        "phase_m_schema.py",
+        "compiler.py"
+      ],
+      "spec": "Structured predicates for UPDATE/DELETE",
+      "tests": [
+        "multi-predicate selector and compiler tests"
+      ]
+    },
+    {
+      "code": [
+        "phase_m_schema.py",
+        "compiler.py"
+      ],
+      "spec": "UPSERT conditional semantics",
+      "tests": [
+        "DO_NOTHING/DO_UPDATE policy regression tests"
+      ]
+    },
+    {
+      "code": [
+        "typed_materializer.py"
+      ],
+      "spec": "Conservative typed materialization",
+      "tests": [
+        "INTEGER/REAL/TEXT/BLOB/NUMERIC strictness tests"
+      ]
+    },
+    {
+      "code": [
+        "typed_materializer.py",
+        "completeness.py"
+      ],
+      "spec": "Semantic completeness after materialization",
+      "tests": [
+        "materialization-before-completeness and context-scoped duplicate tests"
+      ]
+    },
+    {
+      "code": [
+        "typed_materializer.py",
+        "compiler.py"
+      ],
+      "spec": "Binding-specific UPSERT values",
+      "tests": [
+        "same EV/SLOT reused across UPSERT insert/update contexts"
+      ]
+    },
+    {
+      "code": [
+        "pipeline.py",
+        "diagnostics.py"
+      ],
+      "spec": "No oracle spans in primary path",
+      "tests": [
+        "oracle isolation tests"
+      ]
+    }
+  ]
+}

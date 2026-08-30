@@ -1,0 +1,11 @@
+{
+  "confirmation_481_evaluated": false,
+  "experiment_run": false,
+  "gpu_called": false,
+  "live_sql_bench_gt_opened": false,
+  "model_called": false,
+  "qwen_generation_run": false,
+  "stage": "Stage7D_V2_A1_IMPLEMENTATION",
+  "stage_scope": "implementation with synthetic fixtures and mocked LLM outputs only",
+  "train_dev_generation_run": false
+}

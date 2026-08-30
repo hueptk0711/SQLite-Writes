@@ -1,0 +1,16 @@
+{
+  "date": "20260829",
+  "hash_policy": "sha256_canonical_lf_for_utf8_text_raw_bytes_for_binary_inputs",
+  "input_hashes": {
+    "stage7c_a1_v2_development_protocol/CHAT_TEMPLATE_RENDERING_SPEC.json": "2ebd0a30b9bcc16fc33e9ffc445a3b46da17692ca066fefd874e41feb7867725",
+    "stage7c_a1_v2_development_protocol/GENERATION_PROTOCOL_A1.json": "8552b34746265c0990b1ae1882df5bcc5d06ee53bf7d1f8b74746ae97d975917",
+    "stage7c_a1_v2_development_protocol/PHASE_M_PROMPT_SPEC.json": "b04e67c0c3c9b7f27687891486a4d95b65bfab86a6208e5568d34c8f7acda279",
+    "stage7c_a1_v2_development_protocol/PHASE_O_OUTPUT_VALIDATION_SPEC.json": "c6df0f89e9fada502c535b632bf8b89c8fdca37c79276df204701b8591e233a2",
+    "stage7c_a1_v2_development_protocol/PHASE_O_PROMPT_SPEC.json": "da81ffa16d1209c300c95e959547e0dec34b9f99676ccf50fdf4f7b683926315",
+    "stage7c_a1_v2_development_protocol/PROMPT_SERIALIZATION_SPEC.json": "ef7983223c7e5ae168270cd5b14e3037b3909cedcf880d36c1994559d7e400e0",
+    "stage7c_a1_v2_development_protocol/QUESTION_OFFSET_GUIDE_SPEC.json": "3b573e188a368521b9ed259ae78120a0725ace028d2ce808af3f12049366b5d1",
+    "stage7c_a1_v2_development_protocol/STAGE7C_A1_PROTOCOL_LOCK.json": "bc7ec58a9c5ac83bcca17869be91dc09a169315cfab4a64a715a101fd913d2db",
+    "stage7d_v2_a1_implementation/STAGE7D_IMPLEMENTATION_LOCK.json": "ae5ff0393f74996dc0165930862d6cbfdb84671ea2dc7454c4d43475b7863800"
+  },
+  "stage": "Stage7C_A2_PHASE_O_PROMPT_FEASIBILITY_AMENDMENT"
+}

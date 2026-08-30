@@ -1,0 +1,26 @@
+{
+  "date": "20260827",
+  "hash_policy": "text_sha256_canonical_lf",
+  "input_hashes": {
+    "stage7b_v2_method_specification/ABLATION_REGISTRATION.json": "75b1061bd25c57a47c8bd02fa5b79943125496dfef7a6957763dc146a56ccb44",
+    "stage7b_v2_method_specification/COMPLETENESS_VERIFICATION_SPEC.json": "4c273264810f088d12578571dec1516589c308aa42d010b84bb7e6d8831efbc9",
+    "stage7b_v2_method_specification/DEVELOPMENT_DATA_POLICY.json": "a6d27fa67575ba6eb612d7cbdbb41d099ba8fa1384df7b603ba3b4ce1e3b2174",
+    "stage7b_v2_method_specification/OPERATION_CONDITIONING_SPEC.json": "a43ef3314b00755c13927bc67bb2fc5747cfd75f5162ef068dc253f6057918ca",
+    "stage7b_v2_method_specification/SLOT_GROUNDED_IR_SPEC.json": "125d6ab9f98e52213ae478c4f2f47558c6e1912b96a9e4c212647aa293657ee6",
+    "stage7b_v2_method_specification/STAGE7B_V2_SPECIFICATION_LOCK.json": "2dad42f8e9cf5733d6aa6cc65b48c337eeaf683aad777c46df614af6cfbd4e72",
+    "stage7b_v2_method_specification/V2_ARCHITECTURE_SPEC.json": "a1a48c39c4e928eb40f3f9696f08ed186fb7b5ecaf7c3f1479ecfd6dae1512e5",
+    "stage7c_v2_development_data_protocol/DEV_CREATE_MANIFEST.jsonl": "6ae38509b9abb3d9f9a198274cb2accd9c9ee233d20c3e8cfe6cad109edd535b",
+    "stage7c_v2_development_data_protocol/EVIDENCE_INVENTORY_SPEC.json": "6929249f9a3820bcd23ea81f4b60ff5d6b18dee36be7580ffc82cd813245cbfe",
+    "stage7c_v2_development_data_protocol/GENERATION_PROTOCOL_SPEC.json": "05dd068cfb852597d141ffc507a58f381dae048e97208364318b6c00bac0ed1b",
+    "stage7c_v2_development_data_protocol/SEMANTIC_SLOT_DERIVATION_AUDIT.json": "7d0a25953e91338584ba5f71c74adfeb94a4e25d8a55a68d6e25da8e11a2a963",
+    "stage7c_v2_development_data_protocol/SEMANTIC_SLOT_INVENTORY_SPEC.json": "78d592c917c0a3ffdb59e9a8e2bf9d2e310d42c64decc6dd790f815a57f8f3f2",
+    "stage7c_v2_development_data_protocol/STAGE7C_DATA_PROTOCOL_LOCK.json": "3c71a1daf5cab899c4009c6c81f5df920744cc84eaa2c5ba730b63c9320ce773",
+    "stage7c_v2_development_data_protocol/STAGE7C_INPUT_MANIFEST.json": "aa84235d8bb326a7cc2f7f439b195204f46e8725ae77aa57daa22ddea6eb7dc3",
+    "stage7c_v2_development_data_protocol/TRAIN_CREATE_MANIFEST.jsonl": "194248d8eb8688822af9934887f08b053f5d9d8eb440df703d2f48863f0c29bd",
+    "stage7c_v2_development_data_protocol/upstream_crudsql/data/dev/crud_dev_sql.json": "fe3c98e1c6e21e30f369c4561657c7c42aefd61fec544601b2cf81e5581f9da6",
+    "stage7c_v2_development_data_protocol/upstream_crudsql/data/dev/crud_dev_table.json": "d1280f2da0be3d620afb7edd40d823578d60b6e8c595c2d1bf168d8352ac9f85",
+    "stage7c_v2_development_data_protocol/upstream_crudsql/data/train/crud_train_sql.json": "d45bd50ae42a291ecc324d9826bbeb832ccfea0554a785d90f67b5a2e43bcf14",
+    "stage7c_v2_development_data_protocol/upstream_crudsql/data/train/crud_train_table.json": "088fa945d1e825915aba03de862d499f35fbb1afa8aa5c2cec71679e2e62311b"
+  },
+  "stage": "Stage7B_A1_FREE_TEXT_SLOT_DISCOVERY_AMENDMENT"
+}

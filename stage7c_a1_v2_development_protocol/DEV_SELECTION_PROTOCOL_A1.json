@@ -1,0 +1,11 @@
+{
+  "current_481_test": "post_hoc_only_not_selection",
+  "phase_m_metrics_are_diagnostic": true,
+  "phase_o_metrics_are_diagnostic": true,
+  "primary_metric": "Target-State Accuracy",
+  "prompt_or_capacity_change_after_dev_generation": "formal_amendment_required_before_any_selection",
+  "selection_after_481_forbidden": true,
+  "selection_split": "CRUDSQL dev Create",
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL",
+  "train_split": "CRUDSQL train Create"
+}

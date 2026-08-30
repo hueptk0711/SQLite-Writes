@@ -1,0 +1,17 @@
+{
+  "capacity_change": "Phase O output expands from one enum to enum plus span offsets",
+  "decoding_unchanged": {
+    "do_sample": false,
+    "retry_count": 0,
+    "temperature": 0.0,
+    "top_p": 1.0
+  },
+  "gpu_called": false,
+  "model_called": false,
+  "model_revision_unchanged": "Qwen/Qwen2.5-Coder-7B-Instruct@c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "new_phase_o_max_new_tokens": 512,
+  "old_phase_o_max_new_tokens": 32,
+  "phase_m_max_new_tokens": 8192,
+  "stage": "Stage7B_A1_FREE_TEXT_SLOT_DISCOVERY_AMENDMENT",
+  "trigger": "pre-experiment schema capacity amendment, not selected from model performance"
+}

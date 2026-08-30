@@ -1,0 +1,9 @@
+{
+  "broad_context_evidence_allowed": true,
+  "broad_context_evidence_required": false,
+  "evidence_definition": "context spans may help the model interpret the request but are not automatically semantic write slots",
+  "forbidden_mapping": "do_not_convert_every_context_evidence_span_into_SLOT",
+  "semantic_slots_from_phase_o_only": true,
+  "slot_definition": "atomic value spans selected by Phase O as semantic write values",
+  "stage": "Stage7B_A1_FREE_TEXT_SLOT_DISCOVERY_AMENDMENT"
+}

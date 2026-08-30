@@ -1,0 +1,23 @@
+{
+  "add_post_hoc_normalization": false,
+  "allow_slot_reuse_after_model_performance": false,
+  "dev_samples_with_gap": 33,
+  "dev_samples_with_joint_reuse_gap": 1,
+  "dev_unique_samples_with_any_representational_gap": 34,
+  "diagnostic_flags": [
+    "source_gold_nonalignable_under_frozen_materializer",
+    "joint_span_reuse_nonrepresentable"
+  ],
+  "duplicate_source_span_post_hoc": false,
+  "eligible": true,
+  "exclude_after_model_performance": false,
+  "joint_source_span_oracle_audit": "JOINT_SOURCE_SPAN_ORACLE_AUDIT.json",
+  "modify_gold": false,
+  "retain_in_primary_dev_denominator": true,
+  "retain_in_primary_train_denominator": true,
+  "source": "Stage7B-A1 NONALIGNABLE_SOURCE_SPAN_POLICY.json",
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL",
+  "train_samples_with_gap": 93,
+  "train_samples_with_joint_reuse_gap": 22,
+  "train_unique_samples_with_any_representational_gap": 114
+}

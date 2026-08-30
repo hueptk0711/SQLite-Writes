@@ -1,0 +1,17 @@
+{
+  "add_post_hoc_normalization": false,
+  "allowed_reporting": [
+    "overall_target_state_accuracy",
+    "source_alignable_subset_diagnostic"
+  ],
+  "dev_eligible": true,
+  "diagnostic_flag": "source_gold_nonalignable_under_frozen_materializer",
+  "exclude_after_model_performance": false,
+  "modify_gold": false,
+  "policy": "source-gold non-alignability under the frozen A1 span-only materializer is diagnostic only",
+  "primary_metric_denominator_policy": "full frozen split denominator",
+  "retain_in_primary_dev_denominator": true,
+  "retain_in_primary_train_denominator": true,
+  "stage": "Stage7B_A1_FREE_TEXT_SLOT_DISCOVERY_AMENDMENT",
+  "train_eligible": true
+}

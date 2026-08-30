@@ -1,0 +1,43 @@
+{
+  "ablation_selection_after_dev_performance_allowed": false,
+  "amended_variants": {
+    "V2-A_MINUS_OPERATION_CONDITIONING": {
+      "intervention": "Phase O-A selects semantic spans only and emits no operation; Phase M-A uses a single unified operation-unconditioned IR schema that predicts operation plus mappings",
+      "phase_m_a_responsibilities": [
+        "operation_prediction",
+        "slot_to_column_or_predicate_mapping"
+      ],
+      "phase_o_a_responsibilities": [
+        "semantic_span_selection"
+      ],
+      "schemas": "single unified operation-unconditioned Phase M schema",
+      "total_model_calls": 2,
+      "unchanged_from_v2_full_a1": [
+        "span_offsets",
+        "dynamic_reference_enums",
+        "typed_materializer",
+        "completeness_verifier",
+        "deterministic_compiler_and_preflight"
+      ]
+    },
+    "V2-B_MINUS_CONSTRAINED_REFERENCES": "remove dynamic inventory membership gates while preserving Phase O span selection and all other components",
+    "V2-C_MINUS_DETERMINISTIC_MATERIALIZATION": "replace deterministic typed materializer with the pre-registered counterfactual from Stage7B while preserving Phase O span selection",
+    "V2-D_MINUS_COMPLETENESS_VERIFICATION": "bypass required SLOT_* completeness gate while preserving Phase O span selection and all other components",
+    "V2-FULL-A1": "Phase O selects operation plus grounded atomic semantic value spans; Phase M maps required SLOT_* refs to columns/predicates",
+    "V2-O_MINUS_SPAN_SELECTION": {
+      "confirmatory_ablation_family_member": false,
+      "diagnostic_only": true,
+      "intervention": "retain operation prediction but replace Phase O span inventory with deterministic Stage7C PATCH2 inventory to isolate the free-text slot discovery amendment",
+      "p_value_baseline_allowed": false
+    }
+  },
+  "confirmatory_ablation_family": [
+    "V2-A_MINUS_OPERATION_CONDITIONING",
+    "V2-B_MINUS_CONSTRAINED_REFERENCES",
+    "V2-C_MINUS_DETERMINISTIC_MATERIALIZATION",
+    "V2-D_MINUS_COMPLETENESS_VERIFICATION"
+  ],
+  "everything_else_held_constant": true,
+  "hidden_third_model_call_allowed": false,
+  "stage": "Stage7B_A1_FREE_TEXT_SLOT_DISCOVERY_AMENDMENT"
+}

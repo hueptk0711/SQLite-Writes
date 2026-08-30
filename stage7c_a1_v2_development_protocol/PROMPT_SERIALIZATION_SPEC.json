@@ -1,0 +1,46 @@
+{
+  "contract": {
+    "encoding": "UTF-8",
+    "ensure_ascii": false,
+    "forbidden_renderers": [
+      "str(obj)",
+      "repr(obj)",
+      "json.dumps default",
+      "ensure_ascii=True",
+      "indent=2"
+    ],
+    "indent": null,
+    "inventory_ordering": {
+      "columns": "sort by column_ref",
+      "constraints": "sort by constraint_ref",
+      "evidence": "sort by EV numeric order",
+      "slots": "sort by SLOT numeric order",
+      "tables": "sort by table_ref"
+    },
+    "newline": "LF",
+    "separators": [
+      ",",
+      ":"
+    ],
+    "sort_keys": true
+  },
+  "ensure_ascii_true_allowed": false,
+  "indentation_allowed": false,
+  "phase_m_rendered_prompt_inputs": [
+    "system_prompt",
+    "predicted_operation",
+    "canonical_schema_inventory_json",
+    "canonical_evidence_inventory_json",
+    "canonical_semantic_slot_inventory_json"
+  ],
+  "phase_o_rendered_prompt_inputs": [
+    "system_prompt",
+    "exact_question",
+    "offset_guide",
+    "canonical_schema_inventory_json"
+  ],
+  "reference_python": "json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(',', ':'))",
+  "rendered_prompt_sha256_algorithm": "sha256(UTF-8 bytes after canonical CRLF/CR to LF normalization of the rendered prompt)",
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL",
+  "str_or_repr_serialization_allowed": false
+}

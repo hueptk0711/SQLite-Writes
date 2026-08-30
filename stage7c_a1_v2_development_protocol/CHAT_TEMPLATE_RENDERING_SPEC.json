@@ -1,0 +1,25 @@
+{
+  "add_generation_prompt": true,
+  "contract": {
+    "actual_chat_template_string_sha256": null,
+    "actual_chat_template_string_sha256_status": "not_materialized_in_repository; Stage7D preflight must extract tokenizer.chat_template from the frozen tokenizer revision and record its hash before generation",
+    "add_generation_prompt": true,
+    "messages_format": "ordered list of role/content dictionaries",
+    "phase_m_messages": [
+      "system",
+      "user"
+    ],
+    "phase_o_messages": [
+      "system",
+      "user"
+    ],
+    "tokenize": false,
+    "tokenizer_config_file_sha256": "959e7f1d9a1b7641a6d6ce05ca97b75c7894fcb66cbe5a040406458fb1128ee4",
+    "tokenizer_method": "tokenizer.apply_chat_template"
+  },
+  "free_choice_in_stage7d_allowed": false,
+  "rendering_call": "tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)",
+  "stage": "Stage7C_A1_V2_DEVELOPMENT_PROTOCOL",
+  "stage7d_preflight_required": "extract actual tokenizer.chat_template from frozen tokenizer revision and record actual_chat_template_string_sha256 before generation",
+  "tokenize": false
+}

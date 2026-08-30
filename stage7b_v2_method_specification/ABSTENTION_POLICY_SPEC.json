@@ -1,0 +1,13 @@
+{
+  "allowed_reasons": [
+    "schema_nonconformance",
+    "invalid_reference",
+    "unsafe_materialization",
+    "semantic_incompleteness",
+    "independently_audited_true_ambiguity"
+  ],
+  "component": "abstention_policy",
+  "policy": "Abstention is a safety mechanism for independently demonstrated ambiguity, not an explanation for the two Stage7A parse failures.",
+  "stage": "Stage7B_V2_METHOD_SPECIFICATION",
+  "true_ambiguity_direct_support_from_stage7a": 0
+}

@@ -1,0 +1,33 @@
+{
+  "changed_component": "Phase O user prompt template only",
+  "examples_added": false,
+  "offset_guide_serializer": {
+    "a2_spec_path": "stage7c_a1_v2_development_protocol/QUESTION_OFFSET_GUIDE_SPEC.json",
+    "a3_spec_path": "stage7c_a1_v2_development_protocol/QUESTION_OFFSET_GUIDE_SPEC.json",
+    "changed": false
+  },
+  "parent_prompt": "Stage7C-A2",
+  "phase_m_system_prompt": {
+    "a2_sha256": "1d9b423cfea7b0de7dc329a707fccd7ff820cda7404d9b6d449420b348781781",
+    "a3_sha256": "1d9b423cfea7b0de7dc329a707fccd7ff820cda7404d9b6d449420b348781781",
+    "changed": false
+  },
+  "phase_m_user_prompt_template": {
+    "a2_sha256": "8c53626a3bca9f1af98cb5c73fa28505ba93ea2f33dcf6d7e52cb4c7d417b958",
+    "a3_sha256": "8c53626a3bca9f1af98cb5c73fa28505ba93ea2f33dcf6d7e52cb4c7d417b958",
+    "changed": false
+  },
+  "phase_o_system_prompt": {
+    "a2_sha256": "7dc6322ea44cba7a0f5b45dee2d20608a900959e60d92f4eff0f6bcc0fb106c5",
+    "a3_sha256": "7dc6322ea44cba7a0f5b45dee2d20608a900959e60d92f4eff0f6bcc0fb106c5",
+    "changed": false
+  },
+  "phase_o_user_prompt_template": {
+    "a2_sha256": "f20a56efba45c4807b26abf5d9b413967c2d66ee2bc0c6fde3632ae109fcca42",
+    "a3_sha256": "1bfdb5a9099e221ed3e120534dabe009705b7da1405e53f0ff8c91c05860c010",
+    "appended_amendment_sha256": "e757ebc93389ead71fd4b9c2e03165419b5907c9f7b4f2be574a9f19e207d5fa",
+    "changed": true
+  },
+  "stage": "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT",
+  "zero_shot": true
+}

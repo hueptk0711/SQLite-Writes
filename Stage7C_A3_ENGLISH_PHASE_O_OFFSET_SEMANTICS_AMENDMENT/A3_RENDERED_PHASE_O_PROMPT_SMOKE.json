@@ -1,0 +1,7 @@
+{
+  "amendment_present": true,
+  "messages_sha256": "f681d92278c1321a9bea624f6076acc1085c0722ea3a85d16f2167e825a09bb9",
+  "phase_o_prompt_spec_path": "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT/PHASE_O_PROMPT_SPEC_A3_ENGLISH.json",
+  "rendered_from_spec_path": "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT/PHASE_O_PROMPT_SPEC_A3_ENGLISH.json",
+  "sample_id": "stage7c_fresh_english_001"
+}

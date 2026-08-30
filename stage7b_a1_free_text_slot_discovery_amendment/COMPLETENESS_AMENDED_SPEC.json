@@ -1,0 +1,9 @@
+{
+  "complete_iff": "missing is empty and extra is empty and each required SLOT_* is mapped exactly once unless operation-specific schema explicitly permits reuse",
+  "extra": "mapped_set - allowed_slot_set",
+  "mapped_set": "SLOT_* refs used by Phase M assignments/predicates for the predicted operation",
+  "missing": "required_set - mapped_set",
+  "phase_o_span_recall_failure": "reported separately when Phase O misses an atomic write value; not hidden as Phase M completeness success",
+  "required_set": "all SLOT_* created from accepted Phase O value_spans",
+  "stage": "Stage7B_A1_FREE_TEXT_SLOT_DISCOVERY_AMENDMENT"
+}

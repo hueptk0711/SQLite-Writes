@@ -1,0 +1,273 @@
+{
+  "coordinate_contract": "Python Unicode code-point offsets on the exact original question string, [start_char, end_char)",
+  "dev": {
+    "example_non_source_alignable_samples": [
+      {
+        "missing_values": [
+          {
+            "column_index": 7,
+            "gold_value": "2018/7/1",
+            "source_type": "text"
+          }
+        ],
+        "question": "和路雪雪糕是联合利华集团旗下的著名冰淇淋品牌，其规格是80克/袋，2018年7月1日在昆明被昆明食品安全局抽查，将该记录添加至数据库",
+        "sample_id": "stage7c_crudsql_dev_create_0020"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 7,
+            "gold_value": "2019/6/5",
+            "source_type": "text"
+          }
+        ],
+        "question": "2019年6月5日在昆明抽查的85克/袋的MAGNUM梦龙是和路雪旗下的知名冰淇淋品牌，这条记录插入数据库中",
+        "sample_id": "stage7c_crudsql_dev_create_0021"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 7,
+            "gold_value": "2020/7/15",
+            "source_type": "text"
+          }
+        ],
+        "question": "昆明食品安全局在2020年7月15日抽查到巧乐兹，该雪糕是通用磨坊(中国)投资有限公司旗下的冰淇淋品牌，把这项记录插入表中",
+        "sample_id": "stage7c_crudsql_dev_create_0022"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 7,
+            "gold_value": "2021/6/15",
+            "source_type": "text"
+          }
+        ],
+        "question": "接着帮我插入数据，中街1946是沈阳中街冰点城食品有限公司旗下的冰淇淋品牌，在2021年6月15日被曲靖市食品安全局抽查",
+        "sample_id": "stage7c_crudsql_dev_create_0023"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 3,
+            "gold_value": "昆明市",
+            "source_type": "text"
+          }
+        ],
+        "question": "你好，把11月在昆明举行的昆明理工大学运动会加入数据库中，其中参加的运动员有500人，主办单位就是昆明理工大学",
+        "sample_id": "stage7c_crudsql_dev_create_0024"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 5,
+            "gold_value": "2000人",
+            "source_type": "text"
+          }
+        ],
+        "question": "还是插入数据，12月将要举办昆明市大学生篮球竞赛，地点待定，参赛人员必须是昆明市大学生，总计将会有2000余人参加，由昆明理工大学主办，拓东体育馆承办",
+        "sample_id": "stage7c_crudsql_dev_create_0026"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 5,
+            "gold_value": "236人",
+            "source_type": "text"
+          }
+        ],
+        "question": "最后再插入一条数据，6月在昆明捞鱼河举行云南省大学生龙舟竞赛，届时有236名运动员参加比赛，本次比赛由云南省教育厅主办，昆明市体育局承办",
+        "sample_id": "stage7c_crudsql_dev_create_0027"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 0,
+            "gold_value": "长春市",
+            "source_type": "text"
+          }
+        ],
+        "question": "下面这条记录是要插入的内容，长春百货商店(虹山南路店)活动即开始，在2023年10月1日—2023年12月25日期间，活动内容是只要购买满200元则赠送10元购物券一张，再补充上活动细则：数量有限，送完即止",
+        "sample_id": "stage7c_crudsql_dev_create_0037"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 3,
+            "gold_value": "5",
+            "source_type": "real"
+          }
+        ],
+        "question": "昆明中心假日酒店位于云南省昆明市盘龙区东风东路29号，是一家五星级酒店，总共有120个房间，将该信息添加到数据库中",
+        "sample_id": "stage7c_crudsql_dev_create_0044"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 3,
+            "gold_value": "5",
+            "source_type": "real"
+          }
+        ],
+        "question": "位于云南省昆明市官渡区迎宾路1号的世纪金源大饭店(迎宾路店)是一家五星级大酒店，房间数高达150间，请将该信息插入数据库",
+        "sample_id": "stage7c_crudsql_dev_create_0045"
+      }
+    ],
+    "gold_assignment_count": 845,
+    "nonalignable_sample_rate": 0.1375,
+    "sample_count": 240,
+    "samples_with_at_least_one_non_source_alignable_value": 33,
+    "source_selectable_gold_value_count": 810,
+    "source_selectable_gold_value_rate": 0.95858,
+    "split": "dev"
+  },
+  "materialization_contract": {
+    "BLOB_OR_UNSUPPORTED": "not source-alignable under A1 span-only policy",
+    "INTEGER": "some exact numeric substring must parse losslessly to the gold integer",
+    "REAL_OR_NUMERIC": "some exact numeric substring must parse to the gold finite numeric value",
+    "TEXT": "gold text must be an exact substring of the original question"
+  },
+  "nonalignable_policy": {
+    "add_post_hoc_normalization": false,
+    "diagnostic_flag": "source_gold_nonalignable_under_frozen_materializer",
+    "eligible": true,
+    "exclude_after_model_performance": false,
+    "modify_gold": false,
+    "retain_in_primary_dev_denominator": true,
+    "retain_in_primary_train_denominator": true
+  },
+  "normalization_before_offset_validation": "none",
+  "oracle_question": "If Phase O selected perfect exact source spans, how many gold values could be materialized under the frozen Stage7B materializer?",
+  "stage": "Stage7B_A1_FREE_TEXT_SLOT_DISCOVERY_AMENDMENT",
+  "train": {
+    "example_non_source_alignable_samples": [
+      {
+        "missing_values": [
+          {
+            "column_index": 2,
+            "gold_value": "昆明一线",
+            "source_type": "real"
+          }
+        ],
+        "question": "可以帮我向数据库中插入数据吗，所在省份是云南，产线名称是昆明一线，日熔量为900吨",
+        "sample_id": "stage7c_crudsql_train_create_0036"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 0,
+            "gold_value": "600126.sh",
+            "source_type": "text"
+          }
+        ],
+        "question": "我会给你一段数据，你帮我把它加入到数据库中，好吗，其中证券是杭钢股份，其代码为00126.sh，接着是ROE和EPS指标分别为22.12和1.01",
+        "sample_id": "stage7c_crudsql_train_create_0095"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 1,
+            "gold_value": "5238",
+            "source_type": "text"
+          }
+        ],
+        "question": "我想新增一条关于互联网行业收入的内容，2018Q1-Q3为2238亿元",
+        "sample_id": "stage7c_crudsql_train_create_0104"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 0,
+            "gold_value": "688425.SH",
+            "source_type": "text"
+          }
+        ],
+        "question": "向表中添加以下数据：其中公司为铁建重工，它的股票代码是88425.SH，经过我们调查，其股价为4.75元，市值达253亿元",
+        "sample_id": "stage7c_crudsql_train_create_0115"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 0,
+            "gold_value": "2012/9/22",
+            "source_type": "text"
+          }
+        ],
+        "question": "我想添加2012/10/1的各个城市的房地产周均环比数据，但是这次我们只有北上广深这四个城市的数据，依次是22.8，46.2，33.5，23.5",
+        "sample_id": "stage7c_crudsql_train_create_0219"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 2,
+            "gold_value": "17.22",
+            "source_type": "real"
+          }
+        ],
+        "question": "把上周和本周成交面积为14.58，17，22的南京插入到表中吧，谢谢啦",
+        "sample_id": "stage7c_crudsql_train_create_0226"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 1,
+            "gold_value": "63",
+            "source_type": "text"
+          },
+          {
+            "column_index": 2,
+            "gold_value": "58",
+            "source_type": "real"
+          }
+        ],
+        "question": "按照我给出的内容进行插入操作，城市为长春，11年H1和H2分别是842和888",
+        "sample_id": "stage7c_crudsql_train_create_0292"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 1,
+            "gold_value": "贝壳-W",
+            "source_type": "text"
+          }
+        ],
+        "question": "看看可不可以加入贝壳控股有限公司，它的代码是02423.HK",
+        "sample_id": "stage7c_crudsql_train_create_0344"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 1,
+            "gold_value": "2012.6",
+            "source_type": "real"
+          }
+        ],
+        "question": "在2012年6月，西部建设的年利率是12%，期限为24个月，这条内容帮我插入到表中",
+        "sample_id": "stage7c_crudsql_train_create_0377"
+      },
+      {
+        "missing_values": [
+          {
+            "column_index": 0,
+            "gold_value": "500",
+            "source_type": "real"
+          },
+          {
+            "column_index": 1,
+            "gold_value": "150",
+            "source_type": "real"
+          }
+        ],
+        "question": "虽然有不少数据没有搜集到，但还是先将假定总房价为210万元时，首付按30%需要支付63万元插入到表中，其它降息和还款信息我再去搜集一下",
+        "sample_id": "stage7c_crudsql_train_create_0387"
+      }
+    ],
+    "gold_assignment_count": 5407,
+    "nonalignable_sample_rate": 0.052841,
+    "sample_count": 1760,
+    "samples_with_at_least_one_non_source_alignable_value": 93,
+    "source_selectable_gold_value_count": 5295,
+    "source_selectable_gold_value_rate": 0.979286,
+    "split": "train"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "acceptance_policy": "operation exact match, all atomic spans exact, no extra spans, deterministic validation PASS",
+  "fresh_synthetic_smoke_count": 4,
+  "gpu_called": false,
+  "languages": [
+    "en",
+    "zh"
+  ],
+  "model_called": false,
+  "old_stage7e0_failed_smokes_are_diagnostic_regression_only": true,
+  "smoke_set_sha256": "7449e7367fa6aaef55058086d02626ca14c0fbf4e3c050485a766157242b24c2",
+  "stage": "Stage7C_A2_PHASE_O_PROMPT_FEASIBILITY_AMENDMENT",
+  "status": "LOCKED_BEFORE_MODEL_RUN",
+  "three_value_cases": 2,
+  "train_dev_generation_run": false,
+  "two_value_cases": 2
+}

@@ -1,0 +1,70 @@
+{
+  "artifact_hashes": {
+    "CHAT_TEMPLATE_PREFLIGHT.json": "15d0c79b962c5d7d40f914f45565174ee52acc89e5b2d8b30a663b52094072e5",
+    "IMPLEMENTATION_COMPONENT_MANIFEST.json": "5f27db21f83609cccc9dc094caa99ceb8b1a93bc950a0f9f911bb3ab0b4ea67e",
+    "IMPLEMENTATION_INVARIANTS.json": "5f8640ff8df90d7d8dfabbb094368402bb660e4667a81ec44e8961b2def47410",
+    "NO_MODEL_EXECUTION_AUDIT.json": "1cb22542eb3af0764c325bf6a01074eed03a83956ab21b23ab265f0c1771e407",
+    "ORACLE_ISOLATION_AUDIT.json": "bb09934d807621b4982392366e661ea9bcbf8658e0feb6537bdf0c4f31d52a3b",
+    "REVIEWER_README.md": "4b661560f8a497b32a4d0ccb1b80b7c17488606103ed0529c23365ebcf427c09",
+    "SPEC_TO_CODE_TRACEABILITY.json": "e02a07094b58d21be4885c24932245739eb4219d8fbeb8b6a9299bea6924e62d",
+    "STAGE7D_INPUT_MANIFEST.json": "977a048f67aae9cd771ce76da8950effd674e94264d25eda0c13785e9129c159",
+    "TEST_SUMMARY.json": "6ea328fe140f37bddb689cf0c56ab1177b7cdb2d20d0da24d87460484316e2fb",
+    "VALIDATION_REPORT.md": "628ec2341f2cec94c81c5ef34aac669082a49b4c7991e833926f75d30df27dbb"
+  },
+  "code_hashes": {
+    "src/nldbwrite_v3/v2_a1/__init__.py": "12f0b1bddf72c6ab80639378526a8b8dc3d0119b7e120797277a8c52ea0c0de4",
+    "src/nldbwrite_v3/v2_a1/compiler.py": "d56ad05f60c10f2a24259cd58597695f7ba52bb235efc5a91bb4c1937a257275",
+    "src/nldbwrite_v3/v2_a1/completeness.py": "47db2a40a9601780239b226c33c4cdb6ff6b274a591112e4f965fd465165edd6",
+    "src/nldbwrite_v3/v2_a1/diagnostics.py": "b5966fddd202621b2a86fcc9822722fbd5c0cd50904aac6bf5864f07f3a27804",
+    "src/nldbwrite_v3/v2_a1/inventories.py": "9dfed4d3b597041d8b2c2ec92cd3d612076156c88c0d9d90658f57de9f4343d6",
+    "src/nldbwrite_v3/v2_a1/json_schema.py": "4e9d9c37f6cf8926884999c55dac06837a7b9836fed139b8bb26d56e39351f02",
+    "src/nldbwrite_v3/v2_a1/phase_m_output.py": "9c8a6518eb3da9f866c53499c2c58a189315a4bda48fb9fc895f81c11e48dfec",
+    "src/nldbwrite_v3/v2_a1/phase_m_schema.py": "24f3a2bf8b8f3d53f3cdf0ab97d54fdd6caca8681c16a0c2450fcd2b48dc106b",
+    "src/nldbwrite_v3/v2_a1/phase_o_output.py": "32d83b76600cc0ee0a8a789c16f46f3a5987484b2b759ace4ba514edbfc022b4",
+    "src/nldbwrite_v3/v2_a1/phase_o_schema.py": "bcfe4f7f708d3711f1523a168838d37218999f15481a06025ff08303f1c147a6",
+    "src/nldbwrite_v3/v2_a1/pipeline.py": "4fbc4851195f7d7b8ee67d360d1de11dada270ee01f50ec949504f94b11cc8eb",
+    "src/nldbwrite_v3/v2_a1/preflight.py": "d774fec2b6f69d257cef4829b01705f072ff8f88d13b7a6e1d66828fed6eaec3",
+    "src/nldbwrite_v3/v2_a1/prompt_rendering.py": "b2e76f7a8388e8cfa44fe08e8003bfee01c2b8b1e2f4b9c564da80fbad31487f",
+    "src/nldbwrite_v3/v2_a1/protocol.py": "4cb053dd072345c98f4ee99f7d6af3864ec21a0b041cfec094ada9b0fa47e9e9",
+    "src/nldbwrite_v3/v2_a1/reference_validation.py": "f9e894d3f8524ef5297926814ae61db048f6273435c79397bc19b7182c65d9b6",
+    "src/nldbwrite_v3/v2_a1/slot_inventory.py": "71faa58c8faf04f844f615474949c2564214bc53c2765155e0a1108f257dda01",
+    "src/nldbwrite_v3/v2_a1/span_validation.py": "bdf83e64c7ec693889ac28932756ff8d999bb3cf3b3dd5538400599736a80a01",
+    "src/nldbwrite_v3/v2_a1/typed_materializer.py": "23aa962fdf959fb801452771025f502368f8df436ea8f5a35dd3e8ad28c488c8",
+    "src/nldbwrite_v3/v2_a1/types.py": "784812256b77629368240c6c63d9504bf936805ba7442986f1df592a4427d0db"
+  },
+  "created_utc": "2026-08-27T00:00:00+00:00",
+  "experiment_run": false,
+  "gpu_called": false,
+  "input_hashes": {
+    "stage7b_a1_free_text_slot_discovery_amendment/COMPLETENESS_AMENDED_SPEC.json": "4933a5df0ffca308d6188beb55d93859404055a2a00c3bfcc0685d972bd854d9",
+    "stage7b_a1_free_text_slot_discovery_amendment/PHASE_O_JSON_SCHEMA.json": "92add4e9fb96423b4fda68d89341872843cbafe6792e699e9c8ac2d0ca1ece3c",
+    "stage7b_a1_free_text_slot_discovery_amendment/PHASE_O_SEMANTIC_SPAN_SPEC.json": "1a10ac2ab911d33632bdbc67d44af175807aac56850dd4595da28dcbb57af8e7",
+    "stage7b_a1_free_text_slot_discovery_amendment/SOURCE_SPAN_ORACLE_AUDIT.json": "cbaf13aaa3076314a3374da9f81c8a9e882a572ff824b1fd8555cafd3d6c1aa1",
+    "stage7b_a1_free_text_slot_discovery_amendment/SPAN_VALIDATION_SPEC.json": "67e7c0e4fa4d7f8e767eb68a3d914bf8dc32440676c912aca57613ae6a42f50e",
+    "stage7b_a1_free_text_slot_discovery_amendment/STAGE7B_A1_LOCK.json": "4cdd28b72eda0927041bb2cad5fb18abcc70f3531b9f374e9fe5c36d82a6f5b1",
+    "stage7b_v2_method_specification/DESIGN_TO_EVIDENCE_TRACEABILITY.json": "3ee94586663fe6f3102a166ccc680297ea86619f3b095cccf36be7ebd44d3b28",
+    "stage7b_v2_method_specification/STAGE7B_V2_SPECIFICATION_LOCK.json": "2dad42f8e9cf5733d6aa6cc65b48c337eeaf683aad777c46df614af6cfbd4e72",
+    "stage7b_v2_method_specification/V2_ARCHITECTURE_SPEC.json": "a1a48c39c4e928eb40f3f9696f08ed186fb7b5ecaf7c3f1479ecfd6dae1512e5",
+    "stage7c_a1_v2_development_protocol/DATA_LEAKAGE_AUDIT_A1.json": "e232d0f53f1e3de7803c36539c0aaf0fcd39d4dc62b11ab262c99ace6928c683",
+    "stage7c_a1_v2_development_protocol/GENERATION_PROTOCOL_A1.json": "8552b34746265c0990b1ae1882df5bcc5d06ee53bf7d1f8b74746ae97d975917",
+    "stage7c_a1_v2_development_protocol/PHASE_M_PROMPT_SPEC.json": "b04e67c0c3c9b7f27687891486a4d95b65bfab86a6208e5568d34c8f7acda279",
+    "stage7c_a1_v2_development_protocol/PHASE_O_OUTPUT_VALIDATION_SPEC.json": "c6df0f89e9fada502c535b632bf8b89c8fdca37c79276df204701b8591e233a2",
+    "stage7c_a1_v2_development_protocol/PHASE_O_PROMPT_SPEC.json": "da81ffa16d1209c300c95e959547e0dec34b9f99676ccf50fdf4f7b683926315",
+    "stage7c_a1_v2_development_protocol/QUESTION_OFFSET_GUIDE_SPEC.json": "3b573e188a368521b9ed259ae78120a0725ace028d2ce808af3f12049366b5d1",
+    "stage7c_a1_v2_development_protocol/RESERVED_BENCHMARK_POLICY.json": "888a7c86f286e999c9bdec2a3bf66100d59b559cbbb70675b4df7bf211f43bc7",
+    "stage7c_a1_v2_development_protocol/STAGE7C_A1_PROTOCOL_LOCK.json": "bc7ec58a9c5ac83bcca17869be91dc09a169315cfab4a64a715a101fd913d2db"
+  },
+  "model_called": false,
+  "script_hashes": {
+    "scripts/data/build_stage7d_v2_a1_implementation.py": "c3c13615bdebf103b545a13d5f8e2170543c9fd585ff2d017bab9e64e36ad020",
+    "scripts/data/validate_stage7d_v2_a1_implementation.py": "7b7a72220e8f0879ee82d17fb30ea7deafed1667322155ad6934e289e2bf3379"
+  },
+  "stage": "Stage7D_V2_A1_IMPLEMENTATION",
+  "status": "PASS_STAGE7D_V2_A1_IMPLEMENTATION_LOCKED",
+  "test_hashes": {
+    "tests/v2_a1/test_stage7d_v2_a1.py": "91f82b9912af1bf7b251ba24ce6f844b2e84b3c384f5ad7775e26ee7c792e1b5"
+  },
+  "v2_generation_run": false,
+  "validated_utc": "2026-08-27T00:00:00+00:00",
+  "violations": []
+}

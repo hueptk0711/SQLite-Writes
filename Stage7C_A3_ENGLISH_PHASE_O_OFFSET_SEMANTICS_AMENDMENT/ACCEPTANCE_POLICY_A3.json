@@ -1,0 +1,26 @@
+{
+  "diagnostic_only_after_primary": [
+    "4 A2 fresh English cases",
+    "2 old PATCH9/Alice diagnostics"
+  ],
+  "primary_stage7e0_a3_acceptance": {
+    "averaging_allowed": false,
+    "checks": [
+      "Phase O operation exact",
+      "Phase O spans exact",
+      "no extra spans",
+      "deterministic span validation PASS",
+      "Phase M mapping exact",
+      "SLOT-to-EV coherence PASS",
+      "typed materialization PASS",
+      "completeness PASS",
+      "compilation PASS",
+      "preflight ADMITTED",
+      "canonical target state exact"
+    ],
+    "required_pass_count": "8/8",
+    "sample_set": "8 fresh English A3 cases",
+    "seven_of_eight_allowed": false
+  },
+  "stage": "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT"
+}

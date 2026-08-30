@@ -1,0 +1,10 @@
+{
+  "decision": "amend Phase O zero-shot prompt wording before any train/dev generation",
+  "do_not_patch_backend_further": true,
+  "do_not_run_train_dev_before_a2_review": true,
+  "patch9_evidence_summary": "PATCH9_EVIDENCE_SUMMARY.json",
+  "scientific_scope": "prompt clarification only; no answer injection, no examples, no data or label changes",
+  "stage": "Stage7C_A2_PHASE_O_PROMPT_FEASIBILITY_AMENDMENT",
+  "status": "RATIONALE_LOCKED",
+  "trigger": "Stage7E0 PATCH9 localized remaining failure to Phase O semantic span selection with backend audits passing."
+}
