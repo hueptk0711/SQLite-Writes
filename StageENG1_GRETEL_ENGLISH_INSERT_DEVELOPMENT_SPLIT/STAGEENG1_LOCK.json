@@ -1,0 +1,15 @@
+{
+  "created_utc": "2026-08-30T08:15:55.391833+00:00",
+  "dataset_id": "gretelai/synthetic_text_to_sql",
+  "derived_artifact_manifest_sha256": "e2e6220b725f68a783c39a77ec9f30ac0342647584ef6504ee0845bc528ef4f7",
+  "git_branch": "stage6/crudsql-eligibility-audit",
+  "git_commit": "f9b8585676cb4ce01b6c77c42ae16400faeb9981",
+  "gpu_called": false,
+  "model_called": false,
+  "revision": "740ab236e64503fba51be1101df7a1be83bf455d",
+  "source_stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION",
+  "source_stage_confirmation_manifest_sha256": "28b9ddbc89521679914df88431ed5c6741f39edf2ffb43a70f7f4e218f64fd8c",
+  "source_stage_development_manifest_sha256": "cc450324d0105ae8bc3c1b34559a2a50f43d03ef1ff07463c5853967a3250210",
+  "stage": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT",
+  "status": "PASS_DEVELOPMENT_SPLIT_FROZEN"
+}

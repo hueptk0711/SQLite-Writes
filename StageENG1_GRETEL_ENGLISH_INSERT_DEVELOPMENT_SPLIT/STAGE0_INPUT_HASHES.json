@@ -1,0 +1,21 @@
+{
+  "input_files": {
+    "DERIVED_ARTIFACT_MANIFEST.json": {
+      "bytes": 3799,
+      "sha256": "93908b19fe7aa6c5e0ab3739fe44656c6693c067b08f32059bbc35af62212869"
+    },
+    "DEVELOPMENT_TRAIN_CANDIDATE_MANIFEST.jsonl": {
+      "bytes": 1086492,
+      "sha256": "cc450324d0105ae8bc3c1b34559a2a50f43d03ef1ff07463c5853967a3250210"
+    },
+    "OFFICIAL_TEST_CONFIRMATION_MANIFEST.jsonl": {
+      "bytes": 59495,
+      "sha256": "28b9ddbc89521679914df88431ed5c6741f39edf2ffb43a70f7f4e218f64fd8c"
+    },
+    "STAGEENG0_LOCK.json": {
+      "bytes": 604,
+      "sha256": "2147cd6961a6a310e93a0e93bed4d9ba426f84a2152573acfcc5d5e0ff129d8a"
+    }
+  },
+  "stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION"
+}

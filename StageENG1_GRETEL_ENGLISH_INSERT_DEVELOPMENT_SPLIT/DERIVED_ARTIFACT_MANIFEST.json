@@ -1,0 +1,57 @@
+{
+  "artifact_count": 10,
+  "artifacts": [
+    {
+      "bytes": 1533,
+      "path": "DEVELOPMENT_SPLIT_POLICY.json",
+      "sha256": "40268c34f486d48687b24be4825519a0783ec167b4cb82208e394cb903cee569"
+    },
+    {
+      "bytes": 732,
+      "path": "STAGE0_INPUT_HASHES.json",
+      "sha256": "0cb63f9c512ecf69b4f01e23df19b0c9da754fc601fea4e7e6297110ea00697c"
+    },
+    {
+      "bytes": 1153965,
+      "path": "DEVELOPMENT_TRAIN_SPLIT_MANIFEST.jsonl",
+      "sha256": "15773835603366e54d6db7e9f0c53c70d9e3877db7da7f632f9c51949086f5d7"
+    },
+    {
+      "bytes": 139068,
+      "path": "DEVELOPMENT_DEV_SPLIT_MANIFEST.jsonl",
+      "sha256": "7452bca7f2b065c53ce093dcbbfe39e0397cbe894e90e3c12deac5a271affdc5"
+    },
+    {
+      "bytes": 139068,
+      "path": "DEVELOPMENT_PILOT_POOL_MANIFEST.jsonl",
+      "sha256": "7452bca7f2b065c53ce093dcbbfe39e0397cbe894e90e3c12deac5a271affdc5"
+    },
+    {
+      "bytes": 61847,
+      "path": "DEVELOPMENT_SPLIT_IDS.tsv",
+      "sha256": "a7c16d40ef82f3a32d37b3b2a20f4c4d5b34c5c0e596d0f25ff1f01cb3bba6cc"
+    },
+    {
+      "bytes": 823612,
+      "path": "SPLIT_GROUP_AUDIT.json",
+      "sha256": "73671b60a6f953eaf16f828f5d4bb6012ac538196d003533cadbcd59b80c2dfa"
+    },
+    {
+      "bytes": 117448,
+      "path": "DUPLICATE_AUDIT.json",
+      "sha256": "3e70debb0e53eeb05bdcd120240406d50c406a75c1ce41a064d8ccf8d1977844"
+    },
+    {
+      "bytes": 362,
+      "path": "OFFICIAL_TEST_ISOLATION_AUDIT.json",
+      "sha256": "8af15df5feba4435ffcadbbbbcf648a88d4c485a99b80771238f8564befdad04"
+    },
+    {
+      "bytes": 783,
+      "path": "STAGEENG1_SPLIT_SUMMARY.json",
+      "sha256": "e20085a160d1398bfb317b82d7816a3b69c7feda7f68445096ba8d4a1697bf7b"
+    }
+  ],
+  "combined_scientific_artifacts_sha256": "a67f4a384eda7f8f7c47a14eb51086956b83d3d52afc033a978cf73c20a5d2c6",
+  "stage": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
+}

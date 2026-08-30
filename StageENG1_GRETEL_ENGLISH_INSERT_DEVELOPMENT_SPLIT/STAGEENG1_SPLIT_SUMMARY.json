@@ -1,0 +1,18 @@
+{
+  "cross_split_signature_violation_count": 0,
+  "dataset_id": "gretelai/synthetic_text_to_sql",
+  "dataset_revision": "740ab236e64503fba51be1101df7a1be83bf455d",
+  "development_dev_count": 100,
+  "development_pilot_pool_count": 100,
+  "development_train_count": 828,
+  "gpu_called": false,
+  "model_called": false,
+  "raw_text_available_for_normalized_audit": true,
+  "source_stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION",
+  "source_stage_lock_commit": "05637b4457a680ee9d91c4759077235ca39c4f7b",
+  "source_stage_lock_status": "PASS_QUALIFICATION_ARTIFACTS_BUILT",
+  "split_group_count": 791,
+  "stage": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT",
+  "stage0_development_candidate_count": 928,
+  "stage0_official_confirmation_count": 51
+}

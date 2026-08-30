@@ -1,0 +1,40 @@
+{
+  "dataset_id": "gretelai/synthetic_text_to_sql",
+  "dataset_revision": "740ab236e64503fba51be1101df7a1be83bf455d",
+  "gpu_called": false,
+  "input_population": {
+    "requires_complexity_class": "single_row_insert",
+    "requires_development_allowed": true,
+    "requires_official_test_confirmation_only": false,
+    "requires_operation": "INSERT",
+    "requires_source_split": "train",
+    "requires_v2_literal_grounded_primary_eligible": true
+  },
+  "leakage_component_signatures": [
+    "schema_database_group",
+    "context_hash",
+    "prompt_hash",
+    "normalized_prompt_hash",
+    "sql_hash",
+    "sql_template_hash",
+    "source_row_key"
+  ],
+  "leakage_rule": "no signature value may appear in both development_train and development_dev",
+  "model_called": false,
+  "model_outputs_allowed": false,
+  "official_test_policy": {
+    "count": 51,
+    "included_in_stageeng1_split": false,
+    "source_split": "test",
+    "usage": "confirmation_only_after_development_freeze"
+  },
+  "source_stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION",
+  "split": {
+    "development_dev_role": "locked_pilot_pool_no_model_run_in_stageeng1",
+    "development_dev_target_count": 100,
+    "development_train_role": "available_for_later_analysis_or_tuning_after_review",
+    "group_selection": "deterministic_subset_sum_over_leakage_components",
+    "split_seed": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT_V1"
+  },
+  "stage": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
+}

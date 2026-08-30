@@ -1,0 +1,7 @@
+{
+  "official_confirmation_count": 51,
+  "official_test_confirmation_manifest_sha256": "28b9ddbc89521679914df88431ed5c6741f39edf2ffb43a70f7f4e218f64fd8c",
+  "official_test_confirmation_only_ids_in_stageeng1_split": [],
+  "official_test_policy": "excluded_from_stageeng1_development_split",
+  "stage": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
+}
