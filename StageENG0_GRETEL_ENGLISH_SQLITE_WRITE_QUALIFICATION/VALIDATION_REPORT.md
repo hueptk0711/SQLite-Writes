@@ -34,7 +34,7 @@ Secondary eligible UPDATE        2671
 Secondary eligible DELETE        2808
 ```
 
-## PATCH1 INSERT Grounding Funnel
+## PATCH2 INSERT Grounding Funnel
 
 ```text
 Single-row INSERT eligible              2410
@@ -71,11 +71,11 @@ Source alignability:
 ## Validation Commands
 
 ```text
-uv run --with pyarrow python scripts/data/build_stageeng0_gretel_qualification.py --raw-dir <raw_dir> --out-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION --package StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION_PATCH1_FINAL_REVIEWER_PACKAGE_20260830.zip
+uv run --with pyarrow python scripts/data/build_stageeng0_gretel_qualification.py --raw-dir <raw_dir> --out-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION --package StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION_PATCH2_FINAL_REVIEWER_PACKAGE_20260830.zip
 uv run --with pyarrow python scripts/data/validate_stageeng0_gretel_qualification.py --stage-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION --raw-dir <raw_dir>
 PYTHONPATH=tests/support/windows_py314_pytest_tempdir python -m pytest -q tests/test_stageeng0_gretel_qualification.py --basetemp .codex_tmp/pytest_stageeng0_tests5
 PYTHONPATH=tests/support/windows_py314_pytest_tempdir python -m pytest -q -m "not integration" --basetemp .codex_tmp/pytest_stageeng0_regression
-python -m zipfile --test StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION_PATCH1_FINAL_REVIEWER_PACKAGE_20260830.zip
+python -m zipfile --test StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION_PATCH2_FINAL_REVIEWER_PACKAGE_20260830.zip
 ```
 
 Results:
@@ -83,7 +83,7 @@ Results:
 ```text
 build: PASS
 validator: PASS
-dedicated tests: PASS, 68 tests
+dedicated tests: PASS, 72 tests
 regression tests: PASS, non-integration suite
 zip integrity: PASS
 derived artifact manifest: PASS

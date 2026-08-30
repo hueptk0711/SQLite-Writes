@@ -1,6 +1,5 @@
 {
   "controlled_exclusion_reasons": [
-    "ambiguous_multiple_occurrences",
     "context_parse_failure",
     "derived_value_not_supported",
     "expression_value_not_supported",
@@ -16,6 +15,23 @@
     "nondeterministic",
     "sqlite_dialect_incompatible"
   ],
+  "dataset_sqlite_write_eligibility": {
+    "does_not_require": [
+      "source literal grounding",
+      "V2 primary representability",
+      "model performance"
+    ],
+    "requires": [
+      "English natural-language prompt",
+      "exactly one gold write statement",
+      "operation in INSERT, UPDATE, DELETE",
+      "sql_context executes directly in SQLite without dialect rewrite",
+      "target table and referenced target columns exist in SQLite schema",
+      "gold write executes with PRAGMA foreign_keys=ON",
+      "D0 and D* snapshots are reproducible from fresh context",
+      "no external time/random state dependency"
+    ]
+  },
   "frozen_before_manifest_generation": true,
   "model_outputs_allowed": false,
   "primary_eligible_requires": [
@@ -30,9 +46,18 @@
     "source-alignability is derived from gold SQL and prompt only"
   ],
   "stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION",
-  "v2_literal_grounded_primary_scope": [
-    "INSERT",
-    "single_row_insert",
-    "source_alignable_literal"
-  ]
+  "v2_literal_grounded_primary_scope": {
+    "assignment_value_kinds": [
+      "direct_integer_literal",
+      "direct_real_literal",
+      "direct_string_literal"
+    ],
+    "complexity_class": "single_row_insert",
+    "inherits_dataset_sqlite_write_eligibility": true,
+    "joint_matching_algorithm": "maximum_cardinality_bipartite_matching",
+    "multiple_source_occurrences": "kept_as_acceptable_alternative_spans_not_an_automatic_exclusion",
+    "operation": "INSERT",
+    "require_all_assignments_individually_source_alignable": true,
+    "require_joint_one_to_one_source_matching": true
+  }
 }

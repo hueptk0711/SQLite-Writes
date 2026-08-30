@@ -12,9 +12,9 @@
       "sha256": "16a6326ae8827ef132d2d657b5e80533034222fcb63efee73e49953b01452d5f"
     },
     {
-      "bytes": 1322,
+      "bytes": 2438,
       "path": "ELIGIBILITY_POLICY.json",
-      "sha256": "99c22bf30b27d45d4710560aca2d955b3bf0657c814bb9f1165608de1591c47f"
+      "sha256": "7c2f6fcf28133e0774efe0e3337e0ba3a1bffa0cbdd49c3ec6a25da0d17507b2"
     },
     {
       "bytes": 484,
@@ -107,6 +107,6 @@
       "sha256": "28b9ddbc89521679914df88431ed5c6741f39edf2ffb43a70f7f4e218f64fd8c"
     }
   ],
-  "combined_scientific_artifacts_sha256": "84c1c161e267fe615db122bb109cc0c87de8e52cf266559eb62dd5fd36019dd1",
+  "combined_scientific_artifacts_sha256": "321f97638dd542e85a244479c6f78ac55ba30b694be086e881eca6814d84d456",
   "stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION"
 }

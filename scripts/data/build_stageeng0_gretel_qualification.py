@@ -70,7 +70,6 @@ CONTROLLED_EXCLUSION_REASONS = {
     "derived_value_not_supported",
     "implicit_value_not_supported",
     "nonalignable_normalization",
-    "ambiguous_multiple_occurrences",
     "expression_value_not_supported",
     "joint_source_not_representable",
 }
@@ -1124,6 +1123,23 @@ def eligibility_policy() -> dict[str, Any]:
         "stage": STAGE_NAME,
         "frozen_before_manifest_generation": True,
         "model_outputs_allowed": False,
+        "dataset_sqlite_write_eligibility": {
+            "requires": [
+                "English natural-language prompt",
+                "exactly one gold write statement",
+                "operation in INSERT, UPDATE, DELETE",
+                "sql_context executes directly in SQLite without dialect rewrite",
+                "target table and referenced target columns exist in SQLite schema",
+                "gold write executes with PRAGMA foreign_keys=ON",
+                "D0 and D* snapshots are reproducible from fresh context",
+                "no external time/random state dependency",
+            ],
+            "does_not_require": [
+                "source literal grounding",
+                "V2 primary representability",
+                "model performance",
+            ],
+        },
         "primary_eligible_requires": [
             "English natural-language prompt",
             "exactly one gold write statement",
@@ -1135,11 +1151,16 @@ def eligibility_policy() -> dict[str, Any]:
             "no external time/random state dependency",
             "source-alignability is derived from gold SQL and prompt only",
         ],
-        "v2_literal_grounded_primary_scope": [
-            "INSERT",
-            "single_row_insert",
-            "source_alignable_literal",
-        ],
+        "v2_literal_grounded_primary_scope": {
+            "inherits_dataset_sqlite_write_eligibility": True,
+            "operation": "INSERT",
+            "complexity_class": "single_row_insert",
+            "assignment_value_kinds": sorted(SUPPORTED_PRIMARY_LITERAL_KINDS),
+            "require_all_assignments_individually_source_alignable": True,
+            "require_joint_one_to_one_source_matching": True,
+            "joint_matching_algorithm": "maximum_cardinality_bipartite_matching",
+            "multiple_source_occurrences": "kept_as_acceptable_alternative_spans_not_an_automatic_exclusion",
+        },
         "controlled_exclusion_reasons": sorted(CONTROLLED_EXCLUSION_REASONS),
     }
 
@@ -1605,7 +1626,7 @@ Secondary eligible UPDATE        {len(manifests['UPDATE'])}
 Secondary eligible DELETE        {len(manifests['DELETE'])}
 ```
 
-## PATCH1 INSERT Grounding Funnel
+## PATCH2 INSERT Grounding Funnel
 
 ```text
 Single-row INSERT eligible              {insert_grounding_summary['single_row_insert_eligible']}
@@ -1633,11 +1654,11 @@ Source alignability:
 ## Validation Commands
 
 ```text
-uv run --with pyarrow python scripts/data/build_stageeng0_gretel_qualification.py --raw-dir <raw_dir> --out-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION --package StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION_PATCH1_FINAL_REVIEWER_PACKAGE_20260830.zip
+uv run --with pyarrow python scripts/data/build_stageeng0_gretel_qualification.py --raw-dir <raw_dir> --out-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION --package StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION_PATCH2_FINAL_REVIEWER_PACKAGE_20260830.zip
 uv run --with pyarrow python scripts/data/validate_stageeng0_gretel_qualification.py --stage-dir StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION --raw-dir <raw_dir>
 PYTHONPATH=tests/support/windows_py314_pytest_tempdir python -m pytest -q tests/test_stageeng0_gretel_qualification.py --basetemp .codex_tmp/pytest_stageeng0_tests5
 PYTHONPATH=tests/support/windows_py314_pytest_tempdir python -m pytest -q -m "not integration" --basetemp .codex_tmp/pytest_stageeng0_regression
-python -m zipfile --test StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION_PATCH1_FINAL_REVIEWER_PACKAGE_20260830.zip
+python -m zipfile --test StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION_PATCH2_FINAL_REVIEWER_PACKAGE_20260830.zip
 ```
 
 Results:
@@ -1645,7 +1666,7 @@ Results:
 ```text
 build: PASS
 validator: PASS
-dedicated tests: PASS, 68 tests
+dedicated tests: PASS, 72 tests
 regression tests: PASS, non-integration suite
 zip integrity: PASS
 derived artifact manifest: PASS

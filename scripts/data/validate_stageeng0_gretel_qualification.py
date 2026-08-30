@@ -21,6 +21,7 @@ from scripts.data.build_stageeng0_gretel_qualification import (
     RAW_FILES,
     SCIENTIFIC_ARTIFACTS,
     STAGE_NAME,
+    SUPPORTED_PRIMARY_LITERAL_KINDS,
     build_run,
     load_parquet_rows,
     sha256_file,
@@ -67,6 +68,18 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line]
 
 
+def expected_primary_insert(row: dict[str, Any]) -> bool:
+    grounding = row.get("insert_assignment_grounding") or {}
+    return bool(
+        row.get("sqlite_write_eligible")
+        and row.get("operation") == "INSERT"
+        and row.get("complexity_class") == "single_row_insert"
+        and grounding.get("all_assignments_supported_direct_literal") is True
+        and grounding.get("all_assignments_individually_source_alignable") is True
+        and grounding.get("jointly_source_representable") is True
+    )
+
+
 def validate(
     stage_dir: Path,
     raw_dir: Path | None = None,
@@ -111,6 +124,22 @@ def validate(
         failures.append("gpu_called_not_false")
     if policy.get("model_outputs_allowed") is not False:
         failures.append("eligibility_policy_allows_model_outputs")
+    primary_policy = policy.get("v2_literal_grounded_primary_scope")
+    if not isinstance(primary_policy, dict):
+        failures.append("primary_policy_not_machine_readable")
+    else:
+        if primary_policy.get("operation") != "INSERT":
+            failures.append("primary_policy_operation_mismatch")
+        if primary_policy.get("complexity_class") != "single_row_insert":
+            failures.append("primary_policy_complexity_mismatch")
+        if set(primary_policy.get("assignment_value_kinds", [])) != SUPPORTED_PRIMARY_LITERAL_KINDS:
+            failures.append("primary_policy_literal_kinds_mismatch")
+        if primary_policy.get("require_all_assignments_individually_source_alignable") is not True:
+            failures.append("primary_policy_individual_grounding_not_required")
+        if primary_policy.get("require_joint_one_to_one_source_matching") is not True:
+            failures.append("primary_policy_joint_matching_not_required")
+        if "automatic_exclusion" not in str(primary_policy.get("multiple_source_occurrences", "")):
+            failures.append("primary_policy_multiple_occurrences_semantics_missing")
     if lock.get("derived_artifact_manifest_sha256") != sha256_file(
         stage_dir / "DERIVED_ARTIFACT_MANIFEST.json"
     ):
@@ -157,6 +186,10 @@ def validate(
                 failures.append(f"manifest_operation_mismatch:{row['sample_id']}")
             if not row.get("sqlite_write_eligible"):
                 failures.append(f"manifest_contains_ineligible:{row['sample_id']}")
+            if operation == "INSERT":
+                expected_primary = expected_primary_insert(row)
+                if bool(row.get("v2_literal_grounded_primary_eligible")) != expected_primary:
+                    failures.append(f"primary_insert_flag_policy_mismatch:{row['sample_id']}")
     if len(manifest_ids) != len(set(manifest_ids)):
         failures.append("sample_id_in_multiple_manifests")
     if set(manifest_ids) != eligible_ledger_ids:

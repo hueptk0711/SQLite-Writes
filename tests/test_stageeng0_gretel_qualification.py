@@ -10,6 +10,7 @@ from scripts.data.build_stageeng0_gretel_qualification import (
     build_run,
     classify_gold_sql,
     classify_write_complexity,
+    eligibility_policy,
     has_nondeterministic_sql,
     insert_assignment_grounding,
     parse_insert_assignments,
@@ -19,7 +20,7 @@ from scripts.data.build_stageeng0_gretel_qualification import (
     sql_statements,
     target_reference,
 )
-from scripts.data.validate_stageeng0_gretel_qualification import validate
+from scripts.data.validate_stageeng0_gretel_qualification import expected_primary_insert, validate
 
 
 @pytest.mark.parametrize(
@@ -371,3 +372,88 @@ def test_official_test_primary_candidate_is_confirmation_only(tmp_path: Path) ->
     assert len(confirmation) == 1
     assert confirmation[0]["development_allowed"] is False
     assert confirmation[0]["official_test_confirmation_only"] is True
+
+
+def test_policy_machine_readable_primary_rule_matches_patch1_logic() -> None:
+    policy = eligibility_policy()
+    primary = policy["v2_literal_grounded_primary_scope"]
+
+    assert primary["operation"] == "INSERT"
+    assert primary["complexity_class"] == "single_row_insert"
+    assert set(primary["assignment_value_kinds"]) == {
+        "direct_string_literal",
+        "direct_integer_literal",
+        "direct_real_literal",
+    }
+    assert primary["require_all_assignments_individually_source_alignable"] is True
+    assert primary["require_joint_one_to_one_source_matching"] is True
+    assert "ambiguous_multiple_occurrences" not in policy["controlled_exclusion_reasons"]
+    assert "not_an_automatic_exclusion" in primary["multiple_source_occurrences"]
+
+
+def test_expected_primary_insert_recomputes_from_grounding_fields() -> None:
+    row = {
+        "sqlite_write_eligible": True,
+        "operation": "INSERT",
+        "complexity_class": "single_row_insert",
+        "insert_assignment_grounding": {
+            "all_assignments_supported_direct_literal": True,
+            "all_assignments_individually_source_alignable": True,
+            "jointly_source_representable": True,
+        },
+    }
+
+    assert expected_primary_insert(row) is True
+    row["insert_assignment_grounding"]["jointly_source_representable"] = False
+    assert expected_primary_insert(row) is False
+
+
+def test_generic_source_alignable_but_joint_false_is_not_primary(tmp_path: Path) -> None:
+    context = "CREATE TABLE t(a INT, b INT);"
+    rows = {
+        "train": [_row(1, "Set both fields to 5.", context, "INSERT INTO t(a,b) VALUES (5,5);")],
+        "test": [],
+    }
+    build_run(rows, tmp_path / "stage", _raw_dir(tmp_path))
+    manifest_row = json.loads(
+        (tmp_path / "stage" / "ELIGIBLE_INSERT_MANIFEST.jsonl").read_text(encoding="utf-8")
+    )
+
+    assert manifest_row["source_alignability_status"] == "source_alignable_literal"
+    assert manifest_row["insert_assignment_grounding"]["jointly_source_representable"] is False
+    assert manifest_row["v2_literal_grounded_primary_eligible"] is False
+
+
+def test_validator_rejects_primary_flag_inconsistent_with_grounding(tmp_path: Path) -> None:
+    context = "CREATE TABLE t(a INT, b INT);"
+    rows = {
+        "train": [_row(1, "Set both fields to 5.", context, "INSERT INTO t(a,b) VALUES (5,5);")],
+        "test": [],
+    }
+    build_run(rows, tmp_path / "stage", _raw_dir(tmp_path))
+    path = tmp_path / "stage" / "ELIGIBLE_INSERT_MANIFEST.jsonl"
+    row = json.loads(path.read_text(encoding="utf-8"))
+    row["v2_literal_grounded_primary_eligible"] = True
+    path.write_text(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
+    manifest = json.loads((tmp_path / "stage" / "DERIVED_ARTIFACT_MANIFEST.json").read_text(encoding="utf-8"))
+    for artifact in manifest["artifacts"]:
+        if artifact["path"] == "ELIGIBLE_INSERT_MANIFEST.jsonl":
+            artifact["sha256"] = __import__("hashlib").sha256(path.read_bytes()).hexdigest()
+            artifact["bytes"] = path.stat().st_size
+    (tmp_path / "stage" / "DERIVED_ARTIFACT_MANIFEST.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    lock = json.loads((tmp_path / "stage" / "STAGEENG0_LOCK.json").read_text(encoding="utf-8"))
+    lock["derived_artifact_manifest_sha256"] = __import__("hashlib").sha256(
+        (tmp_path / "stage" / "DERIVED_ARTIFACT_MANIFEST.json").read_bytes()
+    ).hexdigest()
+    (tmp_path / "stage" / "STAGEENG0_LOCK.json").write_text(
+        json.dumps(lock, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    result = validate(tmp_path / "stage")
+
+    assert result["status"] == "FAIL"
+    assert "primary_insert_flag_policy_mismatch:gretel:train:1:000000" in result["failures"]
