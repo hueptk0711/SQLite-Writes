@@ -1,0 +1,40 @@
+# Stage7B-A2 English Candidate-Span Reference Amendment
+
+This package defines a candidate-span reference representation for English
+single-row INSERT development work.
+
+Review order:
+
+1. `Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/A3_FEASIBILITY_CONCLUSION.json`
+2. `Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/DESIGN_TRAIN_SCOPE_AUDIT.json`
+3. `Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/SPAN_REFERENCE_INVENTORY_SPEC.json`
+4. `Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/CANDIDATE_GENERATION_ALGORITHM_SPEC.json`
+5. `Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/PHASE_O_SPAN_REFERENCE_SCHEMA.json`
+6. `Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/PHASE_O_SPAN_REFERENCE_PROTOCOL.json`
+7. `Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/DOWNSTREAM_DERIVATION_SPEC.json`
+8. `Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/ORACLE_CANDIDATE_COVERAGE_AUDIT.json`
+9. `Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/ORACLE_CANDIDATE_COVERAGE_AUDIT.jsonl`
+10. `Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/DERIVED_ARTIFACT_MANIFEST.json`
+11. `Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/STAGE7B_A2_LOCK.json`
+12. `scripts/data/build_stage7b_a2_candidate_span_reference.py`
+13. `scripts/data/validate_stage7b_a2_candidate_span_reference.py`
+14. `tests/test_stage7b_a2_candidate_span_reference.py`
+15. `Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/VALIDATION_REPORT.md`
+
+Rerun with local Gretel parquet:
+
+```bash
+uv run --with pyarrow python scripts/data/build_stage7b_a2_candidate_span_reference.py \
+  --raw-dir /path/to/gretel_synthetic_text_to_sql_740ab236 \
+  --out-dir Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT
+python scripts/data/validate_stage7b_a2_candidate_span_reference.py \
+  --stage-dir Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT
+```
+
+No GPU is required. No model is called.
+
+Local artifact directory at build time:
+
+```text
+D:\paper kltn\text to sql\github_publish\SQLite-Writes\Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT
+```

@@ -1,0 +1,19 @@
+{
+  "gpu_called": false,
+  "model_called": false,
+  "model_generated_offsets_removed": true,
+  "selected_span_ref_resolution": [
+    "Reject unknown span_refs.",
+    "Resolve selected refs to deterministic inventory rows.",
+    "Sort selected spans by (start_char, end_char, span_ref).",
+    "Derive EV_1/SLOT_1, EV_2/SLOT_2, ... from resolved source text."
+  ],
+  "stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT",
+  "unchanged_components": [
+    "Phase M slot-to-column mapping",
+    "typed materialization",
+    "completeness verification",
+    "compiler",
+    "SQLite preflight"
+  ]
+}

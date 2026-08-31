@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "operation": {
+      "const": "INSERT",
+      "type": "string"
+    },
+    "span_refs": {
+      "items": {
+        "pattern": "^SPAN_[0-9]{4}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "operation",
+    "span_refs"
+  ],
+  "title": "Stage7B-A2 Phase O Span Reference Output",
+  "type": "object"
+}

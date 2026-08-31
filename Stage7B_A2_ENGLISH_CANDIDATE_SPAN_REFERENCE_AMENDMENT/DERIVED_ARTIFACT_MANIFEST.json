@@ -1,0 +1,53 @@
+{
+  "artifact_count": 9,
+  "artifacts": [
+    {
+      "bytes": 764,
+      "path": "A3_FEASIBILITY_CONCLUSION.json",
+      "sha256": "3104c183349b4d944e0fc00e2106778ae7a109ea0c64cf02329aa84ade246638"
+    },
+    {
+      "bytes": 516,
+      "path": "DESIGN_TRAIN_SCOPE_AUDIT.json",
+      "sha256": "7fbb15d65c9a92b2aab599d2a9fc71cedb3ae264fc3cbbab30080d50ec3d4765"
+    },
+    {
+      "bytes": 748,
+      "path": "SPAN_REFERENCE_INVENTORY_SPEC.json",
+      "sha256": "1012a8ba0f5f3fbf1c324fba5a77f84859bf9d62e5e20f03971b65ce84c73a9a"
+    },
+    {
+      "bytes": 874,
+      "path": "CANDIDATE_GENERATION_ALGORITHM_SPEC.json",
+      "sha256": "76484e42e858b6f0756f8c0bf485ee3440cc7c6c6c6a33dd477a04c70fc84346"
+    },
+    {
+      "bytes": 507,
+      "path": "PHASE_O_SPAN_REFERENCE_SCHEMA.json",
+      "sha256": "6206766565c43ecb97b97d9514275a693439f5158531b426a4b7c7b1f3aebdc0"
+    },
+    {
+      "bytes": 638,
+      "path": "PHASE_O_SPAN_REFERENCE_PROTOCOL.json",
+      "sha256": "d147418798d0c9174635c8738b7b3944a249d951f6a8763012dc65176820bc08"
+    },
+    {
+      "bytes": 604,
+      "path": "DOWNSTREAM_DERIVATION_SPEC.json",
+      "sha256": "cf8868e2fb6049bba5f59bee368de9e183f7c9f48d86d0de72cfc9b5bf2ed90d"
+    },
+    {
+      "bytes": 1354,
+      "path": "ORACLE_CANDIDATE_COVERAGE_AUDIT.json",
+      "sha256": "b94ac1bcdbf7c29e3368538fb8a99122e38cc902f7126be926b3d870a10954c5"
+    },
+    {
+      "bytes": 740988,
+      "path": "ORACLE_CANDIDATE_COVERAGE_AUDIT.jsonl",
+      "sha256": "91d01c9089f3ab23f9da027537cfe053dfc0436982035763c8f6ea765d38aaba"
+    }
+  ],
+  "combined_scientific_artifacts_sha256": "56b9f10cb914eae7d4554f4872e2375f5b855b7c5d93e06cee6ead42f69c2ee4",
+  "patch": "PATCH0",
+  "stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
+}

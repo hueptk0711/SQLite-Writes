@@ -1,0 +1,17 @@
+{
+  "candidate_inventory_generated_by": "source_only_high_recall_lexical_inventory_v1",
+  "development_dev_usage_allowed": false,
+  "few_shot_allowed": false,
+  "gpu_called": false,
+  "model_called": false,
+  "model_generates_character_offsets": false,
+  "official_test_usage_allowed": false,
+  "operation_scope": "INSERT",
+  "phase_o_task": "select semantic value candidates by span_ref only",
+  "pilot_usage_allowed": false,
+  "repair_allowed": false,
+  "replaces": "Stage7E0-A3 numeric start_char/end_char prediction",
+  "retry_allowed": false,
+  "stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT",
+  "zero_shot": true
+}

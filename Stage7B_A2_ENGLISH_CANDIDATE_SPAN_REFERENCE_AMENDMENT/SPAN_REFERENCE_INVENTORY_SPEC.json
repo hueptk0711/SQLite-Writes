@@ -1,0 +1,34 @@
+{
+  "candidate_fields": [
+    "span_ref",
+    "start_char",
+    "end_char",
+    "text",
+    "tags"
+  ],
+  "gpu_called": false,
+  "max_ngram_tokens": 16,
+  "max_span_chars": 160,
+  "model_called": false,
+  "no_gold_at_runtime": true,
+  "representation": "candidate_span_reference_inventory",
+  "runtime_visibility": {
+    "model_does_not_generate": [
+      "start_char",
+      "end_char"
+    ],
+    "model_sees": [
+      "span_ref",
+      "text",
+      "tags"
+    ],
+    "resolver_uses": [
+      "span_ref",
+      "start_char",
+      "end_char",
+      "text"
+    ]
+  },
+  "span_ref_format": "SPAN_0001, SPAN_0002, ... assigned after deterministic sort by (start_char, end_char)",
+  "stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
+}

@@ -1,0 +1,14 @@
+{
+  "design_source": "StageENG1 development_train excluding development_pilot_pool",
+  "design_train_non_pilot_count": 728,
+  "development_dev_count": 100,
+  "development_dev_ids_in_design_train": [],
+  "development_pilot_pool_count": 100,
+  "gpu_called": false,
+  "model_called": false,
+  "official_test_confirmation_count": 51,
+  "official_test_ids_in_design_train": [],
+  "pilot_ids_in_design_train": [],
+  "source_stageeng1_train_count": 828,
+  "stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
+}

@@ -1,0 +1,14 @@
+{
+  "conclusion": "Stage7E0-A3 is closed as a valid feasibility failure for numeric character-offset prediction.",
+  "evidence_integrity_status": "PASS",
+  "gretel_pilot_opened": false,
+  "next_method_change": "replace model-generated numeric offsets with model-selected candidate span_refs",
+  "primary_gate_status": "FAIL",
+  "primary_pass_count": "1/8",
+  "protocol_compliance_status": "PASS",
+  "required_pass_count": "8/8",
+  "source_lock_path": "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT/STAGE7E0_A3_SERVER_RESULT_LOCK.json",
+  "source_lock_sha256": "45167eaef936adf8c7d3ec80c0388ffea2dbbf968854c6f179666ffa2e6920f5",
+  "source_stage": "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT",
+  "stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
+}
