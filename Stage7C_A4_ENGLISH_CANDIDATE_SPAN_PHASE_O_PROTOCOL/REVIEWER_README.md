@@ -15,18 +15,25 @@ Review order:
 8. `Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/ACCEPTANCE_POLICY_A4.json`
 9. `Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/CANDIDATE_MISS_FAILURE_POLICY.json`
 10. `Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/SOURCE_INPUT_MANIFEST.json`
-11. `Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/DERIVED_ARTIFACT_MANIFEST.json`
-12. `Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/STAGE7C_A4_LOCK.json`
-13. `Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/VALIDATION_REPORT.md`
-14. `scripts/data/build_stage7c_a4_candidate_span_phase_o_protocol.py`
-15. `scripts/data/validate_stage7c_a4_candidate_span_phase_o_protocol.py`
-16. `tests/test_stage7c_a4_candidate_span_phase_o_protocol.py`
+11. `Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/SYNTHETIC_SQLITE_DB_MANIFEST.jsonl`
+12. `Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/PACKAGE_FILE_INTEGRITY_MANIFEST.json`
+13. `Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/DERIVED_ARTIFACT_MANIFEST.json`
+14. `Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/STAGE7C_A4_LOCK.json`
+15. `Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/VALIDATION_REPORT.md`
+16. `scripts/data/build_stage7c_a4_candidate_span_phase_o_protocol.py`
+17. `scripts/data/validate_stage7c_a4_candidate_span_phase_o_protocol.py`
+18. `tests/test_stage7c_a4_candidate_span_phase_o_protocol.py`
 
 Clean extraction commands:
 
 ```bash
 python scripts/data/validate_stage7c_a4_candidate_span_phase_o_protocol.py \
   --stage-dir Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL
+uv run --with transformers python scripts/data/validate_stage7c_a4_candidate_span_phase_o_protocol.py \
+  --stage-dir Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL \
+  --rebuild \
+  --tokenizer-name-or-path Qwen/Qwen2.5-Coder-7B-Instruct \
+  --tokenizer-revision c03e6d358207e414f1eca0bb1891e29f1db0e242
 python -m pytest -q tests/test_stage7c_a4_candidate_span_phase_o_protocol.py
 ```
 

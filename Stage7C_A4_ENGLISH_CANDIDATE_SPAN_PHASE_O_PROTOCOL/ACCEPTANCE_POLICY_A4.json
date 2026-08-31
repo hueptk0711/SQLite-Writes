@@ -3,7 +3,7 @@
   "gpu_called": false,
   "gretel_pilot_opened": false,
   "model_called": false,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "stage": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL",
   "synthetic_feasibility_gate": {
     "averaging_allowed": false,

@@ -23,6 +23,7 @@ from scripts.data.build_stage7c_a4_candidate_span_phase_o_protocol import (
     STAGE7B_SELECTED_VARIANT,
     build_stage,
     canonical_json,
+    logical_db_fixture_hash,
     oracle_span_ref_path,
     package_reviewer,
     prompt_spec,
@@ -82,6 +83,8 @@ def test_model_side_input_contains_no_labels_or_offsets(built_stage: Path) -> No
         assert "start_char" not in row["model_side_input"]["candidate_inventory_text"]
         assert "end_char" not in row["model_side_input"]["candidate_inventory_text"]
         assert row["label_side_expected"]["model_side_visible"] is False
+        assert "sqlite_db_sha256" not in row["synthetic_db_spec"]
+        assert "logical_db_fixture_hash" in row["synthetic_db_spec"]
 
 
 def test_dynamic_schema_enum_equals_exact_candidate_refs(built_stage: Path) -> None:
@@ -154,6 +157,26 @@ def test_token_audit_records_full_rendered_prompt_burden(built_stage: Path) -> N
         assert audit["rendered_prompt_token_stats"]["p95"] >= audit["rendered_prompt_token_stats"]["median"]
 
 
+def test_logical_db_identity_is_independent_from_sqlite_binary_hash(built_stage: Path) -> None:
+    db_manifest = read_jsonl(built_stage / "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl")
+    package_integrity = read_json(built_stage / "PACKAGE_FILE_INTEGRITY_MANIFEST.json")
+    assert all("sqlite_db_sha256" not in row for row in db_manifest)
+    assert all("logical_db_fixture_hash" in row for row in db_manifest)
+    for row in db_manifest:
+        expected = logical_db_fixture_hash(
+            {
+                "sample_id": row["sample_id"],
+                "table_name": row["table_name"],
+                "columns": row["source_columns"],
+            },
+            row["create_sql"],
+        )
+        assert row["logical_db_fixture_hash"] == expected
+        assert row["logical_db_fixture_hash"] != sha256_file(built_stage / row["sqlite_db_path"])
+    assert package_integrity["identity_scope"] == "physical_package_file_integrity_not_cross_environment_scientific_rebuild"
+    assert all("sqlite_binary_file_sha256" in item for item in package_integrity["sqlite_binary_artifacts"])
+
+
 def test_candidate_miss_policy_locks_denominator_failure(built_stage: Path) -> None:
     policy = read_json(built_stage / "CANDIDATE_MISS_FAILURE_POLICY.json")
     lock = read_json(built_stage / "STAGE7C_A4_LOCK.json")
@@ -169,6 +192,22 @@ def test_validator_accepts_generated_artifacts(built_stage: Path) -> None:
     assert report["fresh_english_case_count"] == 10
     assert report["gold_value_count"] == 35
     assert report["oracle_preflight_admitted_count"] == 10
+
+
+def test_semantic_rebuild_passes_without_binary_sqlite_hash_matching(tmp_path: Path) -> None:
+    stage = tmp_path / STAGE_NAME
+    build_stage(stage)
+    report = validate(stage, rebuild=True)
+    assert report["status"] == "PASS", report["failures"]
+
+
+def test_validator_requires_tokenizer_for_rebuild_when_frozen_audit_passed() -> None:
+    audit = read_json(ROOT / STAGE_NAME / "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json")
+    if audit["tokenizer_status"] != "PASS":
+        pytest.skip("committed stage artifact was not built with tokenizer PASS")
+    report = validate(ROOT / STAGE_NAME, rebuild=True)
+    assert report["status"] == "FAIL"
+    assert report["failures"] == ["TOKENIZER_REQUIRED_FOR_REBUILD"]
 
 
 def test_validator_rejects_unknown_span_ref_tamper(tmp_path: Path) -> None:

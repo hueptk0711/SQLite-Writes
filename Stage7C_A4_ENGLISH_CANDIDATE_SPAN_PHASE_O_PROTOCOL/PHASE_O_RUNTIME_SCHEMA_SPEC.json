@@ -2,7 +2,7 @@
   "dynamic_constraint": "span_refs.items.enum is exactly [candidate.span_ref for candidate in current sample inventory]",
   "gpu_called": false,
   "model_called": false,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "runtime_builder": "build_dynamic_phase_o_schema(candidate_inventory)",
   "stage": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL",
   "static_pattern_fallback_allowed": false,

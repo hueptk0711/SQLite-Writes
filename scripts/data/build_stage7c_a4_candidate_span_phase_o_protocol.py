@@ -53,7 +53,7 @@ from scripts.data.build_stage7b_a2_candidate_span_reference import (
 
 
 STAGE_NAME = "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL"
-PATCH_NAME = "PATCH0"
+PATCH_NAME = "PATCH1"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260831.zip"
 STAGE7B_A2_NAME = "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
 STAGE7C_A3_NAME = "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT"
@@ -95,6 +95,9 @@ SCIENTIFIC_ARTIFACTS = [
     "ACCEPTANCE_POLICY_A4.json",
     "CANDIDATE_MISS_FAILURE_POLICY.json",
     "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl",
+]
+PACKAGE_INTEGRITY_ARTIFACTS = [
+    "PACKAGE_FILE_INTEGRITY_MANIFEST.json",
 ]
 UPSTREAM_PACKAGE_PATHS = [
     "pyproject.toml",
@@ -336,6 +339,17 @@ def create_sql(case: dict[str, Any]) -> str:
     return f'CREATE TABLE "{case["table_name"]}" ({columns});'
 
 
+def logical_db_fixture_hash(case: dict[str, Any], schema_sql: str) -> str:
+    logical_fixture = {
+        "sample_id": case["sample_id"],
+        "table_name": case["table_name"],
+        "columns": case["columns"],
+        "create_sql": schema_sql,
+        "initial_state": [],
+    }
+    return sha256_text(canonical_json(logical_fixture))
+
+
 def target_rows(case: dict[str, Any]) -> list[dict[str, Any]]:
     return [
         {
@@ -362,8 +376,10 @@ def create_case_db(case: dict[str, Any], db_dir: Path) -> dict[str, Any]:
         connection.commit()
     return {
         "sample_id": case["sample_id"],
+        "table_name": case["table_name"],
+        "source_columns": case["columns"],
         "sqlite_db_path": f"sqlite_dbs/{db_path.name}",
-        "sqlite_db_sha256": sha256_file(db_path),
+        "logical_db_fixture_hash": logical_db_fixture_hash(case, schema_sql),
         "initial_state_hash": sha256_text(canonical_json([])),
         "create_sql": schema_sql,
         "create_sql_sha256": sha256_text(schema_sql),
@@ -722,24 +738,44 @@ def smoke_row(case: dict[str, Any], db_info: dict[str, Any]) -> dict[str, Any]:
 
 
 def build_derived_manifest(stage_dir: Path) -> dict[str, Any]:
-    artifact_names = [
-        *SCIENTIFIC_ARTIFACTS,
-        *[f"sqlite_dbs/{path.name}" for path in sorted((stage_dir / "sqlite_dbs").glob("*.sqlite"))],
-    ]
     artifacts = [
         {
             "path": name,
             "bytes": (stage_dir / name).stat().st_size,
             "sha256": sha256_file(stage_dir / name),
         }
-        for name in sorted(artifact_names)
+        for name in sorted(SCIENTIFIC_ARTIFACTS)
     ]
     return {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
+        "identity_scope": "scientific_logical_artifacts_only",
         "artifact_count": len(artifacts),
         "artifacts": artifacts,
         "combined_scientific_artifacts_sha256": sha256_text(canonical_json(artifacts)),
+    }
+
+
+def package_file_integrity_manifest(stage_dir: Path) -> dict[str, Any]:
+    sqlite_files = sorted((stage_dir / "sqlite_dbs").glob("*.sqlite"))
+    sqlite_artifacts = [
+        {
+            "path": f"sqlite_dbs/{path.name}",
+            "bytes": path.stat().st_size,
+            "sqlite_binary_file_sha256": sha256_file(path),
+            "integrity_scope": "package_file_tamper_detection_only",
+        }
+        for path in sqlite_files
+    ]
+    return {
+        "stage": STAGE_NAME,
+        "patch": PATCH_NAME,
+        "identity_scope": "physical_package_file_integrity_not_cross_environment_scientific_rebuild",
+        "sqlite_binary_artifact_count": len(sqlite_artifacts),
+        "sqlite_binary_artifacts": sqlite_artifacts,
+        "combined_sqlite_binary_artifacts_sha256": sha256_text(canonical_json(sqlite_artifacts)),
+        "model_called": False,
+        "gpu_called": False,
     }
 
 
@@ -797,6 +833,13 @@ rendered_prompt_tokens_max={token_stats.get("max")}
 
 Candidate-generator miss is locked as a method failure. It must remain in every
 pilot/dev/test denominator and may not be used as a sample-exclusion rule.
+
+## Rebuild Semantics
+
+SQLite fixture identity is logical, not bytewise physical SQLite file identity.
+`SYNTHETIC_SQLITE_DB_MANIFEST.jsonl` stores create SQL, initial state hash, and
+`logical_db_fixture_hash`. `PACKAGE_FILE_INTEGRITY_MANIFEST.json` stores binary
+SQLite file hashes only for ZIP tamper detection.
 """
 
 
@@ -818,18 +861,25 @@ Review order:
 8. `{STAGE_NAME}/ACCEPTANCE_POLICY_A4.json`
 9. `{STAGE_NAME}/CANDIDATE_MISS_FAILURE_POLICY.json`
 10. `{STAGE_NAME}/SOURCE_INPUT_MANIFEST.json`
-11. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
-12. `{STAGE_NAME}/STAGE7C_A4_LOCK.json`
-13. `{STAGE_NAME}/VALIDATION_REPORT.md`
-14. `scripts/data/build_stage7c_a4_candidate_span_phase_o_protocol.py`
-15. `scripts/data/validate_stage7c_a4_candidate_span_phase_o_protocol.py`
-16. `tests/test_stage7c_a4_candidate_span_phase_o_protocol.py`
+11. `{STAGE_NAME}/SYNTHETIC_SQLITE_DB_MANIFEST.jsonl`
+12. `{STAGE_NAME}/PACKAGE_FILE_INTEGRITY_MANIFEST.json`
+13. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
+14. `{STAGE_NAME}/STAGE7C_A4_LOCK.json`
+15. `{STAGE_NAME}/VALIDATION_REPORT.md`
+16. `scripts/data/build_stage7c_a4_candidate_span_phase_o_protocol.py`
+17. `scripts/data/validate_stage7c_a4_candidate_span_phase_o_protocol.py`
+18. `tests/test_stage7c_a4_candidate_span_phase_o_protocol.py`
 
 Clean extraction commands:
 
 ```bash
 python scripts/data/validate_stage7c_a4_candidate_span_phase_o_protocol.py \\
   --stage-dir {STAGE_NAME}
+uv run --with transformers python scripts/data/validate_stage7c_a4_candidate_span_phase_o_protocol.py \\
+  --stage-dir {STAGE_NAME} \\
+  --rebuild \\
+  --tokenizer-name-or-path {QWEN_TOKENIZER_ID} \\
+  --tokenizer-revision {QWEN_TOKENIZER_REVISION}
 python -m pytest -q tests/test_stage7c_a4_candidate_span_phase_o_protocol.py
 ```
 
@@ -882,6 +932,7 @@ def build_stage(
     write_jsonl(out_dir / "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl", db_manifest)
     token_audit = prompt_token_audit(rows, tokenizer_name_or_path, tokenizer_revision)
     write_json(out_dir / "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json", token_audit)
+    write_json(out_dir / "PACKAGE_FILE_INTEGRITY_MANIFEST.json", package_file_integrity_manifest(out_dir))
 
     derived_manifest = build_derived_manifest(out_dir)
     write_json(out_dir / "DERIVED_ARTIFACT_MANIFEST.json", derived_manifest)

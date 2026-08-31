@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+import sqlite3
 import sys
 from pathlib import Path
 from typing import Any
@@ -23,13 +24,16 @@ from nldbwrite_v3.v2_a1.inventories import FORBIDDEN_MODEL_SIDE_KEYS
 from scripts.data.build_stage7c_a4_candidate_span_phase_o_protocol import (
     MODEL_ID,
     MODEL_REVISION,
+    PACKAGE_INTEGRITY_ARTIFACTS,
     PHASE_O_SYSTEM_PROMPT,
     PHASE_O_USER_PROMPT_TEMPLATE,
+    QWEN_TOKENIZER_REVISION,
     SCIENTIFIC_ARTIFACTS,
     STAGE_NAME,
     STAGE7B_SELECTED_VARIANT,
     build_stage,
     canonical_json,
+    logical_db_fixture_hash,
     oracle_span_ref_path,
     read_json,
     read_jsonl,
@@ -41,6 +45,7 @@ from scripts.data.build_stage7c_a4_candidate_span_phase_o_protocol import (
 
 REQUIRED_FILES = [
     *SCIENTIFIC_ARTIFACTS,
+    *PACKAGE_INTEGRITY_ARTIFACTS,
     "DERIVED_ARTIFACT_MANIFEST.json",
     "STAGE7C_A4_LOCK.json",
     "VALIDATION_REPORT.md",
@@ -189,8 +194,18 @@ def validate_rows(stage_dir: Path, failures: list[str]) -> tuple[int, int, int]:
         if not db_path.is_file():
             failures.append(f"missing_sqlite_db:{sample_id}")
             continue
-        if sha256_file(db_path) != row["synthetic_db_spec"]["sqlite_db_sha256"]:
-            failures.append(f"sqlite_db_hash_mismatch:{sample_id}")
+        expected_logical_hash = logical_db_fixture_hash(
+            {
+                "sample_id": sample_id,
+                "table_name": row["synthetic_db_spec"]["table_name"],
+                "columns": row["synthetic_db_spec"]["source_columns"],
+            },
+            row["synthetic_db_spec"]["create_sql"],
+        )
+        if row["synthetic_db_spec"].get("logical_db_fixture_hash") != expected_logical_hash:
+            failures.append(f"logical_db_fixture_hash_mismatch:{sample_id}")
+        if "sqlite_db_sha256" in row["synthetic_db_spec"]:
+            failures.append(f"sqlite_binary_hash_embedded_in_scientific_fixture:{sample_id}")
         try:
             oracle = oracle_span_ref_path(row, db_path)
         except Exception as exc:
@@ -221,6 +236,7 @@ def validate_rows(stage_dir: Path, failures: list[str]) -> tuple[int, int, int]:
 def validate_manifests(stage_dir: Path, failures: list[str]) -> None:
     source_manifest = read_json(stage_dir / "SOURCE_INPUT_MANIFEST.json")
     derived_manifest = read_json(stage_dir / "DERIVED_ARTIFACT_MANIFEST.json")
+    package_integrity = read_json(stage_dir / "PACKAGE_FILE_INTEGRITY_MANIFEST.json")
     lock = read_json(stage_dir / "STAGE7C_A4_LOCK.json")
     token_audit = read_json(stage_dir / "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json")
     miss_policy = read_json(stage_dir / "CANDIDATE_MISS_FAILURE_POLICY.json")
@@ -229,6 +245,7 @@ def validate_manifests(stage_dir: Path, failures: list[str]) -> None:
     for payload_name, payload in {
         "source_manifest": source_manifest,
         "lock": lock,
+        "package_integrity": package_integrity,
         "token_audit": token_audit,
         "miss_policy": miss_policy,
         "acceptance": acceptance,
@@ -257,6 +274,8 @@ def validate_manifests(stage_dir: Path, failures: list[str]) -> None:
         failures.append("token_stats_missing")
     if token_audit.get("fresh_case_count") != 10:
         failures.append("token_audit_case_count_mismatch")
+    if package_integrity.get("identity_scope") != "physical_package_file_integrity_not_cross_environment_scientific_rebuild":
+        failures.append("package_integrity_scope_mismatch")
 
     for source in source_manifest.get("source_files", []):
         path = PROJECT_ROOT / source.get("path", "")
@@ -269,9 +288,14 @@ def validate_manifests(stage_dir: Path, failures: list[str]) -> None:
             failures.append(f"source_manifest_hash_mismatch:{source.get('path')}")
 
     manifest_by_path = {row["path"]: row for row in derived_manifest.get("artifacts", [])}
+    if derived_manifest.get("identity_scope") != "scientific_logical_artifacts_only":
+        failures.append("derived_manifest_identity_scope_mismatch")
     for name in SCIENTIFIC_ARTIFACTS:
         if name not in manifest_by_path:
             failures.append(f"derived_manifest_missing:{name}")
+    for forbidden in PACKAGE_INTEGRITY_ARTIFACTS:
+        if forbidden in manifest_by_path:
+            failures.append(f"derived_manifest_contains_package_integrity_artifact:{forbidden}")
     for artifact in derived_manifest.get("artifacts", []):
         path = stage_dir / artifact["path"]
         if not path.is_file():
@@ -282,6 +306,67 @@ def validate_manifests(stage_dir: Path, failures: list[str]) -> None:
         failures.append("combined_scientific_artifacts_hash_mismatch")
     if lock.get("derived_artifact_manifest_sha256") != sha256_file(stage_dir / "DERIVED_ARTIFACT_MANIFEST.json"):
         failures.append("lock_derived_manifest_hash_mismatch")
+    sqlite_integrity_rows = package_integrity.get("sqlite_binary_artifacts", [])
+    if package_integrity.get("sqlite_binary_artifact_count") != len(sqlite_integrity_rows):
+        failures.append("package_integrity_count_mismatch")
+    if package_integrity.get("combined_sqlite_binary_artifacts_sha256") != sha256_text(canonical_json(sqlite_integrity_rows)):
+        failures.append("package_integrity_combined_hash_mismatch")
+    for artifact in sqlite_integrity_rows:
+        path = stage_dir / artifact["path"]
+        if not path.is_file():
+            failures.append(f"package_integrity_missing_sqlite:{artifact['path']}")
+        elif sha256_file(path) != artifact.get("sqlite_binary_file_sha256"):
+            failures.append(f"package_integrity_sqlite_hash_mismatch:{artifact['path']}")
+
+
+def sqlite_table_info(db_path: Path, table_name: str) -> list[dict[str, Any]]:
+    with sqlite3.connect(db_path) as connection:
+        rows = connection.execute(f'PRAGMA table_info("{table_name}")').fetchall()
+    return [
+        {
+            "cid": row[0],
+            "name": row[1],
+            "type": row[2],
+            "notnull": row[3],
+            "dflt_value": row[4],
+            "pk": row[5],
+        }
+        for row in rows
+    ]
+
+
+def validate_rebuild_logical_db_semantics(stage_dir: Path, rebuild_dir: Path, failures: list[str]) -> None:
+    original_rows = read_jsonl(stage_dir / "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl")
+    rebuilt_rows = read_jsonl(rebuild_dir / "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl")
+    if len(original_rows) != len(rebuilt_rows):
+        failures.append("rebuild_logical_db_manifest_count_mismatch")
+        return
+    rebuilt_by_id = {row["sample_id"]: row for row in rebuilt_rows}
+    for original in original_rows:
+        sample_id = original["sample_id"]
+        rebuilt = rebuilt_by_id.get(sample_id)
+        if rebuilt is None:
+            failures.append(f"rebuild_logical_db_missing_sample:{sample_id}")
+            continue
+        for key in (
+            "table_name",
+            "source_columns",
+            "create_sql",
+            "create_sql_sha256",
+            "initial_state_hash",
+            "logical_db_fixture_hash",
+        ):
+            if original.get(key) != rebuilt.get(key):
+                failures.append(f"rebuild_logical_db_{key}_mismatch:{sample_id}")
+        if original.get("sqlite_db_path") != rebuilt.get("sqlite_db_path"):
+            failures.append(f"rebuild_logical_db_path_mismatch:{sample_id}")
+        original_table = original.get("table_name")
+        rebuilt_table = rebuilt.get("table_name")
+        if original_table != rebuilt_table:
+            failures.append(f"rebuild_logical_db_table_name_mismatch:{sample_id}")
+            continue
+        if sqlite_table_info(stage_dir / original["sqlite_db_path"], original_table) != sqlite_table_info(rebuild_dir / rebuilt["sqlite_db_path"], rebuilt_table):
+            failures.append(f"rebuild_logical_db_schema_mismatch:{sample_id}")
 
 
 def validate(
@@ -289,6 +374,7 @@ def validate(
     *,
     rebuild: bool = False,
     tokenizer_name_or_path: str | None = None,
+    tokenizer_revision: str = QWEN_TOKENIZER_REVISION,
 ) -> dict[str, Any]:
     failures: list[str] = []
     for name in REQUIRED_FILES:
@@ -302,15 +388,30 @@ def validate(
     validate_manifests(stage_dir, failures)
 
     if rebuild and not failures:
-        rebuild_dir = stage_dir.parent / f"{STAGE_NAME}_rebuild_validation"
-        try:
-            build_stage(rebuild_dir, tokenizer_name_or_path=tokenizer_name_or_path)
-            for name in [*SCIENTIFIC_ARTIFACTS, "DERIVED_ARTIFACT_MANIFEST.json"]:
-                if sha256_file(stage_dir / name) != sha256_file(rebuild_dir / name):
-                    failures.append(f"rebuild_artifact_mismatch:{name}")
-        finally:
-            if rebuild_dir.exists():
-                shutil.rmtree(rebuild_dir, ignore_errors=True)
+        token_audit = read_json(stage_dir / "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json")
+        if token_audit.get("tokenizer_status") == "PASS" and not tokenizer_name_or_path:
+            failures.append("TOKENIZER_REQUIRED_FOR_REBUILD")
+        if failures:
+            pass
+        else:
+            rebuild_dir = stage_dir.parent / f"{STAGE_NAME}_rebuild_validation"
+            try:
+                build_stage(
+                    rebuild_dir,
+                    tokenizer_name_or_path=tokenizer_name_or_path,
+                    tokenizer_revision=tokenizer_revision,
+                )
+                rebuilt_token_audit = read_json(rebuild_dir / "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json")
+                if token_audit.get("tokenizer_status") == "PASS" and rebuilt_token_audit.get("tokenizer_status") != "PASS":
+                    failures.append("TOKENIZER_UNAVAILABLE_FOR_REBUILD")
+                else:
+                    for name in [*SCIENTIFIC_ARTIFACTS, "DERIVED_ARTIFACT_MANIFEST.json"]:
+                        if sha256_file(stage_dir / name) != sha256_file(rebuild_dir / name):
+                            failures.append(f"rebuild_artifact_mismatch:{name}")
+                    validate_rebuild_logical_db_semantics(stage_dir, rebuild_dir, failures)
+            finally:
+                if rebuild_dir.exists():
+                    shutil.rmtree(rebuild_dir, ignore_errors=True)
 
     lock = read_json(stage_dir / "STAGE7C_A4_LOCK.json")
     token_audit = read_json(stage_dir / "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json")
@@ -333,8 +434,14 @@ def main() -> None:
     parser.add_argument("--stage-dir", type=Path, default=PROJECT_ROOT / STAGE_NAME)
     parser.add_argument("--rebuild", action="store_true")
     parser.add_argument("--tokenizer-name-or-path", default=None)
+    parser.add_argument("--tokenizer-revision", default=QWEN_TOKENIZER_REVISION)
     args = parser.parse_args()
-    result = validate(args.stage_dir, rebuild=args.rebuild, tokenizer_name_or_path=args.tokenizer_name_or_path)
+    result = validate(
+        args.stage_dir,
+        rebuild=args.rebuild,
+        tokenizer_name_or_path=args.tokenizer_name_or_path,
+        tokenizer_revision=args.tokenizer_revision,
+    )
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     if result["status"] != "PASS":
         sys.exit(1)

@@ -12,7 +12,7 @@
   "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
   "model_selects_span_refs": true,
   "operation_scope": "INSERT",
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "prompt_hashes": {
     "phase_o_system_prompt_sha256": "0f08370a200315d1e98491b0fcb3c46803f129e753f52e20fe19e4fc1b754465",
     "phase_o_user_prompt_template_sha256": "a38a9f2f803061bb1eddc43f26b4c00b9fafe4ab8d9e344cbe310acbcfbf0808"

@@ -22,7 +22,7 @@
   "gpu_called": false,
   "model_called": false,
   "operation_const": "INSERT",
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "span_refs": {
     "items_runtime_constraint": "enum over exact current candidate inventory refs",
     "minItems": 1,

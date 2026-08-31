@@ -50,3 +50,10 @@ rendered_prompt_tokens_max=1019
 
 Candidate-generator miss is locked as a method failure. It must remain in every
 pilot/dev/test denominator and may not be used as a sample-exclusion rule.
+
+## Rebuild Semantics
+
+SQLite fixture identity is logical, not bytewise physical SQLite file identity.
+`SYNTHETIC_SQLITE_DB_MANIFEST.jsonl` stores create SQL, initial state hash, and
+`logical_db_fixture_hash`. `PACKAGE_FILE_INTEGRITY_MANIFEST.json` stores binary
+SQLite file hashes only for ZIP tamper detection.

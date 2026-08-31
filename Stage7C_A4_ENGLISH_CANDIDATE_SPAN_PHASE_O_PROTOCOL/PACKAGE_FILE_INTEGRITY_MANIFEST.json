@@ -1,0 +1,71 @@
+{
+  "combined_sqlite_binary_artifacts_sha256": "87d67b794c6864aac20dc2ba3622db1ab317977cf3ddd6c129373eaa1ccc79ca",
+  "gpu_called": false,
+  "identity_scope": "physical_package_file_integrity_not_cross_environment_scientific_rebuild",
+  "model_called": false,
+  "patch": "PATCH1",
+  "sqlite_binary_artifact_count": 10,
+  "sqlite_binary_artifacts": [
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_001.sqlite",
+      "sqlite_binary_file_sha256": "fd48f392b50c81c2a6714273fbde66f33b9aa64f2c0c9112072b5b778ebebbab"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_002.sqlite",
+      "sqlite_binary_file_sha256": "6227bcaf106cfb25acf548d08ea27ed5064420728a1b4a2330dcac1b434358af"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_003.sqlite",
+      "sqlite_binary_file_sha256": "ea9c20822d05f902b427ded1412b3037edc617b07e5c1d94cc7d7925771b620a"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_004.sqlite",
+      "sqlite_binary_file_sha256": "4d21a2c88dd876be58f50fb7ec654e761d1b502b608bb5431c6206d478a024ab"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_005.sqlite",
+      "sqlite_binary_file_sha256": "d7b4fa83ef67caf9c3506f91e962cefb3f27f0bead6da82620414cceed677461"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_006.sqlite",
+      "sqlite_binary_file_sha256": "6c4914a4c1d582650b6fd7baa128ac50867ab158e4dfda2dc9c7a3aab025e45c"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_007.sqlite",
+      "sqlite_binary_file_sha256": "5b7dae16eb47913f4973fa5566ed5f9eb1c659ef56747ae3f37cb7fb1d26b46d"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_008.sqlite",
+      "sqlite_binary_file_sha256": "c74e68d33928461fac8ffe721abdc139119ddf5eee0fde2aa6c417f803a5663f"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_009.sqlite",
+      "sqlite_binary_file_sha256": "429ec038edcfa82d935548d65d355651ca0e6213688fa37d08c1792ca998df84"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_010.sqlite",
+      "sqlite_binary_file_sha256": "b872cf48f45c0199498ee401bf1300f14f2969972261f3f42e30ec6d5d955321"
+    }
+  ],
+  "stage": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL"
+}

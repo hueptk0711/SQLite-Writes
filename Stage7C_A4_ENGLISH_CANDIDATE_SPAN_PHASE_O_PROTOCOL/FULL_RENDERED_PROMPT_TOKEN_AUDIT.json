@@ -2,7 +2,7 @@
   "fresh_case_count": 10,
   "gpu_called": false,
   "model_called": false,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "per_sample": [
     {
       "candidate_count": 24,
