@@ -1,0 +1,1627 @@
+{
+  "baseline_variant": "brute16",
+  "gpu_called": false,
+  "minimum_assignment_candidate_coverage": 0.99,
+  "minimum_full_sample_candidate_coverage": 0.99,
+  "model_called": false,
+  "selected_variant": "lexical_ngram2",
+  "selection_rule": "first require assignment/full-sample coverage >= 0.99; then minimize p95 candidate_count, mean candidate_count, and max candidate_count",
+  "stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT",
+  "status": "PASS",
+  "variants": [
+    {
+      "assignment_candidate_coverage": 0.9330673758865248,
+      "assignment_count": 2256,
+      "candidate_inventory_count_stats": {
+        "max": 19,
+        "mean": 5.278846153846154,
+        "median": 4.0,
+        "min": 0,
+        "p95": 11
+      },
+      "candidate_serialization_char_stats": {
+        "max": 681,
+        "mean": 182.12912087912088,
+        "median": 156.5,
+        "min": 0,
+        "p95": 382
+      },
+      "candidate_tag_counts": {
+        "EMAIL": 10,
+        "IDENTIFIER": 985,
+        "NUMBER": 1548,
+        "QUOTED_TEXT": 1837,
+        "TEXT_SPAN": 3,
+        "URL": 4
+      },
+      "covered_assignment_count": 2105,
+      "design_sample_count": 728,
+      "full_sample_candidate_coverage": 0.8365384615384616,
+      "full_sample_covered_count": 609,
+      "missing_assignment_count": 151,
+      "missing_assignments": [
+        {
+          "assignment_index": 0,
+          "end_char": 43,
+          "gold_text": "Sydney",
+          "sample_id": "gretel:train:10024:018014",
+          "start_char": 37
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 71,
+          "gold_text": "Wolves",
+          "sample_id": "gretel:train:10306:018296",
+          "start_char": 65
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 109,
+          "gold_text": "United Kingdom",
+          "sample_id": "gretel:train:11680:025667",
+          "start_char": 95
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 114,
+          "gold_text": "spruce",
+          "sample_id": "gretel:train:12374:026361",
+          "start_char": 108
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 71,
+          "gold_text": "new sustainable fabric",
+          "sample_id": "gretel:train:13263:021274",
+          "start_char": 49
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 103,
+          "gold_text": "country Y",
+          "sample_id": "gretel:train:13263:021274",
+          "start_char": 94
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 40,
+          "gold_text": "Samarium",
+          "sample_id": "gretel:train:15976:023987",
+          "start_char": 32
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 62,
+          "gold_text": "Nigeria",
+          "sample_id": "gretel:train:15976:023987",
+          "start_char": 55
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 32,
+          "gold_text": "New York",
+          "sample_id": "gretel:train:17601:036655",
+          "start_char": 24
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 88,
+          "gold_text": "Hospital",
+          "sample_id": "gretel:train:18147:037201",
+          "start_char": 80
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 68,
+          "gold_text": "Mountain",
+          "sample_id": "gretel:train:18147:037201",
+          "start_char": 60
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 43,
+          "gold_text": "Spain",
+          "sample_id": "gretel:train:18332:037386",
+          "start_char": 38
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 22,
+          "gold_text": "Puma",
+          "sample_id": "gretel:train:18605:037659",
+          "start_char": 18
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 68,
+          "gold_text": "Rwanda",
+          "sample_id": "gretel:train:19124:051685",
+          "start_char": 62
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 36,
+          "gold_text": "Australia",
+          "sample_id": "gretel:train:20127:052688",
+          "start_char": 27
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 63,
+          "gold_text": "centrifuge",
+          "sample_id": "gretel:train:20532:053093",
+          "start_char": 53
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 42,
+          "gold_text": "India",
+          "sample_id": "gretel:train:2123:030744",
+          "start_char": 37
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 56,
+          "gold_text": "literacy program",
+          "sample_id": "gretel:train:22556:076894",
+          "start_char": 40
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 65,
+          "gold_text": "Kenya",
+          "sample_id": "gretel:train:22556:076894",
+          "start_char": 60
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 22,
+          "gold_text": "wind turbine",
+          "sample_id": "gretel:train:22602:076940",
+          "start_char": 10
+        },
+        {
+          "assignment_index": 3,
+          "end_char": 33,
+          "gold_text": "Coin",
+          "sample_id": "gretel:train:23740:078078",
+          "start_char": 29
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 55,
+          "gold_text": "bus",
+          "sample_id": "gretel:train:23896:078234",
+          "start_char": 52
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 23,
+          "gold_text": "smart city",
+          "sample_id": "gretel:train:24058:078396",
+          "start_char": 13
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 37,
+          "gold_text": "Coral",
+          "sample_id": "gretel:train:24670:055607",
+          "start_char": 32
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 59,
+          "gold_text": "India",
+          "sample_id": "gretel:train:25196:056133",
+          "start_char": 54
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 24,
+          "gold_text": "Maria",
+          "sample_id": "gretel:train:31074:035508",
+          "start_char": 19
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 31,
+          "gold_text": "Garcia",
+          "sample_id": "gretel:train:31074:035508",
+          "start_char": 25
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 44,
+          "gold_text": "Q2",
+          "sample_id": "gretel:train:32601:033063",
+          "start_char": 42
+        },
+        {
+          "assignment_index": 3,
+          "end_char": 146,
+          "gold_text": "Pakistan",
+          "sample_id": "gretel:train:32634:033096",
+          "start_char": 138
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 31,
+          "gold_text": "Koala",
+          "sample_id": "gretel:train:32760:033222",
+          "start_char": 26
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 30,
+          "gold_text": "DonorF",
+          "sample_id": "gretel:train:3350:031971",
+          "start_char": 24
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 49,
+          "gold_text": "South America",
+          "sample_id": "gretel:train:3350:031971",
+          "start_char": 36
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 68,
+          "gold_text": "Canada",
+          "sample_id": "gretel:train:33543:034005",
+          "start_char": 62
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 42,
+          "gold_text": "AI adoption",
+          "sample_id": "gretel:train:34592:038623",
+          "start_char": 31
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 77,
+          "gold_text": "Well I",
+          "sample_id": "gretel:train:34743:038774",
+          "start_char": 71
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 90,
+          "gold_text": "West Africa",
+          "sample_id": "gretel:train:34743:038774",
+          "start_char": 79
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 35,
+          "gold_text": "Mexico",
+          "sample_id": "gretel:train:35331:049296",
+          "start_char": 29
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 96,
+          "gold_text": "Jane Smith",
+          "sample_id": "gretel:train:35435:049400",
+          "start_char": 86
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 67,
+          "gold_text": "Amsterdam",
+          "sample_id": "gretel:train:36350:050315",
+          "start_char": 58
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 44,
+          "gold_text": "Brazil",
+          "sample_id": "gretel:train:37089:051054",
+          "start_char": 38
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 93,
+          "gold_text": "Kenya",
+          "sample_id": "gretel:train:37124:051089",
+          "start_char": 88
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 49,
+          "gold_text": "Africa",
+          "sample_id": "gretel:train:37124:051089",
+          "start_char": 43
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 88,
+          "gold_text": "Emerald",
+          "sample_id": "gretel:train:3765:002188",
+          "start_char": 81
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 70,
+          "gold_text": "Florida",
+          "sample_id": "gretel:train:37712:041690",
+          "start_char": 63
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 56,
+          "gold_text": "Pakistan",
+          "sample_id": "gretel:train:38155:042133",
+          "start_char": 48
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 97,
+          "gold_text": "Data Science",
+          "sample_id": "gretel:train:38665:042643",
+          "start_char": 85
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 45,
+          "gold_text": "California",
+          "sample_id": "gretel:train:4131:002554",
+          "start_char": 35
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 51,
+          "gold_text": "Q1",
+          "sample_id": "gretel:train:4131:002554",
+          "start_char": 49
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 23,
+          "gold_text": "smart city",
+          "sample_id": "gretel:train:43339:027161",
+          "start_char": 13
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 72,
+          "gold_text": "Fair Trade",
+          "sample_id": "gretel:train:43642:027464",
+          "start_char": 62
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 142,
+          "gold_text": "Ohio",
+          "sample_id": "gretel:train:43822:027644",
+          "start_char": 138
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 23,
+          "gold_text": "smart city",
+          "sample_id": "gretel:train:4438:002861",
+          "start_char": 13
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 49,
+          "gold_text": "Arizona",
+          "sample_id": "gretel:train:44666:028488",
+          "start_char": 42
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 127,
+          "gold_text": "Children's Rights",
+          "sample_id": "gretel:train:47119:072864",
+          "start_char": 110
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 93,
+          "gold_text": "North Sea",
+          "sample_id": "gretel:train:47215:072960",
+          "start_char": 84
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 45,
+          "gold_text": "Washington",
+          "sample_id": "gretel:train:47411:073156",
+          "start_char": 35
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 51,
+          "gold_text": "Q3",
+          "sample_id": "gretel:train:47411:073156",
+          "start_char": 49
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 56,
+          "gold_text": "France",
+          "sample_id": "gretel:train:47539:073284",
+          "start_char": 50
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 24,
+          "gold_text": "ash",
+          "sample_id": "gretel:train:47581:073326",
+          "start_char": 21
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 36,
+          "gold_text": "basketball",
+          "sample_id": "gretel:train:48363:074108",
+          "start_char": 26
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 41,
+          "gold_text": "Ytterbium",
+          "sample_id": "gretel:train:48512:074257",
+          "start_char": 32
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 63,
+          "gold_text": "Vietnam",
+          "sample_id": "gretel:train:48512:074257",
+          "start_char": 56
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 47,
+          "gold_text": "Japan",
+          "sample_id": "gretel:train:48540:074285",
+          "start_char": 42
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 94,
+          "gold_text": "Python Programming",
+          "sample_id": "gretel:train:48987:015220",
+          "start_char": 76
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 17,
+          "gold_text": "organic",
+          "sample_id": "gretel:train:49198:015431",
+          "start_char": 10
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 77,
+          "gold_text": "dinner",
+          "sample_id": "gretel:train:49627:015860",
+          "start_char": 71
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 49,
+          "gold_text": "Montana",
+          "sample_id": "gretel:train:49790:016023",
+          "start_char": 42
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 55,
+          "gold_text": "industrial",
+          "sample_id": "gretel:train:50086:016319",
+          "start_char": 45
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 39,
+          "gold_text": "Canada",
+          "sample_id": "gretel:train:53900:054290",
+          "start_char": 33
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 53,
+          "gold_text": "Europium Oxide",
+          "sample_id": "gretel:train:55411:047847",
+          "start_char": 39
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 62,
+          "gold_text": "Elkhorn Coral",
+          "sample_id": "gretel:train:55437:047873",
+          "start_char": 49
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 99,
+          "gold_text": "Caribbean",
+          "sample_id": "gretel:train:55437:047873",
+          "start_char": 90
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 133,
+          "gold_text": "Vulnerable",
+          "sample_id": "gretel:train:55437:047873",
+          "start_char": 123
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 72,
+          "gold_text": "Red Line",
+          "sample_id": "gretel:train:55907:048343",
+          "start_char": 64
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 54,
+          "gold_text": "Florida",
+          "sample_id": "gretel:train:56096:048532",
+          "start_char": 47
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 61,
+          "gold_text": "Guatemala",
+          "sample_id": "gretel:train:58575:060903",
+          "start_char": 52
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 76,
+          "gold_text": "Jim",
+          "sample_id": "gretel:train:59088:064913",
+          "start_char": 73
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 82,
+          "gold_text": "Smith",
+          "sample_id": "gretel:train:59088:064913",
+          "start_char": 77
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 52,
+          "gold_text": "Sequoia",
+          "sample_id": "gretel:train:59378:065203",
+          "start_char": 45
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 37,
+          "gold_text": "software engineer",
+          "sample_id": "gretel:train:59933:065758",
+          "start_char": 20
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 73,
+          "gold_text": "LinkedIn",
+          "sample_id": "gretel:train:59933:065758",
+          "start_char": 65
+        },
+        {
+          "assignment_index": 3,
+          "end_char": 101,
+          "gold_text": "2023-02-18 10:00:00",
+          "sample_id": "gretel:train:60545:066370",
+          "start_char": 82
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 49,
+          "gold_text": "Portland",
+          "sample_id": "gretel:train:61664:067489",
+          "start_char": 41
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 19,
+          "gold_text": "ABC",
+          "sample_id": "gretel:train:61678:067503",
+          "start_char": 16
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 22,
+          "gold_text": "Ali",
+          "sample_id": "gretel:train:62196:068021",
+          "start_char": 19
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 61,
+          "gold_text": "Startup DEF",
+          "sample_id": "gretel:train:6362:001265",
+          "start_char": 50
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 87,
+          "gold_text": "Clinic",
+          "sample_id": "gretel:train:64252:082061",
+          "start_char": 81
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 57,
+          "gold_text": "South Africa",
+          "sample_id": "gretel:train:66076:097781",
+          "start_char": 45
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 30,
+          "gold_text": "Terbium",
+          "sample_id": "gretel:train:66076:097781",
+          "start_char": 23
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 53,
+          "gold_text": "France",
+          "sample_id": "gretel:train:66976:045827",
+          "start_char": 47
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 43,
+          "gold_text": "Europium",
+          "sample_id": "gretel:train:66976:045827",
+          "start_char": 35
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 63,
+          "gold_text": "oak",
+          "sample_id": "gretel:train:67388:046239",
+          "start_char": 60
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 18,
+          "gold_text": "new cargo",
+          "sample_id": "gretel:train:67677:046528",
+          "start_char": 9
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 79,
+          "gold_text": "789B",
+          "sample_id": "gretel:train:69507:091264",
+          "start_char": 75
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 72,
+          "gold_text": "Indonesia",
+          "sample_id": "gretel:train:70548:084379",
+          "start_char": 63
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 24,
+          "gold_text": "sustainable",
+          "sample_id": "gretel:train:70611:084442",
+          "start_char": 13
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 45,
+          "gold_text": "Texas",
+          "sample_id": "gretel:train:71028:084859",
+          "start_char": 40
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 77,
+          "gold_text": "Hispanic",
+          "sample_id": "gretel:train:71028:084859",
+          "start_char": 69
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 43,
+          "gold_text": "STU",
+          "sample_id": "gretel:train:71918:085749",
+          "start_char": 40
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 56,
+          "gold_text": "Germany",
+          "sample_id": "gretel:train:71996:085827",
+          "start_char": 49
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 47,
+          "gold_text": "Thailand",
+          "sample_id": "gretel:train:73095:029471",
+          "start_char": 39
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 83,
+          "gold_text": "bioinformatics project",
+          "sample_id": "gretel:train:73531:029907",
+          "start_char": 61
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 75,
+          "gold_text": "bioinformatics",
+          "sample_id": "gretel:train:73531:029907",
+          "start_char": 61
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 40,
+          "gold_text": "Texas",
+          "sample_id": "gretel:train:74986:008194",
+          "start_char": 35
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 46,
+          "gold_text": "Q4",
+          "sample_id": "gretel:train:74986:008194",
+          "start_char": 44
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 79,
+          "gold_text": "456A",
+          "sample_id": "gretel:train:75332:008540",
+          "start_char": 75
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 81,
+          "gold_text": "Arctic Ocean",
+          "sample_id": "gretel:train:76695:061524",
+          "start_char": 69
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 58,
+          "gold_text": "Pacific",
+          "sample_id": "gretel:train:77749:062578",
+          "start_char": 51
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 46,
+          "gold_text": "Canada",
+          "sample_id": "gretel:train:83072:079933",
+          "start_char": 40
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 63,
+          "gold_text": "operational",
+          "sample_id": "gretel:train:83072:079933",
+          "start_char": 52
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 94,
+          "gold_text": "John Doe",
+          "sample_id": "gretel:train:83271:080132",
+          "start_char": 86
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 110,
+          "gold_text": "Gulf of Mexico",
+          "sample_id": "gretel:train:84128:071013",
+          "start_char": 96
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 54,
+          "gold_text": "China",
+          "sample_id": "gretel:train:84189:071074",
+          "start_char": 49
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 31,
+          "gold_text": "Brazil",
+          "sample_id": "gretel:train:84267:071152",
+          "start_char": 25
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 43,
+          "gold_text": "Michigan",
+          "sample_id": "gretel:train:84785:071670",
+          "start_char": 35
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 49,
+          "gold_text": "Q1",
+          "sample_id": "gretel:train:84785:071670",
+          "start_char": 47
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 30,
+          "gold_text": "DonorC",
+          "sample_id": "gretel:train:85757:088174",
+          "start_char": 24
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 41,
+          "gold_text": "India",
+          "sample_id": "gretel:train:85757:088174",
+          "start_char": 36
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 23,
+          "gold_text": "DonorI",
+          "sample_id": "gretel:train:86136:088553",
+          "start_char": 17
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 36,
+          "gold_text": "Oceania",
+          "sample_id": "gretel:train:86136:088553",
+          "start_char": 29
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 53,
+          "gold_text": "S102",
+          "sample_id": "gretel:train:86860:089277",
+          "start_char": 49
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 57,
+          "gold_text": "Tokyo",
+          "sample_id": "gretel:train:86872:089289",
+          "start_char": 52
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 24,
+          "gold_text": "Sofia",
+          "sample_id": "gretel:train:87836:098180",
+          "start_char": 19
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 34,
+          "gold_text": "Rodriguez",
+          "sample_id": "gretel:train:87836:098180",
+          "start_char": 25
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 49,
+          "gold_text": "Surrealism",
+          "sample_id": "gretel:train:88274:098618",
+          "start_char": 39
+        },
+        {
+          "assignment_index": 3,
+          "end_char": 69,
+          "gold_text": "20th Century",
+          "sample_id": "gretel:train:88274:098618",
+          "start_char": 57
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 52,
+          "gold_text": "Blue Hole",
+          "sample_id": "gretel:train:88483:098827",
+          "start_char": 43
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 46,
+          "gold_text": "Giant Pacific Octopus",
+          "sample_id": "gretel:train:88770:099114",
+          "start_char": 25
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 67,
+          "gold_text": "Pacific Ocean",
+          "sample_id": "gretel:train:88770:099114",
+          "start_char": 54
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 69,
+          "gold_text": "Leatherback Turtle",
+          "sample_id": "gretel:train:89105:099449",
+          "start_char": 51
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 110,
+          "gold_text": "Atlantic Ocean",
+          "sample_id": "gretel:train:89105:099449",
+          "start_char": 96
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 29,
+          "gold_text": "electric vehicle",
+          "sample_id": "gretel:train:89140:099484",
+          "start_char": 13
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 49,
+          "gold_text": "Olivia Rodrigo",
+          "sample_id": "gretel:train:89517:099861",
+          "start_char": 35
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 57,
+          "gold_text": "train",
+          "sample_id": "gretel:train:89958:062937",
+          "start_char": 52
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 89,
+          "gold_text": "Maria Garcia",
+          "sample_id": "gretel:train:89969:062948",
+          "start_char": 77
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 61,
+          "gold_text": "gold",
+          "sample_id": "gretel:train:90143:063122",
+          "start_char": 57
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 40,
+          "gold_text": "Han Xu",
+          "sample_id": "gretel:train:90991:063970",
+          "start_char": 34
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 51,
+          "gold_text": "China",
+          "sample_id": "gretel:train:90991:063970",
+          "start_char": 46
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 64,
+          "gold_text": "Maria",
+          "sample_id": "gretel:train:91226:064205",
+          "start_char": 59
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 41,
+          "gold_text": "mining engineer",
+          "sample_id": "gretel:train:91226:064205",
+          "start_char": 26
+        },
+        {
+          "assignment_index": 3,
+          "end_char": 101,
+          "gold_text": "Female",
+          "sample_id": "gretel:train:91226:064205",
+          "start_char": 95
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 92,
+          "gold_text": "Caucasian",
+          "sample_id": "gretel:train:91685:094099",
+          "start_char": 83
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 50,
+          "gold_text": "Japan",
+          "sample_id": "gretel:train:91985:094399",
+          "start_char": 45
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 32,
+          "gold_text": "ABC",
+          "sample_id": "gretel:train:9223:017213",
+          "start_char": 29
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 21,
+          "gold_text": "Impossible Burger",
+          "sample_id": "gretel:train:9337:017327",
+          "start_char": 4
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 17,
+          "gold_text": "Tofu Stir Fry",
+          "sample_id": "gretel:train:94155:092645",
+          "start_char": 4
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 19,
+          "gold_text": "new school",
+          "sample_id": "gretel:train:9740:017730",
+          "start_char": 9
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 37,
+          "gold_text": "Atlanta",
+          "sample_id": "gretel:train:9740:017730",
+          "start_char": 30
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 69,
+          "gold_text": "Alvin",
+          "sample_id": "gretel:train:97844:009808",
+          "start_char": 64
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 16,
+          "gold_text": "new museum",
+          "sample_id": "gretel:train:97889:009853",
+          "start_char": 6
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 67,
+          "gold_text": "Sydney",
+          "sample_id": "gretel:train:98285:010249",
+          "start_char": 61
+        }
+      ],
+      "passes_hard_requirements": false,
+      "variant": "typed_only"
+    },
+    {
+      "assignment_candidate_coverage": 0.9796099290780141,
+      "assignment_count": 2256,
+      "candidate_inventory_count_stats": {
+        "max": 62,
+        "mean": 24.08653846153846,
+        "median": 23.5,
+        "min": 6,
+        "p95": 36
+      },
+      "candidate_serialization_char_stats": {
+        "max": 1988,
+        "mean": 753.2142857142857,
+        "median": 734.5,
+        "min": 178,
+        "p95": 1187
+      },
+      "candidate_tag_counts": {
+        "EMAIL": 10,
+        "IDENTIFIER": 985,
+        "NUMBER": 1548,
+        "QUOTED_TEXT": 1837,
+        "TEXT_SPAN": 13695,
+        "URL": 4
+      },
+      "covered_assignment_count": 2210,
+      "design_sample_count": 728,
+      "full_sample_candidate_coverage": 0.9423076923076923,
+      "full_sample_covered_count": 686,
+      "missing_assignment_count": 46,
+      "missing_assignments": [
+        {
+          "assignment_index": 1,
+          "end_char": 109,
+          "gold_text": "United Kingdom",
+          "sample_id": "gretel:train:11680:025667",
+          "start_char": 95
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 71,
+          "gold_text": "new sustainable fabric",
+          "sample_id": "gretel:train:13263:021274",
+          "start_char": 49
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 103,
+          "gold_text": "country Y",
+          "sample_id": "gretel:train:13263:021274",
+          "start_char": 94
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 32,
+          "gold_text": "New York",
+          "sample_id": "gretel:train:17601:036655",
+          "start_char": 24
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 56,
+          "gold_text": "literacy program",
+          "sample_id": "gretel:train:22556:076894",
+          "start_char": 40
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 22,
+          "gold_text": "wind turbine",
+          "sample_id": "gretel:train:22602:076940",
+          "start_char": 10
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 23,
+          "gold_text": "smart city",
+          "sample_id": "gretel:train:24058:078396",
+          "start_char": 13
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 49,
+          "gold_text": "South America",
+          "sample_id": "gretel:train:3350:031971",
+          "start_char": 36
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 42,
+          "gold_text": "AI adoption",
+          "sample_id": "gretel:train:34592:038623",
+          "start_char": 31
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 77,
+          "gold_text": "Well I",
+          "sample_id": "gretel:train:34743:038774",
+          "start_char": 71
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 90,
+          "gold_text": "West Africa",
+          "sample_id": "gretel:train:34743:038774",
+          "start_char": 79
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 96,
+          "gold_text": "Jane Smith",
+          "sample_id": "gretel:train:35435:049400",
+          "start_char": 86
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 97,
+          "gold_text": "Data Science",
+          "sample_id": "gretel:train:38665:042643",
+          "start_char": 85
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 23,
+          "gold_text": "smart city",
+          "sample_id": "gretel:train:43339:027161",
+          "start_char": 13
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 72,
+          "gold_text": "Fair Trade",
+          "sample_id": "gretel:train:43642:027464",
+          "start_char": 62
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 23,
+          "gold_text": "smart city",
+          "sample_id": "gretel:train:4438:002861",
+          "start_char": 13
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 127,
+          "gold_text": "Children's Rights",
+          "sample_id": "gretel:train:47119:072864",
+          "start_char": 110
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 93,
+          "gold_text": "North Sea",
+          "sample_id": "gretel:train:47215:072960",
+          "start_char": 84
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 94,
+          "gold_text": "Python Programming",
+          "sample_id": "gretel:train:48987:015220",
+          "start_char": 76
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 53,
+          "gold_text": "Europium Oxide",
+          "sample_id": "gretel:train:55411:047847",
+          "start_char": 39
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 62,
+          "gold_text": "Elkhorn Coral",
+          "sample_id": "gretel:train:55437:047873",
+          "start_char": 49
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 72,
+          "gold_text": "Red Line",
+          "sample_id": "gretel:train:55907:048343",
+          "start_char": 64
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 37,
+          "gold_text": "software engineer",
+          "sample_id": "gretel:train:59933:065758",
+          "start_char": 20
+        },
+        {
+          "assignment_index": 3,
+          "end_char": 101,
+          "gold_text": "2023-02-18 10:00:00",
+          "sample_id": "gretel:train:60545:066370",
+          "start_char": 82
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 61,
+          "gold_text": "Startup DEF",
+          "sample_id": "gretel:train:6362:001265",
+          "start_char": 50
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 57,
+          "gold_text": "South Africa",
+          "sample_id": "gretel:train:66076:097781",
+          "start_char": 45
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 18,
+          "gold_text": "new cargo",
+          "sample_id": "gretel:train:67677:046528",
+          "start_char": 9
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 83,
+          "gold_text": "bioinformatics project",
+          "sample_id": "gretel:train:73531:029907",
+          "start_char": 61
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 81,
+          "gold_text": "Arctic Ocean",
+          "sample_id": "gretel:train:76695:061524",
+          "start_char": 69
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 94,
+          "gold_text": "John Doe",
+          "sample_id": "gretel:train:83271:080132",
+          "start_char": 86
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 110,
+          "gold_text": "Gulf of Mexico",
+          "sample_id": "gretel:train:84128:071013",
+          "start_char": 96
+        },
+        {
+          "assignment_index": 3,
+          "end_char": 69,
+          "gold_text": "20th Century",
+          "sample_id": "gretel:train:88274:098618",
+          "start_char": 57
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 52,
+          "gold_text": "Blue Hole",
+          "sample_id": "gretel:train:88483:098827",
+          "start_char": 43
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 46,
+          "gold_text": "Giant Pacific Octopus",
+          "sample_id": "gretel:train:88770:099114",
+          "start_char": 25
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 67,
+          "gold_text": "Pacific Ocean",
+          "sample_id": "gretel:train:88770:099114",
+          "start_char": 54
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 69,
+          "gold_text": "Leatherback Turtle",
+          "sample_id": "gretel:train:89105:099449",
+          "start_char": 51
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 110,
+          "gold_text": "Atlantic Ocean",
+          "sample_id": "gretel:train:89105:099449",
+          "start_char": 96
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 29,
+          "gold_text": "electric vehicle",
+          "sample_id": "gretel:train:89140:099484",
+          "start_char": 13
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 49,
+          "gold_text": "Olivia Rodrigo",
+          "sample_id": "gretel:train:89517:099861",
+          "start_char": 35
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 89,
+          "gold_text": "Maria Garcia",
+          "sample_id": "gretel:train:89969:062948",
+          "start_char": 77
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 40,
+          "gold_text": "Han Xu",
+          "sample_id": "gretel:train:90991:063970",
+          "start_char": 34
+        },
+        {
+          "assignment_index": 2,
+          "end_char": 41,
+          "gold_text": "mining engineer",
+          "sample_id": "gretel:train:91226:064205",
+          "start_char": 26
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 21,
+          "gold_text": "Impossible Burger",
+          "sample_id": "gretel:train:9337:017327",
+          "start_char": 4
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 17,
+          "gold_text": "Tofu Stir Fry",
+          "sample_id": "gretel:train:94155:092645",
+          "start_char": 4
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 19,
+          "gold_text": "new school",
+          "sample_id": "gretel:train:9740:017730",
+          "start_char": 9
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 16,
+          "gold_text": "new museum",
+          "sample_id": "gretel:train:97889:009853",
+          "start_char": 6
+        }
+      ],
+      "passes_hard_requirements": false,
+      "variant": "lexical_ngram1"
+    },
+    {
+      "assignment_candidate_coverage": 0.99822695035461,
+      "assignment_count": 2256,
+      "candidate_inventory_count_stats": {
+        "max": 114,
+        "mean": 45.809065934065934,
+        "median": 45.0,
+        "min": 11,
+        "p95": 70
+      },
+      "candidate_serialization_char_stats": {
+        "max": 3933,
+        "mean": 1569.510989010989,
+        "median": 1518.0,
+        "min": 351,
+        "p95": 2427
+      },
+      "candidate_tag_counts": {
+        "EMAIL": 10,
+        "IDENTIFIER": 985,
+        "NUMBER": 1548,
+        "QUOTED_TEXT": 1837,
+        "TEXT_SPAN": 29509,
+        "URL": 4
+      },
+      "covered_assignment_count": 2252,
+      "design_sample_count": 728,
+      "full_sample_candidate_coverage": 0.9945054945054945,
+      "full_sample_covered_count": 724,
+      "missing_assignment_count": 4,
+      "missing_assignments": [
+        {
+          "assignment_index": 0,
+          "end_char": 71,
+          "gold_text": "new sustainable fabric",
+          "sample_id": "gretel:train:13263:021274",
+          "start_char": 49
+        },
+        {
+          "assignment_index": 1,
+          "end_char": 110,
+          "gold_text": "Gulf of Mexico",
+          "sample_id": "gretel:train:84128:071013",
+          "start_char": 96
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 46,
+          "gold_text": "Giant Pacific Octopus",
+          "sample_id": "gretel:train:88770:099114",
+          "start_char": 25
+        },
+        {
+          "assignment_index": 0,
+          "end_char": 17,
+          "gold_text": "Tofu Stir Fry",
+          "sample_id": "gretel:train:94155:092645",
+          "start_char": 4
+        }
+      ],
+      "passes_hard_requirements": true,
+      "variant": "lexical_ngram2"
+    },
+    {
+      "assignment_candidate_coverage": 1.0,
+      "assignment_count": 2256,
+      "candidate_inventory_count_stats": {
+        "max": 167,
+        "mean": 66.83241758241758,
+        "median": 65.0,
+        "min": 15,
+        "p95": 102
+      },
+      "candidate_serialization_char_stats": {
+        "max": 6260,
+        "mean": 2497.2664835164837,
+        "median": 2429.0,
+        "min": 509,
+        "p95": 3931
+      },
+      "candidate_tag_counts": {
+        "EMAIL": 10,
+        "IDENTIFIER": 985,
+        "NUMBER": 1548,
+        "QUOTED_TEXT": 1837,
+        "TEXT_SPAN": 44814,
+        "URL": 4
+      },
+      "covered_assignment_count": 2256,
+      "design_sample_count": 728,
+      "full_sample_candidate_coverage": 1.0,
+      "full_sample_covered_count": 728,
+      "missing_assignment_count": 0,
+      "missing_assignments": [],
+      "passes_hard_requirements": true,
+      "variant": "lexical_ngram3"
+    },
+    {
+      "assignment_candidate_coverage": 1.0,
+      "assignment_count": 2256,
+      "candidate_inventory_count_stats": {
+        "max": 214,
+        "mean": 86.7967032967033,
+        "median": 84.0,
+        "min": 18,
+        "p95": 133
+      },
+      "candidate_serialization_char_stats": {
+        "max": 8651,
+        "mean": 3512.1236263736264,
+        "median": 3420.5,
+        "min": 643,
+        "p95": 5549
+      },
+      "candidate_tag_counts": {
+        "EMAIL": 10,
+        "IDENTIFIER": 985,
+        "NUMBER": 1548,
+        "QUOTED_TEXT": 1837,
+        "TEXT_SPAN": 59348,
+        "URL": 4
+      },
+      "covered_assignment_count": 2256,
+      "design_sample_count": 728,
+      "full_sample_candidate_coverage": 1.0,
+      "full_sample_covered_count": 728,
+      "missing_assignment_count": 0,
+      "missing_assignments": [],
+      "passes_hard_requirements": true,
+      "variant": "lexical_ngram4"
+    },
+    {
+      "assignment_candidate_coverage": 1.0,
+      "assignment_count": 2256,
+      "candidate_inventory_count_stats": {
+        "max": 704,
+        "mean": 227.79532967032966,
+        "median": 215.0,
+        "min": 20,
+        "p95": 401
+      },
+      "candidate_serialization_char_stats": {
+        "max": 53447,
+        "mean": 15539.748626373626,
+        "median": 14441.0,
+        "min": 803,
+        "p95": 30436
+      },
+      "candidate_tag_counts": {
+        "EMAIL": 10,
+        "IDENTIFIER": 985,
+        "NUMBER": 1548,
+        "QUOTED_TEXT": 1837,
+        "TEXT_SPAN": 161995,
+        "URL": 4
+      },
+      "covered_assignment_count": 2256,
+      "design_sample_count": 728,
+      "full_sample_candidate_coverage": 1.0,
+      "full_sample_covered_count": 728,
+      "missing_assignment_count": 0,
+      "missing_assignments": [],
+      "passes_hard_requirements": true,
+      "variant": "brute16"
+    }
+  ]
+}

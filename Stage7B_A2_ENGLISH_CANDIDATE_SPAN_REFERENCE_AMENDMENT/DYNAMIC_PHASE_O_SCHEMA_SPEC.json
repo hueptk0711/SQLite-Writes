@@ -1,0 +1,10 @@
+{
+  "base_schema_path": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/PHASE_O_SPAN_REFERENCE_BASE_SCHEMA.json",
+  "dynamic_constraint": "span_refs.items.enum is exactly the current sample's candidate_inventory span_ref list",
+  "gpu_called": false,
+  "model_called": false,
+  "runtime_schema_builder": "build_dynamic_phase_o_schema(candidate_inventory)",
+  "stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT",
+  "unique_items": true,
+  "unknown_span_refs_structurally_impossible": true
+}

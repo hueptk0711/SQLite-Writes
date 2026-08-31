@@ -1,5 +1,5 @@
 {
-  "candidate_inventory_generated_by": "source_only_high_recall_lexical_inventory_v1",
+  "candidate_inventory_generated_by": "lexical_ngram2",
   "development_dev_usage_allowed": false,
   "few_shot_allowed": false,
   "gpu_called": false,
@@ -12,6 +12,7 @@
   "repair_allowed": false,
   "replaces": "Stage7E0-A3 numeric start_char/end_char prediction",
   "retry_allowed": false,
+  "runtime_schema": "dynamic per-sample JSON schema with span_refs.items.enum equal to exact current inventory refs",
   "stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT",
   "zero_shot": true
 }

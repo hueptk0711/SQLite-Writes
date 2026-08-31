@@ -1,5 +1,5 @@
 {
-  "algorithm": "source_only_high_recall_lexical_inventory_v1",
+  "algorithm": "lexical_ngram2",
   "deterministic": true,
   "forbidden_inputs": [
     "gold_sql",
@@ -13,9 +13,10 @@
     "question_text"
   ],
   "model_called": false,
+  "selected_by": "hard coverage thresholds, then lowest p95 candidate_count, mean candidate_count, max candidate_count",
   "stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT",
   "steps": [
-    "Enumerate all non-whitespace token n-grams up to 16 tokens and 160 characters.",
+    "Enumerate all non-whitespace token n-grams up to 2 tokens and 160 characters.",
     "Add boundary-stripped variants for punctuation, quotes, currency marks, and percent signs.",
     "Add regex candidates for emails, URLs, hex identifiers, numeric literals, comma-grouped numbers, and compound identifiers.",
     "Add quoted-string inner content for ASCII single and double quotes.",

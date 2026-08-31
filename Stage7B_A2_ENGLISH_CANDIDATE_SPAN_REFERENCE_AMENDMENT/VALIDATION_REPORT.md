@@ -23,20 +23,44 @@ gpu_called=false
 ## Oracle Candidate Coverage
 
 ```text
-assignment_candidate_coverage=2256/2256
-full_sample_candidate_coverage=728/728
+selected_variant=lexical_ngram2
+assignment_candidate_coverage=2252/2256
+full_sample_candidate_coverage=724/728
 min_required_assignment_coverage=0.99
 min_required_full_sample_coverage=0.99
-candidate_count_min=20
-candidate_count_median=215.0
-candidate_count_p95=401
-candidate_count_max=704
+candidate_count_min=11
+candidate_count_median=45.0
+candidate_count_p95=70
+candidate_count_max=114
+missing_assignments=4
+```
+
+## Pareto Selection
+
+```text
+selection_rule=first require assignment/full-sample coverage >= 0.99; then minimize p95 candidate_count, mean candidate_count, and max candidate_count
+selected_variant=lexical_ngram2
+baseline_variant=brute16
+```
+
+## Serialization Burden
+
+```text
+tokenizer_status=PASS
+tokenizer=Qwen/Qwen2.5-Coder-7B-Instruct
+tokenizer_revision=c03e6d358207e414f1eca0bb1891e29f1db0e242
+serialization_chars_median=1518.0
+serialization_chars_p95=2427
+serialization_tokens_median=662.0
+serialization_tokens_p95=1057
+serialization_tokens_max=1722
 ```
 
 ## Method Decision
 
-The deterministic source-only inventory covers every audited gold assignment
-on the 728 non-pilot design-train samples. Phase O should therefore stop
-generating numeric character offsets and instead select `SPAN_...` references.
-Phase M, typed materialization, completeness, compiler, and SQLite preflight
-remain unchanged.
+The selected compact deterministic source-only inventory satisfies the frozen
+coverage requirements while sharply reducing candidate burden relative to the
+PATCH0 brute-force baseline. Phase O should stop generating numeric character
+offsets and instead select dynamically-enumerated `SPAN_...` references. Phase
+M, typed materialization, completeness, compiler, and SQLite preflight remain
+unchanged.

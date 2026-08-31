@@ -1,43 +1,72 @@
 {
-  "assignment_candidate_coverage": 1.0,
+  "assignment_candidate_coverage": 0.99822695035461,
   "assignment_count": 2256,
   "candidate_generation_reads_gold_at_runtime": false,
+  "candidate_generator_variant": "lexical_ngram2",
   "candidate_inventory_count_stats": {
-    "max": 704,
-    "mean": 227.79532967032966,
-    "median": 215.0,
-    "min": 20,
-    "p95": 401
+    "max": 114,
+    "mean": 45.809065934065934,
+    "median": 45.0,
+    "min": 11,
+    "p95": 70
+  },
+  "candidate_serialization_char_stats": {
+    "max": 3933,
+    "mean": 1569.510989010989,
+    "median": 1518.0,
+    "min": 351,
+    "p95": 2427
   },
   "candidate_tag_counts": {
-    "boundary_stripped_compound_identifier": 983,
-    "boundary_stripped_compound_word": 797,
-    "boundary_stripped_email": 10,
-    "boundary_stripped_hex_identifier": 2,
-    "boundary_stripped_ngram": 124416,
-    "boundary_stripped_plain_number": 1530,
-    "boundary_stripped_url": 2,
-    "compound_identifier": 983,
-    "compound_word": 797,
-    "email": 10,
-    "hex_identifier": 2,
-    "plain_number": 1530,
-    "quoted_content": 1837,
-    "url": 2,
-    "whitespace_ngram": 124416
+    "EMAIL": 10,
+    "IDENTIFIER": 985,
+    "NUMBER": 1548,
+    "QUOTED_TEXT": 1837,
+    "TEXT_SPAN": 29509,
+    "URL": 4
   },
-  "covered_assignment_count": 2256,
+  "covered_assignment_count": 2252,
   "design_sample_count": 728,
-  "full_sample_candidate_coverage": 1.0,
-  "full_sample_covered_count": 728,
+  "full_sample_candidate_coverage": 0.9945054945054945,
+  "full_sample_covered_count": 724,
   "gold_used_only_for_oracle_coverage_audit": true,
   "gpu_called": false,
   "minimum_assignment_candidate_coverage": 0.99,
   "minimum_full_sample_candidate_coverage": 0.99,
-  "missing_assignment_count": 0,
-  "missing_assignments": [],
+  "missing_assignment_count": 4,
+  "missing_assignments": [
+    {
+      "assignment_index": 0,
+      "end_char": 71,
+      "gold_text": "new sustainable fabric",
+      "sample_id": "gretel:train:13263:021274",
+      "start_char": 49
+    },
+    {
+      "assignment_index": 1,
+      "end_char": 110,
+      "gold_text": "Gulf of Mexico",
+      "sample_id": "gretel:train:84128:071013",
+      "start_char": 96
+    },
+    {
+      "assignment_index": 0,
+      "end_char": 46,
+      "gold_text": "Giant Pacific Octopus",
+      "sample_id": "gretel:train:88770:099114",
+      "start_char": 25
+    },
+    {
+      "assignment_index": 0,
+      "end_char": 17,
+      "gold_text": "Tofu Stir Fry",
+      "sample_id": "gretel:train:94155:092645",
+      "start_char": 4
+    }
+  ],
   "model_called": false,
   "scope": "StageENG1 development_train excluding 100-sample pilot pool",
   "stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT",
-  "status": "PASS"
+  "status": "PASS",
+  "variant": "lexical_ngram2"
 }

@@ -7,7 +7,7 @@
     "tags"
   ],
   "gpu_called": false,
-  "max_ngram_tokens": 16,
+  "max_ngram_tokens": 2,
   "max_span_chars": 160,
   "model_called": false,
   "no_gold_at_runtime": true,

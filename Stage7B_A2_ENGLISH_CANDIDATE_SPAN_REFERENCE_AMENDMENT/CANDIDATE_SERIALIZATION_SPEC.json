@@ -1,0 +1,26 @@
+{
+  "allowed_model_visible_tags": [
+    "EMAIL",
+    "IDENTIFIER",
+    "NUMBER",
+    "QUOTED_TEXT",
+    "TEXT_SPAN",
+    "URL"
+  ],
+  "format": "one candidate per line",
+  "gpu_called": false,
+  "line_template": "SPAN_0001 | TAG[,TAG...] | exact source text",
+  "model_called": false,
+  "model_hidden_fields": [
+    "start_char",
+    "end_char",
+    "provenance_tags"
+  ],
+  "model_visible_fields": [
+    "span_ref",
+    "tags",
+    "text"
+  ],
+  "stable_sort": "(start_char, end_char, span_ref)",
+  "stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
+}

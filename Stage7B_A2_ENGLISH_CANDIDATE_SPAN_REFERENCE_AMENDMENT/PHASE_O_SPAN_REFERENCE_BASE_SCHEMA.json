@@ -8,7 +8,7 @@
     },
     "span_refs": {
       "items": {
-        "pattern": "^SPAN_[0-9]{4}$",
+        "description": "Runtime schema replaces this with an enum over the current sample inventory.",
         "type": "string"
       },
       "minItems": 1,

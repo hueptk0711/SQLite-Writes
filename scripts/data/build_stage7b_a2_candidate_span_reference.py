@@ -31,7 +31,7 @@ from scripts.data.build_stageeng0_gretel_qualification import DATASET_ID, DATASE
 
 
 STAGE_NAME = "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
-PATCH_NAME = "PATCH0"
+PATCH_NAME = "PATCH1"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260831.zip"
 STAGEENG0_NAME = "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION"
 STAGEENG1_NAME = "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
@@ -43,9 +43,22 @@ EXPECTED_OFFICIAL_TEST_COUNT = 51
 EXPECTED_ASSIGNMENT_COUNT = 2256
 MIN_ASSIGNMENT_COVERAGE = 0.99
 MIN_FULL_SAMPLE_COVERAGE = 0.99
-MAX_NGRAM_TOKENS = 16
+SELECTED_VARIANT = "lexical_ngram2"
+BASELINE_VARIANT = "brute16"
+PARETO_VARIANTS = [
+    ("typed_only", 0),
+    ("lexical_ngram1", 1),
+    ("lexical_ngram2", 2),
+    ("lexical_ngram3", 3),
+    ("lexical_ngram4", 4),
+    ("brute16", 16),
+]
+MAX_NGRAM_TOKENS = 2
+BASELINE_MAX_NGRAM_TOKENS = 16
 MAX_SPAN_CHARS = 160
 BOUNDARY_STRIP_CHARS = " \t\r\n\"'()[]{}<>.,;:!?$%"
+QWEN_TOKENIZER_ID = "Qwen/Qwen2.5-Coder-7B-Instruct"
+QWEN_TOKENIZER_REVISION = "c03e6d358207e414f1eca0bb1891e29f1db0e242"
 REGEX_PATTERNS = [
     ("email", r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}"),
     ("url", r"https?://\S+"),
@@ -56,13 +69,18 @@ REGEX_PATTERNS = [
     ("compound_identifier", r"[A-Za-z0-9]+(?:[_\-][A-Za-z0-9]+)+"),
 ]
 SCIENTIFIC_ARTIFACTS = [
+    "SOURCE_INPUT_MANIFEST.json",
     "A3_FEASIBILITY_CONCLUSION.json",
     "DESIGN_TRAIN_SCOPE_AUDIT.json",
     "SPAN_REFERENCE_INVENTORY_SPEC.json",
     "CANDIDATE_GENERATION_ALGORITHM_SPEC.json",
-    "PHASE_O_SPAN_REFERENCE_SCHEMA.json",
+    "PHASE_O_SPAN_REFERENCE_BASE_SCHEMA.json",
+    "DYNAMIC_PHASE_O_SCHEMA_SPEC.json",
     "PHASE_O_SPAN_REFERENCE_PROTOCOL.json",
+    "CANDIDATE_SERIALIZATION_SPEC.json",
+    "CANDIDATE_SERIALIZATION_BURDEN_AUDIT.json",
     "DOWNSTREAM_DERIVATION_SPEC.json",
+    "CANDIDATE_GENERATOR_PARETO_AUDIT.json",
     "ORACLE_CANDIDATE_COVERAGE_AUDIT.json",
     "ORACLE_CANDIDATE_COVERAGE_AUDIT.jsonl",
 ]
@@ -75,6 +93,7 @@ class CandidateSpan:
     end_char: int
     text: str
     tags: tuple[str, ...]
+    provenance_tags: tuple[str, ...] = ()
 
 
 def canonical_text(text: str) -> str:
@@ -156,19 +175,47 @@ def _add_boundary_stripped(spans: dict[tuple[int, int], set[str]], source: str, 
     _add_span(spans, source, stripped_start, stripped_end, tag)
 
 
-def generate_candidate_inventory(source_text: str) -> list[CandidateSpan]:
+def variant_ngram_limit(variant: str) -> int:
+    for name, limit in PARETO_VARIANTS:
+        if name == variant:
+            return limit
+    raise ValueError(f"Unknown candidate generator variant: {variant}")
+
+
+def model_visible_tags(text: str, provenance_tags: set[str]) -> tuple[str, ...]:
+    tags: set[str] = set()
+    if any(tag in provenance_tags for tag in {"email", "boundary_stripped_email"}):
+        tags.add("EMAIL")
+    if any(tag in provenance_tags for tag in {"url", "boundary_stripped_url"}):
+        tags.add("URL")
+    if any(tag in provenance_tags for tag in {"hex_identifier", "compound_identifier", "boundary_stripped_hex_identifier", "boundary_stripped_compound_identifier"}):
+        tags.add("IDENTIFIER")
+    if any(tag in provenance_tags for tag in {"plain_number", "comma_number", "boundary_stripped_plain_number", "boundary_stripped_comma_number"}):
+        tags.add("NUMBER")
+    if "quoted_content" in provenance_tags:
+        tags.add("QUOTED_TEXT")
+    if not tags:
+        tags.add("TEXT_SPAN")
+    if re.fullmatch(r"[-+]?\d+(?:\.\d+)?", text):
+        tags.add("NUMBER")
+    return tuple(sorted(tags))
+
+
+def generate_candidate_inventory(source_text: str, *, variant: str = SELECTED_VARIANT) -> list[CandidateSpan]:
     """Generate source-only candidate spans without inspecting labels/gold."""
 
     spans: dict[tuple[int, int], set[str]] = {}
     tokens = list(re.finditer(r"\S+", source_text))
-    for start_index, start_token in enumerate(tokens):
-        for end_index in range(start_index, min(len(tokens), start_index + MAX_NGRAM_TOKENS)):
-            start = start_token.start()
-            end = tokens[end_index].end()
-            if end - start > MAX_SPAN_CHARS:
-                continue
-            _add_span(spans, source_text, start, end, "whitespace_ngram")
-            _add_boundary_stripped(spans, source_text, start, end, "boundary_stripped_ngram")
+    ngram_limit = variant_ngram_limit(variant)
+    if ngram_limit:
+        for start_index, start_token in enumerate(tokens):
+            for end_index in range(start_index, min(len(tokens), start_index + ngram_limit)):
+                start = start_token.start()
+                end = tokens[end_index].end()
+                if end - start > MAX_SPAN_CHARS:
+                    continue
+                _add_span(spans, source_text, start, end, "whitespace_ngram")
+                _add_boundary_stripped(spans, source_text, start, end, "boundary_stripped_ngram")
 
     for tag, pattern in REGEX_PATTERNS:
         for match in re.finditer(pattern, source_text):
@@ -181,14 +228,16 @@ def generate_candidate_inventory(source_text: str) -> list[CandidateSpan]:
             _add_span(spans, source_text, match.start(1), match.end(1), "quoted_content")
 
     candidates: list[CandidateSpan] = []
-    for index, ((start, end), tags) in enumerate(sorted(spans.items()), start=1):
+    for index, ((start, end), provenance_tags) in enumerate(sorted(spans.items()), start=1):
+        text = source_text[start:end]
         candidates.append(
             CandidateSpan(
                 span_ref=f"SPAN_{index:04d}",
                 start_char=start,
                 end_char=end,
-                text=source_text[start:end],
-                tags=tuple(sorted(tags)),
+                text=text,
+                tags=model_visible_tags(text, provenance_tags),
+                provenance_tags=tuple(sorted(provenance_tags)),
             )
         )
     return candidates
@@ -201,7 +250,57 @@ def candidate_to_json(candidate: CandidateSpan) -> dict[str, Any]:
         "end_char": candidate.end_char,
         "text": candidate.text,
         "tags": list(candidate.tags),
+        "provenance_tags": list(candidate.provenance_tags),
     }
+
+
+def phase_o_base_schema() -> dict[str, Any]:
+    return phase_o_schema(dynamic_refs=None)
+
+
+def build_dynamic_phase_o_schema(candidate_inventory: list[CandidateSpan]) -> dict[str, Any]:
+    return phase_o_schema(dynamic_refs=[candidate.span_ref for candidate in candidate_inventory])
+
+
+def phase_o_schema(dynamic_refs: list[str] | None = None) -> dict[str, Any]:
+    item_schema: dict[str, Any]
+    if dynamic_refs is None:
+        item_schema = {"type": "string", "description": "Runtime schema replaces this with an enum over the current sample inventory."}
+    else:
+        item_schema = {"type": "string", "enum": dynamic_refs}
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "Stage7B-A2 Phase O Span Reference Output",
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["operation", "span_refs"],
+        "properties": {
+            "operation": {"type": "string", "const": "INSERT"},
+            "span_refs": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": True,
+                "items": item_schema,
+            },
+        },
+    }
+
+
+def resolve_selected_span_refs(candidate_inventory: list[CandidateSpan], selected_refs: list[str]) -> list[CandidateSpan]:
+    if len(selected_refs) != len(set(selected_refs)):
+        raise ValueError("Duplicate span_refs are forbidden")
+    by_ref = {candidate.span_ref: candidate for candidate in candidate_inventory}
+    unknown = [span_ref for span_ref in selected_refs if span_ref not in by_ref]
+    if unknown:
+        raise ValueError(f"Unknown span_refs: {unknown}")
+    return sorted((by_ref[span_ref] for span_ref in selected_refs), key=lambda item: (item.start_char, item.end_char, item.span_ref))
+
+
+def serialize_candidate_inventory(candidate_inventory: list[CandidateSpan]) -> str:
+    return "\n".join(
+        f"{candidate.span_ref} | {','.join(candidate.tags)} | {candidate.text}"
+        for candidate in candidate_inventory
+    )
 
 
 def inventory_spec() -> dict[str, Any]:
@@ -226,11 +325,12 @@ def inventory_spec() -> dict[str, Any]:
 def algorithm_spec() -> dict[str, Any]:
     return {
         "stage": STAGE_NAME,
-        "algorithm": "source_only_high_recall_lexical_inventory_v1",
+        "algorithm": SELECTED_VARIANT,
+        "selected_by": "hard coverage thresholds, then lowest p95 candidate_count, mean candidate_count, max candidate_count",
         "inputs": ["question_text"],
         "forbidden_inputs": ["gold_sql", "gold_values", "gold_offsets", "target_state", "model_outputs"],
         "steps": [
-            "Enumerate all non-whitespace token n-grams up to 16 tokens and 160 characters.",
+            "Enumerate all non-whitespace token n-grams up to 2 tokens and 160 characters.",
             "Add boundary-stripped variants for punctuation, quotes, currency marks, and percent signs.",
             "Add regex candidates for emails, URLs, hex identifiers, numeric literals, comma-grouped numbers, and compound identifiers.",
             "Add quoted-string inner content for ASCII single and double quotes.",
@@ -239,25 +339,6 @@ def algorithm_spec() -> dict[str, Any]:
         "deterministic": True,
         "model_called": False,
         "gpu_called": False,
-    }
-
-
-def phase_o_schema() -> dict[str, Any]:
-    return {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "Stage7B-A2 Phase O Span Reference Output",
-        "type": "object",
-        "additionalProperties": False,
-        "required": ["operation", "span_refs"],
-        "properties": {
-            "operation": {"type": "string", "const": "INSERT"},
-            "span_refs": {
-                "type": "array",
-                "minItems": 1,
-                "uniqueItems": True,
-                "items": {"type": "string", "pattern": "^SPAN_[0-9]{4}$"},
-            },
-        },
     }
 
 
@@ -272,7 +353,8 @@ def phase_o_protocol() -> dict[str, Any]:
         "repair_allowed": False,
         "retry_allowed": False,
         "model_generates_character_offsets": False,
-        "candidate_inventory_generated_by": "source_only_high_recall_lexical_inventory_v1",
+        "candidate_inventory_generated_by": SELECTED_VARIANT,
+        "runtime_schema": "dynamic per-sample JSON schema with span_refs.items.enum equal to exact current inventory refs",
         "pilot_usage_allowed": False,
         "development_dev_usage_allowed": False,
         "official_test_usage_allowed": False,
@@ -303,6 +385,60 @@ def downstream_derivation_spec() -> dict[str, Any]:
     }
 
 
+def source_input_manifest(stageeng0_dir: Path, stageeng1_dir: Path, stage7e0_dir: Path) -> dict[str, Any]:
+    files = [
+        (STAGEENG0_NAME, stageeng0_dir, "STAGEENG0_LOCK.json"),
+        (STAGEENG0_NAME, stageeng0_dir, "INSERT_ASSIGNMENT_GROUNDING_AUDIT.jsonl"),
+        (STAGEENG1_NAME, stageeng1_dir, "STAGEENG1_LOCK.json"),
+        (STAGEENG1_NAME, stageeng1_dir, "DEVELOPMENT_TRAIN_SPLIT_MANIFEST.jsonl"),
+        (STAGEENG1_NAME, stageeng1_dir, "DEVELOPMENT_PILOT_POOL_MANIFEST.jsonl"),
+        (STAGEENG1_NAME, stageeng1_dir, "DEVELOPMENT_DEV_SPLIT_MANIFEST.jsonl"),
+        (STAGE7E0_NAME, stage7e0_dir, "STAGE7E0_A3_SERVER_RESULT_LOCK.json"),
+    ]
+    return {
+        "stage": STAGE_NAME,
+        "patch": PATCH_NAME,
+        "model_called": False,
+        "gpu_called": False,
+        "source_files": [
+            {
+                "source_stage": stage,
+                "path": f"{stage}/{rel}",
+                "sha256": sha256_file(root / rel),
+                "bytes": (root / rel).stat().st_size,
+            }
+            for stage, root, rel in files
+        ],
+    }
+
+
+def dynamic_phase_o_schema_spec() -> dict[str, Any]:
+    return {
+        "stage": STAGE_NAME,
+        "base_schema_path": f"{STAGE_NAME}/PHASE_O_SPAN_REFERENCE_BASE_SCHEMA.json",
+        "runtime_schema_builder": "build_dynamic_phase_o_schema(candidate_inventory)",
+        "dynamic_constraint": "span_refs.items.enum is exactly the current sample's candidate_inventory span_ref list",
+        "unknown_span_refs_structurally_impossible": True,
+        "unique_items": True,
+        "model_called": False,
+        "gpu_called": False,
+    }
+
+
+def serialization_spec() -> dict[str, Any]:
+    return {
+        "stage": STAGE_NAME,
+        "format": "one candidate per line",
+        "line_template": "SPAN_0001 | TAG[,TAG...] | exact source text",
+        "model_visible_fields": ["span_ref", "tags", "text"],
+        "model_hidden_fields": ["start_char", "end_char", "provenance_tags"],
+        "allowed_model_visible_tags": ["EMAIL", "IDENTIFIER", "NUMBER", "QUOTED_TEXT", "TEXT_SPAN", "URL"],
+        "stable_sort": "(start_char, end_char, span_ref)",
+        "model_called": False,
+        "gpu_called": False,
+    }
+
+
 def a3_feasibility_conclusion(stage7e0_dir: Path) -> dict[str, Any]:
     lock_path = stage7e0_dir / "STAGE7E0_A3_SERVER_RESULT_LOCK.json"
     lock = read_json(lock_path)
@@ -320,6 +456,45 @@ def a3_feasibility_conclusion(stage7e0_dir: Path) -> dict[str, Any]:
         "gretel_pilot_opened": lock.get("gretel_pilot_opened"),
         "next_method_change": "replace model-generated numeric offsets with model-selected candidate span_refs",
     }
+
+
+def _stats(values: list[int]) -> dict[str, float | int]:
+    ordered = sorted(values)
+    p95_index = int(0.95 * (len(ordered) - 1)) if ordered else 0
+    return {
+        "min": min(ordered),
+        "median": median(ordered),
+        "mean": mean(ordered),
+        "p95": ordered[p95_index],
+        "max": max(ordered),
+    }
+
+
+def load_tokenizer(tokenizer_name_or_path: str | None, revision: str) -> tuple[Any | None, dict[str, Any]]:
+    if not tokenizer_name_or_path:
+        return None, {
+            "tokenizer_status": "NOT_RUN",
+            "tokenizer_name_or_path": None,
+            "tokenizer_revision": revision,
+            "reason": "No tokenizer path/name was provided.",
+        }
+    try:
+        from transformers import AutoTokenizer
+
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer_name_or_path, revision=revision, trust_remote_code=False)
+        return tokenizer, {
+            "tokenizer_status": "PASS",
+            "tokenizer_name_or_path": tokenizer_name_or_path,
+            "tokenizer_revision": revision,
+            "tokenizer_class": type(tokenizer).__name__,
+        }
+    except Exception as exc:
+        return None, {
+            "tokenizer_status": "FAIL",
+            "tokenizer_name_or_path": tokenizer_name_or_path,
+            "tokenizer_revision": revision,
+            "error": f"{type(exc).__name__}: {exc}",
+        }
 
 
 def scope_audit(stageeng0_dir: Path, stageeng1_dir: Path) -> dict[str, Any]:
@@ -348,8 +523,7 @@ def scope_audit(stageeng0_dir: Path, stageeng1_dir: Path) -> dict[str, Any]:
     }
 
 
-def coverage_audit(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    raw_by_id = load_raw_by_sample_id(raw_dir)
+def design_assignments(stageeng0_dir: Path, stageeng1_dir: Path) -> tuple[set[str], dict[str, list[dict[str, Any]]], list[dict[str, Any]]]:
     train_rows = read_jsonl(stageeng1_dir / "DEVELOPMENT_TRAIN_SPLIT_MANIFEST.jsonl")
     design_ids = {str(row["sample_id"]) for row in train_rows if not row.get("development_pilot_pool")}
     assignment_rows = [
@@ -360,11 +534,22 @@ def coverage_audit(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) -> t
     assignments_by_sample: dict[str, list[dict[str, Any]]] = {}
     for row in assignment_rows:
         assignments_by_sample.setdefault(str(row["sample_id"]), []).append(row)
+    return design_ids, assignments_by_sample, assignment_rows
 
+
+def evaluate_candidate_variant(
+    raw_by_id: dict[str, dict[str, Any]],
+    design_ids: set[str],
+    assignments_by_sample: dict[str, list[dict[str, Any]]],
+    assignment_rows: list[dict[str, Any]],
+    *,
+    variant: str,
+    include_rows: bool,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     sample_rows: list[dict[str, Any]] = []
     covered_assignment_count = 0
     candidate_counts: list[int] = []
-    matched_ref_counts: list[int] = []
+    serialization_chars: list[int] = []
     tag_counts: dict[str, int] = {}
     missing: list[dict[str, Any]] = []
     for sample_id in sorted(design_ids):
@@ -372,8 +557,10 @@ def coverage_audit(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) -> t
         if raw is None:
             raise RuntimeError(f"Raw parquet row missing for {sample_id}")
         question = str(raw.get("sql_prompt") or "")
-        inventory = generate_candidate_inventory(question)
+        inventory = generate_candidate_inventory(question, variant=variant)
+        serialized = serialize_candidate_inventory(inventory)
         candidate_counts.append(len(inventory))
+        serialization_chars.append(len(serialized))
         candidate_by_key = {(item.start_char, item.end_char, item.text): item for item in inventory}
         for item in inventory:
             for tag in item.tags:
@@ -389,7 +576,6 @@ def coverage_audit(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) -> t
             sample_full = sample_full and covered
             if covered:
                 covered_assignment_count += 1
-                matched_ref_counts.append(len(candidate.tags))
             else:
                 missing.append(
                     {
@@ -400,66 +586,163 @@ def coverage_audit(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) -> t
                         "end_char": span["end_char"],
                     }
                 )
-            assignment_checks.append(
+            if include_rows:
+                assignment_checks.append(
+                    {
+                        "assignment_index": assignment["assignment_index"],
+                        "column_ref_or_name": assignment["column_ref_or_name"],
+                        "gold_text": span["text"],
+                        "start_char": span["start_char"],
+                        "end_char": span["end_char"],
+                        "covered": covered,
+                        "matched_span_ref": candidate.span_ref if candidate else None,
+                        "matched_tags": list(candidate.tags) if candidate else [],
+                    }
+                )
+        if include_rows:
+            sample_rows.append(
                 {
-                    "assignment_index": assignment["assignment_index"],
-                    "column_ref_or_name": assignment["column_ref_or_name"],
-                    "gold_text": span["text"],
-                    "start_char": span["start_char"],
-                    "end_char": span["end_char"],
-                    "covered": covered,
-                    "matched_span_ref": candidate.span_ref if candidate else None,
-                    "matched_tags": list(candidate.tags) if candidate else [],
+                    "sample_id": sample_id,
+                    "source_split": "train",
+                    "stageeng1_subset": "development_train_non_pilot",
+                    "question_sha256": sha256_text(question),
+                    "candidate_generator_variant": variant,
+                    "candidate_count": len(inventory),
+                    "candidate_serialization_chars": len(serialized),
+                    "dynamic_enum_size": len(build_dynamic_phase_o_schema(inventory)["properties"]["span_refs"]["items"]["enum"]),
+                    "assignment_count": len(assignment_checks),
+                    "all_assignments_covered": sample_full,
+                    "assignments": assignment_checks,
                 }
             )
-        sample_rows.append(
-            {
-                "sample_id": sample_id,
-                "source_split": "train",
-                "stageeng1_subset": "development_train_non_pilot",
-                "question_sha256": sha256_text(question),
-                "candidate_count": len(inventory),
-                "assignment_count": len(assignment_checks),
-                "all_assignments_covered": sample_full,
-                "assignments": assignment_checks,
-            }
-        )
 
     assignment_count = len(assignment_rows)
-    full_sample_count = sum(1 for row in sample_rows if row["all_assignments_covered"])
-    sorted_counts = sorted(candidate_counts)
-    p95_index = int(0.95 * (len(sorted_counts) - 1)) if sorted_counts else 0
+    full_sample_count = sum(1 for row in sample_rows if row["all_assignments_covered"]) if include_rows else len(design_ids) - len({row["sample_id"] for row in missing})
     summary = {
-        "stage": STAGE_NAME,
-        "status": "PASS" if covered_assignment_count / assignment_count >= MIN_ASSIGNMENT_COVERAGE and full_sample_count / len(sample_rows) >= MIN_FULL_SAMPLE_COVERAGE else "FAIL",
-        "scope": "StageENG1 development_train excluding 100-sample pilot pool",
-        "model_called": False,
-        "gpu_called": False,
-        "gold_used_only_for_oracle_coverage_audit": True,
-        "candidate_generation_reads_gold_at_runtime": False,
-        "design_sample_count": len(sample_rows),
+        "variant": variant,
+        "design_sample_count": len(design_ids),
         "assignment_count": assignment_count,
         "covered_assignment_count": covered_assignment_count,
         "missing_assignment_count": assignment_count - covered_assignment_count,
         "assignment_candidate_coverage": covered_assignment_count / assignment_count,
         "full_sample_covered_count": full_sample_count,
-        "full_sample_candidate_coverage": full_sample_count / len(sample_rows),
-        "minimum_assignment_candidate_coverage": MIN_ASSIGNMENT_COVERAGE,
-        "minimum_full_sample_candidate_coverage": MIN_FULL_SAMPLE_COVERAGE,
-        "candidate_inventory_count_stats": {
-            "min": min(candidate_counts),
-            "median": median(candidate_counts),
-            "mean": mean(candidate_counts),
-            "p95": sorted_counts[p95_index],
-            "max": max(candidate_counts),
-        },
+        "full_sample_candidate_coverage": full_sample_count / len(design_ids),
+        "candidate_inventory_count_stats": _stats(candidate_counts),
+        "candidate_serialization_char_stats": _stats(serialization_chars),
         "candidate_tag_counts": dict(sorted(tag_counts.items())),
         "missing_assignments": missing,
     }
     return summary, sample_rows
 
 
-def validation_report(scope: dict[str, Any], coverage: dict[str, Any]) -> str:
+def pareto_audit(raw_by_id: dict[str, dict[str, Any]], design_ids: set[str], assignments_by_sample: dict[str, list[dict[str, Any]]], assignment_rows: list[dict[str, Any]]) -> dict[str, Any]:
+    variant_reports = []
+    for variant, _limit in PARETO_VARIANTS:
+        report, _rows = evaluate_candidate_variant(
+            raw_by_id,
+            design_ids,
+            assignments_by_sample,
+            assignment_rows,
+            variant=variant,
+            include_rows=False,
+        )
+        report["passes_hard_requirements"] = (
+            report["assignment_candidate_coverage"] >= MIN_ASSIGNMENT_COVERAGE
+            and report["full_sample_candidate_coverage"] >= MIN_FULL_SAMPLE_COVERAGE
+        )
+        variant_reports.append(report)
+    passing = [row for row in variant_reports if row["passes_hard_requirements"]]
+    selected = min(
+        passing,
+        key=lambda row: (
+            row["candidate_inventory_count_stats"]["p95"],
+            row["candidate_inventory_count_stats"]["mean"],
+            row["candidate_inventory_count_stats"]["max"],
+            row["variant"],
+        ),
+    )
+    return {
+        "stage": STAGE_NAME,
+        "status": "PASS" if selected["variant"] == SELECTED_VARIANT else "FAIL",
+        "selection_rule": "first require assignment/full-sample coverage >= 0.99; then minimize p95 candidate_count, mean candidate_count, and max candidate_count",
+        "selected_variant": selected["variant"],
+        "baseline_variant": BASELINE_VARIANT,
+        "minimum_assignment_candidate_coverage": MIN_ASSIGNMENT_COVERAGE,
+        "minimum_full_sample_candidate_coverage": MIN_FULL_SAMPLE_COVERAGE,
+        "variants": variant_reports,
+        "model_called": False,
+        "gpu_called": False,
+    }
+
+
+def serialization_burden_audit(
+    raw_by_id: dict[str, dict[str, Any]],
+    design_ids: set[str],
+    *,
+    variant: str,
+    tokenizer_name_or_path: str | None,
+    tokenizer_revision: str,
+) -> dict[str, Any]:
+    tokenizer, tokenizer_report = load_tokenizer(tokenizer_name_or_path, tokenizer_revision)
+    char_counts: list[int] = []
+    token_counts: list[int] = []
+    candidate_counts: list[int] = []
+    for sample_id in sorted(design_ids):
+        question = str(raw_by_id[sample_id].get("sql_prompt") or "")
+        inventory = generate_candidate_inventory(question, variant=variant)
+        serialized = serialize_candidate_inventory(inventory)
+        char_counts.append(len(serialized))
+        candidate_counts.append(len(inventory))
+        if tokenizer is not None:
+            token_counts.append(len(tokenizer.encode(serialized, add_special_tokens=False)))
+    report = {
+        "stage": STAGE_NAME,
+        "candidate_generator_variant": variant,
+        "serialization_spec_path": f"{STAGE_NAME}/CANDIDATE_SERIALIZATION_SPEC.json",
+        "design_sample_count": len(design_ids),
+        "candidate_count_stats": _stats(candidate_counts),
+        "candidate_serialization_char_stats": _stats(char_counts),
+        "model_called": False,
+        "gpu_called": False,
+        **tokenizer_report,
+    }
+    if token_counts:
+        report["candidate_serialization_token_stats"] = _stats(token_counts)
+    else:
+        report["candidate_serialization_token_stats"] = None
+    return report
+
+
+def coverage_audit(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) -> tuple[dict[str, Any], list[dict[str, Any]], dict[str, Any], dict[str, Any]]:
+    raw_by_id = load_raw_by_sample_id(raw_dir)
+    design_ids, assignments_by_sample, assignment_rows = design_assignments(stageeng0_dir, stageeng1_dir)
+    pareto = pareto_audit(raw_by_id, design_ids, assignments_by_sample, assignment_rows)
+    selected_summary, sample_rows = evaluate_candidate_variant(
+        raw_by_id,
+        design_ids,
+        assignments_by_sample,
+        assignment_rows,
+        variant=SELECTED_VARIANT,
+        include_rows=True,
+    )
+    summary = {
+        "stage": STAGE_NAME,
+        "status": "PASS" if selected_summary["assignment_candidate_coverage"] >= MIN_ASSIGNMENT_COVERAGE and selected_summary["full_sample_candidate_coverage"] >= MIN_FULL_SAMPLE_COVERAGE else "FAIL",
+        "scope": "StageENG1 development_train excluding 100-sample pilot pool",
+        "model_called": False,
+        "gpu_called": False,
+        "candidate_generator_variant": SELECTED_VARIANT,
+        "gold_used_only_for_oracle_coverage_audit": True,
+        "candidate_generation_reads_gold_at_runtime": False,
+        "minimum_assignment_candidate_coverage": MIN_ASSIGNMENT_COVERAGE,
+        "minimum_full_sample_candidate_coverage": MIN_FULL_SAMPLE_COVERAGE,
+        **selected_summary,
+    }
+    return summary, sample_rows, pareto, raw_by_id
+
+
+def validation_report(scope: dict[str, Any], coverage: dict[str, Any], pareto: dict[str, Any], burden: dict[str, Any]) -> str:
+    token_stats = burden.get("candidate_serialization_token_stats") or {}
     return f"""# Stage7B-A2 English Candidate-Span Reference Amendment Validation Report
 
 Status: {coverage["status"]}
@@ -485,6 +768,7 @@ gpu_called=false
 ## Oracle Candidate Coverage
 
 ```text
+selected_variant={coverage["candidate_generator_variant"]}
 assignment_candidate_coverage={coverage["covered_assignment_count"]}/{coverage["assignment_count"]}
 full_sample_candidate_coverage={coverage["full_sample_covered_count"]}/{coverage["design_sample_count"]}
 min_required_assignment_coverage={MIN_ASSIGNMENT_COVERAGE}
@@ -493,15 +777,38 @@ candidate_count_min={coverage["candidate_inventory_count_stats"]["min"]}
 candidate_count_median={coverage["candidate_inventory_count_stats"]["median"]}
 candidate_count_p95={coverage["candidate_inventory_count_stats"]["p95"]}
 candidate_count_max={coverage["candidate_inventory_count_stats"]["max"]}
+missing_assignments={coverage["missing_assignment_count"]}
+```
+
+## Pareto Selection
+
+```text
+selection_rule={pareto["selection_rule"]}
+selected_variant={pareto["selected_variant"]}
+baseline_variant={pareto["baseline_variant"]}
+```
+
+## Serialization Burden
+
+```text
+tokenizer_status={burden["tokenizer_status"]}
+tokenizer={burden.get("tokenizer_name_or_path")}
+tokenizer_revision={burden.get("tokenizer_revision")}
+serialization_chars_median={burden["candidate_serialization_char_stats"]["median"]}
+serialization_chars_p95={burden["candidate_serialization_char_stats"]["p95"]}
+serialization_tokens_median={token_stats.get("median")}
+serialization_tokens_p95={token_stats.get("p95")}
+serialization_tokens_max={token_stats.get("max")}
 ```
 
 ## Method Decision
 
-The deterministic source-only inventory covers every audited gold assignment
-on the 728 non-pilot design-train samples. Phase O should therefore stop
-generating numeric character offsets and instead select `SPAN_...` references.
-Phase M, typed materialization, completeness, compiler, and SQLite preflight
-remain unchanged.
+The selected compact deterministic source-only inventory satisfies the frozen
+coverage requirements while sharply reducing candidate burden relative to the
+PATCH0 brute-force baseline. Phase O should stop generating numeric character
+offsets and instead select dynamically-enumerated `SPAN_...` references. Phase
+M, typed materialization, completeness, compiler, and SQLite preflight remain
+unchanged.
 """
 
 
@@ -517,23 +824,29 @@ Review order:
 2. `{STAGE_NAME}/DESIGN_TRAIN_SCOPE_AUDIT.json`
 3. `{STAGE_NAME}/SPAN_REFERENCE_INVENTORY_SPEC.json`
 4. `{STAGE_NAME}/CANDIDATE_GENERATION_ALGORITHM_SPEC.json`
-5. `{STAGE_NAME}/PHASE_O_SPAN_REFERENCE_SCHEMA.json`
-6. `{STAGE_NAME}/PHASE_O_SPAN_REFERENCE_PROTOCOL.json`
-7. `{STAGE_NAME}/DOWNSTREAM_DERIVATION_SPEC.json`
-8. `{STAGE_NAME}/ORACLE_CANDIDATE_COVERAGE_AUDIT.json`
-9. `{STAGE_NAME}/ORACLE_CANDIDATE_COVERAGE_AUDIT.jsonl`
-10. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
-11. `{STAGE_NAME}/STAGE7B_A2_LOCK.json`
-12. `scripts/data/build_stage7b_a2_candidate_span_reference.py`
-13. `scripts/data/validate_stage7b_a2_candidate_span_reference.py`
-14. `tests/test_stage7b_a2_candidate_span_reference.py`
-15. `{STAGE_NAME}/VALIDATION_REPORT.md`
+5. `{STAGE_NAME}/CANDIDATE_GENERATOR_PARETO_AUDIT.json`
+6. `{STAGE_NAME}/PHASE_O_SPAN_REFERENCE_BASE_SCHEMA.json`
+7. `{STAGE_NAME}/DYNAMIC_PHASE_O_SCHEMA_SPEC.json`
+8. `{STAGE_NAME}/CANDIDATE_SERIALIZATION_SPEC.json`
+9. `{STAGE_NAME}/CANDIDATE_SERIALIZATION_BURDEN_AUDIT.json`
+10. `{STAGE_NAME}/PHASE_O_SPAN_REFERENCE_PROTOCOL.json`
+11. `{STAGE_NAME}/DOWNSTREAM_DERIVATION_SPEC.json`
+12. `{STAGE_NAME}/ORACLE_CANDIDATE_COVERAGE_AUDIT.json`
+13. `{STAGE_NAME}/ORACLE_CANDIDATE_COVERAGE_AUDIT.jsonl`
+14. `{STAGE_NAME}/SOURCE_INPUT_MANIFEST.json`
+15. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
+16. `{STAGE_NAME}/STAGE7B_A2_LOCK.json`
+17. `scripts/data/build_stage7b_a2_candidate_span_reference.py`
+18. `scripts/data/validate_stage7b_a2_candidate_span_reference.py`
+19. `tests/test_stage7b_a2_candidate_span_reference.py`
+20. `{STAGE_NAME}/VALIDATION_REPORT.md`
 
 Rerun with local Gretel parquet:
 
 ```bash
 uv run --with pyarrow python scripts/data/build_stage7b_a2_candidate_span_reference.py \\
   --raw-dir /path/to/gretel_synthetic_text_to_sql_740ab236 \\
+  --tokenizer-name-or-path {QWEN_TOKENIZER_ID} \\
   --out-dir {STAGE_NAME}
 python scripts/data/validate_stage7b_a2_candidate_span_reference.py \\
   --stage-dir {STAGE_NAME}
@@ -570,6 +883,8 @@ def build_stage(
     stageeng0_dir: Path = PROJECT_ROOT / STAGEENG0_NAME,
     stageeng1_dir: Path = PROJECT_ROOT / STAGEENG1_NAME,
     stage7e0_dir: Path = PROJECT_ROOT / STAGE7E0_NAME,
+    tokenizer_name_or_path: str | None = None,
+    tokenizer_revision: str = QWEN_TOKENIZER_REVISION,
 ) -> dict[str, Any]:
     if out_dir.exists():
         shutil.rmtree(out_dir)
@@ -577,15 +892,28 @@ def build_stage(
 
     a3_conclusion = a3_feasibility_conclusion(stage7e0_dir)
     scope = scope_audit(stageeng0_dir, stageeng1_dir)
-    coverage, coverage_rows = coverage_audit(stageeng0_dir, stageeng1_dir, raw_dir)
+    coverage, coverage_rows, pareto, raw_by_id = coverage_audit(stageeng0_dir, stageeng1_dir, raw_dir)
+    design_ids, _assignments_by_sample, _assignment_rows = design_assignments(stageeng0_dir, stageeng1_dir)
+    burden = serialization_burden_audit(
+        raw_by_id,
+        design_ids,
+        variant=SELECTED_VARIANT,
+        tokenizer_name_or_path=tokenizer_name_or_path,
+        tokenizer_revision=tokenizer_revision,
+    )
 
+    write_json(out_dir / "SOURCE_INPUT_MANIFEST.json", source_input_manifest(stageeng0_dir, stageeng1_dir, stage7e0_dir))
     write_json(out_dir / "A3_FEASIBILITY_CONCLUSION.json", a3_conclusion)
     write_json(out_dir / "DESIGN_TRAIN_SCOPE_AUDIT.json", scope)
     write_json(out_dir / "SPAN_REFERENCE_INVENTORY_SPEC.json", inventory_spec())
     write_json(out_dir / "CANDIDATE_GENERATION_ALGORITHM_SPEC.json", algorithm_spec())
-    write_json(out_dir / "PHASE_O_SPAN_REFERENCE_SCHEMA.json", phase_o_schema())
+    write_json(out_dir / "PHASE_O_SPAN_REFERENCE_BASE_SCHEMA.json", phase_o_base_schema())
+    write_json(out_dir / "DYNAMIC_PHASE_O_SCHEMA_SPEC.json", dynamic_phase_o_schema_spec())
     write_json(out_dir / "PHASE_O_SPAN_REFERENCE_PROTOCOL.json", phase_o_protocol())
+    write_json(out_dir / "CANDIDATE_SERIALIZATION_SPEC.json", serialization_spec())
+    write_json(out_dir / "CANDIDATE_SERIALIZATION_BURDEN_AUDIT.json", burden)
     write_json(out_dir / "DOWNSTREAM_DERIVATION_SPEC.json", downstream_derivation_spec())
+    write_json(out_dir / "CANDIDATE_GENERATOR_PARETO_AUDIT.json", pareto)
     write_json(out_dir / "ORACLE_CANDIDATE_COVERAGE_AUDIT.json", coverage)
     write_jsonl(out_dir / "ORACLE_CANDIDATE_COVERAGE_AUDIT.jsonl", coverage_rows)
 
@@ -604,10 +932,14 @@ def build_stage(
         "source_stageeng1": STAGEENG1_NAME,
         "source_stage7e0": STAGE7E0_NAME,
         "design_train_non_pilot_count": scope["design_train_non_pilot_count"],
+        "selected_candidate_generator_variant": SELECTED_VARIANT,
         "assignment_candidate_coverage": coverage["assignment_candidate_coverage"],
         "full_sample_candidate_coverage": coverage["full_sample_candidate_coverage"],
+        "candidate_count_p95": coverage["candidate_inventory_count_stats"]["p95"],
+        "tokenizer_status": burden["tokenizer_status"],
         "phase_o_model_generates_character_offsets": False,
         "phase_o_model_selects_span_refs": True,
+        "dynamic_span_ref_enum_required": True,
         "model_called": False,
         "gpu_called": False,
         "development_pilot_pool_opened": False,
@@ -616,15 +948,18 @@ def build_stage(
         "derived_artifact_manifest_sha256": sha256_file(out_dir / "DERIVED_ARTIFACT_MANIFEST.json"),
     }
     write_json(out_dir / "STAGE7B_A2_LOCK.json", lock)
-    write_text(out_dir / "VALIDATION_REPORT.md", validation_report(scope, coverage))
+    write_text(out_dir / "VALIDATION_REPORT.md", validation_report(scope, coverage, pareto, burden))
     write_text(out_dir / "REVIEWER_README.md", reviewer_readme(out_dir))
     return {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
         "status": lock["status"],
         "design_train_non_pilot_count": scope["design_train_non_pilot_count"],
+        "selected_candidate_generator_variant": SELECTED_VARIANT,
         "assignment_candidate_coverage": coverage["assignment_candidate_coverage"],
         "full_sample_candidate_coverage": coverage["full_sample_candidate_coverage"],
+        "candidate_count_p95": coverage["candidate_inventory_count_stats"]["p95"],
+        "tokenizer_status": burden["tokenizer_status"],
         "model_called": False,
         "gpu_called": False,
     }
@@ -672,8 +1007,15 @@ def main() -> None:
     parser.add_argument("--raw-dir", type=Path, required=True)
     parser.add_argument("--out-dir", type=Path, default=PROJECT_ROOT / STAGE_NAME)
     parser.add_argument("--package", type=Path, default=PROJECT_ROOT / PACKAGE_NAME)
+    parser.add_argument("--tokenizer-name-or-path", default=None)
+    parser.add_argument("--tokenizer-revision", default=QWEN_TOKENIZER_REVISION)
     args = parser.parse_args()
-    summary = build_stage(args.out_dir, args.raw_dir)
+    summary = build_stage(
+        args.out_dir,
+        args.raw_dir,
+        tokenizer_name_or_path=args.tokenizer_name_or_path,
+        tokenizer_revision=args.tokenizer_revision,
+    )
     digest = package_reviewer(args.out_dir, args.package)
     summary["package"] = str(args.package)
     summary["package_sha256"] = digest
