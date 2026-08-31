@@ -16,7 +16,7 @@ from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 STAGE_NAME = "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT"
-PATCH_NAME = "PATCH2"
+PATCH_NAME = "PATCH3"
 SERVER_RUN_ID = "server_real_run_20260830_220327"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260831.zip"
 RESULT_DIR_NAME = "stage7e0_a3_english_real_generation_preflight_results"
@@ -220,7 +220,7 @@ def failure_analysis(report: dict[str, Any], cases: list[dict[str, Any]], raw_o:
 
 
 def validation_report(report: dict[str, Any]) -> str:
-    return f"""# Stage7E0-A3 English PATCH2 Server Result Validation Report
+    return f"""# Stage7E0-A3 English PATCH3 Server Result Validation Report
 
 Status: INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL
 

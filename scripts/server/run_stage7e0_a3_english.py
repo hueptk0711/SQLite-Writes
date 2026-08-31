@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
 import json
 import shutil
 import sqlite3
@@ -66,6 +67,13 @@ EXPECTED_PRIMARY_COUNT = 8
 PHASE_O_MAX_NEW_TOKENS = 512
 PHASE_M_MAX_NEW_TOKENS = 8192
 CONSTRAINED_BACKEND_ID = "incremental_json_schema_grammar"
+FROZEN_RUNTIME_VERSIONS = {
+    "torch": "2.6.0+cu124",
+    "transformers": "5.5.3",
+    "tokenizers": "0.22.2",
+    "accelerate": "1.14.0",
+    "safetensors": "0.5.3",
+}
 
 
 def canonical_json(value: Any) -> str:
@@ -128,7 +136,7 @@ def assert_result_root_policy(result_root: Path, *, backend: str, allow_inside_g
 def validate_generation_config(args: argparse.Namespace) -> None:
     backend = str(args.backend).lower()
     if backend == "hf":
-        raise SystemExit("STOP: backend=hf is plain unconstrained HF and is forbidden for PATCH2")
+        raise SystemExit("STOP: backend=hf is plain unconstrained HF and is forbidden for PATCH3")
     if backend not in {"constrained_hf", "mock"}:
         raise SystemExit(f"STOP: unsupported backend {backend}")
     if int(args.phase_o_max_new_tokens) != PHASE_O_MAX_NEW_TOKENS:
@@ -136,7 +144,31 @@ def validate_generation_config(args: argparse.Namespace) -> None:
     if int(args.phase_m_max_new_tokens) != PHASE_M_MAX_NEW_TOKENS:
         raise SystemExit(f"STOP: Phase M max_new_tokens must remain {PHASE_M_MAX_NEW_TOKENS}")
     if backend == "constrained_hf" and str(args.quantization).lower() not in {"none", ""}:
-        raise SystemExit("STOP: PATCH2 constrained run forbids 4-bit quantization")
+        raise SystemExit("STOP: PATCH3 constrained run forbids 4-bit quantization")
+    if backend == "constrained_hf" and bool(args.resume):
+        raise SystemExit("STOP: PATCH3 forbids --resume for real constrained runs; archive partial output and start a fresh result-root")
+
+
+def runtime_versions() -> dict[str, str | None]:
+    versions: dict[str, str | None] = {}
+    for package in FROZEN_RUNTIME_VERSIONS:
+        try:
+            versions[package] = importlib.metadata.version(package)
+        except importlib.metadata.PackageNotFoundError:
+            versions[package] = None
+    return versions
+
+
+def validate_runtime_versions(versions: dict[str, str | None] | None = None) -> dict[str, Any]:
+    observed = runtime_versions() if versions is None else dict(versions)
+    mismatches = {
+        package: {"expected": expected, "observed": observed.get(package)}
+        for package, expected in FROZEN_RUNTIME_VERSIONS.items()
+        if observed.get(package) != expected
+    }
+    if mismatches:
+        raise SystemExit(f"STOP: frozen inference runtime version drift: {canonical_json(mismatches)}")
+    return {"status": "PASS", "frozen_runtime_versions": dict(FROZEN_RUNTIME_VERSIONS), "observed_runtime_versions": observed}
 
 
 def load_stage7c_a3_rows(root: Path = PROJECT_ROOT) -> list[dict[str, Any]]:
@@ -264,8 +296,9 @@ class ConstrainedTransformersChatGenerator:
             from transformers import AutoModelForCausalLM, AutoTokenizer
         except ImportError as exc:  # pragma: no cover - server dependency
             raise SystemExit("STOP: constrained real generation requires torch, transformers, and accelerate") from exc
+        self.runtime_lock = validate_runtime_versions()
         if quantization not in {"none", "None", ""}:
-            raise SystemExit("STOP: Stage7E0-A3 PATCH2 forbids 4-bit or any quantized generation")
+            raise SystemExit("STOP: Stage7E0-A3 PATCH3 forbids 4-bit or any quantized generation")
         self.torch = torch
         self.seed = seed
         self.max_input_tokens = max_input_tokens
@@ -374,9 +407,13 @@ class ConstrainedTransformersChatGenerator:
             "model_revision": MODEL_REVISION,
             "quantization": self.quantization,
             "torch_dtype": "auto",
+            "runtime_lock": self.runtime_lock,
             "chat_template_sha256": EXPECTED_CHAT_TEMPLATE_SHA256,
             "torch_version": torch.__version__,
             "transformers_version": __import__("transformers").__version__,
+            "tokenizers_version": importlib.metadata.version("tokenizers"),
+            "accelerate_version": importlib.metadata.version("accelerate"),
+            "safetensors_version": importlib.metadata.version("safetensors"),
             "cuda_available": bool(torch.cuda.is_available()),
             "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
         }

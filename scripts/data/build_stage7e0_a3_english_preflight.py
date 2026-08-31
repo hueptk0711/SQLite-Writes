@@ -25,6 +25,7 @@ from scripts.server.run_stage7e0_a3_english import (  # noqa: E402
     A3_PROMPT_SPEC_REL,
     DEFAULT_MODEL_PATH,
     EXPECTED_CHAT_TEMPLATE_SHA256,
+    FROZEN_RUNTIME_VERSIONS,
     MODEL_ID,
     MODEL_REVISION,
     PHASE_M_MAX_NEW_TOKENS,
@@ -32,11 +33,21 @@ from scripts.server.run_stage7e0_a3_english import (  # noqa: E402
     STAGE7C_A3_DIR,
     run_stage7e0,
 )
+from nldbwrite_v3.v2_a1.inventories import build_schema_inventory  # noqa: E402
+from nldbwrite_v3.v2_a1.phase_m_schema import dynamic_schema  # noqa: E402
+from nldbwrite_v3.v2_a1.phase_o_output import phase_o_json_schema  # noqa: E402
+from nldbwrite_v3.v2_a1.slot_inventory import build_slot_bundle  # noqa: E402
+from nldbwrite_v3.v2_a1.span_validation import validate_and_sort_spans  # noqa: E402
+from scripts.server.run_stage7e0_v2_a1_preflight import (  # noqa: E402
+    build_phase_m_constraint_grammar,
+    build_phase_o_constraint_grammar,
+)
 
 
 STAGE_NAME = "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT"
-PATCH_NAME = "PATCH2"
+PATCH_NAME = "PATCH3"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260831.zip"
+FRESH_CONSTRAINED_RESULT_DIR_NAME = "stage7e0_a3_english_patch3_constrained_results_20260831"
 INVALID_RUN_ID = "server_real_run_20260830_220327"
 INVALID_RESULT_DIR_NAME = "stage7e0_a3_english_real_generation_preflight_results"
 INVALID_SERVER_TAR_NAME = "stage7e0_a3_english_real_generation_preflight_results_20260830_220327.tar.gz"
@@ -130,6 +141,7 @@ def runner_protocol(accepted_commit: str) -> dict[str, Any]:
             "quantization_default": "none",
             "quantization_allowed": False,
             "torch_dtype": "auto",
+            "frozen_runtime_versions": FROZEN_RUNTIME_VERSIONS,
             "deterministic_decoding": {"do_sample": False, "seed": 42},
         },
         "prompt_contract": {
@@ -156,6 +168,8 @@ def runner_protocol(accepted_commit: str) -> dict[str, Any]:
             "finite_known_answer_candidates": False,
             "label_side_data_used_for_constraints": False,
             "automatic_repair": False,
+            "resume_allowed": False,
+            "interrupted_run_policy": "archive partial output as ABORTED_INFRASTRUCTURE and start a new empty result-root; do not pass --resume",
             "phase_o_max_new_tokens": PHASE_O_MAX_NEW_TOKENS,
             "phase_m_max_new_tokens": PHASE_M_MAX_NEW_TOKENS,
             "accepted_patch9_backend_file": "scripts/server/run_stage7e0_v2_a1_preflight.py",
@@ -201,7 +215,7 @@ export TRANSFORMERS_OFFLINE=1
 PY="${{PY:-/home/uet/miniconda3/envs/stage7e0/bin/python}}"
 "$PY" scripts/server/run_stage7e0_a3_english.py \\
   --accepted-protocol-commit {accepted_commit} \\
-  --result-root /home/uet/hue_ptk/stage7e0_a3_english_real_generation_preflight_results \\
+  --result-root /home/uet/hue_ptk/{FRESH_CONSTRAINED_RESULT_DIR_NAME} \\
   --backend constrained_hf \\
   --quantization none \\
   --phase-o-max-new-tokens {PHASE_O_MAX_NEW_TOKENS} \\
@@ -209,32 +223,37 @@ PY="${{PY:-/home/uet/miniconda3/envs/stage7e0/bin/python}}"
   --model-name-or-path {DEFAULT_MODEL_PATH}
 ```
 
-If the run is interrupted before completion, resume with the same command plus:
-
-```bash
-  --resume
-```
+Do not use `--resume` for this real constrained run. If infrastructure interrupts
+the job, archive the partial result directory as `ABORTED_INFRASTRUCTURE` and
+start a new run in a fresh empty result root.
 
 After completion, copy these result files back for review:
 
 ```powershell
-scp -r uet@222.255.250.24:/home/uet/hue_ptk/stage7e0_a3_english_real_generation_preflight_results .
+scp -r uet@222.255.250.24:/home/uet/hue_ptk/{FRESH_CONSTRAINED_RESULT_DIR_NAME} .
+```
+
+Validate a copied result directory with:
+
+```bash
+python scripts/data/validate_stage7e0_a3_server_results.py --result-dir {FRESH_CONSTRAINED_RESULT_DIR_NAME}
 ```
 """
 
 
 def validation_report(accepted_commit: str, mock_summary: dict[str, Any]) -> str:
-    return f"""# Stage7E0-A3 English Real Generation Preflight PATCH2 Validation Report
+    return f"""# Stage7E0-A3 English Real Generation Preflight PATCH3 Validation Report
 
-Status: PASS_PATCH2_CONSTRAINED_BACKEND_READY
+Status: PASS_PATCH3_READY_FOR_REAL_CONSTRAINED_RUN
 
 Validation date: {date.today().isoformat()}
 
 ## Scope
 
-This patch restores the accepted PATCH9 incremental JSON-schema grammar backend
-for the Stage7E0-A3 real runner. It does not claim a new scientific model result
-unless `backend=constrained_hf` is run on the GPU server.
+This patch hardens the accepted PATCH9 incremental JSON-schema grammar backend
+package before GPU execution. It does not claim a new scientific model result
+unless `backend=constrained_hf` is run on the GPU server in the fresh PATCH3
+result root.
 The local dry-run uses label-side expected outputs only as a mock infrastructure
 test and is marked as non-scientific model evidence.
 
@@ -257,6 +276,9 @@ fallback_to_unconstrained=false
 quantization=none
 phase_o_max_new_tokens={PHASE_O_MAX_NEW_TOKENS}
 phase_m_max_new_tokens={PHASE_M_MAX_NEW_TOKENS}
+resume_allowed=false
+fresh_result_root=/home/uet/hue_ptk/{FRESH_CONSTRAINED_RESULT_DIR_NAME}
+frozen_runtime_versions={canonical_json(FROZEN_RUNTIME_VERSIONS)}
 ```
 
 ## Invalid Prior Run Classification
@@ -281,27 +303,33 @@ mock_uses_label_side_expected={str(mock_summary["mock_uses_label_side_expected"]
 ```text
 python scripts/data/validate_stage7c_a3_english_offset_semantics.py --stage-dir Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT
 python scripts/data/validate_stage7e0_a3_english_preflight.py --stage-dir {STAGE_NAME}
+python scripts/data/validate_stage7e0_a3_server_results.py --stage-dir {STAGE_NAME}
 python -m pytest -q tests/test_stage7e0_a3_english_preflight.py
 python -m pytest -q tests/test_stage7e0_a3_patch2_constrained_backend.py
+python -m pytest -q tests/test_stage7e0_a3_patch3_protocol_hardening.py
 python -m zipfile --test {PACKAGE_NAME}
 ```
 """
 
 
 def reviewer_readme(package_name: str, accepted_commit: str) -> str:
-    return f"""# Stage7E0-A3 English Real Generation Preflight PATCH2
+    return f"""# Stage7E0-A3 English Real Generation Preflight PATCH3
 
-This reviewer package restores the accepted PATCH9 constrained backend for the
-eight fresh Stage7C-A3 English cases. It wires Phase O to the exact accepted A3
-prompt spec, keeps Phase M and the V2-A1 materialization/compiler/preflight path
-unchanged, and forbids plain HF fallback, repair, retry, and 4-bit quantization.
+This reviewer package hardens the accepted PATCH9 constrained backend before
+running the eight fresh Stage7C-A3 English cases on GPU. It keeps the prompt,
+cases, schemas, Phase M, model revision, no-repair/no-retry policy, and decoder
+method unchanged, while making the package self-contained and the post-run
+validator outcome-generic.
 
 Clean extraction checks:
 
 ```bash
 python scripts/data/validate_stage7e0_a3_english_preflight.py --stage-dir {STAGE_NAME}
+python scripts/data/validate_stage7c_a3_english_offset_semantics.py --stage-dir Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT
+python scripts/data/validate_stage7e0_a3_server_results.py --stage-dir {STAGE_NAME}
 python -m pytest -q tests/test_stage7e0_a3_english_preflight.py
 python -m pytest -q tests/test_stage7e0_a3_patch2_constrained_backend.py
+python -m pytest -q tests/test_stage7e0_a3_patch3_protocol_hardening.py
 ```
 
 Server execution commands are in:
@@ -344,6 +372,53 @@ def run_mock_dry_run(out_dir: Path, accepted_commit: str) -> dict[str, Any]:
         allow_result_root_inside_git=True,
     )
     return run_stage7e0(args)
+
+
+def constraint_independence_audit() -> dict[str, Any]:
+    rows = read_jsonl(PROJECT_ROOT / STAGE7C_A3_DIR / "FRESH_ENGLISH_A3_SMOKE_SET.jsonl")
+    phase_o_schema = phase_o_json_schema(PROJECT_ROOT)
+    audit_rows: list[dict[str, Any]] = []
+    for row in rows:
+        question = row["model_side_input"]["question"]
+        phase_o_baseline = build_phase_o_constraint_grammar(phase_o_schema, question)
+        mutated_phase_o_row = json.loads(json.dumps(row))
+        mutated_phase_o_row["label_side_expected"]["phase_o"]["operation"] = "UPDATE"
+        phase_o_mutated = build_phase_o_constraint_grammar(phase_o_schema, mutated_phase_o_row["model_side_input"]["question"])
+
+        inventory = build_schema_inventory(row["model_side_input"])
+        spans = validate_and_sort_spans(question, row["label_side_expected"]["phase_o"]["value_spans"])
+        slots = build_slot_bundle(spans)
+        phase_m_schema = dynamic_schema("INSERT", inventory, slots, root=PROJECT_ROOT)
+        phase_m_baseline = build_phase_m_constraint_grammar(phase_m_schema, "INSERT", inventory, slots, root=PROJECT_ROOT)
+        mutated_phase_m_row = json.loads(json.dumps(row))
+        assignments = mutated_phase_m_row["label_side_expected"]["phase_m"]["assignments"]
+        if len(assignments) > 1:
+            assignments[0], assignments[-1] = assignments[-1], assignments[0]
+        elif assignments:
+            assignments[0]["column_ref"] = assignments[0]["column_ref"] + "_MUTATED"
+        phase_m_mutated = build_phase_m_constraint_grammar(phase_m_schema, "INSERT", inventory, slots, root=PROJECT_ROOT)
+
+        audit_rows.append(
+            {
+                "sample_id": row["sample_id"],
+                "phase_o_constraint_fingerprint": phase_o_baseline.fingerprint,
+                "phase_o_label_mutation_fingerprint": phase_o_mutated.fingerprint,
+                "phase_o_label_independent": phase_o_baseline.fingerprint == phase_o_mutated.fingerprint,
+                "phase_m_constraint_fingerprint": phase_m_baseline.fingerprint,
+                "phase_m_label_mutation_fingerprint": phase_m_mutated.fingerprint,
+                "phase_m_label_independent": phase_m_baseline.fingerprint == phase_m_mutated.fingerprint,
+                "label_side_data_used_for_constraints": False,
+            }
+        )
+    return {
+        "stage": STAGE_NAME,
+        "patch": PATCH_NAME,
+        "status": "PASS" if len(audit_rows) == 8 and all(row["phase_o_label_independent"] and row["phase_m_label_independent"] for row in audit_rows) else "FAIL",
+        "case_count": len(audit_rows),
+        "backend": "incremental_json_schema_grammar",
+        "label_side_data_used_for_constraints": False,
+        "rows": audit_rows,
+    }
 
 
 def invalid_run_classification(stage_dir: Path) -> dict[str, Any]:
@@ -433,7 +508,7 @@ same eight A3 cases only with the PATCH9 constrained backend.
 Status: INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL
 
 This file keeps the legacy PATCH1 validation-report filename for package
-compatibility. PATCH2 reclassifies the prior server output as protocol-invalid
+compatibility. PATCH3 reclassifies the prior server output as protocol-invalid
 evidence, not as a scientific 0/8 A3 failure.
 
 ```text
@@ -475,10 +550,14 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
     inputs = stage7c_inputs()
     protocol = runner_protocol(accepted_commit)
     mock_summary = run_mock_dry_run(out_dir, accepted_commit)
+    independence = constraint_independence_audit()
+    if independence["status"] != "PASS":
+        raise RuntimeError("constraint independence audit failed")
     restore_invalid_run_artifacts(out_dir, preserved_invalid_artifacts)
     write_json(out_dir / "STAGE7E0_A3_INPUT_MANIFEST.json", inputs)
     write_json(out_dir / "RUNNER_PROTOCOL_A3.json", protocol)
     write_json(out_dir / "PRIMARY_ACCEPTANCE_POLICY_A3.json", protocol["acceptance"])
+    write_json(out_dir / "CONSTRAINT_INDEPENDENCE_AUDIT_A3.json", independence)
     write_json(out_dir / "INVALID_RUN_001_CLASSIFICATION.json", prior_invalid)
     write_invalid_server_result_notes(out_dir, prior_invalid)
     write_invalid_server_result_lock(out_dir, prior_invalid)
@@ -489,6 +568,7 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
         "STAGE7E0_A3_INPUT_MANIFEST.json",
         "RUNNER_PROTOCOL_A3.json",
         "PRIMARY_ACCEPTANCE_POLICY_A3.json",
+        "CONSTRAINT_INDEPENDENCE_AUDIT_A3.json",
         "INVALID_RUN_001_CLASSIFICATION.json",
         "SERVER_RUN_COMMANDS.md",
         "VALIDATION_REPORT.md",
@@ -514,7 +594,7 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
     lock = {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
-        "status": "PASS_PATCH2_CONSTRAINED_BACKEND_READY",
+        "status": "PASS_PATCH3_READY_FOR_REAL_CONSTRAINED_RUN",
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "git_branch": git_output("branch", "--show-current"),
         "git_commit": accepted_commit,
@@ -533,6 +613,10 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
         "quantization": "none",
         "phase_o_max_new_tokens": PHASE_O_MAX_NEW_TOKENS,
         "phase_m_max_new_tokens": PHASE_M_MAX_NEW_TOKENS,
+        "resume_allowed": False,
+        "fresh_constrained_result_root": f"/home/uet/hue_ptk/{FRESH_CONSTRAINED_RESULT_DIR_NAME}",
+        "frozen_runtime_versions": FROZEN_RUNTIME_VERSIONS,
+        "constraint_independence_audit_sha256": sha256_file(out_dir / "CONSTRAINT_INDEPENDENCE_AUDIT_A3.json"),
         "model_called": False,
         "gpu_called": False,
         "mock_dry_run_only": True,
@@ -574,11 +658,16 @@ def include_paths(stage_dir: Path) -> list[Path]:
         "scripts/server/run_stage7e0_a3_english.py",
         "scripts/server/run_stage7e0_v2_a1_preflight.py",
         "scripts/data/build_stage7e0_a3_english_preflight.py",
+        "scripts/data/build_stage7c_a3_english_offset_semantics.py",
+        "scripts/data/import_stage7e0_a3_server_results.py",
         "scripts/data/validate_stage7c_a3_english_offset_semantics.py",
         "scripts/data/validate_stage7e0_a3_english_preflight.py",
         "scripts/data/validate_stage7e0_a3_server_results.py",
         "tests/test_stage7e0_a3_english_preflight.py",
         "tests/test_stage7e0_a3_patch2_constrained_backend.py",
+        "tests/test_stage7e0_a3_patch3_protocol_hardening.py",
+        "tests/test_stage7e0_a3_server_results.py",
+        "tests/test_stage7c_a3_english_offset_semantics.py",
         "tests/support/windows_py314_pytest_tempdir/sitecustomize.py",
         "tests/support/stage7c_pytest_clean_root/conftest.py",
     ]

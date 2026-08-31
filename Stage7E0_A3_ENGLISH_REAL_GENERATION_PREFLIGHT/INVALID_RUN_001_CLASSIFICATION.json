@@ -6,7 +6,7 @@
   "evidence_integrity_status": "PASS",
   "invalid_run_id": "001",
   "observed_primary_pass_count": "0/8",
-  "patch": "PATCH2",
+  "patch": "PATCH3",
   "primary_gate_status": "INVALID_NOT_EVALUATED",
   "protocol_compliance_status": "FAIL",
   "reason": "backend_protocol_violation",

@@ -101,7 +101,7 @@ def test_builder_and_validator_pass(tmp_path: Path) -> None:
     stage_dir = tmp_path / STAGE_NAME
     package_path = tmp_path / PACKAGE_NAME
     summary = build_stage(stage_dir, package_path)
-    assert summary["status"] == "PASS_PATCH2_CONSTRAINED_BACKEND_READY"
+    assert summary["status"] == "PASS_PATCH3_READY_FOR_REAL_CONSTRAINED_RUN"
     assert summary["mock_primary_pass_count"] == "8/8"
     report = validate(stage_dir)
     assert report["status"] == "PASS", report["failures"]
@@ -124,6 +124,7 @@ def test_stage_lock_forbids_7_of_8_and_gretel(tmp_path: Path) -> None:
     assert lock["gretel_pilot_opened"] is False
     assert protocol["model"]["expected_chat_template_sha256"] == EXPECTED_CHAT_TEMPLATE_SHA256
     assert protocol["model"]["quantization_default"] == "none"
+    assert protocol["generation_contract"]["resume_allowed"] is False
     assert protocol["generation_contract"]["backend"] == "incremental_json_schema_grammar"
     assert protocol["generation_contract"]["phase_m_max_new_tokens"] == 8192
 

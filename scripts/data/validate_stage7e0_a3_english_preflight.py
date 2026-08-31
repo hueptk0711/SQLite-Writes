@@ -21,6 +21,7 @@ from scripts.server.run_stage7e0_a3_english import (  # noqa: E402
     A3_PROMPT_SPEC_REL,
     DEFAULT_MODEL_PATH,
     EXPECTED_CHAT_TEMPLATE_SHA256,
+    FROZEN_RUNTIME_VERSIONS,
     MODEL_ID,
     MODEL_REVISION,
     PHASE_M_MAX_NEW_TOKENS,
@@ -32,10 +33,12 @@ from scripts.server.run_stage7e0_a3_english import (  # noqa: E402
 
 
 STAGE_NAME = "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT"
+FRESH_CONSTRAINED_RESULT_DIR_NAME = "stage7e0_a3_english_patch3_constrained_results_20260831"
 REQUIRED_FILES = {
     "STAGE7E0_A3_INPUT_MANIFEST.json",
     "RUNNER_PROTOCOL_A3.json",
     "PRIMARY_ACCEPTANCE_POLICY_A3.json",
+    "CONSTRAINT_INDEPENDENCE_AUDIT_A3.json",
     "INVALID_RUN_001_CLASSIFICATION.json",
     "SERVER_RUN_COMMANDS.md",
     "VALIDATION_REPORT.md",
@@ -78,6 +81,7 @@ def validate(stage_dir: Path) -> dict[str, Any]:
     protocol = read_json(stage_dir / "RUNNER_PROTOCOL_A3.json")
     inputs = read_json(stage_dir / "STAGE7E0_A3_INPUT_MANIFEST.json")
     policy = read_json(stage_dir / "PRIMARY_ACCEPTANCE_POLICY_A3.json")
+    independence = read_json(stage_dir / "CONSTRAINT_INDEPENDENCE_AUDIT_A3.json")
     invalid_run = read_json(stage_dir / "INVALID_RUN_001_CLASSIFICATION.json")
     lock = read_json(stage_dir / "STAGE7E0_A3_LOCK.json")
     mock_summary = read_json(stage_dir / "mock_dry_run" / "primary_summary.json")
@@ -94,11 +98,13 @@ def validate(stage_dir: Path) -> dict[str, Any]:
     if protocol.get("model", {}).get("expected_chat_template_sha256") != EXPECTED_CHAT_TEMPLATE_SHA256:
         failures.append("runner protocol chat template hash drifted")
     if protocol.get("model", {}).get("quantization_default") != "none":
-        failures.append("PATCH2 must default to no quantization")
+        failures.append("PATCH3 must default to no quantization")
     if protocol.get("model", {}).get("quantization_allowed") is not False:
-        failures.append("PATCH2 must forbid quantization")
+        failures.append("PATCH3 must forbid quantization")
     if protocol.get("model", {}).get("torch_dtype") != "auto":
-        failures.append("PATCH2 must preserve torch_dtype=auto")
+        failures.append("PATCH3 must preserve torch_dtype=auto")
+    if protocol.get("model", {}).get("frozen_runtime_versions") != FROZEN_RUNTIME_VERSIONS:
+        failures.append("frozen runtime versions drifted")
     if protocol.get("prompt_contract", {}).get("phase_o_prompt_spec_path") != A3_PROMPT_SPEC_REL:
         failures.append("runner does not lock exact Stage7C-A3 Phase O prompt spec")
     if protocol.get("prompt_contract", {}).get("phase_m_changed") is not False:
@@ -127,6 +133,10 @@ def validate(stage_dir: Path) -> dict[str, Any]:
         failures.append("label-side data must not feed constraints")
     if protocol.get("generation_contract", {}).get("automatic_repair") is not False:
         failures.append("automatic repair must be false")
+    if protocol.get("generation_contract", {}).get("resume_allowed") is not False:
+        failures.append("real constrained run must not allow --resume")
+    if "do not pass --resume" not in protocol.get("generation_contract", {}).get("interrupted_run_policy", ""):
+        failures.append("interrupted run policy must require a fresh result-root")
     if protocol.get("generation_contract", {}).get("phase_o_max_new_tokens") != PHASE_O_MAX_NEW_TOKENS:
         failures.append("Phase O max_new_tokens drifted")
     if protocol.get("generation_contract", {}).get("phase_m_max_new_tokens") != PHASE_M_MAX_NEW_TOKENS:
@@ -174,23 +184,43 @@ def validate(stage_dir: Path) -> dict[str, Any]:
     if len(raw_o) != 8 or len(raw_m) != 8:
         failures.append("mock raw generation files must contain 8 Phase O and 8 Phase M rows")
 
-    if lock.get("status") != "PASS_PATCH2_CONSTRAINED_BACKEND_READY":
-        failures.append("stage lock status must be PATCH2 constrained-backend ready")
+    if independence.get("status") != "PASS":
+        failures.append("constraint independence audit must pass")
+    if independence.get("case_count") != 8:
+        failures.append("constraint independence audit must cover all 8 cases")
+    if independence.get("label_side_data_used_for_constraints") is not False:
+        failures.append("constraint independence audit must record no label-side constraints")
+    for row in independence.get("rows", []):
+        if row.get("phase_o_label_independent") is not True or row.get("phase_m_label_independent") is not True:
+            failures.append(f"constraint independence failed for {row.get('sample_id')}")
+
+    if lock.get("status") != "PASS_PATCH3_READY_FOR_REAL_CONSTRAINED_RUN":
+        failures.append("stage lock status must be PATCH3 ready for real constrained run")
     if lock.get("backend") != "incremental_json_schema_grammar":
         failures.append("stage lock backend must be constrained PATCH9 backend")
     if lock.get("quantization") != "none":
         failures.append("stage lock quantization must be none")
     if lock.get("phase_m_max_new_tokens") != PHASE_M_MAX_NEW_TOKENS:
         failures.append("stage lock Phase M max_new_tokens drifted")
+    if lock.get("resume_allowed") is not False:
+        failures.append("stage lock must forbid resume")
+    if lock.get("fresh_constrained_result_root") != f"/home/uet/hue_ptk/{FRESH_CONSTRAINED_RESULT_DIR_NAME}":
+        failures.append("stage lock fresh constrained result root drifted")
+    if lock.get("frozen_runtime_versions") != FROZEN_RUNTIME_VERSIONS:
+        failures.append("stage lock frozen runtime versions drifted")
+    if lock.get("constraint_independence_audit_sha256") != sha256_file(stage_dir / "CONSTRAINT_INDEPENDENCE_AUDIT_A3.json"):
+        failures.append("stage lock constraint independence audit hash mismatch")
     if lock.get("model_called") is not False or lock.get("gpu_called") is not False:
         failures.append("stage lock must record no local model/GPU call")
     if lock.get("gretel_pilot_opened") is not False:
         failures.append("Gretel pilot must remain unopened")
 
     commands = (stage_dir / "SERVER_RUN_COMMANDS.md").read_text(encoding="utf-8")
-    for needle in ("uet@222.255.250.24", "/home/uet/hue_ptk", "run_stage7e0_a3_english.py", DEFAULT_MODEL_PATH, "--backend constrained_hf", "--quantization none", "--phase-m-max-new-tokens 8192"):
+    for needle in ("uet@222.255.250.24", "/home/uet/hue_ptk", "run_stage7e0_a3_english.py", DEFAULT_MODEL_PATH, "--backend constrained_hf", "--quantization none", "--phase-m-max-new-tokens 8192", FRESH_CONSTRAINED_RESULT_DIR_NAME, "Do not use `--resume`"):
         if needle not in commands:
             failures.append(f"server command missing {needle}")
+    if "stage7e0_a3_english_real_generation_preflight_results \\" in commands:
+        failures.append("server command must not reuse the old invalid result-root")
 
     if invalid_run.get("reason") != "backend_protocol_violation":
         failures.append("invalid run classification reason drifted")

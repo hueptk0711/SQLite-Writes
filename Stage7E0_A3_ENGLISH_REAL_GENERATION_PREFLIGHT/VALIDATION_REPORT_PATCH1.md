@@ -3,7 +3,7 @@
 Status: INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL
 
 This file keeps the legacy PATCH1 validation-report filename for package
-compatibility. PATCH2 reclassifies the prior server output as protocol-invalid
+compatibility. PATCH3 reclassifies the prior server output as protocol-invalid
 evidence, not as a scientific 0/8 A3 failure.
 
 ```text

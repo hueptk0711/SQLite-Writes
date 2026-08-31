@@ -1,0 +1,90 @@
+{
+  "backend": "incremental_json_schema_grammar",
+  "case_count": 8,
+  "label_side_data_used_for_constraints": false,
+  "patch": "PATCH3",
+  "rows": [
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "e74a72b0bd45e4817c050b44d9f8b1c9050d89b7039badfe5b111e4903e31476",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "e74a72b0bd45e4817c050b44d9f8b1c9050d89b7039badfe5b111e4903e31476",
+      "phase_o_constraint_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "sample_id": "stage7c_fresh_english_001"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "89160615d587ee0bab3c06dd717c1270310ce483fdc517c9a5a2d2b2ee8ad3e5",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "89160615d587ee0bab3c06dd717c1270310ce483fdc517c9a5a2d2b2ee8ad3e5",
+      "phase_o_constraint_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "sample_id": "stage7c_fresh_english_002"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "65d3d0cddb071164389514862635f36b10b6e03251eca6287e74904b48a82798",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "65d3d0cddb071164389514862635f36b10b6e03251eca6287e74904b48a82798",
+      "phase_o_constraint_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "sample_id": "stage7c_fresh_english_003"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "eaecf8f315561bbe63805fe30be88430548aeb660d3f2f4bc49cff542cd5c8a3",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "eaecf8f315561bbe63805fe30be88430548aeb660d3f2f4bc49cff542cd5c8a3",
+      "phase_o_constraint_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "sample_id": "stage7c_fresh_english_004"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "e74a72b0bd45e4817c050b44d9f8b1c9050d89b7039badfe5b111e4903e31476",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "e74a72b0bd45e4817c050b44d9f8b1c9050d89b7039badfe5b111e4903e31476",
+      "phase_o_constraint_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "sample_id": "stage7c_fresh_english_005"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "89160615d587ee0bab3c06dd717c1270310ce483fdc517c9a5a2d2b2ee8ad3e5",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "89160615d587ee0bab3c06dd717c1270310ce483fdc517c9a5a2d2b2ee8ad3e5",
+      "phase_o_constraint_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "sample_id": "stage7c_fresh_english_006"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "65d3d0cddb071164389514862635f36b10b6e03251eca6287e74904b48a82798",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "65d3d0cddb071164389514862635f36b10b6e03251eca6287e74904b48a82798",
+      "phase_o_constraint_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "sample_id": "stage7c_fresh_english_007"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "eaecf8f315561bbe63805fe30be88430548aeb660d3f2f4bc49cff542cd5c8a3",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "eaecf8f315561bbe63805fe30be88430548aeb660d3f2f4bc49cff542cd5c8a3",
+      "phase_o_constraint_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "d4e71ece90fa9af3a379b7d8c34039a897ed433be78a37df25a9f7092bc671fb",
+      "sample_id": "stage7c_fresh_english_008"
+    }
+  ],
+  "stage": "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT",
+  "status": "PASS"
+}

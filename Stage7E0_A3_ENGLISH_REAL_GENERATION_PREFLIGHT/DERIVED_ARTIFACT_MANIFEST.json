@@ -1,5 +1,5 @@
 {
-  "artifact_count": 21,
+  "artifact_count": 22,
   "artifacts": [
     {
       "bytes": 1317,
@@ -7,9 +7,9 @@
       "sha256": "db8e08ce1a1484c1475883b88ca764439b1c36baac2155913e698c107ee3ab95"
     },
     {
-      "bytes": 2482,
+      "bytes": 2839,
       "path": "RUNNER_PROTOCOL_A3.json",
-      "sha256": "51b2966ed05a8f7c422d85ffd4e38d5777c9e5fe5e5c953973c093b49782dec0"
+      "sha256": "c1935481cafcd03d5c30c0c205b9b6e6bce9c7957a0e45e0aa940579c0ee6f75"
     },
     {
       "bytes": 320,
@@ -17,29 +17,34 @@
       "sha256": "fa405b4b90e56c8ba2d79f0b21c9a2e623d75476185980a2234eea0ebadafd6c"
     },
     {
+      "bytes": 5316,
+      "path": "CONSTRAINT_INDEPENDENCE_AUDIT_A3.json",
+      "sha256": "9833f9d1228b6f92c1b1ce07e350c4227e3c9b3f7abd711ceefe8f44b00a364d"
+    },
+    {
       "bytes": 810,
       "path": "INVALID_RUN_001_CLASSIFICATION.json",
-      "sha256": "7face869463acbb0c7393a3acf2a9d6531507d7fa94c9b56dfa4bda74270e5dd"
+      "sha256": "dc1085e44a4376d0016b04aa40a13680850f83bde2a3f46abae9336d8fc528a7"
     },
     {
-      "bytes": 1836,
+      "bytes": 2125,
       "path": "SERVER_RUN_COMMANDS.md",
-      "sha256": "a7e07ca8ee9503488628b8d436a6fac293e951fe27985fc60b25103c7adaa601"
+      "sha256": "9be95da93abb58b6352ad5bec14c8180cc78313c76bda254bd7b0aa23e12c1db"
     },
     {
-      "bytes": 2040,
+      "bytes": 2512,
       "path": "VALIDATION_REPORT.md",
-      "sha256": "97c1864e63076064dc10c3ae0ad02be1c9e185e3c3d9822ccdbdc7e6ae0fc3bf"
+      "sha256": "f9790c3e9f7a0e33cbf4b07f7820b0c23f75a4355418d492af1b417e7397e5eb"
     },
     {
-      "bytes": 974,
+      "bytes": 1313,
       "path": "REVIEWER_README.md",
-      "sha256": "44d5a2d09568bf9929bd3cf558095dc785b7aa8dd1563a326ae9385516dd3e92"
+      "sha256": "1299a4c561eac17be1f5001117498371a14c74bd3a3035e72a04cd5d9339803a"
     },
     {
       "bytes": 908,
       "path": "mock_dry_run/run_manifest.json",
-      "sha256": "d4ec152223afcb722e67c986f0b2b6f0c34c09fb9068926c476206193efba863"
+      "sha256": "85f4a88b372f798bc4dd5369ab850542803803458e9ad5947a1cdfcfcafa711b"
     },
     {
       "bytes": 733,
@@ -99,15 +104,15 @@
     {
       "bytes": 930,
       "path": "STAGE7E0_A3_SERVER_RESULT_LOCK.json",
-      "sha256": "2de6d3c043d6f8c2c3a8cf4df9648c63c3884fe0290e1cccb20e5acdaf26d841"
+      "sha256": "29b0d20866f3de3f8a65531471cf010fe7a76fe19de21fc7e970f19656b18243"
     },
     {
       "bytes": 564,
       "path": "VALIDATION_REPORT_PATCH1.md",
-      "sha256": "7698b307ac79dea91f486a8f41c0b7d674a1acf413fa273b1f013f0fe4766ad3"
+      "sha256": "2a7ad51b7045a9f77bd00b7e5d344dcd3d0349ee749ad86737a30bed47b70b15"
     }
   ],
-  "combined_scientific_artifacts_sha256": "b861840512d52ae0a11cf48908dd659e8226f23a28395e1ebb0f29d459257413",
-  "patch": "PATCH2",
+  "combined_scientific_artifacts_sha256": "9059450e975f13ffe2a3ad888e128412bbaa960e601bd35880f48efc3c36d19d",
+  "patch": "PATCH3",
   "stage": "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT"
 }

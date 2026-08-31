@@ -9,7 +9,7 @@
     "required_pass_count": "8/8",
     "seven_of_eight_allowed": false
   },
-  "accepted_protocol_commit": "30dd861ac52df8c1e04070f1dc807a5032591bdc",
+  "accepted_protocol_commit": "ca5aab5629a62a702f06dea7f9752702a8d2314f",
   "generation_contract": {
     "accepted_patch9_backend_file": "scripts/server/run_stage7e0_v2_a1_preflight.py",
     "accepted_patch9_backend_symbols": [
@@ -25,6 +25,7 @@
     "fallback_to_unconstrained": false,
     "finite_complete_object_enumeration": false,
     "finite_known_answer_candidates": false,
+    "interrupted_run_policy": "archive partial output as ABORTED_INFRASTRUCTURE and start a new empty result-root; do not pass --resume",
     "label_side_data_used_for_constraints": false,
     "phase_m_calls": 1,
     "phase_m_max_new_tokens": 8192,
@@ -32,6 +33,7 @@
     "phase_o_max_new_tokens": 512,
     "primary_cases": "8 fresh Stage7C-A3 English cases",
     "repair": "none",
+    "resume_allowed": false,
     "retry": 0,
     "schema_enforcement_mode": "transformers_prefix_allowed_tokens_fn",
     "token_level_enforcement": true,
@@ -44,13 +46,20 @@
       "seed": 42
     },
     "expected_chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "frozen_runtime_versions": {
+      "accelerate": "1.14.0",
+      "safetensors": "0.5.3",
+      "tokenizers": "0.22.2",
+      "torch": "2.6.0+cu124",
+      "transformers": "5.5.3"
+    },
     "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
     "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
     "quantization_allowed": false,
     "quantization_default": "none",
     "torch_dtype": "auto"
   },
-  "patch": "PATCH2",
+  "patch": "PATCH3",
   "prompt_contract": {
     "offset_guide_serializer_changed": false,
     "phase_m_changed": false,
