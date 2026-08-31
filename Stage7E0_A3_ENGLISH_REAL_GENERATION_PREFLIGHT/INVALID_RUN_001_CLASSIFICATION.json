@@ -1,0 +1,19 @@
+{
+  "actual_backend": "plain_hf_unconstrained",
+  "actual_phase_m_max_new_tokens": null,
+  "actual_quantization": "4bit",
+  "decision": "Preserve the prior server files as invalid-run evidence; do not use them as an A3 scientific failure result.",
+  "evidence_integrity_status": "PASS",
+  "invalid_run_id": "001",
+  "observed_primary_pass_count": "0/8",
+  "patch": "PATCH2",
+  "primary_gate_status": "INVALID_NOT_EVALUATED",
+  "protocol_compliance_status": "FAIL",
+  "reason": "backend_protocol_violation",
+  "required_backend": "patch9_incremental_json_schema_grammar",
+  "required_phase_m_max_new_tokens": 8192,
+  "required_quantization": "none",
+  "scientific_result_eligible": false,
+  "source_server_run_id": "server_real_run_20260830_220327",
+  "stage": "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT"
+}

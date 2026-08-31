@@ -21,7 +21,7 @@ def read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def test_imported_server_result_is_failed_real_qwen_evidence(tmp_path: Path) -> None:
+def test_imported_server_result_is_preserved_invalid_run_evidence(tmp_path: Path) -> None:
     tar_path = ROOT / SERVER_TAR_NAME
     assert tar_path.is_file()
     stage_dir = tmp_path / STAGE_NAME
@@ -33,10 +33,10 @@ def test_imported_server_result_is_failed_real_qwen_evidence(tmp_path: Path) -> 
     assert report["result"]["required_pass_count"] == "8/8"
     assert report["result"]["diagnostics_run"] is False
     assert report["result"]["gretel_pilot_opened"] is False
-    assert report["result"]["failure_stage_counts"] == {
-        "phase_m_schema_failure": 5,
-        "phase_o_schema_failure": 3,
-    }
+    assert report["invalid_run_classification"]["evidence_integrity_status"] == "PASS"
+    assert report["invalid_run_classification"]["protocol_compliance_status"] == "FAIL"
+    assert report["invalid_run_classification"]["primary_gate_status"] == "INVALID_NOT_EVALUATED"
+    assert report["invalid_run_classification"]["scientific_result_eligible"] is False
 
 
 def test_server_result_validator_passes(tmp_path: Path) -> None:
@@ -46,7 +46,9 @@ def test_server_result_validator_passes(tmp_path: Path) -> None:
     validation = validate(stage_dir, tar_path)
     assert validation["status"] == "PASS", validation["failures"]
     lock = read_json(stage_dir / "STAGE7E0_A3_SERVER_RESULT_LOCK.json")
-    assert lock["status"] == "FAIL_REAL_QWEN_PRIMARY_0_OF_8_DO_NOT_OPEN_GRETEL"
+    assert lock["status"] == "INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL"
+    assert lock["primary_gate_status"] == "INVALID_NOT_EVALUATED"
+    assert lock["scientific_result_eligible"] is False
     assert lock["gretel_pilot_opened"] is False
 
 

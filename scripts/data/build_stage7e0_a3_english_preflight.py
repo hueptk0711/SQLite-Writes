@@ -27,14 +27,30 @@ from scripts.server.run_stage7e0_a3_english import (  # noqa: E402
     EXPECTED_CHAT_TEMPLATE_SHA256,
     MODEL_ID,
     MODEL_REVISION,
+    PHASE_M_MAX_NEW_TOKENS,
+    PHASE_O_MAX_NEW_TOKENS,
     STAGE7C_A3_DIR,
     run_stage7e0,
 )
 
 
 STAGE_NAME = "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT"
-PATCH_NAME = "PATCH0"
-PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260830.zip"
+PATCH_NAME = "PATCH2"
+PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260831.zip"
+INVALID_RUN_ID = "server_real_run_20260830_220327"
+INVALID_RESULT_DIR_NAME = "stage7e0_a3_english_real_generation_preflight_results"
+INVALID_SERVER_TAR_NAME = "stage7e0_a3_english_real_generation_preflight_results_20260830_220327.tar.gz"
+PRESERVED_INVALID_RUN_RELS = [
+    "SERVER_RESULT_IMPORT_REPORT.json",
+    "SERVER_RESULT_FAILURE_ANALYSIS.md",
+    "VALIDATION_REPORT_PATCH1.md",
+    "STAGE7E0_A3_SERVER_RESULT_LOCK.json",
+    f"{INVALID_RUN_ID}/{INVALID_RESULT_DIR_NAME}/primary_summary.json",
+    f"{INVALID_RUN_ID}/{INVALID_RESULT_DIR_NAME}/primary_case_results.jsonl",
+    f"{INVALID_RUN_ID}/{INVALID_RESULT_DIR_NAME}/raw_phase_o_generations.jsonl",
+    f"{INVALID_RUN_ID}/{INVALID_RESULT_DIR_NAME}/raw_phase_m_generations.jsonl",
+    f"{INVALID_RUN_ID}/{INVALID_RESULT_DIR_NAME}/run_manifest.json",
+]
 
 
 def canonical_text(text: str) -> str:
@@ -111,7 +127,9 @@ def runner_protocol(accepted_commit: str) -> dict[str, Any]:
             "model_revision": MODEL_REVISION,
             "default_server_model_path": DEFAULT_MODEL_PATH,
             "expected_chat_template_sha256": EXPECTED_CHAT_TEMPLATE_SHA256,
-            "quantization_default": "4bit",
+            "quantization_default": "none",
+            "quantization_allowed": False,
+            "torch_dtype": "auto",
             "deterministic_decoding": {"do_sample": False, "seed": 42},
         },
         "prompt_contract": {
@@ -130,7 +148,23 @@ def runner_protocol(accepted_commit: str) -> dict[str, Any]:
             "examples": [],
             "retry": 0,
             "repair": "none",
-            "backend": "same PATCH9 incremental parser/materializer/compiler/preflight path",
+            "backend": "incremental_json_schema_grammar",
+            "token_level_enforcement": True,
+            "schema_enforcement_mode": "transformers_prefix_allowed_tokens_fn",
+            "fallback_to_unconstrained": False,
+            "finite_complete_object_enumeration": False,
+            "finite_known_answer_candidates": False,
+            "label_side_data_used_for_constraints": False,
+            "automatic_repair": False,
+            "phase_o_max_new_tokens": PHASE_O_MAX_NEW_TOKENS,
+            "phase_m_max_new_tokens": PHASE_M_MAX_NEW_TOKENS,
+            "accepted_patch9_backend_file": "scripts/server/run_stage7e0_v2_a1_preflight.py",
+            "accepted_patch9_backend_symbols": [
+                "IncrementalConstraintGrammar",
+                "IncrementalJsonSchemaGrammarBackend",
+                "build_constraint_grammar",
+                "generate_constrained",
+            ],
         },
         "acceptance": {
             "required_pass_count": "8/8",
@@ -164,9 +198,14 @@ unzip -q {package_name} -d {STAGE_NAME}_{PATCH_NAME}_runner
 cd {STAGE_NAME}_{PATCH_NAME}_runner
 export HF_HOME="$HOME/hue_ptk/hf_cache"
 export TRANSFORMERS_OFFLINE=1
-/home/uet/hue_ptk/mp_fs_plus_final_gpu_20260731/.venv_gpu/bin/python scripts/server/run_stage7e0_a3_english.py \\
+PY="${{PY:-/home/uet/miniconda3/envs/stage7e0/bin/python}}"
+"$PY" scripts/server/run_stage7e0_a3_english.py \\
   --accepted-protocol-commit {accepted_commit} \\
   --result-root /home/uet/hue_ptk/stage7e0_a3_english_real_generation_preflight_results \\
+  --backend constrained_hf \\
+  --quantization none \\
+  --phase-o-max-new-tokens {PHASE_O_MAX_NEW_TOKENS} \\
+  --phase-m-max-new-tokens {PHASE_M_MAX_NEW_TOKENS} \\
   --model-name-or-path {DEFAULT_MODEL_PATH}
 ```
 
@@ -185,16 +224,17 @@ scp -r uet@222.255.250.24:/home/uet/hue_ptk/stage7e0_a3_english_real_generation_
 
 
 def validation_report(accepted_commit: str, mock_summary: dict[str, Any]) -> str:
-    return f"""# Stage7E0-A3 English Real Generation Preflight PATCH0 Validation Report
+    return f"""# Stage7E0-A3 English Real Generation Preflight PATCH2 Validation Report
 
-Status: PASS_PROTOCOL_READY_FOR_REAL_QWEN_RUN
+Status: PASS_PATCH2_CONSTRAINED_BACKEND_READY
 
 Validation date: {date.today().isoformat()}
 
 ## Scope
 
-This patch prepares the real Stage7E0-A3 runner and server reviewer package. It
-does not claim a real model result unless `backend=hf` is run on the GPU server.
+This patch restores the accepted PATCH9 incremental JSON-schema grammar backend
+for the Stage7E0-A3 real runner. It does not claim a new scientific model result
+unless `backend=constrained_hf` is run on the GPU server.
 The local dry-run uses label-side expected outputs only as a mock infrastructure
 test and is marked as non-scientific model evidence.
 
@@ -211,7 +251,19 @@ retry=0
 repair=none
 diagnostics_run=false
 gretel_pilot_opened=false
+backend=incremental_json_schema_grammar
+token_level_enforcement=true
+fallback_to_unconstrained=false
+quantization=none
+phase_o_max_new_tokens={PHASE_O_MAX_NEW_TOKENS}
+phase_m_max_new_tokens={PHASE_M_MAX_NEW_TOKENS}
 ```
+
+## Invalid Prior Run Classification
+
+The prior PATCH1 server output is preserved as evidence but is not scientifically
+eligible because it used plain unconstrained HF generation. Its primary gate is
+therefore `INVALID_NOT_EVALUATED`, not `FAIL_0_OF_8`.
 
 ## Local Mock Dry-Run
 
@@ -230,24 +282,26 @@ mock_uses_label_side_expected={str(mock_summary["mock_uses_label_side_expected"]
 python scripts/data/validate_stage7c_a3_english_offset_semantics.py --stage-dir Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT
 python scripts/data/validate_stage7e0_a3_english_preflight.py --stage-dir {STAGE_NAME}
 python -m pytest -q tests/test_stage7e0_a3_english_preflight.py
+python -m pytest -q tests/test_stage7e0_a3_patch2_constrained_backend.py
 python -m zipfile --test {PACKAGE_NAME}
 ```
 """
 
 
 def reviewer_readme(package_name: str, accepted_commit: str) -> str:
-    return f"""# Stage7E0-A3 English Real Generation Preflight PATCH0
+    return f"""# Stage7E0-A3 English Real Generation Preflight PATCH2
 
-This reviewer package prepares the first stage allowed to call Qwen on the
+This reviewer package restores the accepted PATCH9 constrained backend for the
 eight fresh Stage7C-A3 English cases. It wires Phase O to the exact accepted A3
-prompt spec and keeps Phase M, V2-A1 materialization, completeness, compiler,
-preflight, backend, retry, and repair policy unchanged.
+prompt spec, keeps Phase M and the V2-A1 materialization/compiler/preflight path
+unchanged, and forbids plain HF fallback, repair, retry, and 4-bit quantization.
 
 Clean extraction checks:
 
 ```bash
 python scripts/data/validate_stage7e0_a3_english_preflight.py --stage-dir {STAGE_NAME}
 python -m pytest -q tests/test_stage7e0_a3_english_preflight.py
+python -m pytest -q tests/test_stage7e0_a3_patch2_constrained_backend.py
 ```
 
 Server execution commands are in:
@@ -279,7 +333,9 @@ def run_mock_dry_run(out_dir: Path, accepted_commit: str) -> dict[str, Any]:
         result_root=str(mock_root),
         backend="mock",
         model_name_or_path=DEFAULT_MODEL_PATH,
-        quantization="4bit",
+        quantization="none",
+        phase_o_max_new_tokens=PHASE_O_MAX_NEW_TOKENS,
+        phase_m_max_new_tokens=PHASE_M_MAX_NEW_TOKENS,
         max_input_tokens=28672,
         seed=42,
         trust_remote_code=False,
@@ -290,7 +346,128 @@ def run_mock_dry_run(out_dir: Path, accepted_commit: str) -> dict[str, Any]:
     return run_stage7e0(args)
 
 
+def invalid_run_classification(stage_dir: Path) -> dict[str, Any]:
+    extracted = stage_dir / INVALID_RUN_ID / INVALID_RESULT_DIR_NAME
+    summary_path = extracted / "primary_summary.json"
+    manifest_path = extracted / "run_manifest.json"
+    summary = read_json(summary_path) if summary_path.is_file() else {}
+    manifest = read_json(manifest_path) if manifest_path.is_file() else {}
+    model = manifest.get("model", {})
+    actual_backend = summary.get("protocol_backend") or model.get("backend") or summary.get("backend")
+    normalized_actual_backend = "plain_hf_unconstrained" if actual_backend == "hf" else (actual_backend or "plain_hf_unconstrained")
+    return {
+        "stage": STAGE_NAME,
+        "patch": PATCH_NAME,
+        "invalid_run_id": "001",
+        "source_server_run_id": INVALID_RUN_ID,
+        "reason": "backend_protocol_violation",
+        "evidence_integrity_status": "PASS" if summary_path.is_file() and manifest_path.is_file() else "NOT_PRESENT",
+        "protocol_compliance_status": "FAIL",
+        "primary_gate_status": "INVALID_NOT_EVALUATED",
+        "scientific_result_eligible": False,
+        "observed_primary_pass_count": summary.get("primary_pass_count"),
+        "actual_backend": normalized_actual_backend,
+        "required_backend": "patch9_incremental_json_schema_grammar",
+        "actual_quantization": model.get("quantization"),
+        "required_quantization": "none",
+        "actual_phase_m_max_new_tokens": manifest.get("phase_m_max_new_tokens"),
+        "required_phase_m_max_new_tokens": PHASE_M_MAX_NEW_TOKENS,
+        "decision": "Preserve the prior server files as invalid-run evidence; do not use them as an A3 scientific failure result.",
+    }
+
+
+def write_invalid_server_result_lock(stage_dir: Path, classification: dict[str, Any]) -> None:
+    report_path = stage_dir / "SERVER_RESULT_IMPORT_REPORT.json"
+    source_tar = PROJECT_ROOT / INVALID_SERVER_TAR_NAME
+    lock = {
+        "stage": STAGE_NAME,
+        "patch": PATCH_NAME,
+        "status": "INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL",
+        "created_utc": datetime.now(timezone.utc).isoformat(),
+        "server_run_id": INVALID_RUN_ID,
+        "server_result_import_report_sha256": sha256_file(report_path) if report_path.is_file() else None,
+        "source_tar_sha256": sha256_file(source_tar) if source_tar.is_file() else None,
+        "primary_pass_count": classification.get("observed_primary_pass_count"),
+        "required_pass_count": "8/8",
+        "model_called": True,
+        "gpu_called": True,
+        "diagnostics_run": False,
+        "gretel_pilot_opened": False,
+        "evidence_integrity_status": classification["evidence_integrity_status"],
+        "protocol_compliance_status": classification["protocol_compliance_status"],
+        "primary_gate_status": classification["primary_gate_status"],
+        "scientific_result_eligible": classification["scientific_result_eligible"],
+        "decision": classification["decision"],
+    }
+    write_json(stage_dir / "STAGE7E0_A3_SERVER_RESULT_LOCK.json", lock)
+
+
+def write_invalid_server_result_notes(stage_dir: Path, classification: dict[str, Any]) -> None:
+    write_text(
+        stage_dir / "SERVER_RESULT_FAILURE_ANALYSIS.md",
+        f"""# Stage7E0-A3 English Invalid Run 001 Classification
+
+Status: INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL
+
+The prior server files are preserved as evidence with integrity status
+`{classification["evidence_integrity_status"]}`, but they are not a scientific
+A3 primary result because the run used `{classification["actual_backend"]}`
+instead of `{classification["required_backend"]}`.
+
+```text
+observed_primary_pass_count={classification["observed_primary_pass_count"]}
+protocol_compliance_status={classification["protocol_compliance_status"]}
+primary_gate_status={classification["primary_gate_status"]}
+scientific_result_eligible={str(classification["scientific_result_eligible"]).lower()}
+gretel_pilot_opened=false
+```
+
+Decision: preserve the raw server evidence, classify it as invalid, and rerun the
+same eight A3 cases only with the PATCH9 constrained backend.
+""",
+    )
+    write_text(
+        stage_dir / "VALIDATION_REPORT_PATCH1.md",
+        f"""# Stage7E0-A3 English Prior Run Reclassification
+
+Status: INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL
+
+This file keeps the legacy PATCH1 validation-report filename for package
+compatibility. PATCH2 reclassifies the prior server output as protocol-invalid
+evidence, not as a scientific 0/8 A3 failure.
+
+```text
+evidence_integrity_status={classification["evidence_integrity_status"]}
+protocol_compliance_status={classification["protocol_compliance_status"]}
+primary_gate_status={classification["primary_gate_status"]}
+scientific_result_eligible={str(classification["scientific_result_eligible"]).lower()}
+required_backend={classification["required_backend"]}
+actual_backend={classification["actual_backend"]}
+```
+""",
+    )
+
+
+def snapshot_invalid_run_artifacts(stage_dir: Path) -> dict[Path, bytes]:
+    artifacts: dict[Path, bytes] = {}
+    for rel in PRESERVED_INVALID_RUN_RELS:
+        path = stage_dir / rel
+        if path.is_file():
+            artifacts[Path(rel)] = path.read_bytes()
+    return artifacts
+
+
+def restore_invalid_run_artifacts(stage_dir: Path, artifacts: dict[Path, bytes]) -> None:
+    for rel, data in artifacts.items():
+        path = stage_dir / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+
+
 def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
+    source_stage_dir = PROJECT_ROOT / STAGE_NAME
+    preserved_invalid_artifacts = snapshot_invalid_run_artifacts(source_stage_dir)
+    prior_invalid = invalid_run_classification(source_stage_dir)
     if out_dir.exists():
         shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -298,9 +475,13 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
     inputs = stage7c_inputs()
     protocol = runner_protocol(accepted_commit)
     mock_summary = run_mock_dry_run(out_dir, accepted_commit)
+    restore_invalid_run_artifacts(out_dir, preserved_invalid_artifacts)
     write_json(out_dir / "STAGE7E0_A3_INPUT_MANIFEST.json", inputs)
     write_json(out_dir / "RUNNER_PROTOCOL_A3.json", protocol)
     write_json(out_dir / "PRIMARY_ACCEPTANCE_POLICY_A3.json", protocol["acceptance"])
+    write_json(out_dir / "INVALID_RUN_001_CLASSIFICATION.json", prior_invalid)
+    write_invalid_server_result_notes(out_dir, prior_invalid)
+    write_invalid_server_result_lock(out_dir, prior_invalid)
     write_text(out_dir / "SERVER_RUN_COMMANDS.md", server_commands(accepted_commit, package_path.name if package_path else PACKAGE_NAME))
     write_text(out_dir / "VALIDATION_REPORT.md", validation_report(accepted_commit, mock_summary))
     write_text(out_dir / "REVIEWER_README.md", reviewer_readme(package_path.name if package_path else PACKAGE_NAME, accepted_commit))
@@ -308,6 +489,7 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
         "STAGE7E0_A3_INPUT_MANIFEST.json",
         "RUNNER_PROTOCOL_A3.json",
         "PRIMARY_ACCEPTANCE_POLICY_A3.json",
+        "INVALID_RUN_001_CLASSIFICATION.json",
         "SERVER_RUN_COMMANDS.md",
         "VALIDATION_REPORT.md",
         "REVIEWER_README.md",
@@ -317,6 +499,7 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
         "mock_dry_run/raw_phase_o_generations.jsonl",
         "mock_dry_run/raw_phase_m_generations.jsonl",
     ]
+    artifact_names.extend(rel.as_posix() for rel in sorted(preserved_invalid_artifacts))
     manifest = {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
@@ -331,7 +514,7 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
     lock = {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
-        "status": "PASS_PROTOCOL_READY_FOR_REAL_QWEN_RUN",
+        "status": "PASS_PATCH2_CONSTRAINED_BACKEND_READY",
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "git_branch": git_output("branch", "--show-current"),
         "git_commit": accepted_commit,
@@ -344,11 +527,18 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
         "zero_shot": True,
         "retry": 0,
         "repair": "none",
+        "backend": "incremental_json_schema_grammar",
+        "token_level_enforcement": True,
+        "fallback_to_unconstrained": False,
+        "quantization": "none",
+        "phase_o_max_new_tokens": PHASE_O_MAX_NEW_TOKENS,
+        "phase_m_max_new_tokens": PHASE_M_MAX_NEW_TOKENS,
         "model_called": False,
         "gpu_called": False,
         "mock_dry_run_only": True,
         "gretel_pilot_opened": False,
         "derived_artifact_manifest_sha256": sha256_file(out_dir / "DERIVED_ARTIFACT_MANIFEST.json"),
+        "invalid_run_001_classification_sha256": sha256_file(out_dir / "INVALID_RUN_001_CLASSIFICATION.json"),
     }
     write_json(out_dir / "STAGE7E0_A3_LOCK.json", lock)
     summary = {
@@ -372,6 +562,7 @@ def include_paths(stage_dir: Path) -> list[Path]:
     include_rel = [
         "pyproject.toml",
         "requirements-inference.lock.txt",
+        INVALID_SERVER_TAR_NAME,
         STAGE7C_A3_DIR,
         "stage7b_v2_method_specification",
         "stage7b_a1_free_text_slot_discovery_amendment",
@@ -381,10 +572,13 @@ def include_paths(stage_dir: Path) -> list[Path]:
         "src/nldbwrite_v3/v2_a1",
         "src/nldbwrite_v3/inference/parse_output.py",
         "scripts/server/run_stage7e0_a3_english.py",
+        "scripts/server/run_stage7e0_v2_a1_preflight.py",
         "scripts/data/build_stage7e0_a3_english_preflight.py",
         "scripts/data/validate_stage7c_a3_english_offset_semantics.py",
         "scripts/data/validate_stage7e0_a3_english_preflight.py",
+        "scripts/data/validate_stage7e0_a3_server_results.py",
         "tests/test_stage7e0_a3_english_preflight.py",
+        "tests/test_stage7e0_a3_patch2_constrained_backend.py",
         "tests/support/windows_py314_pytest_tempdir/sitecustomize.py",
         "tests/support/stage7c_pytest_clean_root/conftest.py",
     ]

@@ -75,7 +75,9 @@ def test_mock_runner_primary_gate_passes(tmp_path: Path) -> None:
             "result_root": str(tmp_path / "result"),
             "backend": "mock",
             "model_name_or_path": DEFAULT_MODEL_PATH,
-            "quantization": "4bit",
+            "quantization": "none",
+            "phase_o_max_new_tokens": 512,
+            "phase_m_max_new_tokens": 8192,
             "max_input_tokens": 28672,
             "seed": 42,
             "trust_remote_code": False,
@@ -99,7 +101,7 @@ def test_builder_and_validator_pass(tmp_path: Path) -> None:
     stage_dir = tmp_path / STAGE_NAME
     package_path = tmp_path / PACKAGE_NAME
     summary = build_stage(stage_dir, package_path)
-    assert summary["status"] == "PASS_PROTOCOL_READY_FOR_REAL_QWEN_RUN"
+    assert summary["status"] == "PASS_PATCH2_CONSTRAINED_BACKEND_READY"
     assert summary["mock_primary_pass_count"] == "8/8"
     report = validate(stage_dir)
     assert report["status"] == "PASS", report["failures"]
@@ -121,6 +123,9 @@ def test_stage_lock_forbids_7_of_8_and_gretel(tmp_path: Path) -> None:
     assert policy["averaging_allowed"] is False
     assert lock["gretel_pilot_opened"] is False
     assert protocol["model"]["expected_chat_template_sha256"] == EXPECTED_CHAT_TEMPLATE_SHA256
+    assert protocol["model"]["quantization_default"] == "none"
+    assert protocol["generation_contract"]["backend"] == "incremental_json_schema_grammar"
+    assert protocol["generation_contract"]["phase_m_max_new_tokens"] == 8192
 
 
 def test_clean_reviewer_zip_validator_passes(tmp_path: Path) -> None:

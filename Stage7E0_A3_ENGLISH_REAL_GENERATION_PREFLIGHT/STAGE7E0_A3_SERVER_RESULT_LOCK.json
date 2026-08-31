@@ -1,16 +1,20 @@
 {
-  "created_utc": "2026-08-30T14:08:33.621140+00:00",
-  "decision": "Stage7E0-A3 primary gate failed; do not open Gretel pilot.",
+  "created_utc": "2026-08-31T02:42:24.048052+00:00",
+  "decision": "Preserve the prior server files as invalid-run evidence; do not use them as an A3 scientific failure result.",
   "diagnostics_run": false,
+  "evidence_integrity_status": "PASS",
   "gpu_called": true,
   "gretel_pilot_opened": false,
   "model_called": true,
-  "patch": "PATCH1",
+  "patch": "PATCH2",
+  "primary_gate_status": "INVALID_NOT_EVALUATED",
   "primary_pass_count": "0/8",
+  "protocol_compliance_status": "FAIL",
   "required_pass_count": "8/8",
+  "scientific_result_eligible": false,
   "server_result_import_report_sha256": "a781741872ecf7479c250f2348fae5e7af90f82326331e3dba234fd329a913ec",
   "server_run_id": "server_real_run_20260830_220327",
   "source_tar_sha256": "1ccd988d445b3ecdc2b941b4d37808a2c9a307f909ed9d39158aaa76e676b5d8",
   "stage": "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT",
-  "status": "FAIL_REAL_QWEN_PRIMARY_0_OF_8_DO_NOT_OPEN_GRETEL"
+  "status": "INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL"
 }

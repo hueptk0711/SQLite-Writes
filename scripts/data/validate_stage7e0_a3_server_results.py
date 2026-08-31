@@ -29,6 +29,7 @@ REQUIRED_FILES = {
     "SERVER_RESULT_IMPORT_REPORT.json",
     "SERVER_RESULT_FAILURE_ANALYSIS.md",
     "VALIDATION_REPORT_PATCH1.md",
+    "INVALID_RUN_001_CLASSIFICATION.json",
     "STAGE7E0_A3_SERVER_RESULT_LOCK.json",
     f"{SERVER_RUN_ID}/{RESULT_DIR_NAME}/primary_summary.json",
     f"{SERVER_RUN_ID}/{RESULT_DIR_NAME}/primary_case_results.jsonl",
@@ -64,6 +65,7 @@ def validate(stage_dir: Path, tar_path: Path | None = None) -> dict[str, Any]:
             failures.append(f"missing required artifact: {rel}")
     report = read_json(stage_dir / "SERVER_RESULT_IMPORT_REPORT.json")
     lock = read_json(stage_dir / "STAGE7E0_A3_SERVER_RESULT_LOCK.json")
+    invalid_run = read_json(stage_dir / "INVALID_RUN_001_CLASSIFICATION.json")
     extracted = stage_dir / SERVER_RUN_ID / RESULT_DIR_NAME
     summary = read_json(extracted / "primary_summary.json")
     manifest = read_json(extracted / "run_manifest.json")
@@ -81,13 +83,11 @@ def validate(stage_dir: Path, tar_path: Path | None = None) -> dict[str, Any]:
     if report.get("server_run_id") != SERVER_RUN_ID:
         failures.append("server_run_id drifted")
     if summary.get("backend") != "hf":
-        failures.append("real server summary must be backend=hf")
+        failures.append("imported server summary must record the actual plain backend=hf")
     if summary.get("model_called") is not True or summary.get("gpu_called") is not True:
         failures.append("real server result must record model_called/gpu_called true")
-    if summary.get("status") != "FAIL":
-        failures.append("Stage7E0-A3 server result must be FAIL")
-    if summary.get("primary_pass_count") != "0/8":
-        failures.append("server primary pass count must be 0/8")
+    if summary.get("status") not in {"PASS", "FAIL"}:
+        failures.append("server summary status must be a concrete observed execution status")
     if summary.get("required_pass_count") != "8/8":
         failures.append("required pass count must remain 8/8")
     if summary.get("seven_of_eight_allowed") is not False:
@@ -109,16 +109,15 @@ def validate(stage_dir: Path, tar_path: Path | None = None) -> dict[str, Any]:
         failures.append("primary case results must have 8 rows")
     if len(raw_o) != 8:
         failures.append("Phase O raw generations must have 8 rows")
-    if len(raw_m) != 5:
-        failures.append("Phase M raw generations must have 5 rows because 3 cases failed in Phase O")
-    if any(row.get("status") == "PASS" for row in cases):
-        failures.append("no primary case should be marked PASS in imported 0/8 result")
+    if len(raw_m) > 8:
+        failures.append("Phase M raw generations cannot exceed the 8 primary cases")
     failure_counts: dict[str, int] = {}
     for row in cases:
         key = str(row.get("failure_stage"))
         failure_counts[key] = failure_counts.get(key, 0) + 1
-    if failure_counts != {"phase_m_schema_failure": 5, "phase_o_schema_failure": 3}:
-        failures.append(f"failure stage counts drifted: {failure_counts}")
+    observed_pass_count = sum(1 for row in cases if row.get("status") == "PASS")
+    if summary.get("primary_pass_count") != f"{observed_pass_count}/8":
+        failures.append("server primary pass count must match observed case rows")
 
     for rel, expected in report.get("server_result_files", {}).items():
         path = extracted / rel
@@ -133,17 +132,39 @@ def validate(stage_dir: Path, tar_path: Path | None = None) -> dict[str, Any]:
     if summary.get("primary_case_results_sha256") != sha256_file(extracted / "primary_case_results.jsonl"):
         failures.append("primary summary case-results hash mismatch")
 
-    if lock.get("status") != "FAIL_REAL_QWEN_PRIMARY_0_OF_8_DO_NOT_OPEN_GRETEL":
+    if lock.get("status") != "INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL":
         failures.append("server result lock status drifted")
+    if lock.get("evidence_integrity_status") != "PASS":
+        failures.append("invalid run evidence integrity must PASS")
+    if lock.get("protocol_compliance_status") != "FAIL":
+        failures.append("invalid run protocol compliance must FAIL")
+    if lock.get("primary_gate_status") != "INVALID_NOT_EVALUATED":
+        failures.append("invalid run primary gate must be invalid/not evaluated")
+    if lock.get("scientific_result_eligible") is not False:
+        failures.append("invalid run must not be scientifically eligible")
     if lock.get("gretel_pilot_opened") is not False:
         failures.append("server result lock must keep Gretel closed")
     if lock.get("server_result_import_report_sha256") != sha256_file(stage_dir / "SERVER_RESULT_IMPORT_REPORT.json"):
         failures.append("server result lock import-report hash mismatch")
+    if invalid_run.get("reason") != "backend_protocol_violation":
+        failures.append("invalid run classification reason drifted")
+    if invalid_run.get("actual_backend") != "plain_hf_unconstrained":
+        failures.append("invalid run actual backend label drifted")
+    if invalid_run.get("required_backend") != "patch9_incremental_json_schema_grammar":
+        failures.append("invalid run required backend label drifted")
+    if invalid_run.get("scientific_result_eligible") is not False:
+        failures.append("invalid run classification must mark scientific_result_eligible=false")
+    if invalid_run.get("primary_gate_status") != "INVALID_NOT_EVALUATED":
+        failures.append("invalid run classification must mark primary gate invalid")
 
     return {
         "stage": STAGE_NAME,
         "status": "PASS" if not failures else "FAIL",
         "failures": failures,
+        "evidence_integrity_status": lock.get("evidence_integrity_status"),
+        "protocol_compliance_status": lock.get("protocol_compliance_status"),
+        "primary_gate_status": lock.get("primary_gate_status"),
+        "scientific_result_eligible": lock.get("scientific_result_eligible"),
         "primary_pass_count": summary.get("primary_pass_count"),
         "required_pass_count": summary.get("required_pass_count"),
         "model_called": summary.get("model_called"),

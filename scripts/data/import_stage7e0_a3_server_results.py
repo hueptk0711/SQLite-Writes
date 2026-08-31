@@ -16,9 +16,9 @@ from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 STAGE_NAME = "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT"
-PATCH_NAME = "PATCH1"
+PATCH_NAME = "PATCH2"
 SERVER_RUN_ID = "server_real_run_20260830_220327"
-PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260830.zip"
+PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260831.zip"
 RESULT_DIR_NAME = "stage7e0_a3_english_real_generation_preflight_results"
 SERVER_TAR_NAME = "stage7e0_a3_english_real_generation_preflight_results_20260830_220327.tar.gz"
 
@@ -118,14 +118,30 @@ def import_server_results(stage_dir: Path, tar_path: Path) -> dict[str, Any]:
             "failure_count": len(failures),
             "failure_stage_counts": failure_counts,
         },
+        "invalid_run_classification": {
+            "invalid_run_id": "001",
+            "reason": "backend_protocol_violation",
+            "evidence_integrity_status": "PASS",
+            "protocol_compliance_status": "FAIL",
+            "primary_gate_status": "INVALID_NOT_EVALUATED",
+            "scientific_result_eligible": False,
+            "actual_backend": "plain_hf_unconstrained",
+            "reported_backend": summary.get("backend"),
+            "required_backend": "patch9_incremental_json_schema_grammar",
+            "actual_quantization": read_json(extracted / "run_manifest.json").get("model", {}).get("quantization"),
+            "required_quantization": "none",
+            "actual_phase_m_max_new_tokens": read_json(extracted / "run_manifest.json").get("phase_m_max_new_tokens"),
+            "required_phase_m_max_new_tokens": 8192,
+        },
     }
     write_json(stage_dir / "SERVER_RESULT_IMPORT_REPORT.json", report)
+    write_json(stage_dir / "INVALID_RUN_001_CLASSIFICATION.json", report["invalid_run_classification"])
     write_text(stage_dir / "SERVER_RESULT_FAILURE_ANALYSIS.md", failure_analysis(report, cases, raw_o, raw_m))
     write_text(stage_dir / "VALIDATION_REPORT_PATCH1.md", validation_report(report))
     lock = {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
-        "status": "FAIL_REAL_QWEN_PRIMARY_0_OF_8_DO_NOT_OPEN_GRETEL",
+        "status": "INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL",
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "server_run_id": SERVER_RUN_ID,
         "server_result_import_report_sha256": sha256_file(stage_dir / "SERVER_RESULT_IMPORT_REPORT.json"),
@@ -136,7 +152,11 @@ def import_server_results(stage_dir: Path, tar_path: Path) -> dict[str, Any]:
         "gpu_called": True,
         "diagnostics_run": False,
         "gretel_pilot_opened": False,
-        "decision": "Stage7E0-A3 primary gate failed; do not open Gretel pilot.",
+        "evidence_integrity_status": "PASS",
+        "protocol_compliance_status": "FAIL",
+        "primary_gate_status": "INVALID_NOT_EVALUATED",
+        "scientific_result_eligible": False,
+        "decision": "Prior plain-HF output is preserved as invalid-run evidence; do not use it as a scientific A3 failure result.",
     }
     write_json(stage_dir / "STAGE7E0_A3_SERVER_RESULT_LOCK.json", lock)
     return report
@@ -148,21 +168,25 @@ def failure_analysis(report: dict[str, Any], cases: list[dict[str, Any]], raw_o:
     lines = [
         "# Stage7E0-A3 English Real Server Result Failure Analysis",
         "",
-        "Status: FAIL",
+        "Status: INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL",
         "",
-        "The real Qwen GPU run completed the primary Stage7E0-A3 gate and failed 0/8.",
-        "Diagnostics and the Gretel development-train pilot remain unopened.",
+        "The prior Qwen GPU output is preserved as evidence, but it used plain",
+        "unconstrained HF generation and is therefore not a scientific A3 primary",
+        "result. Diagnostics and the Gretel development-train pilot remain unopened.",
         "",
         "```text",
         f"backend={report['result']['backend']}",
         f"primary_pass_count={report['result']['primary_pass_count']}",
         f"required_pass_count={report['result']['required_pass_count']}",
+        "protocol_compliance_status=FAIL",
+        "primary_gate_status=INVALID_NOT_EVALUATED",
+        "scientific_result_eligible=false",
         f"phase_o_raw_rows={report['result']['phase_o_raw_rows']}",
         f"phase_m_raw_rows={report['result']['phase_m_raw_rows']}",
         f"failure_stage_counts={report['result']['failure_stage_counts']}",
         "```",
         "",
-        "## Failed Cases",
+        "## Invalid-Run Case Evidence",
         "",
     ]
     for row in cases:
@@ -196,9 +220,9 @@ def failure_analysis(report: dict[str, Any], cases: list[dict[str, Any]], raw_o:
 
 
 def validation_report(report: dict[str, Any]) -> str:
-    return f"""# Stage7E0-A3 English PATCH1 Server Result Validation Report
+    return f"""# Stage7E0-A3 English PATCH2 Server Result Validation Report
 
-Status: FAIL_REAL_QWEN_PRIMARY_0_OF_8_DO_NOT_OPEN_GRETEL
+Status: INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL
 
 Validation date: {date.today().isoformat()}
 
@@ -218,8 +242,9 @@ gretel_pilot_opened={str(report["result"]["gretel_pilot_opened"]).lower()}
 
 ## Decision
 
-Stage7E0-A3 primary acceptance requires 8/8. The observed 0/8 result fails the
-gate. The Gretel development-train pilot must remain closed.
+The prior server output has evidence integrity, but it used plain unconstrained
+HF generation. Its primary gate is invalid/not evaluated, and the Gretel
+development-train pilot must remain closed.
 """
 
 
@@ -228,6 +253,7 @@ def include_paths(stage_dir: Path, tar_path: Path) -> list[Path]:
         "pyproject.toml",
         "requirements-inference.lock.txt",
         "scripts/server/run_stage7e0_a3_english.py",
+        "scripts/server/run_stage7e0_v2_a1_preflight.py",
         "scripts/data/build_stage7e0_a3_english_preflight.py",
         "scripts/data/validate_stage7e0_a3_english_preflight.py",
         "scripts/data/import_stage7e0_a3_server_results.py",
@@ -288,7 +314,7 @@ def main() -> None:
     summary = {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
-        "status": "FAIL_REAL_QWEN_PRIMARY_0_OF_8_DO_NOT_OPEN_GRETEL",
+        "status": "INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL",
         "primary_pass_count": report["result"]["primary_pass_count"],
         "model_called": True,
         "gpu_called": True,

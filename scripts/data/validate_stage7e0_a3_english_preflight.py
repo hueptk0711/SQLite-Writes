@@ -23,6 +23,8 @@ from scripts.server.run_stage7e0_a3_english import (  # noqa: E402
     EXPECTED_CHAT_TEMPLATE_SHA256,
     MODEL_ID,
     MODEL_REVISION,
+    PHASE_M_MAX_NEW_TOKENS,
+    PHASE_O_MAX_NEW_TOKENS,
     STAGE7C_A3_DIR,
     load_stage7c_a3_rows,
     render_phase_o_a3_messages,
@@ -34,6 +36,7 @@ REQUIRED_FILES = {
     "STAGE7E0_A3_INPUT_MANIFEST.json",
     "RUNNER_PROTOCOL_A3.json",
     "PRIMARY_ACCEPTANCE_POLICY_A3.json",
+    "INVALID_RUN_001_CLASSIFICATION.json",
     "SERVER_RUN_COMMANDS.md",
     "VALIDATION_REPORT.md",
     "REVIEWER_README.md",
@@ -75,6 +78,7 @@ def validate(stage_dir: Path) -> dict[str, Any]:
     protocol = read_json(stage_dir / "RUNNER_PROTOCOL_A3.json")
     inputs = read_json(stage_dir / "STAGE7E0_A3_INPUT_MANIFEST.json")
     policy = read_json(stage_dir / "PRIMARY_ACCEPTANCE_POLICY_A3.json")
+    invalid_run = read_json(stage_dir / "INVALID_RUN_001_CLASSIFICATION.json")
     lock = read_json(stage_dir / "STAGE7E0_A3_LOCK.json")
     mock_summary = read_json(stage_dir / "mock_dry_run" / "primary_summary.json")
     mock_cases = read_jsonl(stage_dir / "mock_dry_run" / "primary_case_results.jsonl")
@@ -89,6 +93,12 @@ def validate(stage_dir: Path) -> dict[str, Any]:
         failures.append("runner protocol server model path drifted")
     if protocol.get("model", {}).get("expected_chat_template_sha256") != EXPECTED_CHAT_TEMPLATE_SHA256:
         failures.append("runner protocol chat template hash drifted")
+    if protocol.get("model", {}).get("quantization_default") != "none":
+        failures.append("PATCH2 must default to no quantization")
+    if protocol.get("model", {}).get("quantization_allowed") is not False:
+        failures.append("PATCH2 must forbid quantization")
+    if protocol.get("model", {}).get("torch_dtype") != "auto":
+        failures.append("PATCH2 must preserve torch_dtype=auto")
     if protocol.get("prompt_contract", {}).get("phase_o_prompt_spec_path") != A3_PROMPT_SPEC_REL:
         failures.append("runner does not lock exact Stage7C-A3 Phase O prompt spec")
     if protocol.get("prompt_contract", {}).get("phase_m_changed") is not False:
@@ -101,6 +111,30 @@ def validate(stage_dir: Path) -> dict[str, Any]:
         failures.append("retry must be 0")
     if protocol.get("generation_contract", {}).get("repair") != "none":
         failures.append("repair must be none")
+    if protocol.get("generation_contract", {}).get("backend") != "incremental_json_schema_grammar":
+        failures.append("real runner must use the PATCH9 incremental constrained backend")
+    if protocol.get("generation_contract", {}).get("schema_enforcement_mode") != "transformers_prefix_allowed_tokens_fn":
+        failures.append("real runner must enforce schema via transformers prefix_allowed_tokens_fn")
+    if protocol.get("generation_contract", {}).get("token_level_enforcement") is not True:
+        failures.append("token-level enforcement must be true")
+    if protocol.get("generation_contract", {}).get("fallback_to_unconstrained") is not False:
+        failures.append("fallback to unconstrained generation must be forbidden")
+    if protocol.get("generation_contract", {}).get("finite_complete_object_enumeration") is not False:
+        failures.append("finite complete-object enumeration must be false")
+    if protocol.get("generation_contract", {}).get("finite_known_answer_candidates") is not False:
+        failures.append("finite known-answer candidates must be false")
+    if protocol.get("generation_contract", {}).get("label_side_data_used_for_constraints") is not False:
+        failures.append("label-side data must not feed constraints")
+    if protocol.get("generation_contract", {}).get("automatic_repair") is not False:
+        failures.append("automatic repair must be false")
+    if protocol.get("generation_contract", {}).get("phase_o_max_new_tokens") != PHASE_O_MAX_NEW_TOKENS:
+        failures.append("Phase O max_new_tokens drifted")
+    if protocol.get("generation_contract", {}).get("phase_m_max_new_tokens") != PHASE_M_MAX_NEW_TOKENS:
+        failures.append("Phase M max_new_tokens drifted")
+    symbols = set(protocol.get("generation_contract", {}).get("accepted_patch9_backend_symbols", []))
+    for symbol in {"IncrementalConstraintGrammar", "IncrementalJsonSchemaGrammarBackend", "build_constraint_grammar", "generate_constrained"}:
+        if symbol not in symbols:
+            failures.append(f"accepted PATCH9 backend symbol missing from protocol: {symbol}")
 
     if policy.get("required_pass_count") != "8/8":
         failures.append("primary acceptance must require 8/8")
@@ -140,17 +174,38 @@ def validate(stage_dir: Path) -> dict[str, Any]:
     if len(raw_o) != 8 or len(raw_m) != 8:
         failures.append("mock raw generation files must contain 8 Phase O and 8 Phase M rows")
 
-    if lock.get("status") != "PASS_PROTOCOL_READY_FOR_REAL_QWEN_RUN":
-        failures.append("stage lock status must be protocol-ready")
+    if lock.get("status") != "PASS_PATCH2_CONSTRAINED_BACKEND_READY":
+        failures.append("stage lock status must be PATCH2 constrained-backend ready")
+    if lock.get("backend") != "incremental_json_schema_grammar":
+        failures.append("stage lock backend must be constrained PATCH9 backend")
+    if lock.get("quantization") != "none":
+        failures.append("stage lock quantization must be none")
+    if lock.get("phase_m_max_new_tokens") != PHASE_M_MAX_NEW_TOKENS:
+        failures.append("stage lock Phase M max_new_tokens drifted")
     if lock.get("model_called") is not False or lock.get("gpu_called") is not False:
         failures.append("stage lock must record no local model/GPU call")
     if lock.get("gretel_pilot_opened") is not False:
         failures.append("Gretel pilot must remain unopened")
 
     commands = (stage_dir / "SERVER_RUN_COMMANDS.md").read_text(encoding="utf-8")
-    for needle in ("uet@222.255.250.24", "/home/uet/hue_ptk", "run_stage7e0_a3_english.py", DEFAULT_MODEL_PATH):
+    for needle in ("uet@222.255.250.24", "/home/uet/hue_ptk", "run_stage7e0_a3_english.py", DEFAULT_MODEL_PATH, "--backend constrained_hf", "--quantization none", "--phase-m-max-new-tokens 8192"):
         if needle not in commands:
             failures.append(f"server command missing {needle}")
+
+    if invalid_run.get("reason") != "backend_protocol_violation":
+        failures.append("invalid run classification reason drifted")
+    if invalid_run.get("evidence_integrity_status") not in {"PASS", "NOT_PRESENT"}:
+        failures.append("invalid run evidence integrity status must be explicit")
+    if invalid_run.get("protocol_compliance_status") != "FAIL":
+        failures.append("prior plain-HF run must be protocol FAIL")
+    if invalid_run.get("primary_gate_status") != "INVALID_NOT_EVALUATED":
+        failures.append("prior plain-HF run primary gate must be invalid/not evaluated")
+    if invalid_run.get("scientific_result_eligible") is not False:
+        failures.append("prior plain-HF run must be scientifically ineligible")
+    if invalid_run.get("required_backend") != "patch9_incremental_json_schema_grammar":
+        failures.append("invalid run required backend label drifted")
+    if invalid_run.get("required_phase_m_max_new_tokens") != PHASE_M_MAX_NEW_TOKENS:
+        failures.append("invalid run required Phase M token limit drifted")
 
     manifest = read_json(stage_dir / "DERIVED_ARTIFACT_MANIFEST.json")
     for item in manifest.get("artifacts", []):

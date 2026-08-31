@@ -32,8 +32,9 @@ from nldbwrite_v3.inference.parse_output import extract_json_object  # noqa: E40
 from nldbwrite_v3.v2_a1.compiler import compile_sqlite_program  # noqa: E402
 from nldbwrite_v3.v2_a1.completeness import verify_completeness  # noqa: E402
 from nldbwrite_v3.v2_a1.inventories import build_schema_inventory  # noqa: E402
+from nldbwrite_v3.v2_a1.phase_m_schema import dynamic_schema  # noqa: E402
 from nldbwrite_v3.v2_a1.phase_m_output import parse_phase_m_output  # noqa: E402
-from nldbwrite_v3.v2_a1.phase_o_output import parse_phase_o_output  # noqa: E402
+from nldbwrite_v3.v2_a1.phase_o_output import parse_phase_o_output, phase_o_json_schema  # noqa: E402
 from nldbwrite_v3.v2_a1.preflight import preflight_sqlite  # noqa: E402
 from nldbwrite_v3.v2_a1.prompt_rendering import (  # noqa: E402
     inventory_payload,
@@ -46,6 +47,7 @@ from nldbwrite_v3.v2_a1.slot_inventory import build_slot_bundle  # noqa: E402
 from nldbwrite_v3.v2_a1.span_validation import validate_and_sort_spans  # noqa: E402
 from nldbwrite_v3.v2_a1.typed_materializer import materialize_ir_values  # noqa: E402
 from nldbwrite_v3.v2_a1.types import V2A1Error  # noqa: E402
+from scripts.server.run_stage7e0_v2_a1_preflight import generate_constrained  # noqa: E402
 
 
 STAGE7C_A3_DIR = "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT"
@@ -61,6 +63,9 @@ EXPECTED_CHAT_TEMPLATE_SHA256 = (
     "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f"
 )
 EXPECTED_PRIMARY_COUNT = 8
+PHASE_O_MAX_NEW_TOKENS = 512
+PHASE_M_MAX_NEW_TOKENS = 8192
+CONSTRAINED_BACKEND_ID = "incremental_json_schema_grammar"
 
 
 def canonical_json(value: Any) -> str:
@@ -120,6 +125,20 @@ def assert_result_root_policy(result_root: Path, *, backend: str, allow_inside_g
     raise SystemExit("STOP: real model result-root must be outside the git checkout")
 
 
+def validate_generation_config(args: argparse.Namespace) -> None:
+    backend = str(args.backend).lower()
+    if backend == "hf":
+        raise SystemExit("STOP: backend=hf is plain unconstrained HF and is forbidden for PATCH2")
+    if backend not in {"constrained_hf", "mock"}:
+        raise SystemExit(f"STOP: unsupported backend {backend}")
+    if int(args.phase_o_max_new_tokens) != PHASE_O_MAX_NEW_TOKENS:
+        raise SystemExit(f"STOP: Phase O max_new_tokens must remain {PHASE_O_MAX_NEW_TOKENS}")
+    if int(args.phase_m_max_new_tokens) != PHASE_M_MAX_NEW_TOKENS:
+        raise SystemExit(f"STOP: Phase M max_new_tokens must remain {PHASE_M_MAX_NEW_TOKENS}")
+    if backend == "constrained_hf" and str(args.quantization).lower() not in {"none", ""}:
+        raise SystemExit("STOP: PATCH2 constrained run forbids 4-bit quantization")
+
+
 def load_stage7c_a3_rows(root: Path = PROJECT_ROOT) -> list[dict[str, Any]]:
     rows = read_jsonl(root / A3_SMOKE_SET_REL)
     if len(rows) != EXPECTED_PRIMARY_COUNT:
@@ -174,10 +193,22 @@ class CallResult:
     output_tokens: int | None = None
     latency_sec: float = 0.0
     hit_max_new_tokens: bool = False
+    generation_metadata: dict[str, Any] | None = None
 
 
 class TwoCallGenerator(Protocol):
-    def generate(self, *, sample_id: str, phase: str, messages: list[dict[str, str]], max_new_tokens: int) -> CallResult:
+    def generate(
+        self,
+        *,
+        sample_id: str,
+        phase: str,
+        messages: list[dict[str, str]],
+        max_new_tokens: int,
+        question: str | None = None,
+        operation: str | None = None,
+        inventory: Any | None = None,
+        slots: Any | None = None,
+    ) -> CallResult:
         ...
 
     def metadata(self) -> dict[str, Any]:
@@ -188,24 +219,53 @@ class LabelMockGenerator:
     def __init__(self, rows: list[dict[str, Any]]):
         self.by_id = {row["sample_id"]: row for row in rows}
 
-    def generate(self, *, sample_id: str, phase: str, messages: list[dict[str, str]], max_new_tokens: int) -> CallResult:
-        del messages, max_new_tokens
+    def generate(
+        self,
+        *,
+        sample_id: str,
+        phase: str,
+        messages: list[dict[str, str]],
+        max_new_tokens: int,
+        question: str | None = None,
+        operation: str | None = None,
+        inventory: Any | None = None,
+        slots: Any | None = None,
+    ) -> CallResult:
+        del messages, max_new_tokens, question, operation, inventory, slots
         label = self.by_id[sample_id]["label_side_expected"]
         key = "phase_o" if phase == "phase_o" else "phase_m"
         raw = canonical_json(label[key])
-        return CallResult(sample_id=sample_id, phase=phase, raw_output=raw, input_tokens=0, output_tokens=len(raw.split()))
+        return CallResult(
+            sample_id=sample_id,
+            phase=phase,
+            raw_output=raw,
+            input_tokens=0,
+            output_tokens=len(raw.split()),
+            generation_metadata={
+                "backend": "mock",
+                "token_level_enforcement": False,
+                "fallback_to_unconstrained": False,
+                "finite_complete_object_enumeration": False,
+                "finite_known_answer_candidates": False,
+                "label_side_data_used_for_constraints": True,
+                "automatic_repair": False,
+                "retry": 0,
+            },
+        )
 
     def metadata(self) -> dict[str, Any]:
         return {"backend": "mock", "model_called": False, "mock_uses_label_side_expected": True}
 
 
-class TransformersChatGenerator:
+class ConstrainedTransformersChatGenerator:
     def __init__(self, *, model_name_or_path: str, quantization: str, trust_remote_code: bool, max_input_tokens: int, seed: int):
         try:
             import torch
-            from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+            from transformers import AutoModelForCausalLM, AutoTokenizer
         except ImportError as exc:  # pragma: no cover - server dependency
-            raise SystemExit("STOP: real generation requires torch, transformers, accelerate, and bitsandbytes") from exc
+            raise SystemExit("STOP: constrained real generation requires torch, transformers, and accelerate") from exc
+        if quantization not in {"none", "None", ""}:
+            raise SystemExit("STOP: Stage7E0-A3 PATCH2 forbids 4-bit or any quantized generation")
         self.torch = torch
         self.seed = seed
         self.max_input_tokens = max_input_tokens
@@ -225,58 +285,95 @@ class TransformersChatGenerator:
         model_kwargs: dict[str, Any] = {"trust_remote_code": trust_remote_code, "device_map": "auto"}
         if not local_model:
             model_kwargs["revision"] = MODEL_REVISION
-        if quantization in {"4bit", "4-bit"}:
-            model_kwargs["quantization_config"] = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16)
-        elif torch.cuda.is_available():
-            model_kwargs["torch_dtype"] = torch.float16
+        if torch.cuda.is_available():
+            model_kwargs["torch_dtype"] = "auto"
         self.model = AutoModelForCausalLM.from_pretrained(model_name_or_path, **model_kwargs)
         self.model.eval()
         self.model_name_or_path = model_name_or_path
-        self.quantization = quantization
+        self.quantization = "none"
 
-    def generate(self, *, sample_id: str, phase: str, messages: list[dict[str, str]], max_new_tokens: int) -> CallResult:
+    def generate(
+        self,
+        *,
+        sample_id: str,
+        phase: str,
+        messages: list[dict[str, str]],
+        max_new_tokens: int,
+        question: str | None = None,
+        operation: str | None = None,
+        inventory: Any | None = None,
+        slots: Any | None = None,
+    ) -> CallResult:
         torch = self.torch
         prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         encoded_probe = self.tokenizer(prompt, add_special_tokens=True, truncation=False)
         original_tokens = len(encoded_probe["input_ids"])
         if original_tokens > self.max_input_tokens:
             return CallResult(sample_id=sample_id, phase=phase, raw_output="", status="input_too_long", error=f"{original_tokens}>{self.max_input_tokens}", input_tokens=original_tokens)
-        encoded = self.tokenizer(prompt, return_tensors="pt", truncation=False)
-        device = next(self.model.parameters()).device
-        encoded = {key: value.to(device) for key, value in encoded.items()}
         torch.manual_seed(self.seed)
         if torch.cuda.is_available():
             torch.cuda.manual_seed_all(self.seed)
-        started = time.perf_counter()
-        with torch.inference_mode():
-            generated = self.model.generate(
-                **encoded,
+        if phase == "phase_o":
+            if question is None:
+                raise SystemExit("STOP: Phase O constrained generation requires question context")
+            schema = phase_o_json_schema(PROJECT_ROOT)
+            generated = generate_constrained(
+                self.model,
+                self.tokenizer,
+                messages,
                 max_new_tokens=max_new_tokens,
-                do_sample=False,
-                pad_token_id=self.tokenizer.pad_token_id,
-                eos_token_id=self.tokenizer.eos_token_id,
+                schema=schema,
+                phase="phase_o",
+                question=question,
+                root=PROJECT_ROOT,
             )
-        elapsed = time.perf_counter() - started
-        output_ids = generated[0, encoded["input_ids"].shape[1] :]
-        token_ids = [int(item) for item in output_ids.tolist()]
-        eos = self.tokenizer.eos_token_id
-        eos_ids = set(eos) if isinstance(eos, list) else ({int(eos)} if eos is not None else set())
-        for index, token_id in enumerate(token_ids):
-            if token_id in eos_ids:
-                token_ids = token_ids[: index + 1]
-                break
-        raw = self.tokenizer.decode(token_ids, skip_special_tokens=True)
-        return CallResult(sample_id=sample_id, phase=phase, raw_output=raw, input_tokens=original_tokens, output_tokens=len(token_ids), latency_sec=elapsed, hit_max_new_tokens=len(token_ids) >= max_new_tokens)
+        elif phase == "phase_m":
+            if operation is None or inventory is None or slots is None:
+                raise SystemExit("STOP: Phase M constrained generation requires operation, inventory, and slots")
+            schema = dynamic_schema(operation, inventory, slots, root=PROJECT_ROOT)
+            generated = generate_constrained(
+                self.model,
+                self.tokenizer,
+                messages,
+                max_new_tokens=max_new_tokens,
+                schema=schema,
+                phase="phase_m",
+                operation=operation,
+                inventory=inventory,
+                slots=slots,
+                root=PROJECT_ROOT,
+            )
+        else:
+            raise SystemExit(f"STOP: unsupported constrained phase {phase}")
+        return CallResult(
+            sample_id=sample_id,
+            phase=phase,
+            raw_output=str(generated["raw_output"]),
+            input_tokens=int(generated["prompt_tokens"]),
+            output_tokens=int(generated["output_tokens"]),
+            latency_sec=float(generated["latency_seconds"]),
+            hit_max_new_tokens=bool(generated["hit_max_new_tokens"]),
+            generation_metadata=generated["backend"],
+        )
 
     def metadata(self) -> dict[str, Any]:
         torch = self.torch
         return {
-            "backend": "hf",
+            "backend": "incremental_json_schema_grammar",
+            "schema_enforcement_mode": "transformers_prefix_allowed_tokens_fn",
+            "token_level_enforcement": True,
+            "fallback_to_unconstrained": False,
+            "finite_complete_object_enumeration": False,
+            "finite_known_answer_candidates": False,
+            "label_side_data_used_for_constraints": False,
+            "automatic_repair": False,
+            "retry": 0,
             "model_called": True,
             "model_id": MODEL_ID,
             "model_name_or_path": self.model_name_or_path,
             "model_revision": MODEL_REVISION,
             "quantization": self.quantization,
+            "torch_dtype": "auto",
             "chat_template_sha256": EXPECTED_CHAT_TEMPLATE_SHA256,
             "torch_version": torch.__version__,
             "transformers_version": __import__("transformers").__version__,
@@ -302,12 +399,25 @@ def canonical_target_state(db_path: Path, sql: str, params: tuple[Any, ...], tab
     return rows, sha256_text(canonical_json(rows))
 
 
-def evaluate_primary_case(row: dict[str, Any], generator: TwoCallGenerator, result_root: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any] | None]:
+def evaluate_primary_case(
+    row: dict[str, Any],
+    generator: TwoCallGenerator,
+    result_root: Path,
+    *,
+    phase_o_max_new_tokens: int,
+    phase_m_max_new_tokens: int,
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any] | None]:
     sample_id = row["sample_id"]
     question = row["model_side_input"]["question"]
     inventory = build_schema_inventory(row["model_side_input"])
     phase_o_messages, phase_o_prompt_hash = render_phase_o_a3_messages(question, row["model_side_input"])
-    phase_o_call = generator.generate(sample_id=sample_id, phase="phase_o", messages=phase_o_messages, max_new_tokens=512)
+    phase_o_call = generator.generate(
+        sample_id=sample_id,
+        phase="phase_o",
+        messages=phase_o_messages,
+        max_new_tokens=phase_o_max_new_tokens,
+        question=question,
+    )
     raw_o = asdict(phase_o_call) | {"messages_sha256": phase_o_prompt_hash}
     if phase_o_call.status != "success":
         return _failed_row(row, "phase_o_generation", phase_o_call.error, phase_o_prompt_hash), raw_o, None
@@ -321,7 +431,15 @@ def evaluate_primary_case(row: dict[str, Any], generator: TwoCallGenerator, resu
     except V2A1Error as exc:
         return _failed_row(row, exc.reason_code, str(exc), phase_o_prompt_hash), raw_o, None
     phase_m_messages, phase_m_prompt_hash = render_phase_m_messages(phase_o["operation"], inventory, slots)
-    phase_m_call = generator.generate(sample_id=sample_id, phase="phase_m", messages=phase_m_messages, max_new_tokens=1024)
+    phase_m_call = generator.generate(
+        sample_id=sample_id,
+        phase="phase_m",
+        messages=phase_m_messages,
+        max_new_tokens=phase_m_max_new_tokens,
+        operation=phase_o["operation"],
+        inventory=inventory,
+        slots=slots,
+    )
     raw_m = asdict(phase_m_call) | {"messages_sha256": phase_m_prompt_hash}
     if phase_m_call.status != "success":
         return _failed_row(row, "phase_m_generation", phase_m_call.error, phase_o_prompt_hash, phase_m_prompt_hash), raw_o, raw_m
@@ -381,6 +499,7 @@ def _failed_row(row: dict[str, Any], stage: str, error: str | None, phase_o_hash
 def run_stage7e0(args: argparse.Namespace) -> dict[str, Any]:
     result_root = Path(args.result_root).resolve()
     backend = str(args.backend).lower()
+    validate_generation_config(args)
     assert_result_root_policy(result_root, backend=backend, allow_inside_git=args.allow_result_root_inside_git)
     git_lock = None if args.skip_git_assertions else assert_git_lock(args.accepted_protocol_commit)
     a3_lock = verify_stage7c_a3_lock()
@@ -391,8 +510,8 @@ def run_stage7e0(args: argparse.Namespace) -> dict[str, Any]:
     generator: TwoCallGenerator
     if backend == "mock":
         generator = LabelMockGenerator(rows)
-    elif backend == "hf":
-        generator = TransformersChatGenerator(
+    elif backend == "constrained_hf":
+        generator = ConstrainedTransformersChatGenerator(
             model_name_or_path=args.model_name_or_path,
             quantization=args.quantization,
             trust_remote_code=args.trust_remote_code,
@@ -402,8 +521,10 @@ def run_stage7e0(args: argparse.Namespace) -> dict[str, Any]:
     else:
         raise SystemExit(f"STOP: unsupported backend {backend}")
     metadata = generator.metadata()
-    if backend == "hf" and metadata.get("cuda_available") is not True:
+    if backend == "constrained_hf" and metadata.get("cuda_available") is not True:
         raise SystemExit("STOP: real Stage7E0-A3 generation requires cuda_available=true")
+    if backend == "constrained_hf" and metadata.get("backend") != CONSTRAINED_BACKEND_ID:
+        raise SystemExit("STOP: constrained backend unavailable; no fallback to unconstrained generation")
     write_json(
         result_root / "run_manifest.json",
         {
@@ -417,6 +538,8 @@ def run_stage7e0(args: argparse.Namespace) -> dict[str, Any]:
             "zero_shot": True,
             "retry": 0,
             "repair": "none",
+            "phase_o_max_new_tokens": int(args.phase_o_max_new_tokens),
+            "phase_m_max_new_tokens": int(args.phase_m_max_new_tokens),
             "phase_o_prompt_spec_path": A3_PROMPT_SPEC_REL,
             "phase_m_prompt_spec_path": "stage7c_a1_v2_development_protocol/PHASE_M_PROMPT_SPEC.json",
         },
@@ -425,7 +548,13 @@ def run_stage7e0(args: argparse.Namespace) -> dict[str, Any]:
     raw_o_rows: list[dict[str, Any]] = []
     raw_m_rows: list[dict[str, Any]] = []
     for row in rows:
-        case_result, raw_o, raw_m = evaluate_primary_case(row, generator, result_root)
+        case_result, raw_o, raw_m = evaluate_primary_case(
+            row,
+            generator,
+            result_root,
+            phase_o_max_new_tokens=int(args.phase_o_max_new_tokens),
+            phase_m_max_new_tokens=int(args.phase_m_max_new_tokens),
+        )
         case_results.append(case_result)
         raw_o_rows.append(raw_o)
         if raw_m is not None:
@@ -438,9 +567,12 @@ def run_stage7e0(args: argparse.Namespace) -> dict[str, Any]:
         "stage": "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT",
         "status": "PASS" if pass_count == EXPECTED_PRIMARY_COUNT else "FAIL",
         "backend": backend,
-        "model_called": backend == "hf",
-        "gpu_called": backend == "hf",
+        "protocol_backend": metadata.get("backend"),
+        "model_called": backend == "constrained_hf",
+        "gpu_called": backend == "constrained_hf",
         "mock_uses_label_side_expected": backend == "mock",
+        "phase_o_max_new_tokens": int(args.phase_o_max_new_tokens),
+        "phase_m_max_new_tokens": int(args.phase_m_max_new_tokens),
         "primary_pass_count": f"{pass_count}/{EXPECTED_PRIMARY_COUNT}",
         "required_pass_count": "8/8",
         "seven_of_eight_allowed": False,
@@ -451,7 +583,7 @@ def run_stage7e0(args: argparse.Namespace) -> dict[str, Any]:
         "primary_case_results_sha256": sha256_file(result_root / "primary_case_results.jsonl"),
     }
     write_json(result_root / "primary_summary.json", summary)
-    if backend == "hf" and summary["status"] != "PASS":
+    if backend == "constrained_hf" and summary["status"] != "PASS":
         raise SystemExit("STOP: Stage7E0-A3 primary failed; do not open Gretel pilot")
     return summary
 
@@ -460,9 +592,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--accepted-protocol-commit", required=True)
     parser.add_argument("--result-root", required=True)
-    parser.add_argument("--backend", choices=["hf", "mock"], default="hf")
+    parser.add_argument("--backend", choices=["constrained_hf", "mock", "hf"], default="constrained_hf")
     parser.add_argument("--model-name-or-path", default=DEFAULT_MODEL_PATH)
-    parser.add_argument("--quantization", default="4bit")
+    parser.add_argument("--quantization", default="none")
+    parser.add_argument("--phase-o-max-new-tokens", type=int, default=PHASE_O_MAX_NEW_TOKENS)
+    parser.add_argument("--phase-m-max-new-tokens", type=int, default=PHASE_M_MAX_NEW_TOKENS)
     parser.add_argument("--max-input-tokens", type=int, default=28672)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--trust-remote-code", action="store_true")
