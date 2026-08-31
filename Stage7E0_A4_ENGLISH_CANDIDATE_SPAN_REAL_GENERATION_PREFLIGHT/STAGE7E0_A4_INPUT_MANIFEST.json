@@ -20,7 +20,7 @@
   "phase_o_prompt_spec_sha256": "1212562667306e574bb0c602aec7a2b7a39a4556875e7e3212eb201898e31eed",
   "phase_o_system_sha256": "0f08370a200315d1e98491b0fcb3c46803f129e753f52e20fe19e4fc1b754465",
   "phase_o_user_template_sha256": "a38a9f2f803061bb1eddc43f26b4c00b9fafe4ab8d9e344cbe310acbcfbf0808",
-  "stage7c_a4_closed_commit": "8512fbd42886934648c64aa867c710ba48faa827",
+  "stage7c_a4_closed_commit": "fe90bf2183ea5eb812367f608997150788f6ad6e",
   "stage7c_a4_dir": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL",
   "stage7c_a4_lock_sha256": "091a42deb7bf667d4f0ec27eb39299bed7ad2311353d998e72c08a494174e523"
 }

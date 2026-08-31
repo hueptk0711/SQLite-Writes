@@ -8,7 +8,7 @@
   "nine_of_ten_allowed": false,
   "phase_m_max_new_tokens": 8192,
   "phase_o_max_new_tokens": 512,
-  "primary_case_results_sha256": "23fc7bca12e68f65dc6d654b4292f5cc4b937db001eeda4d73ea9f5da029b13e",
+  "primary_case_results_sha256": "20760894b98a75c0c24291b24c9ed947bdd6f50fde2740db2f26ce222b23f9c7",
   "primary_pass_count": "10/10",
   "protocol_backend": "mock",
   "raw_phase_m_sha256": "925515075d402c733f9bc47ffa0ee078928456d79e92d72c686d624ffab24d62",

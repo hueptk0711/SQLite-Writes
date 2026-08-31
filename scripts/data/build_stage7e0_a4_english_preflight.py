@@ -47,7 +47,7 @@ from scripts.server.run_stage7e0_v2_a1_preflight import build_phase_m_constraint
 
 
 STAGE_NAME = "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT"
-PATCH_NAME = "PATCH0"
+PATCH_NAME = "PATCH1"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260831.zip"
 FRESH_CONSTRAINED_RESULT_DIR_NAME = "stage7e0_a4_english_candidate_span_constrained_results_20260831"
 

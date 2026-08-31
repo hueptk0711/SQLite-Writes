@@ -4,12 +4,12 @@
     {
       "bytes": 1480,
       "path": "STAGE7E0_A4_INPUT_MANIFEST.json",
-      "sha256": "be448d4b99a6595a7298338fb82d866071201c7df3d6a837987d32db417ab037"
+      "sha256": "b0c2bc337a8c455bffde75bfd74873fbad49d4ba0bb288115edd136009d6cbef"
     },
     {
       "bytes": 2628,
       "path": "RUNNER_PROTOCOL_A4.json",
-      "sha256": "cd89181964d58d31f0d610c752a5451f505bd7f458f73c9469dda90f0a69c6ed"
+      "sha256": "b4b70696796665704d7b8c22b1cbc69954a49f18e676dc44531b0b2fd54fe92a"
     },
     {
       "bytes": 202,
@@ -19,37 +19,37 @@
     {
       "bytes": 6632,
       "path": "CONSTRAINT_INDEPENDENCE_AUDIT_A4.json",
-      "sha256": "cced04afbf8ff847d0198f1457445b29230c64aa83dd8fb4af40e2883fd3edf5"
+      "sha256": "7c62bd28f371c4b4b26a6c36bfc0ee59751b06b2072654e455b637a205dbc2f9"
     },
     {
       "bytes": 2167,
       "path": "SERVER_RUN_COMMANDS.md",
-      "sha256": "5875c271972e34ac7d7f47106579e41e5b4b34f4e94a1291bd3e463132efa400"
+      "sha256": "e33e09959a643ab45a3f38c1f5106810d5baf9162183cfee7b2d3f4abde23f4f"
     },
     {
       "bytes": 1516,
       "path": "VALIDATION_REPORT.md",
-      "sha256": "da5a1e124e16dd9945dec99894bb8c57334f0a134dae14773a01c83f11ef1115"
+      "sha256": "cf63c622bc8d5b09cd8d2aa6768c5171e904d1519a6794d514481a60c950a8c6"
     },
     {
       "bytes": 1002,
       "path": "REVIEWER_README.md",
-      "sha256": "83e88118935035410dac2e39bd406c004361a4b6f781b441e8241fbdda209b90"
+      "sha256": "0dcbde2e62e6cc496d4a3f6ade528b170f0d164993986bf851ecc1ba0a5f5746"
     },
     {
       "bytes": 1019,
       "path": "mock_dry_run/run_manifest.json",
-      "sha256": "1d9b6252d8be7def4adec14dce7a1710121195f0e234642dc84dbccd14f93e94"
+      "sha256": "a677fc301fb09106f892fc4c429758890ec941358f962fa967b4cff128115bfd"
     },
     {
       "bytes": 749,
       "path": "mock_dry_run/primary_summary.json",
-      "sha256": "4393a625c8e012df626cf4b4ed2603451846e7c56b2910ce5df47ae021ace580"
+      "sha256": "78cbc1bf781583056e1e7dbd1e81aef8ba9ed25a9e99dc1cf63dde0ce03442bc"
     },
     {
-      "bytes": 16635,
+      "bytes": 21185,
       "path": "mock_dry_run/primary_case_results.jsonl",
-      "sha256": "23fc7bca12e68f65dc6d654b4292f5cc4b937db001eeda4d73ea9f5da029b13e"
+      "sha256": "20760894b98a75c0c24291b24c9ed947bdd6f50fde2740db2f26ce222b23f9c7"
     },
     {
       "bytes": 6350,
@@ -62,7 +62,7 @@
       "sha256": "925515075d402c733f9bc47ffa0ee078928456d79e92d72c686d624ffab24d62"
     }
   ],
-  "combined_scientific_artifacts_sha256": "3c26f16c9e4936c6c521994306094d1d2dfca55a80e9113dbb156c91e0c01521",
-  "patch": "PATCH0",
+  "combined_scientific_artifacts_sha256": "b634e2a2b969d902973fe6bd56aa3dc293ab222ffb4e59144d77d4614e7d6903",
+  "patch": "PATCH1",
   "stage": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT"
 }

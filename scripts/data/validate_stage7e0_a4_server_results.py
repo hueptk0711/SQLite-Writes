@@ -207,7 +207,7 @@ def classify_result(result_dir: Path) -> dict[str, Any]:
         failure_counts[key] = failure_counts.get(key, 0) + 1
     return {
         "stage": STAGE_NAME,
-        "status": "PASS" if evidence_status == "PASS" else "FAIL",
+        "status": "PASS" if evidence_status == "PASS" and protocol_status == "PASS" else "FAIL",
         "result_dir": str(result_dir),
         "evidence_integrity_status": evidence_status,
         "protocol_compliance_status": protocol_status,

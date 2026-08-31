@@ -5,7 +5,7 @@
     "nine_of_ten_allowed": false,
     "required_pass_count": "10/10"
   },
-  "accepted_protocol_commit": "8512fbd42886934648c64aa867c710ba48faa827",
+  "accepted_protocol_commit": "fe90bf2183ea5eb812367f608997150788f6ad6e",
   "generation_contract": {
     "accepted_patch9_backend_file": "scripts/server/run_stage7e0_v2_a1_preflight.py",
     "automatic_repair": false,
@@ -47,7 +47,7 @@
     "quantization_default": "none",
     "torch_dtype": "auto"
   },
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "prompt_contract": {
     "phase_m_changed": false,
     "phase_m_prompt_spec_path": "stage7c_a1_v2_development_protocol/PHASE_M_PROMPT_SPEC.json",

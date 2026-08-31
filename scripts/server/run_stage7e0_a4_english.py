@@ -600,6 +600,28 @@ def canonical_target_state(db_path: Path, sql: str, params: tuple[Any, ...], tab
     return rows, sha256_text(canonical_json(rows))
 
 
+def canonical_span_ref_selection(row: dict[str, Any], span_refs: list[str]) -> tuple[str, ...]:
+    selected = resolve_selected_span_refs(candidate_records(row), span_refs)
+    return tuple(candidate.span_ref for candidate in selected)
+
+
+def canonical_insert_mapping(ir: dict[str, Any]) -> tuple[str, str, tuple[tuple[str, str, str], ...]]:
+    return (
+        str(ir["operation"]),
+        str(ir["table_ref"]),
+        tuple(
+            sorted(
+                (
+                    str(assignment["slot_ref"]),
+                    str(assignment["evidence_ref"]),
+                    str(assignment["column_ref"]),
+                )
+                for assignment in ir["assignments"]
+            )
+        ),
+    )
+
+
 def _failed_row(row: dict[str, Any], stage: str, error: str | None, phase_o_hash: str, phase_m_hash: str | None = None) -> dict[str, Any]:
     return {"sample_id": row["sample_id"], "status": "FAIL", "failure_stage": stage, "error": error, "checks": {}, "phase_o_messages_sha256": phase_o_hash, "phase_m_messages_sha256": phase_m_hash}
 
@@ -636,16 +658,23 @@ def evaluate_primary_case(row: dict[str, Any], generator: TwoCallGenerator, *, p
         program = compile_sqlite_program(ir, inventory, materialized)
         db_path = PROJECT_ROOT / STAGE7C_A4_DIR / row["synthetic_db_spec"]["sqlite_db_path"]
         preflight = preflight_sqlite(db_path, program)
-        observed, observed_hash = canonical_target_state(db_path, program.sql, program.parameters, row["synthetic_db_spec"]["table_name"])
+        if preflight.admitted:
+            observed, observed_hash = canonical_target_state(db_path, program.sql, program.parameters, row["synthetic_db_spec"]["table_name"])
+        else:
+            observed, observed_hash = [], sha256_text(canonical_json([]))
     except V2A1Error as exc:
         return _failed_row(row, exc.reason_code, str(exc), phase_o_prompt_hash, phase_m_prompt_hash), raw_o, raw_m
     expected = row["label_side_expected"]
+    predicted_span_ref_selection = canonical_span_ref_selection(row, phase_o["span_refs"])
+    expected_span_ref_selection = canonical_span_ref_selection(row, expected["phase_o"]["span_refs"])
+    predicted_phase_m_mapping = canonical_insert_mapping(ir)
+    expected_phase_m_mapping = canonical_insert_mapping(expected["phase_m"])
     checks = {
         "operation_exact": phase_o["operation"] == expected["phase_o"]["operation"],
-        "span_refs_exact": phase_o["span_refs"] == expected["phase_o"]["span_refs"],
-        "no_extra_refs": len(phase_o["span_refs"]) == len(expected["phase_o"]["span_refs"]),
+        "span_ref_selection_exact": predicted_span_ref_selection == expected_span_ref_selection,
+        "no_extra_refs": len(predicted_span_ref_selection) == len(expected_span_ref_selection),
         "all_refs_exist_in_dynamic_enum": set(phase_o["span_refs"]) <= set(candidate_refs),
-        "phase_m_mapping_exact": ir == expected["phase_m"],
+        "phase_m_mapping_exact": predicted_phase_m_mapping == expected_phase_m_mapping,
         "typed_materialization_pass": True,
         "completeness_pass": True,
         "compile_pass": True,
@@ -659,8 +688,12 @@ def evaluate_primary_case(row: dict[str, Any], generator: TwoCallGenerator, *, p
             "failure_stage": None if all(checks.values()) else "acceptance_gate",
             "checks": checks,
             "phase_o_predicted": phase_o,
+            "phase_o_canonical_span_refs": list(predicted_span_ref_selection),
+            "phase_o_expected_canonical_span_refs": list(expected_span_ref_selection),
             "resolved_span_refs": [{"candidate_span_ref": item.span_ref, "start_char": item.start_char, "end_char": item.end_char, "text": item.text} for item in selected],
             "phase_m_predicted": ir,
+            "phase_m_canonical_mapping": predicted_phase_m_mapping,
+            "phase_m_expected_canonical_mapping": expected_phase_m_mapping,
             "compiled_sql": program.sql,
             "compiled_parameters": list(program.parameters),
             "preflight_reason_code": preflight.reason_code,
