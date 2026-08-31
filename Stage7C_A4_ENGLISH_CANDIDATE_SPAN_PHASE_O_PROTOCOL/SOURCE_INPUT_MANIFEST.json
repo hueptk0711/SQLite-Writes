@@ -1,0 +1,56 @@
+{
+  "gpu_called": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "source_files": [
+    {
+      "bytes": 1322,
+      "path": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/STAGE7B_A2_LOCK.json",
+      "sha256": "4419d27bc1c89f9be600443984d6f80ab53f92129b59df92de2eee493e17ca80",
+      "source_stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
+    },
+    {
+      "bytes": 572,
+      "path": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/PHASE_O_SPAN_REFERENCE_BASE_SCHEMA.json",
+      "sha256": "0726ea91e6c138968b67f32ddc78deaa7e8ad9e8849e9549db3a429b420536ad",
+      "source_stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
+    },
+    {
+      "bytes": 510,
+      "path": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/DYNAMIC_PHASE_O_SCHEMA_SPEC.json",
+      "sha256": "8b408762a1d0c7aee99c0816c76e2742babb6cd0fc1f1963ba8473849e46d86e",
+      "source_stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
+    },
+    {
+      "bytes": 567,
+      "path": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/CANDIDATE_SERIALIZATION_SPEC.json",
+      "sha256": "a91711876f7002fec263d952023ff0f71ed7798c4438c0601eeedb6644f46aac",
+      "source_stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
+    },
+    {
+      "bytes": 964,
+      "path": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/CANDIDATE_GENERATION_ALGORITHM_SPEC.json",
+      "sha256": "2948a4baafdb99876feb010436e012b1d33451dbcc253bab831f8e40dbff34aa",
+      "source_stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
+    },
+    {
+      "bytes": 45415,
+      "path": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/CANDIDATE_GENERATOR_PARETO_AUDIT.json",
+      "sha256": "6a2dfbb5e9931c8eb13867e89d95156ce4b491dccacf7bbe81300772c9c3cb4c",
+      "source_stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
+    },
+    {
+      "bytes": 1226,
+      "path": "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT/STAGE7C_A3_LOCK.json",
+      "sha256": "057b14925cc615d9563dd5c88313a7c91bb03df868a1f3eb9917d6a49f56d105",
+      "source_stage": "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT"
+    },
+    {
+      "bytes": 1108,
+      "path": "stage7c_a1_v2_development_protocol/PHASE_M_PROMPT_SPEC.json",
+      "sha256": "b04e67c0c3c9b7f27687891486a4d95b65bfab86a6208e5568d34c8f7acda279",
+      "source_stage": "stage7c_a1_v2_development_protocol"
+    }
+  ],
+  "stage": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL"
+}

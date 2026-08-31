@@ -1,0 +1,28 @@
+{
+  "candidate_generator_source_stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT",
+  "candidate_generator_variant": "lexical_ngram2",
+  "candidate_serialization": "SPAN_0001 | TAG[,TAG...] | exact source text",
+  "examples": [],
+  "gpu_called": false,
+  "model_called": false,
+  "model_generates_character_offsets": false,
+  "model_generates_column_refs": false,
+  "model_generates_values": false,
+  "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "model_selects_span_refs": true,
+  "operation_scope": "INSERT",
+  "patch": "PATCH0",
+  "prompt_hashes": {
+    "phase_o_system_prompt_sha256": "0f08370a200315d1e98491b0fcb3c46803f129e753f52e20fe19e4fc1b754465",
+    "phase_o_user_prompt_template_sha256": "a38a9f2f803061bb1eddc43f26b4c00b9fafe4ab8d9e344cbe310acbcfbf0808"
+  },
+  "protocol": "candidate_span_phase_o_protocol",
+  "repair": "none",
+  "retry": 0,
+  "runtime_schema": "span_refs.items.enum equals exact current sample candidate refs",
+  "stage": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL",
+  "system_prompt": "You select source spans for SQLite INSERT requests. Return only JSON that matches the provided schema.",
+  "user_prompt_template": "Select the source spans that are the literal database values required by the INSERT request.\n\nRules:\n- Choose only from the supplied SPAN references.\n- Select the smallest complete candidate representing each literal value.\n- Do not select field labels, instruction text, table names, or column names.\n- Do not select overlapping broader spans when a smaller exact value span exists.\n- Do not invent span refs.\n- Do not output character offsets, values, column refs, explanations, or markdown.\n\nOriginal request:\n{question}\n\nSchema inventory:\n{schema_inventory}\n\nCandidate span inventory:\n{candidate_inventory}\n",
+  "zero_shot": true
+}

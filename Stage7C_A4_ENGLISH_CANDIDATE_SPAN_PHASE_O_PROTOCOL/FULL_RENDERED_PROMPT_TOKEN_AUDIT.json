@@ -1,0 +1,129 @@
+{
+  "fresh_case_count": 10,
+  "gpu_called": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "per_sample": [
+    {
+      "candidate_count": 24,
+      "candidate_inventory_chars": 859,
+      "message_sha256": "bfcd1325babc1f3705d1ad6be1addc5e93de28d2a1b47221965ac641584426a4",
+      "rendered_prompt_chars": 1989,
+      "rendered_prompt_tokens": 618,
+      "sample_id": "stage7c_a4_fresh_english_001",
+      "system_chars": 102,
+      "user_chars": 1727
+    },
+    {
+      "candidate_count": 33,
+      "candidate_inventory_chars": 1075,
+      "message_sha256": "b354b2467bd1118a9f3a474250058cd59b6d4da9d3e2f0d4b0d239439be4bf00",
+      "rendered_prompt_chars": 2279,
+      "rendered_prompt_tokens": 797,
+      "sample_id": "stage7c_a4_fresh_english_002",
+      "system_chars": 102,
+      "user_chars": 1996
+    },
+    {
+      "candidate_count": 22,
+      "candidate_inventory_chars": 721,
+      "message_sha256": "245fde92728047f3cd48d40417000ab8ba2e3b1184c06ce94e67b09b90c11c8a",
+      "rendered_prompt_chars": 1762,
+      "rendered_prompt_tokens": 558,
+      "sample_id": "stage7c_a4_fresh_english_003",
+      "system_chars": 102,
+      "user_chars": 1514
+    },
+    {
+      "candidate_count": 26,
+      "candidate_inventory_chars": 934,
+      "message_sha256": "6b52e897b7f03abf8e4b793f7ceef79abe6aeff56df307c13037e91d4e9f4076",
+      "rendered_prompt_chars": 2084,
+      "rendered_prompt_tokens": 640,
+      "sample_id": "stage7c_a4_fresh_english_004",
+      "system_chars": 102,
+      "user_chars": 1813
+    },
+    {
+      "candidate_count": 18,
+      "candidate_inventory_chars": 697,
+      "message_sha256": "5c8d57a2d4bfe04fd927b911628612bd13f1d65af35d91e6872d016a11fc2168",
+      "rendered_prompt_chars": 1755,
+      "rendered_prompt_tokens": 523,
+      "sample_id": "stage7c_a4_fresh_english_005",
+      "system_chars": 102,
+      "user_chars": 1519
+    },
+    {
+      "candidate_count": 42,
+      "candidate_inventory_chars": 1382,
+      "message_sha256": "4e4e398b8d63ab7e329a072145fabd128c17fd4d9baeeae440c9860d581e0edc",
+      "rendered_prompt_chars": 2685,
+      "rendered_prompt_tokens": 1019,
+      "sample_id": "stage7c_a4_fresh_english_006",
+      "system_chars": 102,
+      "user_chars": 2381
+    },
+    {
+      "candidate_count": 33,
+      "candidate_inventory_chars": 1108,
+      "message_sha256": "8d13eb5d41718bb3f895fd911e434d2933160fa46250693c898fe79b405c5190",
+      "rendered_prompt_chars": 2321,
+      "rendered_prompt_tokens": 817,
+      "sample_id": "stage7c_a4_fresh_english_007",
+      "system_chars": 102,
+      "user_chars": 2039
+    },
+    {
+      "candidate_count": 41,
+      "candidate_inventory_chars": 1341,
+      "message_sha256": "aef0c40c13a8fc348314b303b1c0e0ff0389363cebdce5be62dbe4a1d386ff96",
+      "rendered_prompt_chars": 2648,
+      "rendered_prompt_tokens": 968,
+      "sample_id": "stage7c_a4_fresh_english_008",
+      "system_chars": 102,
+      "user_chars": 2345
+    },
+    {
+      "candidate_count": 24,
+      "candidate_inventory_chars": 819,
+      "message_sha256": "ecb30522e1fc459b2d19330a7ccf56f53747a2fb7cf3f5a1d4a26db920026ec2",
+      "rendered_prompt_chars": 1954,
+      "rendered_prompt_tokens": 605,
+      "sample_id": "stage7c_a4_fresh_english_009",
+      "system_chars": 102,
+      "user_chars": 1692
+    },
+    {
+      "candidate_count": 32,
+      "candidate_inventory_chars": 1073,
+      "message_sha256": "d6b1ed1f403d68a6ccf66fe668a7db90bce2f963a819a5c0d8d044b3cbc8488a",
+      "rendered_prompt_chars": 2306,
+      "rendered_prompt_tokens": 763,
+      "sample_id": "stage7c_a4_fresh_english_010",
+      "system_chars": 102,
+      "user_chars": 2024
+    }
+  ],
+  "rendered_prompt_char_stats": {
+    "max": 2685,
+    "mean": 2178.3,
+    "median": 2181.5,
+    "min": 1755,
+    "p95": 2648
+  },
+  "rendered_prompt_token_stats": {
+    "max": 1019,
+    "mean": 730.8,
+    "median": 701.5,
+    "min": 523,
+    "p95": 968
+  },
+  "stage": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL",
+  "tokenizer_class": "Qwen2Tokenizer",
+  "tokenizer_name_or_path": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "tokenizer_revision_target": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "tokenizer_status": "PASS",
+  "tokenizer_target": "Qwen/Qwen2.5-Coder-7B-Instruct"
+}

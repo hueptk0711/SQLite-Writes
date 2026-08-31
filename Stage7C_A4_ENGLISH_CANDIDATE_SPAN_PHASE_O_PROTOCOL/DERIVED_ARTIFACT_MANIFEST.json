@@ -1,0 +1,113 @@
+{
+  "artifact_count": 21,
+  "artifacts": [
+    {
+      "bytes": 968,
+      "path": "ACCEPTANCE_POLICY_A4.json",
+      "sha256": "a35ebbe875e3557710e405c094bbd45c3d08904aed5fecc85e1fa0c8ce65d970"
+    },
+    {
+      "bytes": 462,
+      "path": "CANDIDATE_MISS_FAILURE_POLICY.json",
+      "sha256": "1730bf3497e8fc9d2b36a6d8a963a4b414b48ccee98b22c3ef0c732450742b34"
+    },
+    {
+      "bytes": 532,
+      "path": "CANDIDATE_SERIALIZATION_FREEZE.json",
+      "sha256": "3592835b5e9b1935d9c96c52ba240c1a3ce97e9d35be5e393305eddef30a83c2"
+    },
+    {
+      "bytes": 96247,
+      "path": "FRESH_ENGLISH_A4_SPAN_REF_FEASIBILITY_SET.jsonl",
+      "sha256": "6b78c95d6581339797f8306f9573c0f5f5553d0a459c0e859e37e6f19c9e9f89"
+    },
+    {
+      "bytes": 4290,
+      "path": "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json",
+      "sha256": "808d32549439a75ef1c184d41902fb56b3167f25e3016f5f77fa609a1c0aad97"
+    },
+    {
+      "bytes": 12680,
+      "path": "ORACLE_SPAN_REF_PATH_RESULTS.jsonl",
+      "sha256": "a003afb17508d3b11dd8e6a0f47a351aeb99dfb31f56b378667a5b7b077077cb"
+    },
+    {
+      "bytes": 1892,
+      "path": "PHASE_O_PROMPT_SPEC_A4_ENGLISH.json",
+      "sha256": "474c6f2739283b4ccacf127d5a15d64b99aa6bbc522c5cb9d1721eac2cc3a973"
+    },
+    {
+      "bytes": 454,
+      "path": "PHASE_O_RUNTIME_SCHEMA_SPEC.json",
+      "sha256": "03cc69806920a448b10d250584afae47ef267bcfff22feb221bbcd58a3df7307"
+    },
+    {
+      "bytes": 688,
+      "path": "PHASE_O_SPAN_REF_OUTPUT_SPEC.json",
+      "sha256": "1a0b6ed43e0fe446350d1b9e66338e72d5d63afa71c3a94be27a299e02421266"
+    },
+    {
+      "bytes": 2509,
+      "path": "SOURCE_INPUT_MANIFEST.json",
+      "sha256": "bee72ba63d8cf5f03f28c069341d81b485f37b6e748fe00dee1cf6d9d78969f1"
+    },
+    {
+      "bytes": 5147,
+      "path": "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl",
+      "sha256": "08949a854b4e68b574533ac74d3c8921116def0cca9bd1a91edf8ea8f366b527"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_001.sqlite",
+      "sha256": "fd48f392b50c81c2a6714273fbde66f33b9aa64f2c0c9112072b5b778ebebbab"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_002.sqlite",
+      "sha256": "6227bcaf106cfb25acf548d08ea27ed5064420728a1b4a2330dcac1b434358af"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_003.sqlite",
+      "sha256": "ea9c20822d05f902b427ded1412b3037edc617b07e5c1d94cc7d7925771b620a"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_004.sqlite",
+      "sha256": "4d21a2c88dd876be58f50fb7ec654e761d1b502b608bb5431c6206d478a024ab"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_005.sqlite",
+      "sha256": "d7b4fa83ef67caf9c3506f91e962cefb3f27f0bead6da82620414cceed677461"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_006.sqlite",
+      "sha256": "6c4914a4c1d582650b6fd7baa128ac50867ab158e4dfda2dc9c7a3aab025e45c"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_007.sqlite",
+      "sha256": "5b7dae16eb47913f4973fa5566ed5f9eb1c659ef56747ae3f37cb7fb1d26b46d"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_008.sqlite",
+      "sha256": "c74e68d33928461fac8ffe721abdc139119ddf5eee0fde2aa6c417f803a5663f"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_009.sqlite",
+      "sha256": "429ec038edcfa82d935548d65d355651ca0e6213688fa37d08c1792ca998df84"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/stage7c_a4_fresh_english_010.sqlite",
+      "sha256": "b872cf48f45c0199498ee401bf1300f14f2969972261f3f42e30ec6d5d955321"
+    }
+  ],
+  "combined_scientific_artifacts_sha256": "771d9160b0eb5ad412f0449190c21ef0442dabde10305754e6ef5173c0a682fc",
+  "patch": "PATCH0",
+  "stage": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL"
+}

@@ -1,0 +1,27 @@
+{
+  "before_gretel_pilot": "A protocol-compliant span-reference preflight must pass all fresh cases.",
+  "gpu_called": false,
+  "gretel_pilot_opened": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "stage": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL",
+  "synthetic_feasibility_gate": {
+    "averaging_allowed": false,
+    "checks": [
+      "candidate inventory contains every gold value span",
+      "dynamic schema enum equals current candidate refs",
+      "Phase O output uses only span_refs",
+      "unknown and duplicate refs rejected by resolver",
+      "resolved span_refs derive EV/SLOT deterministically",
+      "Phase M mapping exact",
+      "typed materialization PASS",
+      "completeness PASS",
+      "compilation PASS",
+      "SQLite preflight ADMITTED",
+      "canonical target state exact"
+    ],
+    "nine_of_ten_allowed": false,
+    "required_pass_count": "10/10",
+    "sample_set": "10 fresh English A4 candidate-span cases"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "allowed_top_level_keys": [
+    "operation",
+    "span_refs"
+  ],
+  "exact_phase_o_output": {
+    "operation": "INSERT",
+    "span_refs": [
+      "SPAN_0007",
+      "SPAN_0019",
+      "SPAN_0031"
+    ]
+  },
+  "forbidden_top_level_keys": [
+    "value_spans",
+    "start_char",
+    "end_char",
+    "values",
+    "column_refs",
+    "assignments"
+  ],
+  "gpu_called": false,
+  "model_called": false,
+  "operation_const": "INSERT",
+  "patch": "PATCH0",
+  "span_refs": {
+    "items_runtime_constraint": "enum over exact current candidate inventory refs",
+    "minItems": 1,
+    "type": "array",
+    "uniqueItems": true
+  },
+  "stage": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL"
+}

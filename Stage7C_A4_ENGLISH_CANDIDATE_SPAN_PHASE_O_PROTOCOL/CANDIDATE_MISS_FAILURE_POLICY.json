@@ -1,0 +1,15 @@
+{
+  "applies_to": [
+    "fresh_synthetic_feasibility",
+    "gretel_pilot",
+    "development_dev",
+    "official_test"
+  ],
+  "gpu_called": false,
+  "may_exclude_sample_for_candidate_miss": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "pilot_dev_test_denominator_locked": true,
+  "policy": "Candidate-generator miss is a method failure and remains in every pilot/dev/test denominator.",
+  "stage": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL"
+}
