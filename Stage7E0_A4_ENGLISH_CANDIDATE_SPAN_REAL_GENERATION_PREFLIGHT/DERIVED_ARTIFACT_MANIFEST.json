@@ -1,0 +1,68 @@
+{
+  "artifact_count": 12,
+  "artifacts": [
+    {
+      "bytes": 1480,
+      "path": "STAGE7E0_A4_INPUT_MANIFEST.json",
+      "sha256": "be448d4b99a6595a7298338fb82d866071201c7df3d6a837987d32db417ab037"
+    },
+    {
+      "bytes": 2628,
+      "path": "RUNNER_PROTOCOL_A4.json",
+      "sha256": "cd89181964d58d31f0d610c752a5451f505bd7f458f73c9469dda90f0a69c6ed"
+    },
+    {
+      "bytes": 202,
+      "path": "PRIMARY_ACCEPTANCE_POLICY_A4.json",
+      "sha256": "602dc3b8c92289a10c5255875dda9fc0dd3af3d9b659bfc3eec72b55bc44eaab"
+    },
+    {
+      "bytes": 6632,
+      "path": "CONSTRAINT_INDEPENDENCE_AUDIT_A4.json",
+      "sha256": "cced04afbf8ff847d0198f1457445b29230c64aa83dd8fb4af40e2883fd3edf5"
+    },
+    {
+      "bytes": 2167,
+      "path": "SERVER_RUN_COMMANDS.md",
+      "sha256": "5875c271972e34ac7d7f47106579e41e5b4b34f4e94a1291bd3e463132efa400"
+    },
+    {
+      "bytes": 1516,
+      "path": "VALIDATION_REPORT.md",
+      "sha256": "da5a1e124e16dd9945dec99894bb8c57334f0a134dae14773a01c83f11ef1115"
+    },
+    {
+      "bytes": 1002,
+      "path": "REVIEWER_README.md",
+      "sha256": "83e88118935035410dac2e39bd406c004361a4b6f781b441e8241fbdda209b90"
+    },
+    {
+      "bytes": 1019,
+      "path": "mock_dry_run/run_manifest.json",
+      "sha256": "1d9b6252d8be7def4adec14dce7a1710121195f0e234642dc84dbccd14f93e94"
+    },
+    {
+      "bytes": 749,
+      "path": "mock_dry_run/primary_summary.json",
+      "sha256": "4393a625c8e012df626cf4b4ed2603451846e7c56b2910ce5df47ae021ace580"
+    },
+    {
+      "bytes": 16635,
+      "path": "mock_dry_run/primary_case_results.jsonl",
+      "sha256": "23fc7bca12e68f65dc6d654b4292f5cc4b937db001eeda4d73ea9f5da029b13e"
+    },
+    {
+      "bytes": 6350,
+      "path": "mock_dry_run/raw_phase_o_generations.jsonl",
+      "sha256": "5bbfb5b3ab9ea0826b0547a1519f036e6ed6a4085d478b28220cd2dad705047f"
+    },
+    {
+      "bytes": 8815,
+      "path": "mock_dry_run/raw_phase_m_generations.jsonl",
+      "sha256": "925515075d402c733f9bc47ffa0ee078928456d79e92d72c686d624ffab24d62"
+    }
+  ],
+  "combined_scientific_artifacts_sha256": "3c26f16c9e4936c6c521994306094d1d2dfca55a80e9113dbb156c91e0c01521",
+  "patch": "PATCH0",
+  "stage": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT"
+}

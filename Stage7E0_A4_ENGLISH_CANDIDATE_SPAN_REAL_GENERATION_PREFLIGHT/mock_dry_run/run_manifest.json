@@ -1,0 +1,24 @@
+{
+  "accepted_protocol_commit": "8512fbd42886934648c64aa867c710ba48faa827",
+  "git": null,
+  "model": {
+    "backend": "mock",
+    "mock_uses_label_side_expected": true,
+    "model_called": false
+  },
+  "phase_m_max_new_tokens": 8192,
+  "phase_m_prompt_spec_path": "stage7c_a1_v2_development_protocol/PHASE_M_PROMPT_SPEC.json",
+  "phase_o_max_new_tokens": 512,
+  "phase_o_prompt_spec_path": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/PHASE_O_PROMPT_SPEC_A4_ENGLISH.json",
+  "primary_case_count": 10,
+  "primary_first_diagnostics_forbidden_until_freeze": true,
+  "repair": "none",
+  "retry": 0,
+  "stage": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT",
+  "stage7c_a4_inputs": {
+    "a4_prompt_spec_sha256": "1212562667306e574bb0c602aec7a2b7a39a4556875e7e3212eb201898e31eed",
+    "a4_smoke_set_sha256": "3e7cbc6d855cb51bfa9f142f041b390190a0dc50027d025a3421af47fa93812e",
+    "stage7c_a4_lock_sha256": "091a42deb7bf667d4f0ec27eb39299bed7ad2311353d998e72c08a494174e523"
+  },
+  "zero_shot": true
+}

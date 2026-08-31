@@ -1,0 +1,26 @@
+{
+  "fresh_primary_case_count": 10,
+  "fresh_primary_case_ids": [
+    "stage7c_a4_fresh_english_001",
+    "stage7c_a4_fresh_english_002",
+    "stage7c_a4_fresh_english_003",
+    "stage7c_a4_fresh_english_004",
+    "stage7c_a4_fresh_english_005",
+    "stage7c_a4_fresh_english_006",
+    "stage7c_a4_fresh_english_007",
+    "stage7c_a4_fresh_english_008",
+    "stage7c_a4_fresh_english_009",
+    "stage7c_a4_fresh_english_010"
+  ],
+  "fresh_primary_set_sha256": "3e7cbc6d855cb51bfa9f142f041b390190a0dc50027d025a3421af47fa93812e",
+  "phase_m_prompt_spec_path": "stage7c_a1_v2_development_protocol/PHASE_M_PROMPT_SPEC.json",
+  "phase_m_system_sha256": "1d9b423cfea7b0de7dc329a707fccd7ff820cda7404d9b6d449420b348781781",
+  "phase_m_user_template_sha256": "8c53626a3bca9f1af98cb5c73fa28505ba93ea2f33dcf6d7e52cb4c7d417b958",
+  "phase_o_prompt_spec_path": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/PHASE_O_PROMPT_SPEC_A4_ENGLISH.json",
+  "phase_o_prompt_spec_sha256": "1212562667306e574bb0c602aec7a2b7a39a4556875e7e3212eb201898e31eed",
+  "phase_o_system_sha256": "0f08370a200315d1e98491b0fcb3c46803f129e753f52e20fe19e4fc1b754465",
+  "phase_o_user_template_sha256": "a38a9f2f803061bb1eddc43f26b4c00b9fafe4ab8d9e344cbe310acbcfbf0808",
+  "stage7c_a4_closed_commit": "8512fbd42886934648c64aa867c710ba48faa827",
+  "stage7c_a4_dir": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL",
+  "stage7c_a4_lock_sha256": "091a42deb7bf667d4f0ec27eb39299bed7ad2311353d998e72c08a494174e523"
+}

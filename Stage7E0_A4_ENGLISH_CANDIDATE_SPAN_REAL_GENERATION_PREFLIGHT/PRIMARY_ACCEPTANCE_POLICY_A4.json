@@ -1,0 +1,6 @@
+{
+  "averaging_allowed": false,
+  "gretel_pilot_gate": "open 100-sample Gretel development-train pilot only after 10/10 primary PASS",
+  "nine_of_ten_allowed": false,
+  "required_pass_count": "10/10"
+}

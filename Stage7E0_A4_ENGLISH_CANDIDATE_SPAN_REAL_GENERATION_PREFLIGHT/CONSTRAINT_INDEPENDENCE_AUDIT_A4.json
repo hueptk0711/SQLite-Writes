@@ -1,0 +1,110 @@
+{
+  "backend": "incremental_json_schema_grammar",
+  "case_count": 10,
+  "label_side_data_used_for_constraints": false,
+  "patch": "PATCH0",
+  "rows": [
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "89160615d587ee0bab3c06dd717c1270310ce483fdc517c9a5a2d2b2ee8ad3e5",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "89160615d587ee0bab3c06dd717c1270310ce483fdc517c9a5a2d2b2ee8ad3e5",
+      "phase_o_constraint_fingerprint": "f8a2d4d65837b21bc91bfcbd3f9592875a1fb0d370c9c79763035b0ad6d4d487",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "f8a2d4d65837b21bc91bfcbd3f9592875a1fb0d370c9c79763035b0ad6d4d487",
+      "sample_id": "stage7c_a4_fresh_english_001"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "65d3d0cddb071164389514862635f36b10b6e03251eca6287e74904b48a82798",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "65d3d0cddb071164389514862635f36b10b6e03251eca6287e74904b48a82798",
+      "phase_o_constraint_fingerprint": "56c3601f76e04547c6cf9ea3c18093afce41393c9e22bd5406fc86941a88fe46",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "56c3601f76e04547c6cf9ea3c18093afce41393c9e22bd5406fc86941a88fe46",
+      "sample_id": "stage7c_a4_fresh_english_002"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "e74a72b0bd45e4817c050b44d9f8b1c9050d89b7039badfe5b111e4903e31476",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "e74a72b0bd45e4817c050b44d9f8b1c9050d89b7039badfe5b111e4903e31476",
+      "phase_o_constraint_fingerprint": "89cbaf71c732bd6f3ff48cd22e333fba9983c0d2c321f9125a17f89d831fd105",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "89cbaf71c732bd6f3ff48cd22e333fba9983c0d2c321f9125a17f89d831fd105",
+      "sample_id": "stage7c_a4_fresh_english_003"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "89160615d587ee0bab3c06dd717c1270310ce483fdc517c9a5a2d2b2ee8ad3e5",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "89160615d587ee0bab3c06dd717c1270310ce483fdc517c9a5a2d2b2ee8ad3e5",
+      "phase_o_constraint_fingerprint": "802ce73f43cbb2bee82ccb551fbc011a641a96f71a169e7e13f861eba8910141",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "802ce73f43cbb2bee82ccb551fbc011a641a96f71a169e7e13f861eba8910141",
+      "sample_id": "stage7c_a4_fresh_english_004"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "e74a72b0bd45e4817c050b44d9f8b1c9050d89b7039badfe5b111e4903e31476",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "e74a72b0bd45e4817c050b44d9f8b1c9050d89b7039badfe5b111e4903e31476",
+      "phase_o_constraint_fingerprint": "d678fb947d0a1626fdcb8b2e9c1bfaff1e6c7db9775e6e7261aae725f73907dc",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "d678fb947d0a1626fdcb8b2e9c1bfaff1e6c7db9775e6e7261aae725f73907dc",
+      "sample_id": "stage7c_a4_fresh_english_005"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "eaecf8f315561bbe63805fe30be88430548aeb660d3f2f4bc49cff542cd5c8a3",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "eaecf8f315561bbe63805fe30be88430548aeb660d3f2f4bc49cff542cd5c8a3",
+      "phase_o_constraint_fingerprint": "2116fe77ed549249a500ef1563674f6f1122845926a14d5dab6cb4b7232302bf",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "2116fe77ed549249a500ef1563674f6f1122845926a14d5dab6cb4b7232302bf",
+      "sample_id": "stage7c_a4_fresh_english_006"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "65d3d0cddb071164389514862635f36b10b6e03251eca6287e74904b48a82798",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "65d3d0cddb071164389514862635f36b10b6e03251eca6287e74904b48a82798",
+      "phase_o_constraint_fingerprint": "56c3601f76e04547c6cf9ea3c18093afce41393c9e22bd5406fc86941a88fe46",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "56c3601f76e04547c6cf9ea3c18093afce41393c9e22bd5406fc86941a88fe46",
+      "sample_id": "stage7c_a4_fresh_english_007"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "eaecf8f315561bbe63805fe30be88430548aeb660d3f2f4bc49cff542cd5c8a3",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "eaecf8f315561bbe63805fe30be88430548aeb660d3f2f4bc49cff542cd5c8a3",
+      "phase_o_constraint_fingerprint": "8c74a4e98d7b3f7632092902d868e3e5621da9415b27583cfbf3e95e9f20bc66",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "8c74a4e98d7b3f7632092902d868e3e5621da9415b27583cfbf3e95e9f20bc66",
+      "sample_id": "stage7c_a4_fresh_english_008"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "89160615d587ee0bab3c06dd717c1270310ce483fdc517c9a5a2d2b2ee8ad3e5",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "89160615d587ee0bab3c06dd717c1270310ce483fdc517c9a5a2d2b2ee8ad3e5",
+      "phase_o_constraint_fingerprint": "f8a2d4d65837b21bc91bfcbd3f9592875a1fb0d370c9c79763035b0ad6d4d487",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "f8a2d4d65837b21bc91bfcbd3f9592875a1fb0d370c9c79763035b0ad6d4d487",
+      "sample_id": "stage7c_a4_fresh_english_009"
+    },
+    {
+      "label_side_data_used_for_constraints": false,
+      "phase_m_constraint_fingerprint": "65d3d0cddb071164389514862635f36b10b6e03251eca6287e74904b48a82798",
+      "phase_m_label_independent": true,
+      "phase_m_label_mutation_fingerprint": "65d3d0cddb071164389514862635f36b10b6e03251eca6287e74904b48a82798",
+      "phase_o_constraint_fingerprint": "b00eb6ad2d68bb3a50da84832a1449b690b20351a2e1d9920f2e2a366b9c463c",
+      "phase_o_label_independent": true,
+      "phase_o_label_mutation_fingerprint": "b00eb6ad2d68bb3a50da84832a1449b690b20351a2e1d9920f2e2a366b9c463c",
+      "sample_id": "stage7c_a4_fresh_english_010"
+    }
+  ],
+  "stage": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT",
+  "status": "PASS"
+}
