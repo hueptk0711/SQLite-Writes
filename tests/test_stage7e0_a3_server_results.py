@@ -13,7 +13,14 @@ if str(ROOT) not in sys.path:
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from scripts.data.import_stage7e0_a3_server_results import PACKAGE_NAME, SERVER_TAR_NAME, STAGE_NAME, import_server_results, package_reviewer
+from scripts.data.import_stage7e0_a3_server_results import (
+    PACKAGE_NAME,
+    SERVER_RESULT_CLASSIFICATION_NAME,
+    SERVER_TAR_NAME,
+    STAGE_NAME,
+    import_server_results,
+    package_reviewer,
+)
 from scripts.data.validate_stage7e0_a3_server_results import validate
 
 
@@ -21,22 +28,24 @@ def read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def test_imported_server_result_is_preserved_invalid_run_evidence(tmp_path: Path) -> None:
+def test_imported_server_result_is_preserved_as_constrained_primary_failure(tmp_path: Path) -> None:
     tar_path = ROOT / SERVER_TAR_NAME
     assert tar_path.is_file()
     stage_dir = tmp_path / STAGE_NAME
     report = import_server_results(stage_dir, tar_path)
-    assert report["result"]["backend"] == "hf"
+    assert report["result"]["backend"] == "constrained_hf"
     assert report["result"]["model_called"] is True
     assert report["result"]["gpu_called"] is True
-    assert report["result"]["primary_pass_count"] == "0/8"
+    assert report["result"]["primary_pass_count"] == "1/8"
     assert report["result"]["required_pass_count"] == "8/8"
     assert report["result"]["diagnostics_run"] is False
     assert report["result"]["gretel_pilot_opened"] is False
-    assert report["invalid_run_classification"]["evidence_integrity_status"] == "PASS"
-    assert report["invalid_run_classification"]["protocol_compliance_status"] == "FAIL"
-    assert report["invalid_run_classification"]["primary_gate_status"] == "INVALID_NOT_EVALUATED"
-    assert report["invalid_run_classification"]["scientific_result_eligible"] is False
+    assert report["source_validation_report"]["sha256"]
+    assert report["server_result_classification"]["evidence_integrity_status"] == "PASS"
+    assert report["server_result_classification"]["protocol_compliance_status"] == "PASS"
+    assert report["server_result_classification"]["primary_gate_status"] == "FAIL"
+    assert report["server_result_classification"]["scientific_result_eligible"] is True
+    assert read_json(stage_dir / SERVER_RESULT_CLASSIFICATION_NAME)["primary_gate_status"] == "FAIL"
 
 
 def test_server_result_validator_passes(tmp_path: Path) -> None:
@@ -46,9 +55,11 @@ def test_server_result_validator_passes(tmp_path: Path) -> None:
     validation = validate(stage_dir, tar_path)
     assert validation["status"] == "PASS", validation["failures"]
     lock = read_json(stage_dir / "STAGE7E0_A3_SERVER_RESULT_LOCK.json")
-    assert lock["status"] == "INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL"
-    assert lock["primary_gate_status"] == "INVALID_NOT_EVALUATED"
-    assert lock["scientific_result_eligible"] is False
+    assert lock["status"] == "REAL_CONSTRAINED_PRIMARY_FAIL_DO_NOT_OPEN_GRETEL"
+    assert lock["evidence_integrity_status"] == "PASS"
+    assert lock["protocol_compliance_status"] == "PASS"
+    assert lock["primary_gate_status"] == "FAIL"
+    assert lock["scientific_result_eligible"] is True
     assert lock["gretel_pilot_opened"] is False
 
 

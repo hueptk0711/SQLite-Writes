@@ -1,0 +1,23 @@
+{
+  "diagnostics_run": false,
+  "evidence_failures": [],
+  "evidence_integrity_status": "PASS",
+  "failure_stage_counts": {
+    "None": 1,
+    "acceptance_gate": 1,
+    "materialization_failure": 6
+  },
+  "failures": [],
+  "gpu_called": true,
+  "gretel_pilot_opened": false,
+  "model_called": true,
+  "primary_gate_status": "FAIL",
+  "primary_pass_count": "1/8",
+  "protocol_compliance_status": "PASS",
+  "protocol_failures": [],
+  "required_pass_count": "8/8",
+  "result_dir": "/home/uet/hue_ptk/stage7e0_a3_english_patch3_constrained_results_20260831",
+  "scientific_result_eligible": true,
+  "stage": "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT",
+  "status": "PASS"
+}

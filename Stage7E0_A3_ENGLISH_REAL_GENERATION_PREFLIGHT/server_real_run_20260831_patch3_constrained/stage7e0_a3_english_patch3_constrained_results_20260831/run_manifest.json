@@ -1,0 +1,64 @@
+{
+  "accepted_protocol_commit": "ca5aab5629a62a702f06dea7f9752702a8d2314f",
+  "git": {
+    "accepted_protocol_commit": "ca5aab5629a62a702f06dea7f9752702a8d2314f",
+    "execution_commit": null,
+    "git_available": false
+  },
+  "model": {
+    "accelerate_version": "1.14.0",
+    "automatic_repair": false,
+    "backend": "incremental_json_schema_grammar",
+    "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "cuda_available": true,
+    "fallback_to_unconstrained": false,
+    "finite_complete_object_enumeration": false,
+    "finite_known_answer_candidates": false,
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "label_side_data_used_for_constraints": false,
+    "model_called": true,
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "model_name_or_path": "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "quantization": "none",
+    "retry": 0,
+    "runtime_lock": {
+      "frozen_runtime_versions": {
+        "accelerate": "1.14.0",
+        "safetensors": "0.5.3",
+        "tokenizers": "0.22.2",
+        "torch": "2.6.0+cu124",
+        "transformers": "5.5.3"
+      },
+      "observed_runtime_versions": {
+        "accelerate": "1.14.0",
+        "safetensors": "0.5.3",
+        "tokenizers": "0.22.2",
+        "torch": "2.6.0+cu124",
+        "transformers": "5.5.3"
+      },
+      "status": "PASS"
+    },
+    "safetensors_version": "0.5.3",
+    "schema_enforcement_mode": "transformers_prefix_allowed_tokens_fn",
+    "token_level_enforcement": true,
+    "tokenizers_version": "0.22.2",
+    "torch_dtype": "auto",
+    "torch_version": "2.6.0+cu124",
+    "transformers_version": "5.5.3"
+  },
+  "phase_m_max_new_tokens": 8192,
+  "phase_m_prompt_spec_path": "stage7c_a1_v2_development_protocol/PHASE_M_PROMPT_SPEC.json",
+  "phase_o_max_new_tokens": 512,
+  "phase_o_prompt_spec_path": "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT/PHASE_O_PROMPT_SPEC_A3_ENGLISH.json",
+  "primary_case_count": 8,
+  "primary_first_diagnostics_forbidden_until_freeze": true,
+  "repair": "none",
+  "retry": 0,
+  "stage": "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT",
+  "stage7c_a3_inputs": {
+    "a3_prompt_spec_sha256": "84fece4a8bf64ace7c87fbc3d3425a568ea8ed920ae0461c4892007c2af4f200",
+    "stage7c_lock_sha256": "057b14925cc615d9563dd5c88313a7c91bb03df868a1f3eb9917d6a49f56d105"
+  },
+  "zero_shot": true
+}

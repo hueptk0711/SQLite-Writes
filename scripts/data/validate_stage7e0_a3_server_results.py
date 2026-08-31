@@ -25,8 +25,11 @@ if str(SRC_ROOT) not in sys.path:
 
 
 STAGE_NAME = "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT"
-SERVER_RUN_ID = "server_real_run_20260830_220327"
-RESULT_DIR_NAME = "stage7e0_a3_english_real_generation_preflight_results"
+SERVER_RUN_ID = "server_real_run_20260831_patch3_constrained"
+RESULT_DIR_NAME = "stage7e0_a3_english_patch3_constrained_results_20260831"
+LEGACY_RESULT_CANDIDATES = (
+    ("server_real_run_20260830_220327", "stage7e0_a3_english_real_generation_preflight_results"),
+)
 EXPECTED_PRIMARY_COUNT = 8
 EXPECTED_BACKEND = "incremental_json_schema_grammar"
 EXPECTED_SUMMARY_BACKEND = "constrained_hf"
@@ -243,7 +246,14 @@ def classify_result(result_dir: Path) -> dict[str, Any]:
 
 def validate(stage_dir: Path, tar_path: Path | None = None, result_dir: Path | None = None) -> dict[str, Any]:
     del tar_path
-    resolved_result_dir = result_dir or stage_dir / SERVER_RUN_ID / RESULT_DIR_NAME
+    if result_dir is not None:
+        resolved_result_dir = result_dir
+    else:
+        candidates = [(SERVER_RUN_ID, RESULT_DIR_NAME), *LEGACY_RESULT_CANDIDATES]
+        resolved_result_dir = next(
+            (stage_dir / run_id / result_name for run_id, result_name in candidates if (stage_dir / run_id / result_name).is_dir()),
+            stage_dir / SERVER_RUN_ID / RESULT_DIR_NAME,
+        )
     return classify_result(resolved_result_dir)
 
 

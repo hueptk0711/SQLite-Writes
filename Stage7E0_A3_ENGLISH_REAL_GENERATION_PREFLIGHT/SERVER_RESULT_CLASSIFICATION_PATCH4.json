@@ -1,0 +1,13 @@
+{
+  "backend": "constrained_hf",
+  "evidence_failures": [],
+  "evidence_integrity_status": "PASS",
+  "phase_m_max_new_tokens": 8192,
+  "phase_o_max_new_tokens": 512,
+  "primary_gate_status": "FAIL",
+  "protocol_backend": "incremental_json_schema_grammar",
+  "protocol_compliance_status": "PASS",
+  "protocol_failures": [],
+  "quantization": "none",
+  "scientific_result_eligible": true
+}

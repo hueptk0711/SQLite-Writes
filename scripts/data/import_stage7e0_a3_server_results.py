@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import shutil
+import sys
 import tarfile
 import zipfile
 from datetime import date, datetime, timezone
@@ -15,12 +16,22 @@ from typing import Any
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+SRC_ROOT = PROJECT_ROOT / "src"
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
+
+from scripts.data.validate_stage7e0_a3_server_results import classify_result
+
 STAGE_NAME = "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT"
-PATCH_NAME = "PATCH3"
-SERVER_RUN_ID = "server_real_run_20260830_220327"
+PATCH_NAME = "PATCH4"
+SERVER_RUN_ID = "server_real_run_20260831_patch3_constrained"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260831.zip"
-RESULT_DIR_NAME = "stage7e0_a3_english_real_generation_preflight_results"
-SERVER_TAR_NAME = "stage7e0_a3_english_real_generation_preflight_results_20260830_220327.tar.gz"
+RESULT_DIR_NAME = "stage7e0_a3_english_patch3_constrained_results_20260831"
+SERVER_TAR_NAME = "stage7e0_a3_english_patch3_constrained_results_20260831.tar.gz"
+SERVER_RESULT_CLASSIFICATION_NAME = "SERVER_RESULT_CLASSIFICATION_PATCH4.json"
+SERVER_RESULT_VALIDATION_REPORT_NAME = "VALIDATION_REPORT_PATCH4.md"
 
 
 def canonical_text(text: str) -> str:
@@ -70,23 +81,102 @@ def safe_extract_tar(tar_path: Path, dest: Path) -> None:
         archive.extractall(dest)
 
 
+def find_result_dir(result_root: Path) -> Path:
+    exact = result_root / RESULT_DIR_NAME
+    if exact.is_dir():
+        return exact
+    candidates = [
+        child
+        for child in result_root.iterdir()
+        if child.is_dir() and (child / "primary_summary.json").is_file()
+    ]
+    if len(candidates) == 1:
+        return candidates[0]
+    raise RuntimeError(f"Expected one Stage7E0-A3 result directory inside {result_root}")
+
+
+def status_from_classification(classification: dict[str, Any]) -> str:
+    if classification["evidence_integrity_status"] != "PASS":
+        return "REAL_CONSTRAINED_EVIDENCE_INTEGRITY_FAIL_DO_NOT_OPEN_GRETEL"
+    if classification["protocol_compliance_status"] != "PASS":
+        return "REAL_CONSTRAINED_PROTOCOL_FAIL_INVALID_NOT_EVALUATED_DO_NOT_OPEN_GRETEL"
+    if classification["primary_gate_status"] == "PASS":
+        return "REAL_CONSTRAINED_PRIMARY_PASS_GRETEL_PILOT_ELIGIBLE"
+    if classification["primary_gate_status"] == "FAIL":
+        return "REAL_CONSTRAINED_PRIMARY_FAIL_DO_NOT_OPEN_GRETEL"
+    return "REAL_CONSTRAINED_INVALID_NOT_EVALUATED_DO_NOT_OPEN_GRETEL"
+
+
+def decision_from_classification(classification: dict[str, Any]) -> str:
+    if classification["evidence_integrity_status"] != "PASS":
+        return "Server output is not accepted as evidence; do not open Gretel pilot."
+    if classification["protocol_compliance_status"] != "PASS":
+        return "Server output is preserved as protocol-invalid evidence; do not use it as a scientific A3 result."
+    if classification["primary_gate_status"] == "PASS":
+        return "Protocol-compliant constrained A3 output passed 8/8; Gretel pilot eligibility can be reviewed in the next stage."
+    return "Protocol-compliant constrained A3 output is a scientific primary failure; do not open Gretel pilot."
+
+
+def refresh_derived_manifest(stage_dir: Path, result_root: Path) -> None:
+    manifest_path = stage_dir / "DERIVED_ARTIFACT_MANIFEST.json"
+    if not manifest_path.is_file():
+        return
+    manifest = read_json(manifest_path)
+    rel_paths = {item["path"] for item in manifest.get("artifacts", [])}
+    rel_paths.update(
+        {
+            "SERVER_RESULT_FAILURE_ANALYSIS.md",
+            "SERVER_RESULT_IMPORT_REPORT.json",
+            "STAGE7E0_A3_SERVER_RESULT_LOCK.json",
+            SERVER_RESULT_CLASSIFICATION_NAME,
+            SERVER_RESULT_VALIDATION_REPORT_NAME,
+        }
+    )
+    rel_paths.update(
+        child.relative_to(stage_dir).as_posix()
+        for child in result_root.rglob("*")
+        if child.is_file()
+    )
+    artifacts = [
+        {
+            "path": rel,
+            "sha256": sha256_file(stage_dir / rel),
+            "bytes": (stage_dir / rel).stat().st_size,
+        }
+        for rel in sorted(rel_paths)
+        if (stage_dir / rel).is_file()
+    ]
+    manifest["patch"] = PATCH_NAME
+    manifest["artifact_count"] = len(artifacts)
+    manifest["artifacts"] = artifacts
+    manifest["combined_scientific_artifacts_sha256"] = sha256_text(canonical_json(artifacts))
+    write_json(manifest_path, manifest)
+
+    lock_path = stage_dir / "STAGE7E0_A3_LOCK.json"
+    if lock_path.is_file():
+        lock = read_json(lock_path)
+        lock["derived_artifact_manifest_sha256"] = sha256_file(manifest_path)
+        write_json(lock_path, lock)
+
+
 def import_server_results(stage_dir: Path, tar_path: Path) -> dict[str, Any]:
     result_root = stage_dir / SERVER_RUN_ID
     if result_root.exists():
         shutil.rmtree(result_root)
     safe_extract_tar(tar_path, result_root)
-    extracted = result_root / RESULT_DIR_NAME
-    if not extracted.is_dir():
-        raise RuntimeError(f"Expected {RESULT_DIR_NAME} inside {tar_path}")
+    extracted = find_result_dir(result_root)
     summary = read_json(extracted / "primary_summary.json")
+    manifest = read_json(extracted / "run_manifest.json")
     cases = read_jsonl(extracted / "primary_case_results.jsonl")
     raw_o = read_jsonl(extracted / "raw_phase_o_generations.jsonl")
     raw_m = read_jsonl(extracted / "raw_phase_m_generations.jsonl")
+    classification = classify_result(extracted)
     failures = [row for row in cases if row.get("status") != "PASS"]
     failure_counts: dict[str, int] = {}
     for row in failures:
         stage = str(row.get("failure_stage"))
         failure_counts[stage] = failure_counts.get(stage, 0) + 1
+    validation_json = result_root / f"{extracted.name}_validation.json"
     report = {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
@@ -103,6 +193,10 @@ def import_server_results(stage_dir: Path, tar_path: Path) -> dict[str, Any]:
             "raw_phase_m_generations.jsonl": sha256_file(extracted / "raw_phase_m_generations.jsonl"),
             "run_manifest.json": sha256_file(extracted / "run_manifest.json"),
         },
+        "source_validation_report": {
+            "path": validation_json.name if validation_json.is_file() else None,
+            "sha256": sha256_file(validation_json) if validation_json.is_file() else None,
+        },
         "result": {
             "status": summary.get("status"),
             "primary_pass_count": summary.get("primary_pass_count"),
@@ -118,30 +212,29 @@ def import_server_results(stage_dir: Path, tar_path: Path) -> dict[str, Any]:
             "failure_count": len(failures),
             "failure_stage_counts": failure_counts,
         },
-        "invalid_run_classification": {
-            "invalid_run_id": "001",
-            "reason": "backend_protocol_violation",
-            "evidence_integrity_status": "PASS",
-            "protocol_compliance_status": "FAIL",
-            "primary_gate_status": "INVALID_NOT_EVALUATED",
-            "scientific_result_eligible": False,
-            "actual_backend": "plain_hf_unconstrained",
-            "reported_backend": summary.get("backend"),
-            "required_backend": "patch9_incremental_json_schema_grammar",
-            "actual_quantization": read_json(extracted / "run_manifest.json").get("model", {}).get("quantization"),
-            "required_quantization": "none",
-            "actual_phase_m_max_new_tokens": read_json(extracted / "run_manifest.json").get("phase_m_max_new_tokens"),
-            "required_phase_m_max_new_tokens": 8192,
+        "server_result_classification": {
+            "evidence_integrity_status": classification["evidence_integrity_status"],
+            "protocol_compliance_status": classification["protocol_compliance_status"],
+            "primary_gate_status": classification["primary_gate_status"],
+            "scientific_result_eligible": classification["scientific_result_eligible"],
+            "evidence_failures": classification["evidence_failures"],
+            "protocol_failures": classification["protocol_failures"],
+            "backend": summary.get("backend"),
+            "protocol_backend": summary.get("protocol_backend"),
+            "quantization": manifest.get("model", {}).get("quantization"),
+            "phase_o_max_new_tokens": manifest.get("phase_o_max_new_tokens"),
+            "phase_m_max_new_tokens": manifest.get("phase_m_max_new_tokens"),
         },
     }
     write_json(stage_dir / "SERVER_RESULT_IMPORT_REPORT.json", report)
-    write_json(stage_dir / "INVALID_RUN_001_CLASSIFICATION.json", report["invalid_run_classification"])
+    write_json(stage_dir / SERVER_RESULT_CLASSIFICATION_NAME, report["server_result_classification"])
     write_text(stage_dir / "SERVER_RESULT_FAILURE_ANALYSIS.md", failure_analysis(report, cases, raw_o, raw_m))
-    write_text(stage_dir / "VALIDATION_REPORT_PATCH1.md", validation_report(report))
+    write_text(stage_dir / SERVER_RESULT_VALIDATION_REPORT_NAME, validation_report(report))
+    status = status_from_classification(classification)
     lock = {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
-        "status": "INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL",
+        "status": status,
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "server_run_id": SERVER_RUN_ID,
         "server_result_import_report_sha256": sha256_file(stage_dir / "SERVER_RESULT_IMPORT_REPORT.json"),
@@ -152,13 +245,14 @@ def import_server_results(stage_dir: Path, tar_path: Path) -> dict[str, Any]:
         "gpu_called": True,
         "diagnostics_run": False,
         "gretel_pilot_opened": False,
-        "evidence_integrity_status": "PASS",
-        "protocol_compliance_status": "FAIL",
-        "primary_gate_status": "INVALID_NOT_EVALUATED",
-        "scientific_result_eligible": False,
-        "decision": "Prior plain-HF output is preserved as invalid-run evidence; do not use it as a scientific A3 failure result.",
+        "evidence_integrity_status": classification["evidence_integrity_status"],
+        "protocol_compliance_status": classification["protocol_compliance_status"],
+        "primary_gate_status": classification["primary_gate_status"],
+        "scientific_result_eligible": classification["scientific_result_eligible"],
+        "decision": decision_from_classification(classification),
     }
     write_json(stage_dir / "STAGE7E0_A3_SERVER_RESULT_LOCK.json", lock)
+    refresh_derived_manifest(stage_dir, result_root)
     return report
 
 
@@ -168,25 +262,27 @@ def failure_analysis(report: dict[str, Any], cases: list[dict[str, Any]], raw_o:
     lines = [
         "# Stage7E0-A3 English Real Server Result Failure Analysis",
         "",
-        "Status: INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL",
+        f"Status: {status_from_classification(report['server_result_classification'])}",
         "",
-        "The prior Qwen GPU output is preserved as evidence, but it used plain",
-        "unconstrained HF generation and is therefore not a scientific A3 primary",
-        "result. Diagnostics and the Gretel development-train pilot remain unopened.",
+        "The Qwen GPU output is preserved as server evidence. The PATCH3",
+        "constrained run satisfies evidence and protocol checks, but the primary",
+        "gate did not reach the required 8/8 pass count. Diagnostics and the",
+        "Gretel development-train pilot remain unopened.",
         "",
         "```text",
         f"backend={report['result']['backend']}",
         f"primary_pass_count={report['result']['primary_pass_count']}",
         f"required_pass_count={report['result']['required_pass_count']}",
-        "protocol_compliance_status=FAIL",
-        "primary_gate_status=INVALID_NOT_EVALUATED",
-        "scientific_result_eligible=false",
+        f"evidence_integrity_status={report['server_result_classification']['evidence_integrity_status']}",
+        f"protocol_compliance_status={report['server_result_classification']['protocol_compliance_status']}",
+        f"primary_gate_status={report['server_result_classification']['primary_gate_status']}",
+        f"scientific_result_eligible={str(report['server_result_classification']['scientific_result_eligible']).lower()}",
         f"phase_o_raw_rows={report['result']['phase_o_raw_rows']}",
         f"phase_m_raw_rows={report['result']['phase_m_raw_rows']}",
         f"failure_stage_counts={report['result']['failure_stage_counts']}",
         "```",
         "",
-        "## Invalid-Run Case Evidence",
+        "## Primary-Failure Case Evidence",
         "",
     ]
     for row in cases:
@@ -220,9 +316,12 @@ def failure_analysis(report: dict[str, Any], cases: list[dict[str, Any]], raw_o:
 
 
 def validation_report(report: dict[str, Any]) -> str:
-    return f"""# Stage7E0-A3 English PATCH3 Server Result Validation Report
+    classification = report["server_result_classification"]
+    status = status_from_classification(classification)
+    decision = decision_from_classification(classification)
+    return f"""# Stage7E0-A3 English PATCH4 Server Result Validation Report
 
-Status: INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL
+Status: {status}
 
 Validation date: {date.today().isoformat()}
 
@@ -236,15 +335,17 @@ model_called={str(report["result"]["model_called"]).lower()}
 gpu_called={str(report["result"]["gpu_called"]).lower()}
 primary_pass_count={report["result"]["primary_pass_count"]}
 required_pass_count={report["result"]["required_pass_count"]}
+evidence_integrity_status={classification["evidence_integrity_status"]}
+protocol_compliance_status={classification["protocol_compliance_status"]}
+primary_gate_status={classification["primary_gate_status"]}
+scientific_result_eligible={str(classification["scientific_result_eligible"]).lower()}
 diagnostics_run={str(report["result"]["diagnostics_run"]).lower()}
 gretel_pilot_opened={str(report["result"]["gretel_pilot_opened"]).lower()}
 ```
 
 ## Decision
 
-The prior server output has evidence integrity, but it used plain unconstrained
-HF generation. Its primary gate is invalid/not evaluated, and the Gretel
-development-train pilot must remain closed.
+{decision}
 """
 
 
@@ -255,15 +356,24 @@ def include_paths(stage_dir: Path, tar_path: Path) -> list[Path]:
         "scripts/server/run_stage7e0_a3_english.py",
         "scripts/server/run_stage7e0_v2_a1_preflight.py",
         "scripts/data/build_stage7e0_a3_english_preflight.py",
+        "scripts/data/build_stage7c_a3_english_offset_semantics.py",
         "scripts/data/validate_stage7e0_a3_english_preflight.py",
         "scripts/data/import_stage7e0_a3_server_results.py",
         "scripts/data/validate_stage7e0_a3_server_results.py",
+        "scripts/data/validate_stage7c_a3_english_offset_semantics.py",
         "tests/test_stage7e0_a3_english_preflight.py",
         "tests/test_stage7e0_a3_server_results.py",
+        "tests/test_stage7e0_a3_patch2_constrained_backend.py",
+        "tests/test_stage7e0_a3_patch3_protocol_hardening.py",
+        "tests/test_stage7c_a3_english_offset_semantics.py",
         "tests/support/windows_py314_pytest_tempdir/sitecustomize.py",
         "tests/support/stage7c_pytest_clean_root/conftest.py",
         "src/nldbwrite_v3/v2_a1",
         "src/nldbwrite_v3/inference/parse_output.py",
+        "stage7b_v2_method_specification",
+        "stage7b_a1_free_text_slot_discovery_amendment",
+        "stage7c_a1_v2_development_protocol",
+        "stage7c_a2_phase_o_prompt_feasibility_amendment",
         "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT",
     ]
     paths = [path for path in stage_dir.rglob("*") if path.is_file()]
@@ -314,11 +424,15 @@ def main() -> None:
     summary = {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
-        "status": "INVALID_RUN_001_BACKEND_PROTOCOL_VIOLATION_DO_NOT_OPEN_GRETEL",
+        "status": status_from_classification(report["server_result_classification"]),
         "primary_pass_count": report["result"]["primary_pass_count"],
         "model_called": True,
         "gpu_called": True,
         "gretel_pilot_opened": False,
+        "evidence_integrity_status": report["server_result_classification"]["evidence_integrity_status"],
+        "protocol_compliance_status": report["server_result_classification"]["protocol_compliance_status"],
+        "primary_gate_status": report["server_result_classification"]["primary_gate_status"],
+        "scientific_result_eligible": report["server_result_classification"]["scientific_result_eligible"],
         "package": str(args.package),
         "package_sha256": digest,
     }

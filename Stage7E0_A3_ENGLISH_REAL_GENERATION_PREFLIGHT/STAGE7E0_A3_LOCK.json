@@ -2,7 +2,7 @@
   "backend": "incremental_json_schema_grammar",
   "constraint_independence_audit_sha256": "9833f9d1228b6f92c1b1ce07e350c4227e3c9b3f7abd711ceefe8f44b00a364d",
   "created_utc": "2026-08-31T03:02:32.521813+00:00",
-  "derived_artifact_manifest_sha256": "4ad6831dd5af79c2250fb3a6ddb1b17f80d5a43b1cbc734ba6eb987584c9e38c",
+  "derived_artifact_manifest_sha256": "7f5184dc36faa3a359ea7eecc9863b246492e8978249230c38077928eaf51ec1",
   "fallback_to_unconstrained": false,
   "fresh_constrained_result_root": "/home/uet/hue_ptk/stage7e0_a3_english_patch3_constrained_results_20260831",
   "frozen_runtime_versions": {

@@ -1,35 +1,52 @@
 {
-  "patch": "PATCH1",
+  "patch": "PATCH4",
   "result": {
-    "backend": "hf",
+    "backend": "constrained_hf",
     "case_rows": 8,
     "diagnostics_run": false,
-    "failure_count": 8,
+    "failure_count": 7,
     "failure_stage_counts": {
-      "phase_m_schema_failure": 5,
-      "phase_o_schema_failure": 3
+      "acceptance_gate": 1,
+      "materialization_failure": 6
     },
     "gpu_called": true,
     "gretel_pilot_opened": false,
     "model_called": true,
-    "phase_m_raw_rows": 5,
+    "phase_m_raw_rows": 8,
     "phase_o_raw_rows": 8,
-    "primary_pass_count": "0/8",
+    "primary_pass_count": "1/8",
     "required_pass_count": "8/8",
     "status": "FAIL"
   },
-  "server_result_files": {
-    "primary_case_results.jsonl": "b13b4ad9f613d6bfe886b9d235b586a1e76ee8c527f22217d0296f283f646ce9",
-    "primary_summary.json": "4ffc4fa5e50872ec8b074b943c755b25a01294530c74c04399d15de1c36e218f",
-    "raw_phase_m_generations.jsonl": "3e0724d430d6212685135fa369f7549aea16cb579cb97487338e6984646b54b6",
-    "raw_phase_o_generations.jsonl": "cfc8f185f5a0e4c71b0e7578a5ba11b45bb527247de06e1efdf2f86822c4a152",
-    "run_manifest.json": "ea15abbb0ee40d9bd74309a1b8dcda30b18f48b37d3d5aacd6cae1ed5c4f480e"
+  "server_result_classification": {
+    "backend": "constrained_hf",
+    "evidence_failures": [],
+    "evidence_integrity_status": "PASS",
+    "phase_m_max_new_tokens": 8192,
+    "phase_o_max_new_tokens": 512,
+    "primary_gate_status": "FAIL",
+    "protocol_backend": "incremental_json_schema_grammar",
+    "protocol_compliance_status": "PASS",
+    "protocol_failures": [],
+    "quantization": "none",
+    "scientific_result_eligible": true
   },
-  "server_run_id": "server_real_run_20260830_220327",
+  "server_result_files": {
+    "primary_case_results.jsonl": "0a759806cf417c3727a92ef4212a24d7b3dae04288694fb6572eefaed3ae3040",
+    "primary_summary.json": "b548da32a9cf92948e4561b863c83765683f86a5ea950dfb20582a320718bea9",
+    "raw_phase_m_generations.jsonl": "e80c6ce134c5b3fdec75b1f6a7cf2f04e9225ecf4123a8e7da361d53b328c420",
+    "raw_phase_o_generations.jsonl": "35488ff2619caa606d386ec6b35ed553f768d5571529738ff032b63d5ae5480f",
+    "run_manifest.json": "4cf166f5a6cebf85b591ab15ab47561a5fc1519d27fe5b01cdd4e06914c3e89a"
+  },
+  "server_run_id": "server_real_run_20260831_patch3_constrained",
   "source_tar": {
-    "bytes": 3279,
-    "path": "stage7e0_a3_english_real_generation_preflight_results_20260830_220327.tar.gz",
-    "sha256": "1ccd988d445b3ecdc2b941b4d37808a2c9a307f909ed9d39158aaa76e676b5d8"
+    "bytes": 5536,
+    "path": "stage7e0_a3_english_patch3_constrained_results_20260831.tar.gz",
+    "sha256": "4dd9a197f018558fedd86d2846ae5ca80a8652c2e8717569f530dc699a1c58a2"
+  },
+  "source_validation_report": {
+    "path": "stage7e0_a3_english_patch3_constrained_results_20260831_validation.json",
+    "sha256": "6eb2d0575ea25999527553356019065d21df8fa41225e2a017fada9336d74492"
   },
   "stage": "Stage7E0_A3_ENGLISH_REAL_GENERATION_PREFLIGHT"
 }
