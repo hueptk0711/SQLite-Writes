@@ -161,6 +161,9 @@ def validate(stage_dir: Path) -> dict[str, Any]:
             failures.append(f"generation_contract_{key}_drifted")
     if "do not pass --resume" not in generation.get("interrupted_run_policy", ""):
         failures.append("interrupted_run_policy_must_forbid_resume")
+    completed_failure_policy = generation.get("completed_scientific_primary_failure_policy", "")
+    if not all(needle in completed_failure_policy for needle in ("exits 0", "validate", "archive", "hash")):
+        failures.append("completed_scientific_primary_failure_policy_must_preserve_result")
 
     if policy.get("required_pass_count") != "12/12":
         failures.append("primary_acceptance_must_require_12_of_12")
@@ -256,16 +259,22 @@ def validate(stage_dir: Path) -> dict[str, Any]:
         failures.append("stage_lock_constraint_independence_hash_mismatch")
 
     commands = (stage_dir / "SERVER_RUN_COMMANDS.md").read_text(encoding="utf-8")
-    for needle in ("Kaggle", KAGGLE_REQUIREMENTS_LOCK, "preflight_runtime_stage7e0_a5.py", PRIMARY_RUNTIME_PROFILE_ID, "run_stage7e0_a5_english.py", "--backend constrained_hf", "--quantization none", "--phase-o-max-new-tokens 512", PRIMARY_RESULT_DIR_NAME, "Do not use `--resume`"):
+    for needle in ("Kaggle", KAGGLE_REQUIREMENTS_LOCK, "preflight_runtime_stage7e0_a5.py", PRIMARY_RUNTIME_PROFILE_ID, "run_stage7e0_a5_english.py", "--backend constrained_hf", "--quantization none", "--phase-o-max-new-tokens 512", PRIMARY_RESULT_DIR_NAME, "Do not use `--resume`", "less than 12/12", "validate", "archive", "sha256"):
         if needle not in commands:
             failures.append(f"server_command_missing:{needle}")
     primary_pos = commands.find(PRIMARY_RESULT_DIR_NAME)
     if primary_pos < 0:
         failures.append("server_commands_missing_primary_result_root")
+    run_pos = commands.find("python scripts/server/run_stage7e0_a5_english.py")
+    validate_pos = commands.find("python scripts/data/validate_stage7e0_a5_server_results.py")
+    tar_pos = commands.find("tar -czf")
+    sha_pos = commands.find("sha256sum")
+    if not (0 <= run_pos < validate_pos < tar_pos < sha_pos):
+        failures.append("server_commands_must_run_validate_archive_hash_after_primary_runner")
     if "--run-diagnostics-after-primary-pass" in commands:
         failures.append("server_commands_must_not_include_diagnostic_run_in_primary_preflight")
     commands_lower = commands.lower()
-    if not all(needle in commands_lower for needle in ("diagnostics are", "not part of this primary preflight command", "frozen and reviewed")):
+    if not all(needle in commands_lower for needle in ("diagnostics", "not part of this primary preflight", "frozen and reviewed", "12/12")):
         failures.append("server_commands_must_defer_diagnostics_until_primary_review")
 
     manifest = read_json(stage_dir / "DERIVED_ARTIFACT_MANIFEST.json")

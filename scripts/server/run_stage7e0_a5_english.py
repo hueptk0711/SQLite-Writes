@@ -697,7 +697,7 @@ def run_stage7e0(args: argparse.Namespace) -> dict[str, Any]:
         summary["diagnostic_case_results_sha256"] = sha256_file(result_root / "diagnostic_case_results.jsonl")
     write_json(result_root / "primary_summary.json", summary)
     if backend == "constrained_hf" and summary["status"] != "PASS":
-        raise SystemExit("STOP: Stage7E0-A5 primary failed; do not open Gretel pilot")
+        print("Stage7E0-A5 primary gate failed; Gretel and diagnostics remain closed.", file=sys.stderr)
     return summary
 
 

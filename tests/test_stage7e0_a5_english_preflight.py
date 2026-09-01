@@ -4,10 +4,12 @@ import json
 import os
 import subprocess
 import sys
+import tarfile
 import zipfile
 from pathlib import Path
 
 import pytest
+import scripts.server.run_stage7e0_a5_english as stage7e0_runner
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -435,6 +437,60 @@ def _write_server_result(result_dir: Path, *, protocol_valid: bool, pass_count: 
     )
 
 
+def _run_fake_constrained_primary(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, pass_count: int) -> tuple[Path, dict]:
+    rows = load_stage7c_a5_rows(ROOT)
+    overrides = {row["sample_id"]: _wrong_phase_o(row) for index, row in enumerate(rows, start=1) if index > pass_count}
+
+    class FakeConstrainedGenerator:
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
+
+        def generate(self, *, sample_id: str, messages: list[dict[str, str]], max_new_tokens: int, row: dict) -> CallResult:
+            del messages, max_new_tokens
+            phase_o = overrides.get(sample_id, row["label_side_expected"]["phase_o"])
+            raw = canonical_json(phase_o)
+            return CallResult(
+                sample_id=sample_id,
+                phase="phase_o",
+                raw_output=raw,
+                input_tokens=1024,
+                output_tokens=max(1, len(raw.split())),
+                latency_sec=0.01,
+                generation_metadata=_constrained_raw_metadata(row, protocol_valid=True),
+            )
+
+        def metadata(self) -> dict:
+            return _server_model_metadata(protocol_valid=True)
+
+    monkeypatch.setattr(stage7e0_runner, "ConstrainedTransformersChatGenerator", FakeConstrainedGenerator)
+    result_dir = tmp_path / f"fake_constrained_{pass_count}"
+    args = type(
+        "Args",
+        (),
+        {
+            "accepted_protocol_commit": accepted_commit_for_tests(),
+            "result_root": str(result_dir),
+            "backend": "constrained_hf",
+            "model_name_or_path": MODEL_ID,
+            "quantization": "none",
+            "phase_o_max_new_tokens": 512,
+            "max_input_tokens": 28672,
+            "seed": 42,
+            "trust_remote_code": False,
+            "resume": False,
+            "run_diagnostics_after_primary_pass": False,
+            "skip_git_assertions": True,
+            "allow_result_root_inside_git": True,
+        },
+    )()
+    return result_dir, run_stage7e0(args)
+
+
+def _archive_result_dir(result_dir: Path, archive_path: Path) -> None:
+    with tarfile.open(archive_path, "w:gz") as archive:
+        archive.add(result_dir, arcname=result_dir.name)
+
+
 def test_protocol_invalid_server_result_returns_fail(tmp_path: Path) -> None:
     result_dir = tmp_path / "invalid_result"
     _write_server_result(result_dir, protocol_valid=False, pass_count=12)
@@ -461,6 +517,34 @@ def test_valid_12_of_12_server_result_passes(tmp_path: Path) -> None:
     assert report["protocol_compliance_status"] == "PASS"
     assert report["primary_gate_status"] == "PASS"
     assert report["status"] == "PASS"
+
+
+def test_completed_constrained_primary_12_of_12_validates_and_archives(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    result_dir, summary = _run_fake_constrained_primary(tmp_path, monkeypatch, pass_count=12)
+    assert summary["status"] == "PASS"
+    report = validate_server_result(result_dir)
+    assert report["protocol_compliance_status"] == "PASS"
+    assert report["primary_gate_status"] == "PASS"
+    archive_path = tmp_path / "primary_12_of_12.tar.gz"
+    _archive_result_dir(result_dir, archive_path)
+    assert archive_path.is_file()
+    assert archive_path.stat().st_size > 0
+
+
+def test_completed_constrained_primary_11_of_12_still_validates_and_archives(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    result_dir, summary = _run_fake_constrained_primary(tmp_path, monkeypatch, pass_count=11)
+    assert summary["status"] == "FAIL"
+    assert summary["primary_pass_count"] == "11/12"
+    assert summary["gretel_pilot_opened"] is False
+    report = validate_server_result(result_dir)
+    assert report["evidence_integrity_status"] == "PASS"
+    assert report["protocol_compliance_status"] == "PASS"
+    assert report["primary_gate_status"] == "FAIL"
+    assert report["scientific_result_eligible"] is True
+    archive_path = tmp_path / "primary_11_of_12.tar.gz"
+    _archive_result_dir(result_dir, archive_path)
+    assert archive_path.is_file()
+    assert archive_path.stat().st_size > 0
 
 
 def test_server_result_validator_rejects_fake_case_ids(tmp_path: Path) -> None:

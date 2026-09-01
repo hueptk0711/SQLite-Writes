@@ -49,7 +49,7 @@ from scripts.data.build_stage7c_a5_column_conditioned_phase_o_protocol import ca
 
 
 STAGE_NAME = "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT"
-PATCH_NAME = "PATCH1"
+PATCH_NAME = "PATCH2"
 PACKAGE_DATE = "20260901"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
 PRIMARY_RESULT_DIR_NAME = "stage7e0_a5_english_column_conditioned_kaggle_t4x2_primary_results_20260901"
@@ -170,6 +170,7 @@ def runner_protocol(accepted_commit: str) -> dict[str, Any]:
             "automatic_repair": False,
             "resume_allowed": False,
             "interrupted_run_policy": "archive partial output as ABORTED_INFRASTRUCTURE and start a new empty result-root; do not pass --resume",
+            "completed_scientific_primary_failure_policy": "runner exits 0 after writing complete evidence; validate, archive, and hash the result before review",
             "phase_o_max_new_tokens": PHASE_O_MAX_NEW_TOKENS,
             "runner_file": "scripts/server/run_stage7e0_a5_english.py",
             "runtime_preflight_file": "scripts/server/preflight_runtime_stage7e0_a5.py",
@@ -192,7 +193,8 @@ def server_commands(accepted_commit: str) -> str:
     return f"""# Stage7E0-A5 English Column-Conditioned Kaggle T4x2 Commands
 
 Run the primary set first. Do not run diagnostics before the primary result is
-frozen and reviewed.
+frozen and reviewed. A completed primary result is preserved whether it is
+12/12 PASS or a protocol-compliant scientific FAIL below 12/12.
 
 ```bash
 %%bash
@@ -222,9 +224,12 @@ sha256sum /kaggle/working/{PRIMARY_RESULT_DIR_NAME}.tar.gz > /kaggle/working/{PR
 ```
 
 Do not use `--resume`. If infrastructure interrupts, archive the partial output
-as infrastructure-aborted and rerun in a new empty result root. Diagnostics are
-not part of this primary preflight command; run them only after the primary
-result is frozen and reviewed as 12/12 PASS.
+as infrastructure-aborted and rerun in a new empty result root. If the primary
+run completes with less than 12/12, keep running the validator, archive, and
+sha256 commands above; that is a completed scientific result, not an
+infrastructure failure. Diagnostics are not part of this primary preflight
+command; run them only after the primary result is frozen and reviewed as 12/12
+PASS.
 """
 
 

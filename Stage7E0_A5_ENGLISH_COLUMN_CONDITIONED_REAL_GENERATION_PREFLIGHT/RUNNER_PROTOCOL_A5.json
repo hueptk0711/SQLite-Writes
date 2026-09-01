@@ -12,6 +12,7 @@
     "automatic_repair": false,
     "backend": "incremental_json_schema_grammar",
     "calls_per_primary_case": 1,
+    "completed_scientific_primary_failure_policy": "runner exits 0 after writing complete evidence; validate, archive, and hash the result before review",
     "diagnostic_cases": "12 Stage7C-A5 A4-derived diagnostics only after primary 12/12",
     "examples": [],
     "fallback_to_unconstrained": false,
@@ -138,7 +139,7 @@
     "quantization_default": "none",
     "torch_dtype": "auto"
   },
-  "patch": "PATCH1",
+  "patch": "PATCH2",
   "prompt_contract": {
     "column_span_refs_mapping_equality": "order_insensitive_by_object_key",
     "duplicate_non_omit_span_reuse": "method_failure",
