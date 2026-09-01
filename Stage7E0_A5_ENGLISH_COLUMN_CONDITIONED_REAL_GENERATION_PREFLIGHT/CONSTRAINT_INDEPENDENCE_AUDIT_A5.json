@@ -1,0 +1,94 @@
+{
+  "backend": "incremental_json_schema_grammar",
+  "case_count": 12,
+  "label_side_data_used_for_constraints": false,
+  "patch": "PATCH0",
+  "rows": [
+    {
+      "constraint_fingerprint": "6660445608b78b4040bcbe18be401b6b9d73cd7f2c35a1fd27d125a475aeff25",
+      "label_independent": true,
+      "label_mutation_fingerprint": "6660445608b78b4040bcbe18be401b6b9d73cd7f2c35a1fd27d125a475aeff25",
+      "label_side_data_used_for_constraints": false,
+      "sample_id": "stage7c_a5_primary_english_001"
+    },
+    {
+      "constraint_fingerprint": "cf3a57a39d8729024cbb9f7bc0149962c427843d429ef02c885096a385fa9f3b",
+      "label_independent": true,
+      "label_mutation_fingerprint": "cf3a57a39d8729024cbb9f7bc0149962c427843d429ef02c885096a385fa9f3b",
+      "label_side_data_used_for_constraints": false,
+      "sample_id": "stage7c_a5_primary_english_002"
+    },
+    {
+      "constraint_fingerprint": "fc63fb2116cc95037931eb45ef7dd2259e07433d2ebf77396c31dec158080638",
+      "label_independent": true,
+      "label_mutation_fingerprint": "fc63fb2116cc95037931eb45ef7dd2259e07433d2ebf77396c31dec158080638",
+      "label_side_data_used_for_constraints": false,
+      "sample_id": "stage7c_a5_primary_english_003"
+    },
+    {
+      "constraint_fingerprint": "fe033ac7a715456b28b783deb8a485dc66ed1ea341e99758b5f7c147855d98c8",
+      "label_independent": true,
+      "label_mutation_fingerprint": "fe033ac7a715456b28b783deb8a485dc66ed1ea341e99758b5f7c147855d98c8",
+      "label_side_data_used_for_constraints": false,
+      "sample_id": "stage7c_a5_primary_english_004"
+    },
+    {
+      "constraint_fingerprint": "5c8fbfa1aafaec57f4cd133fb8dd8e549c765188f95612fa7d168ddcdabb5417",
+      "label_independent": true,
+      "label_mutation_fingerprint": "5c8fbfa1aafaec57f4cd133fb8dd8e549c765188f95612fa7d168ddcdabb5417",
+      "label_side_data_used_for_constraints": false,
+      "sample_id": "stage7c_a5_primary_english_005"
+    },
+    {
+      "constraint_fingerprint": "8c5e02a6bd4c8ea62797647f40401cd5de2e1ac93046fc49aee9744a65564219",
+      "label_independent": true,
+      "label_mutation_fingerprint": "8c5e02a6bd4c8ea62797647f40401cd5de2e1ac93046fc49aee9744a65564219",
+      "label_side_data_used_for_constraints": false,
+      "sample_id": "stage7c_a5_primary_english_006"
+    },
+    {
+      "constraint_fingerprint": "fc63fb2116cc95037931eb45ef7dd2259e07433d2ebf77396c31dec158080638",
+      "label_independent": true,
+      "label_mutation_fingerprint": "fc63fb2116cc95037931eb45ef7dd2259e07433d2ebf77396c31dec158080638",
+      "label_side_data_used_for_constraints": false,
+      "sample_id": "stage7c_a5_primary_english_007"
+    },
+    {
+      "constraint_fingerprint": "96f0ced833401c9c0c415f352b80e57de2621d762e954490e9f025fb9f06206f",
+      "label_independent": true,
+      "label_mutation_fingerprint": "96f0ced833401c9c0c415f352b80e57de2621d762e954490e9f025fb9f06206f",
+      "label_side_data_used_for_constraints": false,
+      "sample_id": "stage7c_a5_primary_english_008"
+    },
+    {
+      "constraint_fingerprint": "e6deecb7e61086d7cb5759f31c718ddb963708841c24e6f1916e09f2f2f298f7",
+      "label_independent": true,
+      "label_mutation_fingerprint": "e6deecb7e61086d7cb5759f31c718ddb963708841c24e6f1916e09f2f2f298f7",
+      "label_side_data_used_for_constraints": false,
+      "sample_id": "stage7c_a5_primary_english_009"
+    },
+    {
+      "constraint_fingerprint": "2c6b4b92b02a0b30f0bcc23aed304f31f3c1147934f8a912dee953527f794027",
+      "label_independent": true,
+      "label_mutation_fingerprint": "2c6b4b92b02a0b30f0bcc23aed304f31f3c1147934f8a912dee953527f794027",
+      "label_side_data_used_for_constraints": false,
+      "sample_id": "stage7c_a5_primary_english_010"
+    },
+    {
+      "constraint_fingerprint": "080af286e91816eea46cd2a511fe45205cc454fd65c8ed91527684146f11bd6f",
+      "label_independent": true,
+      "label_mutation_fingerprint": "080af286e91816eea46cd2a511fe45205cc454fd65c8ed91527684146f11bd6f",
+      "label_side_data_used_for_constraints": false,
+      "sample_id": "stage7c_a5_primary_english_011"
+    },
+    {
+      "constraint_fingerprint": "ce31ef0dc16cca31093d8feab485824d17111f59d08c809e316a89c8a74a6cc3",
+      "label_independent": true,
+      "label_mutation_fingerprint": "ce31ef0dc16cca31093d8feab485824d17111f59d08c809e316a89c8a74a6cc3",
+      "label_side_data_used_for_constraints": false,
+      "sample_id": "stage7c_a5_primary_english_012"
+    }
+  ],
+  "stage": "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT",
+  "status": "PASS"
+}

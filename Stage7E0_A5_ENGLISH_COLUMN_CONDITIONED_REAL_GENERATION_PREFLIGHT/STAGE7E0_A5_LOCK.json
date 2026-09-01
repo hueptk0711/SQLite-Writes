@@ -1,0 +1,135 @@
+{
+  "allowed_frozen_runtime_profiles": [
+    {
+      "gpu_requirement": "cuda_available=true",
+      "packages": {
+        "accelerate": [
+          "1.14.0"
+        ],
+        "safetensors": [
+          "0.5.3"
+        ],
+        "tokenizers": [
+          "0.22.2"
+        ],
+        "torch": [
+          "2.6.0+cu124"
+        ],
+        "transformers": [
+          "5.5.3"
+        ]
+      },
+      "profile_id": "uet_server_cuda124",
+      "role": "historical_reference_only",
+      "torch_cuda": "12.4"
+    },
+    {
+      "cuda_available": true,
+      "gpu_count": 2,
+      "gpu_device_substring": "Tesla T4",
+      "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
+      "packages": {
+        "accelerate": [
+          "1.14.0"
+        ],
+        "safetensors": [
+          "0.5.3"
+        ],
+        "tokenizers": [
+          "0.22.2"
+        ],
+        "torch": [
+          "2.13.0",
+          "2.13.0+cu130"
+        ],
+        "transformers": [
+          "5.5.3"
+        ]
+      },
+      "profile_id": "kaggle_t4x2_cuda130",
+      "role": "primary_scientific_runtime",
+      "torch_cuda": "13.0"
+    }
+  ],
+  "backend": "incremental_json_schema_grammar",
+  "calls_per_primary_case": 1,
+  "constraint_independence_audit_sha256": "c11b0181567f32e5f2cf243ac7225d2bada3500fcb10aeb1eaf2165e9bf47a1a",
+  "created_utc": "2026-09-01T13:30:38.621047+00:00",
+  "derived_artifact_manifest_sha256": "0d7fec1f01ad36ab50ff867dda4098b4e9b05de73df04f44d417d8e9b31e1fed",
+  "development_dev_used": false,
+  "device_map": "auto",
+  "diagnostic_case_count": 12,
+  "diagnostic_result_root": "/kaggle/working/stage7e0_a5_english_column_conditioned_kaggle_t4x2_diagnostic_results_20260901",
+  "diagnostics_can_compensate_primary_failure": false,
+  "fallback_to_unconstrained": false,
+  "finite_complete_object_enumeration": false,
+  "finite_known_answer_candidates": false,
+  "frozen_runtime_versions": {
+    "accelerate": "1.14.0",
+    "safetensors": "0.5.3",
+    "tokenizers": "0.22.2",
+    "torch": "2.6.0+cu124",
+    "transformers": "5.5.3"
+  },
+  "git_branch": "stage6/crudsql-eligibility-audit",
+  "git_commit": "1b68ef5ff1bfdc52de05da7ae6fd96857c783f63",
+  "gpu_called": false,
+  "gpu_topology_fail_fast_before_model_load": true,
+  "gretel_pilot_opened": false,
+  "historical_runtime_profile_ids": [
+    "uet_server_cuda124"
+  ],
+  "kaggle_requirements_lock": "requirements-inference-kaggle-t4x2.lock.txt",
+  "label_side_data_used_for_constraints": false,
+  "max_memory": null,
+  "mock_dry_run_only": true,
+  "model_called": false,
+  "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "official_test_used": false,
+  "patch": "PATCH0",
+  "phase_m_removed": true,
+  "phase_o_max_new_tokens": 512,
+  "primary_acceptance": "12/12 required; no average and no 11/12 acceptance",
+  "primary_before_diagnostics": true,
+  "primary_case_count": 12,
+  "primary_result_root": "/kaggle/working/stage7e0_a5_english_column_conditioned_kaggle_t4x2_primary_results_20260901",
+  "primary_runtime_profile": {
+    "cuda_available": true,
+    "gpu_count": 2,
+    "gpu_device_substring": "Tesla T4",
+    "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
+    "packages": {
+      "accelerate": [
+        "1.14.0"
+      ],
+      "safetensors": [
+        "0.5.3"
+      ],
+      "tokenizers": [
+        "0.22.2"
+      ],
+      "torch": [
+        "2.13.0",
+        "2.13.0+cu130"
+      ],
+      "transformers": [
+        "5.5.3"
+      ]
+    },
+    "profile_id": "kaggle_t4x2_cuda130",
+    "role": "primary_scientific_runtime",
+    "torch_cuda": "13.0"
+  },
+  "primary_runtime_profile_id": "kaggle_t4x2_cuda130",
+  "quantization": "none",
+  "repair": "none",
+  "resume_allowed": false,
+  "retry": 0,
+  "runtime_profile_switch_after_completed_generation_allowed": false,
+  "single_primary_runtime_profile": true,
+  "stage": "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT",
+  "status": "PASS_READY_FOR_REAL_A5_CONSTRAINED_PREFLIGHT",
+  "token_level_enforcement": true,
+  "zero_shot": true
+}

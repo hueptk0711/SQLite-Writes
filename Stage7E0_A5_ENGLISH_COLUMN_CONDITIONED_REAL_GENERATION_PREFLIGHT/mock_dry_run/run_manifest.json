@@ -1,0 +1,28 @@
+{
+  "accepted_protocol_commit": "1b68ef5ff1bfdc52de05da7ae6fd96857c783f63",
+  "diagnostics_requested_after_primary_pass": false,
+  "git": null,
+  "model": {
+    "backend": "mock",
+    "mock_uses_label_side_expected": true,
+    "model_called": false
+  },
+  "phase_m_raw_generation_file": null,
+  "phase_m_removed": true,
+  "phase_o_max_new_tokens": 512,
+  "phase_o_prompt_spec_path": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/COLUMN_CONDITIONED_PROMPT_SPEC_A5_ENGLISH.json",
+  "primary_case_count": 12,
+  "primary_first_diagnostics_forbidden_until_freeze": true,
+  "repair": "none",
+  "retry": 0,
+  "stage": "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT",
+  "stage7c_a5_inputs": {
+    "a5_diagnostic_set_sha256": "f75d69a457b46cf8b9242c143fa6c3600ca226c35c7ac8e31b367d562503fdea",
+    "a5_primary_set_sha256": "949a541a989f1d7461022599c5508f38bda736202b1a725ffafaaa3aedba47b9",
+    "a5_prompt_spec_sha256": "87a1a84c285234d3fbdaa3a71d90c64899d739036888d1d939ff83459df54d96",
+    "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "stage7c_a5_lock_sha256": "f39d364e88ff50e463d11f80f9eaad7588f6f7869a84c4a9d27355de59ad62a5",
+    "tokenizer_status": "PASS"
+  },
+  "zero_shot": true
+}

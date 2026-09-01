@@ -1,0 +1,63 @@
+{
+  "artifact_count": 11,
+  "artifacts": [
+    {
+      "bytes": 1819,
+      "path": "STAGE7E0_A5_INPUT_MANIFEST.json",
+      "sha256": "72c5eefb08a99a5f9015da1e9d1058f0f093887d71335c1b5a8dd997921fe6e2"
+    },
+    {
+      "bytes": 5097,
+      "path": "RUNNER_PROTOCOL_A5.json",
+      "sha256": "2c3479c0fc9d0aa928fc40b8f5dc82f4712c483744fe67ff58bb89c45bdf004d"
+    },
+    {
+      "bytes": 300,
+      "path": "PRIMARY_ACCEPTANCE_POLICY_A5.json",
+      "sha256": "3a7cf07987d83dd5e37960f21f0ca826d9c9683e4bf661adb167c01e309b7ce0"
+    },
+    {
+      "bytes": 4516,
+      "path": "CONSTRAINT_INDEPENDENCE_AUDIT_A5.json",
+      "sha256": "c11b0181567f32e5f2cf243ac7225d2bada3500fcb10aeb1eaf2165e9bf47a1a"
+    },
+    {
+      "bytes": 2546,
+      "path": "SERVER_RUN_COMMANDS.md",
+      "sha256": "9b97342512751e877355eeef4d42cf5b886412989169b36244e3a6aedb6219ab"
+    },
+    {
+      "bytes": 1192,
+      "path": "VALIDATION_REPORT.md",
+      "sha256": "b39afd89d73914393d3b3610b29b7f58a09116a69c853439ac06eee363f471fe"
+    },
+    {
+      "bytes": 1007,
+      "path": "REVIEWER_README.md",
+      "sha256": "cd0d74506a9e1c1b76d19dcce04158cf20de1eaf93a78d1ce2a8b8197d78276b"
+    },
+    {
+      "bytes": 1267,
+      "path": "mock_dry_run/run_manifest.json",
+      "sha256": "6ad62c4dd7b55ad33b36c0d614b283d3361f359c404f14551feb2ba1affe61db"
+    },
+    {
+      "bytes": 700,
+      "path": "mock_dry_run/primary_summary.json",
+      "sha256": "39dd2d7a86cfaf0fc0262272332bcb9a1339913870d36a3398830ef49ba685c2"
+    },
+    {
+      "bytes": 27707,
+      "path": "mock_dry_run/primary_case_results.jsonl",
+      "sha256": "a23cc35ba23a63d41af1a1559685d4105ceb326d601276dd8c9e0c80dac652f8"
+    },
+    {
+      "bytes": 9021,
+      "path": "mock_dry_run/raw_primary_phase_o_generations.jsonl",
+      "sha256": "5d5c1c55d8ca3c2d6f7b4f5b0c6f704929783a12833ed8766afa9205fc7d47d9"
+    }
+  ],
+  "combined_scientific_artifacts_sha256": "bf28a0fecdb682ade587d5df3abeaf77b09dcb1d7f9024c329321da6ad9cc334",
+  "patch": "PATCH0",
+  "stage": "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT"
+}

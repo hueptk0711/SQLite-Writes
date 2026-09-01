@@ -1,0 +1,705 @@
+#!/usr/bin/env python3
+"""Stage7E0-A5 one-call column-conditioned real-generation preflight runner."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import importlib.metadata
+import json
+import sqlite3
+import subprocess
+import sys
+import time
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Any, Protocol
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+SRC_ROOT = PROJECT_ROOT / "src"
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
+
+from nldbwrite_v3.inference.parse_output import extract_json_object  # noqa: E402
+from nldbwrite_v3.v2_a1.types import V2A1Error  # noqa: E402
+from scripts.data.build_stage7c_a5_column_conditioned_phase_o_protocol import (  # noqa: E402
+    MODEL_ID,
+    MODEL_REVISION,
+    STAGE_NAME as STAGE7C_A5_DIR,
+    canonical_json,
+    oracle_column_conditioned_path,
+    read_json,
+    read_jsonl,
+    render_phase_o_messages,
+    sha256_text,
+)
+from scripts.server.run_stage7e0_a4_english import (  # noqa: E402
+    ALLOWED_FROZEN_RUNTIME_PROFILES,
+    DEFAULT_MODEL_PATH,
+    EXPECTED_CHAT_TEMPLATE_SHA256,
+    FROZEN_RUNTIME_VERSIONS,
+    HISTORICAL_RUNTIME_PROFILE_IDS,
+    PRIMARY_RUNTIME_PROFILE_ID,
+    match_runtime_profile,
+    runtime_profile_by_id,
+    runtime_versions,
+)
+from scripts.server.run_stage7e0_v2_a1_preflight import IncrementalJsonSchemaGrammarBackend  # noqa: E402
+
+
+STAGE_NAME = "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT"
+A5_PRIMARY_SET_REL = f"{STAGE7C_A5_DIR}/FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl"
+A5_DIAGNOSTIC_SET_REL = f"{STAGE7C_A5_DIR}/A4_DERIVED_REGRESSION_DIAGNOSTICS_A5.jsonl"
+A5_PROMPT_SPEC_REL = f"{STAGE7C_A5_DIR}/COLUMN_CONDITIONED_PROMPT_SPEC_A5_ENGLISH.json"
+EXPECTED_PRIMARY_COUNT = 12
+EXPECTED_DIAGNOSTIC_COUNT = 12
+PHASE_O_MAX_NEW_TOKENS = 512
+CONSTRAINED_BACKEND_ID = "incremental_json_schema_grammar"
+
+
+def canonical_text(text: str) -> str:
+    return text.replace("\r\n", "\n").replace("\r", "\n")
+
+
+def sha256_file(path: Path) -> str:
+    data = path.read_bytes()
+    if path.suffix.lower() in {".json", ".jsonl", ".md", ".py", ".txt", ".toml", ".sh"}:
+        data = canonical_text(data.decode("utf-8-sig")).encode("utf-8")
+    return hashlib.sha256(data).hexdigest()
+
+
+def write_json(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+
+
+def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        for row in rows:
+            handle.write(canonical_json(row) + "\n")
+
+
+def git_output(*args: str) -> str:
+    return subprocess.check_output(["git", *args], cwd=PROJECT_ROOT, text=True, encoding="utf-8").strip()
+
+
+def assert_git_lock(accepted_commit: str) -> dict[str, Any]:
+    if not (PROJECT_ROOT / ".git").exists():
+        return {"accepted_protocol_commit": accepted_commit, "execution_commit": None, "git_available": False}
+    head = git_output("rev-parse", "HEAD")
+    if head != accepted_commit:
+        raise SystemExit(f"STOP: git HEAD {head} != accepted Stage7C-A5 protocol commit {accepted_commit}")
+    dirty = git_output("status", "--porcelain", "--untracked-files=no")
+    if dirty:
+        raise SystemExit("STOP: tracked working tree must be clean before real generation")
+    return {"accepted_protocol_commit": accepted_commit, "execution_commit": head, "git_available": True}
+
+
+def assert_result_root_policy(result_root: Path, *, backend: str, allow_inside_git: bool) -> None:
+    if allow_inside_git or backend == "mock":
+        return
+    try:
+        result_root.resolve().relative_to(PROJECT_ROOT.resolve())
+    except ValueError:
+        return
+    raise SystemExit("STOP: real model result-root must be outside the git checkout")
+
+
+def validate_generation_config(args: argparse.Namespace) -> None:
+    backend = str(args.backend).lower()
+    if backend == "hf":
+        raise SystemExit("STOP: backend=hf is plain unconstrained HF and is forbidden for Stage7E0-A5")
+    if backend not in {"constrained_hf", "mock"}:
+        raise SystemExit(f"STOP: unsupported backend {backend}")
+    if int(args.phase_o_max_new_tokens) != PHASE_O_MAX_NEW_TOKENS:
+        raise SystemExit(f"STOP: Phase O max_new_tokens must remain {PHASE_O_MAX_NEW_TOKENS}")
+    if backend == "constrained_hf" and str(args.quantization).lower() not in {"none", ""}:
+        raise SystemExit("STOP: Stage7E0-A5 forbids quantized generation")
+    if backend == "constrained_hf" and bool(args.resume):
+        raise SystemExit("STOP: Stage7E0-A5 forbids --resume; archive partial output and start a fresh result-root")
+
+
+def validate_runtime_versions(versions: dict[str, Any] | None = None) -> dict[str, Any]:
+    observed = runtime_versions() if versions is None else dict(versions)
+    match = match_runtime_profile(observed, allowed_profile_ids=(PRIMARY_RUNTIME_PROFILE_ID,), require_gpu_topology=True)
+    if match["status"] != "PASS":
+        raise SystemExit(f"STOP: frozen inference runtime version drift: {canonical_json(match['failures'])}")
+    return match
+
+
+def verify_stage7c_a5_lock(root: Path = PROJECT_ROOT) -> dict[str, Any]:
+    lock = read_json(root / STAGE7C_A5_DIR / "STAGE7C_A5_LOCK.json")
+    prompt = read_json(root / A5_PROMPT_SPEC_REL)
+    token_audit = read_json(root / STAGE7C_A5_DIR / "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json")
+    if lock.get("status") != "PASS_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FROZEN":
+        raise SystemExit("STOP: Stage7C-A5 protocol is not closed/pass")
+    if lock.get("phase_m_primary_pipeline_removed") is not True or lock.get("model_generates_phase_m") is not False:
+        raise SystemExit("STOP: Stage7C-A5 Phase M removal lock drifted")
+    if prompt.get("model_id") != MODEL_ID or prompt.get("model_revision") != MODEL_REVISION:
+        raise SystemExit("STOP: Stage7C-A5 model identity drifted")
+    if token_audit.get("tokenizer_status") != "PASS" or token_audit.get("chat_template_hash_matches_required") is not True:
+        raise SystemExit("STOP: Stage7C-A5 tokenizer/chat-template audit is not PASS")
+    return {
+        "stage7c_a5_lock_sha256": sha256_file(root / STAGE7C_A5_DIR / "STAGE7C_A5_LOCK.json"),
+        "a5_prompt_spec_sha256": sha256_file(root / A5_PROMPT_SPEC_REL),
+        "a5_primary_set_sha256": sha256_file(root / A5_PRIMARY_SET_REL),
+        "a5_diagnostic_set_sha256": sha256_file(root / A5_DIAGNOSTIC_SET_REL),
+        "tokenizer_status": token_audit["tokenizer_status"],
+        "chat_template_sha256": token_audit["chat_template_sha256"],
+    }
+
+
+def load_stage7c_a5_rows(root: Path = PROJECT_ROOT, *, diagnostics: bool = False) -> list[dict[str, Any]]:
+    rel = A5_DIAGNOSTIC_SET_REL if diagnostics else A5_PRIMARY_SET_REL
+    rows = read_jsonl(root / rel)
+    expected_count = EXPECTED_DIAGNOSTIC_COUNT if diagnostics else EXPECTED_PRIMARY_COUNT
+    expected_prefix = "stage7c_a5_fresh_english_" if diagnostics else "stage7c_a5_primary_english_"
+    if len(rows) != expected_count:
+        raise SystemExit(f"STOP: expected {expected_count} A5 rows, found {len(rows)}")
+    for row in rows:
+        if not str(row.get("sample_id")).startswith(expected_prefix):
+            raise SystemExit(f"STOP: A5 row id prefix drifted for {row.get('sample_id')}")
+        if diagnostics and row.get("diagnostic_role") != "diagnostic_only_after_primary":
+            raise SystemExit(f"STOP: A5 diagnostic role drifted for {row.get('sample_id')}")
+        if set(row.get("model_side_input", {})) != {"question", "schema_inventory", "candidate_inventory_text"}:
+            raise SystemExit(f"STOP: model-side leakage boundary changed for {row.get('sample_id')}")
+        if sorted(row["label_side_expected"]["phase_o"]) != ["column_span_refs", "operation", "table_ref"]:
+            raise SystemExit(f"STOP: A5 Phase O label contract drifted for {row.get('sample_id')}")
+    return rows
+
+
+def _enum_values(node: dict[str, Any]) -> list[str]:
+    values = node.get("enum")
+    if values is None and "const" in node:
+        values = [node["const"]]
+    if not isinstance(values, list) or not values:
+        raise V2A1Error("constraint_schema_enum_missing", "A5 constrained generation requires finite enum/const choices")
+    return [str(value) for value in values]
+
+
+def _branch_specs(schema: dict[str, Any]) -> list[dict[str, Any]]:
+    branches = schema.get("oneOf") or [schema]
+    specs = []
+    for branch in branches:
+        properties = branch["properties"]
+        column_node = properties["column_span_refs"]
+        required_columns = list(column_node["required"])
+        specs.append(
+            {
+                "operation_choices": _enum_values(properties["operation"]),
+                "table_ref": _enum_values(properties["table_ref"])[0],
+                "columns": required_columns,
+                "column_domains": {column: _enum_values(column_node["properties"][column]) for column in required_columns},
+            }
+        )
+    return specs
+
+
+def _literal_status(text: str, literal: str, pos: int) -> tuple[str, int]:
+    if pos >= len(text):
+        return "prefix", pos
+    end = min(len(text), pos + len(literal))
+    fragment = text[pos:end]
+    if not literal.startswith(fragment):
+        return "invalid", pos
+    if len(fragment) < len(literal):
+        return "prefix", len(text)
+    return "complete", pos + len(literal)
+
+
+def _enum_status(text: str, values: list[str], pos: int) -> list[tuple[str, int]]:
+    if pos >= len(text):
+        return [("prefix", pos)]
+    results: list[tuple[str, int]] = []
+    for value in values:
+        end = min(len(text), pos + len(value))
+        fragment = text[pos:end]
+        if value.startswith(fragment):
+            results.append(("prefix", len(text)) if len(fragment) < len(value) else ("complete", pos + len(value)))
+    return results
+
+
+def _sequence_status(text: str, pos: int, parts: list[Any]) -> list[tuple[str, int]]:
+    states = [("complete", pos)]
+    for part in parts:
+        next_states: list[tuple[str, int]] = []
+        for _status, state_pos in states:
+            if isinstance(part, str):
+                result = _literal_status(text, part, state_pos)
+                if result[0] != "invalid":
+                    next_states.append(result)
+            else:
+                next_states.extend(part(text, state_pos))
+        if not next_states:
+            return []
+        if any(status == "prefix" for status, _pos in next_states):
+            return next_states
+        states = next_states
+    return states
+
+
+def _overall_status(results: list[tuple[str, int]], text: str) -> str:
+    if any(status == "complete" and pos == len(text) for status, pos in results):
+        return "complete"
+    if any(status == "prefix" and pos <= len(text) for status, pos in results):
+        return "prefix"
+    return "invalid"
+
+
+def _branch_status(text: str, branch: dict[str, Any]) -> str:
+    parts: list[Any] = ['{"column_span_refs":{']
+    for index, column in enumerate(branch["columns"]):
+        if index:
+            parts.append(",")
+        parts.extend(
+            [
+                f'"{column}":"',
+                lambda value, value_pos, col=column: _enum_status(value, branch["column_domains"][col], value_pos),
+                '"',
+            ]
+        )
+    parts.extend(
+        [
+            '},"operation":"',
+            lambda value, value_pos: _enum_status(value, branch["operation_choices"], value_pos),
+            '","table_ref":"',
+            lambda value, value_pos: _enum_status(value, [branch["table_ref"]], value_pos),
+            '"}',
+        ]
+    )
+    return _overall_status(_sequence_status(text, 0, parts), text)
+
+
+class ColumnConditionedConstraintGrammar:
+    def __init__(self, schema: dict[str, Any]):
+        self.schema_sha256 = sha256_text(canonical_json(schema))
+        self.branches = _branch_specs(schema)
+        self.table_refs = [branch["table_ref"] for branch in self.branches]
+        self.total_column_decisions = sum(len(branch["columns"]) for branch in self.branches)
+        self.max_span_ref_choices = max(len(domain) - 1 for branch in self.branches for domain in branch["column_domains"].values())
+
+    def is_prefix(self, text: str) -> bool:
+        return any(_branch_status(text, branch) in {"prefix", "complete"} for branch in self.branches)
+
+    def is_complete(self, text: str) -> bool:
+        return any(_branch_status(text, branch) == "complete" for branch in self.branches)
+
+    @property
+    def fingerprint(self) -> str:
+        return sha256_text(canonical_json({"schema_sha256": self.schema_sha256, "branches": self.branches}))
+
+    def metadata(self) -> dict[str, Any]:
+        return {
+            "phase": "phase_o",
+            "schema_sha256": self.schema_sha256,
+            "constraint_grammar_sha256": self.fingerprint,
+            "constraint_source": "a5_dynamic_column_conditioned_json_schema",
+            "semantic_branch_points_observed": self.max_span_ref_choices > 1 or len(self.table_refs) > 1,
+            "finite_known_answer_candidates": False,
+            "finite_complete_object_enumeration": False,
+            "label_side_data_used_for_constraints": False,
+            "branching_evidence": {
+                "table_choices": self.table_refs,
+                "max_span_ref_choice_count_per_column": self.max_span_ref_choices,
+                "column_decision_slots_across_branches": self.total_column_decisions,
+            },
+        }
+
+
+def build_phase_o_column_conditioned_constraint_grammar(schema: dict[str, Any]) -> ColumnConditionedConstraintGrammar:
+    return ColumnConditionedConstraintGrammar(schema)
+
+
+def generate_constrained_a5(model: Any, tokenizer: Any, messages: list[dict[str, str]], *, max_new_tokens: int, schema: dict[str, Any]) -> dict[str, Any]:
+    import torch
+
+    constraint_grammar = build_phase_o_column_conditioned_constraint_grammar(schema)
+    rendered = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    inputs = tokenizer(rendered, return_tensors="pt")
+    device = next(model.parameters()).device
+    inputs = {key: value.to(device) for key, value in inputs.items()}
+    prompt_tokens = int(inputs["input_ids"].shape[-1])
+    backend = IncrementalJsonSchemaGrammarBackend(tokenizer, constraint_grammar, eos_token_id=tokenizer.eos_token_id)
+    backend.set_prompt_token_count(prompt_tokens)
+    start = time.monotonic()
+    with torch.inference_mode():
+        output = model.generate(
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            do_sample=False,
+            temperature=None,
+            top_p=None,
+            top_k=None,
+            pad_token_id=tokenizer.eos_token_id,
+            eos_token_id=tokenizer.eos_token_id,
+            prefix_allowed_tokens_fn=backend.allowed_tokens,
+        )
+    generated_ids = output[0][prompt_tokens:]
+    return {
+        "backend": backend.metadata(),
+        "prompt_tokens": prompt_tokens,
+        "output_tokens": int(generated_ids.shape[-1]),
+        "latency_seconds": time.monotonic() - start,
+        "hit_max_new_tokens": int(generated_ids.shape[-1]) >= max_new_tokens,
+        "raw_output": tokenizer.decode(generated_ids, skip_special_tokens=True).strip(),
+    }
+
+
+@dataclass(slots=True)
+class CallResult:
+    sample_id: str
+    phase: str
+    raw_output: str
+    status: str = "success"
+    error: str | None = None
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    latency_sec: float = 0.0
+    hit_max_new_tokens: bool = False
+    generation_metadata: dict[str, Any] | None = None
+
+
+class OneCallGenerator(Protocol):
+    def generate(self, *, sample_id: str, messages: list[dict[str, str]], max_new_tokens: int, row: dict[str, Any]) -> CallResult:
+        ...
+
+    def metadata(self) -> dict[str, Any]:
+        ...
+
+
+class LabelMockGenerator:
+    def __init__(self, rows: list[dict[str, Any]]):
+        self.by_id = {row["sample_id"]: row for row in rows}
+
+    def generate(self, *, sample_id: str, messages: list[dict[str, str]], max_new_tokens: int, row: dict[str, Any]) -> CallResult:
+        del messages, max_new_tokens, row
+        raw = canonical_json(self.by_id[sample_id]["label_side_expected"]["phase_o"])
+        return CallResult(
+            sample_id=sample_id,
+            phase="phase_o",
+            raw_output=raw,
+            input_tokens=0,
+            output_tokens=len(raw.split()),
+            generation_metadata={
+                "backend": "mock",
+                "token_level_enforcement": False,
+                "fallback_to_unconstrained": False,
+                "finite_complete_object_enumeration": False,
+                "finite_known_answer_candidates": False,
+                "label_side_data_used_for_constraints": True,
+                "automatic_repair": False,
+                "retry": 0,
+            },
+        )
+
+    def metadata(self) -> dict[str, Any]:
+        return {"backend": "mock", "model_called": False, "mock_uses_label_side_expected": True}
+
+
+class ConstrainedTransformersChatGenerator:
+    def __init__(self, *, model_name_or_path: str, quantization: str, trust_remote_code: bool, max_input_tokens: int, seed: int):
+        try:
+            import torch
+            from transformers import AutoModelForCausalLM, AutoTokenizer
+        except ImportError as exc:  # pragma: no cover - server dependency
+            raise SystemExit("STOP: constrained real generation requires torch, transformers, and accelerate") from exc
+        self.runtime_lock = validate_runtime_versions()
+        if quantization not in {"none", "None", ""}:
+            raise SystemExit("STOP: Stage7E0-A5 forbids 4-bit or any quantized generation")
+        self.torch = torch
+        self.seed = seed
+        self.max_input_tokens = max_input_tokens
+        local_model = Path(model_name_or_path).exists()
+        if local_model and Path(model_name_or_path).name != MODEL_REVISION:
+            raise SystemExit("STOP: local model snapshot path must end with the frozen revision")
+        kwargs: dict[str, Any] = {"trust_remote_code": trust_remote_code}
+        if not local_model:
+            kwargs["revision"] = MODEL_REVISION
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, **kwargs)
+        if self.tokenizer.pad_token_id is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+        self.tokenizer.padding_side = "left"
+        if sha256_text(getattr(self.tokenizer, "chat_template", None) or "") != EXPECTED_CHAT_TEMPLATE_SHA256:
+            raise SystemExit("STOP: tokenizer chat_template hash does not match Stage7C-A5 lock")
+        model_kwargs: dict[str, Any] = {"trust_remote_code": trust_remote_code, "device_map": "auto"}
+        if not local_model:
+            model_kwargs["revision"] = MODEL_REVISION
+        if torch.cuda.is_available():
+            model_kwargs["torch_dtype"] = "auto"
+        self.model = AutoModelForCausalLM.from_pretrained(model_name_or_path, **model_kwargs)
+        self.model.eval()
+        self.model_name_or_path = model_name_or_path
+        self.quantization = "none"
+
+    def generate(self, *, sample_id: str, messages: list[dict[str, str]], max_new_tokens: int, row: dict[str, Any]) -> CallResult:
+        torch = self.torch
+        prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        token_count = len(self.tokenizer(prompt, add_special_tokens=True, truncation=False)["input_ids"])
+        if token_count > self.max_input_tokens:
+            return CallResult(sample_id=sample_id, phase="phase_o", raw_output="", status="input_too_long", error=f"{token_count}>{self.max_input_tokens}", input_tokens=token_count)
+        torch.manual_seed(self.seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(self.seed)
+        generated = generate_constrained_a5(self.model, self.tokenizer, messages, max_new_tokens=max_new_tokens, schema=row["runtime_constraints"]["phase_o_schema"])
+        return CallResult(
+            sample_id=sample_id,
+            phase="phase_o",
+            raw_output=str(generated["raw_output"]),
+            input_tokens=int(generated["prompt_tokens"]),
+            output_tokens=int(generated["output_tokens"]),
+            latency_sec=float(generated["latency_seconds"]),
+            hit_max_new_tokens=bool(generated["hit_max_new_tokens"]),
+            generation_metadata=generated["backend"],
+        )
+
+    def metadata(self) -> dict[str, Any]:
+        torch = self.torch
+        return {
+            "backend": CONSTRAINED_BACKEND_ID,
+            "schema_enforcement_mode": "transformers_prefix_allowed_tokens_fn",
+            "token_level_enforcement": True,
+            "fallback_to_unconstrained": False,
+            "finite_complete_object_enumeration": False,
+            "finite_known_answer_candidates": False,
+            "label_side_data_used_for_constraints": False,
+            "automatic_repair": False,
+            "retry": 0,
+            "model_called": True,
+            "model_id": MODEL_ID,
+            "model_name_or_path": self.model_name_or_path,
+            "model_revision": MODEL_REVISION,
+            "quantization": self.quantization,
+            "torch_dtype": "auto",
+            "device_map": "auto",
+            "max_memory": None,
+            "runtime_lock": self.runtime_lock,
+            "runtime_profile_id": self.runtime_lock["runtime_profile_id"],
+            "primary_runtime_profile_id": PRIMARY_RUNTIME_PROFILE_ID,
+            "primary_runtime_profile": runtime_profile_by_id(PRIMARY_RUNTIME_PROFILE_ID),
+            "historical_runtime_profile_ids": HISTORICAL_RUNTIME_PROFILE_IDS,
+            "allowed_frozen_runtime_profiles": ALLOWED_FROZEN_RUNTIME_PROFILES,
+            "chat_template_sha256": EXPECTED_CHAT_TEMPLATE_SHA256,
+            "torch_version": torch.__version__,
+            "cuda_runtime": str(torch.version.cuda),
+            "transformers_version": __import__("transformers").__version__,
+            "tokenizers_version": importlib.metadata.version("tokenizers"),
+            "accelerate_version": importlib.metadata.version("accelerate"),
+            "safetensors_version": importlib.metadata.version("safetensors"),
+            "cuda_available": bool(torch.cuda.is_available()),
+            "gpu_count": int(torch.cuda.device_count()) if torch.cuda.is_available() else 0,
+            "gpu_devices": [torch.cuda.get_device_name(index) for index in range(torch.cuda.device_count())] if torch.cuda.is_available() else [],
+        }
+
+
+def branch_for_table(schema: dict[str, Any], table_ref: str) -> dict[str, Any]:
+    for branch in _branch_specs(schema):
+        if branch["table_ref"] == table_ref:
+            return branch
+    raise V2A1Error("phase_o_unknown_table_ref", "Unknown table_ref for A5 schema", details={"table_ref": table_ref})
+
+
+def parse_phase_o_column_conditioned_output(raw: str, schema: dict[str, Any]) -> dict[str, Any]:
+    obj, error = extract_json_object(raw)
+    if obj is None:
+        raise V2A1Error("phase_o_json_extract", error or "Could not extract JSON object")
+    if set(obj) != {"operation", "table_ref", "column_span_refs"}:
+        raise V2A1Error("phase_o_schema_failure", "A5 output must contain only operation, table_ref, column_span_refs")
+    if obj["operation"] != "INSERT":
+        raise V2A1Error("phase_o_schema_failure", "A5 operation must be INSERT")
+    if not isinstance(obj.get("column_span_refs"), dict):
+        raise V2A1Error("phase_o_schema_failure", "column_span_refs must be an object")
+    branch = branch_for_table(schema, str(obj["table_ref"]))
+    decisions = obj["column_span_refs"]
+    if set(decisions) != set(branch["columns"]):
+        raise V2A1Error("phase_o_schema_failure", "column_span_refs keys must exactly equal selected table required columns")
+    ordered: dict[str, str] = {}
+    for column in branch["columns"]:
+        value = decisions[column]
+        if not isinstance(value, str) or value not in branch["column_domains"][column]:
+            raise V2A1Error("phase_o_schema_failure", "column decision must be OMIT or an exact current SPAN ref", details={"column_ref": column, "value": value})
+        ordered[column] = value
+    selected_refs = [span_ref for span_ref in ordered.values() if span_ref != "OMIT"]
+    if len(selected_refs) != len(set(selected_refs)):
+        raise V2A1Error("phase_o_duplicate_span_ref_reuse", "Each non-OMIT SPAN ref may be used at most once")
+    return {"operation": "INSERT", "table_ref": branch["table_ref"], "column_span_refs": ordered}
+
+
+def _failed_row(row: dict[str, Any], stage: str, error: str | None, phase_o_hash: str) -> dict[str, Any]:
+    return {"sample_id": row["sample_id"], "status": "FAIL", "failure_stage": stage, "error": error, "checks": {}, "phase_o_messages_sha256": phase_o_hash}
+
+
+def evaluate_case(row: dict[str, Any], generator: OneCallGenerator, *, phase_o_max_new_tokens: int) -> tuple[dict[str, Any], dict[str, Any]]:
+    sample_id = row["sample_id"]
+    messages, _user, phase_o_prompt_hash = render_phase_o_messages(row)
+    phase_o_call = generator.generate(sample_id=sample_id, messages=messages, max_new_tokens=phase_o_max_new_tokens, row=row)
+    raw_o = asdict(phase_o_call) | {"messages_sha256": phase_o_prompt_hash}
+    if phase_o_call.status != "success":
+        return _failed_row(row, "phase_o_generation", phase_o_call.error, phase_o_prompt_hash), raw_o
+    try:
+        phase_o = parse_phase_o_column_conditioned_output(phase_o_call.raw_output, row["runtime_constraints"]["phase_o_schema"])
+        predicted = json.loads(canonical_json(row))
+        predicted["label_side_expected"]["phase_o"] = phase_o
+        db_path = PROJECT_ROOT / STAGE7C_A5_DIR / row["synthetic_db_spec"]["sqlite_db_path"]
+        oracle = oracle_column_conditioned_path(predicted, db_path)
+    except (V2A1Error, ValueError, sqlite3.Error) as exc:
+        reason = exc.reason_code if isinstance(exc, V2A1Error) else "a5_deterministic_oracle"
+        return _failed_row(row, reason, str(exc), phase_o_prompt_hash), raw_o
+    expected = row["label_side_expected"]["phase_o"]
+    checks = {
+        "operation_exact": phase_o["operation"] == expected["operation"],
+        "table_ref_exact": phase_o["table_ref"] == expected["table_ref"],
+        "column_span_refs_mapping_exact": phase_o["column_span_refs"] == expected["column_span_refs"],
+        "no_duplicate_non_omit_span_reuse": len([v for v in phase_o["column_span_refs"].values() if v != "OMIT"]) == len({v for v in phase_o["column_span_refs"].values() if v != "OMIT"}),
+        "resolver_pass": oracle["resolver"] == "PASS",
+        "typed_materialization_pass": oracle["typed_materialization"] == "PASS",
+        "completeness_pass": oracle["completeness"] == "PASS",
+        "compile_pass": oracle["compilation"] == "PASS",
+        "preflight_admitted": oracle["preflight"] == "ADMITTED",
+        "canonical_target_state_exact": oracle["canonical_target_state_exact"],
+    }
+    return (
+        {
+            "sample_id": sample_id,
+            "status": "PASS" if all(checks.values()) else "FAIL",
+            "failure_stage": None if all(checks.values()) else "acceptance_gate",
+            "checks": checks,
+            "phase_o_predicted": phase_o,
+            "phase_o_expected": expected,
+            "resolved_column_spans": oracle["resolved_column_spans"],
+            "deterministic_ir": oracle["deterministic_ir"],
+            "compiled_sql": oracle["compiled_sql"],
+            "compiled_parameters": oracle["compiled_parameters"],
+            "preflight_reason_code": oracle["preflight_reason_code"],
+            "observed_target_state_hash": oracle["observed_target_state_hash"],
+            "expected_target_state_hash": oracle["expected_target_state_hash"],
+            "phase_o_messages_sha256": phase_o_prompt_hash,
+        },
+        raw_o,
+    )
+
+
+def _run_rows(result_root: Path, rows: list[dict[str, Any]], generator: OneCallGenerator, *, prefix: str, phase_o_max_new_tokens: int) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    case_results: list[dict[str, Any]] = []
+    raw_rows: list[dict[str, Any]] = []
+    for row in rows:
+        case_result, raw_o = evaluate_case(row, generator, phase_o_max_new_tokens=phase_o_max_new_tokens)
+        case_results.append(case_result)
+        raw_rows.append(raw_o)
+        write_jsonl(result_root / f"{prefix}_case_results.jsonl", case_results)
+        write_jsonl(result_root / f"raw_{prefix}_phase_o_generations.jsonl", raw_rows)
+    return case_results, raw_rows
+
+
+def run_stage7e0(args: argparse.Namespace) -> dict[str, Any]:
+    result_root = Path(args.result_root).resolve()
+    backend = str(args.backend).lower()
+    validate_generation_config(args)
+    assert_result_root_policy(result_root, backend=backend, allow_inside_git=args.allow_result_root_inside_git)
+    git_lock = None if args.skip_git_assertions else assert_git_lock(args.accepted_protocol_commit)
+    a5_lock = verify_stage7c_a5_lock()
+    primary_rows = load_stage7c_a5_rows()
+    if result_root.exists() and not args.resume:
+        raise SystemExit("STOP: result-root already exists; do not reuse real A5 result directories")
+    result_root.mkdir(parents=True, exist_ok=True)
+    if backend == "mock":
+        generator: OneCallGenerator = LabelMockGenerator(primary_rows + load_stage7c_a5_rows(diagnostics=True))
+    else:
+        generator = ConstrainedTransformersChatGenerator(model_name_or_path=args.model_name_or_path, quantization=args.quantization, trust_remote_code=args.trust_remote_code, max_input_tokens=args.max_input_tokens, seed=args.seed)
+    metadata = generator.metadata()
+    if backend == "constrained_hf" and metadata.get("cuda_available") is not True:
+        raise SystemExit("STOP: real Stage7E0-A5 generation requires cuda_available=true")
+    if backend == "constrained_hf" and metadata.get("backend") != CONSTRAINED_BACKEND_ID:
+        raise SystemExit("STOP: constrained backend unavailable; no fallback to unconstrained generation")
+    write_json(
+        result_root / "run_manifest.json",
+        {
+            "stage": STAGE_NAME,
+            "accepted_protocol_commit": args.accepted_protocol_commit,
+            "git": git_lock,
+            "stage7c_a5_inputs": a5_lock,
+            "model": metadata,
+            "primary_case_count": len(primary_rows),
+            "primary_first_diagnostics_forbidden_until_freeze": True,
+            "diagnostics_requested_after_primary_pass": bool(args.run_diagnostics_after_primary_pass),
+            "zero_shot": True,
+            "retry": 0,
+            "repair": "none",
+            "phase_o_max_new_tokens": int(args.phase_o_max_new_tokens),
+            "phase_o_prompt_spec_path": A5_PROMPT_SPEC_REL,
+            "phase_m_removed": True,
+            "phase_m_raw_generation_file": None,
+        },
+    )
+    primary_cases, _raw_primary = _run_rows(result_root, primary_rows, generator, prefix="primary", phase_o_max_new_tokens=int(args.phase_o_max_new_tokens))
+    pass_count = sum(1 for row in primary_cases if row["status"] == "PASS")
+    diagnostics_run = False
+    diagnostic_pass_count = 0
+    if args.run_diagnostics_after_primary_pass:
+        if pass_count != EXPECTED_PRIMARY_COUNT:
+            raise SystemExit("STOP: Stage7E0-A5 primary failed; do not run diagnostics or open Gretel pilot")
+        diagnostic_rows = load_stage7c_a5_rows(diagnostics=True)
+        diagnostic_cases, _raw_diag = _run_rows(result_root, diagnostic_rows, generator, prefix="diagnostic", phase_o_max_new_tokens=int(args.phase_o_max_new_tokens))
+        diagnostics_run = True
+        diagnostic_pass_count = sum(1 for row in diagnostic_cases if row["status"] == "PASS")
+        write_json(
+            result_root / "diagnostic_summary.json",
+            {
+                "stage": STAGE_NAME,
+                "status": "PASS" if diagnostic_pass_count == EXPECTED_DIAGNOSTIC_COUNT else "FAIL",
+                "diagnostic_pass_count": f"{diagnostic_pass_count}/{EXPECTED_DIAGNOSTIC_COUNT}",
+                "diagnostic_role": "diagnostic_only_after_primary",
+            },
+        )
+    summary = {
+        "stage": STAGE_NAME,
+        "status": "PASS" if pass_count == EXPECTED_PRIMARY_COUNT else "FAIL",
+        "backend": backend,
+        "protocol_backend": metadata.get("backend"),
+        "model_called": backend == "constrained_hf",
+        "gpu_called": backend == "constrained_hf",
+        "mock_uses_label_side_expected": backend == "mock",
+        "phase_o_max_new_tokens": int(args.phase_o_max_new_tokens),
+        "phase_m_removed": True,
+        "primary_pass_count": f"{pass_count}/{EXPECTED_PRIMARY_COUNT}",
+        "required_pass_count": "12/12",
+        "eleven_of_twelve_allowed": False,
+        "diagnostics_run": diagnostics_run,
+        "diagnostic_pass_count": f"{diagnostic_pass_count}/{EXPECTED_DIAGNOSTIC_COUNT}" if diagnostics_run else None,
+        "gretel_pilot_opened": False,
+        "raw_primary_phase_o_sha256": sha256_file(result_root / "raw_primary_phase_o_generations.jsonl"),
+        "primary_case_results_sha256": sha256_file(result_root / "primary_case_results.jsonl"),
+    }
+    if diagnostics_run:
+        summary["raw_diagnostic_phase_o_sha256"] = sha256_file(result_root / "raw_diagnostic_phase_o_generations.jsonl")
+        summary["diagnostic_case_results_sha256"] = sha256_file(result_root / "diagnostic_case_results.jsonl")
+    write_json(result_root / "primary_summary.json", summary)
+    if backend == "constrained_hf" and summary["status"] != "PASS":
+        raise SystemExit("STOP: Stage7E0-A5 primary failed; do not open Gretel pilot")
+    return summary
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--accepted-protocol-commit", required=True)
+    parser.add_argument("--result-root", required=True)
+    parser.add_argument("--backend", choices=["constrained_hf", "mock", "hf"], default="constrained_hf")
+    parser.add_argument("--model-name-or-path", default=DEFAULT_MODEL_PATH)
+    parser.add_argument("--quantization", default="none")
+    parser.add_argument("--phase-o-max-new-tokens", type=int, default=PHASE_O_MAX_NEW_TOKENS)
+    parser.add_argument("--max-input-tokens", type=int, default=28672)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--trust-remote-code", action="store_true")
+    parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--run-diagnostics-after-primary-pass", action="store_true")
+    parser.add_argument("--skip-git-assertions", action="store_true", help="Allowed for extracted reviewer packages and mock tests only.")
+    parser.add_argument("--allow-result-root-inside-git", action="store_true", help="Allowed for mock tests only.")
+    args = parser.parse_args()
+    print(json.dumps(run_stage7e0(args), ensure_ascii=False, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

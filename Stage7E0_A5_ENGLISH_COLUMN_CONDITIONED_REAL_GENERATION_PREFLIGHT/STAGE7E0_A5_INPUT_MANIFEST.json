@@ -1,0 +1,41 @@
+{
+  "accepted_stage7c_a5_commit": "1b68ef5ff1bfdc52de05da7ae6fd96857c783f63",
+  "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+  "diagnostic_case_count": 12,
+  "diagnostic_case_ids": [
+    "stage7c_a5_fresh_english_001",
+    "stage7c_a5_fresh_english_002",
+    "stage7c_a5_fresh_english_003",
+    "stage7c_a5_fresh_english_004",
+    "stage7c_a5_fresh_english_005",
+    "stage7c_a5_fresh_english_006",
+    "stage7c_a5_fresh_english_007",
+    "stage7c_a5_fresh_english_008",
+    "stage7c_a5_fresh_english_009",
+    "stage7c_a5_fresh_english_010",
+    "stage7c_a5_fresh_english_011",
+    "stage7c_a5_fresh_english_012"
+  ],
+  "diagnostic_set_sha256": "f75d69a457b46cf8b9242c143fa6c3600ca226c35c7ac8e31b367d562503fdea",
+  "phase_o_prompt_spec_path": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/COLUMN_CONDITIONED_PROMPT_SPEC_A5_ENGLISH.json",
+  "phase_o_prompt_spec_sha256": "87a1a84c285234d3fbdaa3a71d90c64899d739036888d1d939ff83459df54d96",
+  "primary_case_count": 12,
+  "primary_case_ids": [
+    "stage7c_a5_primary_english_001",
+    "stage7c_a5_primary_english_002",
+    "stage7c_a5_primary_english_003",
+    "stage7c_a5_primary_english_004",
+    "stage7c_a5_primary_english_005",
+    "stage7c_a5_primary_english_006",
+    "stage7c_a5_primary_english_007",
+    "stage7c_a5_primary_english_008",
+    "stage7c_a5_primary_english_009",
+    "stage7c_a5_primary_english_010",
+    "stage7c_a5_primary_english_011",
+    "stage7c_a5_primary_english_012"
+  ],
+  "primary_set_sha256": "949a541a989f1d7461022599c5508f38bda736202b1a725ffafaaa3aedba47b9",
+  "stage7c_a5_dir": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE",
+  "stage7c_a5_lock_sha256": "f39d364e88ff50e463d11f80f9eaad7588f6f7869a84c4a9d27355de59ad62a5",
+  "tokenizer_status": "PASS"
+}
