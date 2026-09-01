@@ -1,0 +1,26 @@
+{
+  "assignment_count": 2256,
+  "candidate_containing_cue_count": 0,
+  "cue_phrases": [
+    "omitted",
+    "missing",
+    "not provided",
+    "not supplied",
+    "blank",
+    "absent",
+    "left empty"
+  ],
+  "design_sample_count": 728,
+  "exact_candidate_cue_count": 0,
+  "gpu_called": false,
+  "model_called": false,
+  "omission_cue_suppression_has_design_train_recall_risk": false,
+  "question_cue_occurrence_count": 0,
+  "question_cue_occurrences": [],
+  "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT",
+  "status": "PASS",
+  "true_assigned_value_contains_cue_count": 0,
+  "true_assigned_value_contains_cue_examples": [],
+  "true_assigned_value_exact_cue_count": 0,
+  "true_assigned_value_exact_cue_examples": []
+}

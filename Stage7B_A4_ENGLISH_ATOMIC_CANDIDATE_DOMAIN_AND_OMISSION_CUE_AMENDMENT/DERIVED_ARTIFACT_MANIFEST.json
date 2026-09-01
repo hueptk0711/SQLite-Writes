@@ -1,0 +1,63 @@
+{
+  "artifact_count": 11,
+  "artifacts": [
+    {
+      "bytes": 4346,
+      "path": "SOURCE_INPUT_MANIFEST.json",
+      "sha256": "18890bda12589717c8ababe7ca4482f8a0e294b27bff2403e8377e502d35bc71"
+    },
+    {
+      "bytes": 888,
+      "path": "A5_CORRECTED_VALID_FAIL_FREEZE.json",
+      "sha256": "e460cac4bcdf9901b7125aec5c969220df0373c2ab446eee96d539d855be7277"
+    },
+    {
+      "bytes": 854,
+      "path": "DOMAIN_AUDIT_PROTOCOL.json",
+      "sha256": "ffec1e15edd5f794fc9105ac97d3bc1606abfc54e074f7098503657ef169bc4e"
+    },
+    {
+      "bytes": 938,
+      "path": "ATOMIC_CANDIDATE_DOMINANCE_RULE_SPEC.json",
+      "sha256": "b26fe465891f4a71bb7657dc50e278578fe46b9f7fd14b065c5f3bbd6ee45fb4"
+    },
+    {
+      "bytes": 718,
+      "path": "OMISSION_CUE_SUPPRESSION_RULE_SPEC.json",
+      "sha256": "f3a995c26f9c2e019e3390cce2a1b1f612863d0fb710f864b8d55ccb51cb6a7d"
+    },
+    {
+      "bytes": 824,
+      "path": "CURRENT_LEXICAL_NGRAM2_DOMAIN_AUDIT.json",
+      "sha256": "d8e39b9c5626d980a6d2f607f1c13e57f65ebbf23c64686b564487b4757b64ee"
+    },
+    {
+      "bytes": 1164,
+      "path": "ATOMIC_FILTERED_DOMAIN_AUDIT.json",
+      "sha256": "9c99cfcbd929481db6c646b8553dd837e72dce5cd93aa2a57c01c9663943f80b"
+    },
+    {
+      "bytes": 690,
+      "path": "DOMAIN_COMPARISON_AUDIT.json",
+      "sha256": "9e0ec4d7537a43877430f4487c71696757399a8847eb1c21b06718d0fcfdf675"
+    },
+    {
+      "bytes": 752,
+      "path": "OMISSION_CUE_DESIGN_TRAIN_AUDIT.json",
+      "sha256": "c629e49424bff9e8ff7f3dd1192c4769781fd4c48ff2381aee5398f7b4d136cf"
+    },
+    {
+      "bytes": 1000495,
+      "path": "CANDIDATE_DOMAIN_AUDIT_ROWS.jsonl",
+      "sha256": "6cfa5fc6a3eea6bfb917baaf11bcd8f6636a8e26959d304ab922119d45178578"
+    },
+    {
+      "bytes": 188919,
+      "path": "CANDIDATE_SUPPRESSION_EXAMPLES.jsonl",
+      "sha256": "2621363aa86f6be0e383faa00c82afae962f00dfcd4149103810a238bb2741b1"
+    }
+  ],
+  "combined_scientific_artifacts_sha256": "79bfe234f6d9a23ac72a82cab0b097a3c7c5780c4e6c91a8dd4c5dc782783efc",
+  "patch": "PATCH0",
+  "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"
+}

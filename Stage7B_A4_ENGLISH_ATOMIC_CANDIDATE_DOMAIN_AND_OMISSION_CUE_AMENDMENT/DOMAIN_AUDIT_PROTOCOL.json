@@ -1,0 +1,23 @@
+{
+  "baseline_candidate_generator": "lexical_ngram2",
+  "candidate_domain_compared": [
+    "current lexical_ngram2",
+    "lexical_ngram2 minus gold-blind atomic-dominated broad spans and exact omission-cue spans"
+  ],
+  "design_sample_count_required": 728,
+  "forbidden_inputs_for_candidate_suppression": [
+    "gold_sql",
+    "gold_values",
+    "gold_offsets",
+    "target_state",
+    "model_outputs"
+  ],
+  "gold_usage": "Gold assignment spans are used only after candidate generation to audit representability and burden.",
+  "gpu_called": false,
+  "minimum_assignment_representability": 0.99,
+  "minimum_full_sample_representability": 0.99,
+  "model_called": false,
+  "patch": "PATCH0",
+  "scope": "StageENG1 development_train excluding the 100-sample pilot pool",
+  "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"
+}

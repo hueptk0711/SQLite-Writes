@@ -1,0 +1,20 @@
+{
+  "audit_only": true,
+  "candidate_is_not_suppressible_when": "The cue phrase is part of a true assigned database value or a non-exact longer candidate.",
+  "candidate_is_suppressible_when": "Normalized candidate text exactly equals one cue phrase and the SPAN|OMIT column domain includes OMIT.",
+  "cue_phrases": [
+    "omitted",
+    "missing",
+    "not provided",
+    "not supplied",
+    "blank",
+    "absent",
+    "left empty"
+  ],
+  "gold_blind_runtime_policy": true,
+  "gold_used_only_for_design_train_recall_audit": true,
+  "gpu_called": false,
+  "model_called": false,
+  "rule_name": "exact_omission_cue_suppression_audit",
+  "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"
+}

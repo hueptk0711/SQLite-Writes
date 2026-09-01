@@ -1,0 +1,39 @@
+{
+  "assignment_count": 2256,
+  "assignment_representability": 0.9968971631205674,
+  "audit_only": true,
+  "broader_containing_gold_count_stats": {
+    "max": 5,
+    "mean": 0.6808510638297872,
+    "median": 1.0,
+    "min": 0,
+    "p95": 2
+  },
+  "broader_containing_gold_total": 1536,
+  "candidate_count_stats": {
+    "max": 85,
+    "mean": 35.50137362637363,
+    "median": 35.0,
+    "min": 9,
+    "p95": 54
+  },
+  "candidate_generator_variant": "lexical_ngram2",
+  "covered_assignment_count": 2249,
+  "design_sample_count": 728,
+  "domain": "atomic_filtered_candidate_domain_audit",
+  "full_sample_covered_count": 721,
+  "full_sample_representability": 0.9903846153846154,
+  "gpu_called": false,
+  "minimum_assignment_representability": 0.99,
+  "minimum_full_sample_representability": 0.99,
+  "missing_assignment_count": 7,
+  "model_called": false,
+  "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT",
+  "status": "PASS",
+  "suppressed_candidate_total": 7504,
+  "suppressed_candidates_with_strong_child": 7504,
+  "suppressible_gold_assignment_count": 3,
+  "suppression_rule_counts": {
+    "ATOMIC_DOMINATED_BROAD_SPAN": 7504
+  }
+}

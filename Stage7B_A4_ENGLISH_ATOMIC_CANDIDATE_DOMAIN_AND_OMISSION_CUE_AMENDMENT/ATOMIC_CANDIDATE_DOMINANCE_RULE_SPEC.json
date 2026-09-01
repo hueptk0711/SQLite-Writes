@@ -1,0 +1,19 @@
+{
+  "audit_only": true,
+  "candidate_is_not_suppressible_when": [
+    "The candidate is a single-token alphanumeric literal such as Q2, 789B, or S102.",
+    "The candidate itself is tagged as EMAIL, NUMBER, IDENTIFIER, QUOTED_TEXT, or URL.",
+    "No strong atomic child candidate is contained by the span."
+  ],
+  "candidate_is_suppressible_when": [
+    "The candidate has at least two whitespace-delimited tokens.",
+    "The candidate itself has no strong atomic model-visible tag.",
+    "The candidate strictly contains another candidate tagged EMAIL, NUMBER, IDENTIFIER, QUOTED_TEXT, or URL."
+  ],
+  "gold_blind": true,
+  "gpu_called": false,
+  "model_called": false,
+  "purpose": "Reduce broad label-plus-value candidates such as 'loan_id LOAN-842' when an atomic child span exists.",
+  "rule_name": "atomic_dominated_broad_span_suppression_audit",
+  "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"
+}

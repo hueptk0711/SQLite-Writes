@@ -1,0 +1,17 @@
+{
+  "assignment_representability_delta": -0.0013297872340425343,
+  "audit_only": true,
+  "broader_containing_gold_total_delta": -5005,
+  "candidate_count_max_delta": -29,
+  "candidate_count_median_delta": -10.0,
+  "candidate_count_p95_delta": -16,
+  "candidate_domain_under_review": "atomic_filtered_candidate_domain_audit",
+  "current_domain": "current_lexical_ngram2",
+  "full_sample_representability_delta": -0.004120879120879106,
+  "gpu_called": false,
+  "method_freeze_authorized": false,
+  "model_called": false,
+  "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT",
+  "status": "PASS",
+  "threshold_decision": "PASS_AUDIT_THRESHOLDS_READY_FOR_REVIEW"
+}

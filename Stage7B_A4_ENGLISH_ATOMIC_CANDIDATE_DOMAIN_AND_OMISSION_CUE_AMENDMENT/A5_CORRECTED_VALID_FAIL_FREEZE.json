@@ -1,0 +1,23 @@
+{
+  "corrected_pass_case_ids": [
+    "stage7c_a5_primary_english_003",
+    "stage7c_a5_primary_english_012"
+  ],
+  "corrected_primary_pass_count": "2/12",
+  "diagnostics_run": false,
+  "evidence_integrity_status": "PASS",
+  "gpu_called": false,
+  "gretel_pilot_opened": false,
+  "model_called": false,
+  "no_gpu_rerun_required": true,
+  "old_classification": "1/12",
+  "old_classification_status": "SUPERSEDED_BY_GOLD_PROVENANCE_ERRATUM",
+  "primary_gate_status": "FAIL",
+  "protocol_compliance_status": "PASS",
+  "required_pass_count": "12/12",
+  "scientific_result_eligible": true,
+  "source_stage": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0",
+  "source_tar_sha256": "f275b7990c06f6d2130b6ebf0cdb33d29d8a51b83281fdc0beb83cdc2f34c035",
+  "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT",
+  "status": "STAGE7E0_A5_VALID_FEASIBILITY_FAIL_CLOSED"
+}

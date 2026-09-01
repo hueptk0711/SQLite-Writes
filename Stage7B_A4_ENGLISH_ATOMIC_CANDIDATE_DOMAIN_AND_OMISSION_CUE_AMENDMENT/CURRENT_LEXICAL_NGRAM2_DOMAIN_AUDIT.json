@@ -1,0 +1,30 @@
+{
+  "assignment_count": 2256,
+  "assignment_representability": 0.99822695035461,
+  "broader_containing_gold_count_stats": {
+    "max": 7,
+    "mean": 2.8993794326241136,
+    "median": 3.0,
+    "min": 0,
+    "p95": 5
+  },
+  "broader_containing_gold_total": 6541,
+  "candidate_count_stats": {
+    "max": 114,
+    "mean": 45.809065934065934,
+    "median": 45.0,
+    "min": 11,
+    "p95": 70
+  },
+  "candidate_generator_variant": "lexical_ngram2",
+  "covered_assignment_count": 2252,
+  "design_sample_count": 728,
+  "domain": "current_lexical_ngram2",
+  "full_sample_covered_count": 724,
+  "full_sample_representability": 0.9945054945054945,
+  "gpu_called": false,
+  "missing_assignment_count": 4,
+  "model_called": false,
+  "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT",
+  "status": "PASS"
+}
