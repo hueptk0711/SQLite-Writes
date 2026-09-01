@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate and classify Stage7E0-A5 server/Kaggle result directories."""
+"""Validate and classify Stage7E0-A5 server result directories."""
 
 from __future__ import annotations
 

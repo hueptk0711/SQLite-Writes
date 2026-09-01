@@ -17,8 +17,9 @@ if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
 from scripts.data.build_stage7e0_a5_english_preflight import (  # noqa: E402
-    KAGGLE_REQUIREMENTS_LOCK,
     PRIMARY_RESULT_DIR_NAME,
+    SERVER_REQUIREMENTS_LOCK,
+    SERVER_WORK_ROOT,
 )
 from scripts.data.validate_stage7c_a5_column_conditioned_phase_o_protocol import validate as validate_stage7c_a5  # noqa: E402
 from scripts.server.run_stage7e0_a5_english import (  # noqa: E402
@@ -61,7 +62,7 @@ REQUIRED_FILES = {
     "mock_dry_run/raw_primary_phase_o_generations.jsonl",
 }
 PACKAGE_ROOT_REQUIRED_FILES = {
-    KAGGLE_REQUIREMENTS_LOCK,
+    SERVER_REQUIREMENTS_LOCK,
     "scripts/server/preflight_runtime_stage7e0_a5.py",
     "scripts/server/run_stage7e0_a5_english.py",
     "scripts/data/validate_stage7e0_a5_server_results.py",
@@ -120,8 +121,8 @@ def validate(stage_dir: Path) -> dict[str, Any]:
         failures.append("primary_runtime_profile_drifted")
     if model.get("historical_runtime_profile_ids") != HISTORICAL_RUNTIME_PROFILE_IDS:
         failures.append("historical_runtime_profile_ids_drifted")
-    if model.get("kaggle_requirements_lock") != KAGGLE_REQUIREMENTS_LOCK:
-        failures.append("kaggle_requirements_lock_drifted")
+    if model.get("server_requirements_lock") != SERVER_REQUIREMENTS_LOCK:
+        failures.append("server_requirements_lock_drifted")
 
     prompt_contract = protocol.get("prompt_contract", {})
     if prompt_contract.get("phase_o_prompt_spec_path") != A5_PROMPT_SPEC_REL:
@@ -249,7 +250,7 @@ def validate(stage_dir: Path) -> dict[str, Any]:
     }.items():
         if lock.get(key) != expected:
             failures.append(f"stage_lock_{key}_drifted")
-    if lock.get("primary_result_root") != f"/kaggle/working/{PRIMARY_RESULT_DIR_NAME}":
+    if lock.get("primary_result_root") != f"{SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}":
         failures.append("stage_lock_primary_result_root_drifted")
     if lock.get("frozen_runtime_versions") != FROZEN_RUNTIME_VERSIONS:
         failures.append("stage_lock_frozen_runtime_versions_drifted")
@@ -259,7 +260,7 @@ def validate(stage_dir: Path) -> dict[str, Any]:
         failures.append("stage_lock_constraint_independence_hash_mismatch")
 
     commands = (stage_dir / "SERVER_RUN_COMMANDS.md").read_text(encoding="utf-8")
-    for needle in ("Kaggle", KAGGLE_REQUIREMENTS_LOCK, "preflight_runtime_stage7e0_a5.py", PRIMARY_RUNTIME_PROFILE_ID, "run_stage7e0_a5_english.py", "--backend constrained_hf", "--quantization none", "--phase-o-max-new-tokens 512", PRIMARY_RESULT_DIR_NAME, "Do not use `--resume`", "less than 12/12", "validate", "archive", "sha256"):
+    for needle in ("UET", SERVER_REQUIREMENTS_LOCK, "CUDA_VISIBLE_DEVICES=0", "preflight_runtime_stage7e0_a5.py", PRIMARY_RUNTIME_PROFILE_ID, "run_stage7e0_a5_english.py", "--backend constrained_hf", "--quantization none", "--phase-o-max-new-tokens 512", PRIMARY_RESULT_DIR_NAME, "Do not use `--resume`", "less than 12/12", "validate", "archive", "sha256"):
         if needle not in commands:
             failures.append(f"server_command_missing:{needle}")
     primary_pos = commands.find(PRIMARY_RESULT_DIR_NAME)

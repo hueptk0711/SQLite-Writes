@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-fast runtime preflight for Stage7E0-A5 Kaggle primary runs."""
+"""Fail-fast runtime preflight for Stage7E0-A5 UET server primary runs."""
 
 from __future__ import annotations
 

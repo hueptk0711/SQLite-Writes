@@ -187,18 +187,18 @@ def test_wrong_span_mapping_fails_acceptance_gate() -> None:
     assert result["checks"]["column_span_refs_mapping_exact"] is False
 
 
-def test_runtime_lock_accepts_kaggle_t4x2_profile() -> None:
+def test_runtime_lock_accepts_uet_rtx4090_profile() -> None:
     report = validate_runtime_versions(
         {
-            "torch": "2.13.0+cu130",
-            "torch_cuda": "13.0",
+            "torch": "2.6.0+cu124",
+            "torch_cuda": "12.4",
             "transformers": "5.5.3",
             "tokenizers": "0.22.2",
             "accelerate": "1.14.0",
             "safetensors": "0.5.3",
             "cuda_available": True,
-            "gpu_count": 2,
-            "gpu_devices": ["Tesla T4", "Tesla T4"],
+            "gpu_count": 1,
+            "gpu_devices": ["NVIDIA GeForce RTX 4090"],
         }
     )
     assert report["status"] == "PASS"
@@ -216,8 +216,8 @@ def test_runtime_lock_rejects_wrong_runtime() -> None:
                 "accelerate": "1.14.0",
                 "safetensors": "0.5.3",
                 "cuda_available": True,
-                "gpu_count": 2,
-                "gpu_devices": ["Tesla T4", "Tesla T4"],
+                "gpu_count": 1,
+                "gpu_devices": ["NVIDIA GeForce RTX 4090"],
             }
         )
 
@@ -349,14 +349,14 @@ def _server_model_metadata(*, protocol_valid: bool) -> dict:
         "max_memory": None,
         "primary_runtime_profile_id": PRIMARY_RUNTIME_PROFILE_ID,
         "runtime_profile_id": PRIMARY_RUNTIME_PROFILE_ID,
-        "torch": "2.13.0+cu130",
-        "torch_cuda": "13.0",
+        "torch": "2.6.0+cu124",
+        "torch_cuda": "12.4",
         "transformers": "5.5.3",
         "tokenizers": "0.22.2",
         "accelerate": "1.14.0",
         "safetensors": "0.5.3",
-        "gpu_count": 2,
-        "gpu_devices": ["Tesla T4", "Tesla T4"],
+        "gpu_count": 1,
+        "gpu_devices": ["NVIDIA GeForce RTX 4090"],
     }
 
 

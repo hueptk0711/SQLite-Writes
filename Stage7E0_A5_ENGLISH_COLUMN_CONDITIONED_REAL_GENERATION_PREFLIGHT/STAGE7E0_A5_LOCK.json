@@ -49,17 +49,43 @@
       "profile_id": "kaggle_t4x2_cuda130",
       "role": "primary_scientific_runtime",
       "torch_cuda": "13.0"
+    },
+    {
+      "cuda_available": true,
+      "gpu_count": 1,
+      "gpu_device_substring": "RTX 4090",
+      "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
+      "packages": {
+        "accelerate": [
+          "1.14.0"
+        ],
+        "safetensors": [
+          "0.5.3"
+        ],
+        "tokenizers": [
+          "0.22.2"
+        ],
+        "torch": [
+          "2.6.0+cu124"
+        ],
+        "transformers": [
+          "5.5.3"
+        ]
+      },
+      "profile_id": "uet_rtx4090_cuda124_visible0",
+      "role": "primary_scientific_runtime_patch3_uet_server",
+      "torch_cuda": "12.4"
     }
   ],
   "backend": "incremental_json_schema_grammar",
   "calls_per_primary_case": 1,
-  "constraint_independence_audit_sha256": "cc64a128b2199775a5954120c534de1ddc969ef7798409c92ab967ae6cd98744",
-  "created_utc": "2026-09-01T14:21:25.896139+00:00",
-  "derived_artifact_manifest_sha256": "e8e9cb6d012e4e11aeeaeee2a1146cb517de64c2a68b0d635e4d76f4bf2722ab",
+  "constraint_independence_audit_sha256": "9495947727e28cd794681b9e0536c82191dd957f075db8adb50b23342fd9181c",
+  "created_utc": "2026-09-01T14:49:09.160618+00:00",
+  "derived_artifact_manifest_sha256": "8aa4275d20795ef938b48078016110e0438a5ce0084bcf100af2c58773544a53",
   "development_dev_used": false,
   "device_map": "auto",
   "diagnostic_case_count": 12,
-  "diagnostic_result_root": "/kaggle/working/stage7e0_a5_english_column_conditioned_kaggle_t4x2_diagnostic_results_20260901",
+  "diagnostic_result_root": "/home/uet/hue_ptk/stage7e0_a5_english_column_conditioned_uet_rtx4090_diagnostic_results_20260901",
   "diagnostics_can_compensate_primary_failure": false,
   "fallback_to_unconstrained": false,
   "finite_complete_object_enumeration": false,
@@ -77,9 +103,9 @@
   "gpu_topology_fail_fast_before_model_load": true,
   "gretel_pilot_opened": false,
   "historical_runtime_profile_ids": [
-    "uet_server_cuda124"
+    "uet_server_cuda124",
+    "kaggle_t4x2_cuda130"
   ],
-  "kaggle_requirements_lock": "requirements-inference-kaggle-t4x2.lock.txt",
   "label_side_data_used_for_constraints": false,
   "max_memory": null,
   "mock_dry_run_only": true,
@@ -87,18 +113,18 @@
   "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
   "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
   "official_test_used": false,
-  "patch": "PATCH2",
+  "patch": "PATCH3",
   "phase_m_removed": true,
   "phase_o_max_new_tokens": 512,
   "primary_acceptance": "12/12 required; no average and no 11/12 acceptance",
   "primary_before_diagnostics": true,
   "primary_case_count": 12,
-  "primary_result_root": "/kaggle/working/stage7e0_a5_english_column_conditioned_kaggle_t4x2_primary_results_20260901",
+  "primary_result_root": "/home/uet/hue_ptk/stage7e0_a5_english_column_conditioned_uet_rtx4090_primary_results_20260901",
   "primary_runtime_profile": {
     "cuda_available": true,
-    "gpu_count": 2,
-    "gpu_device_substring": "Tesla T4",
-    "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
+    "gpu_count": 1,
+    "gpu_device_substring": "RTX 4090",
+    "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
     "packages": {
       "accelerate": [
         "1.14.0"
@@ -110,23 +136,23 @@
         "0.22.2"
       ],
       "torch": [
-        "2.13.0",
-        "2.13.0+cu130"
+        "2.6.0+cu124"
       ],
       "transformers": [
         "5.5.3"
       ]
     },
-    "profile_id": "kaggle_t4x2_cuda130",
-    "role": "primary_scientific_runtime",
-    "torch_cuda": "13.0"
+    "profile_id": "uet_rtx4090_cuda124_visible0",
+    "role": "primary_scientific_runtime_patch3_uet_server",
+    "torch_cuda": "12.4"
   },
-  "primary_runtime_profile_id": "kaggle_t4x2_cuda130",
+  "primary_runtime_profile_id": "uet_rtx4090_cuda124_visible0",
   "quantization": "none",
   "repair": "none",
   "resume_allowed": false,
   "retry": 0,
   "runtime_profile_switch_after_completed_generation_allowed": false,
+  "server_requirements_lock": "requirements-inference-uet-rtx4090-cu124.lock.txt",
   "single_primary_runtime_profile": true,
   "stage": "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT",
   "status": "PASS_READY_FOR_REAL_A5_CONSTRAINED_PREFLIGHT",

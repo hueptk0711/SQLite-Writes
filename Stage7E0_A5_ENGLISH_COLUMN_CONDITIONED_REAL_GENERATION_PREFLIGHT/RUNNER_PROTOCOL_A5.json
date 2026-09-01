@@ -88,6 +88,32 @@
         "profile_id": "kaggle_t4x2_cuda130",
         "role": "primary_scientific_runtime",
         "torch_cuda": "13.0"
+      },
+      {
+        "cuda_available": true,
+        "gpu_count": 1,
+        "gpu_device_substring": "RTX 4090",
+        "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
+        "packages": {
+          "accelerate": [
+            "1.14.0"
+          ],
+          "safetensors": [
+            "0.5.3"
+          ],
+          "tokenizers": [
+            "0.22.2"
+          ],
+          "torch": [
+            "2.6.0+cu124"
+          ],
+          "transformers": [
+            "5.5.3"
+          ]
+        },
+        "profile_id": "uet_rtx4090_cuda124_visible0",
+        "role": "primary_scientific_runtime_patch3_uet_server",
+        "torch_cuda": "12.4"
       }
     ],
     "default_model_path": "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242",
@@ -101,17 +127,17 @@
       "transformers": "5.5.3"
     },
     "historical_runtime_profile_ids": [
-      "uet_server_cuda124"
+      "uet_server_cuda124",
+      "kaggle_t4x2_cuda130"
     ],
-    "kaggle_requirements_lock": "requirements-inference-kaggle-t4x2.lock.txt",
     "max_memory": null,
     "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
     "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
     "primary_runtime_profile": {
       "cuda_available": true,
-      "gpu_count": 2,
-      "gpu_device_substring": "Tesla T4",
-      "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
+      "gpu_count": 1,
+      "gpu_device_substring": "RTX 4090",
+      "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
       "packages": {
         "accelerate": [
           "1.14.0"
@@ -123,23 +149,23 @@
           "0.22.2"
         ],
         "torch": [
-          "2.13.0",
-          "2.13.0+cu130"
+          "2.6.0+cu124"
         ],
         "transformers": [
           "5.5.3"
         ]
       },
-      "profile_id": "kaggle_t4x2_cuda130",
-      "role": "primary_scientific_runtime",
-      "torch_cuda": "13.0"
+      "profile_id": "uet_rtx4090_cuda124_visible0",
+      "role": "primary_scientific_runtime_patch3_uet_server",
+      "torch_cuda": "12.4"
     },
-    "primary_runtime_profile_id": "kaggle_t4x2_cuda130",
+    "primary_runtime_profile_id": "uet_rtx4090_cuda124_visible0",
     "quantization_allowed": false,
     "quantization_default": "none",
+    "server_requirements_lock": "requirements-inference-uet-rtx4090-cu124.lock.txt",
     "torch_dtype": "auto"
   },
-  "patch": "PATCH2",
+  "patch": "PATCH3",
   "prompt_contract": {
     "column_span_refs_mapping_equality": "order_insensitive_by_object_key",
     "duplicate_non_omit_span_reuse": "method_failure",

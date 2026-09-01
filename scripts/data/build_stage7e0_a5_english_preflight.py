@@ -49,12 +49,13 @@ from scripts.data.build_stage7c_a5_column_conditioned_phase_o_protocol import ca
 
 
 STAGE_NAME = "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT"
-PATCH_NAME = "PATCH2"
+PATCH_NAME = "PATCH3"
 PACKAGE_DATE = "20260901"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
-PRIMARY_RESULT_DIR_NAME = "stage7e0_a5_english_column_conditioned_kaggle_t4x2_primary_results_20260901"
-DIAGNOSTIC_RESULT_DIR_NAME = "stage7e0_a5_english_column_conditioned_kaggle_t4x2_diagnostic_results_20260901"
-KAGGLE_REQUIREMENTS_LOCK = "requirements-inference-kaggle-t4x2.lock.txt"
+SERVER_WORK_ROOT = "/home/uet/hue_ptk"
+PRIMARY_RESULT_DIR_NAME = "stage7e0_a5_english_column_conditioned_uet_rtx4090_primary_results_20260901"
+DIAGNOSTIC_RESULT_DIR_NAME = "stage7e0_a5_english_column_conditioned_uet_rtx4090_diagnostic_results_20260901"
+SERVER_REQUIREMENTS_LOCK = "requirements-inference-uet-rtx4090-cu124.lock.txt"
 
 
 def canonical_text(text: str) -> str:
@@ -140,7 +141,7 @@ def runner_protocol(accepted_commit: str) -> dict[str, Any]:
             "primary_runtime_profile_id": PRIMARY_RUNTIME_PROFILE_ID,
             "primary_runtime_profile": runtime_profile_by_id(PRIMARY_RUNTIME_PROFILE_ID),
             "historical_runtime_profile_ids": HISTORICAL_RUNTIME_PROFILE_IDS,
-            "kaggle_requirements_lock": KAGGLE_REQUIREMENTS_LOCK,
+            "server_requirements_lock": SERVER_REQUIREMENTS_LOCK,
         },
         "prompt_contract": {
             "phase_o_prompt_spec_path": A5_PROMPT_SPEC_REL,
@@ -190,37 +191,53 @@ def runner_protocol(accepted_commit: str) -> dict[str, Any]:
 
 
 def server_commands(accepted_commit: str) -> str:
-    return f"""# Stage7E0-A5 English Column-Conditioned Kaggle T4x2 Commands
+    return f"""# Stage7E0-A5 English Column-Conditioned UET RTX4090 Commands
 
 Run the primary set first. Do not run diagnostics before the primary result is
 frozen and reviewed. A completed primary result is preserved whether it is
 12/12 PASS or a protocol-compliant scientific FAIL below 12/12.
 
 ```bash
-%%bash
 set -euo pipefail
-cd /kaggle/working
+cd {SERVER_WORK_ROOT}
+
+if command -v conda >/dev/null 2>&1; then
+  source "$(conda info --base)/etc/profile.d/conda.sh"
+  if ! conda env list | awk '{{print $1}}' | grep -qx stage7e0_a5_uet_py312; then
+    conda create -y -n stage7e0_a5_uet_py312 python=3.12
+  fi
+  conda activate stage7e0_a5_uet_py312
+fi
+
+python -m pip install --upgrade pip
+
 rm -rf {STAGE_NAME}_{PATCH_NAME}_runner
 mkdir -p {STAGE_NAME}_{PATCH_NAME}_runner
-PKG_ROOT="$(find /kaggle/input -type d -name '{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_*' -print -quit)"
-test -n "$PKG_ROOT"
-cp -a "$PKG_ROOT"/. {STAGE_NAME}_{PATCH_NAME}_runner/
+unzip -q -o {PACKAGE_NAME} -d {STAGE_NAME}_{PATCH_NAME}_runner
 cd {STAGE_NAME}_{PATCH_NAME}_runner
-export HF_HOME=/kaggle/working/hf_cache
-python -m pip install --extra-index-url https://download.pytorch.org/whl/cu130 -r {KAGGLE_REQUIREMENTS_LOCK}
+python -m pip install --extra-index-url https://download.pytorch.org/whl/cu124 -r {SERVER_REQUIREMENTS_LOCK}
+
+export CUDA_VISIBLE_DEVICES=0
+export HF_HOME={SERVER_WORK_ROOT}/hf_cache
 python scripts/data/validate_stage7c_a5_column_conditioned_phase_o_protocol.py --stage-dir {STAGE7C_A5_DIR}
 python scripts/data/validate_stage7e0_a5_english_preflight.py --stage-dir {STAGE_NAME}
 python scripts/server/preflight_runtime_stage7e0_a5.py --expected-profile {PRIMARY_RUNTIME_PROFILE_ID}
+
+MODEL_SNAPSHOT="{SERVER_WORK_ROOT}/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/{MODEL_REVISION}"
+if [ ! -d "$MODEL_SNAPSHOT" ]; then
+  MODEL_SNAPSHOT="{MODEL_ID}"
+fi
+
 python scripts/server/run_stage7e0_a5_english.py \\
   --accepted-protocol-commit {accepted_commit} \\
-  --result-root /kaggle/working/{PRIMARY_RESULT_DIR_NAME} \\
+  --result-root {SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME} \\
   --backend constrained_hf \\
   --quantization none \\
   --phase-o-max-new-tokens {PHASE_O_MAX_NEW_TOKENS} \\
-  --model-name-or-path {MODEL_ID}
-python scripts/data/validate_stage7e0_a5_server_results.py --result-dir /kaggle/working/{PRIMARY_RESULT_DIR_NAME}
-tar -czf /kaggle/working/{PRIMARY_RESULT_DIR_NAME}.tar.gz -C /kaggle/working {PRIMARY_RESULT_DIR_NAME}
-sha256sum /kaggle/working/{PRIMARY_RESULT_DIR_NAME}.tar.gz > /kaggle/working/{PRIMARY_RESULT_DIR_NAME}.tar.gz.sha256
+  --model-name-or-path "$MODEL_SNAPSHOT"
+python scripts/data/validate_stage7e0_a5_server_results.py --result-dir {SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}
+tar -czf {SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}.tar.gz -C {SERVER_WORK_ROOT} {PRIMARY_RESULT_DIR_NAME}
+sha256sum {SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}.tar.gz > {SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}.tar.gz.sha256
 ```
 
 Do not use `--resume`. If infrastructure interrupts, archive the partial output
@@ -314,7 +331,7 @@ repair=none
 quantization=none
 phase_o_max_new_tokens={PHASE_O_MAX_NEW_TOKENS}
 primary_runtime_profile_id={PRIMARY_RUNTIME_PROFILE_ID}
-kaggle_requirements_lock={KAGGLE_REQUIREMENTS_LOCK}
+server_requirements_lock={SERVER_REQUIREMENTS_LOCK}
 gretel_pilot_opened=false
 ```
 
@@ -334,9 +351,9 @@ mock_uses_label_side_expected={str(mock_summary["mock_uses_label_side_expected"]
 def reviewer_readme(package_name: str, accepted_commit: str) -> str:
     return f"""# Stage7E0-A5 English Column-Conditioned Real Generation Preflight {PATCH_NAME}
 
-This reviewer package prepares the Kaggle T4x2 primary GPU run for the 12 locked
-Stage7C-A5 primary cases. It does not open Gretel, development-dev, or official
-test rows. A5 uses one model call only; Phase M is removed.
+This reviewer package prepares the UET server RTX 4090 primary GPU run for the
+12 locked Stage7C-A5 primary cases. It does not open Gretel, development-dev, or
+official test rows. A5 uses one model call only; Phase M is removed.
 
 Clean extraction checks:
 
@@ -346,7 +363,7 @@ python scripts/data/validate_stage7e0_a5_english_preflight.py --stage-dir {STAGE
 python -m pytest -q tests/test_stage7e0_a5_english_preflight.py
 ```
 
-Kaggle commands are in `{STAGE_NAME}/SERVER_RUN_COMMANDS.md`.
+UET server commands are in `{STAGE_NAME}/SERVER_RUN_COMMANDS.md`.
 
 Package: `{package_name}`
 
@@ -419,8 +436,8 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
         "quantization": "none",
         "phase_o_max_new_tokens": PHASE_O_MAX_NEW_TOKENS,
         "resume_allowed": False,
-        "primary_result_root": f"/kaggle/working/{PRIMARY_RESULT_DIR_NAME}",
-        "diagnostic_result_root": f"/kaggle/working/{DIAGNOSTIC_RESULT_DIR_NAME}",
+        "primary_result_root": f"{SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}",
+        "diagnostic_result_root": f"{SERVER_WORK_ROOT}/{DIAGNOSTIC_RESULT_DIR_NAME}",
         "primary_before_diagnostics": True,
         "diagnostics_can_compensate_primary_failure": False,
         "frozen_runtime_versions": FROZEN_RUNTIME_VERSIONS,
@@ -428,7 +445,7 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
         "primary_runtime_profile_id": PRIMARY_RUNTIME_PROFILE_ID,
         "primary_runtime_profile": runtime_profile_by_id(PRIMARY_RUNTIME_PROFILE_ID),
         "historical_runtime_profile_ids": HISTORICAL_RUNTIME_PROFILE_IDS,
-        "kaggle_requirements_lock": KAGGLE_REQUIREMENTS_LOCK,
+        "server_requirements_lock": SERVER_REQUIREMENTS_LOCK,
         "single_primary_runtime_profile": True,
         "runtime_profile_switch_after_completed_generation_allowed": False,
         "gpu_topology_fail_fast_before_model_load": True,
@@ -464,7 +481,7 @@ def include_paths(stage_dir: Path) -> list[Path]:
     paths = [path for path in stage_dir.rglob("*") if path.is_file()]
     include_rel = [
         "pyproject.toml",
-        KAGGLE_REQUIREMENTS_LOCK,
+        SERVER_REQUIREMENTS_LOCK,
         STAGE7C_A5_DIR,
         "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL",
         "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT",

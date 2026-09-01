@@ -26,8 +26,8 @@ retry=0
 repair=none
 quantization=none
 phase_o_max_new_tokens=512
-primary_runtime_profile_id=kaggle_t4x2_cuda130
-kaggle_requirements_lock=requirements-inference-kaggle-t4x2.lock.txt
+primary_runtime_profile_id=uet_rtx4090_cuda124_visible0
+server_requirements_lock=requirements-inference-uet-rtx4090-cu124.lock.txt
 gretel_pilot_opened=false
 ```
 

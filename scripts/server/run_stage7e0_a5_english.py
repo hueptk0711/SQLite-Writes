@@ -36,14 +36,11 @@ from scripts.data.build_stage7c_a5_column_conditioned_phase_o_protocol import ( 
     sha256_text,
 )
 from scripts.server.run_stage7e0_a4_english import (  # noqa: E402
-    ALLOWED_FROZEN_RUNTIME_PROFILES,
+    ALLOWED_FROZEN_RUNTIME_PROFILES as A4_ALLOWED_FROZEN_RUNTIME_PROFILES,
     DEFAULT_MODEL_PATH,
     EXPECTED_CHAT_TEMPLATE_SHA256,
     FROZEN_RUNTIME_VERSIONS,
-    HISTORICAL_RUNTIME_PROFILE_IDS,
-    PRIMARY_RUNTIME_PROFILE_ID,
-    match_runtime_profile,
-    runtime_profile_by_id,
+    normalize_runtime_observation,
     runtime_versions,
 )
 from scripts.server.run_stage7e0_v2_a1_preflight import IncrementalJsonSchemaGrammarBackend  # noqa: E402
@@ -58,6 +55,81 @@ EXPECTED_PRIMARY_COUNT = 12
 EXPECTED_DIAGNOSTIC_COUNT = 12
 PHASE_O_MAX_NEW_TOKENS = 512
 CONSTRAINED_BACKEND_ID = "incremental_json_schema_grammar"
+KAGGLE_RUNTIME_PROFILE_ID = "kaggle_t4x2_cuda130"
+UET_RUNTIME_PROFILE_ID = "uet_rtx4090_cuda124_visible0"
+PRIMARY_RUNTIME_PROFILE_ID = UET_RUNTIME_PROFILE_ID
+HISTORICAL_RUNTIME_PROFILE_IDS = ["uet_server_cuda124", KAGGLE_RUNTIME_PROFILE_ID]
+ALLOWED_FROZEN_RUNTIME_PROFILES = [
+    *A4_ALLOWED_FROZEN_RUNTIME_PROFILES,
+    {
+        "profile_id": UET_RUNTIME_PROFILE_ID,
+        "role": "primary_scientific_runtime_patch3_uet_server",
+        "packages": {
+            "torch": ["2.6.0+cu124"],
+            "transformers": ["5.5.3"],
+            "tokenizers": ["0.22.2"],
+            "accelerate": ["1.14.0"],
+            "safetensors": ["0.5.3"],
+        },
+        "torch_cuda": "12.4",
+        "cuda_available": True,
+        "gpu_count": 1,
+        "gpu_device_substring": "RTX 4090",
+        "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
+    },
+]
+
+
+def runtime_profile_by_id(profile_id: str) -> dict[str, Any]:
+    for profile in ALLOWED_FROZEN_RUNTIME_PROFILES:
+        if profile["profile_id"] == profile_id:
+            return profile
+    raise KeyError(profile_id)
+
+
+def match_runtime_profile(
+    versions: dict[str, Any],
+    *,
+    allowed_profile_ids: tuple[str, ...] = (PRIMARY_RUNTIME_PROFILE_ID,),
+    require_gpu_topology: bool = True,
+) -> dict[str, Any]:
+    observed = normalize_runtime_observation(versions)
+    profile_mismatches: dict[str, dict[str, Any]] = {}
+    for profile_id in allowed_profile_ids:
+        profile = runtime_profile_by_id(profile_id)
+        package_mismatches = {
+            package: {"allowed": allowed, "observed": observed.get(package)}
+            for package, allowed in profile["packages"].items()
+            if observed.get(package) not in allowed
+        }
+        declared_profile_id = observed.get("runtime_profile_id")
+        if declared_profile_id is not None and declared_profile_id != profile_id:
+            package_mismatches["runtime_profile_id"] = {"expected": profile_id, "observed": declared_profile_id}
+        cuda_expected = profile.get("torch_cuda")
+        if cuda_expected is not None and observed.get("torch_cuda") != cuda_expected:
+            package_mismatches["torch_cuda"] = {"expected": cuda_expected, "observed": observed.get("torch_cuda")}
+        if require_gpu_topology and profile.get("cuda_available") is not None and observed.get("cuda_available") is not profile["cuda_available"]:
+            package_mismatches["cuda_available"] = {"expected": profile["cuda_available"], "observed": observed.get("cuda_available")}
+        if require_gpu_topology and profile.get("gpu_count") is not None and observed.get("gpu_count") != profile["gpu_count"]:
+            package_mismatches["gpu_count"] = {"expected": profile["gpu_count"], "observed": observed.get("gpu_count")}
+        gpu_device_substring = profile.get("gpu_device_substring")
+        if require_gpu_topology and gpu_device_substring is not None:
+            gpu_devices = observed.get("gpu_devices")
+            if not isinstance(gpu_devices, list) or len(gpu_devices) != profile["gpu_count"] or any(gpu_device_substring not in str(device) for device in gpu_devices):
+                package_mismatches["gpu_devices"] = {
+                    "expected": f"{profile['gpu_count']} devices containing {gpu_device_substring}",
+                    "observed": gpu_devices,
+                }
+        if not package_mismatches:
+            return {
+                "status": "PASS",
+                "runtime_profile_id": profile["profile_id"],
+                "runtime_profile": profile,
+                "allowed_frozen_runtime_profiles": ALLOWED_FROZEN_RUNTIME_PROFILES,
+                "observed_runtime_versions": observed,
+            }
+        profile_mismatches[profile_id] = package_mismatches
+    return {"status": "FAIL", "failures": profile_mismatches, "observed_runtime_versions": observed}
 
 
 def canonical_text(text: str) -> str:
