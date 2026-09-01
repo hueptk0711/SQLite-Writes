@@ -15,6 +15,7 @@
     "table_ref": "TAB_1"
   },
   "representation": "column_conditioned_candidate_selection",
+  "semantic_value_completeness_guaranteed_by_schema": false,
   "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT",
-  "structural_completeness_property": "The JSON object requires every target-table COL ref as a property under column_span_refs."
+  "structural_decision_completeness_property": "The JSON object requires one decision key for every target-table COL ref under column_span_refs."
 }

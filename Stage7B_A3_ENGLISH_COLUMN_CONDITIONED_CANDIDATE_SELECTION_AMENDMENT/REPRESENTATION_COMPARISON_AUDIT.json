@@ -1,7 +1,9 @@
 {
   "column_conditioned_selection": {
+    "candidate_miss_count": 4,
     "early_stop_after_one_value_schema_valid": false,
     "omit_decision_count": 292,
+    "omit_under_selection_still_schema_valid": true,
     "oracle_assignment_candidate_coverage": 0.99822695035461,
     "oracle_type_compatible_coverage": 0.9977836879432624,
     "output_shape": {
@@ -12,6 +14,9 @@
       "table_ref": "TAB_1"
     },
     "requires_one_decision_per_target_column": true,
+    "semantic_assignment_representability": 0.99822695035461,
+    "semantic_value_completeness_guaranteed_by_schema": false,
+    "structural_claim_scope": "decision completeness per target-table column",
     "target_table_column_decision_count": 2548,
     "unknown_length_array": false
   },

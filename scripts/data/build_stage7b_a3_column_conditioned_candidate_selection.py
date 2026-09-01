@@ -49,13 +49,14 @@ from scripts.data.build_stage7b_a2_candidate_span_reference import (  # noqa: E4
 
 
 STAGE_NAME = "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT"
-PATCH_NAME = "PATCH0"
+PATCH_NAME = "PATCH1"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260901.zip"
 STAGEENG0_NAME = "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION"
 STAGEENG1_NAME = "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
 STAGE7B_A2_NAME = "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
 STAGE7C_A4_NAME = "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL"
 STAGE7E0_A4_NAME = "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT"
+CANDIDATE_MISS_SENTINEL = "UNREPRESENTABLE_CANDIDATE_MISS"
 
 SCIENTIFIC_ARTIFACTS = [
     "SOURCE_INPUT_MANIFEST.json",
@@ -64,6 +65,7 @@ SCIENTIFIC_ARTIFACTS = [
     "COLUMN_CONDITIONED_REPRESENTATION_SPEC.json",
     "COLUMN_CONDITIONED_JSON_SCHEMA_SPEC.json",
     "OMIT_POLICY_AND_COLUMN_SCOPE_SPEC.json",
+    "TARGET_TABLE_RUNTIME_FEASIBILITY_AUDIT.json",
     "DESIGN_TRAIN_COLUMN_SCHEMA_AUDIT.json",
     "ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.json",
     "ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.jsonl",
@@ -268,6 +270,46 @@ def parse_create_table_columns(sql_context: str, table_name: str) -> list[Column
     return columns
 
 
+def parse_schema_tables(sql_context: str) -> dict[str, list[ColumnInfo]]:
+    """Parse model-visible CREATE TABLE context without reading gold SQL."""
+
+    tables: dict[str, list[ColumnInfo]] = {}
+    for table_name, _body in _matching_create_table_statements(sql_context):
+        tables[table_name] = parse_create_table_columns(sql_context, table_name)
+    if not tables:
+        raise ValueError("No CREATE TABLE statements found in sql_context")
+    return tables
+
+
+def derive_runtime_target_table(schema_tables: dict[str, list[ColumnInfo]]) -> tuple[str | None, list[ColumnInfo] | None, str]:
+    if len(schema_tables) == 1:
+        table_name, columns = next(iter(schema_tables.items()))
+        return table_name, columns, "schema_only_single_table_context"
+    return None, None, "multi_table_requires_schema_branch_selection"
+
+
+def schema_table_branches(schema_tables: dict[str, list[ColumnInfo]]) -> list[tuple[str, str, list[ColumnInfo]]]:
+    branches: list[tuple[str, str, list[ColumnInfo]]] = []
+    multi_table = len(schema_tables) > 1
+    for table_index, (table_name, columns) in enumerate(sorted(schema_tables.items()), start=1):
+        table_ref = f"TAB_{table_index}"
+        branch_columns = [
+            ColumnInfo(
+                table_name=column.table_name,
+                column_name=column.column_name,
+                column_ref=f"{table_ref}_{column.column_ref}" if multi_table else column.column_ref,
+                source_type=column.source_type,
+                nullable=column.nullable,
+                has_default=column.has_default,
+                primary_key=column.primary_key,
+                autoincrement=column.autoincrement,
+            )
+            for column in columns
+        ]
+        branches.append((table_name, table_ref, branch_columns))
+    return branches
+
+
 def strict_int(text: str) -> bool:
     return re.fullmatch(r"[-+]?\d+", text.strip()) is not None
 
@@ -345,12 +387,13 @@ def a4_valid_fail_freeze(stage7e0_a4_dir: Path) -> dict[str, Any]:
 
 def a4_root_cause_classification(stage7e0_a4_dir: Path) -> dict[str, Any]:
     summary = read_json(stage7e0_a4_dir / "SERVER_RESULT_CLASSIFICATION_PATCH4.json")
+    lock = read_json(stage7e0_a4_dir / "STAGE7E0_A4_SERVER_RESULT_LOCK.json")
     return {
         "stage": STAGE_NAME,
         "source_stage": STAGE7E0_A4_NAME,
         "source_classification_path": f"{STAGE7E0_A4_NAME}/SERVER_RESULT_CLASSIFICATION_PATCH4.json",
         "source_classification_sha256": sha256_file(stage7e0_a4_dir / "SERVER_RESULT_CLASSIFICATION_PATCH4.json"),
-        "primary_pass_count": summary.get("primary_pass_count"),
+        "primary_pass_count": summary.get("primary_pass_count") or lock.get("primary_pass_count"),
         "case_level_exact_selection": "6/10",
         "operation_prediction": "10/10 INSERT",
         "root_cause_counts": {
@@ -386,7 +429,8 @@ def representation_spec() -> dict[str, Any]:
             },
         },
         "column_decision_domain": "For each target-table column, exactly one value: a current candidate SPAN ref or OMIT.",
-        "structural_completeness_property": "The JSON object requires every target-table COL ref as a property under column_span_refs.",
+        "structural_decision_completeness_property": "The JSON object requires one decision key for every target-table COL ref under column_span_refs.",
+        "semantic_value_completeness_guaranteed_by_schema": False,
         "free_length_span_set_removed": True,
         "phase_m_status": "candidate for removal in a later protocol stage; not removed by this design audit",
         "model_called": False,
@@ -415,16 +459,52 @@ def dynamic_schema_for_columns(columns: list[ColumnInfo], span_refs: list[str]) 
     }
 
 
+def dynamic_schema_for_schema_tables(schema_tables: dict[str, list[ColumnInfo]], span_refs: list[str]) -> dict[str, Any]:
+    if len(schema_tables) == 1:
+        return dynamic_schema_for_columns(next(iter(schema_tables.values())), span_refs)
+
+    domain = ["OMIT", *span_refs]
+    branches: list[dict[str, Any]] = []
+    for _table_name, table_ref, branch_columns in schema_table_branches(schema_tables):
+        branches.append(
+            {
+                "type": "object",
+                "additionalProperties": False,
+                "required": ["operation", "table_ref", "column_span_refs"],
+                "properties": {
+                    "operation": {"type": "string", "const": "INSERT"},
+                    "table_ref": {"type": "string", "const": table_ref},
+                    "column_span_refs": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": [column.column_ref for column in branch_columns],
+                        "properties": {column.column_ref: {"type": "string", "enum": domain} for column in branch_columns},
+                    },
+                },
+            }
+        )
+    return {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "Stage7B-A3 Multi-Table Column-Conditioned Candidate Selection Output",
+        "oneOf": branches,
+    }
+
+
 def schema_spec() -> dict[str, Any]:
     return {
         "stage": STAGE_NAME,
-        "runtime_schema_builder": "dynamic_schema_for_columns(target_table_columns, candidate_span_refs)",
+        "runtime_schema_builder": "dynamic_schema_for_schema_tables(model_visible_schema_tables, candidate_span_refs)",
         "required_top_level_keys": ["operation", "table_ref", "column_span_refs"],
         "column_span_refs_required_keys": "exact COL refs for every target-table column",
         "column_value_domain": ["OMIT", "SPAN_0001", "SPAN_0002", "..."],
         "forbidden_top_level_keys": ["span_refs", "value_spans", "start_char", "end_char", "values", "assignments"],
+        "target_table_derivation_at_runtime": "single-table contexts derive TAB_1 from schema only; multi-table contexts use oneOf branches for all model-visible tables",
+        "gold_sql_required_for_runtime_schema": False,
+        "multi_table_schema_strategy": "oneOf branch per visible table_ref with branch-local required column_span_refs",
         "unknown_span_refs_structurally_impossible": True,
         "early_array_stop_structurally_impossible": True,
+        "omit_under_selection_still_schema_valid": True,
+        "structural_claim_scope": "decision completeness per visible target column, not semantic value completeness",
         "model_generates_character_offsets": False,
         "model_generates_free_length_span_set": False,
         "model_called": False,
@@ -477,9 +557,54 @@ def source_input_manifest(stageeng0_dir: Path, stageeng1_dir: Path, stage7b_a2_d
     }
 
 
-def audit_design_train(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
+def target_table_runtime_feasibility_audit(raw_by_id: dict[str, dict[str, Any]], design_ids: set[str]) -> dict[str, Any]:
+    table_counts: list[int] = []
+    failures: list[dict[str, str]] = []
+    single_table_samples: list[str] = []
+    multi_table_samples: list[dict[str, Any]] = []
+    for sample_id in sorted(design_ids):
+        try:
+            schema_tables = parse_schema_tables(str(raw_by_id[sample_id]["sql_context"]))
+            count = len(schema_tables)
+            table_counts.append(count)
+            if count == 1:
+                single_table_samples.append(sample_id)
+            else:
+                multi_table_samples.append({"sample_id": sample_id, "schema_table_count": count, "table_names": sorted(schema_tables)})
+        except Exception as exc:
+            failures.append({"sample_id": sample_id, "error": f"{type(exc).__name__}: {exc}"})
+
+    multi_table_count = len(multi_table_samples)
+    return {
+        "stage": STAGE_NAME,
+        "status": "PASS" if not failures else "FAIL",
+        "design_sample_count": len(design_ids),
+        "parsed_sample_count": len(design_ids) - len(failures),
+        "parse_failure_count": len(failures),
+        "parse_failures": failures[:20],
+        "schema_table_count_stats": _stats(table_counts),
+        "single_table_context_count": len(single_table_samples),
+        "multi_table_context_count": multi_table_count,
+        "multi_table_examples": multi_table_samples[:20],
+        "target_table_derivation_at_runtime": (
+            "schema_only_single_table_context"
+            if multi_table_count == 0
+            else "dynamic oneOf branches cover every model-visible table; table_ref is selected inside the schema, not from gold SQL"
+        ),
+        "gold_sql_required": False,
+        "gold_sql_used_for_runtime_schema": False,
+        "table_ref_const_tab1_allowed": multi_table_count == 0,
+        "multi_table_schema_strategy_required": multi_table_count > 0,
+        "multi_table_schema_strategy": "oneOf_per_model_visible_table",
+        "model_called": False,
+        "gpu_called": False,
+    }
+
+
+def audit_design_train(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], list[dict[str, Any]]]:
     raw_by_id = load_raw_by_sample_id(raw_dir)
     design_ids, assignments_by_sample, assignment_rows = design_assignments(stageeng0_dir, stageeng1_dir)
+    target_table_audit = target_table_runtime_feasibility_audit(raw_by_id, design_ids)
 
     rows: list[dict[str, Any]] = []
     parse_failures: list[dict[str, str]] = []
@@ -495,38 +620,56 @@ def audit_design_train(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) 
     omitted_required_without_default = 0
     samples_with_omit = 0
     type_family_counts: dict[str, int] = {}
+    candidate_miss_count = 0
 
     for sample_id in sorted(design_ids):
         try:
             raw = raw_by_id[sample_id]
-            table_name, insert_columns = parse_insert_target(str(raw["sql"]))
-            columns = parse_create_table_columns(str(raw["sql_context"]), table_name)
+            schema_tables = parse_schema_tables(str(raw["sql_context"]))
             assignments = sorted(assignments_by_sample.get(sample_id, []), key=lambda row: int(row["assignment_index"]))
             assigned_names = [_normalize_identifier(str(row["column_ref_or_name"])) for row in assignments]
-            if not insert_columns:
-                insert_columns = assigned_names
+            runtime_table_name, runtime_columns, runtime_target_source = derive_runtime_target_table(schema_tables)
+            if runtime_table_name is not None and runtime_columns is not None:
+                table_name = runtime_table_name
+                table_ref = "TAB_1"
+                columns = runtime_columns
+                oracle_target_source = "schema_only_single_table_context"
+            else:
+                candidates = []
+                for candidate_table, candidate_ref, candidate_columns in schema_table_branches(schema_tables):
+                    candidate_column_names = {_normalize_identifier(column.column_name) for column in candidate_columns}
+                    if set(assigned_names) <= candidate_column_names:
+                        candidates.append((candidate_table, candidate_ref, candidate_columns))
+                if len(candidates) != 1:
+                    raise ValueError(f"Could not identify a unique oracle target-table branch from assignment column names: {assigned_names}")
+                table_name, table_ref, columns = candidates[0]
+                oracle_target_source = "label_side_assignment_column_names_for_oracle_audit_only"
             inventory = generate_candidate_inventory(str(raw["sql_prompt"]), variant=SELECTED_VARIANT)
             candidate_by_span = {(item.start_char, item.end_char, item.text): item for item in inventory}
             assignment_by_column = dict(zip(assigned_names, assignments))
             span_refs = [candidate.span_ref for candidate in inventory]
-            schema = dynamic_schema_for_columns(columns, span_refs)
+            schema = dynamic_schema_for_schema_tables(schema_tables, span_refs)
 
-            decisions: dict[str, str] = {}
+            decisions: dict[str, str | None] = {}
             column_rows: list[dict[str, Any]] = []
             sample_full = True
             sample_type_full = True
             sample_omit_count = 0
+            sample_candidate_miss_count = 0
             for column in columns:
                 family = type_family(column.source_type)
                 type_family_counts[family] = type_family_counts.get(family, 0) + 1
                 type_compatible = [candidate for candidate in inventory if candidate_type_compatible(candidate.text, column.source_type)]
                 compatible_counts.append(len(type_compatible))
                 assignment = assignment_by_column.get(_normalize_identifier(column.column_name))
-                expected = "OMIT"
+                assignment_present = assignment is not None
+                expected: str | None = "OMIT"
                 covered = True
                 type_covered = True
                 gold_text = None
-                if assignment is not None:
+                failure_reason = None
+                representation_status = "OMIT"
+                if assignment_present:
                     span = assignment["matched_source_span"]
                     gold_text = str(span["text"])
                     candidate = candidate_by_span.get((int(span["start_char"]), int(span["end_char"]), gold_text))
@@ -537,6 +680,13 @@ def audit_design_train(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) 
                     if covered:
                         covered_assignments += 1
                         expected = candidate.span_ref
+                        representation_status = "REPRESENTABLE"
+                    else:
+                        expected = None
+                        failure_reason = CANDIDATE_MISS_SENTINEL
+                        representation_status = "CANDIDATE_MISS"
+                        candidate_miss_count += 1
+                        sample_candidate_miss_count += 1
                     if type_covered:
                         type_compatible_gold += 1
                 else:
@@ -553,7 +703,10 @@ def audit_design_train(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) 
                         "column_name": column.column_name,
                         "source_type": column.source_type,
                         "type_family": family,
+                        "assignment_present": assignment_present,
                         "expected_decision": expected,
+                        "representation_status": representation_status,
+                        "failure_reason": failure_reason,
                         "gold_text": gold_text,
                         "oracle_span_covered": covered,
                         "oracle_span_type_compatible": type_covered,
@@ -577,23 +730,32 @@ def audit_design_train(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) 
                     "question_sha256": sha256_text(str(raw["sql_prompt"])),
                     "sql_sha256": sha256_text(str(raw["sql"])),
                     "target_table": table_name,
+                    "target_table_derivation_at_runtime": runtime_target_source,
+                    "oracle_target_table_branch_source": oracle_target_source,
+                    "gold_sql_used_for_runtime_target_derivation": False,
                     "target_table_column_count": len(columns),
                     "assignment_count": len(assignments),
                     "omit_decision_count": sample_omit_count,
+                    "candidate_miss_count": sample_candidate_miss_count,
                     "candidate_count": len(inventory),
-                    "column_conditioned_schema_required_columns": schema["properties"]["column_span_refs"]["required"],
+                    "column_conditioned_schema_required_columns": [column.column_ref for column in columns],
                     "dynamic_domain_size_per_column": len(span_refs) + 1,
                     "all_gold_assignments_representable": sample_full,
                     "all_gold_assignments_type_compatible": sample_type_full,
-                    "oracle_phase_o_output": {"operation": "INSERT", "table_ref": "TAB_1", "column_span_refs": decisions},
+                    "oracle_phase_o_output_schema_valid": sample_full,
+                    "candidate_miss_sentinel": CANDIDATE_MISS_SENTINEL,
+                    "oracle_phase_o_output": {"operation": "INSERT", "table_ref": table_ref, "column_span_refs": decisions},
                     "model_side_input_preview": {
                         "question_sha256": sha256_text(str(raw["sql_prompt"])),
                         "schema_column_refs": [column.column_ref for column in columns],
+                        "visible_schema_table_count": len(schema_tables),
                         "candidate_inventory_sha256": sha256_text(serialize_candidate_inventory(inventory)),
                     },
                     "runtime_constraints_preview": {
                         "candidate_inventory": [candidate_to_json(candidate) for candidate in inventory],
                         "column_conditioned_schema_sha256": sha256_text(canonical_json(schema)),
+                        "target_table_derivation_at_runtime": runtime_target_source,
+                        "gold_sql_required_for_runtime_schema": False,
                     },
                     "columns": column_rows,
                 }
@@ -619,6 +781,7 @@ def audit_design_train(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) 
         "target_table_column_decision_count": table_decision_count,
         "assigned_column_decision_count": assignment_count,
         "omit_decision_count": omitted_columns,
+        "candidate_miss_count": candidate_miss_count,
         "omitted_columns_nullable_default_or_key_count": omitted_with_default_or_nullable,
         "omitted_required_without_default_count": omitted_required_without_default,
         "type_family_column_counts": dict(sorted(type_family_counts.items())),
@@ -638,7 +801,11 @@ def audit_design_train(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) 
         "full_sample_covered_count": full_sample_count,
         "full_sample_candidate_coverage": full_sample_count / len(design_ids),
         "column_conditioned_decision_count": table_decision_count,
-        "required_column_decision_coverage": table_decision_count / table_decision_count if table_decision_count else 0,
+        "structural_column_key_coverage": table_decision_count / table_decision_count if table_decision_count else 0,
+        "semantic_assignment_representability": covered_assignments / assignment_count,
+        "candidate_miss_count": candidate_miss_count,
+        "candidate_miss_sentinel": CANDIDATE_MISS_SENTINEL,
+        "candidate_miss_sentinel_in_model_schema": False,
         "omit_decision_count": omitted_columns,
         "gold_used_only_for_oracle_coverage_audit": True,
         "runtime_gold_blind": True,
@@ -661,7 +828,7 @@ def audit_design_train(stageeng0_dir: Path, stageeng1_dir: Path, raw_dir: Path) 
         "model_called": False,
         "gpu_called": False,
     }
-    return schema_audit, representability, type_audit, rows
+    return schema_audit, representability, type_audit, target_table_audit, rows
 
 
 def representation_comparison(schema_audit: dict[str, Any], representability: dict[str, Any], type_audit: dict[str, Any]) -> dict[str, Any]:
@@ -683,9 +850,14 @@ def representation_comparison(schema_audit: dict[str, Any], representability: di
             "unknown_length_array": False,
             "requires_one_decision_per_target_column": True,
             "early_stop_after_one_value_schema_valid": False,
+            "omit_under_selection_still_schema_valid": True,
+            "semantic_value_completeness_guaranteed_by_schema": False,
+            "structural_claim_scope": "decision completeness per target-table column",
             "target_table_column_decision_count": schema_audit["target_table_column_decision_count"],
             "omit_decision_count": schema_audit["omit_decision_count"],
+            "candidate_miss_count": representability["candidate_miss_count"],
             "oracle_assignment_candidate_coverage": representability["assignment_candidate_coverage"],
+            "semantic_assignment_representability": representability["semantic_assignment_representability"],
             "oracle_type_compatible_coverage": type_audit["gold_assignment_type_compatible_coverage"],
         },
         "method_decision": "Proceed to a later protocol stage only if reviewer accepts the structural-completeness tradeoff.",
@@ -711,7 +883,15 @@ def build_derived_manifest(stage_dir: Path) -> dict[str, Any]:
     }
 
 
-def validation_report(scope: dict[str, Any], freeze: dict[str, Any], root_cause: dict[str, Any], schema_audit: dict[str, Any], representability: dict[str, Any], type_audit: dict[str, Any]) -> str:
+def validation_report(
+    scope: dict[str, Any],
+    freeze: dict[str, Any],
+    root_cause: dict[str, Any],
+    target_table_audit: dict[str, Any],
+    schema_audit: dict[str, Any],
+    representability: dict[str, Any],
+    type_audit: dict[str, Any],
+) -> str:
     return f"""# Stage7B-A3 English Column-Conditioned Candidate Selection Validation Report
 
 Status: {representability["status"]}
@@ -759,12 +939,23 @@ compiler_or_materializer_bug={root_cause["root_cause_counts"]["compiler_or_mater
 ## Column-Conditioned Audit
 
 ```text
+schema_table_count_min={target_table_audit["schema_table_count_stats"]["min"]}
+schema_table_count_median={target_table_audit["schema_table_count_stats"]["median"]}
+schema_table_count_p95={target_table_audit["schema_table_count_stats"]["p95"]}
+schema_table_count_max={target_table_audit["schema_table_count_stats"]["max"]}
+single_table_context_count={target_table_audit["single_table_context_count"]}/{target_table_audit["design_sample_count"]}
+multi_table_context_count={target_table_audit["multi_table_context_count"]}
+target_table_derivation_at_runtime={target_table_audit["target_table_derivation_at_runtime"]}
+gold_sql_required={str(target_table_audit["gold_sql_required"]).lower()}
 parsed_sample_count={schema_audit["parsed_sample_count"]}
 target_table_column_decision_count={schema_audit["target_table_column_decision_count"]}
 assigned_column_decision_count={schema_audit["assigned_column_decision_count"]}
 omit_decision_count={schema_audit["omit_decision_count"]}
+candidate_miss_count={representability["candidate_miss_count"]}
 omitted_required_without_default_count={schema_audit["omitted_required_without_default_count"]}
 assignment_candidate_coverage={representability["covered_assignment_count"]}/{representability["assignment_count"]}
+semantic_assignment_representability={representability["semantic_assignment_representability"]}
+structural_column_key_coverage={representability["structural_column_key_coverage"]}
 full_sample_candidate_coverage={representability["full_sample_covered_count"]}/{representability["design_sample_count"]}
 gold_assignment_type_compatible_coverage={type_audit["gold_assignment_type_compatible_count"]}/{representability["assignment_count"]}
 candidate_count_p95={type_audit["candidate_count_stats"]["p95"]}
@@ -773,11 +964,12 @@ type_compatible_candidate_count_p95={type_audit["type_compatible_candidate_count
 
 ## Decision
 
-Column-conditioned candidate selection directly addresses the A4 failure mode:
-the schema requires one SPAN/OMIT decision for every target-table column, so
-stopping after the first selected value is no longer schema-valid. This stage
-does not run a new primary feasibility experiment and does not authorize
-opening Gretel pilot/dev/test rows.
+Column-conditioned candidate selection directly addresses the A4 early-stop
+failure mode by requiring one decision key for every target-table column. This
+is decision completeness, not a structural guarantee of semantic value
+completeness: the model can still choose OMIT incorrectly, and that remains an
+evaluation failure. This stage does not run a new primary feasibility
+experiment and does not authorize opening Gretel pilot/dev/test rows.
 """
 
 
@@ -794,18 +986,19 @@ Review order:
 3. `{STAGE_NAME}/COLUMN_CONDITIONED_REPRESENTATION_SPEC.json`
 4. `{STAGE_NAME}/COLUMN_CONDITIONED_JSON_SCHEMA_SPEC.json`
 5. `{STAGE_NAME}/OMIT_POLICY_AND_COLUMN_SCOPE_SPEC.json`
-6. `{STAGE_NAME}/DESIGN_TRAIN_COLUMN_SCHEMA_AUDIT.json`
-7. `{STAGE_NAME}/ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.json`
-8. `{STAGE_NAME}/ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.jsonl`
-9. `{STAGE_NAME}/TYPE_COMPATIBLE_CANDIDATE_AUDIT.json`
-10. `{STAGE_NAME}/REPRESENTATION_COMPARISON_AUDIT.json`
-11. `{STAGE_NAME}/SOURCE_INPUT_MANIFEST.json`
-12. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
-13. `{STAGE_NAME}/STAGE7B_A3_LOCK.json`
-14. `{STAGE_NAME}/VALIDATION_REPORT.md`
-15. `scripts/data/build_stage7b_a3_column_conditioned_candidate_selection.py`
-16. `scripts/data/validate_stage7b_a3_column_conditioned_candidate_selection.py`
-17. `tests/test_stage7b_a3_column_conditioned_candidate_selection.py`
+6. `{STAGE_NAME}/TARGET_TABLE_RUNTIME_FEASIBILITY_AUDIT.json`
+7. `{STAGE_NAME}/DESIGN_TRAIN_COLUMN_SCHEMA_AUDIT.json`
+8. `{STAGE_NAME}/ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.json`
+9. `{STAGE_NAME}/ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.jsonl`
+10. `{STAGE_NAME}/TYPE_COMPATIBLE_CANDIDATE_AUDIT.json`
+11. `{STAGE_NAME}/REPRESENTATION_COMPARISON_AUDIT.json`
+12. `{STAGE_NAME}/SOURCE_INPUT_MANIFEST.json`
+13. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
+14. `{STAGE_NAME}/STAGE7B_A3_LOCK.json`
+15. `{STAGE_NAME}/VALIDATION_REPORT.md`
+16. `scripts/data/build_stage7b_a3_column_conditioned_candidate_selection.py`
+17. `scripts/data/validate_stage7b_a3_column_conditioned_candidate_selection.py`
+18. `tests/test_stage7b_a3_column_conditioned_candidate_selection.py`
 
 Rerun with local Gretel parquet:
 
@@ -843,7 +1036,7 @@ def build_stage(
     scope = scope_audit(stageeng0_dir, stageeng1_dir)
     freeze = a4_valid_fail_freeze(stage7e0_a4_dir)
     root_cause = a4_root_cause_classification(stage7e0_a4_dir)
-    schema_audit, representability, type_audit, rows = audit_design_train(stageeng0_dir, stageeng1_dir, raw_dir)
+    schema_audit, representability, type_audit, target_table_audit, rows = audit_design_train(stageeng0_dir, stageeng1_dir, raw_dir)
     comparison = representation_comparison(schema_audit, representability, type_audit)
 
     write_json(out_dir / "SOURCE_INPUT_MANIFEST.json", source_input_manifest(stageeng0_dir, stageeng1_dir, stage7b_a2_dir, stage7c_a4_dir, stage7e0_a4_dir))
@@ -852,6 +1045,7 @@ def build_stage(
     write_json(out_dir / "COLUMN_CONDITIONED_REPRESENTATION_SPEC.json", representation_spec())
     write_json(out_dir / "COLUMN_CONDITIONED_JSON_SCHEMA_SPEC.json", schema_spec())
     write_json(out_dir / "OMIT_POLICY_AND_COLUMN_SCOPE_SPEC.json", omit_policy_spec())
+    write_json(out_dir / "TARGET_TABLE_RUNTIME_FEASIBILITY_AUDIT.json", target_table_audit)
     write_json(out_dir / "DESIGN_TRAIN_COLUMN_SCHEMA_AUDIT.json", schema_audit)
     write_json(out_dir / "ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.json", representability)
     write_jsonl(out_dir / "ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.jsonl", rows)
@@ -878,7 +1072,11 @@ def build_stage(
         "assignment_candidate_coverage": representability["assignment_candidate_coverage"],
         "full_sample_candidate_coverage": representability["full_sample_candidate_coverage"],
         "target_table_column_decision_count": schema_audit["target_table_column_decision_count"],
+        "target_table_runtime_gold_sql_required": target_table_audit["gold_sql_required"],
+        "single_table_context_count": target_table_audit["single_table_context_count"],
+        "multi_table_context_count": target_table_audit["multi_table_context_count"],
         "omit_decision_count": schema_audit["omit_decision_count"],
+        "candidate_miss_count": representability["candidate_miss_count"],
         "gold_assignment_type_compatible_coverage": type_audit["gold_assignment_type_compatible_coverage"],
         "column_conditioned_output_required": True,
         "free_length_span_refs_removed": True,
@@ -890,7 +1088,7 @@ def build_stage(
         "derived_artifact_manifest_sha256": sha256_file(out_dir / "DERIVED_ARTIFACT_MANIFEST.json"),
     }
     write_json(out_dir / "STAGE7B_A3_LOCK.json", lock)
-    write_text(out_dir / "VALIDATION_REPORT.md", validation_report(scope, freeze, root_cause, schema_audit, representability, type_audit))
+    write_text(out_dir / "VALIDATION_REPORT.md", validation_report(scope, freeze, root_cause, target_table_audit, schema_audit, representability, type_audit))
     write_text(out_dir / "REVIEWER_README.md", reviewer_readme(out_dir))
     return {
         "stage": STAGE_NAME,
@@ -901,7 +1099,10 @@ def build_stage(
         "assignment_candidate_coverage": representability["assignment_candidate_coverage"],
         "full_sample_candidate_coverage": representability["full_sample_candidate_coverage"],
         "target_table_column_decision_count": schema_audit["target_table_column_decision_count"],
+        "single_table_context_count": target_table_audit["single_table_context_count"],
+        "multi_table_context_count": target_table_audit["multi_table_context_count"],
         "omit_decision_count": schema_audit["omit_decision_count"],
+        "candidate_miss_count": representability["candidate_miss_count"],
         "model_called": False,
         "gpu_called": False,
     }

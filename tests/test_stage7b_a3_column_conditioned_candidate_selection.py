@@ -22,14 +22,17 @@ from scripts.data.build_stage7b_a2_candidate_span_reference import (  # noqa: E4
     EXPECTED_DESIGN_SAMPLE_COUNT,
 )
 from scripts.data.build_stage7b_a3_column_conditioned_candidate_selection import (  # noqa: E402
+    CANDIDATE_MISS_SENTINEL,
     PACKAGE_NAME,
     STAGE_NAME,
     build_stage,
     candidate_type_compatible,
     dynamic_schema_for_columns,
+    dynamic_schema_for_schema_tables,
     package_reviewer,
     parse_create_table_columns,
     parse_insert_target,
+    parse_schema_tables,
     split_top_level,
 )
 from scripts.data.validate_stage7b_a3_column_conditioned_candidate_selection import validate  # noqa: E402
@@ -84,12 +87,46 @@ def test_dynamic_schema_requires_every_column_and_blocks_free_span_set() -> None
         assert column_schema["enum"] == ["OMIT", "SPAN_0001", "SPAN_0002"]
 
 
+def test_single_table_runtime_target_derivation_uses_schema_only() -> None:
+    context = 'CREATE TABLE "profiles" ("full_name" TEXT, "trust_level" INTEGER);'
+    schema_tables = parse_schema_tables(context)
+    schema = dynamic_schema_for_schema_tables(schema_tables, ["SPAN_0001"])
+    assert sorted(schema_tables) == ["profiles"]
+    assert schema["properties"]["table_ref"] == {"type": "string", "const": "TAB_1"}
+    assert schema["properties"]["column_span_refs"]["required"] == ["COL_1", "COL_2"]
+    assert "oneOf" not in schema
+
+
+def test_multi_table_schema_builds_oneof_without_gold_sql() -> None:
+    context = (
+        'CREATE TABLE "users" ("name" TEXT, "email" TEXT); '
+        'CREATE TABLE "orders" ("order_id" TEXT, "amount" REAL, "paid" INTEGER);'
+    )
+    schema_tables = parse_schema_tables(context)
+    schema = dynamic_schema_for_schema_tables(schema_tables, ["SPAN_0001", "SPAN_0002"])
+    assert sorted(schema_tables) == ["orders", "users"]
+    assert "oneOf" in schema
+    assert [branch["properties"]["table_ref"]["const"] for branch in schema["oneOf"]] == ["TAB_1", "TAB_2"]
+    required_key_sets = [branch["properties"]["column_span_refs"]["required"] for branch in schema["oneOf"]]
+    assert required_key_sets == [["TAB_1_COL_1", "TAB_1_COL_2", "TAB_1_COL_3"], ["TAB_2_COL_1", "TAB_2_COL_2"]]
+    for branch in schema["oneOf"]:
+        assert "span_refs" not in branch["properties"]
+
+
 def test_type_compatibility_is_strict_for_numeric_columns() -> None:
     assert candidate_type_compatible("12", "INTEGER")
     assert not candidate_type_compatible("trust_level 5", "INTEGER")
     assert candidate_type_compatible("29.99", "DECIMAL(3,2)")
     assert not candidate_type_compatible("price 29.99", "DECIMAL(3,2)")
     assert candidate_type_compatible("price 29.99", "TEXT")
+
+
+def test_candidate_miss_sentinel_is_not_model_schema_value() -> None:
+    columns = parse_create_table_columns('CREATE TABLE x (name TEXT, qty INTEGER);', "x")
+    schema = dynamic_schema_for_columns(columns, ["SPAN_0001"])
+    enums = [schema["properties"]["column_span_refs"]["properties"][column.column_ref]["enum"] for column in columns]
+    assert all(CANDIDATE_MISS_SENTINEL not in enum for enum in enums)
+    assert all("OMIT" in enum for enum in enums)
 
 
 def test_build_and_validator_pass_on_728_design_train(tmp_path: Path) -> None:
@@ -102,6 +139,7 @@ def test_build_and_validator_pass_on_728_design_train(tmp_path: Path) -> None:
     root_cause = read_json(stage_dir / "A4_ROOT_CAUSE_CLASSIFICATION.json")
     schema_audit = read_json(stage_dir / "DESIGN_TRAIN_COLUMN_SCHEMA_AUDIT.json")
     representability = read_json(stage_dir / "ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.json")
+    target_table = read_json(stage_dir / "TARGET_TABLE_RUNTIME_FEASIBILITY_AUDIT.json")
     comparison = read_json(stage_dir / "REPRESENTATION_COMPARISON_AUDIT.json")
     rows = read_jsonl(stage_dir / "ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.jsonl")
 
@@ -113,11 +151,24 @@ def test_build_and_validator_pass_on_728_design_train(tmp_path: Path) -> None:
     assert root_cause["root_cause_counts"]["phase_o_non_atomic_broader_span_selection"] == 1
     assert schema_audit["design_sample_count"] == EXPECTED_DESIGN_SAMPLE_COUNT
     assert schema_audit["parse_failure_count"] == 0
+    assert schema_audit["candidate_miss_count"] == 4
+    assert target_table["single_table_context_count"] == 719
+    assert target_table["multi_table_context_count"] == 9
+    assert target_table["gold_sql_required"] is False
+    assert target_table["schema_table_count_stats"]["min"] == 1
+    assert target_table["schema_table_count_stats"]["p95"] == 1
+    assert target_table["schema_table_count_stats"]["max"] > 1
+    assert target_table["multi_table_schema_strategy"] == "oneOf_per_model_visible_table"
     assert representability["assignment_count"] == EXPECTED_ASSIGNMENT_COUNT
     assert representability["assignment_candidate_coverage"] >= 0.99
+    assert representability["structural_column_key_coverage"] == 1
+    assert representability["semantic_assignment_representability"] == representability["assignment_candidate_coverage"]
+    assert representability["candidate_miss_sentinel"] == CANDIDATE_MISS_SENTINEL
+    assert representability["candidate_miss_sentinel_in_model_schema"] is False
     assert len(rows) == EXPECTED_DESIGN_SAMPLE_COUNT
     assert comparison["current_free_span_set"]["early_stop_after_one_value_schema_valid"] is True
     assert comparison["column_conditioned_selection"]["early_stop_after_one_value_schema_valid"] is False
+    assert comparison["column_conditioned_selection"]["semantic_value_completeness_guaranteed_by_schema"] is False
 
 
 def test_every_oracle_row_has_one_decision_per_required_column(tmp_path: Path) -> None:
@@ -127,7 +178,30 @@ def test_every_oracle_row_has_one_decision_per_required_column(tmp_path: Path) -
         decisions = row["oracle_phase_o_output"]["column_span_refs"]
         assert sorted(decisions) == sorted(row["column_conditioned_schema_required_columns"])
         assert row["dynamic_domain_size_per_column"] == row["candidate_count"] + 1
+        assert row["gold_sql_used_for_runtime_target_derivation"] is False
         assert "span_refs" not in row["oracle_phase_o_output"]
+
+
+def test_assigned_candidate_misses_are_never_labeled_omit(tmp_path: Path) -> None:
+    stage_dir = tmp_path / STAGE_NAME
+    build_stage(stage_dir, raw_dir_or_skip())
+    miss_columns = []
+    true_omit_columns = 0
+    for row in read_jsonl(stage_dir / "ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.jsonl"):
+        for column in row["columns"]:
+            if column["assignment_present"] and not column["oracle_span_covered"]:
+                miss_columns.append(column)
+                assert column["expected_decision"] is None
+                assert column["representation_status"] == "CANDIDATE_MISS"
+                assert column["failure_reason"] == CANDIDATE_MISS_SENTINEL
+                assert column["omitted"] is False
+            if not column["assignment_present"]:
+                true_omit_columns += 1
+                assert column["expected_decision"] == "OMIT"
+                assert column["representation_status"] == "OMIT"
+                assert column["omitted"] is True
+    assert len(miss_columns) == 4
+    assert true_omit_columns == 292
 
 
 def test_validator_rejects_a4_freeze_tamper(tmp_path: Path) -> None:

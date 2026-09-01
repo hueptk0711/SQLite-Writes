@@ -15,16 +15,21 @@
     "values",
     "assignments"
   ],
+  "gold_sql_required_for_runtime_schema": false,
   "gpu_called": false,
   "model_called": false,
   "model_generates_character_offsets": false,
   "model_generates_free_length_span_set": false,
+  "multi_table_schema_strategy": "oneOf branch per visible table_ref with branch-local required column_span_refs",
+  "omit_under_selection_still_schema_valid": true,
   "required_top_level_keys": [
     "operation",
     "table_ref",
     "column_span_refs"
   ],
-  "runtime_schema_builder": "dynamic_schema_for_columns(target_table_columns, candidate_span_refs)",
+  "runtime_schema_builder": "dynamic_schema_for_schema_tables(model_visible_schema_tables, candidate_span_refs)",
   "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT",
+  "structural_claim_scope": "decision completeness per visible target column, not semantic value completeness",
+  "target_table_derivation_at_runtime": "single-table contexts derive TAB_1 from schema only; multi-table contexts use oneOf branches for all model-visible tables",
   "unknown_span_refs_structurally_impossible": true
 }

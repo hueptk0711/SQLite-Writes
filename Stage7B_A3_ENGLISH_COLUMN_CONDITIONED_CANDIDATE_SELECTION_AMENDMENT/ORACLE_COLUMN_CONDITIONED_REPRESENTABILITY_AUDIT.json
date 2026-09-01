@@ -2,6 +2,9 @@
   "assignment_candidate_coverage": 0.99822695035461,
   "assignment_count": 2256,
   "candidate_generator_variant": "lexical_ngram2",
+  "candidate_miss_count": 4,
+  "candidate_miss_sentinel": "UNREPRESENTABLE_CANDIDATE_MISS",
+  "candidate_miss_sentinel_in_model_schema": false,
   "column_conditioned_decision_count": 2548,
   "covered_assignment_count": 2252,
   "design_sample_count": 728,
@@ -12,9 +15,10 @@
   "missing_assignment_count": 4,
   "model_called": false,
   "omit_decision_count": 292,
-  "required_column_decision_coverage": 1.0,
   "runtime_gold_blind": true,
   "scope": "StageENG1 development_train excluding 100-sample pilot pool",
+  "semantic_assignment_representability": 0.99822695035461,
   "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT",
-  "status": "PASS"
+  "status": "PASS",
+  "structural_column_key_coverage": 1.0
 }

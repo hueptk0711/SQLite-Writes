@@ -26,7 +26,7 @@
   "method_implication": "Move from free-length span_refs to required per-column SPAN/OMIT decisions.",
   "model_called": false,
   "operation_prediction": "10/10 INSERT",
-  "primary_pass_count": null,
+  "primary_pass_count": "6/10",
   "root_cause_counts": {
     "compiler_or_materializer_bug": 0,
     "phase_m_primary_root_cause": 0,

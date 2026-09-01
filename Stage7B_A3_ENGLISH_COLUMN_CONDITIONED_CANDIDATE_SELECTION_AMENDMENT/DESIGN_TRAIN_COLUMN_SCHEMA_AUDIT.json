@@ -7,6 +7,7 @@
     "min": 1,
     "p95": 5
   },
+  "candidate_miss_count": 4,
   "design_sample_count": 728,
   "gpu_called": false,
   "model_called": false,

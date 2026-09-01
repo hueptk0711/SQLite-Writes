@@ -6,8 +6,8 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import shutil
 import sys
-import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -25,6 +25,7 @@ from scripts.data.build_stage7b_a2_candidate_span_reference import (  # noqa: E4
     SELECTED_VARIANT,
 )
 from scripts.data.build_stage7b_a3_column_conditioned_candidate_selection import (  # noqa: E402
+    CANDIDATE_MISS_SENTINEL,
     SCIENTIFIC_ARTIFACTS,
     STAGE_NAME,
     build_stage,
@@ -65,6 +66,7 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
     representation = read_json(stage_dir / "COLUMN_CONDITIONED_REPRESENTATION_SPEC.json")
     schema = read_json(stage_dir / "COLUMN_CONDITIONED_JSON_SCHEMA_SPEC.json")
     omit = read_json(stage_dir / "OMIT_POLICY_AND_COLUMN_SCOPE_SPEC.json")
+    target_table = read_json(stage_dir / "TARGET_TABLE_RUNTIME_FEASIBILITY_AUDIT.json")
     schema_audit = read_json(stage_dir / "DESIGN_TRAIN_COLUMN_SCHEMA_AUDIT.json")
     representability = read_json(stage_dir / "ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.json")
     rows = read_jsonl(stage_dir / "ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.jsonl")
@@ -80,6 +82,7 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
         "representation": representation,
         "schema": schema,
         "omit": omit,
+        "target_table": target_table,
         "schema_audit": schema_audit,
         "representability": representability,
         "type_audit": type_audit,
@@ -113,6 +116,8 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
         failures.append("phase_m_should_not_be_primary_root_cause")
     if root_counts.get("compiler_or_materializer_bug") != 0:
         failures.append("compiler_materializer_bug_count_mismatch")
+    if root_cause.get("primary_pass_count") != "6/10":
+        failures.append("root_cause_primary_pass_count_mismatch")
 
     if representation.get("free_length_span_set_removed") is not True:
         failures.append("representation_does_not_remove_free_span_set")
@@ -126,8 +131,40 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
         failures.append("schema_forbidden_keys_incomplete")
     if schema.get("early_array_stop_structurally_impossible") is not True:
         failures.append("schema_does_not_block_early_stop")
+    if schema.get("gold_sql_required_for_runtime_schema") is not False:
+        failures.append("schema_requires_gold_sql_for_runtime")
+    if schema.get("structural_claim_scope") != "decision completeness per visible target column, not semantic value completeness":
+        failures.append("schema_structural_claim_scope_mismatch")
+    if schema.get("omit_under_selection_still_schema_valid") is not True:
+        failures.append("schema_must_disclose_omit_under_selection_validity")
     if omit.get("runtime_gold_blind") is not True:
         failures.append("omit_policy_not_gold_blind")
+
+    if target_table.get("status") != "PASS":
+        failures.append("target_table_audit_status_not_pass")
+    if target_table.get("design_sample_count") != EXPECTED_DESIGN_SAMPLE_COUNT:
+        failures.append("target_table_design_count_mismatch")
+    if target_table.get("gold_sql_required") is not False or target_table.get("gold_sql_used_for_runtime_schema") is not False:
+        failures.append("target_table_gold_sql_leakage")
+    table_stats = target_table.get("schema_table_count_stats", {})
+    single_table_count = int(target_table.get("single_table_context_count", 0))
+    multi_table_count = int(target_table.get("multi_table_context_count", 0))
+    if single_table_count + multi_table_count != EXPECTED_DESIGN_SAMPLE_COUNT:
+        failures.append("target_table_context_count_mismatch")
+    if table_stats.get("min") != 1 or table_stats.get("median") != 1 or table_stats.get("p95") != 1 or int(table_stats.get("max", 0)) < 1:
+        failures.append("target_table_schema_table_count_stats_mismatch")
+    if multi_table_count == 0:
+        if target_table.get("target_table_derivation_at_runtime") != "schema_only_single_table_context":
+            failures.append("target_table_runtime_derivation_not_schema_only")
+        if target_table.get("table_ref_const_tab1_allowed") is not True:
+            failures.append("target_table_const_tab1_not_allowed_for_single_table_scope")
+    else:
+        if target_table.get("multi_table_schema_strategy_required") is not True:
+            failures.append("target_table_multi_table_strategy_not_required")
+        if target_table.get("multi_table_schema_strategy") != "oneOf_per_model_visible_table":
+            failures.append("target_table_multi_table_strategy_mismatch")
+        if "oneOf" not in schema.get("multi_table_schema_strategy", ""):
+            failures.append("schema_missing_multitable_oneof_strategy")
 
     if schema_audit.get("status") != "PASS":
         failures.append("schema_audit_status_not_pass")
@@ -141,6 +178,8 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
         failures.append("assigned_column_decision_count_mismatch")
     if schema_audit.get("target_table_column_decision_count", 0) < EXPECTED_ASSIGNMENT_COUNT:
         failures.append("target_column_decision_count_too_small")
+    if schema_audit.get("candidate_miss_count") != 4:
+        failures.append("schema_audit_candidate_miss_count_mismatch")
 
     if representability.get("status") != "PASS":
         failures.append("representability_status_not_pass")
@@ -154,6 +193,18 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
         failures.append("assignment_coverage_below_stage7b_a2_floor")
     if float(representability.get("assignment_candidate_coverage", 0.0)) < 0.99:
         failures.append("assignment_coverage_below_threshold")
+    if representability.get("candidate_miss_count") != 4:
+        failures.append("representability_candidate_miss_count_mismatch")
+    if representability.get("candidate_miss_sentinel") != CANDIDATE_MISS_SENTINEL:
+        failures.append("representability_candidate_miss_sentinel_mismatch")
+    if representability.get("candidate_miss_sentinel_in_model_schema") is not False:
+        failures.append("candidate_miss_sentinel_must_not_be_model_schema_value")
+    if representability.get("structural_column_key_coverage") != 1:
+        failures.append("structural_column_key_coverage_mismatch")
+    if "required_column_decision_coverage" in representability:
+        failures.append("misleading_required_column_decision_coverage_still_present")
+    if representability.get("semantic_assignment_representability") != representability.get("assignment_candidate_coverage"):
+        failures.append("semantic_assignment_representability_mismatch")
     if len(rows) != EXPECTED_DESIGN_SAMPLE_COUNT:
         failures.append("representability_jsonl_count_mismatch")
     row_full = sum(1 for row in rows if row.get("all_gold_assignments_representable") is True)
@@ -168,6 +219,29 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
         if row.get("dynamic_domain_size_per_column") != row.get("candidate_count", 0) + 1:
             failures.append(f"row_dynamic_domain_size_mismatch:{row.get('sample_id')}")
             break
+        if row.get("gold_sql_used_for_runtime_target_derivation") is not False:
+            failures.append(f"row_uses_gold_sql_for_target_derivation:{row.get('sample_id')}")
+            break
+        for column in row.get("columns", []):
+            assignment_present = column.get("assignment_present")
+            expected = column.get("expected_decision")
+            covered = column.get("oracle_span_covered")
+            omitted = column.get("omitted")
+            if assignment_present and expected == "OMIT":
+                failures.append(f"assigned_column_mislabeled_omit:{row.get('sample_id')}:{column.get('column_ref')}")
+                break
+            if assignment_present and covered is True and not str(expected).startswith("SPAN_"):
+                failures.append(f"covered_assignment_missing_span_decision:{row.get('sample_id')}:{column.get('column_ref')}")
+                break
+            if assignment_present and covered is False:
+                if expected is not None or column.get("failure_reason") != CANDIDATE_MISS_SENTINEL:
+                    failures.append(f"candidate_miss_not_sentinel:{row.get('sample_id')}:{column.get('column_ref')}")
+                    break
+            if not assignment_present and (expected != "OMIT" or omitted is not True):
+                failures.append(f"true_omit_not_omit:{row.get('sample_id')}:{column.get('column_ref')}")
+                break
+        if failures and any(failure.startswith(("assigned_column_mislabeled_omit:", "covered_assignment_missing_span_decision:", "candidate_miss_not_sentinel:", "true_omit_not_omit:")) for failure in failures):
+            break
 
     if type_audit.get("status") != "PASS":
         failures.append("type_audit_status_not_pass")
@@ -177,6 +251,10 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
         failures.append("comparison_free_span_early_stop_not_recorded")
     if comparison.get("column_conditioned_selection", {}).get("early_stop_after_one_value_schema_valid") is not False:
         failures.append("comparison_column_conditioned_early_stop_not_blocked")
+    if comparison.get("column_conditioned_selection", {}).get("semantic_value_completeness_guaranteed_by_schema") is not False:
+        failures.append("comparison_overclaims_semantic_completeness")
+    if comparison.get("column_conditioned_selection", {}).get("candidate_miss_count") != 4:
+        failures.append("comparison_candidate_miss_count_mismatch")
     if comparison.get("pilot_usage_allowed") is not False:
         failures.append("comparison_allows_pilot")
 
@@ -208,8 +286,11 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
         failures.append("lock_reserved_rows_used")
 
     if raw_dir is not None and rebuild and not failures:
-        with tempfile.TemporaryDirectory(prefix="stage7b_a3_rebuild_", dir=stage_dir.parent) as temp:
-            temp_stage = Path(temp) / STAGE_NAME
+        temp_path = stage_dir.parent / "_stage7b_a3_rebuild_validation_tmp"
+        shutil.rmtree(temp_path, ignore_errors=True)
+        temp_path.mkdir(parents=True, exist_ok=True)
+        temp_stage = temp_path / STAGE_NAME
+        try:
             try:
                 build_stage(temp_stage, raw_dir)
                 for name in [*SCIENTIFIC_ARTIFACTS, "DERIVED_ARTIFACT_MANIFEST.json"]:
@@ -217,6 +298,8 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
                         failures.append(f"raw_rebuild_artifact_mismatch:{name}")
             except Exception as exc:
                 failures.append(f"raw_rebuild_failed:{type(exc).__name__}:{exc}")
+        finally:
+            shutil.rmtree(temp_path, ignore_errors=True)
 
     return {
         "stage": STAGE_NAME,
@@ -228,7 +311,10 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
         "assignment_candidate_coverage": representability.get("assignment_candidate_coverage"),
         "full_sample_candidate_coverage": representability.get("full_sample_candidate_coverage"),
         "target_table_column_decision_count": schema_audit.get("target_table_column_decision_count"),
+        "single_table_context_count": target_table.get("single_table_context_count"),
+        "multi_table_context_count": target_table.get("multi_table_context_count"),
         "omit_decision_count": schema_audit.get("omit_decision_count"),
+        "candidate_miss_count": representability.get("candidate_miss_count"),
         "model_called": False,
         "gpu_called": False,
         "gretel_pilot_opened": False,

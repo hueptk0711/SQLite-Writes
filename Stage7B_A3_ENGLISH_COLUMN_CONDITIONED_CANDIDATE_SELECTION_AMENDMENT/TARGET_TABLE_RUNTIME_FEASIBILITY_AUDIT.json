@@ -1,0 +1,101 @@
+{
+  "design_sample_count": 728,
+  "gold_sql_required": false,
+  "gold_sql_used_for_runtime_schema": false,
+  "gpu_called": false,
+  "model_called": false,
+  "multi_table_context_count": 9,
+  "multi_table_examples": [
+    {
+      "sample_id": "gretel:train:22086:014990",
+      "schema_table_count": 2,
+      "table_names": [
+        "artifacts",
+        "excavation_sites"
+      ]
+    },
+    {
+      "sample_id": "gretel:train:23740:078078",
+      "schema_table_count": 2,
+      "table_names": [
+        "artifacts",
+        "excavationsites"
+      ]
+    },
+    {
+      "sample_id": "gretel:train:52482:007114",
+      "schema_table_count": 2,
+      "table_names": [
+        "faculty",
+        "research_grants"
+      ]
+    },
+    {
+      "sample_id": "gretel:train:58006:060334",
+      "schema_table_count": 2,
+      "table_names": [
+        "clients",
+        "transactions"
+      ]
+    },
+    {
+      "sample_id": "gretel:train:59846:065671",
+      "schema_table_count": 3,
+      "table_names": [
+        "ports",
+        "vessels",
+        "voyages"
+      ]
+    },
+    {
+      "sample_id": "gretel:train:631:043809",
+      "schema_table_count": 3,
+      "table_names": [
+        "ports",
+        "vessels",
+        "voyages"
+      ]
+    },
+    {
+      "sample_id": "gretel:train:94207:092697",
+      "schema_table_count": 2,
+      "table_names": [
+        "posts",
+        "users"
+      ]
+    },
+    {
+      "sample_id": "gretel:train:95334:093824",
+      "schema_table_count": 2,
+      "table_names": [
+        "factories",
+        "workers"
+      ]
+    },
+    {
+      "sample_id": "gretel:train:98402:010366",
+      "schema_table_count": 2,
+      "table_names": [
+        "investments",
+        "organizations"
+      ]
+    }
+  ],
+  "multi_table_schema_strategy": "oneOf_per_model_visible_table",
+  "multi_table_schema_strategy_required": true,
+  "parse_failure_count": 0,
+  "parse_failures": [],
+  "parsed_sample_count": 728,
+  "schema_table_count_stats": {
+    "max": 3,
+    "mean": 1.01510989010989,
+    "median": 1.0,
+    "min": 1,
+    "p95": 1
+  },
+  "single_table_context_count": 719,
+  "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT",
+  "status": "PASS",
+  "table_ref_const_tab1_allowed": false,
+  "target_table_derivation_at_runtime": "dynamic oneOf branches cover every model-visible table; table_ref is selected inside the schema, not from gold SQL"
+}

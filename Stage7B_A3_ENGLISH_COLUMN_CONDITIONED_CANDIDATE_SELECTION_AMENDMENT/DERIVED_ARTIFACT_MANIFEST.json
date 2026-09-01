@@ -1,10 +1,10 @@
 {
-  "artifact_count": 11,
+  "artifact_count": 12,
   "artifacts": [
     {
       "bytes": 3149,
       "path": "SOURCE_INPUT_MANIFEST.json",
-      "sha256": "e319ad2a2be803c283109bd148488b829e83e03f60f1d94d7fcb9d010a8612ee"
+      "sha256": "7124b2ea4737684b1540005e0709d96c802bb6e7645b7295e25cb007a49aa89e"
     },
     {
       "bytes": 836,
@@ -12,19 +12,19 @@
       "sha256": "49dd0b52687293629251b9af76d2821b243a7d82c1b068141217c9c855004cb1"
     },
     {
-      "bytes": 1582,
+      "bytes": 1584,
       "path": "A4_ROOT_CAUSE_CLASSIFICATION.json",
-      "sha256": "4d9ebad9a96c1655d2e925de8e2e56c0b2d1fed9ebf6f5e12ebada8b257fb5bb"
+      "sha256": "17159df35cc6489d630094427aebbd5acd4865a090ba66d79acabab24a2c4288"
     },
     {
-      "bytes": 807,
+      "bytes": 884,
       "path": "COLUMN_CONDITIONED_REPRESENTATION_SPEC.json",
-      "sha256": "ca918356f1d041f13b9aa842fb0a77b8173e76f477c4f08cc1574d8721e279f3"
+      "sha256": "279ca07a7834079f6738736262e1374fff6e2d8290d5edd995f62df14868cf80"
     },
     {
-      "bytes": 838,
+      "bytes": 1343,
       "path": "COLUMN_CONDITIONED_JSON_SCHEMA_SPEC.json",
-      "sha256": "30648f5e80091175c5caa6347fe4687f74320fb5428560b4dd10ebc436348a4f"
+      "sha256": "8bde9c69d4f1f5db80ded4038abde79da664a71ae61516da51c0b72c5bb2fd41"
     },
     {
       "bytes": 631,
@@ -32,19 +32,24 @@
       "sha256": "c7fbf17eb7b7b3b84a47f259e8e5e12c7edbcf2d61dccd6141a2e1c8ac34d263"
     },
     {
-      "bytes": 989,
+      "bytes": 2397,
+      "path": "TARGET_TABLE_RUNTIME_FEASIBILITY_AUDIT.json",
+      "sha256": "b08c470756ad7f0538e65228686b4a3274f0437cf0606e7d488e983ccd5901d8"
+    },
+    {
+      "bytes": 1018,
       "path": "DESIGN_TRAIN_COLUMN_SCHEMA_AUDIT.json",
-      "sha256": "d13b50b1656e47295de3ea0441a4a3788344acf7ec43ca6daf73bbaacc04c163"
+      "sha256": "085a468c9fd60b17247ae6f7ed9f9937487e744cbd4e544765696f199ba9dbba"
     },
     {
-      "bytes": 751,
+      "bytes": 952,
       "path": "ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.json",
-      "sha256": "d8ea92188044d6aab10c5bf83b24662ab5b289b5ef77308364260f2e5965d7cf"
+      "sha256": "b970041b459857a2c20b1a739242bbc47d1cf13fea75408c422ec0d8749756f1"
     },
     {
-      "bytes": 6898884,
+      "bytes": 7463556,
       "path": "ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.jsonl",
-      "sha256": "1ad24c0a4c85188355f1071eb008e5c356e16e76ea2bd3bec9a7f232badc4872"
+      "sha256": "89cb122b47df461b2132eee7c79dcf9dcfd2068ab498c7da6f3bb472962bba24"
     },
     {
       "bytes": 939,
@@ -52,12 +57,12 @@
       "sha256": "4037e5f4cac3aa20fdd20c8777dec5a329724db867c157804cb70cfb1aa5ffb3"
     },
     {
-      "bytes": 1495,
+      "bytes": 1783,
       "path": "REPRESENTATION_COMPARISON_AUDIT.json",
-      "sha256": "609f88c59a6c941b933bb1f2c5b8ad028e59fcac7a57bf843e528e62eeccde40"
+      "sha256": "3067672b4f01922dbb0f4e419d716bcd91f9bfa72c1ff0b327fdbae19e36d017"
     }
   ],
-  "combined_scientific_artifacts_sha256": "9a4eee294c3fe9e0467d04b1ed921a2b66b15b2e2ab46a5969c878fc248455d6",
-  "patch": "PATCH0",
+  "combined_scientific_artifacts_sha256": "deeb0445a27cebb756e5bdf849d9fdc8f5b198e168b44c8606bdf3709a0461f3",
+  "patch": "PATCH1",
   "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT"
 }
