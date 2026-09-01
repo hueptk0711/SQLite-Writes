@@ -3,17 +3,21 @@
   "candidate_is_not_suppressible_when": [
     "The candidate is a single-token alphanumeric literal such as Q2, 789B, or S102.",
     "The candidate itself is tagged as EMAIL, NUMBER, IDENTIFIER, QUOTED_TEXT, or URL.",
+    "The candidate is a complete datetime, ordinal phrase, or possessive/compound literal.",
+    "The residual outside the atomic child is not a visible schema label.",
     "No strong atomic child candidate is contained by the span."
   ],
   "candidate_is_suppressible_when": [
     "The candidate has at least two whitespace-delimited tokens.",
-    "The candidate itself has no strong atomic model-visible tag.",
-    "The candidate strictly contains another candidate tagged EMAIL, NUMBER, IDENTIFIER, QUOTED_TEXT, or URL."
+    "The candidate itself is not a recognized complete atomic, datetime, ordinal, possessive, or compound literal.",
+    "The candidate strictly contains another candidate tagged EMAIL, NUMBER, IDENTIFIER, QUOTED_TEXT, or URL.",
+    "The text outside the dominant child normalizes to a model-visible schema table or column label."
   ],
   "gold_blind": true,
   "gpu_called": false,
   "model_called": false,
-  "purpose": "Reduce broad label-plus-value candidates such as 'loan_id LOAN-842' when an atomic child span exists.",
-  "rule_name": "atomic_dominated_broad_span_suppression_audit",
-  "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"
+  "purpose": "Reduce broad label-plus-value candidates such as 'loan_id LOAN-842' only when the label residual matches visible schema.",
+  "rule_name": "schema_label_aware_atomic_dominated_broad_span_suppression_audit",
+  "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT",
+  "uses_model_visible_schema": true
 }

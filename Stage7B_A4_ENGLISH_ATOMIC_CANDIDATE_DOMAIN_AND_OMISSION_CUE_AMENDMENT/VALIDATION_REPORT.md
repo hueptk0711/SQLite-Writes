@@ -28,7 +28,7 @@ candidate_count_max=114
 broader_containing_gold_total=6541
 ```
 
-## Atomic-Filtered Domain Under Review
+## PATCH0 Generic Atomic Domain
 
 ```text
 assignment_representability=2249/2256
@@ -36,9 +36,24 @@ full_sample_representability=721/728
 candidate_count_median=35.0
 candidate_count_p95=54
 candidate_count_max=85
-suppressed_candidate_total=7504
 broader_containing_gold_total=1536
+reviewer_blocker=generic atomic-child suppression creates three additional gold losses
+```
+
+## PATCH1 Schema-Label-Aware Domain
+
+```text
+assignment_representability=2252/2256
+full_sample_representability=724/728
+candidate_count_median=43.0
+candidate_count_p95=68
+candidate_count_max=114
+suppressed_candidate_total=1166
+broader_containing_gold_total=5420
 threshold_decision=PASS_AUDIT_THRESHOLDS_READY_FOR_REVIEW
+additional_assignment_losses=0
+additional_full_sample_losses=0
+preferred_freeze_gate_passed=true
 method_freeze_authorized=false
 ```
 
@@ -50,11 +65,15 @@ true_assigned_value_exact_cue_count=0
 true_assigned_value_contains_cue_count=0
 question_cue_occurrence_count=0
 candidate_containing_cue_count=0
+synthetic_omission_safety_status=PASS
+synthetic_positive_fixtures=4
+synthetic_negative_literal_fixtures=4
 ```
 
 ## Decision
 
-The candidate-domain amendment passes the 99% assignment and full-sample
-representability audit on the 728 design-train samples. This package does not
-freeze a new runtime protocol and does not authorize a model rerun; it provides
-the evidence needed for reviewer approval of a later protocol freeze.
+The PATCH1 schema-label-aware candidate-domain amendment preserves the current
+baseline representability while reducing label-plus-value distractors. This
+package does not freeze a new runtime protocol and does not authorize a model
+rerun; it provides the evidence needed for reviewer approval of a later
+protocol freeze.

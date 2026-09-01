@@ -1,16 +1,44 @@
 {
-  "assignment_representability_delta": -0.0013297872340425343,
+  "assignment_representability_delta": 0.0,
   "audit_only": true,
-  "broader_containing_gold_total_delta": -5005,
-  "candidate_count_max_delta": -29,
-  "candidate_count_median_delta": -10.0,
-  "candidate_count_p95_delta": -16,
-  "candidate_domain_under_review": "atomic_filtered_candidate_domain_audit",
+  "broader_containing_gold_total_delta": -1121,
+  "candidate_count_max_delta": 0,
+  "candidate_count_median_delta": -2.0,
+  "candidate_count_p95_delta": -2,
+  "candidate_domain_under_review": "patch1_schema_label_aware_candidate_domain_audit",
   "current_domain": "current_lexical_ngram2",
-  "full_sample_representability_delta": -0.004120879120879106,
+  "full_sample_representability_delta": 0.0,
   "gpu_called": false,
   "method_freeze_authorized": false,
   "model_called": false,
+  "pareto_rows": [
+    {
+      "assignment_representability": 0.99822695035461,
+      "broader_containing_gold_total": 6541,
+      "candidate_count_median": 45.0,
+      "candidate_count_p95": 70,
+      "domain": "lexical_ngram2",
+      "full_sample_representability": 0.9945054945054945
+    },
+    {
+      "assignment_representability": 0.9968971631205674,
+      "broader_containing_gold_total": 1536,
+      "candidate_count_median": 35.0,
+      "candidate_count_p95": 54,
+      "domain": "patch0_generic_atomic",
+      "full_sample_representability": 0.9903846153846154
+    },
+    {
+      "assignment_representability": 0.99822695035461,
+      "broader_containing_gold_total": 5420,
+      "candidate_count_median": 43.0,
+      "candidate_count_p95": 68,
+      "domain": "patch1_schema_label_aware",
+      "full_sample_representability": 0.9945054945054945
+    }
+  ],
+  "patch0_domain": "patch0_generic_atomic_candidate_domain",
+  "preferred_freeze_gate": "no additional baseline-covered assignment losses",
   "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT",
   "status": "PASS",
   "threshold_decision": "PASS_AUDIT_THRESHOLDS_READY_FOR_REVIEW"

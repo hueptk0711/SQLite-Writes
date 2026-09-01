@@ -1,0 +1,176 @@
+{
+  "failures": [],
+  "fixture_count": 8,
+  "fixtures": [
+    {
+      "case_id": "positive_phone_not_provided",
+      "context_aware_cue_suppressions": [
+        {
+          "reason": {
+            "construction_text": "phone not provided",
+            "cue_phrase": "not provided",
+            "rule": "CONTEXT_AWARE_OMISSION_CUE",
+            "schema_label": "phone"
+          },
+          "span_ref": "SPAN_0012",
+          "text": "not provided"
+        }
+      ],
+      "detected": true,
+      "expected_detected": true,
+      "omission_constructions": [
+        {
+          "cue_phrase": "not provided",
+          "end_char": 38,
+          "label": "phone",
+          "start_char": 20,
+          "text": "phone not provided"
+        }
+      ],
+      "question": "Insert contact Bob. phone not provided.",
+      "schema_labels": [
+        "phone"
+      ]
+    },
+    {
+      "case_id": "positive_region_omitted",
+      "context_aware_cue_suppressions": [
+        {
+          "reason": {
+            "construction_text": "region omitted",
+            "cue_phrase": "omitted",
+            "rule": "CONTEXT_AWARE_OMISSION_CUE",
+            "schema_label": "region"
+          },
+          "span_ref": "SPAN_0012",
+          "text": "omitted"
+        }
+      ],
+      "detected": true,
+      "expected_detected": true,
+      "omission_constructions": [
+        {
+          "cue_phrase": "omitted",
+          "end_char": 28,
+          "label": "region",
+          "start_char": 14,
+          "text": "region omitted"
+        }
+      ],
+      "question": "Add city row. region omitted.",
+      "schema_labels": [
+        "region"
+      ]
+    },
+    {
+      "case_id": "positive_note_missing",
+      "context_aware_cue_suppressions": [
+        {
+          "reason": {
+            "construction_text": "note missing",
+            "cue_phrase": "missing",
+            "rule": "CONTEXT_AWARE_OMISSION_CUE",
+            "schema_label": "note"
+          },
+          "span_ref": "SPAN_0012",
+          "text": "missing"
+        }
+      ],
+      "detected": true,
+      "expected_detected": true,
+      "omission_constructions": [
+        {
+          "cue_phrase": "missing",
+          "end_char": 29,
+          "label": "note",
+          "start_char": 17,
+          "text": "note missing"
+        }
+      ],
+      "question": "Create task row. note missing.",
+      "schema_labels": [
+        "note"
+      ]
+    },
+    {
+      "case_id": "positive_address_left_empty",
+      "context_aware_cue_suppressions": [
+        {
+          "reason": {
+            "construction_text": "address left empty",
+            "cue_phrase": "left empty",
+            "rule": "CONTEXT_AWARE_OMISSION_CUE",
+            "schema_label": "address"
+          },
+          "span_ref": "SPAN_0010",
+          "text": "left empty"
+        }
+      ],
+      "detected": true,
+      "expected_detected": true,
+      "omission_constructions": [
+        {
+          "cue_phrase": "left empty",
+          "end_char": 37,
+          "label": "address",
+          "start_char": 19,
+          "text": "address left empty"
+        }
+      ],
+      "question": "Register customer. address left empty.",
+      "schema_labels": [
+        "address"
+      ]
+    },
+    {
+      "case_id": "negative_status_missing_literal",
+      "context_aware_cue_suppressions": [],
+      "detected": false,
+      "expected_detected": false,
+      "omission_constructions": [],
+      "question": "Insert status \"missing\".",
+      "schema_labels": [
+        "status"
+      ]
+    },
+    {
+      "case_id": "negative_title_missing_link_literal",
+      "context_aware_cue_suppressions": [],
+      "detected": false,
+      "expected_detected": false,
+      "omission_constructions": [],
+      "question": "Insert title \"Missing Link\".",
+      "schema_labels": [
+        "title"
+      ]
+    },
+    {
+      "case_id": "negative_album_blank_space_literal",
+      "context_aware_cue_suppressions": [],
+      "detected": false,
+      "expected_detected": false,
+      "omission_constructions": [],
+      "question": "Insert album \"Blank Space\".",
+      "schema_labels": [
+        "album"
+      ]
+    },
+    {
+      "case_id": "negative_state_absent_literal",
+      "context_aware_cue_suppressions": [],
+      "detected": false,
+      "expected_detected": false,
+      "omission_constructions": [],
+      "question": "Insert state \"Absent\".",
+      "schema_labels": [
+        "state"
+      ]
+    }
+  ],
+  "gpu_called": false,
+  "model_called": false,
+  "negative_literal_fixture_count": 4,
+  "positive_fixture_count": 4,
+  "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT",
+  "status": "PASS"
+}

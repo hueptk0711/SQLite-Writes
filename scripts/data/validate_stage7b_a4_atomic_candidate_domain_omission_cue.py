@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate Stage7B-A4 atomic candidate-domain and omission-cue audit artifacts."""
+"""Validate Stage7B-A4 PATCH1 schema-label-aware candidate-domain audit."""
 
 from __future__ import annotations
 
@@ -25,17 +25,20 @@ from scripts.data.build_stage7b_a2_candidate_span_reference import (  # noqa: E4
 )
 from scripts.data.build_stage7b_a4_atomic_candidate_domain_omission_cue import (  # noqa: E402
     OMISSION_CUE_PHRASES,
+    PATCH_NAME,
     SCIENTIFIC_ARTIFACTS,
     STAGE_NAME,
     STRONG_ATOMIC_TAGS,
-    atomic_dominance_reason,
     build_stage,
     canonical_json,
-    contains_omission_cue,
+    detect_omission_constructions,
     generate_candidate_inventory,
+    generic_atomic_dominance_reason,
     is_exact_omission_cue,
+    schema_label_aware_dominance_reason,
     sha256_file,
     sha256_text,
+    suppressible_span_refs,
 )
 
 
@@ -76,9 +79,13 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
     atomic = read_json(stage_dir / "ATOMIC_CANDIDATE_DOMINANCE_RULE_SPEC.json")
     omission = read_json(stage_dir / "OMISSION_CUE_SUPPRESSION_RULE_SPEC.json")
     current = read_json(stage_dir / "CURRENT_LEXICAL_NGRAM2_DOMAIN_AUDIT.json")
-    filtered = read_json(stage_dir / "ATOMIC_FILTERED_DOMAIN_AUDIT.json")
+    patch0 = read_json(stage_dir / "PATCH0_GENERIC_ATOMIC_DOMAIN_AUDIT.json")
+    schema_aware = read_json(stage_dir / "SCHEMA_LABEL_AWARE_DOMAIN_AUDIT.json")
+    filtered_alias = read_json(stage_dir / "ATOMIC_FILTERED_DOMAIN_AUDIT.json")
     comparison = read_json(stage_dir / "DOMAIN_COMPARISON_AUDIT.json")
+    false_suppression = read_json(stage_dir / "FALSE_SUPPRESSION_AUDIT.json")
     cue = read_json(stage_dir / "OMISSION_CUE_DESIGN_TRAIN_AUDIT.json")
+    synthetic = read_json(stage_dir / "SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json")
     rows = read_jsonl(stage_dir / "CANDIDATE_DOMAIN_AUDIT_ROWS.jsonl")
     examples = read_jsonl(stage_dir / "CANDIDATE_SUPPRESSION_EXAMPLES.jsonl")
     manifest = read_json(stage_dir / "DERIVED_ARTIFACT_MANIFEST.json")
@@ -92,14 +99,19 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
             "atomic": atomic,
             "omission": omission,
             "current": current,
-            "filtered": filtered,
+            "patch0": patch0,
+            "schema_aware": schema_aware,
             "comparison": comparison,
+            "false_suppression": false_suppression,
             "cue": cue,
+            "synthetic": synthetic,
             "lock": lock,
         },
         failures,
     )
 
+    if PATCH_NAME != "PATCH1" or lock.get("patch") != "PATCH1":
+        failures.append("patch_name_not_patch1")
     if a5.get("status") != "STAGE7E0_A5_VALID_FEASIBILITY_FAIL_CLOSED":
         failures.append("a5_closed_status_mismatch")
     if a5.get("corrected_primary_pass_count") != "2/12":
@@ -111,40 +123,49 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
 
     if protocol.get("baseline_candidate_generator") != SELECTED_VARIANT:
         failures.append("protocol_baseline_variant_mismatch")
-    if protocol.get("forbidden_inputs_for_candidate_suppression") != ["gold_sql", "gold_values", "gold_offsets", "target_state", "model_outputs"]:
-        failures.append("protocol_forbidden_inputs_mismatch")
     if protocol.get("design_sample_count_required") != EXPECTED_DESIGN_SAMPLE_COUNT:
         failures.append("protocol_design_count_mismatch")
-    if atomic.get("audit_only") is not True or atomic.get("gold_blind") is not True:
-        failures.append("atomic_rule_not_audit_only_gold_blind")
-    if omission.get("audit_only") is not True or omission.get("cue_phrases") != list(OMISSION_CUE_PHRASES):
+    if atomic.get("rule_name") != "schema_label_aware_atomic_dominated_broad_span_suppression_audit":
+        failures.append("atomic_rule_name_mismatch")
+    if atomic.get("uses_model_visible_schema") is not True or atomic.get("gold_blind") is not True:
+        failures.append("atomic_rule_not_schema_label_gold_blind")
+    if omission.get("cue_phrases") != list(OMISSION_CUE_PHRASES):
         failures.append("omission_rule_spec_mismatch")
+    if "schema-label" not in omission.get("candidate_is_suppressible_when", ""):
+        failures.append("omission_rule_not_context_aware")
 
-    for owner, payload in {"current": current, "filtered": filtered, "cue": cue}.items():
+    for owner, payload in {"current": current, "patch0": patch0, "schema_aware": schema_aware, "cue": cue}.items():
         if payload.get("design_sample_count") != EXPECTED_DESIGN_SAMPLE_COUNT:
             failures.append(f"{owner}_design_sample_count_mismatch")
         if payload.get("assignment_count") != EXPECTED_ASSIGNMENT_COUNT:
             failures.append(f"{owner}_assignment_count_mismatch")
-    if current.get("candidate_generator_variant") != SELECTED_VARIANT or filtered.get("candidate_generator_variant") != SELECTED_VARIANT:
+    if current.get("candidate_generator_variant") != SELECTED_VARIANT or schema_aware.get("candidate_generator_variant") != SELECTED_VARIANT:
         failures.append("candidate_generator_variant_mismatch")
+    if filtered_alias != schema_aware:
+        failures.append("atomic_filtered_alias_mismatch")
+
     if current.get("covered_assignment_count") != 2252 or current.get("full_sample_covered_count") != 724:
         failures.append("current_baseline_counts_mismatch")
-    if filtered.get("covered_assignment_count") != 2249 or filtered.get("full_sample_covered_count") != 721:
-        failures.append("filtered_counts_mismatch")
-    if float(filtered.get("assignment_representability", 0.0)) < MIN_ASSIGNMENT_COVERAGE:
-        failures.append("filtered_assignment_representability_below_threshold")
-    if float(filtered.get("full_sample_representability", 0.0)) < MIN_FULL_SAMPLE_COVERAGE:
-        failures.append("filtered_full_sample_representability_below_threshold")
-    if int(filtered.get("covered_assignment_count", 0)) < math.ceil(MIN_ASSIGNMENT_COVERAGE * EXPECTED_ASSIGNMENT_COUNT):
-        failures.append("filtered_covered_assignment_count_below_floor")
-    if int(filtered.get("full_sample_covered_count", 0)) < math.ceil(MIN_FULL_SAMPLE_COVERAGE * EXPECTED_DESIGN_SAMPLE_COUNT):
-        failures.append("filtered_full_sample_count_below_floor")
-    if int(filtered.get("suppressed_candidate_total", 0)) <= 0:
-        failures.append("filtered_suppressed_candidate_total_not_positive")
-    if filtered.get("suppression_rule_counts", {}).get("ATOMIC_DOMINATED_BROAD_SPAN", 0) <= 0:
-        failures.append("atomic_suppression_rule_not_observed")
-    if filtered.get("suppression_rule_counts", {}).get("EXACT_OMISSION_CUE", 0) not in {None, 0}:
-        failures.append("unexpected_design_train_omission_cue_candidate_suppression")
+    if patch0.get("covered_assignment_count") != 2249 or patch0.get("full_sample_covered_count") != 721:
+        failures.append("patch0_generic_counts_mismatch")
+    if schema_aware.get("covered_assignment_count") != 2252 or schema_aware.get("full_sample_covered_count") != 724:
+        failures.append("schema_aware_counts_mismatch")
+    if float(schema_aware.get("assignment_representability", 0.0)) < MIN_ASSIGNMENT_COVERAGE:
+        failures.append("schema_aware_assignment_representability_below_threshold")
+    if float(schema_aware.get("full_sample_representability", 0.0)) < MIN_FULL_SAMPLE_COVERAGE:
+        failures.append("schema_aware_full_sample_representability_below_threshold")
+    if int(schema_aware.get("covered_assignment_count", 0)) < math.ceil(MIN_ASSIGNMENT_COVERAGE * EXPECTED_ASSIGNMENT_COUNT):
+        failures.append("schema_aware_covered_assignment_count_below_floor")
+    if int(schema_aware.get("full_sample_covered_count", 0)) < math.ceil(MIN_FULL_SAMPLE_COVERAGE * EXPECTED_DESIGN_SAMPLE_COUNT):
+        failures.append("schema_aware_full_sample_count_below_floor")
+    if schema_aware.get("suppression_rule_counts", {}).get("SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE", 0) <= 0:
+        failures.append("schema_label_suppression_rule_not_observed")
+    if schema_aware.get("suppression_rule_counts", {}).get("CONTEXT_AWARE_OMISSION_CUE", 0) not in {None, 0}:
+        failures.append("unexpected_design_train_context_omission_suppression")
+    if int(schema_aware.get("suppressed_candidate_total", 0)) >= int(patch0.get("suppressed_candidate_total", 0)):
+        failures.append("schema_aware_not_more_conservative_than_patch0")
+    if schema_aware.get("broader_containing_gold_total", 0) >= current.get("broader_containing_gold_total", 0):
+        failures.append("schema_aware_broad_burden_not_reduced")
 
     if comparison.get("status") != "PASS":
         failures.append("comparison_status_not_pass")
@@ -152,50 +173,80 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
         failures.append("comparison_threshold_decision_mismatch")
     if comparison.get("method_freeze_authorized") is not False:
         failures.append("comparison_authorizes_freeze")
+    pareto_domains = [row.get("domain") for row in comparison.get("pareto_rows", [])]
+    if pareto_domains != ["lexical_ngram2", "patch0_generic_atomic", "patch1_schema_label_aware"]:
+        failures.append("comparison_pareto_domains_mismatch")
+    if comparison.get("assignment_representability_delta") != 0.0 or comparison.get("full_sample_representability_delta") != 0.0:
+        failures.append("schema_aware_representability_not_preserved")
     if comparison.get("candidate_count_p95_delta", 0) >= 0:
         failures.append("candidate_count_p95_not_reduced")
     if comparison.get("broader_containing_gold_total_delta", 0) >= 0:
         failures.append("broader_candidate_burden_not_reduced")
 
+    if false_suppression.get("status") != "PASS":
+        failures.append("false_suppression_status_not_pass")
+    if false_suppression.get("additional_assignment_losses") != 0:
+        failures.append("false_suppression_assignment_losses_present")
+    if false_suppression.get("additional_full_sample_losses") != 0:
+        failures.append("false_suppression_full_sample_losses_present")
+    if false_suppression.get("preferred_freeze_gate_passed") is not True:
+        failures.append("false_suppression_preferred_gate_not_passed")
+
     if cue.get("true_assigned_value_exact_cue_count") != 0:
         failures.append("cue_exact_gold_value_present")
     if cue.get("true_assigned_value_contains_cue_count") != 0:
         failures.append("cue_containing_gold_value_present")
-    if cue.get("omission_cue_suppression_has_design_train_recall_risk") is not False:
-        failures.append("cue_recall_risk_not_false")
+    if cue.get("question_cue_occurrence_count") != 0:
+        failures.append("unexpected_design_train_cue_occurrence")
+    if synthetic.get("status") != "PASS":
+        failures.append("synthetic_omission_safety_not_pass")
+    if synthetic.get("positive_fixture_count") != 4 or synthetic.get("negative_literal_fixture_count") != 4:
+        failures.append("synthetic_omission_fixture_count_mismatch")
 
     if len(rows) != EXPECTED_DESIGN_SAMPLE_COUNT:
         failures.append("audit_rows_count_mismatch")
-    row_current_full = sum(1 for row in rows if row.get("current_full_sample_representable") is True)
-    row_filtered_full = sum(1 for row in rows if row.get("atomic_filtered_full_sample_representable") is True)
-    row_suppressed_total = sum(int(row.get("suppressed_candidate_count", 0)) for row in rows)
-    if row_current_full != current.get("full_sample_covered_count"):
+    if sum(1 for row in rows if row.get("current_full_sample_representable") is True) != current.get("full_sample_covered_count"):
         failures.append("row_current_full_count_mismatch")
-    if row_filtered_full != filtered.get("full_sample_covered_count"):
-        failures.append("row_filtered_full_count_mismatch")
-    if row_suppressed_total != filtered.get("suppressed_candidate_total"):
+    if sum(1 for row in rows if row.get("patch0_generic_full_sample_representable") is True) != patch0.get("full_sample_covered_count"):
+        failures.append("row_patch0_full_count_mismatch")
+    if sum(1 for row in rows if row.get("atomic_filtered_full_sample_representable") is True) != schema_aware.get("full_sample_covered_count"):
+        failures.append("row_schema_aware_full_count_mismatch")
+    if sum(int(row.get("suppressed_candidate_count", 0)) for row in rows) != schema_aware.get("suppressed_candidate_total"):
         failures.append("row_suppressed_count_mismatch")
     if not examples:
         failures.append("suppression_examples_missing")
     for example in examples[:20]:
         reason = example.get("reason", {})
-        if reason.get("rule") == "ATOMIC_DOMINATED_BROAD_SPAN":
-            if not set(reason.get("dominant_child_tags", [])) & STRONG_ATOMIC_TAGS:
-                failures.append("suppression_example_missing_strong_child")
+        if reason.get("rule") == "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE":
+            allowed_tags = STRONG_ATOMIC_TAGS | {"DATE", "DATETIME", "ORDINAL_PHRASE", "COMPOUND_LITERAL"}
+            if not set(reason.get("dominant_child_tags", [])) & allowed_tags:
+                failures.append("suppression_example_missing_atomic_child")
                 break
-        if reason.get("rule") == "EXACT_OMISSION_CUE" and not is_exact_omission_cue(str(example.get("text", ""))):
-            failures.append("suppression_example_invalid_omission_cue")
-            break
+            if not reason.get("schema_label_residual"):
+                failures.append("suppression_example_missing_schema_residual")
+                break
 
-    question = "Insert loan_id LOAN-842 and quarter Q2. Comment omitted."
-    inventory = generate_candidate_inventory(question)
+    inventory = generate_candidate_inventory("Insert loan_id LOAN-842, mass 0.42, century 20th Century.", variant=SELECTED_VARIANT)
     by_text = {candidate.text: candidate for candidate in inventory}
-    if atomic_dominance_reason(by_text["loan_id LOAN-842"], inventory) is None:
-        failures.append("atomic_rule_does_not_drop_label_plus_identifier")
-    if atomic_dominance_reason(by_text["Q2"], inventory) is not None:
-        failures.append("atomic_rule_drops_single_token_identifier")
-    if not contains_omission_cue("Comment omitted") or not is_exact_omission_cue(" omitted. "):
-        failures.append("omission_cue_helpers_regressed")
+    schema_labels = {"loan id", "mass", "century"}
+    if generic_atomic_dominance_reason(by_text["20th Century"], inventory) is not None:
+        failures.append("lexical_hardening_drops_ordinal_phrase")
+    if schema_label_aware_dominance_reason(by_text["loan_id LOAN-842"], inventory, schema_labels) is None:
+        failures.append("schema_aware_does_not_drop_label_identifier")
+    if schema_label_aware_dominance_reason(by_text["20th Century"], inventory, schema_labels) is not None:
+        failures.append("schema_aware_drops_ordinal_phrase")
+
+    omission_question = 'Insert status "missing". phone not provided.'
+    omission_inventory = generate_candidate_inventory(omission_question, variant=SELECTED_VARIANT)
+    detections = detect_omission_constructions(omission_question, {"status", "phone"})
+    reasons = suppressible_span_refs(omission_inventory, {"status", "phone"}, detections)
+    suppressed_texts = {candidate.text for candidate in omission_inventory if candidate.span_ref in reasons}
+    if "not provided" not in suppressed_texts:
+        failures.append("context_omission_positive_not_suppressed")
+    if "missing" in suppressed_texts:
+        failures.append("context_omission_suppresses_quoted_literal")
+    if not is_exact_omission_cue("missing"):
+        failures.append("omission_cue_exact_helper_regressed")
 
     for item in source.get("source_files", []):
         source_path = PROJECT_ROOT / str(item["path"])
@@ -220,15 +271,17 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
         failures.append("derived_manifest_combined_hash_mismatch")
     if lock.get("derived_artifact_manifest_sha256") != sha256_file(stage_dir / "DERIVED_ARTIFACT_MANIFEST.json"):
         failures.append("lock_derived_manifest_hash_mismatch")
-    if lock.get("status") != "PASS_ATOMIC_CANDIDATE_DOMAIN_OMISSION_CUE_AUDIT_READY_FOR_REVIEW":
+    if lock.get("status") != "PASS_SCHEMA_LABEL_AWARE_CANDIDATE_DOMAIN_OMISSION_CUE_AUDIT_READY_FOR_REVIEW":
         failures.append("lock_status_mismatch")
     if lock.get("method_freeze_authorized") is not False:
         failures.append("lock_authorizes_freeze")
+    if lock.get("additional_assignment_losses") != 0 or lock.get("additional_full_sample_losses") != 0:
+        failures.append("lock_false_suppression_counts_mismatch")
     if lock.get("gretel_pilot_opened") is not False or lock.get("development_dev_used") is not False or lock.get("official_test_used") is not False:
         failures.append("lock_reserved_rows_used")
 
     if raw_dir is not None and rebuild and not failures:
-        temp_path = stage_dir.parent / "_stage7b_a4_rebuild_validation_tmp"
+        temp_path = stage_dir.parent / "_stage7b_a4_patch1_rebuild_validation_tmp"
         shutil.rmtree(temp_path, ignore_errors=True)
         temp_path.mkdir(parents=True, exist_ok=True)
         temp_stage = temp_path / STAGE_NAME
@@ -245,16 +298,19 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
 
     return {
         "stage": STAGE_NAME,
+        "patch": PATCH_NAME,
         "status": "PASS" if not failures else "FAIL",
         "failures": failures,
         "design_sample_count": current.get("design_sample_count"),
         "assignment_count": current.get("assignment_count"),
         "current_assignment_representability": current.get("assignment_representability"),
-        "current_full_sample_representability": current.get("full_sample_representability"),
-        "atomic_filtered_assignment_representability": filtered.get("assignment_representability"),
-        "atomic_filtered_full_sample_representability": filtered.get("full_sample_representability"),
-        "suppressed_candidate_total": filtered.get("suppressed_candidate_total"),
-        "true_assigned_value_exact_cue_count": cue.get("true_assigned_value_exact_cue_count"),
+        "patch0_generic_assignment_representability": patch0.get("assignment_representability"),
+        "schema_label_aware_assignment_representability": schema_aware.get("assignment_representability"),
+        "schema_label_aware_full_sample_representability": schema_aware.get("full_sample_representability"),
+        "additional_assignment_losses": false_suppression.get("additional_assignment_losses"),
+        "additional_full_sample_losses": false_suppression.get("additional_full_sample_losses"),
+        "suppressed_candidate_total": schema_aware.get("suppressed_candidate_total"),
+        "synthetic_omission_cue_safety_status": synthetic.get("status"),
         "model_called": False,
         "gpu_called": False,
         "gretel_pilot_opened": False,

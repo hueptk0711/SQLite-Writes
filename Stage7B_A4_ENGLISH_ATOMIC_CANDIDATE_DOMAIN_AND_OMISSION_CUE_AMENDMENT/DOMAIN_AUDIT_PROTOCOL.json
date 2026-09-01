@@ -17,7 +17,7 @@
   "minimum_assignment_representability": 0.99,
   "minimum_full_sample_representability": 0.99,
   "model_called": false,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "scope": "StageENG1 development_train excluding the 100-sample pilot pool",
   "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"
 }

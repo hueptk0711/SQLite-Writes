@@ -1,0 +1,14 @@
+{
+  "additional_assignment_losses": 0,
+  "additional_full_sample_losses": 0,
+  "baseline_covered_assignment_count": 2252,
+  "baseline_domain": "current_lexical_ngram2",
+  "candidate_domain_under_review": "patch1_schema_label_aware_candidate_domain_audit",
+  "false_suppression_examples": [],
+  "gpu_called": false,
+  "model_called": false,
+  "patch1_covered_assignment_count": 2252,
+  "preferred_freeze_gate_passed": true,
+  "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT",
+  "status": "PASS"
+}

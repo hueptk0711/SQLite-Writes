@@ -45,12 +45,13 @@ from scripts.data.build_stage7b_a2_candidate_span_reference import (  # noqa: E4
 )
 from scripts.data.build_stage7b_a3_column_conditioned_candidate_selection import (  # noqa: E402
     STAGE_NAME as STAGE7B_A3_NAME,
+    parse_schema_tables,
 )
 
 
 STAGE_NAME = "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"
-PATCH_NAME = "PATCH0"
-PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260901.zip"
+PATCH_NAME = "PATCH1"
+PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260902.zip"
 STAGEENG0_NAME = "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION"
 STAGEENG1_NAME = "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
 STAGE7B_A2_NAME = "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
@@ -74,9 +75,13 @@ SCIENTIFIC_ARTIFACTS = [
     "ATOMIC_CANDIDATE_DOMINANCE_RULE_SPEC.json",
     "OMISSION_CUE_SUPPRESSION_RULE_SPEC.json",
     "CURRENT_LEXICAL_NGRAM2_DOMAIN_AUDIT.json",
+    "PATCH0_GENERIC_ATOMIC_DOMAIN_AUDIT.json",
+    "SCHEMA_LABEL_AWARE_DOMAIN_AUDIT.json",
     "ATOMIC_FILTERED_DOMAIN_AUDIT.json",
     "DOMAIN_COMPARISON_AUDIT.json",
+    "FALSE_SUPPRESSION_AUDIT.json",
     "OMISSION_CUE_DESIGN_TRAIN_AUDIT.json",
+    "SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json",
     "CANDIDATE_DOMAIN_AUDIT_ROWS.jsonl",
     "CANDIDATE_SUPPRESSION_EXAMPLES.jsonl",
 ]
@@ -163,6 +168,10 @@ def normalize_cue_text(text: str) -> str:
     return re.sub(r"\s+", " ", text.casefold().strip(" \t\r\n\"'()[]{}<>.,;:!?"))
 
 
+def normalize_label_text(text: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"[_\-.]+", " ", text.casefold()).strip(" \t\r\n\"'()[]{}<>.,;:!?"))
+
+
 def is_exact_omission_cue(text: str) -> bool:
     return normalize_cue_text(text) in OMISSION_CUE_PHRASES
 
@@ -183,6 +192,14 @@ def _strictly_contains(container: CandidateSpan, child: CandidateSpan) -> bool:
 def effective_atomic_tags(candidate: CandidateSpan) -> set[str]:
     tags = set(candidate.tags) & STRONG_ATOMIC_TAGS
     text = candidate.text.strip()
+    if re.fullmatch(r"\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(?::\d{2})?", text):
+        tags.add("DATETIME")
+    elif re.fullmatch(r"\d{4}-\d{2}-\d{2}", text):
+        tags.add("DATE")
+    elif re.fullmatch(r"\d+(?:st|nd|rd|th)\s+[A-Za-z][A-Za-z ]*", text):
+        tags.add("ORDINAL_PHRASE")
+    elif re.fullmatch(r"[A-Za-z]+'s\s+[A-Za-z][A-Za-z ]*", text):
+        tags.add("COMPOUND_LITERAL")
     if re.fullmatch(r"0x[0-9A-Fa-f]+", text):
         tags.add("IDENTIFIER")
     elif re.fullmatch(r"[A-Za-z]+[A-Za-z0-9_-]*\d+[A-Za-z0-9_-]*", text):
@@ -190,8 +207,28 @@ def effective_atomic_tags(candidate: CandidateSpan) -> set[str]:
     return tags
 
 
-def atomic_dominance_reason(candidate: CandidateSpan, inventory: list[CandidateSpan]) -> dict[str, Any] | None:
-    """Return a gold-blind suppression reason for broad non-atomic candidates."""
+def complete_compound_literal(candidate: CandidateSpan) -> bool:
+    return bool(effective_atomic_tags(candidate) - STRONG_ATOMIC_TAGS)
+
+
+def visible_schema_labels(sql_context: str) -> set[str]:
+    labels: set[str] = set()
+    for table_name, columns in parse_schema_tables(sql_context).items():
+        labels.add(normalize_label_text(table_name))
+        for column in columns:
+            labels.add(normalize_label_text(column.column_name))
+    return {label for label in labels if label}
+
+
+def residual_around_child(parent: CandidateSpan, child: CandidateSpan) -> str:
+    parent_text = parent.text
+    child_start = child.start_char - parent.start_char
+    child_end = child.end_char - parent.start_char
+    return f"{parent_text[:child_start]} {parent_text[child_end:]}"
+
+
+def generic_atomic_dominance_reason(candidate: CandidateSpan, inventory: list[CandidateSpan]) -> dict[str, Any] | None:
+    """Return the PATCH0 broad atomic-child suppression reason."""
 
     if len(candidate.text.split()) < 2:
         return None
@@ -223,19 +260,152 @@ def atomic_dominance_reason(candidate: CandidateSpan, inventory: list[CandidateS
     }
 
 
-def suppression_reason(candidate: CandidateSpan, inventory: list[CandidateSpan]) -> dict[str, Any] | None:
-    if is_exact_omission_cue(candidate.text):
-        return {"rule": "EXACT_OMISSION_CUE", "cue_text": normalize_cue_text(candidate.text)}
-    return atomic_dominance_reason(candidate, inventory)
+def schema_label_aware_dominance_reason(
+    candidate: CandidateSpan,
+    inventory: list[CandidateSpan],
+    schema_labels: set[str],
+) -> dict[str, Any] | None:
+    """Suppress only when the non-child residual is a visible schema label."""
+
+    if len(candidate.text.split()) < 2:
+        return None
+    if effective_atomic_tags(candidate) or complete_compound_literal(candidate):
+        return None
+    generic_reason = generic_atomic_dominance_reason(candidate, inventory)
+    if generic_reason is None:
+        return None
+    child_ref = str(generic_reason["dominant_child_span_ref"])
+    child = next(item for item in inventory if item.span_ref == child_ref)
+    residual = normalize_label_text(residual_around_child(candidate, child))
+    if residual not in schema_labels:
+        return None
+    return {
+        "rule": "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE",
+        "dominant_child_span_ref": child.span_ref,
+        "dominant_child_text": child.text,
+        "dominant_child_tags": sorted(effective_atomic_tags(child)),
+        "schema_label_residual": residual,
+        "candidate_token_count": len(candidate.text.split()),
+    }
 
 
-def suppressible_span_refs(inventory: list[CandidateSpan]) -> dict[str, dict[str, Any]]:
+def detect_omission_constructions(question: str, schema_labels: set[str]) -> list[dict[str, Any]]:
+    detections: list[dict[str, Any]] = []
+    lowered = question.casefold()
+    for label in sorted(schema_labels, key=len, reverse=True):
+        if not label:
+            continue
+        label_pattern = re.escape(label).replace(r"\ ", r"[\s_\-]+")
+        for phrase in OMISSION_CUE_PHRASES:
+            phrase_pattern = re.escape(phrase).replace(r"\ ", r"\s+")
+            patterns = [
+                rf"\b(?P<label>{label_pattern})\b\s+(?:is\s+|was\s+)?(?P<cue>{phrase_pattern})\b",
+                rf"\bleave\s+(?P<label>{label_pattern})\s+(?P<cue>{phrase_pattern})\b",
+                rf"\bdo\s+not\s+set\s+(?P<label>{label_pattern})\b",
+            ]
+            for pattern in patterns:
+                for match in re.finditer(pattern, lowered):
+                    detections.append(
+                        {
+                            "label": label,
+                            "cue_phrase": phrase,
+                            "start_char": match.start(),
+                            "end_char": match.end(),
+                            "text": question[match.start() : match.end()],
+                        }
+                    )
+    return detections
+
+
+def context_aware_omission_reason(
+    candidate: CandidateSpan,
+    omission_detections: list[dict[str, Any]],
+) -> dict[str, Any] | None:
+    if not is_exact_omission_cue(candidate.text):
+        return None
+    for detection in omission_detections:
+        cue = str(detection["cue_phrase"])
+        cue_offset = normalize_cue_text(candidate.text)
+        if cue != cue_offset:
+            continue
+        if int(detection["start_char"]) <= candidate.start_char and candidate.end_char <= int(detection["end_char"]):
+            return {
+                "rule": "CONTEXT_AWARE_OMISSION_CUE",
+                "cue_phrase": cue,
+                "schema_label": detection["label"],
+                "construction_text": detection["text"],
+            }
+    return None
+
+
+def suppression_reason(
+    candidate: CandidateSpan,
+    inventory: list[CandidateSpan],
+    schema_labels: set[str],
+    omission_detections: list[dict[str, Any]],
+) -> dict[str, Any] | None:
+    omission_reason = context_aware_omission_reason(candidate, omission_detections)
+    if omission_reason is not None:
+        return omission_reason
+    return schema_label_aware_dominance_reason(candidate, inventory, schema_labels)
+
+
+def suppressible_span_refs(
+    inventory: list[CandidateSpan],
+    schema_labels: set[str] | None = None,
+    omission_detections: list[dict[str, Any]] | None = None,
+) -> dict[str, dict[str, Any]]:
+    schema_labels = schema_labels or set()
+    omission_detections = omission_detections or []
     reasons: dict[str, dict[str, Any]] = {}
     for candidate in inventory:
-        reason = suppression_reason(candidate, inventory)
+        reason = suppression_reason(candidate, inventory, schema_labels, omission_detections)
         if reason is not None:
             reasons[candidate.span_ref] = reason
     return reasons
+
+
+def generic_suppressible_span_refs(inventory: list[CandidateSpan]) -> dict[str, dict[str, Any]]:
+    reasons: dict[str, dict[str, Any]] = {}
+    for candidate in inventory:
+        if is_exact_omission_cue(candidate.text):
+            reasons[candidate.span_ref] = {"rule": "EXACT_OMISSION_CUE", "cue_text": normalize_cue_text(candidate.text)}
+            continue
+        reason = patch0_original_generic_atomic_dominance_reason(candidate, inventory)
+        if reason is not None:
+            reasons[candidate.span_ref] = reason
+    return reasons
+
+
+def patch0_original_generic_atomic_dominance_reason(candidate: CandidateSpan, inventory: list[CandidateSpan]) -> dict[str, Any] | None:
+    if len(candidate.text.split()) < 2:
+        return None
+    if STRONG_ATOMIC_TAGS.intersection(candidate.tags):
+        return None
+    atomic_children = [
+        child
+        for child in inventory
+        if STRONG_ATOMIC_TAGS.intersection(child.tags) and _strictly_contains(candidate, child)
+    ]
+    if not atomic_children:
+        return None
+    tag_priority = {"EMAIL": 5, "URL": 5, "IDENTIFIER": 4, "QUOTED_TEXT": 3, "NUMBER": 2}
+    best_child = max(
+        atomic_children,
+        key=lambda item: (
+            max(tag_priority.get(tag, 0) for tag in item.tags),
+            item.start_char,
+            item.end_char - item.start_char,
+            -item.end_char,
+        ),
+    )
+    return {
+        "rule": "ATOMIC_DOMINATED_BROAD_SPAN",
+        "dominant_child_span_ref": best_child.span_ref,
+        "dominant_child_text": best_child.text,
+        "dominant_child_tags": list(best_child.tags),
+        "candidate_token_count": len(candidate.text.split()),
+    }
 
 
 def _candidate_by_gold_span(inventory: list[CandidateSpan]) -> dict[tuple[int, int, str], CandidateSpan]:
@@ -349,20 +519,24 @@ def domain_audit_protocol() -> dict[str, Any]:
 def atomic_rule_spec() -> dict[str, Any]:
     return {
         "stage": STAGE_NAME,
-        "rule_name": "atomic_dominated_broad_span_suppression_audit",
+        "rule_name": "schema_label_aware_atomic_dominated_broad_span_suppression_audit",
         "audit_only": True,
         "candidate_is_suppressible_when": [
             "The candidate has at least two whitespace-delimited tokens.",
-            "The candidate itself has no strong atomic model-visible tag.",
+            "The candidate itself is not a recognized complete atomic, datetime, ordinal, possessive, or compound literal.",
             "The candidate strictly contains another candidate tagged EMAIL, NUMBER, IDENTIFIER, QUOTED_TEXT, or URL.",
+            "The text outside the dominant child normalizes to a model-visible schema table or column label.",
         ],
         "candidate_is_not_suppressible_when": [
             "The candidate is a single-token alphanumeric literal such as Q2, 789B, or S102.",
             "The candidate itself is tagged as EMAIL, NUMBER, IDENTIFIER, QUOTED_TEXT, or URL.",
+            "The candidate is a complete datetime, ordinal phrase, or possessive/compound literal.",
+            "The residual outside the atomic child is not a visible schema label.",
             "No strong atomic child candidate is contained by the span.",
         ],
         "gold_blind": True,
-        "purpose": "Reduce broad label-plus-value candidates such as 'loan_id LOAN-842' when an atomic child span exists.",
+        "uses_model_visible_schema": True,
+        "purpose": "Reduce broad label-plus-value candidates such as 'loan_id LOAN-842' only when the label residual matches visible schema.",
         "model_called": False,
         "gpu_called": False,
     }
@@ -374,10 +548,66 @@ def omission_rule_spec() -> dict[str, Any]:
         "rule_name": "exact_omission_cue_suppression_audit",
         "audit_only": True,
         "cue_phrases": list(OMISSION_CUE_PHRASES),
-        "candidate_is_suppressible_when": "Normalized candidate text exactly equals one cue phrase and the SPAN|OMIT column domain includes OMIT.",
-        "candidate_is_not_suppressible_when": "The cue phrase is part of a true assigned database value or a non-exact longer candidate.",
+        "candidate_is_suppressible_when": "Normalized candidate text exactly equals one cue phrase inside a detected schema-label omission construction.",
+        "candidate_is_not_suppressible_when": "The cue phrase appears as a quoted/legitimate value or outside a schema-label omission construction.",
         "gold_blind_runtime_policy": True,
         "gold_used_only_for_design_train_recall_audit": True,
+        "model_called": False,
+        "gpu_called": False,
+    }
+
+
+def synthetic_omission_cue_safety_audit() -> dict[str, Any]:
+    fixtures = [
+        {"case_id": "positive_phone_not_provided", "question": "Insert contact Bob. phone not provided.", "schema_labels": {"phone"}, "expected_detected": True},
+        {"case_id": "positive_region_omitted", "question": "Add city row. region omitted.", "schema_labels": {"region"}, "expected_detected": True},
+        {"case_id": "positive_note_missing", "question": "Create task row. note missing.", "schema_labels": {"note"}, "expected_detected": True},
+        {"case_id": "positive_address_left_empty", "question": "Register customer. address left empty.", "schema_labels": {"address"}, "expected_detected": True},
+        {"case_id": "negative_status_missing_literal", "question": 'Insert status "missing".', "schema_labels": {"status"}, "expected_detected": False},
+        {"case_id": "negative_title_missing_link_literal", "question": 'Insert title "Missing Link".', "schema_labels": {"title"}, "expected_detected": False},
+        {"case_id": "negative_album_blank_space_literal", "question": 'Insert album "Blank Space".', "schema_labels": {"album"}, "expected_detected": False},
+        {"case_id": "negative_state_absent_literal", "question": 'Insert state "Absent".', "schema_labels": {"state"}, "expected_detected": False},
+    ]
+    rows: list[dict[str, Any]] = []
+    failures: list[str] = []
+    for fixture in fixtures:
+        question = fixture["question"]
+        schema_labels = set(fixture["schema_labels"])
+        detections = detect_omission_constructions(question, schema_labels)
+        inventory = generate_candidate_inventory(question, variant=SELECTED_VARIANT)
+        reasons = suppressible_span_refs(inventory, schema_labels, detections)
+        cue_suppressions = [
+            {
+                "span_ref": candidate.span_ref,
+                "text": candidate.text,
+                "reason": reasons[candidate.span_ref],
+            }
+            for candidate in inventory
+            if candidate.span_ref in reasons and reasons[candidate.span_ref]["rule"] == "CONTEXT_AWARE_OMISSION_CUE"
+        ]
+        detected = bool(detections or cue_suppressions)
+        expected = bool(fixture["expected_detected"])
+        if detected != expected:
+            failures.append(str(fixture["case_id"]))
+        rows.append(
+            {
+                "case_id": fixture["case_id"],
+                "question": question,
+                "schema_labels": sorted(schema_labels),
+                "expected_detected": expected,
+                "detected": detected,
+                "omission_constructions": detections,
+                "context_aware_cue_suppressions": cue_suppressions,
+            }
+        )
+    return {
+        "stage": STAGE_NAME,
+        "status": "PASS" if not failures else "FAIL",
+        "fixture_count": len(fixtures),
+        "positive_fixture_count": sum(1 for fixture in fixtures if fixture["expected_detected"]),
+        "negative_literal_fixture_count": sum(1 for fixture in fixtures if not fixture["expected_detected"]),
+        "failures": failures,
+        "fixtures": rows,
         "model_called": False,
         "gpu_called": False,
     }
@@ -413,6 +643,7 @@ def audit_domains(
     raw_by_id = load_raw_by_sample_id(raw_dir)
     design_ids, assignments_by_sample, assignment_rows = design_assignments(stageeng0_dir, stageeng1_dir)
     current_acc = _empty_domain_accumulator()
+    patch0_acc = _empty_domain_accumulator()
     filtered_acc = _empty_domain_accumulator()
     row_payloads: list[dict[str, Any]] = []
     suppression_examples: list[dict[str, Any]] = []
@@ -422,9 +653,12 @@ def audit_domains(
     cue_gold_exact: list[dict[str, Any]] = []
     cue_gold_contains: list[dict[str, Any]] = []
     suppression_rule_counts: dict[str, int] = {}
+    patch0_suppression_rule_counts: dict[str, int] = {}
     suppressed_candidate_total = 0
+    patch0_suppressed_candidate_total = 0
     suppressed_candidates_with_strong_child = 0
     suppressible_gold_assignment_count = 0
+    false_suppression_rows: list[dict[str, Any]] = []
 
     for sample_id in sorted(design_ids):
         raw = raw_by_id.get(sample_id)
@@ -432,11 +666,19 @@ def audit_domains(
             raise RuntimeError(f"Raw parquet row missing for {sample_id}")
         question = str(raw.get("sql_prompt") or "")
         inventory = generate_candidate_inventory(question, variant=SELECTED_VARIANT)
-        reasons = suppressible_span_refs(inventory)
+        schema_labels = visible_schema_labels(str(raw.get("sql_context") or ""))
+        omission_detections = detect_omission_constructions(question, schema_labels)
+        patch0_reasons = generic_suppressible_span_refs(inventory)
+        reasons = suppressible_span_refs(inventory, schema_labels, omission_detections)
+        patch0_suppressed_refs = set(patch0_reasons)
         suppressed_refs = set(reasons)
+        patch0_filtered_inventory = [candidate for candidate in inventory if candidate.span_ref not in patch0_suppressed_refs]
         filtered_inventory = [candidate for candidate in inventory if candidate.span_ref not in suppressed_refs]
+        patch0_suppressed_candidate_total += len(patch0_suppressed_refs)
         suppressed_candidate_total += len(suppressed_refs)
-        suppressed_candidates_with_strong_child += sum(1 for reason in reasons.values() if reason["rule"] == "ATOMIC_DOMINATED_BROAD_SPAN")
+        suppressed_candidates_with_strong_child += sum(1 for reason in reasons.values() if reason["rule"] == "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE")
+        for reason in patch0_reasons.values():
+            patch0_suppression_rule_counts[reason["rule"]] = patch0_suppression_rule_counts.get(reason["rule"], 0) + 1
         for reason in reasons.values():
             suppression_rule_counts[reason["rule"]] = suppression_rule_counts.get(reason["rule"], 0) + 1
 
@@ -457,13 +699,16 @@ def audit_domains(
                 cue_exact_candidate_count += 1
 
         current_acc["candidate_counts"].append(len(inventory))
+        patch0_acc["candidate_counts"].append(len(patch0_filtered_inventory))
         filtered_acc["candidate_counts"].append(len(filtered_inventory))
         candidate_by_span = _candidate_by_gold_span(inventory)
         assignments = sorted(assignments_by_sample.get(sample_id, []), key=lambda row: int(row["assignment_index"]))
         current_sample_full = True
+        patch0_sample_full = True
         filtered_sample_full = True
         assignment_rows_for_sample: list[dict[str, Any]] = []
         sample_broad_current = 0
+        sample_broad_patch0 = 0
         sample_broad_filtered = 0
 
         for assignment in assignments:
@@ -474,20 +719,28 @@ def audit_domains(
             gold_key = (gold_start, gold_end, gold_text)
             candidate = candidate_by_span.get(gold_key)
             current_covered = candidate is not None
+            patch0_covered = bool(candidate and candidate.span_ref not in patch0_suppressed_refs)
             filtered_covered = bool(candidate and candidate.span_ref not in suppressed_refs)
             current_sample_full = current_sample_full and current_covered
+            patch0_sample_full = patch0_sample_full and patch0_covered
             filtered_sample_full = filtered_sample_full and filtered_covered
             current_acc["assignment_count"] += 1
+            patch0_acc["assignment_count"] += 1
             filtered_acc["assignment_count"] += 1
             current_acc["covered_assignment_count"] += int(current_covered)
+            patch0_acc["covered_assignment_count"] += int(patch0_covered)
             filtered_acc["covered_assignment_count"] += int(filtered_covered)
             current_broad = _broader_containing_gold_count(inventory, gold_start, gold_end)
+            patch0_broad = _broader_containing_gold_count(inventory, gold_start, gold_end, suppressed_refs=patch0_suppressed_refs)
             filtered_broad = _broader_containing_gold_count(inventory, gold_start, gold_end, suppressed_refs=suppressed_refs)
             current_acc["broader_counts"].append(current_broad)
+            patch0_acc["broader_counts"].append(patch0_broad)
             filtered_acc["broader_counts"].append(filtered_broad)
             current_acc["broader_total"] += current_broad
+            patch0_acc["broader_total"] += patch0_broad
             filtered_acc["broader_total"] += filtered_broad
             sample_broad_current += current_broad
+            sample_broad_patch0 += patch0_broad
             sample_broad_filtered += filtered_broad
             normalized_gold = normalize_cue_text(gold_text)
             if normalized_gold in OMISSION_CUE_PHRASES:
@@ -496,21 +749,33 @@ def audit_domains(
                 cue_gold_contains.append({"sample_id": sample_id, "column_ref_or_name": assignment["column_ref_or_name"], "gold_text": gold_text})
             if current_covered and not filtered_covered:
                 suppressible_gold_assignment_count += 1
+                false_suppression_rows.append(
+                    {
+                        "sample_id": sample_id,
+                        "column_ref_or_name": assignment["column_ref_or_name"],
+                        "gold_text": gold_text,
+                        "span_ref": candidate.span_ref if candidate else None,
+                        "suppression_reason": reasons.get(candidate.span_ref) if candidate else None,
+                    }
+                )
             assignment_rows_for_sample.append(
                 {
                     "assignment_index": assignment["assignment_index"],
                     "column_ref_or_name": assignment["column_ref_or_name"],
                     "gold_text": gold_text,
                     "current_covered": current_covered,
+                    "patch0_generic_atomic_covered": patch0_covered,
                     "atomic_filtered_covered": filtered_covered,
                     "current_span_ref": candidate.span_ref if candidate else None,
                     "suppressed_by_rule": reasons.get(candidate.span_ref) if candidate else None,
                     "broader_containing_gold_current": current_broad,
+                    "broader_containing_gold_patch0_generic": patch0_broad,
                     "broader_containing_gold_atomic_filtered": filtered_broad,
                 }
             )
 
         current_acc["full_sample_covered_count"] += int(current_sample_full)
+        patch0_acc["full_sample_covered_count"] += int(patch0_sample_full)
         filtered_acc["full_sample_covered_count"] += int(filtered_sample_full)
         row_payloads.append(
             {
@@ -518,16 +783,21 @@ def audit_domains(
                 "question_sha256": sha256_text(question),
                 "candidate_generator_variant": SELECTED_VARIANT,
                 "current_candidate_count": len(inventory),
+                "patch0_generic_atomic_candidate_count": len(patch0_filtered_inventory),
                 "atomic_filtered_candidate_count": len(filtered_inventory),
+                "patch0_generic_suppressed_candidate_count": len(patch0_suppressed_refs),
                 "suppressed_candidate_count": len(suppressed_refs),
+                "schema_label_count": len(schema_labels),
                 "suppression_rule_counts": {
                     rule: sum(1 for reason in reasons.values() if reason["rule"] == rule)
                     for rule in sorted({reason["rule"] for reason in reasons.values()})
                 },
                 "assignment_count": len(assignments),
                 "current_full_sample_representable": current_sample_full,
+                "patch0_generic_full_sample_representable": patch0_sample_full,
                 "atomic_filtered_full_sample_representable": filtered_sample_full,
                 "broader_containing_gold_current": sample_broad_current,
+                "broader_containing_gold_patch0_generic": sample_broad_patch0,
                 "broader_containing_gold_atomic_filtered": sample_broad_filtered,
                 "assignments": assignment_rows_for_sample,
             }
@@ -553,6 +823,7 @@ def audit_domains(
                     break
 
     current = _finalize_domain(current_acc)
+    patch0 = _finalize_domain(patch0_acc)
     filtered = _finalize_domain(filtered_acc)
     current_summary = {
         "stage": STAGE_NAME,
@@ -572,13 +843,39 @@ def audit_domains(
         "model_called": False,
         "gpu_called": False,
     }
+    patch0_pass = (
+        patch0.covered_assignment_count / patch0.assignment_count >= MIN_ASSIGNMENT_COVERAGE
+        and patch0.full_sample_covered_count / len(design_ids) >= MIN_FULL_SAMPLE_COVERAGE
+    )
+    patch0_summary = {
+        "stage": STAGE_NAME,
+        "domain": "patch0_generic_atomic_candidate_domain",
+        "status": "PASS" if patch0_pass else "FAIL",
+        "audit_only": True,
+        "candidate_generator_variant": SELECTED_VARIANT,
+        "design_sample_count": len(design_ids),
+        "assignment_count": patch0.assignment_count,
+        "covered_assignment_count": patch0.covered_assignment_count,
+        "missing_assignment_count": patch0.assignment_count - patch0.covered_assignment_count,
+        "assignment_representability": patch0.covered_assignment_count / patch0.assignment_count,
+        "full_sample_covered_count": patch0.full_sample_covered_count,
+        "full_sample_representability": patch0.full_sample_covered_count / len(design_ids),
+        "candidate_count_stats": patch0.candidate_count_stats,
+        "broader_containing_gold_count_stats": patch0.broader_containing_gold_count_stats,
+        "broader_containing_gold_total": patch0.broader_containing_gold_total,
+        "suppressed_candidate_total": patch0_suppressed_candidate_total,
+        "suppression_rule_counts": dict(sorted(patch0_suppression_rule_counts.items())),
+        "reviewer_patch0_blocker": "generic atomic-child suppression creates three additional gold losses",
+        "model_called": False,
+        "gpu_called": False,
+    }
     filtered_pass = (
         filtered.covered_assignment_count / filtered.assignment_count >= MIN_ASSIGNMENT_COVERAGE
         and filtered.full_sample_covered_count / len(design_ids) >= MIN_FULL_SAMPLE_COVERAGE
     )
     filtered_summary = {
         "stage": STAGE_NAME,
-        "domain": "atomic_filtered_candidate_domain_audit",
+        "domain": "patch1_schema_label_aware_candidate_domain_audit",
         "status": "PASS" if filtered_pass else "FAIL",
         "audit_only": True,
         "candidate_generator_variant": SELECTED_VARIANT,
@@ -593,7 +890,7 @@ def audit_domains(
         "broader_containing_gold_count_stats": filtered.broader_containing_gold_count_stats,
         "broader_containing_gold_total": filtered.broader_containing_gold_total,
         "suppressed_candidate_total": suppressed_candidate_total,
-        "suppressed_candidates_with_strong_child": suppressed_candidates_with_strong_child,
+        "suppressed_schema_label_atomic_candidates": suppressed_candidates_with_strong_child,
         "suppression_rule_counts": dict(sorted(suppression_rule_counts.items())),
         "suppressible_gold_assignment_count": suppressible_gold_assignment_count,
         "minimum_assignment_representability": MIN_ASSIGNMENT_COVERAGE,
@@ -606,7 +903,34 @@ def audit_domains(
         "status": "PASS" if filtered_pass else "FAIL",
         "audit_only": True,
         "current_domain": "current_lexical_ngram2",
-        "candidate_domain_under_review": "atomic_filtered_candidate_domain_audit",
+        "patch0_domain": "patch0_generic_atomic_candidate_domain",
+        "candidate_domain_under_review": "patch1_schema_label_aware_candidate_domain_audit",
+        "pareto_rows": [
+            {
+                "domain": "lexical_ngram2",
+                "assignment_representability": current_summary["assignment_representability"],
+                "full_sample_representability": current_summary["full_sample_representability"],
+                "candidate_count_median": current.candidate_count_stats["median"],
+                "candidate_count_p95": current.candidate_count_stats["p95"],
+                "broader_containing_gold_total": current.broader_containing_gold_total,
+            },
+            {
+                "domain": "patch0_generic_atomic",
+                "assignment_representability": patch0_summary["assignment_representability"],
+                "full_sample_representability": patch0_summary["full_sample_representability"],
+                "candidate_count_median": patch0.candidate_count_stats["median"],
+                "candidate_count_p95": patch0.candidate_count_stats["p95"],
+                "broader_containing_gold_total": patch0.broader_containing_gold_total,
+            },
+            {
+                "domain": "patch1_schema_label_aware",
+                "assignment_representability": filtered_summary["assignment_representability"],
+                "full_sample_representability": filtered_summary["full_sample_representability"],
+                "candidate_count_median": filtered.candidate_count_stats["median"],
+                "candidate_count_p95": filtered.candidate_count_stats["p95"],
+                "broader_containing_gold_total": filtered.broader_containing_gold_total,
+            },
+        ],
         "assignment_representability_delta": filtered_summary["assignment_representability"] - current_summary["assignment_representability"],
         "full_sample_representability_delta": filtered_summary["full_sample_representability"] - current_summary["full_sample_representability"],
         "candidate_count_median_delta": filtered.candidate_count_stats["median"] - current.candidate_count_stats["median"],
@@ -614,7 +938,22 @@ def audit_domains(
         "candidate_count_max_delta": filtered.candidate_count_stats["max"] - current.candidate_count_stats["max"],
         "broader_containing_gold_total_delta": filtered.broader_containing_gold_total - current.broader_containing_gold_total,
         "threshold_decision": "PASS_AUDIT_THRESHOLDS_READY_FOR_REVIEW" if filtered_pass else "FAIL_DO_NOT_FREEZE",
+        "preferred_freeze_gate": "no additional baseline-covered assignment losses",
         "method_freeze_authorized": False,
+        "model_called": False,
+        "gpu_called": False,
+    }
+    false_suppression_audit = {
+        "stage": STAGE_NAME,
+        "status": "PASS" if not false_suppression_rows else "FAIL",
+        "baseline_domain": "current_lexical_ngram2",
+        "candidate_domain_under_review": "patch1_schema_label_aware_candidate_domain_audit",
+        "baseline_covered_assignment_count": current.covered_assignment_count,
+        "patch1_covered_assignment_count": filtered.covered_assignment_count,
+        "additional_assignment_losses": len(false_suppression_rows),
+        "additional_full_sample_losses": current.full_sample_covered_count - filtered.full_sample_covered_count,
+        "false_suppression_examples": false_suppression_rows[:50],
+        "preferred_freeze_gate_passed": not false_suppression_rows,
         "model_called": False,
         "gpu_called": False,
     }
@@ -636,7 +975,8 @@ def audit_domains(
         "model_called": False,
         "gpu_called": False,
     }
-    return current_summary, filtered_summary, comparison, cue_audit, row_payloads, suppression_examples
+    synthetic_safety = synthetic_omission_cue_safety_audit()
+    return current_summary, patch0_summary, filtered_summary, comparison, false_suppression_audit, cue_audit, synthetic_safety, row_payloads, suppression_examples
 
 
 def build_derived_manifest(stage_dir: Path) -> dict[str, Any]:
@@ -653,7 +993,15 @@ def build_derived_manifest(stage_dir: Path) -> dict[str, Any]:
     }
 
 
-def validation_report(current: dict[str, Any], filtered: dict[str, Any], comparison: dict[str, Any], cue: dict[str, Any]) -> str:
+def validation_report(
+    current: dict[str, Any],
+    patch0: dict[str, Any],
+    filtered: dict[str, Any],
+    comparison: dict[str, Any],
+    false_suppression: dict[str, Any],
+    cue: dict[str, Any],
+    synthetic_safety: dict[str, Any],
+) -> str:
     return f"""# Stage7B-A4 Atomic Candidate Domain and Omission-Cue Amendment Validation Report
 
 Status: {comparison["status"]}
@@ -684,7 +1032,19 @@ candidate_count_max={current["candidate_count_stats"]["max"]}
 broader_containing_gold_total={current["broader_containing_gold_total"]}
 ```
 
-## Atomic-Filtered Domain Under Review
+## PATCH0 Generic Atomic Domain
+
+```text
+assignment_representability={patch0["covered_assignment_count"]}/{patch0["assignment_count"]}
+full_sample_representability={patch0["full_sample_covered_count"]}/{patch0["design_sample_count"]}
+candidate_count_median={patch0["candidate_count_stats"]["median"]}
+candidate_count_p95={patch0["candidate_count_stats"]["p95"]}
+candidate_count_max={patch0["candidate_count_stats"]["max"]}
+broader_containing_gold_total={patch0["broader_containing_gold_total"]}
+reviewer_blocker={patch0["reviewer_patch0_blocker"]}
+```
+
+## PATCH1 Schema-Label-Aware Domain
 
 ```text
 assignment_representability={filtered["covered_assignment_count"]}/{filtered["assignment_count"]}
@@ -695,6 +1055,9 @@ candidate_count_max={filtered["candidate_count_stats"]["max"]}
 suppressed_candidate_total={filtered["suppressed_candidate_total"]}
 broader_containing_gold_total={filtered["broader_containing_gold_total"]}
 threshold_decision={comparison["threshold_decision"]}
+additional_assignment_losses={false_suppression["additional_assignment_losses"]}
+additional_full_sample_losses={false_suppression["additional_full_sample_losses"]}
+preferred_freeze_gate_passed={str(false_suppression["preferred_freeze_gate_passed"]).lower()}
 method_freeze_authorized=false
 ```
 
@@ -706,14 +1069,18 @@ true_assigned_value_exact_cue_count={cue["true_assigned_value_exact_cue_count"]}
 true_assigned_value_contains_cue_count={cue["true_assigned_value_contains_cue_count"]}
 question_cue_occurrence_count={cue["question_cue_occurrence_count"]}
 candidate_containing_cue_count={cue["candidate_containing_cue_count"]}
+synthetic_omission_safety_status={synthetic_safety["status"]}
+synthetic_positive_fixtures={synthetic_safety["positive_fixture_count"]}
+synthetic_negative_literal_fixtures={synthetic_safety["negative_literal_fixture_count"]}
 ```
 
 ## Decision
 
-The candidate-domain amendment passes the 99% assignment and full-sample
-representability audit on the 728 design-train samples. This package does not
-freeze a new runtime protocol and does not authorize a model rerun; it provides
-the evidence needed for reviewer approval of a later protocol freeze.
+The PATCH1 schema-label-aware candidate-domain amendment preserves the current
+baseline representability while reducing label-plus-value distractors. This
+package does not freeze a new runtime protocol and does not authorize a model
+rerun; it provides the evidence needed for reviewer approval of a later
+protocol freeze.
 """
 
 
@@ -732,18 +1099,22 @@ Review order:
 3. `{STAGE_NAME}/ATOMIC_CANDIDATE_DOMINANCE_RULE_SPEC.json`
 4. `{STAGE_NAME}/OMISSION_CUE_SUPPRESSION_RULE_SPEC.json`
 5. `{STAGE_NAME}/CURRENT_LEXICAL_NGRAM2_DOMAIN_AUDIT.json`
-6. `{STAGE_NAME}/ATOMIC_FILTERED_DOMAIN_AUDIT.json`
-7. `{STAGE_NAME}/DOMAIN_COMPARISON_AUDIT.json`
-8. `{STAGE_NAME}/OMISSION_CUE_DESIGN_TRAIN_AUDIT.json`
-9. `{STAGE_NAME}/CANDIDATE_DOMAIN_AUDIT_ROWS.jsonl`
-10. `{STAGE_NAME}/CANDIDATE_SUPPRESSION_EXAMPLES.jsonl`
-11. `{STAGE_NAME}/SOURCE_INPUT_MANIFEST.json`
-12. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
-13. `{STAGE_NAME}/STAGE7B_A4_LOCK.json`
-14. `{STAGE_NAME}/VALIDATION_REPORT.md`
-15. `scripts/data/build_stage7b_a4_atomic_candidate_domain_omission_cue.py`
-16. `scripts/data/validate_stage7b_a4_atomic_candidate_domain_omission_cue.py`
-17. `tests/test_stage7b_a4_atomic_candidate_domain_omission_cue.py`
+6. `{STAGE_NAME}/PATCH0_GENERIC_ATOMIC_DOMAIN_AUDIT.json`
+7. `{STAGE_NAME}/SCHEMA_LABEL_AWARE_DOMAIN_AUDIT.json`
+8. `{STAGE_NAME}/ATOMIC_FILTERED_DOMAIN_AUDIT.json`
+9. `{STAGE_NAME}/DOMAIN_COMPARISON_AUDIT.json`
+10. `{STAGE_NAME}/FALSE_SUPPRESSION_AUDIT.json`
+11. `{STAGE_NAME}/OMISSION_CUE_DESIGN_TRAIN_AUDIT.json`
+12. `{STAGE_NAME}/SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json`
+13. `{STAGE_NAME}/CANDIDATE_DOMAIN_AUDIT_ROWS.jsonl`
+14. `{STAGE_NAME}/CANDIDATE_SUPPRESSION_EXAMPLES.jsonl`
+15. `{STAGE_NAME}/SOURCE_INPUT_MANIFEST.json`
+16. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
+17. `{STAGE_NAME}/STAGE7B_A4_LOCK.json`
+18. `{STAGE_NAME}/VALIDATION_REPORT.md`
+19. `scripts/data/build_stage7b_a4_atomic_candidate_domain_omission_cue.py`
+20. `scripts/data/validate_stage7b_a4_atomic_candidate_domain_omission_cue.py`
+21. `tests/test_stage7b_a4_atomic_candidate_domain_omission_cue.py`
 
 Clean extraction commands:
 
@@ -790,16 +1161,20 @@ def build_stage(
         shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    current, filtered, comparison, cue, rows, suppression_examples = audit_domains(raw_dir, stageeng0_dir, stageeng1_dir)
+    current, patch0, filtered, comparison, false_suppression, cue, synthetic_safety, rows, suppression_examples = audit_domains(raw_dir, stageeng0_dir, stageeng1_dir)
     write_json(out_dir / "SOURCE_INPUT_MANIFEST.json", source_input_manifest(stageeng0_dir, stageeng1_dir, stage7b_a2_dir, stage7b_a3_dir, stage7c_a5_dir, stage7c_a5_erratum_dir))
     write_json(out_dir / "A5_CORRECTED_VALID_FAIL_FREEZE.json", a5_corrected_valid_fail_freeze(stage7c_a5_erratum_dir))
     write_json(out_dir / "DOMAIN_AUDIT_PROTOCOL.json", domain_audit_protocol())
     write_json(out_dir / "ATOMIC_CANDIDATE_DOMINANCE_RULE_SPEC.json", atomic_rule_spec())
     write_json(out_dir / "OMISSION_CUE_SUPPRESSION_RULE_SPEC.json", omission_rule_spec())
     write_json(out_dir / "CURRENT_LEXICAL_NGRAM2_DOMAIN_AUDIT.json", current)
+    write_json(out_dir / "PATCH0_GENERIC_ATOMIC_DOMAIN_AUDIT.json", patch0)
+    write_json(out_dir / "SCHEMA_LABEL_AWARE_DOMAIN_AUDIT.json", filtered)
     write_json(out_dir / "ATOMIC_FILTERED_DOMAIN_AUDIT.json", filtered)
     write_json(out_dir / "DOMAIN_COMPARISON_AUDIT.json", comparison)
+    write_json(out_dir / "FALSE_SUPPRESSION_AUDIT.json", false_suppression)
     write_json(out_dir / "OMISSION_CUE_DESIGN_TRAIN_AUDIT.json", cue)
+    write_json(out_dir / "SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json", synthetic_safety)
     write_jsonl(out_dir / "CANDIDATE_DOMAIN_AUDIT_ROWS.jsonl", rows)
     write_jsonl(out_dir / "CANDIDATE_SUPPRESSION_EXAMPLES.jsonl", suppression_examples)
     write_json(out_dir / "DERIVED_ARTIFACT_MANIFEST.json", build_derived_manifest(out_dir))
@@ -807,7 +1182,7 @@ def build_stage(
     lock = {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
-        "status": "PASS_ATOMIC_CANDIDATE_DOMAIN_OMISSION_CUE_AUDIT_READY_FOR_REVIEW",
+        "status": "PASS_SCHEMA_LABEL_AWARE_CANDIDATE_DOMAIN_OMISSION_CUE_AUDIT_READY_FOR_REVIEW",
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "git_branch": git_output(PROJECT_ROOT, "branch", "--show-current"),
         "git_commit": git_output(PROJECT_ROOT, "rev-parse", "HEAD"),
@@ -820,14 +1195,20 @@ def build_stage(
         "assignment_count": current["assignment_count"],
         "current_assignment_representability": current["assignment_representability"],
         "current_full_sample_representability": current["full_sample_representability"],
-        "atomic_filtered_assignment_representability": filtered["assignment_representability"],
-        "atomic_filtered_full_sample_representability": filtered["full_sample_representability"],
+        "patch0_generic_assignment_representability": patch0["assignment_representability"],
+        "patch0_generic_full_sample_representability": patch0["full_sample_representability"],
+        "schema_label_aware_assignment_representability": filtered["assignment_representability"],
+        "schema_label_aware_full_sample_representability": filtered["full_sample_representability"],
         "minimum_assignment_representability": MIN_ASSIGNMENT_COVERAGE,
         "minimum_full_sample_representability": MIN_FULL_SAMPLE_COVERAGE,
         "threshold_decision": comparison["threshold_decision"],
         "suppressed_candidate_total": filtered["suppressed_candidate_total"],
+        "additional_assignment_losses": false_suppression["additional_assignment_losses"],
+        "additional_full_sample_losses": false_suppression["additional_full_sample_losses"],
+        "preferred_freeze_gate_passed": false_suppression["preferred_freeze_gate_passed"],
         "true_assigned_value_exact_cue_count": cue["true_assigned_value_exact_cue_count"],
         "true_assigned_value_contains_cue_count": cue["true_assigned_value_contains_cue_count"],
+        "synthetic_omission_cue_safety_status": synthetic_safety["status"],
         "method_freeze_authorized": False,
         "model_called": False,
         "gpu_called": False,
@@ -837,7 +1218,7 @@ def build_stage(
         "derived_artifact_manifest_sha256": sha256_file(out_dir / "DERIVED_ARTIFACT_MANIFEST.json"),
     }
     write_json(out_dir / "STAGE7B_A4_LOCK.json", lock)
-    write_text(out_dir / "VALIDATION_REPORT.md", validation_report(current, filtered, comparison, cue))
+    write_text(out_dir / "VALIDATION_REPORT.md", validation_report(current, patch0, filtered, comparison, false_suppression, cue, synthetic_safety))
     write_text(out_dir / "REVIEWER_README.md", reviewer_readme(out_dir))
     return {
         "stage": STAGE_NAME,
@@ -847,9 +1228,12 @@ def build_stage(
         "assignment_count": current["assignment_count"],
         "current_assignment_representability": current["assignment_representability"],
         "current_full_sample_representability": current["full_sample_representability"],
-        "atomic_filtered_assignment_representability": filtered["assignment_representability"],
-        "atomic_filtered_full_sample_representability": filtered["full_sample_representability"],
+        "patch0_generic_assignment_representability": patch0["assignment_representability"],
+        "patch0_generic_full_sample_representability": patch0["full_sample_representability"],
+        "schema_label_aware_assignment_representability": filtered["assignment_representability"],
+        "schema_label_aware_full_sample_representability": filtered["full_sample_representability"],
         "suppressed_candidate_total": filtered["suppressed_candidate_total"],
+        "additional_assignment_losses": false_suppression["additional_assignment_losses"],
         "true_assigned_value_exact_cue_count": cue["true_assigned_value_exact_cue_count"],
         "model_called": False,
         "gpu_called": False,

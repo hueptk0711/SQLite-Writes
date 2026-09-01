@@ -1,10 +1,10 @@
 {
-  "artifact_count": 11,
+  "artifact_count": 15,
   "artifacts": [
     {
       "bytes": 4346,
       "path": "SOURCE_INPUT_MANIFEST.json",
-      "sha256": "18890bda12589717c8ababe7ca4482f8a0e294b27bff2403e8377e502d35bc71"
+      "sha256": "a156e3bc955a229f19b1b6e37bddf0d342b14fc3dd3fcd69ea87003c1c5e82f5"
     },
     {
       "bytes": 888,
@@ -14,17 +14,17 @@
     {
       "bytes": 854,
       "path": "DOMAIN_AUDIT_PROTOCOL.json",
-      "sha256": "ffec1e15edd5f794fc9105ac97d3bc1606abfc54e074f7098503657ef169bc4e"
+      "sha256": "7dbd5050d26dfe905ab32b35072191ae7b1900270055ac30d7e0227aabfdd725"
     },
     {
-      "bytes": 938,
+      "bytes": 1334,
       "path": "ATOMIC_CANDIDATE_DOMINANCE_RULE_SPEC.json",
-      "sha256": "b26fe465891f4a71bb7657dc50e278578fe46b9f7fd14b065c5f3bbd6ee45fb4"
+      "sha256": "5e6126c99e31bff518bee8c97e97759375d5a96654e81ea402141ec073120171"
     },
     {
-      "bytes": 718,
+      "bytes": 736,
       "path": "OMISSION_CUE_SUPPRESSION_RULE_SPEC.json",
-      "sha256": "f3a995c26f9c2e019e3390cce2a1b1f612863d0fb710f864b8d55ccb51cb6a7d"
+      "sha256": "20415d809a672000e4301e64b0fdff0c2b59801b2fd1032dd453d179c1f3f978"
     },
     {
       "bytes": 824,
@@ -32,14 +32,29 @@
       "sha256": "d8e39b9c5626d980a6d2f607f1c13e57f65ebbf23c64686b564487b4757b64ee"
     },
     {
-      "bytes": 1164,
-      "path": "ATOMIC_FILTERED_DOMAIN_AUDIT.json",
-      "sha256": "9c99cfcbd929481db6c646b8553dd837e72dce5cd93aa2a57c01c9663943f80b"
+      "bytes": 1077,
+      "path": "PATCH0_GENERIC_ATOMIC_DOMAIN_AUDIT.json",
+      "sha256": "e0865ca84f34c9d03abddd0e69043d8010cd2794d2b96d7e04c4aab334be3603"
     },
     {
-      "bytes": 690,
+      "bytes": 1183,
+      "path": "SCHEMA_LABEL_AWARE_DOMAIN_AUDIT.json",
+      "sha256": "4ac37cb476dcd13f4ace16bbbbf03b667ed061c6762fe56f7ede59653a1c4204"
+    },
+    {
+      "bytes": 1183,
+      "path": "ATOMIC_FILTERED_DOMAIN_AUDIT.json",
+      "sha256": "4ac37cb476dcd13f4ace16bbbbf03b667ed061c6762fe56f7ede59653a1c4204"
+    },
+    {
+      "bytes": 1667,
       "path": "DOMAIN_COMPARISON_AUDIT.json",
-      "sha256": "9e0ec4d7537a43877430f4487c71696757399a8847eb1c21b06718d0fcfdf675"
+      "sha256": "d471ca0bedefab243be6d6df84927cf8ae95d9674d5ae62d9890e6bdc5e8c1cc"
+    },
+    {
+      "bytes": 528,
+      "path": "FALSE_SUPPRESSION_AUDIT.json",
+      "sha256": "923d8bd9751c369d37da134c6cfa18a23570c107686a910ea7925736947a3af1"
     },
     {
       "bytes": 752,
@@ -47,17 +62,22 @@
       "sha256": "c629e49424bff9e8ff7f3dd1192c4769781fd4c48ff2381aee5398f7b4d136cf"
     },
     {
-      "bytes": 1000495,
-      "path": "CANDIDATE_DOMAIN_AUDIT_ROWS.jsonl",
-      "sha256": "6cfa5fc6a3eea6bfb917baaf11bcd8f6636a8e26959d304ab922119d45178578"
+      "bytes": 4656,
+      "path": "SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json",
+      "sha256": "d414c283dfce30490559afcc831b883741a15830bf2266f4aaa981b637bbb9d4"
     },
     {
-      "bytes": 188919,
+      "bytes": 1317763,
+      "path": "CANDIDATE_DOMAIN_AUDIT_ROWS.jsonl",
+      "sha256": "e8385a56d721dd9a075e2f1a6aed6c66900488c4ee93cee46fd9dfb5a2b12df1"
+    },
+    {
+      "bytes": 204943,
       "path": "CANDIDATE_SUPPRESSION_EXAMPLES.jsonl",
-      "sha256": "2621363aa86f6be0e383faa00c82afae962f00dfcd4149103810a238bb2741b1"
+      "sha256": "70460df6cbecdbc51fd5bd3455275c359ebbb2a9938edcc716d55c6f1cc85d5d"
     }
   ],
-  "combined_scientific_artifacts_sha256": "79bfe234f6d9a23ac72a82cab0b097a3c7c5780c4e6c91a8dd4c5dc782783efc",
-  "patch": "PATCH0",
+  "combined_scientific_artifacts_sha256": "0723adfd6e195e2c4985509f473ce3dc5c61b2b6619cd7debeb2aeeb1f96a13f",
+  "patch": "PATCH1",
   "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"
 }
