@@ -1,0 +1,12 @@
+{
+  "evidence_failures": [],
+  "evidence_integrity_status": "PASS",
+  "phase_o_max_new_tokens": 512,
+  "primary_gate_status": "FAIL",
+  "primary_runtime_profile_id": "uet_rtx4090_cuda124_visible0",
+  "protocol_compliance_status": "PASS",
+  "protocol_failures": [],
+  "quantization": "none",
+  "runtime_profile_id": "uet_rtx4090_cuda124_visible0",
+  "scientific_result_eligible": true
+}
