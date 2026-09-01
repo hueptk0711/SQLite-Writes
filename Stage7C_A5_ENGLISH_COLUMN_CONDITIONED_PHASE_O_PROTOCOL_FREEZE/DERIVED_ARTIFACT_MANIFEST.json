@@ -1,0 +1,74 @@
+{
+  "artifact_count": 13,
+  "artifacts": [
+    {
+      "bytes": 1021,
+      "path": "ACCEPTANCE_POLICY_A5.json",
+      "sha256": "701daf3b73f99d21b221aafe093c8af951eaf24d1b0d2d23ee016bb8ace2ba4e"
+    },
+    {
+      "bytes": 767,
+      "path": "COLUMN_CONDITIONED_OUTPUT_SPEC_A5.json",
+      "sha256": "6a6533f0cf4894192f7559e6e880c97f165b5beecfc65a0fdae9cf77a1af4efe"
+    },
+    {
+      "bytes": 2070,
+      "path": "COLUMN_CONDITIONED_PROMPT_SPEC_A5_ENGLISH.json",
+      "sha256": "637b693ad504a45160672eed803668af1e9d81ee276d8d045b57c4afdb782528"
+    },
+    {
+      "bytes": 786,
+      "path": "COLUMN_CONDITIONED_RUNTIME_SCHEMA_SPEC_A5.json",
+      "sha256": "6098a6f8afd3acb7462d56752785e5668c5f88bde6ae3137a0750e592424c371"
+    },
+    {
+      "bytes": 543,
+      "path": "COLUMN_CONDITIONED_SERIALIZATION_FREEZE.json",
+      "sha256": "e56070a3e05c0b5a29e904da256defb579dc25384ef0b6c5dae1f376f6d160cc"
+    },
+    {
+      "bytes": 203840,
+      "path": "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl",
+      "sha256": "0b79e20e80ad4f19a6cb3bd82e9126d98e53e727d8db4f34ca1461f28acf3aba"
+    },
+    {
+      "bytes": 4920,
+      "path": "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json",
+      "sha256": "8876a11d9024d5289366c4e6d34a0271c44a089266746420eb20d4c311c22f8a"
+    },
+    {
+      "bytes": 832,
+      "path": "NO_PHASE_M_PRIMARY_PIPELINE_SPEC_A5.json",
+      "sha256": "e979eaad9db5f5a758566fcd2c92fca423e07859a0eec468d94d1e8b804309c0"
+    },
+    {
+      "bytes": 544,
+      "path": "OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A5.json",
+      "sha256": "8d2f101ca7f5d63630f2118c73f6d8b3668551bd4bb9cb30e9937fec0cd78736"
+    },
+    {
+      "bytes": 22728,
+      "path": "ORACLE_COLUMN_CONDITIONED_PATH_RESULTS.jsonl",
+      "sha256": "7d0351efca0ee2fc56d58e5e79585459a8cb51b6100fb976c84ababf50899327"
+    },
+    {
+      "bytes": 2994,
+      "path": "SOURCE_INPUT_MANIFEST.json",
+      "sha256": "e2e7def1a16d4afec1168479b4d1be971abead4f601dceb3c6a9cbd1aa8a23c5"
+    },
+    {
+      "bytes": 12202,
+      "path": "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl",
+      "sha256": "8a6e3e14c43a3028c30e3d2a17bb66e11ae48c7cf5c08c578f7cb8def86cbe92"
+    },
+    {
+      "bytes": 473,
+      "path": "TARGET_TABLE_BRANCHING_PROTOCOL_A5.json",
+      "sha256": "22c1a951ffdd989be2507c5799499c9b8ccbc3c5ebc279050b7c03483e00af0f"
+    }
+  ],
+  "combined_scientific_artifacts_sha256": "c90837c984a71c68a889e7ada9d5bea8346d6275ffc92b51f8e15933032d2dea",
+  "identity_scope": "scientific_logical_artifacts_only",
+  "patch": "PATCH0",
+  "stage": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE"
+}

@@ -1,0 +1,47 @@
+# Stage7C-A5 English Column-Conditioned Phase O Protocol Freeze
+
+This package freezes the one-call column-conditioned candidate-selection
+protocol proposed after Stage7B-A3 PASS/CLOSE. The primary A5 path removes
+Phase M as a model call and derives the compiler IR deterministically from
+`table_ref` and `column_span_refs`.
+
+Review order:
+
+1. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/COLUMN_CONDITIONED_OUTPUT_SPEC_A5.json`
+2. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/COLUMN_CONDITIONED_PROMPT_SPEC_A5_ENGLISH.json`
+3. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/COLUMN_CONDITIONED_RUNTIME_SCHEMA_SPEC_A5.json`
+4. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/TARGET_TABLE_BRANCHING_PROTOCOL_A5.json`
+5. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/NO_PHASE_M_PRIMARY_PIPELINE_SPEC_A5.json`
+6. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/COLUMN_CONDITIONED_SERIALIZATION_FREEZE.json`
+7. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl`
+8. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/ORACLE_COLUMN_CONDITIONED_PATH_RESULTS.jsonl`
+9. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/ACCEPTANCE_POLICY_A5.json`
+10. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A5.json`
+11. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/SOURCE_INPUT_MANIFEST.json`
+12. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/SYNTHETIC_SQLITE_DB_MANIFEST.jsonl`
+13. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/PACKAGE_FILE_INTEGRITY_MANIFEST.json`
+14. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/DERIVED_ARTIFACT_MANIFEST.json`
+15. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/STAGE7C_A5_LOCK.json`
+16. `Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/VALIDATION_REPORT.md`
+17. `scripts/data/build_stage7c_a5_column_conditioned_phase_o_protocol.py`
+18. `scripts/data/validate_stage7c_a5_column_conditioned_phase_o_protocol.py`
+19. `tests/test_stage7c_a5_column_conditioned_phase_o_protocol.py`
+
+Clean extraction commands:
+
+```bash
+python scripts/data/validate_stage7c_a5_column_conditioned_phase_o_protocol.py \
+  --stage-dir Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE
+python scripts/data/validate_stage7c_a5_column_conditioned_phase_o_protocol.py \
+  --stage-dir Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE \
+  --rebuild
+python -m pytest -q tests/test_stage7c_a5_column_conditioned_phase_o_protocol.py
+```
+
+No GPU is required. No model is called. The Gretel pilot pool remains closed.
+
+Local artifact directory at build time:
+
+```text
+Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE
+```

@@ -1,0 +1,83 @@
+{
+  "combined_sqlite_binary_artifacts_sha256": "8ca88be6eafe00f83ecac26107cc4a15a201d8b52bf0e40b84e42768d86951fd",
+  "gpu_called": false,
+  "identity_scope": "physical_package_file_integrity_not_cross_environment_scientific_rebuild",
+  "model_called": false,
+  "patch": "PATCH0",
+  "sqlite_binary_artifact_count": 12,
+  "sqlite_binary_artifacts": [
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_fresh_english_001.sqlite",
+      "sqlite_binary_file_sha256": "e26c269b701e3409375699e135c35ac4aa85a771b5e3db2910710ccfb3a47270"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_fresh_english_002.sqlite",
+      "sqlite_binary_file_sha256": "926cf0718e1f36687d442ccef759b5cea80ae4af067ca88291febaa019c737c1"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_fresh_english_003.sqlite",
+      "sqlite_binary_file_sha256": "33b1c28c51d8acac3dadd7e17e1b2cfd9f1c3769464bffabc869d72dba128045"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_fresh_english_004.sqlite",
+      "sqlite_binary_file_sha256": "87f773e567c92fe000a7af173dcb6b22493c8d83353ea5929c3a7fc6b776ce96"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_fresh_english_005.sqlite",
+      "sqlite_binary_file_sha256": "d6a8014f1c362f2455bcdc8f239eaf80a67b4d8cd92fbd24efe64de81da57e0b"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_fresh_english_006.sqlite",
+      "sqlite_binary_file_sha256": "6c4914a4c1d582650b6fd7baa128ac50867ab158e4dfda2dc9c7a3aab025e45c"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_fresh_english_007.sqlite",
+      "sqlite_binary_file_sha256": "48f48f553be42f8ffe421b7dc801c39862c528d038a228b24e7d92c4c720c797"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_fresh_english_008.sqlite",
+      "sqlite_binary_file_sha256": "5fbabb985da508ab4bba056f39594bc33bd0916a23b7515fa54cf43c6ecea432"
+    },
+    {
+      "bytes": 12288,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_fresh_english_009.sqlite",
+      "sqlite_binary_file_sha256": "3ef5f962e866f84c52e2e151553f712bd3fc63994520470308757c2df56797fe"
+    },
+    {
+      "bytes": 12288,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_fresh_english_010.sqlite",
+      "sqlite_binary_file_sha256": "7b6cd9f5bbe03937b34f008c6b3743c2683477f502b35abd11639b8de9e36843"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_fresh_english_011.sqlite",
+      "sqlite_binary_file_sha256": "1d2d416bf12b72680957489c8410c79deb74b89c98560580eea4af955969d20d"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_fresh_english_012.sqlite",
+      "sqlite_binary_file_sha256": "490dfde2d84f59b9142d555d53449de08eacf34b8b308ee5f7217079d2a7daa1"
+    }
+  ],
+  "stage": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE"
+}

@@ -1,0 +1,26 @@
+{
+  "before_stage7e0_a5": "A protocol-compliant column-conditioned oracle path must pass all fresh cases.",
+  "gpu_called": false,
+  "gretel_pilot_opened": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "stage": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE",
+  "synthetic_feasibility_gate": {
+    "averaging_allowed": false,
+    "checks": [
+      "exact model-facing output schema for single-table and multi-table oneOf",
+      "prompt wording locks SPAN-or-OMIT per column",
+      "candidate serialization exposes refs/tags/text only",
+      "deterministic resolver maps COL_ref + SPAN_ref to exact source text",
+      "primary pipeline does not call Phase M",
+      "typed materialization PASS",
+      "completeness PASS",
+      "SQLite compilation PASS",
+      "rolled-back SQLite preflight ADMITTED",
+      "canonical target state exact"
+    ],
+    "eleven_of_twelve_allowed": false,
+    "required_pass_count": "12/12",
+    "sample_set": "12 fresh English A5 column-conditioned cases"
+  }
+}

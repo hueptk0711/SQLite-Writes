@@ -1,0 +1,20 @@
+{
+  "column_value_domain": [
+    "OMIT",
+    "SPAN_0001",
+    "SPAN_0002",
+    "..."
+  ],
+  "early_array_stop_structurally_impossible": true,
+  "gold_sql_required_for_runtime_schema": false,
+  "gpu_called": false,
+  "model_called": false,
+  "multi_table_strategy": "oneOf branch per model-visible table_ref with branch-local required column_span_refs",
+  "patch": "PATCH0",
+  "runtime_builder": "dynamic_schema_for_schema_tables(model_visible_schema_tables, candidate_span_refs)",
+  "single_table_strategy": "const table_ref TAB_1 with every COL_n key required",
+  "stage": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE",
+  "static_pattern_fallback_allowed": false,
+  "type_based_candidate_pruning_enabled": false,
+  "unknown_span_refs_structurally_impossible": true
+}

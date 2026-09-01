@@ -1,0 +1,32 @@
+{
+  "allowed_top_level_keys": [
+    "operation",
+    "table_ref",
+    "column_span_refs"
+  ],
+  "column_span_refs_contract": "Every selected table column key is required and maps to exactly one current SPAN ref or OMIT.",
+  "exact_phase_o_output_example": {
+    "column_span_refs": {
+      "COL_1": "SPAN_0007",
+      "COL_2": "SPAN_0019",
+      "COL_3": "OMIT"
+    },
+    "operation": "INSERT",
+    "table_ref": "TAB_1"
+  },
+  "forbidden_top_level_keys": [
+    "span_refs",
+    "value_spans",
+    "start_char",
+    "end_char",
+    "values",
+    "assignments",
+    "slot_refs",
+    "phase_m"
+  ],
+  "gpu_called": false,
+  "model_called": false,
+  "omit_token": "OMIT",
+  "patch": "PATCH0",
+  "stage": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE"
+}

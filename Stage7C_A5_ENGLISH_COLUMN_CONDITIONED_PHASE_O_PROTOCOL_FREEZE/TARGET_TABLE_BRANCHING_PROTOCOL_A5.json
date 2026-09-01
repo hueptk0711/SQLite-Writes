@@ -1,0 +1,11 @@
+{
+  "gold_sql_used_for_runtime_target_derivation": false,
+  "gpu_called": false,
+  "model_called": false,
+  "multi_table": "table_ref is selected by the model from oneOf branches over all model-visible tables",
+  "multi_table_fixture_count": 2,
+  "patch": "PATCH0",
+  "runtime_target_table_gold_blind": true,
+  "single_table": "table_ref is structurally fixed to TAB_1 from schema-only context",
+  "stage": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE"
+}
