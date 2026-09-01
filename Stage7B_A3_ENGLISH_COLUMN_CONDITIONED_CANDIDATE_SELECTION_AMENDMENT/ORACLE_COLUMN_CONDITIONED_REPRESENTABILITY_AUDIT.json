@@ -1,0 +1,20 @@
+{
+  "assignment_candidate_coverage": 0.99822695035461,
+  "assignment_count": 2256,
+  "candidate_generator_variant": "lexical_ngram2",
+  "column_conditioned_decision_count": 2548,
+  "covered_assignment_count": 2252,
+  "design_sample_count": 728,
+  "full_sample_candidate_coverage": 0.9945054945054945,
+  "full_sample_covered_count": 724,
+  "gold_used_only_for_oracle_coverage_audit": true,
+  "gpu_called": false,
+  "missing_assignment_count": 4,
+  "model_called": false,
+  "omit_decision_count": 292,
+  "required_column_decision_coverage": 1.0,
+  "runtime_gold_blind": true,
+  "scope": "StageENG1 development_train excluding 100-sample pilot pool",
+  "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT",
+  "status": "PASS"
+}

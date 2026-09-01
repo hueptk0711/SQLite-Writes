@@ -1,0 +1,42 @@
+{
+  "column_conditioned_selection": {
+    "early_stop_after_one_value_schema_valid": false,
+    "omit_decision_count": 292,
+    "oracle_assignment_candidate_coverage": 0.99822695035461,
+    "oracle_type_compatible_coverage": 0.9977836879432624,
+    "output_shape": {
+      "column_span_refs": {
+        "COL_n": "SPAN_ref_or_OMIT"
+      },
+      "operation": "INSERT",
+      "table_ref": "TAB_1"
+    },
+    "requires_one_decision_per_target_column": true,
+    "target_table_column_decision_count": 2548,
+    "unknown_length_array": false
+  },
+  "comparison_scope": "oracle representability and structural burden only; no model call",
+  "current_free_span_set": {
+    "early_stop_after_one_value_schema_valid": true,
+    "min_span_items": 1,
+    "observed_a4_primary_pass_count": "6/10",
+    "observed_failure_family": "phase_o_under_selection_and_non_atomic_span_selection",
+    "output_shape": {
+      "operation": "INSERT",
+      "span_refs": [
+        "SPAN_0001",
+        "..."
+      ]
+    },
+    "source_stage": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL",
+    "unknown_length_array": true
+  },
+  "development_dev_usage_allowed": false,
+  "gpu_called": false,
+  "method_decision": "Proceed to a later protocol stage only if reviewer accepts the structural-completeness tradeoff.",
+  "model_called": false,
+  "official_test_usage_allowed": false,
+  "pilot_usage_allowed": false,
+  "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT",
+  "status": "PASS"
+}

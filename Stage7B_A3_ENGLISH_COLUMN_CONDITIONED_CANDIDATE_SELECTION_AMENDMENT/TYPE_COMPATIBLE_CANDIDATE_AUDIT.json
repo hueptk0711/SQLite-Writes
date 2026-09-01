@@ -1,0 +1,32 @@
+{
+  "candidate_count_stats": {
+    "max": 114,
+    "mean": 45.809065934065934,
+    "median": 45.0,
+    "min": 11,
+    "p95": 70
+  },
+  "candidate_generator_variant": "lexical_ngram2",
+  "design_sample_count": 728,
+  "full_sample_type_compatible_count": 723,
+  "full_sample_type_compatible_coverage": 0.9931318681318682,
+  "gold_assignment_type_compatible_count": 2251,
+  "gold_assignment_type_compatible_coverage": 0.9977836879432624,
+  "gpu_called": false,
+  "model_called": false,
+  "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT",
+  "status": "PASS",
+  "type_compatible_candidate_count_stats": {
+    "max": 114,
+    "mean": 28.649921507064363,
+    "median": 33.0,
+    "min": 0,
+    "p95": 68
+  },
+  "type_family_column_counts": {
+    "INTEGER": 930,
+    "REAL": 174,
+    "TEXT": 1444
+  },
+  "type_filter_policy": "audit only; any future type pruning must remain gold-blind and preserve oracle coverage"
+}

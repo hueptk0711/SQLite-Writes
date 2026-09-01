@@ -1,0 +1,40 @@
+{
+  "case_level_exact_selection": "6/10",
+  "failed_cases": [
+    {
+      "reported_failure_stage": "acceptance_gate",
+      "root_cause": "phase_o_severe_under_selection",
+      "sample_id": "stage7c_a4_fresh_english_002"
+    },
+    {
+      "reported_failure_stage": "acceptance_gate",
+      "root_cause": "phase_o_severe_under_selection",
+      "sample_id": "stage7c_a4_fresh_english_004"
+    },
+    {
+      "reported_failure_stage": "acceptance_gate",
+      "root_cause": "phase_o_severe_under_selection",
+      "sample_id": "stage7c_a4_fresh_english_006"
+    },
+    {
+      "reported_failure_stage": "materialization_failure",
+      "root_cause": "phase_o_non_atomic_broader_span_selection",
+      "sample_id": "stage7c_a4_fresh_english_009"
+    }
+  ],
+  "gpu_called": false,
+  "method_implication": "Move from free-length span_refs to required per-column SPAN/OMIT decisions.",
+  "model_called": false,
+  "operation_prediction": "10/10 INSERT",
+  "primary_pass_count": null,
+  "root_cause_counts": {
+    "compiler_or_materializer_bug": 0,
+    "phase_m_primary_root_cause": 0,
+    "phase_o_non_atomic_broader_span_selection": 1,
+    "phase_o_severe_under_selection": 3
+  },
+  "source_classification_path": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT/SERVER_RESULT_CLASSIFICATION_PATCH4.json",
+  "source_classification_sha256": "de36133d62a9decda968b8dcafbcf2cf03ff5c5efc69a7555dad9c5243037e89",
+  "source_stage": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT",
+  "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT"
+}

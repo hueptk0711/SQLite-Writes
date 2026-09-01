@@ -1,0 +1,19 @@
+{
+  "diagnostics_run": false,
+  "evidence_integrity_status": "PASS",
+  "gpu_called": false,
+  "gretel_pilot_must_remain_closed": true,
+  "gretel_pilot_opened": false,
+  "model_called": false,
+  "no_a4_rerun_allowed": true,
+  "primary_gate_status": "FAIL",
+  "primary_pass_count": "6/10",
+  "protocol_compliance_status": "PASS",
+  "required_pass_count": "10/10",
+  "scientific_result_eligible": true,
+  "source_lock_path": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT/STAGE7E0_A4_SERVER_RESULT_LOCK.json",
+  "source_lock_sha256": "5d35c40e9a526212d70a2cac612d2d416f5b331d46ee6e0fcded2d622d0a8024",
+  "source_stage": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT",
+  "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT",
+  "status": "STAGE7E0_A4_VALID_FEASIBILITY_FAIL_CLOSED"
+}

@@ -1,0 +1,42 @@
+{
+  "assigned_column_decision_count": 2256,
+  "assignment_count_stats": {
+    "max": 7,
+    "mean": 3.098901098901099,
+    "median": 3.0,
+    "min": 1,
+    "p95": 5
+  },
+  "design_sample_count": 728,
+  "gpu_called": false,
+  "model_called": false,
+  "omit_decision_count": 292,
+  "omit_decision_count_stats": {
+    "max": 3,
+    "mean": 0.4010989010989011,
+    "median": 0.0,
+    "min": 0,
+    "p95": 1
+  },
+  "omitted_columns_nullable_default_or_key_count": 292,
+  "omitted_required_without_default_count": 0,
+  "parse_failure_count": 0,
+  "parse_failures": [],
+  "parsed_sample_count": 728,
+  "samples_with_omit_count": 275,
+  "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT",
+  "status": "PASS",
+  "target_table_column_count_stats": {
+    "max": 8,
+    "mean": 3.5,
+    "median": 3.0,
+    "min": 1,
+    "p95": 5
+  },
+  "target_table_column_decision_count": 2548,
+  "type_family_column_counts": {
+    "INTEGER": 930,
+    "REAL": 174,
+    "TEXT": 1444
+  }
+}

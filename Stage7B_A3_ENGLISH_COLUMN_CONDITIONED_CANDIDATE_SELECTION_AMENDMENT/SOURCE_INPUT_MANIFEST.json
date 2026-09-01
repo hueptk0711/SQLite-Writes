@@ -1,0 +1,68 @@
+{
+  "gpu_called": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "source_files": [
+    {
+      "bytes": 604,
+      "path": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/STAGEENG0_LOCK.json",
+      "sha256": "47b1ffbd7830d9ea2cfb27eb3d6db5b07e3b46fc539c31daa8f64dc82b641b2f",
+      "source_stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION"
+    },
+    {
+      "bytes": 5885671,
+      "path": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION/INSERT_ASSIGNMENT_GROUNDING_AUDIT.jsonl",
+      "sha256": "6812615cbad85db9454ea5528749563daf7c4baf9e36b77695744ccdc000e3ea",
+      "source_stage": "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION"
+    },
+    {
+      "bytes": 856,
+      "path": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT/STAGEENG1_LOCK.json",
+      "sha256": "f6adc601b5f1a9033ad8c49a01fc82e01e67e71b623af090f53a858849ce3e16",
+      "source_stage": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
+    },
+    {
+      "bytes": 1187589,
+      "path": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT/DEVELOPMENT_TRAIN_SPLIT_MANIFEST.jsonl",
+      "sha256": "40cde0e64b4953a353e5c783ed676be952b486ac43fbcad4384a6e0cc2ffc7bb",
+      "source_stage": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
+    },
+    {
+      "bytes": 148950,
+      "path": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT/DEVELOPMENT_PILOT_POOL_MANIFEST.jsonl",
+      "sha256": "2fe1d967dec93c25aff1c30104913a86b2e930f4ab5accc8bb04d0a4380024df",
+      "source_stage": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
+    },
+    {
+      "bytes": 142468,
+      "path": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT/DEVELOPMENT_DEV_SPLIT_MANIFEST.jsonl",
+      "sha256": "94924145b89a86ada55e4b4da9a71d4cea10fe46da2cd7d44a94434e3924679a",
+      "source_stage": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
+    },
+    {
+      "bytes": 1322,
+      "path": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT/STAGE7B_A2_LOCK.json",
+      "sha256": "4419d27bc1c89f9be600443984d6f80ab53f92129b59df92de2eee493e17ca80",
+      "source_stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
+    },
+    {
+      "bytes": 1484,
+      "path": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/STAGE7C_A4_LOCK.json",
+      "sha256": "091a42deb7bf667d4f0ec27eb39299bed7ad2311353d998e72c08a494174e523",
+      "source_stage": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL"
+    },
+    {
+      "bytes": 923,
+      "path": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT/STAGE7E0_A4_SERVER_RESULT_LOCK.json",
+      "sha256": "5d35c40e9a526212d70a2cac612d2d416f5b331d46ee6e0fcded2d622d0a8024",
+      "source_stage": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT"
+    },
+    {
+      "bytes": 388,
+      "path": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT/SERVER_RESULT_CLASSIFICATION_PATCH4.json",
+      "sha256": "de36133d62a9decda968b8dcafbcf2cf03ff5c5efc69a7555dad9c5243037e89",
+      "source_stage": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT"
+    }
+  ],
+  "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT"
+}

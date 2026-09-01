@@ -1,0 +1,12 @@
+{
+  "audit_only": true,
+  "column_scope": "all target-table columns from the SQL schema, not only gold INSERT columns",
+  "gold_used_only_for_oracle_representability_audit": true,
+  "gpu_called": false,
+  "model_called": false,
+  "omit_meaning": "The request does not provide a literal value for this column; SQLite default/null/autoincrement behavior is left to deterministic compilation policy.",
+  "omit_token": "OMIT",
+  "omitted_required_without_default_policy": "flag in audit; do not silently exclude samples",
+  "runtime_gold_blind": true,
+  "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT"
+}

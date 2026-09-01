@@ -1,0 +1,30 @@
+{
+  "column_span_refs_required_keys": "exact COL refs for every target-table column",
+  "column_value_domain": [
+    "OMIT",
+    "SPAN_0001",
+    "SPAN_0002",
+    "..."
+  ],
+  "early_array_stop_structurally_impossible": true,
+  "forbidden_top_level_keys": [
+    "span_refs",
+    "value_spans",
+    "start_char",
+    "end_char",
+    "values",
+    "assignments"
+  ],
+  "gpu_called": false,
+  "model_called": false,
+  "model_generates_character_offsets": false,
+  "model_generates_free_length_span_set": false,
+  "required_top_level_keys": [
+    "operation",
+    "table_ref",
+    "column_span_refs"
+  ],
+  "runtime_schema_builder": "dynamic_schema_for_columns(target_table_columns, candidate_span_refs)",
+  "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT",
+  "unknown_span_refs_structurally_impossible": true
+}

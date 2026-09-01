@@ -1,0 +1,20 @@
+{
+  "column_decision_domain": "For each target-table column, exactly one value: a current candidate SPAN ref or OMIT.",
+  "free_length_span_set_removed": true,
+  "gpu_called": false,
+  "model_called": false,
+  "phase_m_status": "candidate for removal in a later protocol stage; not removed by this design audit",
+  "phase_o_output": {
+    "column_span_refs": {
+      "COL_1": "SPAN_0009",
+      "COL_2": "SPAN_0019",
+      "COL_3": "SPAN_0026",
+      "COL_4": "OMIT"
+    },
+    "operation": "INSERT",
+    "table_ref": "TAB_1"
+  },
+  "representation": "column_conditioned_candidate_selection",
+  "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT",
+  "structural_completeness_property": "The JSON object requires every target-table COL ref as a property under column_span_refs."
+}

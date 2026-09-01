@@ -1,0 +1,63 @@
+{
+  "artifact_count": 11,
+  "artifacts": [
+    {
+      "bytes": 3149,
+      "path": "SOURCE_INPUT_MANIFEST.json",
+      "sha256": "e319ad2a2be803c283109bd148488b829e83e03f60f1d94d7fcb9d010a8612ee"
+    },
+    {
+      "bytes": 836,
+      "path": "A4_VALID_FAIL_FREEZE.json",
+      "sha256": "49dd0b52687293629251b9af76d2821b243a7d82c1b068141217c9c855004cb1"
+    },
+    {
+      "bytes": 1582,
+      "path": "A4_ROOT_CAUSE_CLASSIFICATION.json",
+      "sha256": "4d9ebad9a96c1655d2e925de8e2e56c0b2d1fed9ebf6f5e12ebada8b257fb5bb"
+    },
+    {
+      "bytes": 807,
+      "path": "COLUMN_CONDITIONED_REPRESENTATION_SPEC.json",
+      "sha256": "ca918356f1d041f13b9aa842fb0a77b8173e76f477c4f08cc1574d8721e279f3"
+    },
+    {
+      "bytes": 838,
+      "path": "COLUMN_CONDITIONED_JSON_SCHEMA_SPEC.json",
+      "sha256": "30648f5e80091175c5caa6347fe4687f74320fb5428560b4dd10ebc436348a4f"
+    },
+    {
+      "bytes": 631,
+      "path": "OMIT_POLICY_AND_COLUMN_SCOPE_SPEC.json",
+      "sha256": "c7fbf17eb7b7b3b84a47f259e8e5e12c7edbcf2d61dccd6141a2e1c8ac34d263"
+    },
+    {
+      "bytes": 989,
+      "path": "DESIGN_TRAIN_COLUMN_SCHEMA_AUDIT.json",
+      "sha256": "d13b50b1656e47295de3ea0441a4a3788344acf7ec43ca6daf73bbaacc04c163"
+    },
+    {
+      "bytes": 751,
+      "path": "ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.json",
+      "sha256": "d8ea92188044d6aab10c5bf83b24662ab5b289b5ef77308364260f2e5965d7cf"
+    },
+    {
+      "bytes": 6898884,
+      "path": "ORACLE_COLUMN_CONDITIONED_REPRESENTABILITY_AUDIT.jsonl",
+      "sha256": "1ad24c0a4c85188355f1071eb008e5c356e16e76ea2bd3bec9a7f232badc4872"
+    },
+    {
+      "bytes": 939,
+      "path": "TYPE_COMPATIBLE_CANDIDATE_AUDIT.json",
+      "sha256": "4037e5f4cac3aa20fdd20c8777dec5a329724db867c157804cb70cfb1aa5ffb3"
+    },
+    {
+      "bytes": 1495,
+      "path": "REPRESENTATION_COMPARISON_AUDIT.json",
+      "sha256": "609f88c59a6c941b933bb1f2c5b8ad028e59fcac7a57bf843e528e62eeccde40"
+    }
+  ],
+  "combined_scientific_artifacts_sha256": "9a4eee294c3fe9e0467d04b1ed921a2b66b15b2e2ab46a5969c878fc248455d6",
+  "patch": "PATCH0",
+  "stage": "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT"
+}
