@@ -54,7 +54,7 @@
   "backend": "incremental_json_schema_grammar",
   "constraint_independence_audit_sha256": "7a2eb001cf1eb49103b90ca05cf0ecd202104cba7511eec5faf32b7b3fb8a56c",
   "created_utc": "2026-09-01T05:36:24.811698+00:00",
-  "derived_artifact_manifest_sha256": "55046819e3c0e3145a390b543f514b08585b5945829235598c2bc68d30ee9963",
+  "derived_artifact_manifest_sha256": "4b8786a1045a94c1eaeb7bea149dbe423afdcfdbc0e9f110e9212bc08bf224fe",
   "development_dev_used": false,
   "device_map": "auto",
   "fallback_to_unconstrained": false,

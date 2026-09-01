@@ -1,33 +1,26 @@
-# Stage7E0-A4 English Candidate-Span Real Generation Preflight PATCH3
+# Stage7E0-A4 English Kaggle Primary Result PATCH4
 
-This reviewer package prepares the Kaggle T4x2 primary GPU run for the 10 locked
-Stage7C-A4 candidate-span cases. It does not open Gretel, development, or
-official test sets. Phase O emits only `operation` and `span_refs`; Phase M is
-unchanged.
-
-Clean extraction checks:
-
-```bash
-python scripts/data/validate_stage7c_a4_candidate_span_phase_o_protocol.py --stage-dir Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL
-python scripts/data/validate_stage7e0_a4_english_preflight.py --stage-dir Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT
-python scripts/server/preflight_runtime.py --expected-profile kaggle_t4x2_cuda130
-python -m pytest -q tests/test_stage7e0_a4_english_preflight.py
-```
-
-Server commands are in:
+This reviewer package preserves the single Stage7E0-A4 PATCH3 Kaggle T4x2
+primary run. The run is protocol-compliant evidence, but the primary gate did
+not pass.
 
 ```text
-Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT/SERVER_RUN_COMMANDS.md
+source_tar=stage7e0_a4_patch3_kaggle_primary_result_20260901_064812.tar.gz
+source_tar_sha256=e15c73e05a39a87e4c22def54d24149b9d75ca93027b6727ecfa0b5569b12d61
+primary_pass_count=6/10
+required_pass_count=10/10
+evidence_integrity_status=PASS
+protocol_compliance_status=PASS
+primary_gate_status=FAIL
+scientific_result_eligible=true
+gretel_pilot_opened=false
 ```
 
-Package:
+Review these files first:
 
 ```text
-Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT_PATCH3_FINAL_REVIEWER_PACKAGE_20260901.zip
-```
-
-Accepted protocol commit:
-
-```text
-b1cf3e0113f477810c4b1ad8996c1ca6ea0b39b6
+Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT/VALIDATION_REPORT_PATCH4.md
+Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT/SERVER_RESULT_FAILURE_ANALYSIS.md
+Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT/SERVER_RESULT_IMPORT_REPORT.json
+Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT/STAGE7E0_A4_SERVER_RESULT_LOCK.json
 ```

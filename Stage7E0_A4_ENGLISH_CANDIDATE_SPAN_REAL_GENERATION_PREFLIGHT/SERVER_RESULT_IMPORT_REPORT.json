@@ -1,0 +1,52 @@
+{
+  "patch": "PATCH4",
+  "result": {
+    "backend": "constrained_hf",
+    "case_rows": 10,
+    "diagnostics_run": false,
+    "failure_count": 4,
+    "failure_stage_counts": {
+      "acceptance_gate": 3,
+      "materialization_failure": 1
+    },
+    "gpu_called": true,
+    "gretel_pilot_opened": false,
+    "model_called": true,
+    "phase_m_raw_rows": 10,
+    "phase_o_raw_rows": 10,
+    "primary_pass_count": "6/10",
+    "required_pass_count": "10/10",
+    "status": "FAIL"
+  },
+  "server_result_classification": {
+    "backend": "constrained_hf",
+    "evidence_failures": [],
+    "evidence_integrity_status": "PASS",
+    "phase_m_max_new_tokens": 8192,
+    "phase_o_max_new_tokens": 512,
+    "primary_gate_status": "FAIL",
+    "protocol_backend": "incremental_json_schema_grammar",
+    "protocol_compliance_status": "PASS",
+    "protocol_failures": [],
+    "quantization": "none",
+    "scientific_result_eligible": true
+  },
+  "server_result_files": {
+    "primary_case_results.jsonl": "1e3cb77167f329619e8f6bf33eb9103bdf1c8f0943100df479f90c711df90e30",
+    "primary_summary.json": "1984d0a0301f28cbc69f23a173adc838ebdffc73816fdff02e8e44717b48d279",
+    "raw_phase_m_generations.jsonl": "34cef6bcf8c6026c86df5bb0bdb351d52421c6b6848a0cc3e69237f280612df1",
+    "raw_phase_o_generations.jsonl": "f91f793fb083e71cc933f1a995e7348c26bde1be1328e9409a07c76fc4850543",
+    "run_manifest.json": "901dfd835905889dacabcb06e7b7d4af00e1df245e8e2626595e0e720ef5bb45"
+  },
+  "server_run_id": "kaggle_primary_run_20260901_064812_patch3_t4x2",
+  "source_tar": {
+    "bytes": 8282,
+    "path": "stage7e0_a4_patch3_kaggle_primary_result_20260901_064812.tar.gz",
+    "sha256": "e15c73e05a39a87e4c22def54d24149b9d75ca93027b6727ecfa0b5569b12d61"
+  },
+  "source_validation_report": {
+    "path": null,
+    "sha256": null
+  },
+  "stage": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT"
+}

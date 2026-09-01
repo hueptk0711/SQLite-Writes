@@ -1,0 +1,20 @@
+{
+  "created_utc": "2026-09-01T06:57:34.515251+00:00",
+  "decision": "Protocol-compliant constrained A4 output is a scientific primary failure; do not open Gretel pilot.",
+  "diagnostics_run": false,
+  "evidence_integrity_status": "PASS",
+  "gpu_called": true,
+  "gretel_pilot_opened": false,
+  "model_called": true,
+  "patch": "PATCH4",
+  "primary_gate_status": "FAIL",
+  "primary_pass_count": "6/10",
+  "protocol_compliance_status": "PASS",
+  "required_pass_count": "10/10",
+  "scientific_result_eligible": true,
+  "server_result_import_report_sha256": "7207ae503a27135a0b8b569fb3276d8e9181670af0b27ab362f5749f913c5f34",
+  "server_run_id": "kaggle_primary_run_20260901_064812_patch3_t4x2",
+  "source_tar_sha256": "e15c73e05a39a87e4c22def54d24149b9d75ca93027b6727ecfa0b5569b12d61",
+  "stage": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT",
+  "status": "REAL_CONSTRAINED_PRIMARY_FAIL_DO_NOT_OPEN_GRETEL"
+}

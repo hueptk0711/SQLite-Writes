@@ -1,0 +1,19 @@
+{
+  "backend": "constrained_hf",
+  "diagnostics_run": false,
+  "gpu_called": true,
+  "gretel_pilot_opened": false,
+  "mock_uses_label_side_expected": false,
+  "model_called": true,
+  "nine_of_ten_allowed": false,
+  "phase_m_max_new_tokens": 8192,
+  "phase_o_max_new_tokens": 512,
+  "primary_case_results_sha256": "1e3cb77167f329619e8f6bf33eb9103bdf1c8f0943100df479f90c711df90e30",
+  "primary_pass_count": "6/10",
+  "protocol_backend": "incremental_json_schema_grammar",
+  "raw_phase_m_sha256": "34cef6bcf8c6026c86df5bb0bdb351d52421c6b6848a0cc3e69237f280612df1",
+  "raw_phase_o_sha256": "f91f793fb083e71cc933f1a995e7348c26bde1be1328e9409a07c76fc4850543",
+  "required_pass_count": "10/10",
+  "stage": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT",
+  "status": "FAIL"
+}
