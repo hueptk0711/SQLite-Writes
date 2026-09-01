@@ -19,7 +19,9 @@ stage4_fresh_7b_protocol/validation/deterministic_repeat.txt text eol=lf
 
 # Keep hash-frozen dependency locks and method configs byte-stable on Windows.
 requirements-inference.lock.txt text eol=lf
+requirements-inference-uet-rtx4090-cu124.lock.txt text eol=lf
 configs/stage3b/*.json text eol=lf
 configs/stage4/*.json text eol=lf
 stage4r_fresh_failure_attribution/** text eol=lf
 stage4r2_actual_d_f_g1_replay/** text eol=lf
+Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT/SERVER_RUN_COMMANDS.sh text eol=lf

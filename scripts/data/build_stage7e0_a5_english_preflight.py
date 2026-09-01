@@ -49,13 +49,14 @@ from scripts.data.build_stage7c_a5_column_conditioned_phase_o_protocol import ca
 
 
 STAGE_NAME = "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT"
-PATCH_NAME = "PATCH3"
+PATCH_NAME = "PATCH4"
 PACKAGE_DATE = "20260901"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
 SERVER_WORK_ROOT = "/home/uet/hue_ptk"
 PRIMARY_RESULT_DIR_NAME = "stage7e0_a5_english_column_conditioned_uet_rtx4090_primary_results_20260901"
 DIAGNOSTIC_RESULT_DIR_NAME = "stage7e0_a5_english_column_conditioned_uet_rtx4090_diagnostic_results_20260901"
 SERVER_REQUIREMENTS_LOCK = "requirements-inference-uet-rtx4090-cu124.lock.txt"
+SERVER_SCRIPT_NAME = "SERVER_RUN_COMMANDS.sh"
 
 
 def canonical_text(text: str) -> str:
@@ -190,16 +191,15 @@ def runner_protocol(accepted_commit: str) -> dict[str, Any]:
     }
 
 
-def server_commands(accepted_commit: str) -> str:
-    return f"""# Stage7E0-A5 English Column-Conditioned UET RTX4090 Commands
-
-Run the primary set first. Do not run diagnostics before the primary result is
-frozen and reviewed. A completed primary result is preserved whether it is
-12/12 PASS or a protocol-compliant scientific FAIL below 12/12.
-
-```bash
+def server_shell_script(accepted_commit: str) -> str:
+    return f"""#!/usr/bin/env bash
 set -euo pipefail
-cd {SERVER_WORK_ROOT}
+
+SCRIPT_DIR="$(cd "$(dirname "${{BASH_SOURCE[0]}}")" && pwd)"
+PACKAGE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PACKAGE_ROOT"
+
+mkdir -p {SERVER_WORK_ROOT}
 
 if command -v conda >/dev/null 2>&1; then
   source "$(conda info --base)/etc/profile.d/conda.sh"
@@ -210,15 +210,18 @@ if command -v conda >/dev/null 2>&1; then
 fi
 
 python -m pip install --upgrade pip
-
-rm -rf {STAGE_NAME}_{PATCH_NAME}_runner
-mkdir -p {STAGE_NAME}_{PATCH_NAME}_runner
-unzip -q -o {PACKAGE_NAME} -d {STAGE_NAME}_{PATCH_NAME}_runner
-cd {STAGE_NAME}_{PATCH_NAME}_runner
 python -m pip install --extra-index-url https://download.pytorch.org/whl/cu124 -r {SERVER_REQUIREMENTS_LOCK}
 
 export CUDA_VISIBLE_DEVICES=0
 export HF_HOME={SERVER_WORK_ROOT}/hf_cache
+
+RESULT_ROOT="{SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}"
+if [ -e "$RESULT_ROOT" ]; then
+  echo "STOP: result root already exists: $RESULT_ROOT" >&2
+  echo "Archive it as infrastructure-aborted if incomplete, or choose a reviewed new run directory." >&2
+  exit 2
+fi
+
 python scripts/data/validate_stage7c_a5_column_conditioned_phase_o_protocol.py --stage-dir {STAGE7C_A5_DIR}
 python scripts/data/validate_stage7e0_a5_english_preflight.py --stage-dir {STAGE_NAME}
 python scripts/server/preflight_runtime_stage7e0_a5.py --expected-profile {PRIMARY_RUNTIME_PROFILE_ID}
@@ -230,14 +233,34 @@ fi
 
 python scripts/server/run_stage7e0_a5_english.py \\
   --accepted-protocol-commit {accepted_commit} \\
-  --result-root {SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME} \\
+  --result-root "$RESULT_ROOT" \\
   --backend constrained_hf \\
   --quantization none \\
   --phase-o-max-new-tokens {PHASE_O_MAX_NEW_TOKENS} \\
   --model-name-or-path "$MODEL_SNAPSHOT"
-python scripts/data/validate_stage7e0_a5_server_results.py --result-dir {SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}
-tar -czf {SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}.tar.gz -C {SERVER_WORK_ROOT} {PRIMARY_RESULT_DIR_NAME}
-sha256sum {SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}.tar.gz > {SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}.tar.gz.sha256
+python scripts/data/validate_stage7e0_a5_server_results.py --result-dir "$RESULT_ROOT"
+tar -czf "$RESULT_ROOT.tar.gz" -C {SERVER_WORK_ROOT} {PRIMARY_RESULT_DIR_NAME}
+sha256sum "$RESULT_ROOT.tar.gz" > "$RESULT_ROOT.tar.gz.sha256"
+"""
+
+
+def server_commands(accepted_commit: str) -> str:
+    return f""": <<'STAGE7E0_A5_MARKDOWN_DOC'
+# Stage7E0-A5 English Column-Conditioned UET RTX4090 Commands
+
+Run the primary set first. Do not run diagnostics before the primary result is
+frozen and reviewed. A completed primary result is preserved whether it is
+12/12 PASS or a protocol-compliant scientific FAIL below 12/12.
+
+Copy `{PACKAGE_NAME}` to `{SERVER_WORK_ROOT}`, extract it, then run the shell
+script. The `.md` file is bash-compatible and delegates to the `.sh` file, but
+running `{SERVER_SCRIPT_NAME}` directly is preferred.
+
+```bash
+cd {SERVER_WORK_ROOT}
+rm -rf {STAGE_NAME}_{PATCH_NAME}_runner
+unzip -q -o {PACKAGE_NAME} -d {STAGE_NAME}_{PATCH_NAME}_runner
+bash {STAGE_NAME}_{PATCH_NAME}_runner/{STAGE_NAME}/{SERVER_SCRIPT_NAME}
 ```
 
 Do not use `--resume`. If infrastructure interrupts, archive the partial output
@@ -247,6 +270,10 @@ sha256 commands above; that is a completed scientific result, not an
 infrastructure failure. Diagnostics are not part of this primary preflight
 command; run them only after the primary result is frozen and reviewed as 12/12
 PASS.
+STAGE7E0_A5_MARKDOWN_DOC
+
+SCRIPT_DIR="$(cd "$(dirname "${{BASH_SOURCE[0]}}")" && pwd)"
+bash "$SCRIPT_DIR/{SERVER_SCRIPT_NAME}"
 """
 
 
@@ -363,7 +390,9 @@ python scripts/data/validate_stage7e0_a5_english_preflight.py --stage-dir {STAGE
 python -m pytest -q tests/test_stage7e0_a5_english_preflight.py
 ```
 
-UET server commands are in `{STAGE_NAME}/SERVER_RUN_COMMANDS.md`.
+UET server commands are in `{STAGE_NAME}/{SERVER_SCRIPT_NAME}`. The companion
+Markdown file `{STAGE_NAME}/SERVER_RUN_COMMANDS.md` is documentation and also
+delegates to the shell script if run with `bash`.
 
 Package: `{package_name}`
 
@@ -387,6 +416,7 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
     write_json(out_dir / "PRIMARY_ACCEPTANCE_POLICY_A5.json", protocol["acceptance"])
     write_json(out_dir / "CONSTRAINT_INDEPENDENCE_AUDIT_A5.json", independence)
     write_text(out_dir / "SERVER_RUN_COMMANDS.md", server_commands(accepted_commit))
+    write_text(out_dir / SERVER_SCRIPT_NAME, server_shell_script(accepted_commit))
     write_text(out_dir / "VALIDATION_REPORT.md", validation_report(accepted_commit, mock_summary))
     write_text(out_dir / "REVIEWER_README.md", reviewer_readme(package_path.name if package_path else PACKAGE_NAME, accepted_commit))
     artifact_names = [
@@ -395,6 +425,7 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
         "PRIMARY_ACCEPTANCE_POLICY_A5.json",
         "CONSTRAINT_INDEPENDENCE_AUDIT_A5.json",
         "SERVER_RUN_COMMANDS.md",
+        SERVER_SCRIPT_NAME,
         "VALIDATION_REPORT.md",
         "REVIEWER_README.md",
         "mock_dry_run/run_manifest.json",
@@ -480,6 +511,7 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
 def include_paths(stage_dir: Path) -> list[Path]:
     paths = [path for path in stage_dir.rglob("*") if path.is_file()]
     include_rel = [
+        ".gitattributes",
         "pyproject.toml",
         SERVER_REQUIREMENTS_LOCK,
         STAGE7C_A5_DIR,

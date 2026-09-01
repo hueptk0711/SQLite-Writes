@@ -234,6 +234,7 @@ def test_builder_and_validator_pass(tmp_path: Path) -> None:
     assert package_path.with_suffix(package_path.suffix + ".sha256").is_file()
     with zipfile.ZipFile(package_path) as archive:
         assert archive.testzip() is None
+        assert f"{STAGE_NAME}/SERVER_RUN_COMMANDS.sh" in archive.namelist()
 
 
 def test_stage_lock_forbids_11_of_12_phase_m_and_gretel(tmp_path: Path) -> None:
@@ -242,6 +243,7 @@ def test_stage_lock_forbids_11_of_12_phase_m_and_gretel(tmp_path: Path) -> None:
     lock = read_json(stage_dir / "STAGE7E0_A5_LOCK.json")
     policy = read_json(stage_dir / "PRIMARY_ACCEPTANCE_POLICY_A5.json")
     protocol = read_json(stage_dir / "RUNNER_PROTOCOL_A5.json")
+    shell_script = (stage_dir / "SERVER_RUN_COMMANDS.sh").read_text(encoding="utf-8")
     assert lock["primary_acceptance"] == "12/12 required; no average and no 11/12 acceptance"
     assert policy["required_pass_count"] == "12/12"
     assert policy["eleven_of_twelve_allowed"] is False
@@ -255,6 +257,9 @@ def test_stage_lock_forbids_11_of_12_phase_m_and_gretel(tmp_path: Path) -> None:
     assert protocol["prompt_contract"]["phase_o_output_keys"] == ["operation", "table_ref", "column_span_refs"]
     assert protocol["prompt_contract"]["column_span_refs_mapping_equality"] == "order_insensitive_by_object_key"
     assert protocol["generation_contract"]["phase_m_calls"] == 0
+    assert shell_script.startswith("#!/usr/bin/env bash")
+    assert "```" not in shell_script
+    assert "CUDA_VISIBLE_DEVICES=0" in shell_script
 
 
 def test_clean_reviewer_zip_validator_passes(tmp_path: Path) -> None:

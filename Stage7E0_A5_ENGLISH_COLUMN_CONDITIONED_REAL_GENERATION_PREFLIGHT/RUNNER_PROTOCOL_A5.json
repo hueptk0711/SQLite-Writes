@@ -165,7 +165,7 @@
     "server_requirements_lock": "requirements-inference-uet-rtx4090-cu124.lock.txt",
     "torch_dtype": "auto"
   },
-  "patch": "PATCH3",
+  "patch": "PATCH4",
   "prompt_contract": {
     "column_span_refs_mapping_equality": "order_insensitive_by_object_key",
     "duplicate_non_omit_span_reuse": "method_failure",

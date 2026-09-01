@@ -52,6 +52,7 @@ REQUIRED_FILES = {
     "PRIMARY_ACCEPTANCE_POLICY_A5.json",
     "CONSTRAINT_INDEPENDENCE_AUDIT_A5.json",
     "SERVER_RUN_COMMANDS.md",
+    "SERVER_RUN_COMMANDS.sh",
     "VALIDATION_REPORT.md",
     "REVIEWER_README.md",
     "DERIVED_ARTIFACT_MANIFEST.json",
@@ -259,7 +260,15 @@ def validate(stage_dir: Path) -> dict[str, Any]:
     if lock.get("constraint_independence_audit_sha256") != sha256_file(stage_dir / "CONSTRAINT_INDEPENDENCE_AUDIT_A5.json"):
         failures.append("stage_lock_constraint_independence_hash_mismatch")
 
-    commands = (stage_dir / "SERVER_RUN_COMMANDS.md").read_text(encoding="utf-8")
+    commands_md = (stage_dir / "SERVER_RUN_COMMANDS.md").read_text(encoding="utf-8")
+    commands_sh = (stage_dir / "SERVER_RUN_COMMANDS.sh").read_text(encoding="utf-8")
+    commands = commands_md + "\n" + commands_sh
+    if not commands_sh.startswith("#!/usr/bin/env bash"):
+        failures.append("server_shell_script_missing_bash_shebang")
+    if "```" in commands_sh or commands_sh.startswith("# Stage7E0"):
+        failures.append("server_shell_script_must_not_be_markdown")
+    if f"bash \"$SCRIPT_DIR/{'SERVER_RUN_COMMANDS.sh'}\"" not in commands_md:
+        failures.append("server_markdown_must_delegate_to_shell_script")
     for needle in ("UET", SERVER_REQUIREMENTS_LOCK, "CUDA_VISIBLE_DEVICES=0", "preflight_runtime_stage7e0_a5.py", PRIMARY_RUNTIME_PROFILE_ID, "run_stage7e0_a5_english.py", "--backend constrained_hf", "--quantization none", "--phase-o-max-new-tokens 512", PRIMARY_RESULT_DIR_NAME, "Do not use `--resume`", "less than 12/12", "validate", "archive", "sha256"):
         if needle not in commands:
             failures.append(f"server_command_missing:{needle}")
