@@ -41,7 +41,7 @@ def write_json(path: Path, value: dict) -> None:
 
 @pytest.fixture(scope="module")
 def built_stage(tmp_path_factory: pytest.TempPathFactory) -> Path:
-    stage = tmp_path_factory.mktemp("stage7c_a5_patch0") / STAGE_NAME
+    stage = tmp_path_factory.mktemp("stage7c_a5_patch1") / STAGE_NAME
     build_stage(stage)
     return stage
 
@@ -65,11 +65,12 @@ def test_prompt_spec_freezes_column_conditioned_one_call_contract() -> None:
 
 
 def test_stage_has_12_fresh_cases_with_required_surfaces(built_stage: Path) -> None:
-    rows = read_jsonl(built_stage / "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl")
+    rows = read_jsonl(built_stage / "FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl")
     ids = [row["sample_id"] for row in rows]
     tags = {tag for row in rows for tag in row["coverage_tags"]}
     assert len(rows) == 12
     assert len(set(ids)) == 12
+    assert all(sample_id.startswith("stage7c_a5_primary_english_") for sample_id in ids)
     assert not any(sample_id.startswith("stage7c_a4_") or sample_id.startswith("gretel:") for sample_id in ids)
     assert {"3_assigned_columns", "4_assigned_columns", "5_assigned_columns"} <= tags
     assert {"true_omit", "many_nullable_columns", "quoted_multiword", "three_word_value", "overlapping_candidates"} <= tags
@@ -77,7 +78,7 @@ def test_stage_has_12_fresh_cases_with_required_surfaces(built_stage: Path) -> N
 
 
 def test_model_side_input_contains_no_labels_offsets_or_gold(built_stage: Path) -> None:
-    for row in read_jsonl(built_stage / "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl"):
+    for row in read_jsonl(built_stage / "FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl"):
         assert set(row["model_side_input"]) == {"question", "schema_inventory", "candidate_inventory_text"}
         assert "start_char" not in row["model_side_input"]["candidate_inventory_text"]
         assert "end_char" not in row["model_side_input"]["candidate_inventory_text"]
@@ -87,7 +88,7 @@ def test_model_side_input_contains_no_labels_offsets_or_gold(built_stage: Path) 
 
 
 def test_dynamic_schema_domain_and_required_columns_are_exact(built_stage: Path) -> None:
-    rows = read_jsonl(built_stage / "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl")
+    rows = read_jsonl(built_stage / "FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl")
     multi_table_rows = 0
     for row in rows:
         schema = row["runtime_constraints"]["phase_o_schema"]
@@ -110,7 +111,7 @@ def test_dynamic_schema_domain_and_required_columns_are_exact(built_stage: Path)
 def test_phase_o_output_uses_only_column_conditioned_surface(built_stage: Path) -> None:
     assigned_count = 0
     omit_count = 0
-    for row in read_jsonl(built_stage / "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl"):
+    for row in read_jsonl(built_stage / "FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl"):
         phase_o = row["label_side_expected"]["phase_o"]
         assert sorted(phase_o) == ["column_span_refs", "operation", "table_ref"]
         assert phase_o["operation"] == "INSERT"
@@ -121,13 +122,13 @@ def test_phase_o_output_uses_only_column_conditioned_surface(built_stage: Path) 
                 omit_count += 1
             else:
                 assigned_count += 1
-    assert assigned_count == 47
-    assert omit_count == 14
+    assert assigned_count == 52
+    assert omit_count == 15
 
 
 def test_gold_refs_slice_exact_values_and_cover_candidate_inventory(built_stage: Path) -> None:
     total = 0
-    for row in read_jsonl(built_stage / "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl"):
+    for row in read_jsonl(built_stage / "FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl"):
         question = row["model_side_input"]["question"]
         candidate_refs = {candidate["span_ref"] for candidate in row["runtime_constraints"]["candidate_inventory"]}
         for gold in row["label_side_expected"]["gold_column_span_ref_oracle"]:
@@ -135,15 +136,16 @@ def test_gold_refs_slice_exact_values_and_cover_candidate_inventory(built_stage:
             assert gold["candidate_span_ref"] in candidate_refs
             assert row["label_side_expected"]["phase_o"]["column_span_refs"][gold["column_ref"]] == gold["candidate_span_ref"]
             total += 1
-    assert total == 47
+    assert total == 52
 
 
 def test_rendered_prompt_contains_column_omit_and_candidate_inventory(built_stage: Path) -> None:
-    row = read_jsonl(built_stage / "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl")[0]
+    row = read_jsonl(built_stage / "FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl")[0]
     messages, user, digest = render_phase_o_messages(row)
     assert len(messages) == 2
     assert row["model_side_input"]["question"] in user
     assert "Choose exactly one SPAN reference or OMIT" in user
+    assert "Use each non-OMIT SPAN reference for at most one column." in user
     assert "Schema inventory:" in user
     assert "Candidate span inventory:" in user
     assert "SPAN_" in user
@@ -151,13 +153,36 @@ def test_rendered_prompt_contains_column_omit_and_candidate_inventory(built_stag
 
 
 def test_oracle_path_admits_all_cases_without_phase_m_model_surface(built_stage: Path) -> None:
-    rows = read_jsonl(built_stage / "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl")
+    rows = read_jsonl(built_stage / "FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl")
     results = [oracle_column_conditioned_path(row, built_stage / row["synthetic_db_spec"]["sqlite_db_path"]) for row in rows]
     assert sum(result["preflight"] == "ADMITTED" for result in results) == 12
     assert all(result["canonical_target_state_exact"] for result in results)
     assert all(result["phase_m_model_call_removed"] for result in results)
     assert all(result["model_generated_phase_m"] is False for result in results)
     assert all(result["model_generated_slot_refs"] is False for result in results)
+
+
+def test_a4_derived_cases_are_diagnostics_only_after_primary(built_stage: Path) -> None:
+    rows = read_jsonl(built_stage / "A4_DERIVED_REGRESSION_DIAGNOSTICS_A5.jsonl")
+    results = read_jsonl(built_stage / "ORACLE_A4_DERIVED_DIAGNOSTIC_RESULTS.jsonl")
+    assert len(rows) == 12
+    assert len(results) == 12
+    assert all(row["sample_id"].startswith("stage7c_a5_fresh_english_") for row in rows)
+    assert all(row["diagnostic_role"] == "diagnostic_only_after_primary" for row in rows)
+    assert sum(result["preflight"] == "ADMITTED" for result in results) == 12
+    assert all(result["canonical_target_state_exact"] for result in results)
+
+
+def test_primary_independence_and_evaluator_semantics_are_frozen(built_stage: Path) -> None:
+    audit = read_json(built_stage / "A5_PRIMARY_INDEPENDENCE_AUDIT.json")
+    evaluator = read_json(built_stage / "EVALUATOR_SEMANTICS_A5.json")
+    output = read_json(built_stage / "COLUMN_CONDITIONED_OUTPUT_SPEC_A5.json")
+    assert audit["status"] == "PASS"
+    assert audit["exact_literal_overlap_case_count"] == 0
+    assert evaluator["column_span_refs_mapping_equality"] == "order_insensitive_by_object_key"
+    assert evaluator["json_object_key_order_has_semantics"] is False
+    assert evaluator["duplicate_span_reuse_outcome"] == "method_failure"
+    assert output["non_omit_span_refs_unique_across_columns"] is True
 
 
 def test_lock_and_policy_close_gpu_gretel_and_type_pruning(built_stage: Path) -> None:
@@ -171,33 +196,41 @@ def test_lock_and_policy_close_gpu_gretel_and_type_pruning(built_stage: Path) ->
     assert lock["development_dev_used"] is False
     assert lock["official_test_used"] is False
     assert lock["type_based_candidate_pruning_enabled"] is False
+    assert lock["primary_acceptance_precedes_diagnostics"] is True
+    assert lock["diagnostics_can_compensate_primary_failure"] is False
+    assert lock["duplicate_span_reuse_is_method_failure"] is True
+    assert lock["column_span_refs_mapping_equality"] == "order_insensitive_by_object_key"
     assert policy["omit_allowed_for_candidate_miss"] is False
     assert policy["candidate_miss_is_method_failure"] is True
+    assert policy["duplicate_span_reuse_is_method_failure"] is True
     assert no_phase_m["primary_pipeline_phase_m_removed"] is True
 
 
-def test_validator_accepts_generated_artifacts(built_stage: Path) -> None:
-    report = validate(built_stage)
+def test_validator_accepts_frozen_generated_artifacts() -> None:
+    report = validate(ROOT / STAGE_NAME)
     assert report["status"] == "PASS", report["failures"]
     assert report["fresh_english_case_count"] == 12
-    assert report["assigned_column_decision_count"] == 47
-    assert report["omit_column_decision_count"] == 14
+    assert report["assigned_column_decision_count"] == 52
+    assert report["omit_column_decision_count"] == 15
     assert report["multi_table_oneof_case_count"] == 2
+    assert report["a4_derived_regression_diagnostic_count"] == 12
 
 
-def test_semantic_rebuild_passes(tmp_path: Path) -> None:
-    stage = tmp_path / STAGE_NAME
-    build_stage(stage)
-    report = validate(stage, rebuild=True)
-    assert report["status"] == "PASS", report["failures"]
+def test_semantic_rebuild_requires_tokenizer_after_token_audit_pass() -> None:
+    token_audit = read_json(ROOT / STAGE_NAME / "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json")
+    if token_audit["tokenizer_status"] != "PASS":
+        pytest.skip("frozen tokenizer audit is rebuilt by the stage validation command")
+    report = validate(ROOT / STAGE_NAME, rebuild=True)
+    assert report["status"] == "FAIL"
+    assert "TOKENIZER_REQUIRED_FOR_REBUILD" in report["failures"]
 
 
 def test_validator_rejects_phase_m_tamper(tmp_path: Path) -> None:
     stage = tmp_path / STAGE_NAME
     build_stage(stage)
-    rows = read_jsonl(stage / "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl")
+    rows = read_jsonl(stage / "FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl")
     rows[0]["label_side_expected"]["phase_m"] = {"operation": "INSERT", "assignments": []}
-    (stage / "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl").write_text(
+    (stage / "FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl").write_text(
         "\n".join(canonical_json(row) for row in rows) + "\n",
         encoding="utf-8",
     )
@@ -209,10 +242,10 @@ def test_validator_rejects_phase_m_tamper(tmp_path: Path) -> None:
 def test_validator_rejects_unknown_span_ref_tamper(tmp_path: Path) -> None:
     stage = tmp_path / STAGE_NAME
     build_stage(stage)
-    rows = read_jsonl(stage / "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl")
+    rows = read_jsonl(stage / "FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl")
     first_column = next(iter(rows[0]["label_side_expected"]["phase_o"]["column_span_refs"]))
     rows[0]["label_side_expected"]["phase_o"]["column_span_refs"][first_column] = "SPAN_9999"
-    (stage / "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl").write_text(
+    (stage / "FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl").write_text(
         "\n".join(canonical_json(row) for row in rows) + "\n",
         encoding="utf-8",
     )

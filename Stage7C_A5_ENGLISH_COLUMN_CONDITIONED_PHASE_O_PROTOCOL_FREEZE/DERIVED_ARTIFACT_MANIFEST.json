@@ -1,74 +1,94 @@
 {
-  "artifact_count": 13,
+  "artifact_count": 17,
   "artifacts": [
     {
-      "bytes": 1021,
+      "bytes": 204440,
+      "path": "A4_DERIVED_REGRESSION_DIAGNOSTICS_A5.jsonl",
+      "sha256": "f75d69a457b46cf8b9242c143fa6c3600ca226c35c7ac8e31b367d562503fdea"
+    },
+    {
+      "bytes": 4062,
+      "path": "A5_PRIMARY_INDEPENDENCE_AUDIT.json",
+      "sha256": "818cc0a30168b8446927f7d8387aa076eeab3007689ccccef31cca89ace59dfd"
+    },
+    {
+      "bytes": 1248,
       "path": "ACCEPTANCE_POLICY_A5.json",
-      "sha256": "701daf3b73f99d21b221aafe093c8af951eaf24d1b0d2d23ee016bb8ace2ba4e"
+      "sha256": "ebc4cdad5fdb38ffa50c9ae889bfef398435a2263de30414a5a25c58a63eef92"
     },
     {
-      "bytes": 767,
+      "bytes": 819,
       "path": "COLUMN_CONDITIONED_OUTPUT_SPEC_A5.json",
-      "sha256": "6a6533f0cf4894192f7559e6e880c97f165b5beecfc65a0fdae9cf77a1af4efe"
+      "sha256": "7f3f2084af7f20fe163e0e5394724bc32595b762febc781e939a2a7d271fa638"
     },
     {
-      "bytes": 2070,
+      "bytes": 2130,
       "path": "COLUMN_CONDITIONED_PROMPT_SPEC_A5_ENGLISH.json",
-      "sha256": "637b693ad504a45160672eed803668af1e9d81ee276d8d045b57c4afdb782528"
+      "sha256": "87a1a84c285234d3fbdaa3a71d90c64899d739036888d1d939ff83459df54d96"
     },
     {
       "bytes": 786,
       "path": "COLUMN_CONDITIONED_RUNTIME_SCHEMA_SPEC_A5.json",
-      "sha256": "6098a6f8afd3acb7462d56752785e5668c5f88bde6ae3137a0750e592424c371"
+      "sha256": "01b65742822aff7c5bb8b4ddc7fcb745a4c4f4ad6d4708c8800b2d16cfbabc54"
     },
     {
       "bytes": 543,
       "path": "COLUMN_CONDITIONED_SERIALIZATION_FREEZE.json",
-      "sha256": "e56070a3e05c0b5a29e904da256defb579dc25384ef0b6c5dae1f376f6d160cc"
+      "sha256": "2bc2221fbc853b27a0d359348d89035401d53f917e1c6a670ddac270ed59bad2"
     },
     {
-      "bytes": 203840,
-      "path": "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl",
-      "sha256": "0b79e20e80ad4f19a6cb3bd82e9126d98e53e727d8db4f34ca1461f28acf3aba"
+      "bytes": 528,
+      "path": "EVALUATOR_SEMANTICS_A5.json",
+      "sha256": "00c4e2dacbf04a7162e088a04be58175b1977d1854b7e68de596644b21a3c1ec"
     },
     {
-      "bytes": 4920,
+      "bytes": 225996,
+      "path": "FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl",
+      "sha256": "949a541a989f1d7461022599c5508f38bda736202b1a725ffafaaa3aedba47b9"
+    },
+    {
+      "bytes": 5314,
       "path": "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json",
-      "sha256": "8876a11d9024d5289366c4e6d34a0271c44a089266746420eb20d4c311c22f8a"
+      "sha256": "30df2564c1e408d4ce699556076e9d7e31cba827c7b9e8ebe759380e5e833301"
     },
     {
       "bytes": 832,
       "path": "NO_PHASE_M_PRIMARY_PIPELINE_SPEC_A5.json",
-      "sha256": "e979eaad9db5f5a758566fcd2c92fca423e07859a0eec468d94d1e8b804309c0"
+      "sha256": "9a06d3151048b2857a5012b030c07f50956c49eb476127ef3a29605c196f3902"
     },
     {
-      "bytes": 544,
+      "bytes": 594,
       "path": "OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A5.json",
-      "sha256": "8d2f101ca7f5d63630f2118c73f6d8b3668551bd4bb9cb30e9937fec0cd78736"
+      "sha256": "10b95bb8cb4e4bcdf9ba52d16e285d753cada32b22355b9ae250ff7328a120bb"
     },
     {
       "bytes": 22728,
-      "path": "ORACLE_COLUMN_CONDITIONED_PATH_RESULTS.jsonl",
+      "path": "ORACLE_A4_DERIVED_DIAGNOSTIC_RESULTS.jsonl",
       "sha256": "7d0351efca0ee2fc56d58e5e79585459a8cb51b6100fb976c84ababf50899327"
+    },
+    {
+      "bytes": 23953,
+      "path": "ORACLE_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl",
+      "sha256": "210c0f972407d4adb4dcf80ff34880d47cdd5b74a087fee3f0ecd9ddd0a76c3b"
     },
     {
       "bytes": 2994,
       "path": "SOURCE_INPUT_MANIFEST.json",
-      "sha256": "e2e7def1a16d4afec1168479b4d1be971abead4f601dceb3c6a9cbd1aa8a23c5"
+      "sha256": "1bbd05098958fe680fdee3b2e5181b9a9c3fe0a9e631d984c8e726c90ae1b473"
     },
     {
-      "bytes": 12202,
+      "bytes": 26074,
       "path": "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl",
-      "sha256": "8a6e3e14c43a3028c30e3d2a17bb66e11ae48c7cf5c08c578f7cb8def86cbe92"
+      "sha256": "44abce32c6287abb14b66b60722bec957d1a3a9e6ef3b5b7dc7009629c17eaf2"
     },
     {
       "bytes": 473,
       "path": "TARGET_TABLE_BRANCHING_PROTOCOL_A5.json",
-      "sha256": "22c1a951ffdd989be2507c5799499c9b8ccbc3c5ebc279050b7c03483e00af0f"
+      "sha256": "2d3f47b77e6691af49e714f593e416229c3dfabb6ab167fce03be4e287ec0c72"
     }
   ],
-  "combined_scientific_artifacts_sha256": "c90837c984a71c68a889e7ada9d5bea8346d6275ffc92b51f8e15933032d2dea",
+  "combined_scientific_artifacts_sha256": "428db13a03ef7f348b6fd50c785bd3aebc8e7835d02acb0b3f9580baf35100c9",
   "identity_scope": "scientific_logical_artifacts_only",
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "stage": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE"
 }

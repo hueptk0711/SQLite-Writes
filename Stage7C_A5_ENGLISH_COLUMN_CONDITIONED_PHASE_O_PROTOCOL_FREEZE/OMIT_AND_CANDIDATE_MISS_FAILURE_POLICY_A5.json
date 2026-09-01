@@ -1,11 +1,12 @@
 {
   "candidate_miss_is_method_failure": true,
+  "duplicate_span_reuse_is_method_failure": true,
   "gpu_called": false,
   "may_exclude_sample_for_candidate_miss": false,
   "model_called": false,
   "omit_allowed_for_candidate_miss": false,
   "omit_meaning": "The request gives no literal value for this column; SQLite NULL/default/autoincrement behavior is left to deterministic compilation/preflight.",
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "pilot_dev_test_denominator_locked": true,
   "stage": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE",
   "type_based_candidate_pruning_enabled": false

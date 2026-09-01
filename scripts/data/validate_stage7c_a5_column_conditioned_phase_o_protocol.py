@@ -81,6 +81,7 @@ def validate_prompt_and_schema(stage_dir: Path, failures: list[str]) -> None:
     branching = read_json(stage_dir / "TARGET_TABLE_BRANCHING_PROTOCOL_A5.json")
     no_phase_m = read_json(stage_dir / "NO_PHASE_M_PRIMARY_PIPELINE_SPEC_A5.json")
     failure_policy = read_json(stage_dir / "OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A5.json")
+    evaluator = read_json(stage_dir / "EVALUATOR_SEMANTICS_A5.json")
 
     if prompt.get("system_prompt") != PHASE_O_SYSTEM_PROMPT:
         failures.append("prompt_system_text_mismatch")
@@ -104,6 +105,8 @@ def validate_prompt_and_schema(stage_dir: Path, failures: list[str]) -> None:
 
     if output.get("allowed_top_level_keys") != ["operation", "table_ref", "column_span_refs"]:
         failures.append("output_allowed_keys_mismatch")
+    if output.get("non_omit_span_refs_unique_across_columns") is not True:
+        failures.append("output_unique_non_omit_span_refs_missing")
     forbidden = set(output.get("forbidden_top_level_keys", []))
     if not {"span_refs", "value_spans", "start_char", "end_char", "values", "assignments", "slot_refs", "phase_m"} <= forbidden:
         failures.append("output_forbidden_keys_incomplete")
@@ -127,6 +130,12 @@ def validate_prompt_and_schema(stage_dir: Path, failures: list[str]) -> None:
         failures.append("serialization_exposes_offsets")
     if failure_policy.get("omit_allowed_for_candidate_miss") is not False or failure_policy.get("candidate_miss_is_method_failure") is not True:
         failures.append("candidate_miss_policy_mismatch")
+    if failure_policy.get("duplicate_span_reuse_is_method_failure") is not True:
+        failures.append("duplicate_span_reuse_policy_missing")
+    if evaluator.get("column_span_refs_mapping_equality") != "order_insensitive_by_object_key":
+        failures.append("evaluator_mapping_equality_not_order_insensitive")
+    if evaluator.get("duplicate_span_reuse_outcome") != "method_failure":
+        failures.append("evaluator_duplicate_span_reuse_outcome_mismatch")
 
 
 def _schema_candidate_domain(schema: dict[str, Any]) -> list[str]:
@@ -148,16 +157,24 @@ def _required_columns(schema: dict[str, Any], table_ref: str) -> list[str]:
     raise AssertionError(f"missing oneOf branch for {table_ref}")
 
 
-def validate_rows(stage_dir: Path, failures: list[str]) -> tuple[int, int, int, int]:
-    rows = read_jsonl(stage_dir / "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl")
-    oracle_rows = read_jsonl(stage_dir / "ORACLE_COLUMN_CONDITIONED_PATH_RESULTS.jsonl")
+def validate_rows(
+    stage_dir: Path,
+    failures: list[str],
+    *,
+    rows_name: str,
+    oracle_name: str,
+    expected_prefix: str,
+    diagnostic: bool = False,
+) -> tuple[int, int, int, int]:
+    rows = read_jsonl(stage_dir / rows_name)
+    oracle_rows = read_jsonl(stage_dir / oracle_name)
     oracle_by_id = {row["sample_id"]: row for row in oracle_rows}
     if len(rows) != 12:
         failures.append("fresh_case_count_mismatch")
     sample_ids = [row["sample_id"] for row in rows]
     if len(set(sample_ids)) != len(sample_ids):
         failures.append("duplicate_sample_id")
-    if any(str(sample_id).startswith("stage7c_a4_") or str(sample_id).startswith("gretel:") for sample_id in sample_ids):
+    if any(not str(sample_id).startswith(expected_prefix) or str(sample_id).startswith("gretel:") for sample_id in sample_ids):
         failures.append("non_fresh_or_gretel_sample_id_present")
     tags = {tag for row in rows for tag in row.get("coverage_tags", [])}
     missing_tags = sorted(REQUIRED_COVERAGE_TAGS - tags)
@@ -173,6 +190,8 @@ def validate_rows(stage_dir: Path, failures: list[str]) -> tuple[int, int, int, 
             failures.append(f"not_locked_before_model_run:{sample_id}")
         if row.get("fresh_synthetic") is not True:
             failures.append(f"fresh_synthetic_not_true:{sample_id}")
+        if diagnostic and row.get("diagnostic_role") != "diagnostic_only_after_primary":
+            failures.append(f"diagnostic_role_mismatch:{sample_id}")
         if set(row.get("model_side_input", {})) != {"question", "schema_inventory", "candidate_inventory_text"}:
             failures.append(f"model_side_input_keys_mismatch:{sample_id}")
         if FORBIDDEN_MODEL_SIDE_KEYS.intersection(row.get("model_side_input", {})):
@@ -218,6 +237,9 @@ def validate_rows(stage_dir: Path, failures: list[str]) -> tuple[int, int, int, 
                 assigned_count += 1
                 if span_ref not in candidate_refs:
                     failures.append(f"selected_span_ref_missing_from_inventory:{sample_id}:{column_ref}")
+        non_omit_refs = [span_ref for span_ref in phase_o["column_span_refs"].values() if span_ref != "OMIT"]
+        if len(non_omit_refs) != len(set(non_omit_refs)):
+            failures.append(f"duplicate_span_ref_reuse:{sample_id}")
         for item in row["label_side_expected"].get("gold_column_span_ref_oracle", []):
             start = int(item["start_char"])
             end = int(item["end_char"])
@@ -273,6 +295,7 @@ def validate_manifests(stage_dir: Path, failures: list[str]) -> None:
     lock = read_json(stage_dir / "STAGE7C_A5_LOCK.json")
     token_audit = read_json(stage_dir / "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json")
     acceptance = read_json(stage_dir / "ACCEPTANCE_POLICY_A5.json")
+    independence = read_json(stage_dir / "A5_PRIMARY_INDEPENDENCE_AUDIT.json")
 
     for payload_name, payload in {
         "source_manifest": source_manifest,
@@ -291,6 +314,20 @@ def validate_manifests(stage_dir: Path, failures: list[str]) -> None:
         failures.append("lock_no_phase_m_mismatch")
     if lock.get("type_based_candidate_pruning_enabled") is not False:
         failures.append("lock_type_pruning_enabled")
+    if lock.get("duplicate_span_reuse_is_method_failure") is not True:
+        failures.append("lock_duplicate_span_policy_missing")
+    if lock.get("column_span_refs_mapping_equality") != "order_insensitive_by_object_key":
+        failures.append("lock_mapping_equality_mismatch")
+    if lock.get("primary_acceptance_precedes_diagnostics") is not True or lock.get("diagnostics_can_compensate_primary_failure") is not False:
+        failures.append("lock_primary_diagnostic_order_mismatch")
+    if token_audit.get("tokenizer_status") != "PASS":
+        failures.append("tokenizer_status_not_pass")
+    if token_audit.get("rendered_prompt_token_stats") is None:
+        failures.append("token_stats_missing")
+    if token_audit.get("chat_template_hash_matches_required") is not True:
+        failures.append("chat_template_hash_mismatch")
+    if independence.get("status") != "PASS" or independence.get("exact_literal_overlap_case_count") != 0:
+        failures.append("primary_independence_audit_not_pass")
 
     for item in source_manifest.get("source_files", []):
         path = PROJECT_ROOT / item["path"]
@@ -309,7 +346,7 @@ def validate_manifests(stage_dir: Path, failures: list[str]) -> None:
             failures.append(f"derived_artifact_hash_mismatch:{item['path']}")
 
     sqlite_artifacts = package_integrity.get("sqlite_binary_artifacts", [])
-    if package_integrity.get("sqlite_binary_artifact_count") != 12 or len(sqlite_artifacts) != 12:
+    if package_integrity.get("sqlite_binary_artifact_count") != 24 or len(sqlite_artifacts) != 24:
         failures.append("sqlite_binary_artifact_count_mismatch")
     for item in sqlite_artifacts:
         path = stage_dir / item["path"]
@@ -327,10 +364,37 @@ def validate(stage_dir: Path, *, rebuild: bool = False, tokenizer_name_or_path: 
     if failures:
         return {"stage": STAGE_NAME, "status": "FAIL", "failures": failures}
     validate_prompt_and_schema(stage_dir, failures)
-    case_count, assigned_count, omit_count, multi_table_count = validate_rows(stage_dir, failures)
+    case_count, assigned_count, omit_count, multi_table_count = validate_rows(
+        stage_dir,
+        failures,
+        rows_name="FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl",
+        oracle_name="ORACLE_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl",
+        expected_prefix="stage7c_a5_primary_english_",
+    )
+    diagnostic_case_count, diagnostic_assigned_count, diagnostic_omit_count, diagnostic_multi_table_count = validate_rows(
+        stage_dir,
+        failures,
+        rows_name="A4_DERIVED_REGRESSION_DIAGNOSTICS_A5.jsonl",
+        oracle_name="ORACLE_A4_DERIVED_DIAGNOSTIC_RESULTS.jsonl",
+        expected_prefix="stage7c_a5_fresh_english_",
+        diagnostic=True,
+    )
     validate_manifests(stage_dir, failures)
 
     if rebuild:
+        token_audit = read_json(stage_dir / "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json")
+        if token_audit.get("tokenizer_status") == "PASS" and not tokenizer_name_or_path:
+            failures.append("TOKENIZER_REQUIRED_FOR_REBUILD")
+            return {
+                "stage": STAGE_NAME,
+                "status": "FAIL",
+                "failures": failures,
+                "fresh_english_case_count": case_count,
+                "assigned_column_decision_count": assigned_count,
+                "omit_column_decision_count": omit_count,
+                "multi_table_oneof_case_count": multi_table_count,
+                "a4_derived_regression_diagnostic_count": diagnostic_case_count,
+            }
         rebuild_parent = stage_dir.parent / f"{stage_dir.name}__semantic_rebuild_tmp"
         if rebuild_parent.exists():
             shutil.rmtree(rebuild_parent, ignore_errors=True)
@@ -338,12 +402,28 @@ def validate(stage_dir: Path, *, rebuild: bool = False, tokenizer_name_or_path: 
         try:
             rebuilt_failures: list[str] = []
             validate_prompt_and_schema(rebuild_parent, rebuilt_failures)
-            rebuilt_counts = validate_rows(rebuild_parent, rebuilt_failures)
+            rebuilt_counts = validate_rows(
+                rebuild_parent,
+                rebuilt_failures,
+                rows_name="FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl",
+                oracle_name="ORACLE_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl",
+                expected_prefix="stage7c_a5_primary_english_",
+            )
+            rebuilt_diagnostic_counts = validate_rows(
+                rebuild_parent,
+                rebuilt_failures,
+                rows_name="A4_DERIVED_REGRESSION_DIAGNOSTICS_A5.jsonl",
+                oracle_name="ORACLE_A4_DERIVED_DIAGNOSTIC_RESULTS.jsonl",
+                expected_prefix="stage7c_a5_fresh_english_",
+                diagnostic=True,
+            )
             validate_manifests(rebuild_parent, rebuilt_failures)
             if rebuilt_failures:
                 failures.append(f"semantic_rebuild_failed:{rebuilt_failures}")
             if rebuilt_counts != (case_count, assigned_count, omit_count, multi_table_count):
                 failures.append("semantic_rebuild_counts_mismatch")
+            if rebuilt_diagnostic_counts != (diagnostic_case_count, diagnostic_assigned_count, diagnostic_omit_count, diagnostic_multi_table_count):
+                failures.append("semantic_rebuild_diagnostic_counts_mismatch")
         finally:
             shutil.rmtree(rebuild_parent, ignore_errors=True)
 
@@ -355,6 +435,10 @@ def validate(stage_dir: Path, *, rebuild: bool = False, tokenizer_name_or_path: 
         "assigned_column_decision_count": assigned_count,
         "omit_column_decision_count": omit_count,
         "multi_table_oneof_case_count": multi_table_count,
+        "a4_derived_regression_diagnostic_count": diagnostic_case_count,
+        "diagnostic_assigned_column_decision_count": diagnostic_assigned_count,
+        "diagnostic_omit_column_decision_count": diagnostic_omit_count,
+        "diagnostic_multi_table_oneof_case_count": diagnostic_multi_table_count,
     }
 
 

@@ -15,16 +15,16 @@
   "model_selects_column_span_refs": true,
   "model_selects_table_ref": true,
   "operation_scope": "INSERT",
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "prompt_hashes": {
     "phase_o_system_prompt_sha256": "57c27cc632cfc89826d90dab7861e1aea4051b8bcedada73b0f7fed2ddadf7a6",
-    "phase_o_user_prompt_template_sha256": "13d80290457082eaa58f61a54a60ca2cf6f133981ed48638b75fc5b4eb50bb98"
+    "phase_o_user_prompt_template_sha256": "1d859364e47267771ef449a35b2336c26c1e6a5eb026e9f9125e0a8e941fd14b"
   },
   "protocol": "column_conditioned_phase_o_protocol",
   "repair": "none",
   "retry": 0,
   "stage": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE",
   "system_prompt": "You select one source span or OMIT for every SQLite INSERT column. Return only JSON that matches the provided schema.",
-  "user_prompt_template": "Select the literal source span for each target-table column in the INSERT request.\n\nRules:\n- Choose exactly one SPAN reference or OMIT for every column in the selected table branch.\n- Use OMIT only when the request gives no literal value for that column.\n- Choose the smallest complete atomic value span.\n- Do not select field labels, instruction text, table names, or column names.\n- For multi-table schemas, choose exactly one table_ref branch from the model-visible schema.\n- Do not invent span refs.\n- Do not output character offsets, raw values, SLOT refs, Phase M JSON, explanations, or markdown.\n\nOriginal request:\n{question}\n\nSchema inventory:\n{schema_inventory}\n\nCandidate span inventory:\n{candidate_inventory}\n",
+  "user_prompt_template": "Select the literal source span for each target-table column in the INSERT request.\n\nRules:\n- Choose exactly one SPAN reference or OMIT for every column in the selected table branch.\n- Use each non-OMIT SPAN reference for at most one column.\n- Use OMIT only when the request gives no literal value for that column.\n- Choose the smallest complete atomic value span.\n- Do not select field labels, instruction text, table names, or column names.\n- For multi-table schemas, choose exactly one table_ref branch from the model-visible schema.\n- Do not invent span refs.\n- Do not output character offsets, raw values, SLOT refs, Phase M JSON, explanations, or markdown.\n\nOriginal request:\n{question}\n\nSchema inventory:\n{schema_inventory}\n\nCandidate span inventory:\n{candidate_inventory}\n",
   "zero_shot": true
 }

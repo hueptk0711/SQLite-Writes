@@ -10,7 +10,7 @@
   "gpu_called": false,
   "model_called": false,
   "multi_table_strategy": "oneOf branch per model-visible table_ref with branch-local required column_span_refs",
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "runtime_builder": "dynamic_schema_for_schema_tables(model_visible_schema_tables, candidate_span_refs)",
   "single_table_strategy": "const table_ref TAB_1 with every COL_n key required",
   "stage": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE",

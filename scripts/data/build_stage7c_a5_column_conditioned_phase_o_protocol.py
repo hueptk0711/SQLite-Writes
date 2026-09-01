@@ -9,6 +9,7 @@ rows, and no official test rows are opened.
 from __future__ import annotations
 
 import argparse
+import difflib
 import hashlib
 import json
 import shutil
@@ -53,7 +54,7 @@ from scripts.data.build_stage7b_a3_column_conditioned_candidate_selection import
 
 
 STAGE_NAME = "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE"
-PATCH_NAME = "PATCH0"
+PATCH_NAME = "PATCH1"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260901.zip"
 STAGE7B_A2_NAME = "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
 STAGE7B_A3_NAME = "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT"
@@ -69,6 +70,7 @@ PHASE_O_USER_PROMPT_TEMPLATE = """Select the literal source span for each target
 
 Rules:
 - Choose exactly one SPAN reference or OMIT for every column in the selected table branch.
+- Use each non-OMIT SPAN reference for at most one column.
 - Use OMIT only when the request gives no literal value for that column.
 - Choose the smallest complete atomic value span.
 - Do not select field labels, instruction text, table names, or column names.
@@ -94,8 +96,12 @@ SCIENTIFIC_ARTIFACTS = [
     "TARGET_TABLE_BRANCHING_PROTOCOL_A5.json",
     "NO_PHASE_M_PRIMARY_PIPELINE_SPEC_A5.json",
     "OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A5.json",
-    "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl",
-    "ORACLE_COLUMN_CONDITIONED_PATH_RESULTS.jsonl",
+    "EVALUATOR_SEMANTICS_A5.json",
+    "A5_PRIMARY_INDEPENDENCE_AUDIT.json",
+    "FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl",
+    "A4_DERIVED_REGRESSION_DIAGNOSTICS_A5.jsonl",
+    "ORACLE_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl",
+    "ORACLE_A4_DERIVED_DIAGNOSTIC_RESULTS.jsonl",
     "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json",
     "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl",
     "ACCEPTANCE_POLICY_A5.json",
@@ -416,6 +422,265 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"material_name": "Copper Dawn Textile", "batch": "MAT-44", "density": "7.8", "source": "lab bench"},
         },
     ]
+_a4_derived_diagnostic_case_definitions = case_definitions
+
+
+def case_definitions() -> list[dict[str, Any]]:
+    return [
+        {
+            "sample_id": "stage7c_a5_primary_english_001",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "quoted_multiword", "identifier", "integer", "date"],
+            "question": 'For library_loans, create loan_id LOAN-842, title "River Atlas", borrower card CARD-190, loan_days 21, due_on 2026-10-15. Hold shelf is not provided.',
+            "selected_table": "library_loans",
+            "tables": [
+                {
+                    "table_name": "library_loans",
+                    "columns": [
+                        {"column_name": "loan_id", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "title", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "borrower_card", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "loan_days", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "due_on", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "hold_shelf", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"loan_id": "LOAN-842", "title": "River Atlas", "borrower_card": "CARD-190", "loan_days": "21", "due_on": "2026-10-15"},
+        },
+        {
+            "sample_id": "stage7c_a5_primary_english_002",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "three_word_value", "quoted_multiword", "real", "integer"],
+            "question": 'Store research grant "Aurora Mapping Study", grant_code GR-2042, amount 87500.50, fiscal_year 2027. Sponsor contact omitted.',
+            "selected_table": "research_grants",
+            "tables": [
+                {
+                    "table_name": "research_grants",
+                    "columns": [
+                        {"column_name": "grant_title", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "grant_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "amount", "source_type": "REAL", "nullable": False},
+                        {"column_name": "fiscal_year", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "sponsor_contact", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"grant_title": "Aurora Mapping Study", "grant_code": "GR-2042", "amount": "87500.50", "fiscal_year": "2027"},
+        },
+        {
+            "sample_id": "stage7c_a5_primary_english_003",
+            "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "identifier", "integer"],
+            "question": "Create vehicle inspection VIN-9K2L7M, plate HZX-482, mileage 64012, passed 7, bay BAY_14. Inspector note left empty.",
+            "selected_table": "vehicle_inspections",
+            "tables": [
+                {
+                    "table_name": "vehicle_inspections",
+                    "columns": [
+                        {"column_name": "vin_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "plate", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "mileage", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "passed", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "bay", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "inspector_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"vin_code": "VIN-9K2L7M", "plate": "HZX-482", "mileage": "64012", "passed": "7", "bay": "BAY_14"},
+        },
+        {
+            "sample_id": "stage7c_a5_primary_english_004",
+            "coverage_tags": ["single_table", "3_assigned_columns", "true_omit", "three_word_value", "real"],
+            "question": 'Add subscription plan "Silver Archive Plus", plan_code PLAN-77, monthly_fee 14.95. Seat count and coupon code are absent.',
+            "selected_table": "subscription_plans",
+            "tables": [
+                {
+                    "table_name": "subscription_plans",
+                    "columns": [
+                        {"column_name": "plan_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "plan_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "monthly_fee", "source_type": "REAL", "nullable": False},
+                        {"column_name": "seats", "source_type": "INTEGER", "nullable": True},
+                        {"column_name": "coupon_code", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"plan_name": "Silver Archive Plus", "plan_code": "PLAN-77", "monthly_fee": "14.95"},
+        },
+        {
+            "sample_id": "stage7c_a5_primary_english_005",
+            "coverage_tags": ["single_table", "4_assigned_columns", "many_nullable_columns", "true_omit", "three_word_value", "real", "percent", "hex_identifier"],
+            "question": 'Record weather station "Cedar Ridge Outpost", station_id 0xA5C0DE, temperature 19.6, humidity 72%. Leave operator, alert_code, and maintenance_note blank.',
+            "selected_table": "weather_stations",
+            "tables": [
+                {
+                    "table_name": "weather_stations",
+                    "columns": [
+                        {"column_name": "station_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "station_id", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "temperature_c", "source_type": "REAL", "nullable": False},
+                        {"column_name": "humidity_text", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "operator", "source_type": "TEXT", "nullable": True},
+                        {"column_name": "alert_code", "source_type": "TEXT", "nullable": True},
+                        {"column_name": "maintenance_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"station_name": "Cedar Ridge Outpost", "station_id": "0xA5C0DE", "temperature_c": "19.6", "humidity_text": "72%"},
+        },
+        {
+            "sample_id": "stage7c_a5_primary_english_006",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "quoted_multiword", "real", "integer", "text_numeric_mix"],
+            "question": 'Open warehouse bin BIN-A17 on aisle 6 with capacity 240.5 and stored_item "copper rivets". Reorder flag not set.',
+            "selected_table": "warehouse_bins",
+            "tables": [
+                {
+                    "table_name": "warehouse_bins",
+                    "columns": [
+                        {"column_name": "bin_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "aisle", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "capacity", "source_type": "REAL", "nullable": False},
+                        {"column_name": "stored_item", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "reorder_flag", "source_type": "INTEGER", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"bin_code": "BIN-A17", "aisle": "6", "capacity": "240.5", "stored_item": "copper rivets"},
+        },
+        {
+            "sample_id": "stage7c_a5_primary_english_007",
+            "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "quoted_multiword", "email", "integer"],
+            "question": 'Register conference attendee "Leah Morton", badge_email leah.morton@conf.example, track "data systems", paid 2, seat A-14. Dietary note missing.',
+            "selected_table": "conference_registrations",
+            "tables": [
+                {
+                    "table_name": "conference_registrations",
+                    "columns": [
+                        {"column_name": "attendee_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "badge_email", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "track", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "paid", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "seat", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "dietary_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"attendee_name": "Leah Morton", "badge_email": "leah.morton@conf.example", "track": "data systems", "paid": "2", "seat": "A-14"},
+        },
+        {
+            "sample_id": "stage7c_a5_primary_english_008",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "quoted_multiword", "integer"],
+            "question": 'Create flight segment FL-390 from origin "Da Nang" to destination "Seoul", duration_minutes 285, gate C7. Delay reason omitted.',
+            "selected_table": "flight_segments",
+            "tables": [
+                {
+                    "table_name": "flight_segments",
+                    "columns": [
+                        {"column_name": "flight_no", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "origin", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "destination", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "duration_minutes", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "gate", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "delay_reason", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"flight_no": "FL-390", "origin": "Da Nang", "destination": "Seoul", "duration_minutes": "285", "gate": "C7"},
+        },
+        {
+            "sample_id": "stage7c_a5_primary_english_009",
+            "coverage_tags": ["multi_table", "oneOf", "4_assigned_columns", "true_omit", "quoted_multiword", "real"],
+            "question": 'Use the specimens table: insert specimen_code SPEC-019, tissue "maple leaf", mass 0.42, freezer_slot FZ-3. Analysis note is absent.',
+            "selected_table": "specimens",
+            "tables": [
+                {
+                    "table_name": "researchers",
+                    "columns": [
+                        {"column_name": "researcher_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "researcher_name", "source_type": "TEXT", "nullable": False},
+                    ],
+                },
+                {
+                    "table_name": "specimens",
+                    "columns": [
+                        {"column_name": "specimen_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "tissue", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "mass_g", "source_type": "REAL", "nullable": False},
+                        {"column_name": "freezer_slot", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "analysis_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                },
+            ],
+            "assigned_values": {"specimen_code": "SPEC-019", "tissue": "maple leaf", "mass_g": "0.42", "freezer_slot": "FZ-3"},
+        },
+        {
+            "sample_id": "stage7c_a5_primary_english_010",
+            "coverage_tags": ["multi_table", "oneOf", "4_assigned_columns", "true_omit", "identifier", "real", "date"],
+            "question": 'For the permits table, insert permit_no BP-2027-18, parcel LOT-88A, fee 315.25, issued_on 2026-11-04. Inspector initials are not supplied.',
+            "selected_table": "permits",
+            "tables": [
+                {
+                    "table_name": "contractors",
+                    "columns": [
+                        {"column_name": "contractor_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "company_name", "source_type": "TEXT", "nullable": False},
+                    ],
+                },
+                {
+                    "table_name": "permits",
+                    "columns": [
+                        {"column_name": "permit_no", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "parcel", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "fee", "source_type": "REAL", "nullable": False},
+                        {"column_name": "issued_on", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "inspector_initials", "source_type": "TEXT", "nullable": True},
+                    ],
+                },
+            ],
+            "assigned_values": {"permit_no": "BP-2027-18", "parcel": "LOT-88A", "fee": "315.25", "issued_on": "2026-11-04"},
+        },
+        {
+            "sample_id": "stage7c_a5_primary_english_011",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "overlapping_candidates", "quoted_multiword", "integer"],
+            "question": 'Add music release "Glass Harbor", artist "Glass", track_count 11, label "Northline". Region omitted.',
+            "selected_table": "music_releases",
+            "tables": [
+                {
+                    "table_name": "music_releases",
+                    "columns": [
+                        {"column_name": "release_title", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "artist_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "track_count", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "label", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "region", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"release_title": "Glass Harbor", "artist_name": "Glass", "track_count": "11", "label": "Northline"},
+        },
+        {
+            "sample_id": "stage7c_a5_primary_english_012",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "quoted_multiword", "real", "integer"],
+            "question": 'Insert rental RENT_504 for asset "thermal camera", days 8, deposit 300.00, pickup_window "morning". Return slot blank.',
+            "selected_table": "equipment_rentals",
+            "tables": [
+                {
+                    "table_name": "equipment_rentals",
+                    "columns": [
+                        {"column_name": "rental_id", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "asset", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "days", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "deposit", "source_type": "REAL", "nullable": False},
+                        {"column_name": "pickup_window", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "return_slot", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"rental_id": "RENT_504", "asset": "thermal camera", "days": "8", "deposit": "300.00", "pickup_window": "morning"},
+        },
+    ]
+
+
+def diagnostic_case_definitions() -> list[dict[str, Any]]:
+    return _a4_derived_diagnostic_case_definitions()
 
 
 def table_ref_map(case: dict[str, Any]) -> dict[str, str]:
@@ -705,6 +970,7 @@ def output_spec() -> dict[str, Any]:
         "allowed_top_level_keys": ["operation", "table_ref", "column_span_refs"],
         "forbidden_top_level_keys": ["span_refs", "value_spans", "start_char", "end_char", "values", "assignments", "slot_refs", "phase_m"],
         "column_span_refs_contract": "Every selected table column key is required and maps to exactly one current SPAN ref or OMIT.",
+        "non_omit_span_refs_unique_across_columns": True,
         "omit_token": "OMIT",
         "model_called": False,
         "gpu_called": False,
@@ -788,9 +1054,25 @@ def failure_policy() -> dict[str, Any]:
         "omit_meaning": "The request gives no literal value for this column; SQLite NULL/default/autoincrement behavior is left to deterministic compilation/preflight.",
         "omit_allowed_for_candidate_miss": False,
         "candidate_miss_is_method_failure": True,
+        "duplicate_span_reuse_is_method_failure": True,
         "may_exclude_sample_for_candidate_miss": False,
         "pilot_dev_test_denominator_locked": True,
         "type_based_candidate_pruning_enabled": False,
+        "model_called": False,
+        "gpu_called": False,
+    }
+
+
+def evaluator_semantics() -> dict[str, Any]:
+    return {
+        "stage": STAGE_NAME,
+        "patch": PATCH_NAME,
+        "column_span_refs_mapping_equality": "order_insensitive_by_object_key",
+        "json_object_key_order_has_semantics": False,
+        "span_reuse_rule": "Each non-OMIT SPAN reference may be used for at most one column.",
+        "duplicate_span_reuse_outcome": "method_failure",
+        "primary_acceptance_precedes_diagnostics": True,
+        "diagnostic_cases_can_never_compensate_primary_failures": True,
         "model_called": False,
         "gpu_called": False,
     }
@@ -801,7 +1083,7 @@ def acceptance_policy() -> dict[str, Any]:
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
         "synthetic_feasibility_gate": {
-            "sample_set": "12 fresh English A5 column-conditioned cases",
+            "sample_set": "12 genuinely new English A5 primary column-conditioned cases",
             "required_pass_count": "12/12",
             "averaging_allowed": False,
             "eleven_of_twelve_allowed": False,
@@ -818,8 +1100,64 @@ def acceptance_policy() -> dict[str, Any]:
                 "canonical target state exact",
             ],
         },
+        "diagnostic_gate": {
+            "sample_set": "12 A4-derived regression diagnostics",
+            "required_pass_count": "12/12",
+            "role": "diagnostic_only_after_primary",
+            "can_compensate_primary_failure": False,
+        },
         "before_stage7e0_a5": "A protocol-compliant column-conditioned oracle path must pass all fresh cases.",
         "gretel_pilot_opened": False,
+        "model_called": False,
+        "gpu_called": False,
+    }
+
+
+def primary_independence_audit(primary_cases: list[dict[str, Any]], diagnostic_cases: list[dict[str, Any]]) -> dict[str, Any]:
+    diagnostic_questions = {case["sample_id"]: case["question"] for case in diagnostic_cases}
+    diagnostic_literals = {
+        literal
+        for case in diagnostic_cases
+        for literal in case["assigned_values"].values()
+    }
+    rows = []
+    exact_literal_overlap_count = 0
+    max_similarity = 0.0
+    for case in primary_cases:
+        literals = set(case["assigned_values"].values())
+        overlaps = sorted(literals & diagnostic_literals)
+        similarities = [
+            {
+                "diagnostic_sample_id": diagnostic_id,
+                "sequence_similarity": difflib.SequenceMatcher(None, case["question"], diagnostic_question).ratio(),
+            }
+            for diagnostic_id, diagnostic_question in diagnostic_questions.items()
+        ]
+        nearest = max(similarities, key=lambda item: item["sequence_similarity"])
+        max_similarity = max(max_similarity, float(nearest["sequence_similarity"]))
+        if overlaps:
+            exact_literal_overlap_count += 1
+        rows.append(
+            {
+                "sample_id": case["sample_id"],
+                "exact_literal_overlaps_with_a4_derived_diagnostics": overlaps,
+                "nearest_a4_derived_question": nearest["diagnostic_sample_id"],
+                "nearest_question_sequence_similarity": nearest["sequence_similarity"],
+                "passes_independence_gate": not overlaps and nearest["sequence_similarity"] < 0.60,
+            }
+        )
+    failures = [row["sample_id"] for row in rows if not row["passes_independence_gate"]]
+    return {
+        "stage": STAGE_NAME,
+        "patch": PATCH_NAME,
+        "primary_case_count": len(primary_cases),
+        "a4_derived_diagnostic_case_count": len(diagnostic_cases),
+        "exact_literal_overlap_case_count": exact_literal_overlap_count,
+        "max_nearest_question_sequence_similarity": max_similarity,
+        "similarity_threshold": 0.60,
+        "status": "PASS" if not failures else "FAIL",
+        "failures": failures,
+        "per_primary_case": rows,
         "model_called": False,
         "gpu_called": False,
     }
@@ -897,6 +1235,13 @@ def prompt_token_audit(rows: list[dict[str, Any]], tokenizer_name_or_path: str |
         "patch": PATCH_NAME,
         "tokenizer_target": QWEN_TOKENIZER_ID,
         "tokenizer_revision_target": QWEN_TOKENIZER_REVISION,
+        "chat_template_sha256": sha256_text(str(getattr(tokenizer, "chat_template", ""))) if tokenizer is not None else None,
+        "chat_template_required_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+        "chat_template_hash_matches_required": (
+            sha256_text(str(getattr(tokenizer, "chat_template", ""))) == "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f"
+            if tokenizer is not None
+            else None
+        ),
         "fresh_case_count": len(rows),
         "rendered_prompt_char_stats": _stats(char_counts),
         "rendered_prompt_token_stats": _stats(token_counts) if token_counts else None,
@@ -1100,19 +1445,23 @@ Review order:
 4. `{STAGE_NAME}/TARGET_TABLE_BRANCHING_PROTOCOL_A5.json`
 5. `{STAGE_NAME}/NO_PHASE_M_PRIMARY_PIPELINE_SPEC_A5.json`
 6. `{STAGE_NAME}/COLUMN_CONDITIONED_SERIALIZATION_FREEZE.json`
-7. `{STAGE_NAME}/FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl`
-8. `{STAGE_NAME}/ORACLE_COLUMN_CONDITIONED_PATH_RESULTS.jsonl`
-9. `{STAGE_NAME}/ACCEPTANCE_POLICY_A5.json`
-10. `{STAGE_NAME}/OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A5.json`
-11. `{STAGE_NAME}/SOURCE_INPUT_MANIFEST.json`
-12. `{STAGE_NAME}/SYNTHETIC_SQLITE_DB_MANIFEST.jsonl`
-13. `{STAGE_NAME}/PACKAGE_FILE_INTEGRITY_MANIFEST.json`
-14. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
-15. `{STAGE_NAME}/STAGE7C_A5_LOCK.json`
-16. `{STAGE_NAME}/VALIDATION_REPORT.md`
-17. `scripts/data/build_stage7c_a5_column_conditioned_phase_o_protocol.py`
-18. `scripts/data/validate_stage7c_a5_column_conditioned_phase_o_protocol.py`
-19. `tests/test_stage7c_a5_column_conditioned_phase_o_protocol.py`
+7. `{STAGE_NAME}/FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl`
+8. `{STAGE_NAME}/A4_DERIVED_REGRESSION_DIAGNOSTICS_A5.jsonl`
+9. `{STAGE_NAME}/ORACLE_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl`
+10. `{STAGE_NAME}/ORACLE_A4_DERIVED_DIAGNOSTIC_RESULTS.jsonl`
+11. `{STAGE_NAME}/A5_PRIMARY_INDEPENDENCE_AUDIT.json`
+12. `{STAGE_NAME}/EVALUATOR_SEMANTICS_A5.json`
+13. `{STAGE_NAME}/ACCEPTANCE_POLICY_A5.json`
+14. `{STAGE_NAME}/OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A5.json`
+15. `{STAGE_NAME}/SOURCE_INPUT_MANIFEST.json`
+16. `{STAGE_NAME}/SYNTHETIC_SQLITE_DB_MANIFEST.jsonl`
+17. `{STAGE_NAME}/PACKAGE_FILE_INTEGRITY_MANIFEST.json`
+18. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
+19. `{STAGE_NAME}/STAGE7C_A5_LOCK.json`
+20. `{STAGE_NAME}/VALIDATION_REPORT.md`
+21. `scripts/data/build_stage7c_a5_column_conditioned_phase_o_protocol.py`
+22. `scripts/data/validate_stage7c_a5_column_conditioned_phase_o_protocol.py`
+23. `tests/test_stage7c_a5_column_conditioned_phase_o_protocol.py`
 
 Clean extraction commands:
 
@@ -1121,7 +1470,9 @@ python scripts/data/validate_stage7c_a5_column_conditioned_phase_o_protocol.py \
   --stage-dir {STAGE_NAME}
 python scripts/data/validate_stage7c_a5_column_conditioned_phase_o_protocol.py \\
   --stage-dir {STAGE_NAME} \\
-  --rebuild
+  --rebuild \\
+  --tokenizer-name-or-path {QWEN_TOKENIZER_ID} \\
+  --tokenizer-revision {QWEN_TOKENIZER_REVISION}
 python -m pytest -q tests/test_stage7c_a5_column_conditioned_phase_o_protocol.py
 ```
 
@@ -1158,11 +1509,15 @@ def build_stage(
     write_json(out_dir / "TARGET_TABLE_BRANCHING_PROTOCOL_A5.json", branching_protocol())
     write_json(out_dir / "NO_PHASE_M_PRIMARY_PIPELINE_SPEC_A5.json", no_phase_m_spec())
     write_json(out_dir / "OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A5.json", failure_policy())
+    write_json(out_dir / "EVALUATOR_SEMANTICS_A5.json", evaluator_semantics())
     write_json(out_dir / "ACCEPTANCE_POLICY_A5.json", acceptance_policy())
+    write_json(out_dir / "A5_PRIMARY_INDEPENDENCE_AUDIT.json", primary_independence_audit(case_definitions(), diagnostic_case_definitions()))
 
     rows = []
+    diagnostic_rows = []
     db_manifest = []
     oracle_results = []
+    diagnostic_oracle_results = []
     for case in case_definitions():
         db_info = create_case_db(case, db_dir)
         row = smoke_row(case, db_info)
@@ -1173,9 +1528,22 @@ def build_stage(
         rows.append(row)
         db_manifest.append({**db_info, "source_tables": case["tables"]})
         oracle_results.append(oracle)
+    for case in diagnostic_case_definitions():
+        db_info = create_case_db(case, db_dir)
+        row = smoke_row(case, db_info)
+        row["diagnostic_role"] = "diagnostic_only_after_primary"
+        oracle = oracle_column_conditioned_path(row, out_dir / db_info["sqlite_db_path"])
+        row["label_side_expected"]["resolved_column_span_oracle"] = oracle["resolved_column_spans"]
+        row["label_side_expected"]["deterministic_ir_oracle"] = oracle["deterministic_ir"]
+        row["label_side_expected"]["target_state"]["compiler_observed_target_state_hash"] = oracle["observed_target_state_hash"]
+        diagnostic_rows.append(row)
+        db_manifest.append({**db_info, "source_tables": case["tables"], "diagnostic_role": "diagnostic_only_after_primary"})
+        diagnostic_oracle_results.append(oracle)
 
-    write_jsonl(out_dir / "FRESH_ENGLISH_A5_COLUMN_CONDITIONED_FEASIBILITY_SET.jsonl", rows)
-    write_jsonl(out_dir / "ORACLE_COLUMN_CONDITIONED_PATH_RESULTS.jsonl", oracle_results)
+    write_jsonl(out_dir / "FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl", rows)
+    write_jsonl(out_dir / "A4_DERIVED_REGRESSION_DIAGNOSTICS_A5.jsonl", diagnostic_rows)
+    write_jsonl(out_dir / "ORACLE_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl", oracle_results)
+    write_jsonl(out_dir / "ORACLE_A4_DERIVED_DIAGNOSTIC_RESULTS.jsonl", diagnostic_oracle_results)
     write_jsonl(out_dir / "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl", db_manifest)
     token_audit = prompt_token_audit(rows, tokenizer_name_or_path, tokenizer_revision)
     write_json(out_dir / "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json", token_audit)
@@ -1185,6 +1553,8 @@ def build_stage(
     assigned_count = sum(sum(1 for value in row["label_side_expected"]["phase_o"]["column_span_refs"].values() if value != "OMIT") for row in rows)
     omit_count = sum(sum(1 for value in row["label_side_expected"]["phase_o"]["column_span_refs"].values() if value == "OMIT") for row in rows)
     multi_table_count = sum(1 for row in rows if row["runtime_constraints"]["schema_table_count"] > 1)
+    diagnostic_assigned_count = sum(sum(1 for value in row["label_side_expected"]["phase_o"]["column_span_refs"].values() if value != "OMIT") for row in diagnostic_rows)
+    diagnostic_omit_count = sum(sum(1 for value in row["label_side_expected"]["phase_o"]["column_span_refs"].values() if value == "OMIT") for row in diagnostic_rows)
     lock = {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
@@ -1200,6 +1570,12 @@ def build_stage(
         "multi_table_oneof_case_count": multi_table_count,
         "oracle_preflight_admitted_count": sum(1 for item in oracle_results if item["preflight"] == "ADMITTED"),
         "canonical_target_state_exact_count": sum(1 for item in oracle_results if item["canonical_target_state_exact"]),
+        "a4_derived_regression_diagnostic_count": len(diagnostic_rows),
+        "diagnostic_assigned_column_decision_count": diagnostic_assigned_count,
+        "diagnostic_omit_column_decision_count": diagnostic_omit_count,
+        "diagnostic_oracle_preflight_admitted_count": sum(1 for item in diagnostic_oracle_results if item["preflight"] == "ADMITTED"),
+        "primary_acceptance_precedes_diagnostics": True,
+        "diagnostics_can_compensate_primary_failure": False,
         "phase_m_primary_pipeline_removed": True,
         "model_generates_phase_m": False,
         "model_generates_slot_refs": False,
@@ -1207,8 +1583,12 @@ def build_stage(
         "multi_table_oneof_required": True,
         "candidate_miss_is_method_failure": True,
         "candidate_miss_can_exclude_samples": False,
+        "duplicate_span_reuse_is_method_failure": True,
+        "column_span_refs_mapping_equality": "order_insensitive_by_object_key",
         "type_based_candidate_pruning_enabled": False,
         "tokenizer_status": token_audit["tokenizer_status"],
+        "chat_template_sha256": token_audit["chat_template_sha256"],
+        "chat_template_hash_matches_required": token_audit["chat_template_hash_matches_required"],
         "model_called": False,
         "gpu_called": False,
         "gretel_pilot_opened": False,
@@ -1217,7 +1597,10 @@ def build_stage(
         "derived_artifact_manifest_sha256": sha256_file(out_dir / "DERIVED_ARTIFACT_MANIFEST.json"),
     }
     write_json(out_dir / "STAGE7C_A5_LOCK.json", lock)
-    write_text(out_dir / "VALIDATION_REPORT.md", validation_report(len(rows), assigned_count, omit_count, multi_table_count, token_audit))
+    write_text(out_dir / "VALIDATION_REPORT.md", validation_report(len(rows), assigned_count, omit_count, multi_table_count, token_audit).replace(
+        "Candidate-generator miss is a method failure, not OMIT, and may not exclude a\nsample from pilot/dev/test denominators.\n",
+        f"Candidate-generator miss is a method failure, not OMIT, and may not exclude a\nsample from pilot/dev/test denominators. Diagnostics are run after primary and cannot compensate primary failures.\n\n```text\na4_derived_regression_diagnostics={len(diagnostic_rows)}\ndiagnostic_oracle_preflight={sum(1 for item in diagnostic_oracle_results if item['preflight'] == 'ADMITTED')}/{len(diagnostic_rows)} ADMITTED\ncolumn_span_refs_mapping_equality=order_insensitive_by_object_key\nduplicate_span_reuse_is_method_failure=true\n```\n",
+    ))
     write_text(out_dir / "REVIEWER_README.md", reviewer_readme(out_dir))
     return {
         "stage": STAGE_NAME,
@@ -1228,6 +1611,9 @@ def build_stage(
         "omit_column_decision_count": omit_count,
         "multi_table_oneof_case_count": multi_table_count,
         "oracle_preflight_admitted_count": lock["oracle_preflight_admitted_count"],
+        "a4_derived_regression_diagnostic_count": len(diagnostic_rows),
+        "diagnostic_oracle_preflight_admitted_count": lock["diagnostic_oracle_preflight_admitted_count"],
+        "tokenizer_status": token_audit["tokenizer_status"],
         "model_called": False,
         "gpu_called": False,
     }

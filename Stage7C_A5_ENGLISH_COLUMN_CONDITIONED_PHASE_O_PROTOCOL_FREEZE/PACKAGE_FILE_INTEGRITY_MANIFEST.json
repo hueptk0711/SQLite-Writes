@@ -1,10 +1,10 @@
 {
-  "combined_sqlite_binary_artifacts_sha256": "8ca88be6eafe00f83ecac26107cc4a15a201d8b52bf0e40b84e42768d86951fd",
+  "combined_sqlite_binary_artifacts_sha256": "71e20576f56513ccaa23ac029a0c8fca97ce7ecb233ea8371d208b6149fc812b",
   "gpu_called": false,
   "identity_scope": "physical_package_file_integrity_not_cross_environment_scientific_rebuild",
   "model_called": false,
-  "patch": "PATCH0",
-  "sqlite_binary_artifact_count": 12,
+  "patch": "PATCH1",
+  "sqlite_binary_artifact_count": 24,
   "sqlite_binary_artifacts": [
     {
       "bytes": 8192,
@@ -77,6 +77,78 @@
       "integrity_scope": "package_file_tamper_detection_only",
       "path": "sqlite_dbs/stage7c_a5_fresh_english_012.sqlite",
       "sqlite_binary_file_sha256": "490dfde2d84f59b9142d555d53449de08eacf34b8b308ee5f7217079d2a7daa1"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_primary_english_001.sqlite",
+      "sqlite_binary_file_sha256": "f8257a7948b84c5b516cde20b854f9d4925e45769f3189a854c9f3a12671c510"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_primary_english_002.sqlite",
+      "sqlite_binary_file_sha256": "451f3675493a33c2788a17f0290942eeb78f74668b465ff0cd9b7d8d93a74ac5"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_primary_english_003.sqlite",
+      "sqlite_binary_file_sha256": "46bf580000c711ce779c9ec7cdaba73cf79168748b5a667f776e36e01eb7264e"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_primary_english_004.sqlite",
+      "sqlite_binary_file_sha256": "23b2ab8145e32d342c46eb5502d23b1a4d5e5cca5e21af4498b7d2c16e78cbf8"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_primary_english_005.sqlite",
+      "sqlite_binary_file_sha256": "5662bbbea6a93d1c3d6ce2a3dbc835a8523529a53da6c10684b1ed7fa76e8cf4"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_primary_english_006.sqlite",
+      "sqlite_binary_file_sha256": "ac3feda60f98f4d0d31a71e25a844ddbc33fdb78c5ec5fe91ff14add73fbf58c"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_primary_english_007.sqlite",
+      "sqlite_binary_file_sha256": "04b617465b098aba248e21c939e80e1d565056627ab4dfa1e41d0abbaa735a73"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_primary_english_008.sqlite",
+      "sqlite_binary_file_sha256": "6cae5524b0dab95dca73675141a2bf12185d92fab51174f2302d97d739729bc1"
+    },
+    {
+      "bytes": 12288,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_primary_english_009.sqlite",
+      "sqlite_binary_file_sha256": "f255e5874d7d80c9ed61bbfb813cc340365a7d4aaa66d7e489958d1cfbe77ac9"
+    },
+    {
+      "bytes": 12288,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_primary_english_010.sqlite",
+      "sqlite_binary_file_sha256": "02ff704959fe7a0ea29f8a18ee732d30f05a0fe1f050f2efb10e750c0875f576"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_primary_english_011.sqlite",
+      "sqlite_binary_file_sha256": "e710b8bfe805625529e3d1bf018d9b71d455fc5aa0628580ae6e7a4ec3fa98e2"
+    },
+    {
+      "bytes": 8192,
+      "integrity_scope": "package_file_tamper_detection_only",
+      "path": "sqlite_dbs/stage7c_a5_primary_english_012.sqlite",
+      "sqlite_binary_file_sha256": "b48199443c6934190f0bd04ad33b017d092fc09644499a65f548252cfac9abda"
     }
   ],
   "stage": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE"

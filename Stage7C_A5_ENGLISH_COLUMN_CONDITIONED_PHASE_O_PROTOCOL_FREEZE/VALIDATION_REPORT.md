@@ -25,8 +25,8 @@ type_based_candidate_pruning_enabled=false
 
 ```text
 fresh_cases=12
-assigned_column_decisions=47
-omit_column_decisions=14
+assigned_column_decisions=52
+omit_column_decisions=15
 multi_table_oneof_cases=2
 oracle_preflight=12/12 ADMITTED
 canonical_target_state=12/12 exact
@@ -35,17 +35,24 @@ canonical_target_state=12/12 exact
 ## Full Prompt Token Burden
 
 ```text
-tokenizer_status=NOT_RUN
-tokenizer=None
+tokenizer_status=PASS
+tokenizer=Qwen/Qwen2.5-Coder-7B-Instruct
 tokenizer_revision=c03e6d358207e414f1eca0bb1891e29f1db0e242
-rendered_prompt_chars_median=2948.5
-rendered_prompt_chars_p95=3329
-rendered_prompt_tokens_median=None
-rendered_prompt_tokens_p95=None
-rendered_prompt_tokens_max=None
+rendered_prompt_chars_median=3252.0
+rendered_prompt_chars_p95=3681
+rendered_prompt_tokens_median=1100.5
+rendered_prompt_tokens_p95=1322
+rendered_prompt_tokens_max=1336
 ```
 
 ## Locked Failure Policy
 
 Candidate-generator miss is a method failure, not OMIT, and may not exclude a
-sample from pilot/dev/test denominators.
+sample from pilot/dev/test denominators. Diagnostics are run after primary and cannot compensate primary failures.
+
+```text
+a4_derived_regression_diagnostics=12
+diagnostic_oracle_preflight=12/12 ADMITTED
+column_span_refs_mapping_equality=order_insensitive_by_object_key
+duplicate_span_reuse_is_method_failure=true
+```

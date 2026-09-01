@@ -1,9 +1,15 @@
 {
   "before_stage7e0_a5": "A protocol-compliant column-conditioned oracle path must pass all fresh cases.",
+  "diagnostic_gate": {
+    "can_compensate_primary_failure": false,
+    "required_pass_count": "12/12",
+    "role": "diagnostic_only_after_primary",
+    "sample_set": "12 A4-derived regression diagnostics"
+  },
   "gpu_called": false,
   "gretel_pilot_opened": false,
   "model_called": false,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "stage": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE",
   "synthetic_feasibility_gate": {
     "averaging_allowed": false,
@@ -21,6 +27,6 @@
     ],
     "eleven_of_twelve_allowed": false,
     "required_pass_count": "12/12",
-    "sample_set": "12 fresh English A5 column-conditioned cases"
+    "sample_set": "12 genuinely new English A5 primary column-conditioned cases"
   }
 }

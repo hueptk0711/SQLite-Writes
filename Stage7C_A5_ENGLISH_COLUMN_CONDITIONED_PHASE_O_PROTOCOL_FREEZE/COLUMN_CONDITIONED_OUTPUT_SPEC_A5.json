@@ -26,7 +26,8 @@
   ],
   "gpu_called": false,
   "model_called": false,
+  "non_omit_span_refs_unique_across_columns": true,
   "omit_token": "OMIT",
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "stage": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE"
 }

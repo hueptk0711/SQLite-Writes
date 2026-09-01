@@ -1,143 +1,152 @@
 {
+  "chat_template_hash_matches_required": true,
+  "chat_template_required_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+  "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
   "fresh_case_count": 12,
   "gpu_called": false,
   "model_called": false,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "per_sample": [
     {
-      "candidate_count": 41,
-      "candidate_inventory_chars": 1414,
-      "message_sha256": "970618bc90c37e19612f2631cf9c6e95e5bf07d5227898ac8e1612babe083299",
-      "rendered_prompt_chars": 2852,
-      "rendered_prompt_tokens": null,
-      "sample_id": "stage7c_a5_fresh_english_001",
+      "candidate_count": 59,
+      "candidate_inventory_chars": 2037,
+      "message_sha256": "1693b67ca7d59acededfb4f4f3672076f568fd3a3a09e34d816426a662538af8",
+      "rendered_prompt_chars": 3681,
+      "rendered_prompt_tokens": 1336,
+      "sample_id": "stage7c_a5_primary_english_001",
       "system_chars": 117,
-      "user_chars": 2533
-    },
-    {
-      "candidate_count": 47,
-      "candidate_inventory_chars": 1547,
-      "message_sha256": "4d70f2057bc869bce77a3850b23b8c24257de737659fc5587d7fc7ef560806b8",
-      "rendered_prompt_chars": 2996,
-      "rendered_prompt_tokens": null,
-      "sample_id": "stage7c_a5_fresh_english_002",
-      "system_chars": 117,
-      "user_chars": 2671
+      "user_chars": 3331
     },
     {
       "candidate_count": 43,
-      "candidate_inventory_chars": 1467,
-      "message_sha256": "39d0dbdd8510bb97862937463b9defa87ca44906061ebe71070752875c24ac43",
-      "rendered_prompt_chars": 2921,
-      "rendered_prompt_tokens": null,
-      "sample_id": "stage7c_a5_fresh_english_003",
+      "candidate_inventory_chars": 1554,
+      "message_sha256": "7ba88b1133a7565d9c851c8f5fd8811bda210882022ca636806e799f86a43b79",
+      "rendered_prompt_chars": 3103,
+      "rendered_prompt_tokens": 1059,
+      "sample_id": "stage7c_a5_primary_english_002",
       "system_chars": 117,
-      "user_chars": 2600
+      "user_chars": 2781
     },
     {
-      "candidate_count": 46,
-      "candidate_inventory_chars": 1615,
-      "message_sha256": "2040fefda2b1884eef79266a08cd407e1d046a8ff90cbf62a143e6098af792fd",
-      "rendered_prompt_chars": 3104,
-      "rendered_prompt_tokens": null,
-      "sample_id": "stage7c_a5_fresh_english_004",
+      "candidate_count": 48,
+      "candidate_inventory_chars": 1606,
+      "message_sha256": "325a0f789256bd06a007897a515bfd4053b1a967bac3cee426590d40db4d5ba8",
+      "rendered_prompt_chars": 3200,
+      "rendered_prompt_tokens": 1148,
+      "sample_id": "stage7c_a5_primary_english_003",
       "system_chars": 117,
-      "user_chars": 2762
+      "user_chars": 2869
     },
     {
-      "candidate_count": 37,
-      "candidate_inventory_chars": 1362,
-      "message_sha256": "dd849d2698eb9db39d8577f4ad8840daccf52e5950c9fff8907ac9bada4110f1",
-      "rendered_prompt_chars": 2749,
-      "rendered_prompt_tokens": null,
-      "sample_id": "stage7c_a5_fresh_english_005",
+      "candidate_count": 45,
+      "candidate_inventory_chars": 1564,
+      "message_sha256": "83556d817a63f105b7696ed5fb9566ccf3256505fcc91ce9bcd8f7627a32701b",
+      "rendered_prompt_chars": 3107,
+      "rendered_prompt_tokens": 1022,
+      "sample_id": "stage7c_a5_primary_english_004",
       "system_chars": 117,
-      "user_chars": 2446
+      "user_chars": 2783
+    },
+    {
+      "candidate_count": 56,
+      "candidate_inventory_chars": 2002,
+      "message_sha256": "12ca51b35429855b9fbc17cc2351b0ed02348f27984c9171f2f2895b1620394f",
+      "rendered_prompt_chars": 3739,
+      "rendered_prompt_tokens": 1257,
+      "sample_id": "stage7c_a5_primary_english_005",
+      "system_chars": 117,
+      "user_chars": 3380
     },
     {
       "candidate_count": 41,
-      "candidate_inventory_chars": 1342,
-      "message_sha256": "1577444d2876146a61a1514b90e753ada027f1e5e1fb4db1567302a05f686658",
-      "rendered_prompt_chars": 2766,
-      "rendered_prompt_tokens": null,
-      "sample_id": "stage7c_a5_fresh_english_006",
+      "candidate_inventory_chars": 1350,
+      "message_sha256": "a85cb792c1657719ae106e59c8c7d2d421c9788eb9704cbc9e956916d31210f6",
+      "rendered_prompt_chars": 2878,
+      "rendered_prompt_tokens": 957,
+      "sample_id": "stage7c_a5_primary_english_006",
       "system_chars": 117,
-      "user_chars": 2447
+      "user_chars": 2558
     },
     {
-      "candidate_count": 41,
-      "candidate_inventory_chars": 1414,
-      "message_sha256": "36bffb9adad4138481ad0b1389337a2a32efb19194beaeb210e08b127c211a21",
-      "rendered_prompt_chars": 2865,
-      "rendered_prompt_tokens": null,
-      "sample_id": "stage7c_a5_fresh_english_007",
+      "candidate_count": 48,
+      "candidate_inventory_chars": 1725,
+      "message_sha256": "45eddb4da971ac269ac9de017145be98453450811636333cb4b0036828b207d7",
+      "rendered_prompt_chars": 3371,
+      "rendered_prompt_tokens": 1101,
+      "sample_id": "stage7c_a5_primary_english_007",
       "system_chars": 117,
-      "user_chars": 2554
+      "user_chars": 3024
+    },
+    {
+      "candidate_count": 49,
+      "candidate_inventory_chars": 1672,
+      "message_sha256": "c339141faec28d54734d968b3d18bd9725871d0602a83746fd6d359612cf244e",
+      "rendered_prompt_chars": 3304,
+      "rendered_prompt_tokens": 1100,
+      "sample_id": "stage7c_a5_primary_english_008",
+      "system_chars": 117,
+      "user_chars": 2954
     },
     {
       "candidate_count": 50,
-      "candidate_inventory_chars": 1727,
-      "message_sha256": "e7b2f23936bd074280473fca2693e8976b7c7984bf2635a8124c5ec272fb2a17",
-      "rendered_prompt_chars": 3329,
-      "rendered_prompt_tokens": null,
-      "sample_id": "stage7c_a5_fresh_english_008",
+      "candidate_inventory_chars": 1719,
+      "message_sha256": "8ce375e140bb790d6f2a4e25864fe8071ddb3a06dcc1e291be4a69adfdc66819",
+      "rendered_prompt_chars": 3505,
+      "rendered_prompt_tokens": 1190,
+      "sample_id": "stage7c_a5_primary_english_009",
       "system_chars": 117,
-      "user_chars": 2969
+      "user_chars": 3144
     },
     {
-      "candidate_count": 54,
-      "candidate_inventory_chars": 1823,
-      "message_sha256": "03543d4fccfee0b230955bd4c786b74393b4ca730b8ed7606b750660bb84ae93",
-      "rendered_prompt_chars": 3520,
-      "rendered_prompt_tokens": null,
-      "sample_id": "stage7c_a5_fresh_english_009",
+      "candidate_count": 53,
+      "candidate_inventory_chars": 1832,
+      "message_sha256": "a35ffd6f6a749a2c73041940a01167efb5528c8b90d3183cddf5b45ab8cf50ce",
+      "rendered_prompt_chars": 3610,
+      "rendered_prompt_tokens": 1322,
+      "sample_id": "stage7c_a5_primary_english_010",
       "system_chars": 117,
-      "user_chars": 3156
+      "user_chars": 3254
     },
     {
-      "candidate_count": 46,
-      "candidate_inventory_chars": 1564,
-      "message_sha256": "a7ddffa66fc61c809efa17b09738945e620bd57f2131189ec3fda7e6c470810b",
-      "rendered_prompt_chars": 3247,
-      "rendered_prompt_tokens": null,
-      "sample_id": "stage7c_a5_fresh_english_010",
+      "candidate_count": 38,
+      "candidate_inventory_chars": 1358,
+      "message_sha256": "09f839aea56fe1d1cd9ac0e8ec68b1a3f82f1500168b866dde397a351fa5acea",
+      "rendered_prompt_chars": 2890,
+      "rendered_prompt_tokens": 913,
+      "sample_id": "stage7c_a5_primary_english_011",
       "system_chars": 117,
-      "user_chars": 2891
-    },
-    {
-      "candidate_count": 44,
-      "candidate_inventory_chars": 1472,
-      "message_sha256": "04015bf8b2606607b46194a76af8d46af05bb14ab861c653a109fe35ec975b68",
-      "rendered_prompt_chars": 2940,
-      "rendered_prompt_tokens": null,
-      "sample_id": "stage7c_a5_fresh_english_011",
-      "system_chars": 117,
-      "user_chars": 2602
+      "user_chars": 2553
     },
     {
       "candidate_count": 44,
-      "candidate_inventory_chars": 1501,
-      "message_sha256": "4aaf72ff2aa2238bb4fbebdebaaaf3259d4c217aeb62fec0c20104388c8b251a",
-      "rendered_prompt_chars": 2957,
-      "rendered_prompt_tokens": null,
-      "sample_id": "stage7c_a5_fresh_english_012",
+      "candidate_inventory_chars": 1525,
+      "message_sha256": "d2453aca93343ff6790630b4cd1d31f2f9b59688d7cbacb931b6730c58420dc4",
+      "rendered_prompt_chars": 3136,
+      "rendered_prompt_tokens": 1052,
+      "sample_id": "stage7c_a5_primary_english_012",
       "system_chars": 117,
-      "user_chars": 2627
+      "user_chars": 2791
     }
   ],
-  "reason": "No tokenizer path/name was provided.",
   "rendered_prompt_char_stats": {
-    "max": 3520,
-    "mean": 3020.5,
-    "median": 2948.5,
-    "min": 2749,
-    "p95": 3329
+    "max": 3739,
+    "mean": 3293.6666666666665,
+    "median": 3252.0,
+    "min": 2878,
+    "p95": 3681
   },
-  "rendered_prompt_token_stats": null,
+  "rendered_prompt_token_stats": {
+    "max": 1336,
+    "mean": 1121.4166666666667,
+    "median": 1100.5,
+    "min": 913,
+    "p95": 1322
+  },
   "stage": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE",
-  "tokenizer_name_or_path": null,
+  "tokenizer_class": "Qwen2Tokenizer",
+  "tokenizer_name_or_path": "Qwen/Qwen2.5-Coder-7B-Instruct",
   "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
   "tokenizer_revision_target": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
-  "tokenizer_status": "NOT_RUN",
+  "tokenizer_status": "PASS",
   "tokenizer_target": "Qwen/Qwen2.5-Coder-7B-Instruct"
 }
