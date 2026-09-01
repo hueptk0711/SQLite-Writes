@@ -68,6 +68,27 @@ FROZEN_RUNTIME_VERSIONS = {
     "accelerate": "1.14.0",
     "safetensors": "0.5.3",
 }
+KAGGLE_T4X2_RUNTIME_VERSIONS = {
+    "torch": "2.13.0",
+    "transformers": "5.5.3",
+    "tokenizers": "0.22.2",
+    "accelerate": "1.14.0",
+    "safetensors": "0.5.3",
+}
+ALLOWED_FROZEN_RUNTIME_PROFILES = [
+    {
+        "profile_id": "uet_server_cuda124",
+        "packages": FROZEN_RUNTIME_VERSIONS,
+        "torch_cuda": "12.4",
+        "gpu_requirement": "cuda_available=true",
+    },
+    {
+        "profile_id": "kaggle_t4x2_cuda130",
+        "packages": KAGGLE_T4X2_RUNTIME_VERSIONS,
+        "torch_cuda": "13.0",
+        "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
+    },
+]
 
 
 def canonical_text(text: str) -> str:
@@ -154,19 +175,37 @@ def runtime_versions() -> dict[str, str | None]:
             versions[package] = importlib.metadata.version(package)
         except importlib.metadata.PackageNotFoundError:
             versions[package] = None
+    try:
+        import torch
+
+        versions["torch_cuda"] = str(torch.version.cuda)
+    except Exception:
+        versions["torch_cuda"] = None
     return versions
 
 
 def validate_runtime_versions(versions: dict[str, str | None] | None = None) -> dict[str, Any]:
     observed = runtime_versions() if versions is None else dict(versions)
-    mismatches = {
-        package: {"expected": expected, "observed": observed.get(package)}
-        for package, expected in FROZEN_RUNTIME_VERSIONS.items()
-        if observed.get(package) != expected
-    }
-    if mismatches:
-        raise SystemExit(f"STOP: frozen inference runtime version drift: {canonical_json(mismatches)}")
-    return {"status": "PASS", "frozen_runtime_versions": dict(FROZEN_RUNTIME_VERSIONS), "observed_runtime_versions": observed}
+    profile_mismatches: dict[str, dict[str, Any]] = {}
+    for profile in ALLOWED_FROZEN_RUNTIME_PROFILES:
+        package_mismatches = {
+            package: {"expected": expected, "observed": observed.get(package)}
+            for package, expected in profile["packages"].items()
+            if observed.get(package) != expected
+        }
+        cuda_expected = profile.get("torch_cuda")
+        if cuda_expected is not None and observed.get("torch_cuda") != cuda_expected:
+            package_mismatches["torch_cuda"] = {"expected": cuda_expected, "observed": observed.get("torch_cuda")}
+        if not package_mismatches:
+            return {
+                "status": "PASS",
+                "runtime_profile_id": profile["profile_id"],
+                "frozen_runtime_versions": dict(profile["packages"]),
+                "allowed_frozen_runtime_profiles": ALLOWED_FROZEN_RUNTIME_PROFILES,
+                "observed_runtime_versions": observed,
+            }
+        profile_mismatches[str(profile["profile_id"])] = package_mismatches
+    raise SystemExit(f"STOP: frozen inference runtime version drift: {canonical_json(profile_mismatches)}")
 
 
 def load_stage7c_a4_rows(root: Path = PROJECT_ROOT) -> list[dict[str, Any]]:
@@ -579,14 +618,19 @@ class ConstrainedTransformersChatGenerator:
             "quantization": self.quantization,
             "torch_dtype": "auto",
             "runtime_lock": self.runtime_lock,
+            "runtime_profile_id": self.runtime_lock["runtime_profile_id"],
+            "allowed_frozen_runtime_profiles": ALLOWED_FROZEN_RUNTIME_PROFILES,
             "chat_template_sha256": EXPECTED_CHAT_TEMPLATE_SHA256,
             "torch_version": torch.__version__,
+            "cuda_runtime": str(torch.version.cuda),
             "transformers_version": __import__("transformers").__version__,
             "tokenizers_version": importlib.metadata.version("tokenizers"),
             "accelerate_version": importlib.metadata.version("accelerate"),
             "safetensors_version": importlib.metadata.version("safetensors"),
             "cuda_available": bool(torch.cuda.is_available()),
             "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+            "gpu_count": int(torch.cuda.device_count()) if torch.cuda.is_available() else 0,
+            "gpu_devices": [torch.cuda.get_device_name(index) for index in range(torch.cuda.device_count())] if torch.cuda.is_available() else [],
         }
 
 

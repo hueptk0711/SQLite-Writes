@@ -1,4 +1,4 @@
-# Stage7E0-A4 English Candidate-Span Real Generation Preflight PATCH0
+# Stage7E0-A4 English Candidate-Span Real Generation Preflight PATCH2
 
 This reviewer package prepares the GPU run for the 10 locked Stage7C-A4
 candidate-span cases. It does not open Gretel, development, or official test
@@ -21,11 +21,11 @@ Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT/SERVER_RUN_COMMANDS
 Package:
 
 ```text
-Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT_PATCH1_FINAL_REVIEWER_PACKAGE_20260831.zip
+Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT_PATCH2_FINAL_REVIEWER_PACKAGE_20260901.zip
 ```
 
 Accepted protocol commit:
 
 ```text
-fe90bf2183ea5eb812367f608997150788f6ad6e
+41a54496e8d2d9b35cd2164c10c1a5ab1e12a6b8
 ```

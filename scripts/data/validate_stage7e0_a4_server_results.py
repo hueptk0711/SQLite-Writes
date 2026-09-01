@@ -29,13 +29,32 @@ EXPECTED_PROMPT_PATH = "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/PHASE
 EXPECTED_MODEL_ID = "Qwen/Qwen2.5-Coder-7B-Instruct"
 EXPECTED_MODEL_REVISION = "c03e6d358207e414f1eca0bb1891e29f1db0e242"
 EXPECTED_CHAT_TEMPLATE_SHA256 = "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f"
-FROZEN_RUNTIME_VERSIONS = {
-    "torch_version": "2.6.0+cu124",
-    "transformers_version": "5.5.3",
-    "tokenizers_version": "0.22.2",
-    "accelerate_version": "1.14.0",
-    "safetensors_version": "0.5.3",
-}
+ALLOWED_RUNTIME_PROFILES = [
+    {
+        "profile_id": "uet_server_cuda124",
+        "versions": {
+            "torch_version": ["2.6.0+cu124"],
+            "transformers_version": ["5.5.3"],
+            "tokenizers_version": ["0.22.2"],
+            "accelerate_version": ["1.14.0"],
+            "safetensors_version": ["0.5.3"],
+        },
+        "cuda_runtime": "12.4",
+    },
+    {
+        "profile_id": "kaggle_t4x2_cuda130",
+        "versions": {
+            "torch_version": ["2.13.0+cu130", "2.13.0"],
+            "transformers_version": ["5.5.3"],
+            "tokenizers_version": ["0.22.2"],
+            "accelerate_version": ["1.14.0"],
+            "safetensors_version": ["0.5.3"],
+        },
+        "cuda_runtime": "13.0",
+        "gpu_count": 2,
+        "gpu_device_substring": "Tesla T4",
+    },
+]
 REQUIRED_RESULT_FILES = {
     "primary_summary.json",
     "primary_case_results.jsonl",
@@ -124,6 +143,33 @@ def _metadata_rows(raw_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [row["generation_metadata"] for row in raw_rows if isinstance(row.get("generation_metadata"), dict)]
 
 
+def _runtime_profile_match(model: dict[str, Any]) -> tuple[str | None, dict[str, dict[str, Any]]]:
+    profile_mismatches: dict[str, dict[str, Any]] = {}
+    for profile in ALLOWED_RUNTIME_PROFILES:
+        mismatches: dict[str, Any] = {}
+        for key, allowed_values in profile["versions"].items():
+            if model.get(key) not in allowed_values:
+                mismatches[key] = {"allowed": allowed_values, "observed": model.get(key)}
+        declared_profile_id = model.get("runtime_profile_id")
+        if declared_profile_id is not None and declared_profile_id != profile["profile_id"]:
+            mismatches["runtime_profile_id"] = {"expected": profile["profile_id"], "observed": declared_profile_id}
+        cuda_runtime = profile.get("cuda_runtime")
+        if cuda_runtime is not None and model.get("cuda_runtime") != cuda_runtime:
+            mismatches["cuda_runtime"] = {"expected": cuda_runtime, "observed": model.get("cuda_runtime")}
+        gpu_count = profile.get("gpu_count")
+        if gpu_count is not None and model.get("gpu_count") != gpu_count:
+            mismatches["gpu_count"] = {"expected": gpu_count, "observed": model.get("gpu_count")}
+        gpu_device_substring = profile.get("gpu_device_substring")
+        if gpu_device_substring is not None:
+            gpu_devices = model.get("gpu_devices")
+            if not isinstance(gpu_devices, list) or len(gpu_devices) != gpu_count or any(gpu_device_substring not in str(device) for device in gpu_devices):
+                mismatches["gpu_devices"] = {"expected": f"{gpu_count} devices containing {gpu_device_substring}", "observed": gpu_devices}
+        if not mismatches:
+            return str(profile["profile_id"]), {}
+        profile_mismatches[str(profile["profile_id"])] = mismatches
+    return None, profile_mismatches
+
+
 def protocol_compliance_failures(summary: dict[str, Any], manifest: dict[str, Any], raw_o: list[dict[str, Any]], raw_m: list[dict[str, Any]]) -> list[str]:
     failures: list[str] = []
     model = manifest.get("model", {})
@@ -158,9 +204,9 @@ def protocol_compliance_failures(summary: dict[str, Any], manifest: dict[str, An
         failures.append("quantization_must_be_none")
     if model.get("torch_dtype") != "auto":
         failures.append("torch_dtype_must_be_auto")
-    for key, expected in FROZEN_RUNTIME_VERSIONS.items():
-        if model.get(key) != expected:
-            failures.append(f"runtime_{key}_must_be_{expected}")
+    runtime_profile_id, runtime_mismatches = _runtime_profile_match(model)
+    if runtime_profile_id is None:
+        failures.append(f"runtime_profile_mismatch:{json.dumps(runtime_mismatches, ensure_ascii=False, sort_keys=True)}")
     if int(summary.get("phase_o_max_new_tokens", -1)) != EXPECTED_PHASE_O_MAX_NEW_TOKENS:
         failures.append("summary_phase_o_max_new_tokens_drifted")
     if int(summary.get("phase_m_max_new_tokens", -1)) != EXPECTED_PHASE_M_MAX_NEW_TOKENS:

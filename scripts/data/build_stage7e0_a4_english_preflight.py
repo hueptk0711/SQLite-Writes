@@ -24,6 +24,7 @@ if str(SRC_ROOT) not in sys.path:
 from scripts.data.build_stage7c_a4_candidate_span_phase_o_protocol import SCIENTIFIC_ARTIFACTS as A4_SCIENTIFIC_ARTIFACTS  # noqa: E402
 from scripts.server.run_stage7e0_a4_english import (  # noqa: E402
     A4_PROMPT_SPEC_REL,
+    ALLOWED_FROZEN_RUNTIME_PROFILES,
     DEFAULT_MODEL_PATH,
     EXPECTED_CHAT_TEMPLATE_SHA256,
     EXPECTED_PRIMARY_COUNT,
@@ -47,9 +48,10 @@ from scripts.server.run_stage7e0_v2_a1_preflight import build_phase_m_constraint
 
 
 STAGE_NAME = "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT"
-PATCH_NAME = "PATCH1"
-PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260831.zip"
-FRESH_CONSTRAINED_RESULT_DIR_NAME = "stage7e0_a4_english_candidate_span_constrained_results_20260831"
+PATCH_NAME = "PATCH2"
+PACKAGE_DATE = "20260901"
+PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
+FRESH_CONSTRAINED_RESULT_DIR_NAME = "stage7e0_a4_english_candidate_span_constrained_results_20260901"
 
 
 def canonical_text(text: str) -> str:
@@ -123,6 +125,8 @@ def runner_protocol(accepted_commit: str) -> dict[str, Any]:
             "quantization_allowed": False,
             "torch_dtype": "auto",
             "frozen_runtime_versions": FROZEN_RUNTIME_VERSIONS,
+            "allowed_frozen_runtime_profiles": ALLOWED_FROZEN_RUNTIME_PROFILES,
+            "kaggle_runtime_profile_id": "kaggle_t4x2_cuda130",
         },
         "prompt_contract": {
             "phase_o_prompt_spec_path": A4_PROMPT_SPEC_REL,
@@ -212,6 +216,28 @@ Validate copied results:
 
 ```bash
 python scripts/data/validate_stage7e0_a4_server_results.py --result-dir {FRESH_CONSTRAINED_RESULT_DIR_NAME}
+```
+
+Run on Kaggle T4x2 after adding the package as a Kaggle dataset:
+
+```bash
+cd /kaggle/working
+rm -rf {STAGE_NAME}_{PATCH_NAME}_runner
+mkdir -p {STAGE_NAME}_{PATCH_NAME}_runner
+PKG_ROOT="$(find /kaggle/input -type d -name '{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_*' -print -quit)"
+cp -a "$PKG_ROOT"/. {STAGE_NAME}_{PATCH_NAME}_runner/
+cd {STAGE_NAME}_{PATCH_NAME}_runner
+export HF_HOME=/kaggle/working/hf_cache
+python scripts/data/validate_stage7e0_a4_english_preflight.py --stage-dir {STAGE_NAME}
+python scripts/server/run_stage7e0_a4_english.py \\
+  --accepted-protocol-commit {accepted_commit} \\
+  --result-root /kaggle/working/{FRESH_CONSTRAINED_RESULT_DIR_NAME} \\
+  --backend constrained_hf \\
+  --quantization none \\
+  --phase-o-max-new-tokens {PHASE_O_MAX_NEW_TOKENS} \\
+  --phase-m-max-new-tokens {PHASE_M_MAX_NEW_TOKENS} \\
+  --model-name-or-path {MODEL_ID}
+python scripts/data/validate_stage7e0_a4_server_results.py --result-dir /kaggle/working/{FRESH_CONSTRAINED_RESULT_DIR_NAME}
 ```
 """
 
@@ -316,6 +342,7 @@ repair=none
 quantization=none
 phase_o_max_new_tokens={PHASE_O_MAX_NEW_TOKENS}
 phase_m_max_new_tokens={PHASE_M_MAX_NEW_TOKENS}
+allowed_runtime_profiles={canonical_json(ALLOWED_FROZEN_RUNTIME_PROFILES)}
 gretel_pilot_opened=false
 ```
 
@@ -342,7 +369,7 @@ python -m zipfile --test {PACKAGE_NAME}
 
 
 def reviewer_readme(package_name: str, accepted_commit: str) -> str:
-    return f"""# Stage7E0-A4 English Candidate-Span Real Generation Preflight PATCH0
+    return f"""# Stage7E0-A4 English Candidate-Span Real Generation Preflight {PATCH_NAME}
 
 This reviewer package prepares the GPU run for the 10 locked Stage7C-A4
 candidate-span cases. It does not open Gretel, development, or official test
@@ -444,6 +471,8 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
         "resume_allowed": False,
         "fresh_constrained_result_root": f"/home/uet/hue_ptk/{FRESH_CONSTRAINED_RESULT_DIR_NAME}",
         "frozen_runtime_versions": FROZEN_RUNTIME_VERSIONS,
+        "allowed_frozen_runtime_profiles": ALLOWED_FROZEN_RUNTIME_PROFILES,
+        "kaggle_runtime_profile_id": "kaggle_t4x2_cuda130",
         "constraint_independence_audit_sha256": sha256_file(out_dir / "CONSTRAINT_INDEPENDENCE_AUDIT_A4.json"),
         "model_called": False,
         "gpu_called": False,

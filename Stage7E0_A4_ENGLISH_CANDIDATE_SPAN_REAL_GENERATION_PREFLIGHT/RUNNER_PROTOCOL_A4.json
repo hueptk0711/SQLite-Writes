@@ -5,7 +5,7 @@
     "nine_of_ten_allowed": false,
     "required_pass_count": "10/10"
   },
-  "accepted_protocol_commit": "fe90bf2183ea5eb812367f608997150788f6ad6e",
+  "accepted_protocol_commit": "41a54496e8d2d9b35cd2164c10c1a5ab1e12a6b8",
   "generation_contract": {
     "accepted_patch9_backend_file": "scripts/server/run_stage7e0_v2_a1_preflight.py",
     "automatic_repair": false,
@@ -32,6 +32,32 @@
     "zero_shot": true
   },
   "model": {
+    "allowed_frozen_runtime_profiles": [
+      {
+        "gpu_requirement": "cuda_available=true",
+        "packages": {
+          "accelerate": "1.14.0",
+          "safetensors": "0.5.3",
+          "tokenizers": "0.22.2",
+          "torch": "2.6.0+cu124",
+          "transformers": "5.5.3"
+        },
+        "profile_id": "uet_server_cuda124",
+        "torch_cuda": "12.4"
+      },
+      {
+        "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
+        "packages": {
+          "accelerate": "1.14.0",
+          "safetensors": "0.5.3",
+          "tokenizers": "0.22.2",
+          "torch": "2.13.0",
+          "transformers": "5.5.3"
+        },
+        "profile_id": "kaggle_t4x2_cuda130",
+        "torch_cuda": "13.0"
+      }
+    ],
     "default_server_model_path": "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242",
     "expected_chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
     "frozen_runtime_versions": {
@@ -41,13 +67,14 @@
       "torch": "2.6.0+cu124",
       "transformers": "5.5.3"
     },
+    "kaggle_runtime_profile_id": "kaggle_t4x2_cuda130",
     "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
     "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
     "quantization_allowed": false,
     "quantization_default": "none",
     "torch_dtype": "auto"
   },
-  "patch": "PATCH1",
+  "patch": "PATCH2",
   "prompt_contract": {
     "phase_m_changed": false,
     "phase_m_prompt_spec_path": "stage7c_a1_v2_development_protocol/PHASE_M_PROMPT_SPEC.json",
