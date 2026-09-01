@@ -7,12 +7,12 @@ frozen and reviewed.
 %%bash
 set -euo pipefail
 cd /kaggle/working
-rm -rf Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT_PATCH0_runner
-mkdir -p Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT_PATCH0_runner
-PKG_ROOT="$(find /kaggle/input -type d -name 'Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT_PATCH0_FINAL_REVIEWER_PACKAGE_*' -print -quit)"
+rm -rf Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT_PATCH1_runner
+mkdir -p Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT_PATCH1_runner
+PKG_ROOT="$(find /kaggle/input -type d -name 'Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT_PATCH1_FINAL_REVIEWER_PACKAGE_*' -print -quit)"
 test -n "$PKG_ROOT"
-cp -a "$PKG_ROOT"/. Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT_PATCH0_runner/
-cd Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT_PATCH0_runner
+cp -a "$PKG_ROOT"/. Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT_PATCH1_runner/
+cd Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT_PATCH1_runner
 export HF_HOME=/kaggle/working/hf_cache
 python -m pip install --extra-index-url https://download.pytorch.org/whl/cu130 -r requirements-inference-kaggle-t4x2.lock.txt
 python scripts/data/validate_stage7c_a5_column_conditioned_phase_o_protocol.py --stage-dir Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE

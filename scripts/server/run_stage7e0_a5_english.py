@@ -53,6 +53,7 @@ STAGE_NAME = "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT"
 A5_PRIMARY_SET_REL = f"{STAGE7C_A5_DIR}/FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl"
 A5_DIAGNOSTIC_SET_REL = f"{STAGE7C_A5_DIR}/A4_DERIVED_REGRESSION_DIAGNOSTICS_A5.jsonl"
 A5_PROMPT_SPEC_REL = f"{STAGE7C_A5_DIR}/COLUMN_CONDITIONED_PROMPT_SPEC_A5_ENGLISH.json"
+STAGE7E0_A5_INPUT_MANIFEST_REL = f"{STAGE_NAME}/STAGE7E0_A5_INPUT_MANIFEST.json"
 EXPECTED_PRIMARY_COUNT = 12
 EXPECTED_DIAGNOSTIC_COUNT = 12
 PHASE_O_MAX_NEW_TOKENS = 512
@@ -86,16 +87,30 @@ def git_output(*args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=PROJECT_ROOT, text=True, encoding="utf-8").strip()
 
 
+def verify_accepted_protocol_commit_argument(accepted_commit: str) -> dict[str, Any]:
+    manifest_path = PROJECT_ROOT / STAGE7E0_A5_INPUT_MANIFEST_REL
+    if not manifest_path.is_file():
+        raise SystemExit(f"STOP: missing frozen Stage7E0-A5 input manifest: {STAGE7E0_A5_INPUT_MANIFEST_REL}")
+    manifest = read_json(manifest_path)
+    frozen = manifest.get("accepted_stage7c_a5_commit")
+    if not isinstance(frozen, str) or not frozen:
+        raise SystemExit("STOP: frozen Stage7E0-A5 input manifest does not record accepted_stage7c_a5_commit")
+    if accepted_commit != frozen:
+        raise SystemExit(f"STOP: accepted protocol commit {accepted_commit} != frozen package commit {frozen}")
+    return {"input_manifest_available": True, "frozen_accepted_protocol_commit": frozen}
+
+
 def assert_git_lock(accepted_commit: str) -> dict[str, Any]:
+    manifest_lock = verify_accepted_protocol_commit_argument(accepted_commit)
     if not (PROJECT_ROOT / ".git").exists():
-        return {"accepted_protocol_commit": accepted_commit, "execution_commit": None, "git_available": False}
+        return {"accepted_protocol_commit": accepted_commit, "execution_commit": None, "git_available": False, **manifest_lock}
     head = git_output("rev-parse", "HEAD")
     if head != accepted_commit:
         raise SystemExit(f"STOP: git HEAD {head} != accepted Stage7C-A5 protocol commit {accepted_commit}")
     dirty = git_output("status", "--porcelain", "--untracked-files=no")
     if dirty:
         raise SystemExit("STOP: tracked working tree must be clean before real generation")
-    return {"accepted_protocol_commit": accepted_commit, "execution_commit": head, "git_available": True}
+    return {"accepted_protocol_commit": accepted_commit, "execution_commit": head, "git_available": True, **manifest_lock}
 
 
 def assert_result_root_policy(result_root: Path, *, backend: str, allow_inside_git: bool) -> None:
@@ -296,6 +311,7 @@ class ColumnConditionedConstraintGrammar:
             "phase": "phase_o",
             "schema_sha256": self.schema_sha256,
             "constraint_grammar_sha256": self.fingerprint,
+            "constraint_fingerprint": self.fingerprint,
             "constraint_source": "a5_dynamic_column_conditioned_json_schema",
             "semantic_branch_points_observed": self.max_span_ref_choices > 1 or len(self.table_refs) > 1,
             "finite_known_answer_candidates": False,
@@ -598,7 +614,11 @@ def run_stage7e0(args: argparse.Namespace) -> dict[str, Any]:
     backend = str(args.backend).lower()
     validate_generation_config(args)
     assert_result_root_policy(result_root, backend=backend, allow_inside_git=args.allow_result_root_inside_git)
-    git_lock = None if args.skip_git_assertions else assert_git_lock(args.accepted_protocol_commit)
+    if args.skip_git_assertions:
+        manifest_lock = verify_accepted_protocol_commit_argument(args.accepted_protocol_commit)
+        git_lock = {"accepted_protocol_commit": args.accepted_protocol_commit, "execution_commit": None, "git_available": (PROJECT_ROOT / ".git").exists(), "git_assertions_skipped": True, **manifest_lock}
+    else:
+        git_lock = assert_git_lock(args.accepted_protocol_commit)
     a5_lock = verify_stage7c_a5_lock()
     primary_rows = load_stage7c_a5_rows()
     if result_root.exists() and not args.resume:

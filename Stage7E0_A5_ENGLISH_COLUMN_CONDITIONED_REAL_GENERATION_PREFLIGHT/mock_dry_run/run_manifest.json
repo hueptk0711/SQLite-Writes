@@ -1,7 +1,14 @@
 {
   "accepted_protocol_commit": "1b68ef5ff1bfdc52de05da7ae6fd96857c783f63",
   "diagnostics_requested_after_primary_pass": false,
-  "git": null,
+  "git": {
+    "accepted_protocol_commit": "1b68ef5ff1bfdc52de05da7ae6fd96857c783f63",
+    "execution_commit": null,
+    "frozen_accepted_protocol_commit": "1b68ef5ff1bfdc52de05da7ae6fd96857c783f63",
+    "git_assertions_skipped": true,
+    "git_available": true,
+    "input_manifest_available": true
+  },
   "model": {
     "backend": "mock",
     "mock_uses_label_side_expected": true,

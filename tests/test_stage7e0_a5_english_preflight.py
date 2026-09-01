@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import zipfile
@@ -34,6 +35,7 @@ from scripts.server.run_stage7e0_a5_english import (
     parse_phase_o_column_conditioned_output,
     run_stage7e0,
     validate_runtime_versions,
+    verify_accepted_protocol_commit_argument,
     write_json,
     write_jsonl,
 )
@@ -48,6 +50,9 @@ def read_jsonl(path: Path) -> list[dict]:
 
 
 def accepted_commit_for_tests() -> str:
+    manifest_path = ROOT / STAGE_NAME / "STAGE7E0_A5_INPUT_MANIFEST.json"
+    if manifest_path.is_file():
+        return read_json(manifest_path)["accepted_stage7c_a5_commit"]
     if (ROOT / ".git").exists():
         return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     lock_path = ROOT / STAGE_NAME / "STAGE7E0_A5_LOCK.json"
@@ -57,16 +62,19 @@ def accepted_commit_for_tests() -> str:
 
 
 class OverrideGenerator(LabelMockGenerator):
-    def __init__(self, rows: list[dict], phase_o_override: dict | None = None):
+    def __init__(self, rows: list[dict], phase_o_override: dict | None = None, phase_o_overrides: dict[str, dict] | None = None):
         super().__init__(rows)
         self.phase_o_override = phase_o_override
+        self.phase_o_overrides = phase_o_overrides or {}
 
     def generate(self, **kwargs) -> CallResult:
-        if self.phase_o_override is None:
+        sample_id = kwargs["sample_id"]
+        override = self.phase_o_overrides.get(sample_id, self.phase_o_override)
+        if override is None:
             return super().generate(**kwargs)
-        raw = canonical_json(self.phase_o_override)
+        raw = canonical_json(override)
         return CallResult(
-            sample_id=kwargs["sample_id"],
+            sample_id=sample_id,
             phase="phase_o",
             raw_output=raw,
             input_tokens=0,
@@ -248,6 +256,8 @@ def test_stage_lock_forbids_11_of_12_phase_m_and_gretel(tmp_path: Path) -> None:
 
 
 def test_clean_reviewer_zip_validator_passes(tmp_path: Path) -> None:
+    if os.environ.get("STAGE7E0_A5_SKIP_NESTED_CLEAN_ZIP_FULL_PYTEST") == "1":
+        return
     stage_dir = tmp_path / STAGE_NAME
     package_path = tmp_path / PACKAGE_NAME
     build_stage(stage_dir, package_path)
@@ -263,28 +273,60 @@ def test_clean_reviewer_zip_validator_passes(tmp_path: Path) -> None:
         check=False,
     )
     assert result.returncode == 0, result.stdout + result.stderr
+    full = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q"],
+        cwd=extract,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        env=os.environ | {"STAGE7E0_A5_SKIP_NESTED_CLEAN_ZIP_FULL_PYTEST": "1"},
+    )
+    assert full.returncode == 0, full.stdout + full.stderr
 
 
-def _write_server_result(result_dir: Path, *, protocol_valid: bool, pass_count: int) -> None:
-    result_dir.mkdir(parents=True, exist_ok=True)
-    cases = [
-        {"sample_id": f"case_{index:02d}", "status": "PASS" if index <= pass_count else "FAIL", "failure_stage": None if index <= pass_count else "acceptance_gate", "checks": {}}
-        for index in range(1, 13)
-    ]
-    raw_metadata = {
+def _expected_input_manifest_for_tests() -> dict:
+    path = ROOT / STAGE_NAME / "STAGE7E0_A5_INPUT_MANIFEST.json"
+    if path.is_file():
+        return read_json(path)
+    stage_dir = ROOT / STAGE_NAME
+    package_path = ROOT / PACKAGE_NAME
+    build_stage(stage_dir, package_path)
+    return read_json(path)
+
+
+def _wrong_phase_o(row: dict) -> dict:
+    phase_o = json.loads(canonical_json(row["label_side_expected"]["phase_o"]))
+    for column, value in phase_o["column_span_refs"].items():
+        if value != "OMIT":
+            phase_o["column_span_refs"][column] = "OMIT"
+            return phase_o
+    first_column = next(iter(phase_o["column_span_refs"]))
+    for branch in row["runtime_constraints"]["phase_o_schema"].get("oneOf", [row["runtime_constraints"]["phase_o_schema"]]):
+        if branch["properties"]["table_ref"].get("const") == phase_o["table_ref"]:
+            domain = branch["properties"]["column_span_refs"]["properties"][first_column]["enum"]
+            phase_o["column_span_refs"][first_column] = next(value for value in domain if value != phase_o["column_span_refs"][first_column])
+            return phase_o
+    raise AssertionError("could not build wrong A5 phase_o")
+
+
+def _constrained_raw_metadata(row: dict, *, protocol_valid: bool) -> dict:
+    grammar = build_phase_o_column_conditioned_constraint_grammar(row["runtime_constraints"]["phase_o_schema"])
+    metadata = grammar.metadata() | {
         "backend": "incremental_json_schema_grammar" if protocol_valid else "mock",
+        "schema_mode": "incremental_json_schema_grammar" if protocol_valid else "mock",
         "token_level_enforcement": protocol_valid,
         "fallback_to_unconstrained": False,
-        "finite_complete_object_enumeration": False,
-        "finite_known_answer_candidates": False,
-        "label_side_data_used_for_constraints": False,
         "automatic_repair": False,
         "retry": 0,
+        "vocab_size": 151936,
+        "json_safe_token_count": 2048,
     }
-    raw_o = [{"sample_id": row["sample_id"], "generation_metadata": raw_metadata} for row in cases]
-    write_jsonl(result_dir / "primary_case_results.jsonl", cases)
-    write_jsonl(result_dir / "raw_primary_phase_o_generations.jsonl", raw_o)
-    model = {
+    return metadata
+
+
+def _server_model_metadata(*, protocol_valid: bool) -> dict:
+    return {
         "backend": "incremental_json_schema_grammar" if protocol_valid else "mock",
         "schema_enforcement_mode": "transformers_prefix_allowed_tokens_fn",
         "token_level_enforcement": protocol_valid,
@@ -314,11 +356,56 @@ def _write_server_result(result_dir: Path, *, protocol_valid: bool, pass_count: 
         "gpu_count": 2,
         "gpu_devices": ["Tesla T4", "Tesla T4"],
     }
+
+
+def _rewrite_summary_hashes(result_dir: Path) -> None:
+    summary = read_json(result_dir / "primary_summary.json")
+    summary["raw_primary_phase_o_sha256"] = validate_server_result.__globals__["sha256_file"](result_dir / "raw_primary_phase_o_generations.jsonl")
+    summary["primary_case_results_sha256"] = validate_server_result.__globals__["sha256_file"](result_dir / "primary_case_results.jsonl")
+    write_json(result_dir / "primary_summary.json", summary)
+
+
+def _write_server_result(result_dir: Path, *, protocol_valid: bool, pass_count: int, accepted_protocol_commit: str | None = None) -> None:
+    result_dir.mkdir(parents=True, exist_ok=True)
+    rows = load_stage7c_a5_rows(ROOT)
+    overrides = {row["sample_id"]: _wrong_phase_o(row) for index, row in enumerate(rows, start=1) if index > pass_count}
+    generator = OverrideGenerator(rows, phase_o_overrides=overrides)
+    cases = []
+    raw_o = []
+    for index, row in enumerate(rows, start=1):
+        case_result, raw = evaluate_case(row, generator, phase_o_max_new_tokens=512)
+        raw["generation_metadata"] = _constrained_raw_metadata(row, protocol_valid=protocol_valid)
+        raw["input_tokens"] = 1000 + index
+        raw["output_tokens"] = max(1, len(str(raw["raw_output"]).split()))
+        raw["latency_sec"] = round(0.1 + index / 1000, 3)
+        cases.append(case_result)
+        raw_o.append(raw)
+    write_jsonl(result_dir / "primary_case_results.jsonl", cases)
+    write_jsonl(result_dir / "raw_primary_phase_o_generations.jsonl", raw_o)
+    expected_input = _expected_input_manifest_for_tests()
+    accepted = accepted_protocol_commit or expected_input["accepted_stage7c_a5_commit"]
     write_json(
         result_dir / "run_manifest.json",
         {
             "stage": STAGE_NAME,
-            "model": model,
+            "accepted_protocol_commit": accepted,
+            "git": {
+                "accepted_protocol_commit": accepted,
+                "execution_commit": None,
+                "git_available": False,
+                "input_manifest_available": True,
+                "frozen_accepted_protocol_commit": expected_input["accepted_stage7c_a5_commit"],
+            },
+            "stage7c_a5_inputs": {
+                "stage7c_a5_lock_sha256": expected_input["stage7c_a5_lock_sha256"],
+                "a5_prompt_spec_sha256": expected_input["phase_o_prompt_spec_sha256"],
+                "a5_primary_set_sha256": expected_input["primary_set_sha256"],
+                "a5_diagnostic_set_sha256": expected_input["diagnostic_set_sha256"],
+                "tokenizer_status": expected_input["tokenizer_status"],
+                "chat_template_sha256": expected_input["chat_template_sha256"],
+            },
+            "model": _server_model_metadata(protocol_valid=protocol_valid),
+            "primary_case_count": 12,
             "phase_o_prompt_spec_path": "Stage7C_A5_ENGLISH_COLUMN_CONDITIONED_PHASE_O_PROTOCOL_FREEZE/COLUMN_CONDITIONED_PROMPT_SPEC_A5_ENGLISH.json",
             "retry": 0,
             "repair": "none",
@@ -374,3 +461,120 @@ def test_valid_12_of_12_server_result_passes(tmp_path: Path) -> None:
     assert report["protocol_compliance_status"] == "PASS"
     assert report["primary_gate_status"] == "PASS"
     assert report["status"] == "PASS"
+
+
+def test_server_result_validator_rejects_fake_case_ids(tmp_path: Path) -> None:
+    result_dir = tmp_path / "fake_ids"
+    _write_server_result(result_dir, protocol_valid=True, pass_count=12)
+    cases = read_jsonl(result_dir / "primary_case_results.jsonl")
+    raw_o = read_jsonl(result_dir / "raw_primary_phase_o_generations.jsonl")
+    for index, row in enumerate(cases, start=1):
+        row["sample_id"] = f"case_{index:02d}"
+    for index, row in enumerate(raw_o, start=1):
+        row["sample_id"] = f"case_{index:02d}"
+    write_jsonl(result_dir / "primary_case_results.jsonl", cases)
+    write_jsonl(result_dir / "raw_primary_phase_o_generations.jsonl", raw_o)
+    _rewrite_summary_hashes(result_dir)
+    report = validate_server_result(result_dir)
+    assert report["evidence_integrity_status"] == "FAIL"
+    assert "primary_case_result_ids_must_equal_locked_a5_primary_ids" in report["evidence_failures"]
+    assert "raw_generation_ids_must_equal_locked_a5_primary_ids" in report["evidence_failures"]
+
+
+def test_server_result_validator_rejects_missing_raw_output(tmp_path: Path) -> None:
+    result_dir = tmp_path / "missing_raw_output"
+    _write_server_result(result_dir, protocol_valid=True, pass_count=12)
+    raw_o = read_jsonl(result_dir / "raw_primary_phase_o_generations.jsonl")
+    raw_o[0].pop("raw_output")
+    write_jsonl(result_dir / "raw_primary_phase_o_generations.jsonl", raw_o)
+    _rewrite_summary_hashes(result_dir)
+    report = validate_server_result(result_dir)
+    assert report["evidence_integrity_status"] == "FAIL"
+    assert any(failure.startswith("raw_generation_missing_required_keys:stage7c_a5_primary_english_001:raw_output") for failure in report["evidence_failures"])
+
+
+def test_server_result_validator_rejects_fabricated_pass_status(tmp_path: Path) -> None:
+    result_dir = tmp_path / "fabricated_pass"
+    _write_server_result(result_dir, protocol_valid=True, pass_count=11)
+    cases = read_jsonl(result_dir / "primary_case_results.jsonl")
+    for row in cases:
+        row["status"] = "PASS"
+        row["failure_stage"] = None
+        if "checks" in row:
+            row["checks"] = {key: True for key in row["checks"]}
+    write_jsonl(result_dir / "primary_case_results.jsonl", cases)
+    summary = read_json(result_dir / "primary_summary.json")
+    summary["status"] = "PASS"
+    summary["primary_pass_count"] = "12/12"
+    write_json(result_dir / "primary_summary.json", summary)
+    _rewrite_summary_hashes(result_dir)
+    report = validate_server_result(result_dir)
+    assert report["evidence_integrity_status"] == "FAIL"
+    assert any(failure.startswith("case_result_replay_mismatch:") for failure in report["evidence_failures"])
+    assert "primary_pass_count_must_match_replayed_case_rows" in report["evidence_failures"]
+
+
+def test_server_result_validator_rejects_raw_output_tamper_after_rehashed_summary(tmp_path: Path) -> None:
+    result_dir = tmp_path / "tampered_raw_rehashed"
+    _write_server_result(result_dir, protocol_valid=True, pass_count=12)
+    rows = load_stage7c_a5_rows(ROOT)
+    raw_o = read_jsonl(result_dir / "raw_primary_phase_o_generations.jsonl")
+    raw_o[0]["raw_output"] = canonical_json(_wrong_phase_o(rows[0]))
+    write_jsonl(result_dir / "raw_primary_phase_o_generations.jsonl", raw_o)
+    _rewrite_summary_hashes(result_dir)
+    report = validate_server_result(result_dir)
+    assert report["evidence_integrity_status"] == "FAIL"
+    assert "case_result_replay_mismatch:stage7c_a5_primary_english_001" in report["evidence_failures"]
+    assert "primary_pass_count_must_match_replayed_case_rows" in report["evidence_failures"]
+
+
+def test_server_result_validator_rejects_wrong_message_hash(tmp_path: Path) -> None:
+    result_dir = tmp_path / "wrong_message_hash"
+    _write_server_result(result_dir, protocol_valid=True, pass_count=12)
+    raw_o = read_jsonl(result_dir / "raw_primary_phase_o_generations.jsonl")
+    raw_o[0]["messages_sha256"] = "0" * 64
+    write_jsonl(result_dir / "raw_primary_phase_o_generations.jsonl", raw_o)
+    _rewrite_summary_hashes(result_dir)
+    report = validate_server_result(result_dir)
+    assert report["evidence_integrity_status"] == "FAIL"
+    assert "raw_generation_messages_sha256_mismatch:stage7c_a5_primary_english_001" in report["evidence_failures"]
+
+
+def test_server_result_validator_rejects_wrong_accepted_protocol_commit(tmp_path: Path) -> None:
+    result_dir = tmp_path / "wrong_commit"
+    _write_server_result(result_dir, protocol_valid=True, pass_count=12, accepted_protocol_commit="WRONG_COMMIT_FOR_PROBE")
+    report = validate_server_result(result_dir)
+    assert report["evidence_integrity_status"] == "FAIL"
+    assert "run_manifest_accepted_protocol_commit_mismatch" in report["evidence_failures"]
+
+
+def test_runner_rejects_wrong_accepted_protocol_commit_even_when_git_assertions_are_skipped(tmp_path: Path) -> None:
+    args = type(
+        "Args",
+        (),
+        {
+            "accepted_protocol_commit": "WRONG_COMMIT_FOR_PROBE",
+            "result_root": str(tmp_path / "result"),
+            "backend": "mock",
+            "model_name_or_path": MODEL_ID,
+            "quantization": "none",
+            "phase_o_max_new_tokens": 512,
+            "max_input_tokens": 28672,
+            "seed": 42,
+            "trust_remote_code": False,
+            "resume": False,
+            "run_diagnostics_after_primary_pass": False,
+            "skip_git_assertions": True,
+            "allow_result_root_inside_git": True,
+        },
+    )()
+    with pytest.raises(SystemExit, match="accepted protocol commit WRONG_COMMIT_FOR_PROBE"):
+        run_stage7e0(args)
+
+
+def test_verify_accepted_protocol_commit_argument_accepts_only_frozen_manifest_commit() -> None:
+    report = verify_accepted_protocol_commit_argument(accepted_commit_for_tests())
+    assert report["input_manifest_available"] is True
+    assert report["frozen_accepted_protocol_commit"] == accepted_commit_for_tests()
+    with pytest.raises(SystemExit, match="accepted protocol commit WRONG_COMMIT_FOR_PROBE"):
+        verify_accepted_protocol_commit_argument("WRONG_COMMIT_FOR_PROBE")

@@ -9,7 +9,7 @@
     {
       "bytes": 5097,
       "path": "RUNNER_PROTOCOL_A5.json",
-      "sha256": "2c3479c0fc9d0aa928fc40b8f5dc82f4712c483744fe67ff58bb89c45bdf004d"
+      "sha256": "3b4261ea26ac1f872beab6c7558bfc6ea89a53bdf25a3505c91bc8eda8cabb43"
     },
     {
       "bytes": 300,
@@ -19,12 +19,12 @@
     {
       "bytes": 4516,
       "path": "CONSTRAINT_INDEPENDENCE_AUDIT_A5.json",
-      "sha256": "c11b0181567f32e5f2cf243ac7225d2bada3500fcb10aeb1eaf2165e9bf47a1a"
+      "sha256": "3aa039c0b688f3e4f9ac14ff9b648b91eb4b962cd3701a70060b096b542c292d"
     },
     {
       "bytes": 2546,
       "path": "SERVER_RUN_COMMANDS.md",
-      "sha256": "9b97342512751e877355eeef4d42cf5b886412989169b36244e3a6aedb6219ab"
+      "sha256": "125bb4bf62cfbfe876ef261566a987e29f5e6c0c252d1ce4b9ec8c859598d636"
     },
     {
       "bytes": 1192,
@@ -34,12 +34,12 @@
     {
       "bytes": 1007,
       "path": "REVIEWER_README.md",
-      "sha256": "cd0d74506a9e1c1b76d19dcce04158cf20de1eaf93a78d1ce2a8b8197d78276b"
+      "sha256": "ac978713815607f192506fb238d2a38e1db1b5bd2dc2918e558d9510afe72342"
     },
     {
-      "bytes": 1267,
+      "bytes": 1557,
       "path": "mock_dry_run/run_manifest.json",
-      "sha256": "6ad62c4dd7b55ad33b36c0d614b283d3361f359c404f14551feb2ba1affe61db"
+      "sha256": "86449e4250f2c19dfddfe9a27cb3b2103d40b53dd8f157eabee566cd3faad4b2"
     },
     {
       "bytes": 700,
@@ -57,7 +57,7 @@
       "sha256": "5d5c1c55d8ca3c2d6f7b4f5b0c6f704929783a12833ed8766afa9205fc7d47d9"
     }
   ],
-  "combined_scientific_artifacts_sha256": "bf28a0fecdb682ade587d5df3abeaf77b09dcb1d7f9024c329321da6ad9cc334",
-  "patch": "PATCH0",
+  "combined_scientific_artifacts_sha256": "40c91a7f94268dbb089ac35b1f20181f7df48910f08f78c17a3a064a7a5d55eb",
+  "patch": "PATCH1",
   "stage": "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT"
 }

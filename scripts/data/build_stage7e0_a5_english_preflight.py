@@ -49,7 +49,7 @@ from scripts.data.build_stage7c_a5_column_conditioned_phase_o_protocol import ca
 
 
 STAGE_NAME = "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT"
-PATCH_NAME = "PATCH0"
+PATCH_NAME = "PATCH1"
 PACKAGE_DATE = "20260901"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
 PRIMARY_RESULT_DIR_NAME = "stage7e0_a5_english_column_conditioned_kaggle_t4x2_primary_results_20260901"
@@ -82,7 +82,21 @@ def git_output(*args: str) -> str:
         return ""
 
 
-def stage7c_a5_inputs() -> dict[str, Any]:
+def frozen_accepted_stage7c_a5_commit() -> str:
+    existing_manifest = PROJECT_ROOT / STAGE_NAME / "STAGE7E0_A5_INPUT_MANIFEST.json"
+    if existing_manifest.is_file():
+        value = read_json(existing_manifest).get("accepted_stage7c_a5_commit")
+        if isinstance(value, str) and value:
+            return value
+    committed_manifest = git_output("show", f"HEAD:{STAGE_NAME}/STAGE7E0_A5_INPUT_MANIFEST.json")
+    if committed_manifest:
+        value = json.loads(committed_manifest).get("accepted_stage7c_a5_commit")
+        if isinstance(value, str) and value:
+            return value
+    return git_output("rev-parse", "HEAD") or "UNKNOWN"
+
+
+def stage7c_a5_inputs(accepted_commit: str) -> dict[str, Any]:
     upstream = validate_stage7c_a5(PROJECT_ROOT / STAGE7C_A5_DIR)
     if upstream.get("status") != "PASS":
         raise RuntimeError(f"Stage7C-A5 validation must pass before Stage7E0-A5: {upstream.get('failures')}")
@@ -91,7 +105,7 @@ def stage7c_a5_inputs() -> dict[str, Any]:
     token_audit = read_json(PROJECT_ROOT / STAGE7C_A5_DIR / "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json")
     return {
         "stage7c_a5_dir": STAGE7C_A5_DIR,
-        "accepted_stage7c_a5_commit": git_output("rev-parse", "HEAD") or "UNKNOWN",
+        "accepted_stage7c_a5_commit": accepted_commit,
         "phase_o_prompt_spec_path": A5_PROMPT_SPEC_REL,
         "phase_o_prompt_spec_sha256": sha256_file(PROJECT_ROOT / A5_PROMPT_SPEC_REL),
         "primary_case_count": len(primary_rows),
@@ -336,17 +350,17 @@ Accepted Stage7C-A5 protocol commit: `{accepted_commit}`
 
 
 def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
+    accepted_commit = frozen_accepted_stage7c_a5_commit()
     if out_dir.exists():
         shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    accepted_commit = git_output("rev-parse", "HEAD") or "UNKNOWN"
-    inputs = stage7c_a5_inputs()
+    inputs = stage7c_a5_inputs(accepted_commit)
     protocol = runner_protocol(accepted_commit)
+    write_json(out_dir / "STAGE7E0_A5_INPUT_MANIFEST.json", inputs)
     mock_summary = run_mock_dry_run(out_dir, accepted_commit)
     independence = constraint_independence_audit()
     if independence["status"] != "PASS":
         raise RuntimeError("constraint independence audit failed")
-    write_json(out_dir / "STAGE7E0_A5_INPUT_MANIFEST.json", inputs)
     write_json(out_dir / "RUNNER_PROTOCOL_A5.json", protocol)
     write_json(out_dir / "PRIMARY_ACCEPTANCE_POLICY_A5.json", protocol["acceptance"])
     write_json(out_dir / "CONSTRAINT_INDEPENDENCE_AUDIT_A5.json", independence)
@@ -447,6 +461,8 @@ def include_paths(stage_dir: Path) -> list[Path]:
         "pyproject.toml",
         KAGGLE_REQUIREMENTS_LOCK,
         STAGE7C_A5_DIR,
+        "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL",
+        "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT",
         "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT",
         "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT",
         "src/nldbwrite_v3/v2_a1",
@@ -463,6 +479,7 @@ def include_paths(stage_dir: Path) -> list[Path]:
         "scripts/data/build_stage7b_a2_candidate_span_reference.py",
         "scripts/data/build_stage7b_a3_column_conditioned_candidate_selection.py",
         "scripts/data/build_stageeng0_gretel_qualification.py",
+        "tests/conftest.py",
         "tests/test_stage7e0_a5_english_preflight.py",
         "tests/test_stage7c_a5_column_conditioned_phase_o_protocol.py",
         "tests/support/windows_py314_pytest_tempdir/sitecustomize.py",
