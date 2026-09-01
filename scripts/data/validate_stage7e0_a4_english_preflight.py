@@ -17,7 +17,7 @@ if str(PROJECT_ROOT) not in sys.path:
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from scripts.data.build_stage7e0_a4_english_preflight import FRESH_CONSTRAINED_RESULT_DIR_NAME  # noqa: E402
+from scripts.data.build_stage7e0_a4_english_preflight import FRESH_CONSTRAINED_RESULT_DIR_NAME, KAGGLE_REQUIREMENTS_LOCK  # noqa: E402
 from scripts.data.validate_stage7c_a4_candidate_span_phase_o_protocol import validate as validate_stage7c_a4  # noqa: E402
 from scripts.server.run_stage7e0_a4_english import (  # noqa: E402
     A4_PROMPT_SPEC_REL,
@@ -30,10 +30,13 @@ from scripts.server.run_stage7e0_a4_english import (  # noqa: E402
     MODEL_REVISION,
     PHASE_M_MAX_NEW_TOKENS,
     PHASE_O_MAX_NEW_TOKENS,
+    HISTORICAL_RUNTIME_PROFILE_IDS,
+    PRIMARY_RUNTIME_PROFILE_ID,
     STAGE7C_A4_DIR,
     build_phase_o_span_ref_constraint_grammar,
     load_stage7c_a4_rows,
     render_phase_o_a4_messages,
+    runtime_profile_by_id,
 )
 
 
@@ -53,6 +56,10 @@ REQUIRED_FILES = {
     "mock_dry_run/primary_case_results.jsonl",
     "mock_dry_run/raw_phase_o_generations.jsonl",
     "mock_dry_run/raw_phase_m_generations.jsonl",
+}
+PACKAGE_ROOT_REQUIRED_FILES = {
+    KAGGLE_REQUIREMENTS_LOCK,
+    "scripts/server/preflight_runtime.py",
 }
 
 
@@ -80,6 +87,10 @@ def validate(stage_dir: Path) -> dict[str, Any]:
     for rel in sorted(REQUIRED_FILES):
         if not (stage_dir / rel).is_file():
             failures.append(f"missing_required_artifact:{rel}")
+    package_root = stage_dir.parent
+    for rel in sorted(PACKAGE_ROOT_REQUIRED_FILES):
+        if not (package_root / rel).is_file() and not (PROJECT_ROOT / rel).is_file():
+            failures.append(f"missing_required_package_file:{rel}")
     if failures:
         return {"stage": STAGE_NAME, "status": "FAIL", "failures": failures}
 
@@ -112,8 +123,16 @@ def validate(stage_dir: Path) -> dict[str, Any]:
         failures.append("frozen_runtime_versions_drifted")
     if model.get("allowed_frozen_runtime_profiles") != ALLOWED_FROZEN_RUNTIME_PROFILES:
         failures.append("allowed_frozen_runtime_profiles_drifted")
-    if model.get("kaggle_runtime_profile_id") != "kaggle_t4x2_cuda130":
-        failures.append("kaggle_runtime_profile_id_drifted")
+    if model.get("primary_runtime_profile_id") != PRIMARY_RUNTIME_PROFILE_ID:
+        failures.append("primary_runtime_profile_id_drifted")
+    if model.get("primary_runtime_profile") != runtime_profile_by_id(PRIMARY_RUNTIME_PROFILE_ID):
+        failures.append("primary_runtime_profile_drifted")
+    if model.get("historical_runtime_profile_ids") != HISTORICAL_RUNTIME_PROFILE_IDS:
+        failures.append("historical_runtime_profile_ids_drifted")
+    if model.get("historical_runtime_profiles") != [runtime_profile_by_id(profile_id) for profile_id in HISTORICAL_RUNTIME_PROFILE_IDS]:
+        failures.append("historical_runtime_profiles_drifted")
+    if model.get("kaggle_requirements_lock") != KAGGLE_REQUIREMENTS_LOCK:
+        failures.append("kaggle_requirements_lock_drifted")
 
     prompt_contract = protocol.get("prompt_contract", {})
     if prompt_contract.get("phase_o_prompt_spec_path") != A4_PROMPT_SPEC_REL:
@@ -142,6 +161,11 @@ def validate(stage_dir: Path) -> dict[str, Any]:
         "resume_allowed": False,
         "phase_o_max_new_tokens": PHASE_O_MAX_NEW_TOKENS,
         "phase_m_max_new_tokens": PHASE_M_MAX_NEW_TOKENS,
+        "single_primary_runtime_profile": True,
+        "runtime_profile_switch_after_completed_generation_allowed": False,
+        "gpu_topology_fail_fast_before_model_load": True,
+        "device_map": "auto",
+        "max_memory": None,
     }
     for key, expected in expected_generation.items():
         if generation.get(key) != expected:
@@ -217,19 +241,35 @@ def validate(stage_dir: Path) -> dict[str, Any]:
     }.items():
         if lock.get(key) != expected:
             failures.append(f"stage_lock_{key}_drifted")
-    if lock.get("fresh_constrained_result_root") != f"/home/uet/hue_ptk/{FRESH_CONSTRAINED_RESULT_DIR_NAME}":
+    if lock.get("fresh_constrained_result_root") != f"/kaggle/working/{FRESH_CONSTRAINED_RESULT_DIR_NAME}":
         failures.append("stage_lock_fresh_result_root_drifted")
     if lock.get("frozen_runtime_versions") != FROZEN_RUNTIME_VERSIONS:
         failures.append("stage_lock_frozen_runtime_versions_drifted")
     if lock.get("allowed_frozen_runtime_profiles") != ALLOWED_FROZEN_RUNTIME_PROFILES:
         failures.append("stage_lock_allowed_frozen_runtime_profiles_drifted")
-    if lock.get("kaggle_runtime_profile_id") != "kaggle_t4x2_cuda130":
-        failures.append("stage_lock_kaggle_runtime_profile_id_drifted")
+    if lock.get("primary_runtime_profile_id") != PRIMARY_RUNTIME_PROFILE_ID:
+        failures.append("stage_lock_primary_runtime_profile_id_drifted")
+    if lock.get("primary_runtime_profile") != runtime_profile_by_id(PRIMARY_RUNTIME_PROFILE_ID):
+        failures.append("stage_lock_primary_runtime_profile_drifted")
+    if lock.get("historical_runtime_profile_ids") != HISTORICAL_RUNTIME_PROFILE_IDS:
+        failures.append("stage_lock_historical_runtime_profile_ids_drifted")
+    if lock.get("historical_runtime_profiles") != [runtime_profile_by_id(profile_id) for profile_id in HISTORICAL_RUNTIME_PROFILE_IDS]:
+        failures.append("stage_lock_historical_runtime_profiles_drifted")
+    for key, expected in {
+        "kaggle_requirements_lock": KAGGLE_REQUIREMENTS_LOCK,
+        "single_primary_runtime_profile": True,
+        "runtime_profile_switch_after_completed_generation_allowed": False,
+        "gpu_topology_fail_fast_before_model_load": True,
+        "device_map": "auto",
+        "max_memory": None,
+    }.items():
+        if lock.get(key) != expected:
+            failures.append(f"stage_lock_{key}_drifted")
     if lock.get("constraint_independence_audit_sha256") != sha256_file(stage_dir / "CONSTRAINT_INDEPENDENCE_AUDIT_A4.json"):
         failures.append("stage_lock_constraint_independence_hash_mismatch")
 
     commands = (stage_dir / "SERVER_RUN_COMMANDS.md").read_text(encoding="utf-8")
-    for needle in ("uet@222.255.250.24", "/home/uet/hue_ptk", "run_stage7e0_a4_english.py", DEFAULT_MODEL_PATH, "--backend constrained_hf", "--quantization none", "--phase-m-max-new-tokens 8192", FRESH_CONSTRAINED_RESULT_DIR_NAME, "Do not use `--resume`"):
+    for needle in ("Kaggle", "requirements-inference-kaggle-t4x2.lock.txt", "preflight_runtime.py", PRIMARY_RUNTIME_PROFILE_ID, "run_stage7e0_a4_english.py", "--backend constrained_hf", "--quantization none", "--phase-m-max-new-tokens 8192", FRESH_CONSTRAINED_RESULT_DIR_NAME, "Do not use `--resume`"):
         if needle not in commands:
             failures.append(f"server_command_missing:{needle}")
     if "gretel" in commands.lower() and "pilot" in commands.lower() and "open" in commands.lower():

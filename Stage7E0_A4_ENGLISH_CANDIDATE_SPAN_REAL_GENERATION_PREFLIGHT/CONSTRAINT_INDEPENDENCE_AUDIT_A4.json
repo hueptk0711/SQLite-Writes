@@ -2,7 +2,7 @@
   "backend": "incremental_json_schema_grammar",
   "case_count": 10,
   "label_side_data_used_for_constraints": false,
-  "patch": "PATCH2",
+  "patch": "PATCH3",
   "rows": [
     {
       "label_side_data_used_for_constraints": false,

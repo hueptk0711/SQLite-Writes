@@ -75,17 +75,36 @@ KAGGLE_T4X2_RUNTIME_VERSIONS = {
     "accelerate": "1.14.0",
     "safetensors": "0.5.3",
 }
+PRIMARY_RUNTIME_PROFILE_ID = "kaggle_t4x2_cuda130"
+HISTORICAL_RUNTIME_PROFILE_IDS = ["uet_server_cuda124"]
 ALLOWED_FROZEN_RUNTIME_PROFILES = [
     {
         "profile_id": "uet_server_cuda124",
-        "packages": FROZEN_RUNTIME_VERSIONS,
+        "role": "historical_reference_only",
+        "packages": {
+            "torch": ["2.6.0+cu124"],
+            "transformers": ["5.5.3"],
+            "tokenizers": ["0.22.2"],
+            "accelerate": ["1.14.0"],
+            "safetensors": ["0.5.3"],
+        },
         "torch_cuda": "12.4",
         "gpu_requirement": "cuda_available=true",
     },
     {
         "profile_id": "kaggle_t4x2_cuda130",
-        "packages": KAGGLE_T4X2_RUNTIME_VERSIONS,
+        "role": "primary_scientific_runtime",
+        "packages": {
+            "torch": ["2.13.0", "2.13.0+cu130"],
+            "transformers": ["5.5.3"],
+            "tokenizers": ["0.22.2"],
+            "accelerate": ["1.14.0"],
+            "safetensors": ["0.5.3"],
+        },
         "torch_cuda": "13.0",
+        "cuda_available": True,
+        "gpu_count": 2,
+        "gpu_device_substring": "Tesla T4",
         "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
     },
 ]
@@ -169,7 +188,7 @@ def validate_generation_config(args: argparse.Namespace) -> None:
 
 
 def runtime_versions() -> dict[str, str | None]:
-    versions: dict[str, str | None] = {}
+    versions: dict[str, Any] = {}
     for package in FROZEN_RUNTIME_VERSIONS:
         try:
             versions[package] = importlib.metadata.version(package)
@@ -179,33 +198,91 @@ def runtime_versions() -> dict[str, str | None]:
         import torch
 
         versions["torch_cuda"] = str(torch.version.cuda)
+        versions["cuda_available"] = bool(torch.cuda.is_available())
+        versions["gpu_count"] = int(torch.cuda.device_count()) if torch.cuda.is_available() else 0
+        versions["gpu_devices"] = [torch.cuda.get_device_name(index) for index in range(torch.cuda.device_count())] if torch.cuda.is_available() else []
     except Exception:
         versions["torch_cuda"] = None
+        versions["cuda_available"] = False
+        versions["gpu_count"] = 0
+        versions["gpu_devices"] = []
     return versions
 
 
-def validate_runtime_versions(versions: dict[str, str | None] | None = None) -> dict[str, Any]:
-    observed = runtime_versions() if versions is None else dict(versions)
-    profile_mismatches: dict[str, dict[str, Any]] = {}
+def runtime_profile_by_id(profile_id: str) -> dict[str, Any]:
     for profile in ALLOWED_FROZEN_RUNTIME_PROFILES:
+        if profile["profile_id"] == profile_id:
+            return profile
+    raise KeyError(profile_id)
+
+
+def normalize_runtime_observation(versions: dict[str, Any]) -> dict[str, Any]:
+    aliases = {
+        "torch_version": "torch",
+        "cuda_runtime": "torch_cuda",
+        "transformers_version": "transformers",
+        "tokenizers_version": "tokenizers",
+        "accelerate_version": "accelerate",
+        "safetensors_version": "safetensors",
+    }
+    observed = dict(versions)
+    for source, target in aliases.items():
+        if target not in observed and source in observed:
+            observed[target] = observed[source]
+    return observed
+
+
+def match_runtime_profile(
+    versions: dict[str, Any],
+    *,
+    allowed_profile_ids: tuple[str, ...] = (PRIMARY_RUNTIME_PROFILE_ID,),
+    require_gpu_topology: bool = True,
+) -> dict[str, Any]:
+    observed = normalize_runtime_observation(versions)
+    profile_mismatches: dict[str, dict[str, Any]] = {}
+    for profile_id in allowed_profile_ids:
+        profile = runtime_profile_by_id(profile_id)
         package_mismatches = {
-            package: {"expected": expected, "observed": observed.get(package)}
-            for package, expected in profile["packages"].items()
-            if observed.get(package) != expected
+            package: {"allowed": allowed, "observed": observed.get(package)}
+            for package, allowed in profile["packages"].items()
+            if observed.get(package) not in allowed
         }
+        declared_profile_id = observed.get("runtime_profile_id")
+        if declared_profile_id is not None and declared_profile_id != profile_id:
+            package_mismatches["runtime_profile_id"] = {"expected": profile_id, "observed": declared_profile_id}
         cuda_expected = profile.get("torch_cuda")
         if cuda_expected is not None and observed.get("torch_cuda") != cuda_expected:
             package_mismatches["torch_cuda"] = {"expected": cuda_expected, "observed": observed.get("torch_cuda")}
+        if require_gpu_topology and profile.get("cuda_available") is not None and observed.get("cuda_available") is not profile["cuda_available"]:
+            package_mismatches["cuda_available"] = {"expected": profile["cuda_available"], "observed": observed.get("cuda_available")}
+        if require_gpu_topology and profile.get("gpu_count") is not None and observed.get("gpu_count") != profile["gpu_count"]:
+            package_mismatches["gpu_count"] = {"expected": profile["gpu_count"], "observed": observed.get("gpu_count")}
+        gpu_device_substring = profile.get("gpu_device_substring")
+        if require_gpu_topology and gpu_device_substring is not None:
+            gpu_devices = observed.get("gpu_devices")
+            if not isinstance(gpu_devices, list) or len(gpu_devices) != profile["gpu_count"] or any(gpu_device_substring not in str(device) for device in gpu_devices):
+                package_mismatches["gpu_devices"] = {
+                    "expected": f"{profile['gpu_count']} devices containing {gpu_device_substring}",
+                    "observed": gpu_devices,
+                }
         if not package_mismatches:
             return {
                 "status": "PASS",
                 "runtime_profile_id": profile["profile_id"],
-                "frozen_runtime_versions": dict(profile["packages"]),
+                "runtime_profile": profile,
                 "allowed_frozen_runtime_profiles": ALLOWED_FROZEN_RUNTIME_PROFILES,
                 "observed_runtime_versions": observed,
             }
-        profile_mismatches[str(profile["profile_id"])] = package_mismatches
-    raise SystemExit(f"STOP: frozen inference runtime version drift: {canonical_json(profile_mismatches)}")
+        profile_mismatches[profile_id] = package_mismatches
+    return {"status": "FAIL", "failures": profile_mismatches, "observed_runtime_versions": observed}
+
+
+def validate_runtime_versions(versions: dict[str, Any] | None = None) -> dict[str, Any]:
+    observed = runtime_versions() if versions is None else dict(versions)
+    match = match_runtime_profile(observed, allowed_profile_ids=(PRIMARY_RUNTIME_PROFILE_ID,), require_gpu_topology=True)
+    if match["status"] != "PASS":
+        raise SystemExit(f"STOP: frozen inference runtime version drift: {canonical_json(match['failures'])}")
+    return match
 
 
 def load_stage7c_a4_rows(root: Path = PROJECT_ROOT) -> list[dict[str, Any]]:
@@ -617,8 +694,13 @@ class ConstrainedTransformersChatGenerator:
             "model_revision": MODEL_REVISION,
             "quantization": self.quantization,
             "torch_dtype": "auto",
+            "device_map": "auto",
+            "max_memory": None,
             "runtime_lock": self.runtime_lock,
             "runtime_profile_id": self.runtime_lock["runtime_profile_id"],
+            "primary_runtime_profile_id": PRIMARY_RUNTIME_PROFILE_ID,
+            "primary_runtime_profile": runtime_profile_by_id(PRIMARY_RUNTIME_PROFILE_ID),
+            "historical_runtime_profile_ids": HISTORICAL_RUNTIME_PROFILE_IDS,
             "allowed_frozen_runtime_profiles": ALLOWED_FROZEN_RUNTIME_PROFILES,
             "chat_template_sha256": EXPECTED_CHAT_TEMPLATE_SHA256,
             "torch_version": torch.__version__,

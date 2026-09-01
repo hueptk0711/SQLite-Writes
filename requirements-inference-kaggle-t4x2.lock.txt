@@ -1,0 +1,12 @@
+--extra-index-url https://download.pytorch.org/whl/cu130
+
+# Stage7E0-A4 PATCH3 primary runtime lock for Kaggle T4x2.
+# Install in a fresh Kaggle session before loading Qwen, then run:
+# python scripts/server/preflight_runtime.py
+torch==2.13.0+cu130
+transformers==5.5.3
+accelerate==1.14.0
+sentencepiece==0.2.1
+protobuf==6.33.5
+safetensors==0.5.3
+tokenizers==0.22.2

@@ -4,12 +4,12 @@
     {
       "bytes": 1480,
       "path": "STAGE7E0_A4_INPUT_MANIFEST.json",
-      "sha256": "ce573f9ef64526511bdf816755ad5734c0f24fe73470716c4b8f48b2e1094aa6"
+      "sha256": "0bb585cccb2a6d815a86562d9ed774344ea15db2cfc8d29a1eb2f9c5d352b841"
     },
     {
-      "bytes": 3433,
+      "bytes": 5552,
       "path": "RUNNER_PROTOCOL_A4.json",
-      "sha256": "987fd5daa10a757f22ff0121782af3b3c24c2e176ab2dbecd97f9bc20e5d35fe"
+      "sha256": "e556faf5ed77303581ff98b1e0c3ea8f51d09fbeaa75f57f5b66864bab33c00a"
     },
     {
       "bytes": 202,
@@ -19,27 +19,27 @@
     {
       "bytes": 6632,
       "path": "CONSTRAINT_INDEPENDENCE_AUDIT_A4.json",
-      "sha256": "176ed5dae737fa2f0458ce96b7dacb0e228081a4c87846823a5887a7a33eb223"
+      "sha256": "7a2eb001cf1eb49103b90ca05cf0ecd202104cba7511eec5faf32b7b3fb8a56c"
     },
     {
-      "bytes": 3482,
+      "bytes": 2056,
       "path": "SERVER_RUN_COMMANDS.md",
-      "sha256": "e60836e871c2c2c279dcdc8df037b8a8511c81abb848d16fa9ce946191a8be92"
+      "sha256": "712da31ea55d0d3230de81ee5810541d0f7f4d50fe55b3fef7af4ba1695e22a4"
     },
     {
-      "bytes": 1999,
+      "bytes": 2519,
       "path": "VALIDATION_REPORT.md",
-      "sha256": "4bbfffe66363d5f6f9407ddb4d7d635c926b69516ab7fa9a7db77d959ff766fa"
+      "sha256": "c531e0903b262e6dd1e3bf028430293f0cf10089d33677fcece89c7684417317"
     },
     {
-      "bytes": 1002,
+      "bytes": 1104,
       "path": "REVIEWER_README.md",
-      "sha256": "80d347e36e2b517871eb11d096451a2d8c1fa14bddb1336ffd45c8b5e1735833"
+      "sha256": "a6245f63a5fbfba2303eac5f11a3d8257375838d81fe59f6f43c4a428214fda1"
     },
     {
       "bytes": 1019,
       "path": "mock_dry_run/run_manifest.json",
-      "sha256": "0a3cd2758dac7cdb3d904d3823df23190357e29c10876fc2d6e32f1886a93aa7"
+      "sha256": "60d314f0fdbf2402130f8cf4c3f25984afebf867b8a7d302511e756ea721ad07"
     },
     {
       "bytes": 749,
@@ -62,7 +62,7 @@
       "sha256": "925515075d402c733f9bc47ffa0ee078928456d79e92d72c686d624ffab24d62"
     }
   ],
-  "combined_scientific_artifacts_sha256": "842185e66406045164c0da622c4ad9e5bb0c6670a1c16606cc2495ac2b972770",
-  "patch": "PATCH2",
+  "combined_scientific_artifacts_sha256": "2114a0693b3e7dc18788b1fc622373e08f5255b631f9822d5d77a7ef88aa15e7",
+  "patch": "PATCH3",
   "stage": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT"
 }

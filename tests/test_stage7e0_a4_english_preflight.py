@@ -25,6 +25,7 @@ from scripts.server.run_stage7e0_a4_english import (
     EXPECTED_CHAT_TEMPLATE_SHA256,
     MODEL_ID,
     MODEL_REVISION,
+    PRIMARY_RUNTIME_PROFILE_ID,
     LabelMockGenerator,
     build_phase_o_span_ref_constraint_grammar,
     canonical_json,
@@ -151,11 +152,32 @@ def test_runtime_lock_accepts_kaggle_t4x2_profile() -> None:
             "tokenizers": "0.22.2",
             "accelerate": "1.14.0",
             "safetensors": "0.5.3",
+            "cuda_available": True,
+            "gpu_count": 2,
+            "gpu_devices": ["Tesla T4", "Tesla T4"],
         }
     )
     assert report["status"] == "PASS"
-    assert report["runtime_profile_id"] == "kaggle_t4x2_cuda130"
+    assert report["runtime_profile_id"] == PRIMARY_RUNTIME_PROFILE_ID
     assert report["allowed_frozen_runtime_profiles"] == ALLOWED_FROZEN_RUNTIME_PROFILES
+
+
+def test_runtime_lock_accepts_kaggle_torch_local_version_suffix() -> None:
+    report = validate_runtime_versions(
+        {
+            "torch": "2.13.0+cu130",
+            "torch_cuda": "13.0",
+            "transformers": "5.5.3",
+            "tokenizers": "0.22.2",
+            "accelerate": "1.14.0",
+            "safetensors": "0.5.3",
+            "cuda_available": True,
+            "gpu_count": 2,
+            "gpu_devices": ["Tesla T4", "Tesla T4"],
+        }
+    )
+    assert report["status"] == "PASS"
+    assert report["runtime_profile_id"] == PRIMARY_RUNTIME_PROFILE_ID
 
 
 def test_runtime_lock_rejects_unknown_kaggle_runtime() -> None:
@@ -168,6 +190,43 @@ def test_runtime_lock_rejects_unknown_kaggle_runtime() -> None:
                 "tokenizers": "0.22.2",
                 "accelerate": "1.14.0",
                 "safetensors": "0.5.3",
+                "cuda_available": True,
+                "gpu_count": 2,
+                "gpu_devices": ["Tesla T4", "Tesla T4"],
+            }
+        )
+
+
+def test_runtime_lock_rejects_wrong_kaggle_gpu_count() -> None:
+    with pytest.raises(SystemExit, match="frozen inference runtime version drift"):
+        validate_runtime_versions(
+            {
+                "torch": "2.13.0+cu130",
+                "torch_cuda": "13.0",
+                "transformers": "5.5.3",
+                "tokenizers": "0.22.2",
+                "accelerate": "1.14.0",
+                "safetensors": "0.5.3",
+                "cuda_available": True,
+                "gpu_count": 1,
+                "gpu_devices": ["Tesla T4"],
+            }
+        )
+
+
+def test_runtime_lock_rejects_wrong_kaggle_gpu_name() -> None:
+    with pytest.raises(SystemExit, match="frozen inference runtime version drift"):
+        validate_runtime_versions(
+            {
+                "torch": "2.13.0+cu130",
+                "torch_cuda": "13.0",
+                "transformers": "5.5.3",
+                "tokenizers": "0.22.2",
+                "accelerate": "1.14.0",
+                "safetensors": "0.5.3",
+                "cuda_available": True,
+                "gpu_count": 2,
+                "gpu_devices": ["Tesla P100", "Tesla P100"],
             }
         )
 
@@ -289,12 +348,20 @@ def test_stage_lock_forbids_9_of_10_and_gretel(tmp_path: Path) -> None:
     assert protocol["model"]["expected_chat_template_sha256"] == EXPECTED_CHAT_TEMPLATE_SHA256
     assert protocol["model"]["quantization_default"] == "none"
     assert protocol["model"]["allowed_frozen_runtime_profiles"] == ALLOWED_FROZEN_RUNTIME_PROFILES
-    assert protocol["model"]["kaggle_runtime_profile_id"] == "kaggle_t4x2_cuda130"
+    assert protocol["model"]["primary_runtime_profile_id"] == PRIMARY_RUNTIME_PROFILE_ID
+    assert protocol["model"]["kaggle_requirements_lock"] == "requirements-inference-kaggle-t4x2.lock.txt"
     assert protocol["generation_contract"]["resume_allowed"] is False
     assert protocol["generation_contract"]["backend"] == "incremental_json_schema_grammar"
+    assert protocol["generation_contract"]["single_primary_runtime_profile"] is True
+    assert protocol["generation_contract"]["runtime_profile_switch_after_completed_generation_allowed"] is False
+    assert protocol["generation_contract"]["gpu_topology_fail_fast_before_model_load"] is True
+    assert protocol["generation_contract"]["device_map"] == "auto"
+    assert protocol["generation_contract"]["max_memory"] is None
     assert protocol["prompt_contract"]["phase_o_output_keys"] == ["operation", "span_refs"]
     assert lock["allowed_frozen_runtime_profiles"] == ALLOWED_FROZEN_RUNTIME_PROFILES
-    assert lock["kaggle_runtime_profile_id"] == "kaggle_t4x2_cuda130"
+    assert lock["primary_runtime_profile_id"] == PRIMARY_RUNTIME_PROFILE_ID
+    assert lock["single_primary_runtime_profile"] is True
+    assert lock["runtime_profile_switch_after_completed_generation_allowed"] is False
 
 
 def test_clean_reviewer_zip_validator_passes(tmp_path: Path) -> None:
@@ -320,7 +387,7 @@ def test_clean_reviewer_zip_validator_passes(tmp_path: Path) -> None:
     assert result.returncode == 0, result.stdout + result.stderr
 
 
-def _write_server_result(result_dir: Path, *, protocol_valid: bool, pass_count: int, runtime_profile: str = "uet") -> None:
+def _write_server_result(result_dir: Path, *, protocol_valid: bool, pass_count: int, runtime_profile: str = "kaggle") -> None:
     result_dir.mkdir(parents=True, exist_ok=True)
     cases = [
         {"sample_id": f"case_{index:02d}", "status": "PASS" if index <= pass_count else "FAIL", "failure_stage": None if index <= pass_count else "acceptance_gate", "checks": {}}
@@ -374,6 +441,9 @@ def _write_server_result(result_dir: Path, *, protocol_valid: bool, pass_count: 
         "chat_template_sha256": EXPECTED_CHAT_TEMPLATE_SHA256,
         "quantization": "none",
         "torch_dtype": "auto",
+        "device_map": "auto",
+        "max_memory": None,
+        "primary_runtime_profile_id": PRIMARY_RUNTIME_PROFILE_ID,
         "transformers_version": "5.5.3",
         "tokenizers_version": "0.22.2",
         "accelerate_version": "1.14.0",
@@ -461,3 +531,25 @@ def test_server_validator_accepts_kaggle_t4x2_runtime_profile(tmp_path: Path) ->
     assert report["protocol_compliance_status"] == "PASS"
     assert report["primary_gate_status"] == "PASS"
     assert report["status"] == "PASS"
+
+
+def test_server_validator_rejects_uet_runtime_as_primary_after_kaggle_lock(tmp_path: Path) -> None:
+    result_dir = tmp_path / "uet_runtime_after_kaggle_lock"
+    _write_server_result(result_dir, protocol_valid=True, pass_count=10, runtime_profile="uet")
+    report = validate_server_result(result_dir)
+    assert report["evidence_integrity_status"] == "PASS"
+    assert report["protocol_compliance_status"] == "FAIL"
+    assert report["primary_gate_status"] == "INVALID_NOT_EVALUATED"
+    assert any("runtime_profile_mismatch" in failure for failure in report["protocol_failures"])
+
+
+def test_server_validator_rejects_wrong_kaggle_topology(tmp_path: Path) -> None:
+    result_dir = tmp_path / "wrong_kaggle_topology"
+    _write_server_result(result_dir, protocol_valid=True, pass_count=10, runtime_profile="kaggle")
+    manifest = read_json(result_dir / "run_manifest.json")
+    manifest["model"]["gpu_devices"] = ["Tesla P100", "Tesla P100"]
+    write_json(result_dir / "run_manifest.json", manifest)
+    report = validate_server_result(result_dir)
+    assert report["evidence_integrity_status"] == "PASS"
+    assert report["protocol_compliance_status"] == "FAIL"
+    assert any("runtime_profile_mismatch" in failure for failure in report["protocol_failures"])

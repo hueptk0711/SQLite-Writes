@@ -33,11 +33,14 @@ from scripts.server.run_stage7e0_a4_english import (  # noqa: E402
     MODEL_REVISION,
     PHASE_M_MAX_NEW_TOKENS,
     PHASE_O_MAX_NEW_TOKENS,
+    HISTORICAL_RUNTIME_PROFILE_IDS,
+    PRIMARY_RUNTIME_PROFILE_ID,
     STAGE7C_A4_DIR,
     build_phase_o_span_ref_constraint_grammar,
     candidate_records,
     load_stage7c_a4_rows,
     run_stage7e0,
+    runtime_profile_by_id,
 )
 from nldbwrite_v3.v2_a1.inventories import build_schema_inventory  # noqa: E402
 from nldbwrite_v3.v2_a1.phase_m_schema import dynamic_schema  # noqa: E402
@@ -48,10 +51,11 @@ from scripts.server.run_stage7e0_v2_a1_preflight import build_phase_m_constraint
 
 
 STAGE_NAME = "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT"
-PATCH_NAME = "PATCH2"
+PATCH_NAME = "PATCH3"
 PACKAGE_DATE = "20260901"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
-FRESH_CONSTRAINED_RESULT_DIR_NAME = "stage7e0_a4_english_candidate_span_constrained_results_20260901"
+FRESH_CONSTRAINED_RESULT_DIR_NAME = "stage7e0_a4_english_candidate_span_kaggle_t4x2_results_20260901"
+KAGGLE_REQUIREMENTS_LOCK = "requirements-inference-kaggle-t4x2.lock.txt"
 
 
 def canonical_text(text: str) -> str:
@@ -126,7 +130,11 @@ def runner_protocol(accepted_commit: str) -> dict[str, Any]:
             "torch_dtype": "auto",
             "frozen_runtime_versions": FROZEN_RUNTIME_VERSIONS,
             "allowed_frozen_runtime_profiles": ALLOWED_FROZEN_RUNTIME_PROFILES,
-            "kaggle_runtime_profile_id": "kaggle_t4x2_cuda130",
+            "primary_runtime_profile_id": PRIMARY_RUNTIME_PROFILE_ID,
+            "primary_runtime_profile": runtime_profile_by_id(PRIMARY_RUNTIME_PROFILE_ID),
+            "historical_runtime_profile_ids": HISTORICAL_RUNTIME_PROFILE_IDS,
+            "historical_runtime_profiles": [runtime_profile_by_id(profile_id) for profile_id in HISTORICAL_RUNTIME_PROFILE_IDS],
+            "kaggle_requirements_lock": KAGGLE_REQUIREMENTS_LOCK,
         },
         "prompt_contract": {
             "phase_o_prompt_spec_path": A4_PROMPT_SPEC_REL,
@@ -159,6 +167,12 @@ def runner_protocol(accepted_commit: str) -> dict[str, Any]:
             "phase_m_max_new_tokens": PHASE_M_MAX_NEW_TOKENS,
             "accepted_patch9_backend_file": "scripts/server/run_stage7e0_v2_a1_preflight.py",
             "candidate_span_a4_runner_file": "scripts/server/run_stage7e0_a4_english.py",
+            "runtime_preflight_file": "scripts/server/preflight_runtime.py",
+            "single_primary_runtime_profile": True,
+            "runtime_profile_switch_after_completed_generation_allowed": False,
+            "gpu_topology_fail_fast_before_model_load": True,
+            "device_map": "auto",
+            "max_memory": None,
         },
         "acceptance": {
             "required_pass_count": "10/10",
@@ -170,65 +184,31 @@ def runner_protocol(accepted_commit: str) -> dict[str, Any]:
 
 
 def server_commands(accepted_commit: str, package_name: str) -> str:
-    return f"""# Stage7E0-A4 English Candidate-Span Server Run Commands
+    return f"""# Stage7E0-A4 English Candidate-Span Kaggle Primary Run Commands
 
-Upload from Windows:
+Stage7E0-A4 PATCH3 locks the primary scientific runtime to:
 
-```powershell
-cd "D:\\paper kltn\\text to sql\\github_publish\\SQLite-Writes"
-scp "{package_name}" uet@222.255.250.24:/home/uet/hue_ptk/
-scp "{package_name}.sha256" uet@222.255.250.24:/home/uet/hue_ptk/
+```text
+primary_runtime_profile_id={PRIMARY_RUNTIME_PROFILE_ID}
 ```
 
-Run on the GPU server:
+Run this as a Kaggle notebook Bash cell after adding this reviewer package as a
+Kaggle dataset:
 
 ```bash
-ssh uet@222.255.250.24
-cd /home/uet/hue_ptk
-sha256sum -c {package_name}.sha256
-rm -rf {STAGE_NAME}_{PATCH_NAME}_runner
-mkdir -p {STAGE_NAME}_{PATCH_NAME}_runner
-unzip -q {package_name} -d {STAGE_NAME}_{PATCH_NAME}_runner
-cd {STAGE_NAME}_{PATCH_NAME}_runner
-export HF_HOME="$HOME/hue_ptk/hf_cache"
-export TRANSFORMERS_OFFLINE=1
-PY="${{PY:-/home/uet/miniconda3/envs/stage7e0/bin/python}}"
-"$PY" scripts/server/run_stage7e0_a4_english.py \\
-  --accepted-protocol-commit {accepted_commit} \\
-  --result-root /home/uet/hue_ptk/{FRESH_CONSTRAINED_RESULT_DIR_NAME} \\
-  --backend constrained_hf \\
-  --quantization none \\
-  --phase-o-max-new-tokens {PHASE_O_MAX_NEW_TOKENS} \\
-  --phase-m-max-new-tokens {PHASE_M_MAX_NEW_TOKENS} \\
-  --model-name-or-path {DEFAULT_MODEL_PATH}
-```
-
-Do not use `--resume`. If infrastructure interrupts the job, archive the
-partial output and rerun in a new empty result root.
-
-Copy results back:
-
-```powershell
-scp -r uet@222.255.250.24:/home/uet/hue_ptk/{FRESH_CONSTRAINED_RESULT_DIR_NAME} .
-```
-
-Validate copied results:
-
-```bash
-python scripts/data/validate_stage7e0_a4_server_results.py --result-dir {FRESH_CONSTRAINED_RESULT_DIR_NAME}
-```
-
-Run on Kaggle T4x2 after adding the package as a Kaggle dataset:
-
-```bash
+%%bash
+set -euo pipefail
 cd /kaggle/working
 rm -rf {STAGE_NAME}_{PATCH_NAME}_runner
 mkdir -p {STAGE_NAME}_{PATCH_NAME}_runner
 PKG_ROOT="$(find /kaggle/input -type d -name '{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_*' -print -quit)"
+test -n "$PKG_ROOT"
 cp -a "$PKG_ROOT"/. {STAGE_NAME}_{PATCH_NAME}_runner/
 cd {STAGE_NAME}_{PATCH_NAME}_runner
 export HF_HOME=/kaggle/working/hf_cache
+python -m pip install --extra-index-url https://download.pytorch.org/whl/cu130 -r {KAGGLE_REQUIREMENTS_LOCK}
 python scripts/data/validate_stage7e0_a4_english_preflight.py --stage-dir {STAGE_NAME}
+python scripts/server/preflight_runtime.py --expected-profile {PRIMARY_RUNTIME_PROFILE_ID}
 python scripts/server/run_stage7e0_a4_english.py \\
   --accepted-protocol-commit {accepted_commit} \\
   --result-root /kaggle/working/{FRESH_CONSTRAINED_RESULT_DIR_NAME} \\
@@ -239,6 +219,11 @@ python scripts/server/run_stage7e0_a4_english.py \\
   --model-name-or-path {MODEL_ID}
 python scripts/data/validate_stage7e0_a4_server_results.py --result-dir /kaggle/working/{FRESH_CONSTRAINED_RESULT_DIR_NAME}
 ```
+
+Do not use `--resume`. If infrastructure interrupts before any completed
+primary generation, archive the partial output as infrastructure-aborted and
+rerun in a new empty result root. Do not switch to another runtime profile after
+observing any primary semantic output.
 """
 
 
@@ -342,6 +327,11 @@ repair=none
 quantization=none
 phase_o_max_new_tokens={PHASE_O_MAX_NEW_TOKENS}
 phase_m_max_new_tokens={PHASE_M_MAX_NEW_TOKENS}
+primary_runtime_profile_id={PRIMARY_RUNTIME_PROFILE_ID}
+kaggle_requirements_lock={KAGGLE_REQUIREMENTS_LOCK}
+single_primary_runtime_profile=true
+runtime_profile_switch_after_completed_generation_allowed=false
+gpu_topology_fail_fast_before_model_load=true
 allowed_runtime_profiles={canonical_json(ALLOWED_FROZEN_RUNTIME_PROFILES)}
 gretel_pilot_opened=false
 ```
@@ -362,6 +352,7 @@ mock_uses_label_side_expected={str(mock_summary["mock_uses_label_side_expected"]
 ```text
 python scripts/data/validate_stage7c_a4_candidate_span_phase_o_protocol.py --stage-dir Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL
 python scripts/data/validate_stage7e0_a4_english_preflight.py --stage-dir {STAGE_NAME}
+python scripts/server/preflight_runtime.py --expected-profile {PRIMARY_RUNTIME_PROFILE_ID}
 python -m pytest -q tests/test_stage7e0_a4_english_preflight.py
 python -m zipfile --test {PACKAGE_NAME}
 ```
@@ -371,15 +362,17 @@ python -m zipfile --test {PACKAGE_NAME}
 def reviewer_readme(package_name: str, accepted_commit: str) -> str:
     return f"""# Stage7E0-A4 English Candidate-Span Real Generation Preflight {PATCH_NAME}
 
-This reviewer package prepares the GPU run for the 10 locked Stage7C-A4
-candidate-span cases. It does not open Gretel, development, or official test
-sets. Phase O emits only `operation` and `span_refs`; Phase M is unchanged.
+This reviewer package prepares the Kaggle T4x2 primary GPU run for the 10 locked
+Stage7C-A4 candidate-span cases. It does not open Gretel, development, or
+official test sets. Phase O emits only `operation` and `span_refs`; Phase M is
+unchanged.
 
 Clean extraction checks:
 
 ```bash
 python scripts/data/validate_stage7c_a4_candidate_span_phase_o_protocol.py --stage-dir Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL
 python scripts/data/validate_stage7e0_a4_english_preflight.py --stage-dir {STAGE_NAME}
+python scripts/server/preflight_runtime.py --expected-profile {PRIMARY_RUNTIME_PROFILE_ID}
 python -m pytest -q tests/test_stage7e0_a4_english_preflight.py
 ```
 
@@ -469,10 +462,19 @@ def build_stage(out_dir: Path, package_path: Path | None) -> dict[str, Any]:
         "phase_o_max_new_tokens": PHASE_O_MAX_NEW_TOKENS,
         "phase_m_max_new_tokens": PHASE_M_MAX_NEW_TOKENS,
         "resume_allowed": False,
-        "fresh_constrained_result_root": f"/home/uet/hue_ptk/{FRESH_CONSTRAINED_RESULT_DIR_NAME}",
+        "fresh_constrained_result_root": f"/kaggle/working/{FRESH_CONSTRAINED_RESULT_DIR_NAME}",
         "frozen_runtime_versions": FROZEN_RUNTIME_VERSIONS,
         "allowed_frozen_runtime_profiles": ALLOWED_FROZEN_RUNTIME_PROFILES,
-        "kaggle_runtime_profile_id": "kaggle_t4x2_cuda130",
+        "primary_runtime_profile_id": PRIMARY_RUNTIME_PROFILE_ID,
+        "primary_runtime_profile": runtime_profile_by_id(PRIMARY_RUNTIME_PROFILE_ID),
+        "historical_runtime_profile_ids": HISTORICAL_RUNTIME_PROFILE_IDS,
+        "historical_runtime_profiles": [runtime_profile_by_id(profile_id) for profile_id in HISTORICAL_RUNTIME_PROFILE_IDS],
+        "kaggle_requirements_lock": KAGGLE_REQUIREMENTS_LOCK,
+        "single_primary_runtime_profile": True,
+        "runtime_profile_switch_after_completed_generation_allowed": False,
+        "gpu_topology_fail_fast_before_model_load": True,
+        "device_map": "auto",
+        "max_memory": None,
         "constraint_independence_audit_sha256": sha256_file(out_dir / "CONSTRAINT_INDEPENDENCE_AUDIT_A4.json"),
         "model_called": False,
         "gpu_called": False,
@@ -504,6 +506,7 @@ def include_paths(stage_dir: Path) -> list[Path]:
     include_rel = [
         "pyproject.toml",
         "requirements-inference.lock.txt",
+        KAGGLE_REQUIREMENTS_LOCK,
         STAGE7C_A4_DIR,
         "Stage7C_A3_ENGLISH_PHASE_O_OFFSET_SEMANTICS_AMENDMENT/STAGE7C_A3_LOCK.json",
         "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT",
@@ -512,6 +515,7 @@ def include_paths(stage_dir: Path) -> list[Path]:
         "src/nldbwrite_v3/v2_a1",
         "src/nldbwrite_v3/inference/parse_output.py",
         "scripts/server/run_stage7e0_a4_english.py",
+        "scripts/server/preflight_runtime.py",
         "scripts/server/run_stage7e0_v2_a1_preflight.py",
         "scripts/data/build_stage7e0_a4_english_preflight.py",
         "scripts/data/validate_stage7e0_a4_english_preflight.py",

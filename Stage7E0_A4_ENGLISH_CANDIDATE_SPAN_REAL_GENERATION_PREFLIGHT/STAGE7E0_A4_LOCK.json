@@ -3,35 +3,62 @@
     {
       "gpu_requirement": "cuda_available=true",
       "packages": {
-        "accelerate": "1.14.0",
-        "safetensors": "0.5.3",
-        "tokenizers": "0.22.2",
-        "torch": "2.6.0+cu124",
-        "transformers": "5.5.3"
+        "accelerate": [
+          "1.14.0"
+        ],
+        "safetensors": [
+          "0.5.3"
+        ],
+        "tokenizers": [
+          "0.22.2"
+        ],
+        "torch": [
+          "2.6.0+cu124"
+        ],
+        "transformers": [
+          "5.5.3"
+        ]
       },
       "profile_id": "uet_server_cuda124",
+      "role": "historical_reference_only",
       "torch_cuda": "12.4"
     },
     {
+      "cuda_available": true,
+      "gpu_count": 2,
+      "gpu_device_substring": "Tesla T4",
       "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
       "packages": {
-        "accelerate": "1.14.0",
-        "safetensors": "0.5.3",
-        "tokenizers": "0.22.2",
-        "torch": "2.13.0",
-        "transformers": "5.5.3"
+        "accelerate": [
+          "1.14.0"
+        ],
+        "safetensors": [
+          "0.5.3"
+        ],
+        "tokenizers": [
+          "0.22.2"
+        ],
+        "torch": [
+          "2.13.0",
+          "2.13.0+cu130"
+        ],
+        "transformers": [
+          "5.5.3"
+        ]
       },
       "profile_id": "kaggle_t4x2_cuda130",
+      "role": "primary_scientific_runtime",
       "torch_cuda": "13.0"
     }
   ],
   "backend": "incremental_json_schema_grammar",
-  "constraint_independence_audit_sha256": "176ed5dae737fa2f0458ce96b7dacb0e228081a4c87846823a5887a7a33eb223",
-  "created_utc": "2026-09-01T05:09:06.059905+00:00",
-  "derived_artifact_manifest_sha256": "a8dc86a41ac4343a085c9aa8f16f59455fe01789caa73ee11b979d75b5466ce5",
+  "constraint_independence_audit_sha256": "7a2eb001cf1eb49103b90ca05cf0ecd202104cba7511eec5faf32b7b3fb8a56c",
+  "created_utc": "2026-09-01T05:36:24.811698+00:00",
+  "derived_artifact_manifest_sha256": "55046819e3c0e3145a390b543f514b08585b5945829235598c2bc68d30ee9963",
   "development_dev_used": false,
+  "device_map": "auto",
   "fallback_to_unconstrained": false,
-  "fresh_constrained_result_root": "/home/uet/hue_ptk/stage7e0_a4_english_candidate_span_constrained_results_20260901",
+  "fresh_constrained_result_root": "/kaggle/working/stage7e0_a4_english_candidate_span_kaggle_t4x2_results_20260901",
   "frozen_runtime_versions": {
     "accelerate": "1.14.0",
     "safetensors": "0.5.3",
@@ -40,25 +67,85 @@
     "transformers": "5.5.3"
   },
   "git_branch": "stage6/crudsql-eligibility-audit",
-  "git_commit": "41a54496e8d2d9b35cd2164c10c1a5ab1e12a6b8",
+  "git_commit": "b1cf3e0113f477810c4b1ad8996c1ca6ea0b39b6",
   "gpu_called": false,
+  "gpu_topology_fail_fast_before_model_load": true,
   "gretel_pilot_opened": false,
-  "kaggle_runtime_profile_id": "kaggle_t4x2_cuda130",
+  "historical_runtime_profile_ids": [
+    "uet_server_cuda124"
+  ],
+  "historical_runtime_profiles": [
+    {
+      "gpu_requirement": "cuda_available=true",
+      "packages": {
+        "accelerate": [
+          "1.14.0"
+        ],
+        "safetensors": [
+          "0.5.3"
+        ],
+        "tokenizers": [
+          "0.22.2"
+        ],
+        "torch": [
+          "2.6.0+cu124"
+        ],
+        "transformers": [
+          "5.5.3"
+        ]
+      },
+      "profile_id": "uet_server_cuda124",
+      "role": "historical_reference_only",
+      "torch_cuda": "12.4"
+    }
+  ],
+  "kaggle_requirements_lock": "requirements-inference-kaggle-t4x2.lock.txt",
+  "max_memory": null,
   "mock_dry_run_only": true,
   "model_called": false,
   "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
   "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
   "official_test_used": false,
-  "patch": "PATCH2",
+  "patch": "PATCH3",
   "phase_m_max_new_tokens": 8192,
   "phase_o_max_new_tokens": 512,
   "phase_o_prompt_spec_path": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/PHASE_O_PROMPT_SPEC_A4_ENGLISH.json",
   "primary_acceptance": "10/10 required; no average and no 9/10 acceptance",
   "primary_case_count": 10,
+  "primary_runtime_profile": {
+    "cuda_available": true,
+    "gpu_count": 2,
+    "gpu_device_substring": "Tesla T4",
+    "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
+    "packages": {
+      "accelerate": [
+        "1.14.0"
+      ],
+      "safetensors": [
+        "0.5.3"
+      ],
+      "tokenizers": [
+        "0.22.2"
+      ],
+      "torch": [
+        "2.13.0",
+        "2.13.0+cu130"
+      ],
+      "transformers": [
+        "5.5.3"
+      ]
+    },
+    "profile_id": "kaggle_t4x2_cuda130",
+    "role": "primary_scientific_runtime",
+    "torch_cuda": "13.0"
+  },
+  "primary_runtime_profile_id": "kaggle_t4x2_cuda130",
   "quantization": "none",
   "repair": "none",
   "resume_allowed": false,
   "retry": 0,
+  "runtime_profile_switch_after_completed_generation_allowed": false,
+  "single_primary_runtime_profile": true,
   "stage": "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT",
   "status": "PASS_READY_FOR_REAL_A4_CONSTRAINED_PREFLIGHT",
   "token_level_enforcement": true,
