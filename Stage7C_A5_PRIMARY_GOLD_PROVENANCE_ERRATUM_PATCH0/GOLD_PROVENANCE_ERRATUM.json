@@ -1,0 +1,45 @@
+{
+  "corrections": [
+    {
+      "column_name": "passed",
+      "column_ref": "COL_4",
+      "new_candidate_span_ref": "SPAN_0030",
+      "new_end_char": 76,
+      "new_start_char": 75,
+      "old_candidate_span_ref": "SPAN_0013",
+      "old_end_char": 35,
+      "old_start_char": 34,
+      "sample_id": "stage7c_a5_primary_english_003",
+      "split": "primary",
+      "value": "7"
+    },
+    {
+      "column_name": "artist_name",
+      "column_ref": "COL_2",
+      "new_candidate_span_ref": "SPAN_0019",
+      "new_end_char": 47,
+      "new_start_char": 42,
+      "old_candidate_span_ref": "SPAN_0009",
+      "old_end_char": 24,
+      "old_start_char": 19,
+      "sample_id": "stage7c_a5_primary_english_011",
+      "split": "primary",
+      "value": "Glass"
+    },
+    {
+      "column_name": "state_name",
+      "column_ref": "COL_2",
+      "new_candidate_span_ref": "SPAN_0021",
+      "new_end_char": 41,
+      "new_start_char": 33,
+      "old_candidate_span_ref": "SPAN_0008",
+      "old_end_char": 18,
+      "old_start_char": 10,
+      "sample_id": "stage7c_a5_fresh_english_011",
+      "split": "diagnostic",
+      "value": "New York"
+    }
+  ],
+  "stage": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0",
+  "status": "PASS"
+}

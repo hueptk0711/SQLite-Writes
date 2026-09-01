@@ -1,0 +1,62 @@
+{
+  "artifact_count": 11,
+  "artifacts": [
+    {
+      "bytes": 204521,
+      "path": "CORRECTED_A4_DERIVED_REGRESSION_DIAGNOSTICS_A5.jsonl",
+      "sha256": "41b226d29286dac3569fb78b97117cd1a8ba2eb552fbd7d7a96fbcc0d3d501d3"
+    },
+    {
+      "bytes": 226156,
+      "path": "CORRECTED_FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl",
+      "sha256": "2019cc234888f3a43e96adbda993cbe24819f224b22398012591fba362cbabdc"
+    },
+    {
+      "bytes": 60639,
+      "path": "DUPLICATE_LITERAL_GOLD_AUDIT.json",
+      "sha256": "77824fbfe268f4f775579fdc2813c75a3b00ed629b524e23ceae01109c6a1ae7"
+    },
+    {
+      "bytes": 738,
+      "path": "ERRATUM_LOCK.json",
+      "sha256": "49478f448744802ca4472073979f54a0002937ceb1639e89298350cca36e33b5"
+    },
+    {
+      "bytes": 865,
+      "path": "ERRATUM_REPORT.md",
+      "sha256": "272e4c40ef0fd2c167350540ffebb2738943ed25651790ba821b719894a0e0da"
+    },
+    {
+      "bytes": 1238,
+      "path": "GOLD_PROVENANCE_ERRATUM.json",
+      "sha256": "d85c0fa17c467a40a828c1feecabcd29ab8f966e709b0d12b5959b0b3bdc51df"
+    },
+    {
+      "bytes": 22937,
+      "path": "OFFLINE_REPLAY_CORRECTED_UET_PRIMARY_RESULTS.jsonl",
+      "sha256": "67be14a9cdf1cc4d2604b4d87fad984ca283b9a6bb71e0ea5434406fe964dc39"
+    },
+    {
+      "bytes": 815,
+      "path": "OFFLINE_REPLAY_CORRECTED_UET_PRIMARY_SUMMARY.json",
+      "sha256": "0a79d3dee83ed429af2e340efc418f911da1d3b824a450834dce2eba4ed581bb"
+    },
+    {
+      "bytes": 864,
+      "path": "REVIEWER_README.md",
+      "sha256": "1f9aa3e7b72ffabacf732cd908810fde4f1861f10a145937131267f933c678b7"
+    },
+    {
+      "bytes": 637,
+      "path": "SERVER_RESULT_RECLASSIFICATION_PATCH0.json",
+      "sha256": "559dba1dfd65e62961fdac763f523d9fcddbe274bfe209155899c7a8ae4a47f7"
+    },
+    {
+      "bytes": 459,
+      "path": "VALIDATION_REPORT.md",
+      "sha256": "43c450621244e4b73a9459d45fcb4ecf2334769de3315a2378ae6a05eae2693a"
+    }
+  ],
+  "combined_scientific_artifacts_sha256": "435b6fed71a767b289492da41db44515e217be0bcd78bd637cff65bc291dcb58",
+  "stage": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0"
+}

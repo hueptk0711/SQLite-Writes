@@ -1,0 +1,22 @@
+{
+  "corrected_pass_case_ids": [
+    "stage7c_a5_primary_english_003",
+    "stage7c_a5_primary_english_012"
+  ],
+  "corrected_primary_pass_count": "2/12",
+  "failure_stage_counts": {
+    "None": 2,
+    "acceptance_gate": 7,
+    "materialization_failure": 3
+  },
+  "gpu_called": false,
+  "model_called": false,
+  "old_gold_primary_pass_count": "1/12",
+  "original_classification_superseded": "SUPERSEDED_BY_GOLD_PROVENANCE_ERRATUM",
+  "raw_primary_phase_o_sha256": "3ff2c3e079f19099dcce9b1883faca98156376b24a097f080886e5dfbeedb1d9",
+  "raw_uet_outputs_reused": true,
+  "required_pass_count": "12/12",
+  "source_stage": "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT",
+  "stage": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0",
+  "status": "REAL_CONSTRAINED_PRIMARY_FAIL_DO_NOT_OPEN_GRETEL"
+}

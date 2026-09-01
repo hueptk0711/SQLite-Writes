@@ -401,6 +401,7 @@ def case_definitions() -> list[dict[str, Any]]:
                 }
             ],
             "assigned_values": {"city_name": "New York City", "state_name": "New York", "population_rank": "1", "nickname": "Big Apple"},
+            "assigned_value_spans": {"state_name": {"start_char": 33, "end_char": 41}},
         },
         {
             "sample_id": "stage7c_a5_fresh_english_012",
@@ -485,6 +486,7 @@ def case_definitions() -> list[dict[str, Any]]:
                 }
             ],
             "assigned_values": {"vin_code": "VIN-9K2L7M", "plate": "HZX-482", "mileage": "64012", "passed": "7", "bay": "BAY_14"},
+            "assigned_value_spans": {"passed": {"start_char": 75, "end_char": 76}},
         },
         {
             "sample_id": "stage7c_a5_primary_english_004",
@@ -655,6 +657,7 @@ def case_definitions() -> list[dict[str, Any]]:
                 }
             ],
             "assigned_values": {"release_title": "Glass Harbor", "artist_name": "Glass", "track_count": "11", "label": "Northline"},
+            "assigned_value_spans": {"artist_name": {"start_char": 42, "end_char": 47}},
         },
         {
             "sample_id": "stage7c_a5_primary_english_012",
@@ -859,10 +862,36 @@ def read_rows(connection: sqlite3.Connection, table: str) -> list[dict[str, Any]
     return [dict(row) for row in rows]
 
 
-def find_value_span(question: str, value: str) -> dict[str, Any]:
-    start = question.index(value)
-    end = start + len(value)
-    return {"start_char": start, "end_char": end, "text": value}
+def literal_occurrences(question: str, value: str) -> list[dict[str, Any]]:
+    occurrences = []
+    start = 0
+    while True:
+        index = question.find(value, start)
+        if index < 0:
+            return occurrences
+        occurrences.append({"start_char": index, "end_char": index + len(value), "text": value})
+        start = index + 1
+
+
+def find_value_span(case: dict[str, Any], column_name: str, value: str) -> dict[str, Any]:
+    question = case["question"]
+    occurrences = literal_occurrences(question, value)
+    explicit = case.get("assigned_value_spans", {}).get(column_name)
+    if explicit is not None:
+        start = int(explicit["start_char"])
+        end = int(explicit["end_char"])
+        if question[start:end] != value:
+            raise ValueError(f"Explicit source span mismatch for {case['sample_id']} column {column_name}: {start}:{end} != {value!r}")
+        return {
+            "start_char": start,
+            "end_char": end,
+            "text": value,
+            "occurrence_count": len(occurrences),
+            "explicitly_disambiguated": True,
+        }
+    if len(occurrences) != 1:
+        raise ValueError(f"Ambiguous assigned literal for {case['sample_id']} column {column_name}: {value!r} occurs {len(occurrences)} times; explicit source span required")
+    return {**occurrences[0], "occurrence_count": 1, "explicitly_disambiguated": False}
 
 
 def gold_column_span_refs(case: dict[str, Any], inventory: list[Any]) -> tuple[dict[str, str], list[dict[str, Any]]]:
@@ -875,7 +904,7 @@ def gold_column_span_refs(case: dict[str, Any], inventory: list[Any]) -> tuple[d
             selected[column.column_ref] = "OMIT"
             continue
         value = assigned[column.column_name]
-        span = find_value_span(case["question"], value)
+        span = find_value_span(case, column.column_name, value)
         candidate = by_span.get((span["start_char"], span["end_char"]))
         if candidate is None:
             raise ValueError(f"Candidate generation miss for {case['sample_id']} column {column.column_ref} value {value!r}")

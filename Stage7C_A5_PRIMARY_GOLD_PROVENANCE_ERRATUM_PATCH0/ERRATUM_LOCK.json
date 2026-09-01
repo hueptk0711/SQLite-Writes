@@ -1,0 +1,17 @@
+{
+  "corrected_primary_pass_count": "2/12",
+  "correction_count": 3,
+  "created_utc": "2026-09-01T15:56:46.062212+00:00",
+  "diagnostics_run": false,
+  "duplicate_literal_gold_audit_sha256": "77824fbfe268f4f775579fdc2813c75a3b00ed629b524e23ceae01109c6a1ae7",
+  "gpu_called": false,
+  "gretel_pilot_opened": false,
+  "model_called": false,
+  "old_gold_classification": "SUPERSEDED_BY_GOLD_PROVENANCE_ERRATUM",
+  "old_gold_primary_pass_count": "1/12",
+  "raw_uet_outputs_reused": true,
+  "required_pass_count": "12/12",
+  "source_tar_sha256": "f275b7990c06f6d2130b6ebf0cdb33d29d8a51b83281fdc0beb83cdc2f34c035",
+  "stage": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0",
+  "status": "REAL_CONSTRAINED_PRIMARY_FAIL_DO_NOT_OPEN_GRETEL"
+}

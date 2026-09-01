@@ -1,0 +1,2205 @@
+{
+  "diagnostic_case_count": 12,
+  "diagnostic_duplicate_literal_count": 1,
+  "duplicate_literal_count": 3,
+  "implicit_first_occurrence_forbidden_count": 0,
+  "primary_case_count": 12,
+  "primary_duplicate_literal_count": 2,
+  "rows": [
+    {
+      "candidate_span_ref": "SPAN_0012",
+      "candidate_text": "LOAN-842",
+      "column_name": "loan_id",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 42,
+      "gold_start_char": 34,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 42,
+          "start_char": 34,
+          "text": "LOAN-842"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_001",
+      "split": "primary",
+      "value": "LOAN-842"
+    },
+    {
+      "candidate_span_ref": "SPAN_0021",
+      "candidate_text": "River Atlas",
+      "column_name": "title",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 62,
+      "gold_start_char": 51,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 62,
+          "start_char": 51,
+          "text": "River Atlas"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_001",
+      "split": "primary",
+      "value": "River Atlas"
+    },
+    {
+      "candidate_span_ref": "SPAN_0030",
+      "candidate_text": "CARD-190",
+      "column_name": "borrower_card",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 87,
+      "gold_start_char": 79,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 87,
+          "start_char": 79,
+          "text": "CARD-190"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_001",
+      "split": "primary",
+      "value": "CARD-190"
+    },
+    {
+      "candidate_span_ref": "SPAN_0037",
+      "candidate_text": "21",
+      "column_name": "loan_days",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 101,
+      "gold_start_char": 99,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 101,
+          "start_char": 99,
+          "text": "21"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_001",
+      "split": "primary",
+      "value": "21"
+    },
+    {
+      "candidate_span_ref": "SPAN_0044",
+      "candidate_text": "2026-10-15",
+      "column_name": "due_on",
+      "column_ref": "COL_5",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 120,
+      "gold_start_char": 110,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 120,
+          "start_char": 110,
+          "text": "2026-10-15"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_001",
+      "split": "primary",
+      "value": "2026-10-15"
+    },
+    {
+      "candidate_span_ref": "SPAN_0011",
+      "candidate_text": "Aurora Mapping Study",
+      "column_name": "grant_title",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 42,
+      "gold_start_char": 22,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 42,
+          "start_char": 22,
+          "text": "Aurora Mapping Study"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_002",
+      "split": "primary",
+      "value": "Aurora Mapping Study"
+    },
+    {
+      "candidate_span_ref": "SPAN_0021",
+      "candidate_text": "GR-2042",
+      "column_name": "grant_code",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 63,
+      "gold_start_char": 56,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 63,
+          "start_char": 56,
+          "text": "GR-2042"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_002",
+      "split": "primary",
+      "value": "GR-2042"
+    },
+    {
+      "candidate_span_ref": "SPAN_0028",
+      "candidate_text": "87500.50",
+      "column_name": "amount",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 80,
+      "gold_start_char": 72,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 80,
+          "start_char": 72,
+          "text": "87500.50"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_002",
+      "split": "primary",
+      "value": "87500.50"
+    },
+    {
+      "candidate_span_ref": "SPAN_0034",
+      "candidate_text": "2027",
+      "column_name": "fiscal_year",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 98,
+      "gold_start_char": 94,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 98,
+          "start_char": 94,
+          "text": "2027"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_002",
+      "split": "primary",
+      "value": "2027"
+    },
+    {
+      "candidate_span_ref": "SPAN_0008",
+      "candidate_text": "VIN-9K2L7M",
+      "column_name": "vin_code",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 36,
+      "gold_start_char": 26,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 36,
+          "start_char": 26,
+          "text": "VIN-9K2L7M"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_003",
+      "split": "primary",
+      "value": "VIN-9K2L7M"
+    },
+    {
+      "candidate_span_ref": "SPAN_0017",
+      "candidate_text": "HZX-482",
+      "column_name": "plate",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 51,
+      "gold_start_char": 44,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 51,
+          "start_char": 44,
+          "text": "HZX-482"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_003",
+      "split": "primary",
+      "value": "HZX-482"
+    },
+    {
+      "candidate_span_ref": "SPAN_0024",
+      "candidate_text": "64012",
+      "column_name": "mileage",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 66,
+      "gold_start_char": 61,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 66,
+          "start_char": 61,
+          "text": "64012"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_003",
+      "split": "primary",
+      "value": "64012"
+    },
+    {
+      "candidate_span_ref": "SPAN_0030",
+      "candidate_text": "7",
+      "column_name": "passed",
+      "column_ref": "COL_4",
+      "duplicate_literal": true,
+      "explicitly_disambiguated": true,
+      "gold_end_char": 76,
+      "gold_start_char": 75,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "end_char": 35,
+          "start_char": 34,
+          "text": "7"
+        },
+        {
+          "end_char": 76,
+          "start_char": 75,
+          "text": "7"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_003",
+      "split": "primary",
+      "value": "7"
+    },
+    {
+      "candidate_span_ref": "SPAN_0036",
+      "candidate_text": "BAY_14",
+      "column_name": "bay",
+      "column_ref": "COL_5",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 88,
+      "gold_start_char": 82,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 88,
+          "start_char": 82,
+          "text": "BAY_14"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_003",
+      "split": "primary",
+      "value": "BAY_14"
+    },
+    {
+      "candidate_span_ref": "SPAN_0011",
+      "candidate_text": "Silver Archive Plus",
+      "column_name": "plan_name",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 42,
+      "gold_start_char": 23,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 42,
+          "start_char": 23,
+          "text": "Silver Archive Plus"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_004",
+      "split": "primary",
+      "value": "Silver Archive Plus"
+    },
+    {
+      "candidate_span_ref": "SPAN_0021",
+      "candidate_text": "PLAN-77",
+      "column_name": "plan_code",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 62,
+      "gold_start_char": 55,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 62,
+          "start_char": 55,
+          "text": "PLAN-77"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_004",
+      "split": "primary",
+      "value": "PLAN-77"
+    },
+    {
+      "candidate_span_ref": "SPAN_0028",
+      "candidate_text": "14.95",
+      "column_name": "monthly_fee",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 81,
+      "gold_start_char": 76,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 81,
+          "start_char": 76,
+          "text": "14.95"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_004",
+      "split": "primary",
+      "value": "14.95"
+    },
+    {
+      "candidate_span_ref": "SPAN_0011",
+      "candidate_text": "Cedar Ridge Outpost",
+      "column_name": "station_name",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 43,
+      "gold_start_char": 24,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 43,
+          "start_char": 24,
+          "text": "Cedar Ridge Outpost"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_005",
+      "split": "primary",
+      "value": "Cedar Ridge Outpost"
+    },
+    {
+      "candidate_span_ref": "SPAN_0022",
+      "candidate_text": "0xA5C0DE",
+      "column_name": "station_id",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 65,
+      "gold_start_char": 57,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 65,
+          "start_char": 57,
+          "text": "0xA5C0DE"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_005",
+      "split": "primary",
+      "value": "0xA5C0DE"
+    },
+    {
+      "candidate_span_ref": "SPAN_0030",
+      "candidate_text": "19.6",
+      "column_name": "temperature_c",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 83,
+      "gold_start_char": 79,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 83,
+          "start_char": 79,
+          "text": "19.6"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_005",
+      "split": "primary",
+      "value": "19.6"
+    },
+    {
+      "candidate_span_ref": "SPAN_0037",
+      "candidate_text": "72%",
+      "column_name": "humidity_text",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 97,
+      "gold_start_char": 94,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 97,
+          "start_char": 94,
+          "text": "72%"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_005",
+      "split": "primary",
+      "value": "72%"
+    },
+    {
+      "candidate_span_ref": "SPAN_0007",
+      "candidate_text": "BIN-A17",
+      "column_name": "bin_code",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 26,
+      "gold_start_char": 19,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 26,
+          "start_char": 19,
+          "text": "BIN-A17"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_006",
+      "split": "primary",
+      "value": "BIN-A17"
+    },
+    {
+      "candidate_span_ref": "SPAN_0014",
+      "candidate_text": "6",
+      "column_name": "aisle",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 37,
+      "gold_start_char": 36,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 37,
+          "start_char": 36,
+          "text": "6"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_006",
+      "split": "primary",
+      "value": "6"
+    },
+    {
+      "candidate_span_ref": "SPAN_0020",
+      "candidate_text": "240.5",
+      "column_name": "capacity",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 57,
+      "gold_start_char": 52,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 57,
+          "start_char": 52,
+          "text": "240.5"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_006",
+      "split": "primary",
+      "value": "240.5"
+    },
+    {
+      "candidate_span_ref": "SPAN_0029",
+      "candidate_text": "copper rivets",
+      "column_name": "stored_item",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 88,
+      "gold_start_char": 75,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 88,
+          "start_char": 75,
+          "text": "copper rivets"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_006",
+      "split": "primary",
+      "value": "copper rivets"
+    },
+    {
+      "candidate_span_ref": "SPAN_0010",
+      "candidate_text": "Leah Morton",
+      "column_name": "attendee_name",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 41,
+      "gold_start_char": 30,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 41,
+          "start_char": 30,
+          "text": "Leah Morton"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_007",
+      "split": "primary",
+      "value": "Leah Morton"
+    },
+    {
+      "candidate_span_ref": "SPAN_0017",
+      "candidate_text": "leah.morton@conf.example",
+      "column_name": "badge_email",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 80,
+      "gold_start_char": 56,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 80,
+          "start_char": 56,
+          "text": "leah.morton@conf.example"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_007",
+      "split": "primary",
+      "value": "leah.morton@conf.example"
+    },
+    {
+      "candidate_span_ref": "SPAN_0025",
+      "candidate_text": "data systems",
+      "column_name": "track",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 101,
+      "gold_start_char": 89,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 101,
+          "start_char": 89,
+          "text": "data systems"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_007",
+      "split": "primary",
+      "value": "data systems"
+    },
+    {
+      "candidate_span_ref": "SPAN_0032",
+      "candidate_text": "2",
+      "column_name": "paid",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 110,
+      "gold_start_char": 109,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 110,
+          "start_char": 109,
+          "text": "2"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_007",
+      "split": "primary",
+      "value": "2"
+    },
+    {
+      "candidate_span_ref": "SPAN_0038",
+      "candidate_text": "A-14",
+      "column_name": "seat",
+      "column_ref": "COL_5",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 121,
+      "gold_start_char": 117,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 121,
+          "start_char": 117,
+          "text": "A-14"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_007",
+      "split": "primary",
+      "value": "A-14"
+    },
+    {
+      "candidate_span_ref": "SPAN_0007",
+      "candidate_text": "FL-390",
+      "column_name": "flight_no",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 28,
+      "gold_start_char": 22,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 28,
+          "start_char": 22,
+          "text": "FL-390"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_008",
+      "split": "primary",
+      "value": "FL-390"
+    },
+    {
+      "candidate_span_ref": "SPAN_0017",
+      "candidate_text": "Da Nang",
+      "column_name": "origin",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 49,
+      "gold_start_char": 42,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 49,
+          "start_char": 42,
+          "text": "Da Nang"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_008",
+      "split": "primary",
+      "value": "Da Nang"
+    },
+    {
+      "candidate_span_ref": "SPAN_0028",
+      "candidate_text": "Seoul",
+      "column_name": "destination",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 72,
+      "gold_start_char": 67,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 72,
+          "start_char": 67,
+          "text": "Seoul"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_008",
+      "split": "primary",
+      "value": "Seoul"
+    },
+    {
+      "candidate_span_ref": "SPAN_0033",
+      "candidate_text": "285",
+      "column_name": "duration_minutes",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 95,
+      "gold_start_char": 92,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 95,
+          "start_char": 92,
+          "text": "285"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_008",
+      "split": "primary",
+      "value": "285"
+    },
+    {
+      "candidate_span_ref": "SPAN_0039",
+      "candidate_text": "C7",
+      "column_name": "gate",
+      "column_ref": "COL_5",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 104,
+      "gold_start_char": 102,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 104,
+          "start_char": 102,
+          "text": "C7"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_008",
+      "split": "primary",
+      "value": "C7"
+    },
+    {
+      "candidate_span_ref": "SPAN_0016",
+      "candidate_text": "SPEC-019",
+      "column_name": "specimen_code",
+      "column_ref": "TAB_2_COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 54,
+      "gold_start_char": 46,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 54,
+          "start_char": 46,
+          "text": "SPEC-019"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_009",
+      "split": "primary",
+      "value": "SPEC-019"
+    },
+    {
+      "candidate_span_ref": "SPAN_0025",
+      "candidate_text": "maple leaf",
+      "column_name": "tissue",
+      "column_ref": "TAB_2_COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 74,
+      "gold_start_char": 64,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 74,
+          "start_char": 64,
+          "text": "maple leaf"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_009",
+      "split": "primary",
+      "value": "maple leaf"
+    },
+    {
+      "candidate_span_ref": "SPAN_0032",
+      "candidate_text": "0.42",
+      "column_name": "mass_g",
+      "column_ref": "TAB_2_COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 86,
+      "gold_start_char": 82,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 86,
+          "start_char": 82,
+          "text": "0.42"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_009",
+      "split": "primary",
+      "value": "0.42"
+    },
+    {
+      "candidate_span_ref": "SPAN_0038",
+      "candidate_text": "FZ-3",
+      "column_name": "freezer_slot",
+      "column_ref": "TAB_2_COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 105,
+      "gold_start_char": 101,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 105,
+          "start_char": 101,
+          "text": "FZ-3"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_009",
+      "split": "primary",
+      "value": "FZ-3"
+    },
+    {
+      "candidate_span_ref": "SPAN_0016",
+      "candidate_text": "BP-2027-18",
+      "column_name": "permit_no",
+      "column_ref": "TAB_2_COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 50,
+      "gold_start_char": 40,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 50,
+          "start_char": 40,
+          "text": "BP-2027-18"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_010",
+      "split": "primary",
+      "value": "BP-2027-18"
+    },
+    {
+      "candidate_span_ref": "SPAN_0024",
+      "candidate_text": "LOT-88A",
+      "column_name": "parcel",
+      "column_ref": "TAB_2_COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 66,
+      "gold_start_char": 59,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 66,
+          "start_char": 59,
+          "text": "LOT-88A"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_010",
+      "split": "primary",
+      "value": "LOT-88A"
+    },
+    {
+      "candidate_span_ref": "SPAN_0031",
+      "candidate_text": "315.25",
+      "column_name": "fee",
+      "column_ref": "TAB_2_COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 78,
+      "gold_start_char": 72,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 78,
+          "start_char": 72,
+          "text": "315.25"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_010",
+      "split": "primary",
+      "value": "315.25"
+    },
+    {
+      "candidate_span_ref": "SPAN_0038",
+      "candidate_text": "2026-11-04",
+      "column_name": "issued_on",
+      "column_ref": "TAB_2_COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 100,
+      "gold_start_char": 90,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 100,
+          "start_char": 90,
+          "text": "2026-11-04"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_010",
+      "split": "primary",
+      "value": "2026-11-04"
+    },
+    {
+      "candidate_span_ref": "SPAN_0010",
+      "candidate_text": "Glass Harbor",
+      "column_name": "release_title",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 31,
+      "gold_start_char": 19,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 31,
+          "start_char": 19,
+          "text": "Glass Harbor"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_011",
+      "split": "primary",
+      "value": "Glass Harbor"
+    },
+    {
+      "candidate_span_ref": "SPAN_0019",
+      "candidate_text": "Glass",
+      "column_name": "artist_name",
+      "column_ref": "COL_2",
+      "duplicate_literal": true,
+      "explicitly_disambiguated": true,
+      "gold_end_char": 47,
+      "gold_start_char": 42,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "end_char": 24,
+          "start_char": 19,
+          "text": "Glass"
+        },
+        {
+          "end_char": 47,
+          "start_char": 42,
+          "text": "Glass"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_011",
+      "split": "primary",
+      "value": "Glass"
+    },
+    {
+      "candidate_span_ref": "SPAN_0024",
+      "candidate_text": "11",
+      "column_name": "track_count",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 64,
+      "gold_start_char": 62,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 64,
+          "start_char": 62,
+          "text": "11"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_011",
+      "split": "primary",
+      "value": "11"
+    },
+    {
+      "candidate_span_ref": "SPAN_0032",
+      "candidate_text": "Northline",
+      "column_name": "label",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 82,
+      "gold_start_char": 73,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 82,
+          "start_char": 73,
+          "text": "Northline"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_011",
+      "split": "primary",
+      "value": "Northline"
+    },
+    {
+      "candidate_span_ref": "SPAN_0005",
+      "candidate_text": "RENT_504",
+      "column_name": "rental_id",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 22,
+      "gold_start_char": 14,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 22,
+          "start_char": 14,
+          "text": "RENT_504"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_012",
+      "split": "primary",
+      "value": "RENT_504"
+    },
+    {
+      "candidate_span_ref": "SPAN_0015",
+      "candidate_text": "thermal camera",
+      "column_name": "asset",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 48,
+      "gold_start_char": 34,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 48,
+          "start_char": 34,
+          "text": "thermal camera"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_012",
+      "split": "primary",
+      "value": "thermal camera"
+    },
+    {
+      "candidate_span_ref": "SPAN_0022",
+      "candidate_text": "8",
+      "column_name": "days",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 57,
+      "gold_start_char": 56,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 57,
+          "start_char": 56,
+          "text": "8"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_012",
+      "split": "primary",
+      "value": "8"
+    },
+    {
+      "candidate_span_ref": "SPAN_0028",
+      "candidate_text": "300.00",
+      "column_name": "deposit",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 73,
+      "gold_start_char": 67,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 73,
+          "start_char": 67,
+          "text": "300.00"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_012",
+      "split": "primary",
+      "value": "300.00"
+    },
+    {
+      "candidate_span_ref": "SPAN_0036",
+      "candidate_text": "morning",
+      "column_name": "pickup_window",
+      "column_ref": "COL_5",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 97,
+      "gold_start_char": 90,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 97,
+          "start_char": 90,
+          "text": "morning"
+        }
+      ],
+      "sample_id": "stage7c_a5_primary_english_012",
+      "split": "primary",
+      "value": "morning"
+    },
+    {
+      "candidate_span_ref": "SPAN_0008",
+      "candidate_text": "Mina Tran",
+      "column_name": "name",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 23,
+      "gold_start_char": 14,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 23,
+          "start_char": 14,
+          "text": "Mina Tran"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_001",
+      "split": "diagnostic",
+      "value": "Mina Tran"
+    },
+    {
+      "candidate_span_ref": "SPAN_0015",
+      "candidate_text": "mina.tran@example.com",
+      "column_name": "email",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 53,
+      "gold_start_char": 32,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 53,
+          "start_char": 32,
+          "text": "mina.tran@example.com"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_001",
+      "split": "diagnostic",
+      "value": "mina.tran@example.com"
+    },
+    {
+      "candidate_span_ref": "SPAN_0021",
+      "candidate_text": "3",
+      "column_name": "tier",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 61,
+      "gold_start_char": 60,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 61,
+          "start_char": 60,
+          "text": "3"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_001",
+      "split": "diagnostic",
+      "value": "3"
+    },
+    {
+      "candidate_span_ref": "SPAN_0030",
+      "candidate_text": "2026-09-01",
+      "column_name": "signup_date",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 85,
+      "gold_start_char": 75,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 85,
+          "start_char": 75,
+          "text": "2026-09-01"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_001",
+      "split": "diagnostic",
+      "value": "2026-09-01"
+    },
+    {
+      "candidate_span_ref": "SPAN_0011",
+      "candidate_text": "Lotus Garden Soup",
+      "column_name": "item_name",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 35,
+      "gold_start_char": 18,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 35,
+          "start_char": 18,
+          "text": "Lotus Garden Soup"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_002",
+      "split": "diagnostic",
+      "value": "Lotus Garden Soup"
+    },
+    {
+      "candidate_span_ref": "SPAN_0021",
+      "candidate_text": "SOUP-778",
+      "column_name": "sku",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 50,
+      "gold_start_char": 42,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 50,
+          "start_char": 42,
+          "text": "SOUP-778"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_002",
+      "split": "diagnostic",
+      "value": "SOUP-778"
+    },
+    {
+      "candidate_span_ref": "SPAN_0028",
+      "candidate_text": "29.99",
+      "column_name": "price",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 63,
+      "gold_start_char": 58,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 63,
+          "start_char": 58,
+          "text": "29.99"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_002",
+      "split": "diagnostic",
+      "value": "29.99"
+    },
+    {
+      "candidate_span_ref": "SPAN_0034",
+      "candidate_text": "1",
+      "column_name": "active",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 73,
+      "gold_start_char": 72,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 73,
+          "start_char": 72,
+          "text": "1"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_002",
+      "split": "diagnostic",
+      "value": "1"
+    },
+    {
+      "candidate_span_ref": "SPAN_0009",
+      "candidate_text": "North Sea Basin",
+      "column_name": "site_name",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 28,
+      "gold_start_char": 13,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 28,
+          "start_char": 13,
+          "text": "North Sea Basin"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_003",
+      "split": "diagnostic",
+      "value": "North Sea Basin"
+    },
+    {
+      "candidate_span_ref": "SPAN_0021",
+      "candidate_text": "1500",
+      "column_name": "depth_m",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 45,
+      "gold_start_char": 41,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 45,
+          "start_char": 41,
+          "text": "1500"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_003",
+      "split": "diagnostic",
+      "value": "1500"
+    },
+    {
+      "candidate_span_ref": "SPAN_0027",
+      "candidate_text": "34.7",
+      "column_name": "salinity",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 60,
+      "gold_start_char": 56,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 60,
+          "start_char": 56,
+          "text": "34.7"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_003",
+      "split": "diagnostic",
+      "value": "34.7"
+    },
+    {
+      "candidate_span_ref": "SPAN_0034",
+      "candidate_text": "2026-08-28",
+      "column_name": "observed_on",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 84,
+      "gold_start_char": 74,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 84,
+          "start_char": 74,
+          "text": "2026-08-28"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_003",
+      "split": "diagnostic",
+      "value": "2026-08-28"
+    },
+    {
+      "candidate_span_ref": "SPAN_0009",
+      "candidate_text": "Silver Pacific Squid",
+      "column_name": "species_name",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 33,
+      "gold_start_char": 13,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 33,
+          "start_char": 13,
+          "text": "Silver Pacific Squid"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_004",
+      "split": "diagnostic",
+      "value": "Silver Pacific Squid"
+    },
+    {
+      "candidate_span_ref": "SPAN_0019",
+      "candidate_text": "12",
+      "column_name": "population",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 49,
+      "gold_start_char": 47,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 49,
+          "start_char": 47,
+          "text": "12"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_004",
+      "split": "diagnostic",
+      "value": "12"
+    },
+    {
+      "candidate_span_ref": "SPAN_0027",
+      "candidate_text": "protected",
+      "column_name": "status",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 68,
+      "gold_start_char": 59,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 68,
+          "start_char": 59,
+          "text": "protected"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_004",
+      "split": "diagnostic",
+      "value": "protected"
+    },
+    {
+      "candidate_span_ref": "SPAN_0034",
+      "candidate_text": "north reef",
+      "column_name": "region",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 89,
+      "gold_start_char": 79,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 89,
+          "start_char": 79,
+          "text": "north reef"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_004",
+      "split": "diagnostic",
+      "value": "north reef"
+    },
+    {
+      "candidate_span_ref": "SPAN_0008",
+      "candidate_text": "user_452",
+      "column_name": "handle",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 29,
+      "gold_start_char": 21,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 29,
+          "start_char": 21,
+          "text": "user_452"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_005",
+      "split": "diagnostic",
+      "value": "user_452"
+    },
+    {
+      "candidate_span_ref": "SPAN_0016",
+      "candidate_text": "ops-team+452@example.org",
+      "column_name": "recovery_email",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 70,
+      "gold_start_char": 46,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 70,
+          "start_char": 46,
+          "text": "ops-team+452@example.org"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_005",
+      "split": "diagnostic",
+      "value": "ops-team+452@example.org"
+    },
+    {
+      "candidate_span_ref": "SPAN_0027",
+      "candidate_text": "Ari Chen",
+      "column_name": "display_name",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 94,
+      "gold_start_char": 86,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 94,
+          "start_char": 86,
+          "text": "Ari Chen"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_005",
+      "split": "diagnostic",
+      "value": "Ari Chen"
+    },
+    {
+      "candidate_span_ref": "SPAN_0008",
+      "candidate_text": "SHIP-2026-09",
+      "column_name": "shipment_id",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 28,
+      "gold_start_char": 16,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 28,
+          "start_char": 16,
+          "text": "SHIP-2026-09"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_006",
+      "split": "diagnostic",
+      "value": "SHIP-2026-09"
+    },
+    {
+      "candidate_span_ref": "SPAN_0018",
+      "candidate_text": "Blue Rail",
+      "column_name": "carrier",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 48,
+      "gold_start_char": 39,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 48,
+          "start_char": 39,
+          "text": "Blue Rail"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_006",
+      "split": "diagnostic",
+      "value": "Blue Rail"
+    },
+    {
+      "candidate_span_ref": "SPAN_0025",
+      "candidate_text": "18.5",
+      "column_name": "weight",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 62,
+      "gold_start_char": 58,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 62,
+          "start_char": 58,
+          "text": "18.5"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_006",
+      "split": "diagnostic",
+      "value": "18.5"
+    },
+    {
+      "candidate_span_ref": "SPAN_0031",
+      "candidate_text": "4",
+      "column_name": "stops",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 71,
+      "gold_start_char": 70,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 71,
+          "start_char": 70,
+          "text": "4"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_006",
+      "split": "diagnostic",
+      "value": "4"
+    },
+    {
+      "candidate_span_ref": "SPAN_0038",
+      "candidate_text": "2026-09-02",
+      "column_name": "eta",
+      "column_ref": "COL_5",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 87,
+      "gold_start_char": 77,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 87,
+          "start_char": 77,
+          "text": "2026-09-02"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_006",
+      "split": "diagnostic",
+      "value": "2026-09-02"
+    },
+    {
+      "candidate_span_ref": "SPAN_0011",
+      "candidate_text": "0xCAFE2026",
+      "column_name": "sensor_id",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 38,
+      "gold_start_char": 28,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 38,
+          "start_char": 28,
+          "text": "0xCAFE2026"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_007",
+      "split": "diagnostic",
+      "value": "0xCAFE2026"
+    },
+    {
+      "candidate_span_ref": "SPAN_0018",
+      "candidate_text": "42.125",
+      "column_name": "reading",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 54,
+      "gold_start_char": 48,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 54,
+          "start_char": 48,
+          "text": "42.125"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_007",
+      "split": "diagnostic",
+      "value": "42.125"
+    },
+    {
+      "candidate_span_ref": "SPAN_0025",
+      "candidate_text": "88%",
+      "column_name": "confidence_text",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 70,
+      "gold_start_char": 67,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 70,
+          "start_char": 67,
+          "text": "88%"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_007",
+      "split": "diagnostic",
+      "value": "88%"
+    },
+    {
+      "candidate_span_ref": "SPAN_0031",
+      "candidate_text": "BATCH_77",
+      "column_name": "batch",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 86,
+      "gold_start_char": 78,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 86,
+          "start_char": 78,
+          "text": "BATCH_77"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_007",
+      "split": "diagnostic",
+      "value": "BATCH_77"
+    },
+    {
+      "candidate_span_ref": "SPAN_0008",
+      "candidate_text": "backup review",
+      "column_name": "title",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 26,
+      "gold_start_char": 13,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 26,
+          "start_char": 13,
+          "text": "backup review"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_008",
+      "split": "diagnostic",
+      "value": "backup review"
+    },
+    {
+      "candidate_span_ref": "SPAN_0017",
+      "candidate_text": "ops team",
+      "column_name": "owner",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 44,
+      "gold_start_char": 36,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 44,
+          "start_char": 36,
+          "text": "ops team"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_008",
+      "split": "diagnostic",
+      "value": "ops team"
+    },
+    {
+      "candidate_span_ref": "SPAN_0025",
+      "candidate_text": "2026-09-10",
+      "column_name": "due_date",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 61,
+      "gold_start_char": 51,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 61,
+          "start_char": 51,
+          "text": "2026-09-10"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_008",
+      "split": "diagnostic",
+      "value": "2026-09-10"
+    },
+    {
+      "candidate_span_ref": "SPAN_0016",
+      "candidate_text": "ORD-501",
+      "column_name": "order_no",
+      "column_ref": "TAB_2_COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 44,
+      "gold_start_char": 37,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 44,
+          "start_char": 37,
+          "text": "ORD-501"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_009",
+      "split": "diagnostic",
+      "value": "ORD-501"
+    },
+    {
+      "candidate_span_ref": "SPAN_0023",
+      "candidate_text": "CUST-9",
+      "column_name": "customer_code",
+      "column_ref": "TAB_2_COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 66,
+      "gold_start_char": 60,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 66,
+          "start_char": 60,
+          "text": "CUST-9"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_009",
+      "split": "diagnostic",
+      "value": "CUST-9"
+    },
+    {
+      "candidate_span_ref": "SPAN_0030",
+      "candidate_text": "1250.75",
+      "column_name": "total",
+      "column_ref": "TAB_2_COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 81,
+      "gold_start_char": 74,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 81,
+          "start_char": 74,
+          "text": "1250.75"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_009",
+      "split": "diagnostic",
+      "value": "1250.75"
+    },
+    {
+      "candidate_span_ref": "SPAN_0039",
+      "candidate_text": "paid in full",
+      "column_name": "status",
+      "column_ref": "TAB_2_COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 103,
+      "gold_start_char": 91,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 103,
+          "start_char": 91,
+          "text": "paid in full"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_009",
+      "split": "diagnostic",
+      "value": "paid in full"
+    },
+    {
+      "candidate_span_ref": "SPAN_0012",
+      "candidate_text": "PT-778",
+      "column_name": "patient_no",
+      "column_ref": "TAB_2_COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 35,
+      "gold_start_char": 29,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 35,
+          "start_char": 29,
+          "text": "PT-778"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_010",
+      "split": "diagnostic",
+      "value": "PT-778"
+    },
+    {
+      "candidate_span_ref": "SPAN_0021",
+      "candidate_text": "Nora Vale",
+      "column_name": "name",
+      "column_ref": "TAB_2_COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 52,
+      "gold_start_char": 43,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 52,
+          "start_char": 43,
+          "text": "Nora Vale"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_010",
+      "split": "diagnostic",
+      "value": "Nora Vale"
+    },
+    {
+      "candidate_span_ref": "SPAN_0028",
+      "candidate_text": "41",
+      "column_name": "age",
+      "column_ref": "TAB_2_COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 61,
+      "gold_start_char": 59,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 61,
+          "start_char": 59,
+          "text": "41"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_010",
+      "split": "diagnostic",
+      "value": "41"
+    },
+    {
+      "candidate_span_ref": "SPAN_0035",
+      "candidate_text": "2026-09-03",
+      "column_name": "admitted_on",
+      "column_ref": "TAB_2_COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 85,
+      "gold_start_char": 75,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 85,
+          "start_char": 75,
+          "text": "2026-09-03"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_010",
+      "split": "diagnostic",
+      "value": "2026-09-03"
+    },
+    {
+      "candidate_span_ref": "SPAN_0009",
+      "candidate_text": "New York City",
+      "column_name": "city_name",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 23,
+      "gold_start_char": 10,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 23,
+          "start_char": 10,
+          "text": "New York City"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_011",
+      "split": "diagnostic",
+      "value": "New York City"
+    },
+    {
+      "candidate_span_ref": "SPAN_0021",
+      "candidate_text": "New York",
+      "column_name": "state_name",
+      "column_ref": "COL_2",
+      "duplicate_literal": true,
+      "explicitly_disambiguated": true,
+      "gold_end_char": 41,
+      "gold_start_char": 33,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 2,
+      "occurrences": [
+        {
+          "end_char": 18,
+          "start_char": 10,
+          "text": "New York"
+        },
+        {
+          "end_char": 41,
+          "start_char": 33,
+          "text": "New York"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_011",
+      "split": "diagnostic",
+      "value": "New York"
+    },
+    {
+      "candidate_span_ref": "SPAN_0028",
+      "candidate_text": "1",
+      "column_name": "population_rank",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 61,
+      "gold_start_char": 60,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 61,
+          "start_char": 60,
+          "text": "1"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_011",
+      "split": "diagnostic",
+      "value": "1"
+    },
+    {
+      "candidate_span_ref": "SPAN_0036",
+      "candidate_text": "Big Apple",
+      "column_name": "nickname",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 82,
+      "gold_start_char": 73,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 82,
+          "start_char": 73,
+          "text": "Big Apple"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_011",
+      "split": "diagnostic",
+      "value": "Big Apple"
+    },
+    {
+      "candidate_span_ref": "SPAN_0009",
+      "candidate_text": "Copper Dawn Textile",
+      "column_name": "material_name",
+      "column_ref": "COL_1",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 36,
+      "gold_start_char": 17,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 36,
+          "start_char": 17,
+          "text": "Copper Dawn Textile"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_012",
+      "split": "diagnostic",
+      "value": "Copper Dawn Textile"
+    },
+    {
+      "candidate_span_ref": "SPAN_0019",
+      "candidate_text": "MAT-44",
+      "column_name": "batch",
+      "column_ref": "COL_2",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 51,
+      "gold_start_char": 45,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 51,
+          "start_char": 45,
+          "text": "MAT-44"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_012",
+      "split": "diagnostic",
+      "value": "MAT-44"
+    },
+    {
+      "candidate_span_ref": "SPAN_0026",
+      "candidate_text": "7.8",
+      "column_name": "density",
+      "column_ref": "COL_3",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 64,
+      "gold_start_char": 61,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 64,
+          "start_char": 61,
+          "text": "7.8"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_012",
+      "split": "diagnostic",
+      "value": "7.8"
+    },
+    {
+      "candidate_span_ref": "SPAN_0034",
+      "candidate_text": "lab bench",
+      "column_name": "source",
+      "column_ref": "COL_4",
+      "duplicate_literal": false,
+      "explicitly_disambiguated": false,
+      "gold_end_char": 83,
+      "gold_start_char": 74,
+      "implicit_first_occurrence_forbidden": false,
+      "occurrence_count": 1,
+      "occurrences": [
+        {
+          "end_char": 83,
+          "start_char": 74,
+          "text": "lab bench"
+        }
+      ],
+      "sample_id": "stage7c_a5_fresh_english_012",
+      "split": "diagnostic",
+      "value": "lab bench"
+    }
+  ],
+  "stage": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0",
+  "status": "PASS"
+}

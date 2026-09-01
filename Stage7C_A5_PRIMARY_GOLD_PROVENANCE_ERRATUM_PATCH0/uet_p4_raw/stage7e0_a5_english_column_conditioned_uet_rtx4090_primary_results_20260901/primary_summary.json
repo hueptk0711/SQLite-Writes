@@ -1,0 +1,19 @@
+{
+  "backend": "constrained_hf",
+  "diagnostic_pass_count": null,
+  "diagnostics_run": false,
+  "eleven_of_twelve_allowed": false,
+  "gpu_called": true,
+  "gretel_pilot_opened": false,
+  "mock_uses_label_side_expected": false,
+  "model_called": true,
+  "phase_m_removed": true,
+  "phase_o_max_new_tokens": 512,
+  "primary_case_results_sha256": "f41908184b54d67732f847318957650e2d154046e94923c5e73878b0a86fb842",
+  "primary_pass_count": "1/12",
+  "protocol_backend": "incremental_json_schema_grammar",
+  "raw_primary_phase_o_sha256": "3ff2c3e079f19099dcce9b1883faca98156376b24a097f080886e5dfbeedb1d9",
+  "required_pass_count": "12/12",
+  "stage": "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT",
+  "status": "FAIL"
+}

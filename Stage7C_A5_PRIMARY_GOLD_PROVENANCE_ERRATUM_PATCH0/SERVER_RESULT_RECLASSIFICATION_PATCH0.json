@@ -1,0 +1,15 @@
+{
+  "corrected_primary_gate_status": "FAIL",
+  "corrected_primary_pass_count": "2/12",
+  "diagnostics_run": false,
+  "evidence_integrity_status": "PASS",
+  "gretel_pilot_opened": false,
+  "old_gold_classification": "SUPERSEDED_BY_GOLD_PROVENANCE_ERRATUM",
+  "old_gold_primary_gate_status": "FAIL",
+  "old_gold_primary_pass_count": "1/12",
+  "protocol_compliance_status": "PASS",
+  "scientific_result_eligible": true,
+  "source_tar_sha256": "f275b7990c06f6d2130b6ebf0cdb33d29d8a51b83281fdc0beb83cdc2f34c035",
+  "stage": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0",
+  "status": "REAL_CONSTRAINED_PRIMARY_FAIL_DO_NOT_OPEN_GRETEL"
+}
