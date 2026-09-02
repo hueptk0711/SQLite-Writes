@@ -81,7 +81,7 @@
   "calls_per_primary_case": 1,
   "constraint_independence_audit_sha256": "ead4d272b13ff87356ef23b4012fe951a7f8d551c6cdd5fc0a53cac5bf4c3862",
   "created_utc": "2026-09-02T09:13:31.619125+00:00",
-  "derived_artifact_manifest_sha256": "6119cefe85c6491620def1d81ad0161c304cafe3171da1f6236d8b233496493f",
+  "derived_artifact_manifest_sha256": "35bc847e3b3289e4e788f3bcef918476986c8f91ae41c92369650e0ea07662be",
   "development_dev_used": false,
   "device_map": "auto",
   "diagnostic_case_count": 36,

@@ -1,0 +1,20 @@
+{
+  "created_utc": "2026-09-02T14:16:30.187736+00:00",
+  "decision": "Protocol-compliant constrained A6 output is a scientific primary failure; do not open Gretel pilot.",
+  "diagnostics_run": false,
+  "evidence_integrity_status": "PASS",
+  "gpu_called": true,
+  "gretel_pilot_opened": false,
+  "model_called": true,
+  "patch": "PATCH1",
+  "primary_gate_status": "FAIL",
+  "primary_pass_count": "2/12",
+  "protocol_compliance_status": "PASS",
+  "required_pass_count": "12/12",
+  "scientific_result_eligible": true,
+  "server_result_import_report_sha256": "1bbb113f40b60df2764029ff7540fbb177cef9fe522bdade2d4f85ba443bba11",
+  "server_run_id": "uet_p4",
+  "source_tar_sha256": "328a3840cb9c349969029479cc5e0ea0baf4499b50bf2c74927d3e9c394af459",
+  "stage": "Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT",
+  "status": "REAL_CONSTRAINED_PRIMARY_FAIL_DO_NOT_OPEN_GRETEL"
+}

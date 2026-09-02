@@ -1,0 +1,291 @@
+{
+  "accepted_protocol_commit": "e1f4b4b73fdaeb6a2235c1d96e4928ce8736bc49",
+  "diagnostics_requested_after_primary_pass": false,
+  "git": {
+    "accepted_protocol_commit": "e1f4b4b73fdaeb6a2235c1d96e4928ce8736bc49",
+    "execution_commit": null,
+    "frozen_accepted_protocol_commit": "e1f4b4b73fdaeb6a2235c1d96e4928ce8736bc49",
+    "git_available": false,
+    "input_manifest_available": true
+  },
+  "model": {
+    "accelerate_version": "1.14.0",
+    "allowed_frozen_runtime_profiles": [
+      {
+        "gpu_requirement": "cuda_available=true",
+        "packages": {
+          "accelerate": [
+            "1.14.0"
+          ],
+          "safetensors": [
+            "0.5.3"
+          ],
+          "tokenizers": [
+            "0.22.2"
+          ],
+          "torch": [
+            "2.6.0+cu124"
+          ],
+          "transformers": [
+            "5.5.3"
+          ]
+        },
+        "profile_id": "uet_server_cuda124",
+        "role": "historical_reference_only",
+        "torch_cuda": "12.4"
+      },
+      {
+        "cuda_available": true,
+        "gpu_count": 2,
+        "gpu_device_substring": "Tesla T4",
+        "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
+        "packages": {
+          "accelerate": [
+            "1.14.0"
+          ],
+          "safetensors": [
+            "0.5.3"
+          ],
+          "tokenizers": [
+            "0.22.2"
+          ],
+          "torch": [
+            "2.13.0",
+            "2.13.0+cu130"
+          ],
+          "transformers": [
+            "5.5.3"
+          ]
+        },
+        "profile_id": "kaggle_t4x2_cuda130",
+        "role": "primary_scientific_runtime",
+        "torch_cuda": "13.0"
+      },
+      {
+        "cuda_available": true,
+        "gpu_count": 1,
+        "gpu_device_substring": "RTX 4090",
+        "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
+        "packages": {
+          "accelerate": [
+            "1.14.0"
+          ],
+          "safetensors": [
+            "0.5.3"
+          ],
+          "tokenizers": [
+            "0.22.2"
+          ],
+          "torch": [
+            "2.6.0+cu124"
+          ],
+          "transformers": [
+            "5.5.3"
+          ]
+        },
+        "profile_id": "uet_rtx4090_cuda124_visible0",
+        "role": "primary_scientific_runtime_patch3_uet_server",
+        "torch_cuda": "12.4"
+      }
+    ],
+    "automatic_repair": false,
+    "backend": "incremental_json_schema_grammar",
+    "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "cuda_available": true,
+    "cuda_runtime": "12.4",
+    "device_map": "auto",
+    "fallback_to_unconstrained": false,
+    "finite_complete_object_enumeration": false,
+    "finite_known_answer_candidates": false,
+    "gpu_count": 1,
+    "gpu_devices": [
+      "NVIDIA GeForce RTX 4090"
+    ],
+    "historical_runtime_profile_ids": [
+      "uet_server_cuda124",
+      "kaggle_t4x2_cuda130"
+    ],
+    "label_side_data_used_for_constraints": false,
+    "max_memory": null,
+    "model_called": true,
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "model_name_or_path": "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "primary_runtime_profile": {
+      "cuda_available": true,
+      "gpu_count": 1,
+      "gpu_device_substring": "RTX 4090",
+      "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
+      "packages": {
+        "accelerate": [
+          "1.14.0"
+        ],
+        "safetensors": [
+          "0.5.3"
+        ],
+        "tokenizers": [
+          "0.22.2"
+        ],
+        "torch": [
+          "2.6.0+cu124"
+        ],
+        "transformers": [
+          "5.5.3"
+        ]
+      },
+      "profile_id": "uet_rtx4090_cuda124_visible0",
+      "role": "primary_scientific_runtime_patch3_uet_server",
+      "torch_cuda": "12.4"
+    },
+    "primary_runtime_profile_id": "uet_rtx4090_cuda124_visible0",
+    "quantization": "none",
+    "retry": 0,
+    "runtime_lock": {
+      "allowed_frozen_runtime_profiles": [
+        {
+          "gpu_requirement": "cuda_available=true",
+          "packages": {
+            "accelerate": [
+              "1.14.0"
+            ],
+            "safetensors": [
+              "0.5.3"
+            ],
+            "tokenizers": [
+              "0.22.2"
+            ],
+            "torch": [
+              "2.6.0+cu124"
+            ],
+            "transformers": [
+              "5.5.3"
+            ]
+          },
+          "profile_id": "uet_server_cuda124",
+          "role": "historical_reference_only",
+          "torch_cuda": "12.4"
+        },
+        {
+          "cuda_available": true,
+          "gpu_count": 2,
+          "gpu_device_substring": "Tesla T4",
+          "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
+          "packages": {
+            "accelerate": [
+              "1.14.0"
+            ],
+            "safetensors": [
+              "0.5.3"
+            ],
+            "tokenizers": [
+              "0.22.2"
+            ],
+            "torch": [
+              "2.13.0",
+              "2.13.0+cu130"
+            ],
+            "transformers": [
+              "5.5.3"
+            ]
+          },
+          "profile_id": "kaggle_t4x2_cuda130",
+          "role": "primary_scientific_runtime",
+          "torch_cuda": "13.0"
+        },
+        {
+          "cuda_available": true,
+          "gpu_count": 1,
+          "gpu_device_substring": "RTX 4090",
+          "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
+          "packages": {
+            "accelerate": [
+              "1.14.0"
+            ],
+            "safetensors": [
+              "0.5.3"
+            ],
+            "tokenizers": [
+              "0.22.2"
+            ],
+            "torch": [
+              "2.6.0+cu124"
+            ],
+            "transformers": [
+              "5.5.3"
+            ]
+          },
+          "profile_id": "uet_rtx4090_cuda124_visible0",
+          "role": "primary_scientific_runtime_patch3_uet_server",
+          "torch_cuda": "12.4"
+        }
+      ],
+      "observed_runtime_versions": {
+        "accelerate": "1.14.0",
+        "cuda_available": true,
+        "gpu_count": 1,
+        "gpu_devices": [
+          "NVIDIA GeForce RTX 4090"
+        ],
+        "safetensors": "0.5.3",
+        "tokenizers": "0.22.2",
+        "torch": "2.6.0+cu124",
+        "torch_cuda": "12.4",
+        "transformers": "5.5.3"
+      },
+      "runtime_profile": {
+        "cuda_available": true,
+        "gpu_count": 1,
+        "gpu_device_substring": "RTX 4090",
+        "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
+        "packages": {
+          "accelerate": [
+            "1.14.0"
+          ],
+          "safetensors": [
+            "0.5.3"
+          ],
+          "tokenizers": [
+            "0.22.2"
+          ],
+          "torch": [
+            "2.6.0+cu124"
+          ],
+          "transformers": [
+            "5.5.3"
+          ]
+        },
+        "profile_id": "uet_rtx4090_cuda124_visible0",
+        "role": "primary_scientific_runtime_patch3_uet_server",
+        "torch_cuda": "12.4"
+      },
+      "runtime_profile_id": "uet_rtx4090_cuda124_visible0",
+      "status": "PASS"
+    },
+    "runtime_profile_id": "uet_rtx4090_cuda124_visible0",
+    "safetensors_version": "0.5.3",
+    "schema_enforcement_mode": "transformers_prefix_allowed_tokens_fn",
+    "token_level_enforcement": true,
+    "tokenizers_version": "0.22.2",
+    "torch_dtype": "auto",
+    "torch_version": "2.6.0+cu124",
+    "transformers_version": "5.5.3"
+  },
+  "phase_m_raw_generation_file": null,
+  "phase_m_removed": true,
+  "phase_o_max_new_tokens": 512,
+  "phase_o_prompt_spec_path": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE/ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROMPT_SPEC_A6_ENGLISH.json",
+  "primary_case_count": 12,
+  "primary_first_diagnostics_forbidden_until_freeze": true,
+  "repair": "none",
+  "retry": 0,
+  "stage": "Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT",
+  "stage7c_a6_inputs": {
+    "a6_diagnostic_set_sha256": "79a714aa1244da22f5243d23aa512849676d0a3681970e95387f7357b444f74c",
+    "a6_primary_set_sha256": "9ecd822da88fb4ddb3a69293f54ec7cb569cac71af6d52ef2cec7aa35a5a16c2",
+    "a6_prompt_spec_sha256": "8b61296169dfa38820fbc05bca9e0d7b397cddc5ee7652021d3a452c22bd0db4",
+    "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "stage7c_a6_lock_sha256": "82ed8abbe4353c97ad9a0e87f944bc70e20610e094a99ceb8d3342c3e34b5a53",
+    "tokenizer_status": "PASS"
+  },
+  "zero_shot": true
+}

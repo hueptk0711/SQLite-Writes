@@ -1,15 +1,10 @@
 {
-  "artifact_count": 12,
+  "artifact_count": 21,
   "artifacts": [
     {
-      "bytes": 3343,
-      "path": "STAGE7E0_A6_INPUT_MANIFEST.json",
-      "sha256": "961b55357dd3431ba6959c3ed4cbac4df8ed949f3e5839e8326c5fd3ab4f1fc0"
-    },
-    {
-      "bytes": 6248,
-      "path": "RUNNER_PROTOCOL_A6.json",
-      "sha256": "44dfc31d7d32c2f46ba2543fd8b4a6f27b3d1c9ec5cc466e8e44d911976970e0"
+      "bytes": 4530,
+      "path": "CONSTRAINT_INDEPENDENCE_AUDIT_A6.json",
+      "sha256": "ead4d272b13ff87356ef23b4012fe951a7f8d551c6cdd5fc0a53cac5bf4c3862"
     },
     {
       "bytes": 300,
@@ -17,9 +12,29 @@
       "sha256": "3a7cf07987d83dd5e37960f21f0ca826d9c9683e4bf661adb167c01e309b7ce0"
     },
     {
-      "bytes": 4530,
-      "path": "CONSTRAINT_INDEPENDENCE_AUDIT_A6.json",
-      "sha256": "ead4d272b13ff87356ef23b4012fe951a7f8d551c6cdd5fc0a53cac5bf4c3862"
+      "bytes": 1099,
+      "path": "REVIEWER_README.md",
+      "sha256": "f2d0d60e8d55c5be24f91fce20628343855e434269dc50ea6e404d68f593df1c"
+    },
+    {
+      "bytes": 6248,
+      "path": "RUNNER_PROTOCOL_A6.json",
+      "sha256": "44dfc31d7d32c2f46ba2543fd8b4a6f27b3d1c9ec5cc466e8e44d911976970e0"
+    },
+    {
+      "bytes": 386,
+      "path": "SERVER_RESULT_CLASSIFICATION_PATCH1.json",
+      "sha256": "72921f43408989f878529395915b5c9326400916b98e18c16641a6046c650c45"
+    },
+    {
+      "bytes": 3916,
+      "path": "SERVER_RESULT_FAILURE_ANALYSIS.md",
+      "sha256": "6a1f5b55f77c3097aa810b62f66009946e0a3e98e9730f241004f4d83116db46"
+    },
+    {
+      "bytes": 2020,
+      "path": "SERVER_RESULT_IMPORT_REPORT.json",
+      "sha256": "1bbb113f40b60df2764029ff7540fbb177cef9fe522bdade2d4f85ba443bba11"
     },
     {
       "bytes": 1804,
@@ -32,24 +47,24 @@
       "sha256": "7c0cdba34a4ce2b705f67f6adda8315cba7ff3f135f36c2a7f5768ec9fbb2213"
     },
     {
+      "bytes": 3343,
+      "path": "STAGE7E0_A6_INPUT_MANIFEST.json",
+      "sha256": "961b55357dd3431ba6959c3ed4cbac4df8ed949f3e5839e8326c5fd3ab4f1fc0"
+    },
+    {
+      "bytes": 901,
+      "path": "STAGE7E0_A6_SERVER_RESULT_LOCK.json",
+      "sha256": "55642f09be11efb04f393644efbe30e4c510354c679f5c5b3663071f4a36f0be"
+    },
+    {
       "bytes": 1232,
       "path": "VALIDATION_REPORT.md",
       "sha256": "a27fd2b811049f9df2516e1dd9dd83754f852ecd6a6ec738102ee7dc633c8e08"
     },
     {
-      "bytes": 1302,
-      "path": "REVIEWER_README.md",
-      "sha256": "ac817b4503e1cb1ba42c7f231f25f18a05bb2ec07027076f4d77af8b953a3208"
-    },
-    {
-      "bytes": 1591,
-      "path": "mock_dry_run/run_manifest.json",
-      "sha256": "8b5344c30187a4b972a2fd4606ed5991a758e8fcddb0d02f72996e3c482a8bca"
-    },
-    {
-      "bytes": 714,
-      "path": "mock_dry_run/primary_summary.json",
-      "sha256": "1886753d1a850c84470e3c99134e224d0ad3755b1c6d6e67676c7c4fd995daf4"
+      "bytes": 824,
+      "path": "VALIDATION_REPORT_PATCH1.md",
+      "sha256": "3a4fc3c0c1d4e68712323fcc79512e27702a46426ccc989c15841590e9a3bca4"
     },
     {
       "bytes": 28570,
@@ -57,12 +72,42 @@
       "sha256": "6a9fc1728f576fbf106945138d7bff879d4de10285b04fe70039937574319881"
     },
     {
+      "bytes": 714,
+      "path": "mock_dry_run/primary_summary.json",
+      "sha256": "1886753d1a850c84470e3c99134e224d0ad3755b1c6d6e67676c7c4fd995daf4"
+    },
+    {
       "bytes": 9094,
       "path": "mock_dry_run/raw_primary_phase_o_generations.jsonl",
       "sha256": "d98b68bddee0b94f54c61cb6b18cf6a9e5e1e8b97168888ecaf7ca705f5adb64"
+    },
+    {
+      "bytes": 1591,
+      "path": "mock_dry_run/run_manifest.json",
+      "sha256": "8b5344c30187a4b972a2fd4606ed5991a758e8fcddb0d02f72996e3c482a8bca"
+    },
+    {
+      "bytes": 25536,
+      "path": "uet_p4/stage7e0_a6_english_atomic_domain_column_conditioned_uet_rtx4090_primary_results_20260902/primary_case_results.jsonl",
+      "sha256": "bd97981cc4ab7f5e3ad35bcb3da6a56f3f758997cd8f0cdefc7523ceabf28fb2"
+    },
+    {
+      "bytes": 749,
+      "path": "uet_p4/stage7e0_a6_english_atomic_domain_column_conditioned_uet_rtx4090_primary_results_20260902/primary_summary.json",
+      "sha256": "b2029ab54cd33fd609a33e08c6456ca10153fd66e61ec2b249f536551d48c85c"
+    },
+    {
+      "bytes": 17129,
+      "path": "uet_p4/stage7e0_a6_english_atomic_domain_column_conditioned_uet_rtx4090_primary_results_20260902/raw_primary_phase_o_generations.jsonl",
+      "sha256": "c6d10aa1313a470b32c765ee20a1a93800fee190cf6827cfaec56eb218904b4a"
+    },
+    {
+      "bytes": 9086,
+      "path": "uet_p4/stage7e0_a6_english_atomic_domain_column_conditioned_uet_rtx4090_primary_results_20260902/run_manifest.json",
+      "sha256": "06cead2e5b9bf1ef39d7f00f76576def7586950c14254d85453c69f29384b74e"
     }
   ],
-  "combined_scientific_artifacts_sha256": "e5aca3a839d98023da38857c0930031a76616f82d2c843ab04b7eb882aeca63c",
-  "patch": "PATCH0",
+  "combined_scientific_artifacts_sha256": "532d5e03b17b2d6037b2bafd785b83f730e506a0807a46a4de03bfda452d16a5",
+  "patch": "PATCH1",
   "stage": "Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT"
 }

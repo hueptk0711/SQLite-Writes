@@ -1,21 +1,26 @@
-# Stage7E0-A6 English Atomic-Domain Column-Conditioned Real Generation Preflight PATCH0
+# Stage7E0-A6 English UET Primary Result PATCH1
 
-This reviewer package prepares the UET server RTX 4090 primary GPU run for the
-12 locked Stage7C-A6 primary cases. It does not open Gretel, development-dev, or
-official test rows. A6 uses one model call only; Phase M is removed.
+This reviewer package preserves the single Stage7E0-A6 PATCH0 UET RTX 4090
+primary run. The run is protocol-compliant evidence, but the primary gate did
+not pass.
 
-Clean extraction checks:
-
-```bash
-python scripts/data/validate_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py --stage-dir Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE
-python scripts/data/validate_stage7e0_a6_english_preflight.py --stage-dir Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT
-python -m pytest -q tests/test_stage7e0_a6_english_preflight.py
+```text
+source_tar=stage7e0_a6_english_atomic_domain_column_conditioned_uet_rtx4090_primary_results_20260902.tar.gz
+source_tar_sha256=328a3840cb9c349969029479cc5e0ea0baf4499b50bf2c74927d3e9c394af459
+primary_pass_count=2/12
+required_pass_count=12/12
+evidence_integrity_status=PASS
+protocol_compliance_status=PASS
+primary_gate_status=FAIL
+scientific_result_eligible=true
+gretel_pilot_opened=false
 ```
 
-UET server commands are in `Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT/SERVER_RUN_COMMANDS.sh`. The companion
-Markdown file `Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT/SERVER_RUN_COMMANDS.md` is documentation and also
-delegates to the shell script if run with `bash`.
+Review these files first:
 
-Package: `Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT_PATCH0_FINAL_REVIEWER_PACKAGE_20260902.zip`
-
-Accepted Stage7C-A6 protocol commit: `e1f4b4b73fdaeb6a2235c1d96e4928ce8736bc49`
+```text
+Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT/VALIDATION_REPORT_PATCH1.md
+Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT/SERVER_RESULT_FAILURE_ANALYSIS.md
+Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT/SERVER_RESULT_IMPORT_REPORT.json
+Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT/STAGE7E0_A6_SERVER_RESULT_LOCK.json
+```
