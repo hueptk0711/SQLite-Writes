@@ -1,0 +1,197 @@
+{
+  "chat_template_hash_matches_required": true,
+  "chat_template_required_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+  "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+  "filtered_candidate_count_stats": {
+    "max": 54,
+    "mean": 37.25,
+    "median": 37.5,
+    "min": 25,
+    "p95": 50
+  },
+  "fresh_case_count": 12,
+  "gpu_called": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "per_sample": [
+    {
+      "candidate_inventory_chars": 1861,
+      "filtered_candidate_count": 54,
+      "message_sha256": "fec5391fe70f26641e6f2f605008ea274ce596c87ce0826e6dc160b694c03e97",
+      "rendered_prompt_chars": 3680,
+      "rendered_prompt_tokens": 1284,
+      "sample_id": "stage7c_a6_primary_english_001",
+      "suppressed_candidate_count": 6,
+      "system_chars": 117,
+      "unfiltered_candidate_count": 60,
+      "user_chars": 3342
+    },
+    {
+      "candidate_inventory_chars": 804,
+      "filtered_candidate_count": 25,
+      "message_sha256": "5b9e85cf60d7c56ed711eb15433404bad1a8b4d009cbb4b571deb3b6017de210",
+      "rendered_prompt_chars": 2461,
+      "rendered_prompt_tokens": 761,
+      "sample_id": "stage7c_a6_primary_english_002",
+      "suppressed_candidate_count": 13,
+      "system_chars": 117,
+      "unfiltered_candidate_count": 38,
+      "user_chars": 2164
+    },
+    {
+      "candidate_inventory_chars": 873,
+      "filtered_candidate_count": 27,
+      "message_sha256": "be00e71b0de48275ca1f248182adbb474a55fa39f6e8d0d8490a8ab9b5166539",
+      "rendered_prompt_chars": 2512,
+      "rendered_prompt_tokens": 771,
+      "sample_id": "stage7c_a6_primary_english_003",
+      "suppressed_candidate_count": 11,
+      "system_chars": 117,
+      "unfiltered_candidate_count": 38,
+      "user_chars": 2205
+    },
+    {
+      "candidate_inventory_chars": 1386,
+      "filtered_candidate_count": 40,
+      "message_sha256": "6fb9dd2504c3132abeaa71e57719d77498cd1332698a7e6e78b4436416e14339",
+      "rendered_prompt_chars": 3091,
+      "rendered_prompt_tokens": 962,
+      "sample_id": "stage7c_a6_primary_english_004",
+      "suppressed_candidate_count": 5,
+      "system_chars": 117,
+      "unfiltered_candidate_count": 45,
+      "user_chars": 2756
+    },
+    {
+      "candidate_inventory_chars": 925,
+      "filtered_candidate_count": 28,
+      "message_sha256": "cad90fd0735a3bc0f94de26eed88a10f28904db1573ae5208b1e30c6eec2fed3",
+      "rendered_prompt_chars": 2669,
+      "rendered_prompt_tokens": 816,
+      "sample_id": "stage7c_a6_primary_english_005",
+      "suppressed_candidate_count": 14,
+      "system_chars": 117,
+      "unfiltered_candidate_count": 42,
+      "user_chars": 2349
+    },
+    {
+      "candidate_inventory_chars": 1705,
+      "filtered_candidate_count": 50,
+      "message_sha256": "6c6ca3d86be2fd10017924f3609610a59a5c058ea475d680bb893458ec639dc9",
+      "rendered_prompt_chars": 3532,
+      "rendered_prompt_tokens": 1155,
+      "sample_id": "stage7c_a6_primary_english_006",
+      "suppressed_candidate_count": 2,
+      "system_chars": 117,
+      "unfiltered_candidate_count": 52,
+      "user_chars": 3170
+    },
+    {
+      "candidate_inventory_chars": 1272,
+      "filtered_candidate_count": 39,
+      "message_sha256": "40adc42913a9da32aced83df68b74171a4b06242a6f4775fc0061eaa0c895a42",
+      "rendered_prompt_chars": 2933,
+      "rendered_prompt_tokens": 928,
+      "sample_id": "stage7c_a6_primary_english_007",
+      "suppressed_candidate_count": 5,
+      "system_chars": 117,
+      "unfiltered_candidate_count": 44,
+      "user_chars": 2598
+    },
+    {
+      "candidate_inventory_chars": 990,
+      "filtered_candidate_count": 30,
+      "message_sha256": "654f5a6d22df96514907d17e47f17b13cc39b5925c39ca681994ce849122e16b",
+      "rendered_prompt_chars": 2865,
+      "rendered_prompt_tokens": 927,
+      "sample_id": "stage7c_a6_primary_english_008",
+      "suppressed_candidate_count": 10,
+      "system_chars": 117,
+      "unfiltered_candidate_count": 40,
+      "user_chars": 2531
+    },
+    {
+      "candidate_inventory_chars": 1156,
+      "filtered_candidate_count": 33,
+      "message_sha256": "feee8eb6df897344817956e71f7c17fa9bc26f3abae21fedc6c34c2e748a4acd",
+      "rendered_prompt_chars": 3063,
+      "rendered_prompt_tokens": 972,
+      "sample_id": "stage7c_a6_primary_english_009",
+      "suppressed_candidate_count": 9,
+      "system_chars": 117,
+      "unfiltered_candidate_count": 42,
+      "user_chars": 2718
+    },
+    {
+      "candidate_inventory_chars": 1533,
+      "filtered_candidate_count": 44,
+      "message_sha256": "4efb2ced8bc74396af461ab15c3b894ee19f9657633a4c2698345e6431370800",
+      "rendered_prompt_chars": 3314,
+      "rendered_prompt_tokens": 1063,
+      "sample_id": "stage7c_a6_primary_english_010",
+      "suppressed_candidate_count": 1,
+      "system_chars": 117,
+      "unfiltered_candidate_count": 45,
+      "user_chars": 2966
+    },
+    {
+      "candidate_inventory_chars": 1209,
+      "filtered_candidate_count": 36,
+      "message_sha256": "40cc3131ba32a2af4ffcc600f355b38203b7f3d5a10021d8a579007e5b473a5c",
+      "rendered_prompt_chars": 2868,
+      "rendered_prompt_tokens": 898,
+      "sample_id": "stage7c_a6_primary_english_011",
+      "suppressed_candidate_count": 8,
+      "system_chars": 117,
+      "unfiltered_candidate_count": 44,
+      "user_chars": 2544
+    },
+    {
+      "candidate_inventory_chars": 1467,
+      "filtered_candidate_count": 41,
+      "message_sha256": "26fc3c1fe80c1dd0a0e3a4d6452c2d589350a83c99cb97de8f0448f9d84ab1ff",
+      "rendered_prompt_chars": 3226,
+      "rendered_prompt_tokens": 1041,
+      "sample_id": "stage7c_a6_primary_english_012",
+      "suppressed_candidate_count": 5,
+      "system_chars": 117,
+      "unfiltered_candidate_count": 46,
+      "user_chars": 2883
+    }
+  ],
+  "rendered_prompt_char_stats": {
+    "max": 3680,
+    "mean": 3017.8333333333335,
+    "median": 2998.0,
+    "min": 2461,
+    "p95": 3532
+  },
+  "rendered_prompt_token_stats": {
+    "max": 1284,
+    "mean": 964.8333333333334,
+    "median": 945.0,
+    "min": 761,
+    "p95": 1155
+  },
+  "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE",
+  "suppressed_candidate_count_stats": {
+    "max": 14,
+    "mean": 7.416666666666667,
+    "median": 7.0,
+    "min": 1,
+    "p95": 13
+  },
+  "tokenizer_class": "Qwen2Tokenizer",
+  "tokenizer_name_or_path": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "tokenizer_revision_target": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "tokenizer_status": "PASS",
+  "tokenizer_target": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "unfiltered_candidate_count_stats": {
+    "max": 60,
+    "mean": 44.666666666666664,
+    "median": 44.0,
+    "min": 38,
+    "p95": 52
+  }
+}

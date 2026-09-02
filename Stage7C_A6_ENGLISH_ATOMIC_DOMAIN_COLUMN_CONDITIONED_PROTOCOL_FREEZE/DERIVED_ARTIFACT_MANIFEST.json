@@ -1,0 +1,104 @@
+{
+  "artifact_count": 19,
+  "artifacts": [
+    {
+      "bytes": 243805,
+      "path": "A5_OBSERVED_REGRESSION_DIAGNOSTICS_A6.jsonl",
+      "sha256": "6c106a1bca1dbe0753fe5f6a43169101d94ba52c2e771910192267a7d9093283"
+    },
+    {
+      "bytes": 4732,
+      "path": "A6_ORACLE_CANDIDATE_DOMAIN_AUDIT.json",
+      "sha256": "7c9c3bb2b9b5d7994317c9900683b5fba48f7f97593649df5b0e9e77dc4bf423"
+    },
+    {
+      "bytes": 4084,
+      "path": "A6_PRIMARY_INDEPENDENCE_AUDIT.json",
+      "sha256": "0171da80585e18bf937803f057c30857e5d9664c5b9ddbdd089e72bdcd274754"
+    },
+    {
+      "bytes": 1254,
+      "path": "ACCEPTANCE_POLICY_A6.json",
+      "sha256": "e1a9e3dc9cfe8b034b6ec83653caa15f27eed58ba22905b4e4d7a2925426fa90"
+    },
+    {
+      "bytes": 825,
+      "path": "ATOMIC_DOMAIN_COLUMN_CONDITIONED_OUTPUT_SPEC_A6.json",
+      "sha256": "8800d43a838a66a04326fca0b126c2561ca11024841c1c97e1c1e3c7538d1c7d"
+    },
+    {
+      "bytes": 2468,
+      "path": "ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROMPT_SPEC_A6_ENGLISH.json",
+      "sha256": "00c653de496646bd8cde8574b388c92cdee66daccd242e22c51e9dbd0e33d132"
+    },
+    {
+      "bytes": 963,
+      "path": "ATOMIC_DOMAIN_COLUMN_CONDITIONED_RUNTIME_SCHEMA_SPEC_A6.json",
+      "sha256": "9462eaadd208074d11317e6cb0670fb0ee76c04da0ddf283a01f6c35c0906987"
+    },
+    {
+      "bytes": 716,
+      "path": "ATOMIC_DOMAIN_COLUMN_CONDITIONED_SERIALIZATION_FREEZE.json",
+      "sha256": "5ed673f0c9162657bdf95e957288b97de115a65ade40a075075a1d242a2a9f1e"
+    },
+    {
+      "bytes": 1490,
+      "path": "CANDIDATE_DOMAIN_RUNTIME_FREEZE_A6.json",
+      "sha256": "233bd5b09981dd2263170906a0d1af8fae4911480ac8d9e26e1f95568ca89781"
+    },
+    {
+      "bytes": 534,
+      "path": "EVALUATOR_SEMANTICS_A6.json",
+      "sha256": "7af59527b1b32fe4f59b9fbb3fdbce8c0bf30ae0cc8c1f8cf33a976173a8c2c2"
+    },
+    {
+      "bytes": 230246,
+      "path": "FRESH_ENGLISH_A6_PRIMARY_FEASIBILITY_SET.jsonl",
+      "sha256": "0c005adaa8ce7e3010e244a48390712aae1e0f6c95d7090448ad63d8a2c4d4c5"
+    },
+    {
+      "bytes": 6773,
+      "path": "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json",
+      "sha256": "c1485045eb4a5250eb60de9e2fd02fd88d4f618de1bf77f52a24efd22c4dd114"
+    },
+    {
+      "bytes": 838,
+      "path": "NO_PHASE_M_PRIMARY_PIPELINE_SPEC_A6.json",
+      "sha256": "2474d5ce4a951783db4bb9d146edd04152d644e053636a459da4f496acff6b85"
+    },
+    {
+      "bytes": 600,
+      "path": "OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A6.json",
+      "sha256": "0446af4390d18028280f7b41ca47301a0c6eeef3c6f603657e90e2ead83ebd07"
+    },
+    {
+      "bytes": 23953,
+      "path": "ORACLE_A5_OBSERVED_DIAGNOSTIC_RESULTS.jsonl",
+      "sha256": "43c5b39ce388a71b260df22da2d5b93352f6eefaadfd35b7c6150fb737b51b5f"
+    },
+    {
+      "bytes": 23751,
+      "path": "ORACLE_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl",
+      "sha256": "be2e5d22bc41fadbe835a2244c7da1a68b50a1478f325d76101f3386fdde398a"
+    },
+    {
+      "bytes": 4661,
+      "path": "SOURCE_INPUT_MANIFEST.json",
+      "sha256": "5be3a6e689b0fef8a9ee21b9b01891b89f406aebe2ce5cb6ade2ed3c4264d53f"
+    },
+    {
+      "bytes": 26901,
+      "path": "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl",
+      "sha256": "08afb6fa8206b41561d586e79a60580c77141fde6c0d16ea3e5d4e7684f7a389"
+    },
+    {
+      "bytes": 479,
+      "path": "TARGET_TABLE_BRANCHING_PROTOCOL_A6.json",
+      "sha256": "bacc0ee5745c7d549f6db74729acf1eb53e5597cf048314403ade1942858e6a9"
+    }
+  ],
+  "combined_scientific_artifacts_sha256": "42a4d969ec430f4fd5251f2caf9b2df863fcc1d091ccbe1450916d8190eff90d",
+  "identity_scope": "scientific_logical_artifacts_only",
+  "patch": "PATCH0",
+  "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE"
+}

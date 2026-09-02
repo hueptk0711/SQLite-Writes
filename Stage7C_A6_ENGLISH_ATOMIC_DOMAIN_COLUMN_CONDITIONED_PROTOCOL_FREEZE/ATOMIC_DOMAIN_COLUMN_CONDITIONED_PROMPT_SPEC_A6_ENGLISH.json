@@ -1,0 +1,32 @@
+{
+  "candidate_domain_filter_source_patch": "PATCH2",
+  "candidate_domain_filter_source_stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT",
+  "candidate_generator_source_stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT",
+  "candidate_generator_variant": "lexical_ngram2",
+  "candidate_serialization": "SPAN_0001 | TAG[,TAG...] | exact source text",
+  "examples": [],
+  "gpu_called": false,
+  "model_called": false,
+  "model_generates_character_offsets": false,
+  "model_generates_free_length_span_set": false,
+  "model_generates_phase_m": false,
+  "model_generates_slot_refs": false,
+  "model_generates_values": false,
+  "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "model_selects_column_span_refs": true,
+  "model_selects_table_ref": true,
+  "operation_scope": "INSERT",
+  "patch": "PATCH0",
+  "prompt_hashes": {
+    "phase_o_system_prompt_sha256": "57c27cc632cfc89826d90dab7861e1aea4051b8bcedada73b0f7fed2ddadf7a6",
+    "phase_o_user_prompt_template_sha256": "e259bcf0c0a186f53381722bca6836eea6c2b1e4345f4716332b80310bff0236"
+  },
+  "protocol": "atomic_domain_column_conditioned_phase_o_protocol",
+  "repair": "none",
+  "retry": 0,
+  "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE",
+  "system_prompt": "You select one source span or OMIT for every SQLite INSERT column. Return only JSON that matches the provided schema.",
+  "user_prompt_template": "Select the literal source span for each target-table column in the INSERT request.\n\nRules:\n- Choose exactly one SPAN reference or OMIT for every column in the selected table branch.\n- Use each non-OMIT SPAN reference for at most one column.\n- Use OMIT only when the request gives no literal value for that column.\n- Choose the smallest complete atomic value span.\n- The candidate span inventory has already removed deterministic schema-label/value distractors and omission-cue distractors.\n- Do not select field labels, instruction text, table names, column names, or label-plus-value spans.\n- For multi-table schemas, choose exactly one table_ref branch from the model-visible schema.\n- Do not invent span refs.\n- Do not output character offsets, raw values, SLOT refs, Phase M JSON, explanations, or markdown.\n\nOriginal request:\n{question}\n\nSchema inventory:\n{schema_inventory}\n\nCandidate span inventory:\n{candidate_inventory}\n",
+  "zero_shot": true
+}

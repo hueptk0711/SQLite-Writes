@@ -1,0 +1,52 @@
+{
+  "candidate_miss_policy": "If the filter suppresses a true gold span on pilot/dev/test, it is a method failure and cannot exclude the sample.",
+  "forbidden_runtime_inputs": [
+    "gold_sql",
+    "gold_values",
+    "gold_offsets",
+    "target_state",
+    "model_outputs"
+  ],
+  "gold_blind_runtime_inputs": [
+    "question",
+    "candidate_inventory",
+    "model_visible_schema",
+    "frozen_cue_list",
+    "frozen_stoplist"
+  ],
+  "gpu_called": false,
+  "manual_alias_additions_allowed_after_a6_outputs": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "runtime_order": [
+    "generate lexical_ngram2 candidate inventory",
+    "derive schema-label aliases from model-visible table and column names",
+    "detect schema-label/schema-alias omission constructions in the question",
+    "suppress schema-label/schema-alias dominated label-plus-atomic spans",
+    "suppress context-aware omission-cue spans and full omission constructions",
+    "build dynamic column-conditioned JSON schema over remaining SPAN refs plus OMIT"
+  ],
+  "schema_alias_stopwords": [
+    "c",
+    "code",
+    "count",
+    "date",
+    "flag",
+    "g",
+    "id",
+    "kg",
+    "name",
+    "no",
+    "number",
+    "pct",
+    "percent",
+    "percentage",
+    "text",
+    "time",
+    "type",
+    "value"
+  ],
+  "source_patch": "PATCH2",
+  "source_stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT",
+  "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE"
+}

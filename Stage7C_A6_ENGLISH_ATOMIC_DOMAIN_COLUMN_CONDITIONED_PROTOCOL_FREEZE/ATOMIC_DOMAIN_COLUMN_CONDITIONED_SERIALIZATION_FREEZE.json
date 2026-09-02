@@ -1,0 +1,22 @@
+{
+  "candidate_domain_filter_source_patch": "PATCH2",
+  "candidate_domain_filter_source_stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT",
+  "candidate_generator_variant": "lexical_ngram2",
+  "format_frozen_before_model_run": true,
+  "gpu_called": false,
+  "line_template": "SPAN_0001 | TAG[,TAG...] | exact source text",
+  "model_called": false,
+  "model_hidden_fields": [
+    "start_char",
+    "end_char",
+    "provenance_tags"
+  ],
+  "model_visible_fields": [
+    "span_ref",
+    "tags",
+    "text"
+  ],
+  "patch": "PATCH0",
+  "source_stage": "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT",
+  "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE"
+}

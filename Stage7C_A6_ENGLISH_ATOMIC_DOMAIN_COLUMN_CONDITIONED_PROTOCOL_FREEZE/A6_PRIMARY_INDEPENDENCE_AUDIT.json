@@ -1,0 +1,99 @@
+{
+  "a4_derived_diagnostic_case_count": 12,
+  "exact_literal_overlap_case_count": 0,
+  "failures": [],
+  "gpu_called": false,
+  "max_nearest_question_sequence_similarity": 0.5658914728682171,
+  "model_called": false,
+  "patch": "PATCH0",
+  "per_primary_case": [
+    {
+      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
+      "nearest_a4_derived_question": "stage7c_a5_primary_english_001",
+      "nearest_question_sequence_similarity": 0.35802469135802467,
+      "passes_independence_gate": true,
+      "sample_id": "stage7c_a6_primary_english_001"
+    },
+    {
+      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
+      "nearest_a4_derived_question": "stage7c_a5_primary_english_005",
+      "nearest_question_sequence_similarity": 0.4806201550387597,
+      "passes_independence_gate": true,
+      "sample_id": "stage7c_a6_primary_english_002"
+    },
+    {
+      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
+      "nearest_a4_derived_question": "stage7c_a5_primary_english_001",
+      "nearest_question_sequence_similarity": 0.4388185654008439,
+      "passes_independence_gate": true,
+      "sample_id": "stage7c_a6_primary_english_003"
+    },
+    {
+      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
+      "nearest_a4_derived_question": "stage7c_a5_primary_english_011",
+      "nearest_question_sequence_similarity": 0.34513274336283184,
+      "passes_independence_gate": true,
+      "sample_id": "stage7c_a6_primary_english_004"
+    },
+    {
+      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
+      "nearest_a4_derived_question": "stage7c_a5_primary_english_007",
+      "nearest_question_sequence_similarity": 0.5658914728682171,
+      "passes_independence_gate": true,
+      "sample_id": "stage7c_a6_primary_english_005"
+    },
+    {
+      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
+      "nearest_a4_derived_question": "stage7c_a5_primary_english_001",
+      "nearest_question_sequence_similarity": 0.3709090909090909,
+      "passes_independence_gate": true,
+      "sample_id": "stage7c_a6_primary_english_006"
+    },
+    {
+      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
+      "nearest_a4_derived_question": "stage7c_a5_primary_english_011",
+      "nearest_question_sequence_similarity": 0.40625,
+      "passes_independence_gate": true,
+      "sample_id": "stage7c_a6_primary_english_007"
+    },
+    {
+      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
+      "nearest_a4_derived_question": "stage7c_a5_primary_english_002",
+      "nearest_question_sequence_similarity": 0.3203463203463203,
+      "passes_independence_gate": true,
+      "sample_id": "stage7c_a6_primary_english_008"
+    },
+    {
+      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
+      "nearest_a4_derived_question": "stage7c_a5_primary_english_009",
+      "nearest_question_sequence_similarity": 0.5433070866141733,
+      "passes_independence_gate": true,
+      "sample_id": "stage7c_a6_primary_english_009"
+    },
+    {
+      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
+      "nearest_a4_derived_question": "stage7c_a5_primary_english_008",
+      "nearest_question_sequence_similarity": 0.5078125,
+      "passes_independence_gate": true,
+      "sample_id": "stage7c_a6_primary_english_010"
+    },
+    {
+      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
+      "nearest_a4_derived_question": "stage7c_a5_primary_english_012",
+      "nearest_question_sequence_similarity": 0.44642857142857145,
+      "passes_independence_gate": true,
+      "sample_id": "stage7c_a6_primary_english_011"
+    },
+    {
+      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
+      "nearest_a4_derived_question": "stage7c_a5_primary_english_012",
+      "nearest_question_sequence_similarity": 0.42105263157894735,
+      "passes_independence_gate": true,
+      "sample_id": "stage7c_a6_primary_english_012"
+    }
+  ],
+  "primary_case_count": 12,
+  "similarity_threshold": 0.6,
+  "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE",
+  "status": "PASS"
+}

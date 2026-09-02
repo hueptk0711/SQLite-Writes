@@ -1,0 +1,23 @@
+{
+  "deterministic_ir_derivation": "For every non-OMIT column decision, assign the selected span to the same column in selected-table column order.",
+  "gpu_called": false,
+  "model_called": false,
+  "model_generates_phase_m": false,
+  "model_generates_slot_refs": false,
+  "new_one_call_pipeline": [
+    "column-conditioned Phase O table_ref plus column_span_refs",
+    "deterministic SPAN resolution",
+    "deterministic per-column IR assignment derivation",
+    "typed materialization",
+    "completeness verification",
+    "SQLite compilation",
+    "rolled-back SQLite preflight"
+  ],
+  "old_two_call_pipeline": [
+    "Phase O span selection",
+    "Phase M slot-to-column mapping"
+  ],
+  "patch": "PATCH0",
+  "primary_pipeline_phase_m_removed": true,
+  "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE"
+}
