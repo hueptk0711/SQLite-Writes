@@ -1,0 +1,35 @@
+{
+  "accepted_protocol_commit": "e1f4b4b73fdaeb6a2235c1d96e4928ce8736bc49",
+  "diagnostics_requested_after_primary_pass": false,
+  "git": {
+    "accepted_protocol_commit": "e1f4b4b73fdaeb6a2235c1d96e4928ce8736bc49",
+    "execution_commit": null,
+    "frozen_accepted_protocol_commit": "e1f4b4b73fdaeb6a2235c1d96e4928ce8736bc49",
+    "git_assertions_skipped": true,
+    "git_available": true,
+    "input_manifest_available": true
+  },
+  "model": {
+    "backend": "mock",
+    "mock_uses_label_side_expected": true,
+    "model_called": false
+  },
+  "phase_m_raw_generation_file": null,
+  "phase_m_removed": true,
+  "phase_o_max_new_tokens": 512,
+  "phase_o_prompt_spec_path": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE/ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROMPT_SPEC_A6_ENGLISH.json",
+  "primary_case_count": 12,
+  "primary_first_diagnostics_forbidden_until_freeze": true,
+  "repair": "none",
+  "retry": 0,
+  "stage": "Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT",
+  "stage7c_a6_inputs": {
+    "a6_diagnostic_set_sha256": "79a714aa1244da22f5243d23aa512849676d0a3681970e95387f7357b444f74c",
+    "a6_primary_set_sha256": "9ecd822da88fb4ddb3a69293f54ec7cb569cac71af6d52ef2cec7aa35a5a16c2",
+    "a6_prompt_spec_sha256": "8b61296169dfa38820fbc05bca9e0d7b397cddc5ee7652021d3a452c22bd0db4",
+    "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "stage7c_a6_lock_sha256": "82ed8abbe4353c97ad9a0e87f944bc70e20610e094a99ceb8d3342c3e34b5a53",
+    "tokenizer_status": "PASS"
+  },
+  "zero_shot": true
+}

@@ -1,0 +1,181 @@
+{
+  "acceptance": {
+    "averaging_allowed": false,
+    "diagnostics_can_compensate_primary_failure": false,
+    "eleven_of_twelve_allowed": false,
+    "gretel_pilot_gate": "open 100-sample Gretel development-train pilot only after 12/12 primary PASS",
+    "primary_before_diagnostics": true,
+    "required_pass_count": "12/12"
+  },
+  "accepted_protocol_commit": "e1f4b4b73fdaeb6a2235c1d96e4928ce8736bc49",
+  "generation_contract": {
+    "automatic_repair": false,
+    "backend": "incremental_json_schema_grammar",
+    "calls_per_primary_case": 1,
+    "completed_scientific_primary_failure_policy": "runner exits 0 after writing complete evidence; validate, archive, and hash the result before review",
+    "diagnostic_cases": "36 Stage7C-A6 diagnostics deferred until after primary result is frozen and reviewed",
+    "examples": [],
+    "fallback_to_unconstrained": false,
+    "finite_complete_object_enumeration": false,
+    "finite_known_answer_candidates": false,
+    "gpu_topology_fail_fast_before_model_load": true,
+    "interrupted_run_policy": "archive partial output as ABORTED_INFRASTRUCTURE and start a new empty result-root; do not pass --resume",
+    "label_side_data_used_for_constraints": false,
+    "phase_m_calls": 0,
+    "phase_o_calls": 1,
+    "phase_o_max_new_tokens": 512,
+    "phase_o_runtime_schema": "table_ref branch plus per-column exact current SPAN refs or OMIT",
+    "primary_cases": "12 locked Stage7C-A6 primary English column-conditioned cases",
+    "repair": "none",
+    "resume_allowed": false,
+    "retry": 0,
+    "runner_file": "scripts/server/run_stage7e0_a6_english.py",
+    "runtime_preflight_file": "scripts/server/preflight_runtime_stage7e0_a6.py",
+    "runtime_profile_switch_after_completed_generation_allowed": false,
+    "schema_enforcement_mode": "transformers_prefix_allowed_tokens_fn",
+    "single_primary_runtime_profile": true,
+    "token_level_enforcement": true,
+    "zero_shot": true
+  },
+  "model": {
+    "allowed_frozen_runtime_profiles": [
+      {
+        "gpu_requirement": "cuda_available=true",
+        "packages": {
+          "accelerate": [
+            "1.14.0"
+          ],
+          "safetensors": [
+            "0.5.3"
+          ],
+          "tokenizers": [
+            "0.22.2"
+          ],
+          "torch": [
+            "2.6.0+cu124"
+          ],
+          "transformers": [
+            "5.5.3"
+          ]
+        },
+        "profile_id": "uet_server_cuda124",
+        "role": "historical_reference_only",
+        "torch_cuda": "12.4"
+      },
+      {
+        "cuda_available": true,
+        "gpu_count": 2,
+        "gpu_device_substring": "Tesla T4",
+        "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
+        "packages": {
+          "accelerate": [
+            "1.14.0"
+          ],
+          "safetensors": [
+            "0.5.3"
+          ],
+          "tokenizers": [
+            "0.22.2"
+          ],
+          "torch": [
+            "2.13.0",
+            "2.13.0+cu130"
+          ],
+          "transformers": [
+            "5.5.3"
+          ]
+        },
+        "profile_id": "kaggle_t4x2_cuda130",
+        "role": "primary_scientific_runtime",
+        "torch_cuda": "13.0"
+      },
+      {
+        "cuda_available": true,
+        "gpu_count": 1,
+        "gpu_device_substring": "RTX 4090",
+        "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
+        "packages": {
+          "accelerate": [
+            "1.14.0"
+          ],
+          "safetensors": [
+            "0.5.3"
+          ],
+          "tokenizers": [
+            "0.22.2"
+          ],
+          "torch": [
+            "2.6.0+cu124"
+          ],
+          "transformers": [
+            "5.5.3"
+          ]
+        },
+        "profile_id": "uet_rtx4090_cuda124_visible0",
+        "role": "primary_scientific_runtime_patch3_uet_server",
+        "torch_cuda": "12.4"
+      }
+    ],
+    "default_model_path": "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "device_map": "auto",
+    "expected_chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "frozen_runtime_versions": {
+      "accelerate": "1.14.0",
+      "safetensors": "0.5.3",
+      "tokenizers": "0.22.2",
+      "torch": "2.6.0+cu124",
+      "transformers": "5.5.3"
+    },
+    "historical_runtime_profile_ids": [
+      "uet_server_cuda124",
+      "kaggle_t4x2_cuda130"
+    ],
+    "max_memory": null,
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "primary_runtime_profile": {
+      "cuda_available": true,
+      "gpu_count": 1,
+      "gpu_device_substring": "RTX 4090",
+      "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
+      "packages": {
+        "accelerate": [
+          "1.14.0"
+        ],
+        "safetensors": [
+          "0.5.3"
+        ],
+        "tokenizers": [
+          "0.22.2"
+        ],
+        "torch": [
+          "2.6.0+cu124"
+        ],
+        "transformers": [
+          "5.5.3"
+        ]
+      },
+      "profile_id": "uet_rtx4090_cuda124_visible0",
+      "role": "primary_scientific_runtime_patch3_uet_server",
+      "torch_cuda": "12.4"
+    },
+    "primary_runtime_profile_id": "uet_rtx4090_cuda124_visible0",
+    "quantization_allowed": false,
+    "quantization_default": "none",
+    "server_requirements_lock": "requirements-inference-uet-rtx4090-cu124.lock.txt",
+    "torch_dtype": "auto"
+  },
+  "patch": "PATCH0",
+  "prompt_contract": {
+    "column_span_refs_mapping_equality": "order_insensitive_by_object_key",
+    "duplicate_non_omit_span_reuse": "method_failure",
+    "phase_m_removed": true,
+    "phase_o_output_keys": [
+      "operation",
+      "table_ref",
+      "column_span_refs"
+    ],
+    "phase_o_prompt_spec_path": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE/ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROMPT_SPEC_A6_ENGLISH.json"
+  },
+  "stage": "Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT"
+}
