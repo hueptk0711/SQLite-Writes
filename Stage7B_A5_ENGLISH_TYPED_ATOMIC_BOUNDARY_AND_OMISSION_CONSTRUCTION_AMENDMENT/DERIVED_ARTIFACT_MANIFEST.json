@@ -1,60 +1,65 @@
 {
-  "artifact_count": 13,
+  "artifact_count": 14,
   "artifacts": [
     {
-      "bytes": 3179,
+      "bytes": 4848,
       "path": "SOURCE_INPUT_MANIFEST.json",
-      "sha256": "01136b86952c5ac30bf96cb26b15483a2dc3066e524e686b41474df496345301"
+      "sha256": "77185b2c778734a6f8d40fb7feb941d96fb0d0ec6c7fecdd65213f52c26f8c32"
     },
     {
       "bytes": 803,
       "path": "A6_VALID_FEASIBILITY_FAIL_FREEZE.json",
-      "sha256": "4ed000cca05415aa5648bc45f9f1fa8311318a7ff74fa704cb03aca53766f201"
+      "sha256": "7667e80386281bd1118db6090737f0001ff5ff7b7cedae69eb0e2a26a3ff8b6b"
     },
     {
       "bytes": 673,
       "path": "METHOD_AUDIT_PROTOCOL.json",
-      "sha256": "05e892ab7d9f9181e4567319b6e26af3aaded18cc6681dbe08d26f11bff24cf2"
+      "sha256": "dbcee16c6f2998cd253e7590ba03649e758cba839f500d0bdf586cef6331594f"
     },
     {
-      "bytes": 360,
+      "bytes": 668,
       "path": "TYPED_ATOMICITY_RULE_SPEC.json",
-      "sha256": "c4a3326fe9e222fd5efdbab7bced84d7ab7e1076f13ba5b308e93b22782aef6a"
+      "sha256": "20a1cc542c454c027cd67dfc6d64b5c94c3bc4e4ac847536b608ce20cc0d7ddb"
     },
     {
-      "bytes": 530,
+      "bytes": 657,
+      "path": "OMIT_ADMISSIBILITY_RULE_SPEC.json",
+      "sha256": "f59f353923aeefc8024fbc681fd81d6e407994740e4257ed505b9e18b647fc78"
+    },
+    {
+      "bytes": 612,
       "path": "OMISSION_CONSTRUCTION_SUPPRESSION_RULE_SPEC.json",
-      "sha256": "73b210806b47ceb4e0a93bb06b5b3d14735a5f1104e4e3c03b3b104cca8f3098"
+      "sha256": "ae43b9499fc4da8492714dfe8b1ca17665b19188b0ab214f818248d566ea6f14"
     },
     {
       "bytes": 445,
       "path": "QUOTE_BOUNDARY_RULE_SPEC.json",
-      "sha256": "cf98e769f097bcb8e89827f71649e5c5d0fbf1c945e3fcc9fec833282febbe7a"
+      "sha256": "81c9c65eb86c7cd16b4589736efef7d9e3abc068bbe93d741c12436d95ba39a0"
     },
     {
       "bytes": 946,
       "path": "DESIGN_TRAIN_BASELINE_A4_DOMAIN_AUDIT.json",
-      "sha256": "d4b3b1376016fdc4052d05cad57b6acb30d4b779781a1ee92fa55183918c2eff"
+      "sha256": "b990b47fd2813063f95009efd75996dacf1de7cf175925750dadb144e90c9c81"
     },
     {
       "bytes": 1170,
       "path": "DESIGN_TRAIN_STAGE7B_A5_DOMAIN_AUDIT.json",
-      "sha256": "825437b0e6573d8336bb077fbc9bcf0936ea1d66f63be6290b9655b2c5a41b5b"
+      "sha256": "9f14d4a1626a514e3ecf1ae35c2257f47a02f9b1e404ff51d0fd6bcda87d6ff8"
     },
     {
       "bytes": 530,
       "path": "FALSE_SUPPRESSION_AUDIT.json",
-      "sha256": "deffc5a0f2d507f3923aa6664fcfdc29636c2785216fd6c73a99a1881b01a02c"
+      "sha256": "fa143341eb67b53add05a46894138f3c4874f89c0b6cf8b8c7b0a24acc5b530c"
     },
     {
-      "bytes": 10733,
+      "bytes": 11963,
       "path": "A6_OBSERVED_ERROR_COUNTERFACTUAL_AUDIT.json",
-      "sha256": "b8d549a78cf230794043fad3b821e55a15dfa872a048eda13d050229a61bcb0d"
+      "sha256": "8c863c73cf81492915bba0c0b399af4890db5a5a7cff86217ee0683b6086376d"
     },
     {
-      "bytes": 5799,
+      "bytes": 7832,
       "path": "SYNTHETIC_TYPED_OMISSION_BOUNDARY_SAFETY_AUDIT.json",
-      "sha256": "a105e6401c4b3715a567334c2a364b65d0bded3fcbd802b622c18f1d21a2b851"
+      "sha256": "8a5c473b3b478f051b3b3b28e6cb64d2b9466df0c348eed18b7090b76c814d07"
     },
     {
       "bytes": 863507,
@@ -67,7 +72,7 @@
       "sha256": "10258506fbc444dd9a17f80385e9affca942a8cb3a69b199a81a8a99c202d89b"
     }
   ],
-  "combined_scientific_artifacts_sha256": "3cd33daf4ae47c7450a380a4fd1742921fad73267bdd98291c45714e4686f6fc",
-  "patch": "PATCH0",
+  "combined_scientific_artifacts_sha256": "ef33a24a3899701b3cdfde061d2a73333a84ab4d75303386d97b7cdf73501ae6",
+  "patch": "PATCH1",
   "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT"
 }

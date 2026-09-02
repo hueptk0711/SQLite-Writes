@@ -28,6 +28,7 @@ from scripts.data.build_stage7b_a5_typed_atomic_boundary_omission import (  # no
     canonical_json,
     detect_omission_constructions,
     generate_candidate_inventory,
+    omittable_schema_aliases_from_inventory,
     schema_label_alias_index,
     sha256_file,
     sha256_text,
@@ -52,6 +53,16 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
+def _candidate_for_text_in_region(inventory: list[Any], question: str, text: str, region: str) -> Any:
+    region_start = question.casefold().index(region.casefold())
+    region_end = region_start + len(region)
+    return next(
+        candidate
+        for candidate in inventory
+        if candidate.text == text and region_start <= candidate.start_char and candidate.end_char <= region_end
+    )
+
+
 def _check_false_model_gpu(payloads: dict[str, dict[str, Any]], failures: list[str]) -> None:
     for owner, payload in payloads.items():
         if payload.get("model_called") is not False or payload.get("gpu_called") is not False:
@@ -70,6 +81,7 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
     a6_freeze = read_json(stage_dir / "A6_VALID_FEASIBILITY_FAIL_FREEZE.json")
     protocol = read_json(stage_dir / "METHOD_AUDIT_PROTOCOL.json")
     typed = read_json(stage_dir / "TYPED_ATOMICITY_RULE_SPEC.json")
+    omit_admissibility = read_json(stage_dir / "OMIT_ADMISSIBILITY_RULE_SPEC.json")
     omission = read_json(stage_dir / "OMISSION_CONSTRUCTION_SUPPRESSION_RULE_SPEC.json")
     boundary = read_json(stage_dir / "QUOTE_BOUNDARY_RULE_SPEC.json")
     baseline = read_json(stage_dir / "DESIGN_TRAIN_BASELINE_A4_DOMAIN_AUDIT.json")
@@ -88,6 +100,7 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
             "a6_freeze": a6_freeze,
             "protocol": protocol,
             "typed": typed,
+            "omit_admissibility": omit_admissibility,
             "omission": omission,
             "boundary": boundary,
             "baseline": baseline,
@@ -126,6 +139,12 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
         failures.append("protocol_does_not_forbid_a6_rerun")
     if typed.get("rule_name") != "typed_complete_literal_dominates_numeric_child":
         failures.append("typed_rule_name_mismatch")
+    if "abc" not in typed.get("forbidden_suffix_policy", ""):
+        failures.append("typed_rule_does_not_forbid_generic_alpha_suffix")
+    if omit_admissibility.get("rule_name") != "schema_semantic_omit_admissibility":
+        failures.append("omit_admissibility_rule_name_mismatch")
+    if "has_default" not in omit_admissibility.get("omit_admissible_when_any", []):
+        failures.append("omit_admissibility_spec_incomplete")
     if omission.get("rule_name") != "full_omission_construction_region_suppression":
         failures.append("omission_rule_name_mismatch")
     if len(boundary.get("rules", [])) < 4:
@@ -165,8 +184,12 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
         failures.append("a6_wrong_decision_count_mismatch")
     if a6.get("stage7b_a5_correct_gold_suppressed") != 0:
         failures.append("a6_correct_gold_suppressed")
-    if a6.get("stage7b_a5_wrong_decisions_suppressed", 0) <= 0:
-        failures.append("a6_no_wrong_decisions_suppressed")
+    if a6.get("stage7b_a5_wrong_span_choices_suppressed") != 14:
+        failures.append("a6_wrong_span_choices_suppressed_mismatch")
+    if a6.get("stage7b_a5_wrong_required_omit_structurally_impossible") != 1:
+        failures.append("a6_required_omit_structural_count_mismatch")
+    if a6.get("stage7b_a5_observed_wrong_decisions_addressed") != 15:
+        failures.append("a6_observed_wrong_decisions_addressed_mismatch")
     for family in ["typed_complete_literal_numeric_child", "omission_construction_candidate_leak", "quote_punctuation_boundary_quality", "false_omit_required_value"]:
         if family not in a6.get("error_family_counts", {}):
             failures.append(f"a6_missing_error_family:{family}")
@@ -178,18 +201,50 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
     if not examples:
         failures.append("suppression_examples_missing")
 
-    inventory = generate_candidate_inventory('Insert hydration_pct 68%, status "Absent", and memo absent.')
+    helper_question = 'Insert hydration_pct 68%, required status absent, required status missing, and optional memo absent.'
+    inventory = generate_candidate_inventory(helper_question)
     aliases = schema_label_alias_index({"hydration pct", "status", "memo"})
-    detections = detect_omission_constructions('Insert hydration_pct 68%, status "Absent", and memo absent.', aliases)
+    schema_inventory = {
+        "columns": [
+            {"column_name": "hydration_pct", "nullable": False, "has_default": False},
+            {"column_name": "status", "nullable": False, "has_default": False},
+            {"column_name": "memo", "nullable": True, "has_default": False},
+        ]
+    }
+    omittable_aliases = omittable_schema_aliases_from_inventory(schema_inventory)
+    detections = detect_omission_constructions(
+        helper_question,
+        omittable_aliases,
+    )
     reasons = a5_suppression_reasons(inventory, aliases, detections, include_a4=False)
-    by_text = {candidate.text: candidate for candidate in inventory}
-    if typed_complete_literal_reason(by_text["68"], inventory) is None:
+    pct_child = _candidate_for_text_in_region(inventory, helper_question, "68", "hydration_pct 68%")
+    if typed_complete_literal_reason(pct_child, inventory) is None:
         failures.append("typed_helper_does_not_find_percent_parent")
-    if by_text["68"].span_ref not in reasons:
+    if pct_child.span_ref not in reasons:
         failures.append("a5_helper_does_not_suppress_percent_child")
-    quoted_absent = next(candidate for candidate in inventory if candidate.text == "Absent")
-    if quoted_absent.span_ref in reasons:
-        failures.append("a5_helper_suppresses_quoted_absent_literal")
+    required_status_absent = _candidate_for_text_in_region(inventory, helper_question, "status absent", "required status absent")
+    required_absent = _candidate_for_text_in_region(inventory, helper_question, "absent", "required status absent")
+    required_status_missing = _candidate_for_text_in_region(inventory, helper_question, "status missing", "required status missing")
+    required_missing = _candidate_for_text_in_region(inventory, helper_question, "missing", "required status missing")
+    optional_memo_absent = _candidate_for_text_in_region(inventory, helper_question, "memo absent", "optional memo absent")
+    if required_status_absent.span_ref in reasons or required_absent.span_ref in reasons:
+        failures.append("a5_helper_suppresses_required_absent_literal")
+    if required_status_missing.span_ref in reasons or required_missing.span_ref in reasons:
+        failures.append("a5_helper_suppresses_required_missing_literal")
+    if optional_memo_absent.span_ref not in reasons:
+        failures.append("a5_helper_does_not_suppress_optional_memo_absent")
+
+    unit_question = "Insert hydration_pct 68kg, completion_percentage 68abc, weight_kg 68kg, and duration_ms 25ms."
+    unit_inventory = generate_candidate_inventory(unit_question)
+    unit_reasons = a5_suppression_reasons(unit_inventory, schema_label_alias_index({"hydration pct", "completion percentage", "weight kg", "duration ms"}), [], include_a4=False)
+    for text, region in [("68", "68kg"), ("68kg", "68kg"), ("68abc", "68abc"), ("25", "25ms"), ("25ms", "25ms")]:
+        try:
+            candidate = _candidate_for_text_in_region(unit_inventory, unit_question, text, region)
+        except StopIteration:
+            failures.append(f"unit_fixture_missing:{text}")
+            continue
+        if candidate.span_ref in unit_reasons:
+            failures.append(f"unit_fixture_incorrectly_suppressed:{text}")
 
     manifest_by_path = {item["path"]: item for item in manifest.get("artifacts", [])}
     if manifest.get("artifact_count") != len(SCIENTIFIC_ARTIFACTS):
@@ -242,7 +297,9 @@ def validate(stage_dir: Path, raw_dir: Path | None = None, *, rebuild: bool = Fa
         "additional_full_sample_losses": false.get("additional_full_sample_losses"),
         "a6_case_exact_pass_count": a6.get("case_exact_pass_count"),
         "a6_wrong_decisions": a6.get("wrong_decision_count"),
-        "a6_wrong_decisions_suppressed_by_a5": a6.get("stage7b_a5_wrong_decisions_suppressed"),
+        "a6_wrong_span_choices_suppressed_by_a5": a6.get("stage7b_a5_wrong_span_choices_suppressed"),
+        "a6_wrong_required_omit_structurally_impossible": a6.get("stage7b_a5_wrong_required_omit_structurally_impossible"),
+        "a6_observed_wrong_decisions_addressed": a6.get("stage7b_a5_observed_wrong_decisions_addressed"),
         "model_called": False,
         "gpu_called": False,
         "gretel_pilot_opened": False,

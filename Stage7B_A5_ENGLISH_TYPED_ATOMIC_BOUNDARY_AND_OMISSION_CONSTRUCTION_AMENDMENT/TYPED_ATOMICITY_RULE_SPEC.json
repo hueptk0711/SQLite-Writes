@@ -1,9 +1,19 @@
 {
+  "activated_only_by_label_context": [
+    "pct",
+    "percent",
+    "percentage"
+  ],
+  "dominant_suffixes": [
+    "%",
+    " percent"
+  ],
+  "forbidden_suffix_policy": "Generic alphabetic suffixes such as kg, ms, and abc are not percentage literals and do not suppress the numeric child.",
   "gold_blind": true,
   "gpu_called": false,
   "model_called": false,
-  "patch": "PATCH0",
-  "purpose": "Prefer complete typed literals such as 68% over numeric child 68 when both spans are present.",
+  "patch": "PATCH1",
+  "purpose": "Prefer complete percent literals such as 68% or 68 percent over numeric child 68 when both spans are present.",
   "rule_name": "typed_complete_literal_dominates_numeric_child",
   "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT"
 }

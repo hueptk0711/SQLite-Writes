@@ -1,0 +1,23 @@
+{
+  "gold_blind": true,
+  "gpu_called": false,
+  "model_called": false,
+  "omit_admissible_when_any": [
+    "nullable",
+    "has_default",
+    "primary_key",
+    "autoincrement",
+    "generated"
+  ],
+  "omit_forbidden_when_all": [
+    "not nullable",
+    "no default",
+    "not primary key",
+    "not autoincrement",
+    "not generated"
+  ],
+  "patch": "PATCH1",
+  "purpose": "Allow omission-region suppression and dynamic OMIT availability only for schema columns whose SQL semantics permit an omitted value.",
+  "rule_name": "schema_semantic_omit_admissibility",
+  "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT"
+}

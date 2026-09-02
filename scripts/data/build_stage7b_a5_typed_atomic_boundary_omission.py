@@ -37,6 +37,7 @@ from scripts.data.build_stage7b_a2_candidate_span_reference import (  # noqa: E4
     generate_candidate_inventory,
     load_raw_by_sample_id,
 )
+from scripts.data.build_stage7b_a3_column_conditioned_candidate_selection import parse_schema_tables  # noqa: E402
 from scripts.data.build_stage7b_a4_atomic_candidate_domain_omission_cue import (  # noqa: E402
     OMISSION_CUE_PHRASES,
     PATCH_NAME as STAGE7B_A4_PATCH_NAME,
@@ -54,7 +55,7 @@ from scripts.data.build_stage7b_a4_atomic_candidate_domain_omission_cue import (
 
 
 STAGE_NAME = "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT"
-PATCH_NAME = "PATCH0"
+PATCH_NAME = "PATCH1"
 PACKAGE_DATE = "20260902"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
 RAW_DIR_DEFAULT = PROJECT_ROOT.parents[1] / "external_sources" / "gretel_synthetic_text_to_sql_740ab236"
@@ -69,6 +70,7 @@ SCIENTIFIC_ARTIFACTS = [
     "A6_VALID_FEASIBILITY_FAIL_FREEZE.json",
     "METHOD_AUDIT_PROTOCOL.json",
     "TYPED_ATOMICITY_RULE_SPEC.json",
+    "OMIT_ADMISSIBILITY_RULE_SPEC.json",
     "OMISSION_CONSTRUCTION_SUPPRESSION_RULE_SPEC.json",
     "QUOTE_BOUNDARY_RULE_SPEC.json",
     "DESIGN_TRAIN_BASELINE_A4_DOMAIN_AUDIT.json",
@@ -172,6 +174,41 @@ def _span_by_bounds(inventory: list[CandidateSpan]) -> dict[tuple[int, int], Can
     return {(candidate.start_char, candidate.end_char): candidate for candidate in inventory}
 
 
+def _column_is_omit_admissible(column: Any) -> bool:
+    if isinstance(column, dict):
+        return bool(
+            column.get("nullable")
+            or column.get("has_default")
+            or column.get("primary_key")
+            or column.get("autoincrement")
+            or column.get("generated")
+        )
+    return bool(
+        getattr(column, "nullable", False)
+        or getattr(column, "has_default", False)
+        or getattr(column, "primary_key", False)
+        or getattr(column, "autoincrement", False)
+        or getattr(column, "generated", False)
+    )
+
+
+def omittable_schema_aliases_from_sql_context(sql_context: str) -> dict[str, list[str]]:
+    labels: set[str] = set()
+    for columns in parse_schema_tables(sql_context).values():
+        for column in columns:
+            if _column_is_omit_admissible(column):
+                labels.add(_normal_label(column.column_name))
+    return schema_label_alias_index({label for label in labels if label})
+
+
+def omittable_schema_aliases_from_inventory(schema_inventory: dict[str, Any]) -> dict[str, list[str]]:
+    labels: set[str] = set()
+    for column in schema_inventory.get("columns", []):
+        if _column_is_omit_admissible(column):
+            labels.add(_normal_label(str(column.get("column_name") or "")))
+    return schema_label_alias_index({label for label in labels if label})
+
+
 def typed_complete_literal_reason(candidate: CandidateSpan, inventory: list[CandidateSpan]) -> dict[str, Any] | None:
     """Suppress a numeric child when a same-start complete typed literal exists."""
 
@@ -183,12 +220,12 @@ def typed_complete_literal_reason(candidate: CandidateSpan, inventory: list[Cand
         for parent in inventory
         if parent.start_char == candidate.start_char
         and parent.end_char > candidate.end_char
-        and re.fullmatch(re.escape(text) + r"(?:%|[A-Za-z]{1,4})", parent.text.strip())
+        and re.fullmatch(re.escape(text) + r"(?:%|\s+percent)", parent.text.strip(), flags=re.IGNORECASE)
     ]
     if not typed_parents:
         return None
     parent = min(typed_parents, key=lambda item: item.end_char - item.start_char)
-    typed_label_context = False
+    typed_label_context = parent.text.strip().casefold().endswith(" percent")
     for container in inventory:
         if container.start_char <= parent.start_char and parent.end_char <= container.end_char and container.start_char < parent.start_char:
             relative_start = parent.start_char - container.start_char
@@ -343,10 +380,13 @@ def audit_design_train(raw_dir: Path) -> tuple[dict[str, Any], dict[str, Any], d
         raw = raw_by_id[sample_id]
         question = str(raw.get("sql_prompt") or "")
         inventory = generate_candidate_inventory(question, variant=SELECTED_VARIANT)
-        schema_aliases = schema_label_alias_index(visible_schema_labels(str(raw.get("sql_context") or "")))
-        detections = detect_omission_constructions(question, schema_aliases)
-        baseline_reasons = suppressible_span_refs(inventory, schema_aliases, detections)
-        a5_reasons = a5_suppression_reasons(inventory, schema_aliases, detections, include_a4=True)
+        sql_context = str(raw.get("sql_context") or "")
+        schema_aliases = schema_label_alias_index(visible_schema_labels(sql_context))
+        baseline_detections = detect_omission_constructions(question, schema_aliases)
+        omittable_aliases = omittable_schema_aliases_from_sql_context(sql_context)
+        omittable_detections = detect_omission_constructions(question, omittable_aliases)
+        baseline_reasons = suppressible_span_refs(inventory, schema_aliases, baseline_detections)
+        a5_reasons = a5_suppression_reasons(inventory, schema_aliases, omittable_detections, include_a4=True)
         baseline_suppressed = set(baseline_reasons)
         a5_suppressed = set(a5_reasons)
         baseline_inventory = [candidate for candidate in inventory if candidate.span_ref not in baseline_suppressed]
@@ -498,7 +538,8 @@ def a6_observed_error_counterfactual(stage7c_a6_dir: Path, stage7e0_a6_dir: Path
     }
     case_rows = read_jsonl(stage7e0_a6_dir / "uet_p4" / STAGE7E0_A6_RESULT_DIR / "primary_case_results.jsonl")
     decision_rows: list[dict[str, Any]] = []
-    wrong_suppressed = 0
+    wrong_span_suppressed = 0
+    wrong_required_omit_structurally_impossible = 0
     correct_gold_suppressed = 0
     family_counts: dict[str, int] = {}
 
@@ -509,8 +550,9 @@ def a6_observed_error_counterfactual(stage7c_a6_dir: Path, stage7e0_a6_dir: Path
         inventory = [candidate_from_json(candidate) for candidate in row["runtime_constraints"]["candidate_inventory"]]
         by_ref = {candidate.span_ref: candidate for candidate in inventory}
         schema_aliases = schema_inventory_aliases(row["model_side_input"]["schema_inventory"])
-        detections = detect_omission_constructions(row["model_side_input"]["question"], schema_aliases)
-        reasons = a5_suppression_reasons(inventory, schema_aliases, detections, include_a4=False)
+        omittable_aliases = omittable_schema_aliases_from_inventory(row["model_side_input"]["schema_inventory"])
+        omittable_detections = detect_omission_constructions(row["model_side_input"]["question"], omittable_aliases)
+        reasons = a5_suppression_reasons(inventory, schema_aliases, omittable_detections, include_a4=False)
         for column_ref in sorted(set(expected) | set(predicted)):
             expected_ref = expected.get(column_ref)
             predicted_ref = predicted.get(column_ref)
@@ -521,7 +563,17 @@ def a6_observed_error_counterfactual(stage7c_a6_dir: Path, stage7e0_a6_dir: Path
             family_counts[family] = family_counts.get(family, 0) + 1
             pred_suppressed = bool(predicted_ref and predicted_ref != "OMIT" and predicted_ref in reasons)
             gold_suppressed = bool(expected_ref and expected_ref != "OMIT" and expected_ref in reasons)
-            wrong_suppressed += int(pred_suppressed)
+            required_omit_structurally_impossible = bool(
+                predicted_ref == "OMIT"
+                and expected_ref != "OMIT"
+                and column.get("nullable") is False
+                and column.get("has_default") is False
+                and not column.get("primary_key")
+                and not column.get("autoincrement")
+                and not column.get("generated")
+            )
+            wrong_span_suppressed += int(pred_suppressed)
+            wrong_required_omit_structurally_impossible += int(required_omit_structurally_impossible)
             correct_gold_suppressed += int(gold_suppressed)
             decision_rows.append(
                 {
@@ -533,22 +585,26 @@ def a6_observed_error_counterfactual(stage7c_a6_dir: Path, stage7e0_a6_dir: Path
                     "predicted_span_ref": predicted_ref,
                     "predicted_text": _candidate_text(by_ref, predicted_ref),
                     "error_family": family,
-                    "stage7b_a5_wrong_decision_suppressed": pred_suppressed,
+                    "stage7b_a5_wrong_span_choice_suppressed": pred_suppressed,
+                    "stage7b_a5_wrong_required_omit_structurally_impossible": required_omit_structurally_impossible,
                     "stage7b_a5_correct_gold_suppressed": gold_suppressed,
                     "stage7b_a5_suppression_reason": reasons.get(str(predicted_ref)),
                 }
             )
     pass_cases = sum(1 for row in case_rows if row.get("status") == "PASS")
+    observed_addressed = wrong_span_suppressed + wrong_required_omit_structurally_impossible
     return {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
-        "status": "PASS" if pass_cases == 2 and len(decision_rows) == 15 and correct_gold_suppressed == 0 else "FAIL",
+        "status": "PASS" if pass_cases == 2 and len(decision_rows) == 15 and observed_addressed == 15 and correct_gold_suppressed == 0 else "FAIL",
         "audit_type": "development_diagnostic_not_independent_evaluation",
         "source_stage": STAGE7E0_A6_NAME,
         "source_primary_result": "2/12 valid feasibility failure, closed",
         "case_exact_pass_count": f"{pass_cases}/12",
         "wrong_decision_count": len(decision_rows),
-        "stage7b_a5_wrong_decisions_suppressed": wrong_suppressed,
+        "stage7b_a5_wrong_span_choices_suppressed": wrong_span_suppressed,
+        "stage7b_a5_wrong_required_omit_structurally_impossible": wrong_required_omit_structurally_impossible,
+        "stage7b_a5_observed_wrong_decisions_addressed": observed_addressed,
         "stage7b_a5_correct_gold_suppressed": correct_gold_suppressed,
         "error_family_counts": dict(sorted(family_counts.items())),
         "decision_rows": decision_rows,
@@ -561,22 +617,57 @@ def synthetic_safety_audit() -> dict[str, Any]:
     fixtures = [
         {
             "name": "percent_complete_literal",
-            "question": "Insert hydration_pct 68% and proof_minutes 42.",
+            "question": "Insert hydration_pct 68%, completion_percentage 68 percent, and proof_minutes 42.",
             "aliases": {"hydration pct", "proof minutes"},
+            "omittable_aliases": set(),
             "must_suppress": ["68"],
-            "must_keep": ["68%", "42"],
+            "must_keep": ["68%", "68 percent", "42"],
         },
         {
-            "name": "omission_region",
-            "question": "Insert record. Field memo absent. Status \"Absent\".",
-            "aliases": {"field memo", "status"},
+            "name": "required_status_absent_missing_kept",
+            "question": 'Insert record. Required status absent, required status missing, status "Absent", and status "Missing".',
+            "aliases": {"status"},
+            "omittable_aliases": set(),
+            "must_suppress": [],
+            "must_keep": ["status absent", "absent", "status missing", "missing", "Absent", "Missing"],
+        },
+        {
+            "name": "optional_memo_absent_suppressed",
+            "question": "Insert record. Optional memo absent.",
+            "aliases": {"memo"},
+            "omittable_aliases": {"memo"},
             "must_suppress": ["memo absent", "absent"],
-            "must_keep": ["Absent"],
+            "must_keep": [],
+        },
+        {
+            "name": "percentage_context_rejects_generic_alpha_suffix",
+            "question": "Insert hydration_pct 68kg and completion_percentage 68abc.",
+            "aliases": {"hydration pct", "completion percentage"},
+            "omittable_aliases": set(),
+            "must_suppress": [],
+            "must_keep": ["68", "68kg", "68abc"],
+        },
+        {
+            "name": "unit_suffixes_are_not_percentage_literals",
+            "question": "Insert weight_kg 68kg and duration_ms 25ms.",
+            "aliases": {"weight kg", "duration ms"},
+            "omittable_aliases": set(),
+            "must_suppress": [],
+            "must_keep": ["68", "68kg", "25", "25ms"],
+        },
+        {
+            "name": "quoted_absent_missing_literals_kept",
+            "question": 'Insert record. Optional memo "Absent" and optional note "Missing".',
+            "aliases": {"field memo", "status"},
+            "omittable_aliases": {"field memo"},
+            "must_suppress": [],
+            "must_keep": ["Absent", "Missing"],
         },
         {
             "name": "unbalanced_quote_boundary",
             "question": "Insert scanner \"flatbed nine\" and job_id JOB-9.",
             "aliases": {"scanner name", "job id"},
+            "omittable_aliases": set(),
             "must_suppress": ['scanner "flatbed'],
             "must_keep": ["flatbed nine", "JOB-9"],
         },
@@ -584,6 +675,7 @@ def synthetic_safety_audit() -> dict[str, Any]:
             "name": "label_prefix_partial_value",
             "question": "Insert docket_stage second review and intake_id INT-7.",
             "aliases": {"docket stage", "intake id"},
+            "omittable_aliases": set(),
             "must_suppress": ["docket_stage second"],
             "must_keep": ["second review", "INT-7"],
         },
@@ -593,7 +685,8 @@ def synthetic_safety_audit() -> dict[str, Any]:
     for fixture in fixtures:
         inventory = generate_candidate_inventory(fixture["question"], variant=SELECTED_VARIANT)
         aliases = schema_label_alias_index(fixture["aliases"])
-        detections = detect_omission_constructions(fixture["question"], aliases)
+        omittable_aliases = schema_label_alias_index(fixture["omittable_aliases"])
+        detections = detect_omission_constructions(fixture["question"], omittable_aliases)
         reasons = a5_suppression_reasons(inventory, aliases, detections, include_a4=False)
         by_text: dict[str, list[CandidateSpan]] = {}
         for candidate in inventory:
@@ -603,6 +696,9 @@ def synthetic_safety_audit() -> dict[str, Any]:
             if text not in suppressed_texts:
                 failures.append(f"{fixture['name']}:not_suppressed:{text}")
         for text in fixture["must_keep"]:
+            if text not in by_text:
+                failures.append(f"{fixture['name']}:missing_fixture_candidate:{text}")
+                continue
             if any(candidate.span_ref in reasons for candidate in by_text.get(text, [])):
                 failures.append(f"{fixture['name']}:incorrectly_suppressed:{text}")
         rows.append({"fixture": fixture["name"], "suppressed_texts": sorted(suppressed_texts), "reasons": reasons})
@@ -626,8 +722,19 @@ def source_input_manifest(raw_dir: Path) -> dict[str, Any]:
         "scripts/data/build_stage7b_a2_candidate_span_reference.py",
         "scripts/data/build_stage7b_a3_column_conditioned_candidate_selection.py",
         "scripts/data/build_stageeng0_gretel_qualification.py",
+        "scripts/data/build_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py",
+        "scripts/data/validate_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py",
+        "scripts/data/build_stage7e0_a6_english_preflight.py",
+        "scripts/data/validate_stage7e0_a6_english_preflight.py",
+        "scripts/server/preflight_runtime_stage7e0_a6.py",
+        "scripts/server/run_stage7e0_a4_english.py",
+        "scripts/server/run_stage7e0_v2_a1_preflight.py",
         "scripts/server/run_stage7e0_a6_english.py",
         "scripts/data/validate_stage7e0_a6_server_results.py",
+        "src/nldbwrite_v3/__init__.py",
+        "src/nldbwrite_v3/inference",
+        "src/nldbwrite_v3/v2_a1",
+        "tests/conftest.py",
         "tests/test_stage7b_a5_typed_atomic_boundary_omission.py",
         "tests/test_stage7e0_a6_english_preflight.py",
         f"{STAGE7C_A6_NAME}/STAGE7C_A6_LOCK.json",
@@ -714,7 +821,9 @@ additional_assignment_losses={false["additional_assignment_losses"]}
 additional_full_sample_losses={false["additional_full_sample_losses"]}
 a6_primary_result=2/12 valid feasibility failure
 a6_wrong_decisions={a6["wrong_decision_count"]}
-a6_wrong_decisions_suppressed_by_a5={a6["stage7b_a5_wrong_decisions_suppressed"]}
+a6_wrong_span_choices_suppressed_by_a5={a6["stage7b_a5_wrong_span_choices_suppressed"]}
+a6_wrong_required_omit_structurally_impossible={a6["stage7b_a5_wrong_required_omit_structurally_impossible"]}
+a6_observed_wrong_decisions_addressed={a6["stage7b_a5_observed_wrong_decisions_addressed"]}
 a6_correct_gold_suppressed_by_a5={a6["stage7b_a5_correct_gold_suppressed"]}
 synthetic_safety={synthetic["status"]}
 model_called=false
@@ -741,26 +850,27 @@ Review order:
 2. `{STAGE_NAME}/A6_VALID_FEASIBILITY_FAIL_FREEZE.json`
 3. `{STAGE_NAME}/METHOD_AUDIT_PROTOCOL.json`
 4. `{STAGE_NAME}/TYPED_ATOMICITY_RULE_SPEC.json`
-5. `{STAGE_NAME}/OMISSION_CONSTRUCTION_SUPPRESSION_RULE_SPEC.json`
-6. `{STAGE_NAME}/QUOTE_BOUNDARY_RULE_SPEC.json`
-7. `{STAGE_NAME}/DESIGN_TRAIN_BASELINE_A4_DOMAIN_AUDIT.json`
-8. `{STAGE_NAME}/DESIGN_TRAIN_STAGE7B_A5_DOMAIN_AUDIT.json`
-9. `{STAGE_NAME}/FALSE_SUPPRESSION_AUDIT.json`
-10. `{STAGE_NAME}/A6_OBSERVED_ERROR_COUNTERFACTUAL_AUDIT.json`
-11. `{STAGE_NAME}/SYNTHETIC_TYPED_OMISSION_BOUNDARY_SAFETY_AUDIT.json`
-12. `{STAGE_NAME}/CANDIDATE_DOMAIN_AUDIT_ROWS.jsonl`
-13. `{STAGE_NAME}/CANDIDATE_SUPPRESSION_EXAMPLES.jsonl`
-14. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
-15. `{STAGE_NAME}/STAGE7B_A5_LOCK.json`
-16. `scripts/data/build_stage7b_a5_typed_atomic_boundary_omission.py`
-17. `scripts/data/validate_stage7b_a5_typed_atomic_boundary_omission.py`
-18. `tests/test_stage7b_a5_typed_atomic_boundary_omission.py`
+5. `{STAGE_NAME}/OMIT_ADMISSIBILITY_RULE_SPEC.json`
+6. `{STAGE_NAME}/OMISSION_CONSTRUCTION_SUPPRESSION_RULE_SPEC.json`
+7. `{STAGE_NAME}/QUOTE_BOUNDARY_RULE_SPEC.json`
+8. `{STAGE_NAME}/DESIGN_TRAIN_BASELINE_A4_DOMAIN_AUDIT.json`
+9. `{STAGE_NAME}/DESIGN_TRAIN_STAGE7B_A5_DOMAIN_AUDIT.json`
+10. `{STAGE_NAME}/FALSE_SUPPRESSION_AUDIT.json`
+11. `{STAGE_NAME}/A6_OBSERVED_ERROR_COUNTERFACTUAL_AUDIT.json`
+12. `{STAGE_NAME}/SYNTHETIC_TYPED_OMISSION_BOUNDARY_SAFETY_AUDIT.json`
+13. `{STAGE_NAME}/CANDIDATE_DOMAIN_AUDIT_ROWS.jsonl`
+14. `{STAGE_NAME}/CANDIDATE_SUPPRESSION_EXAMPLES.jsonl`
+15. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
+16. `{STAGE_NAME}/STAGE7B_A5_LOCK.json`
+17. `scripts/data/build_stage7b_a5_typed_atomic_boundary_omission.py`
+18. `scripts/data/validate_stage7b_a5_typed_atomic_boundary_omission.py`
+19. `tests/test_stage7b_a5_typed_atomic_boundary_omission.py`
 
 Clean extraction validation:
 
 ```bash
 python scripts/data/validate_stage7b_a5_typed_atomic_boundary_omission.py --stage-dir {STAGE_NAME}
-python -m pytest -q tests/test_stage7b_a5_typed_atomic_boundary_omission.py
+python -m pytest -q
 ```
 
 Full rebuild requires the local Gretel parquet source:
@@ -803,7 +913,24 @@ def build_stage(out_dir: Path, raw_dir: Path) -> dict[str, Any]:
             "stage": STAGE_NAME,
             "patch": PATCH_NAME,
             "rule_name": "typed_complete_literal_dominates_numeric_child",
-            "purpose": "Prefer complete typed literals such as 68% over numeric child 68 when both spans are present.",
+            "purpose": "Prefer complete percent literals such as 68% or 68 percent over numeric child 68 when both spans are present.",
+            "dominant_suffixes": ["%", " percent"],
+            "forbidden_suffix_policy": "Generic alphabetic suffixes such as kg, ms, and abc are not percentage literals and do not suppress the numeric child.",
+            "activated_only_by_label_context": ["pct", "percent", "percentage"],
+            "gold_blind": True,
+            "model_called": False,
+            "gpu_called": False,
+        },
+    )
+    write_json(
+        out_dir / "OMIT_ADMISSIBILITY_RULE_SPEC.json",
+        {
+            "stage": STAGE_NAME,
+            "patch": PATCH_NAME,
+            "rule_name": "schema_semantic_omit_admissibility",
+            "purpose": "Allow omission-region suppression and dynamic OMIT availability only for schema columns whose SQL semantics permit an omitted value.",
+            "omit_admissible_when_any": ["nullable", "has_default", "primary_key", "autoincrement", "generated"],
+            "omit_forbidden_when_all": ["not nullable", "no default", "not primary key", "not autoincrement", "not generated"],
             "gold_blind": True,
             "model_called": False,
             "gpu_called": False,
@@ -816,7 +943,7 @@ def build_stage(out_dir: Path, raw_dir: Path) -> dict[str, Any]:
             "patch": PATCH_NAME,
             "rule_name": "full_omission_construction_region_suppression",
             "cue_phrases": list(OMISSION_CUE_PHRASES),
-            "purpose": "Suppress every normal candidate span inside deterministic schema-label omission constructions; keep the special OMIT decision.",
+            "purpose": "Suppress normal candidate spans inside deterministic schema-label omission constructions only when that schema column is semantically omittable; keep the special OMIT decision outside the candidate inventory.",
             "gold_blind": True,
             "model_called": False,
             "gpu_called": False,
@@ -866,7 +993,9 @@ def build_stage(out_dir: Path, raw_dir: Path) -> dict[str, Any]:
         "additional_full_sample_losses": false["additional_full_sample_losses"],
         "a6_primary_result": "2/12 valid feasibility failure closed",
         "a6_wrong_decisions": a6["wrong_decision_count"],
-        "a6_wrong_decisions_suppressed_by_a5": a6["stage7b_a5_wrong_decisions_suppressed"],
+        "a6_wrong_span_choices_suppressed_by_a5": a6["stage7b_a5_wrong_span_choices_suppressed"],
+        "a6_wrong_required_omit_structurally_impossible": a6["stage7b_a5_wrong_required_omit_structurally_impossible"],
+        "a6_observed_wrong_decisions_addressed": a6["stage7b_a5_observed_wrong_decisions_addressed"],
         "a6_correct_gold_suppressed_by_a5": a6["stage7b_a5_correct_gold_suppressed"],
         "method_freeze_authorized": False,
         "a6_rerun_authorized": False,
@@ -888,7 +1017,9 @@ def build_stage(out_dir: Path, raw_dir: Path) -> dict[str, Any]:
         "additional_full_sample_losses": false["additional_full_sample_losses"],
         "a6_primary_result": "2/12",
         "a6_wrong_decisions": a6["wrong_decision_count"],
-        "a6_wrong_decisions_suppressed_by_a5": a6["stage7b_a5_wrong_decisions_suppressed"],
+        "a6_wrong_span_choices_suppressed_by_a5": a6["stage7b_a5_wrong_span_choices_suppressed"],
+        "a6_wrong_required_omit_structurally_impossible": a6["stage7b_a5_wrong_required_omit_structurally_impossible"],
+        "a6_observed_wrong_decisions_addressed": a6["stage7b_a5_observed_wrong_decisions_addressed"],
         "model_called": False,
         "gpu_called": False,
     }
@@ -905,11 +1036,22 @@ def include_paths_for_package(stage_dir: Path) -> list[Path]:
         "scripts/data/build_stage7b_a2_candidate_span_reference.py",
         "scripts/data/build_stage7b_a3_column_conditioned_candidate_selection.py",
         "scripts/data/build_stageeng0_gretel_qualification.py",
+        "scripts/data/build_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py",
+        "scripts/data/validate_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py",
+        "scripts/data/build_stage7e0_a6_english_preflight.py",
+        "scripts/data/validate_stage7e0_a6_english_preflight.py",
+        "scripts/server/preflight_runtime_stage7e0_a6.py",
+        "scripts/server/run_stage7e0_a4_english.py",
+        "scripts/server/run_stage7e0_v2_a1_preflight.py",
         "scripts/server/run_stage7e0_a6_english.py",
         "scripts/data/validate_stage7e0_a6_server_results.py",
+        "requirements-inference-uet-rtx4090-cu124.lock.txt",
+        "tests/conftest.py",
         "tests/test_stage7b_a5_typed_atomic_boundary_omission.py",
         "tests/test_stage7e0_a6_english_preflight.py",
         "tests/support/windows_py314_pytest_tempdir/sitecustomize.py",
+        "src/nldbwrite_v3/__init__.py",
+        "src/nldbwrite_v3",
         STAGE7B_A4_NAME,
         STAGE7C_A6_NAME,
         STAGE7E0_A6_NAME,
@@ -919,7 +1061,13 @@ def include_paths_for_package(stage_dir: Path) -> list[Path]:
         if path.is_file():
             files.append(path)
         elif path.is_dir():
-            files.extend(child for child in path.rglob("*") if child.is_file() and "__pycache__" not in child.parts)
+            files.extend(
+                child
+                for child in path.rglob("*")
+                if child.is_file()
+                and "__pycache__" not in child.parts
+                and not (rel == "src/nldbwrite_v3" and "analysis" in child.relative_to(path).parts)
+            )
     return sorted({path for path in files if path.is_file()}, key=lambda item: item.as_posix())
 
 

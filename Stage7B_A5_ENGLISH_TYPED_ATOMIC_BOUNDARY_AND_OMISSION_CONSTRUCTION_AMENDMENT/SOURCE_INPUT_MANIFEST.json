@@ -1,22 +1,22 @@
 {
   "git_branch": "stage6/crudsql-eligibility-audit",
-  "git_commit": "d8538542300a219f3466d0e183c169d154a716d5",
+  "git_commit": "545df637f99385799b34a5e7c1cda9d0845fb1ea",
   "gpu_called": false,
   "model_called": false,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "raw_dir": "D:\\paper kltn\\text to sql\\external_sources\\gretel_synthetic_text_to_sql_740ab236",
   "raw_train_parquet_present": true,
   "raw_train_parquet_sha256": "2bee9ac07cf5057d36b5ea30fb47d948697e882f42bd1cc661185396287c0180",
   "source_files": [
     {
-      "bytes": 44637,
+      "bytes": 52752,
       "path": "scripts/data/build_stage7b_a5_typed_atomic_boundary_omission.py",
-      "sha256": "9e7e144887636512aa9f039473388fe54c8f0268d807cf5bc8af6bbd66525f37"
+      "sha256": "5e6aec9fcb68e6bd280329e00cfd5e1492fc9635060478b3063c51ab3ac10c06"
     },
     {
-      "bytes": 12693,
+      "bytes": 16417,
       "path": "scripts/data/validate_stage7b_a5_typed_atomic_boundary_omission.py",
-      "sha256": "c8ae65fc2087d29770d6675ba92d9ec9deeca503c9a0d32c804da3ba5fde6668"
+      "sha256": "c9ec5c00b1c072350d84895cee4720944c8329ad6502789b77f02ad05387a3a4"
     },
     {
       "bytes": 83730,
@@ -39,6 +39,41 @@
       "sha256": "16f99e789a01040213fc1be7be8cb153c9db39aefee02eae3700ec3d1aefd377"
     },
     {
+      "bytes": 159989,
+      "path": "scripts/data/build_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py",
+      "sha256": "ae20447e36e922d0b722bc3e726ddb7c4d013c429047bdda82b37657eb2e7ad7"
+    },
+    {
+      "bytes": 31971,
+      "path": "scripts/data/validate_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py",
+      "sha256": "ed651339c9792acae59bf7210412715e5be3005c70689e1e4c5843004a6ed0d5"
+    },
+    {
+      "bytes": 26006,
+      "path": "scripts/data/build_stage7e0_a6_english_preflight.py",
+      "sha256": "2ba0ebf6c4247fc6731a14c0722d8499b9fbab9fbaa1b600e023304b64f825a4"
+    },
+    {
+      "bytes": 16997,
+      "path": "scripts/data/validate_stage7e0_a6_english_preflight.py",
+      "sha256": "4ea7b1251bf2774e5ae12271a5a7194f4235cec1e1b2edfa702c8077094b4c15"
+    },
+    {
+      "bytes": 1136,
+      "path": "scripts/server/preflight_runtime_stage7e0_a6.py",
+      "sha256": "1208f9a97338cfda07013f36b0b91a1cef552bf1d40a9c2facacc0570f092797"
+    },
+    {
+      "bytes": 45977,
+      "path": "scripts/server/run_stage7e0_a4_english.py",
+      "sha256": "73392542da4ce191a5f64fdaf764168113ceb319bf277f2b14a90b6bd5ecb899"
+    },
+    {
+      "bytes": 52743,
+      "path": "scripts/server/run_stage7e0_v2_a1_preflight.py",
+      "sha256": "10eff8f293996ef764a63fe242a21ee5a0f3b27f204d990c77805b9456401a89"
+    },
+    {
       "bytes": 41946,
       "path": "scripts/server/run_stage7e0_a6_english.py",
       "sha256": "b1c4b1a4e4818661ff1f958edd70b950754a1b3d271309e5772bc46b6c5e0242"
@@ -49,9 +84,19 @@
       "sha256": "0b417bf6a27c277129ae7e393549d34191b0b181b7fe1334b472240e86119b70"
     },
     {
-      "bytes": 6518,
+      "bytes": 209,
+      "path": "src/nldbwrite_v3/__init__.py",
+      "sha256": "77bc2e1a5df2a9c0dbd544a1d138331c95552f67c701afc4f159b57a6eb7d812"
+    },
+    {
+      "bytes": 513,
+      "path": "tests/conftest.py",
+      "sha256": "b7260613ee9da8e0b6a502fd7abf460b543eaaf9818eace7fae77e5a33998b83"
+    },
+    {
+      "bytes": 9428,
       "path": "tests/test_stage7b_a5_typed_atomic_boundary_omission.py",
-      "sha256": "5d8b5b28e7ae9350b0c1150250c5de085a5645bc1a8f7a42bb940710bd8de1f0"
+      "sha256": "91c28a7f8e2d42af9dffc32cbd9fb10646b304a02eeeac20852886091bf44954"
     },
     {
       "bytes": 31721,

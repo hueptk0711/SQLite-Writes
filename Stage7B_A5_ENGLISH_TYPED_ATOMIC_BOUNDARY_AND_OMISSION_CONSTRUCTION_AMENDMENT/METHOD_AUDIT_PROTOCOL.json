@@ -11,7 +11,7 @@
   ],
   "gpu_called": false,
   "model_called": false,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "scope": "CPU-only design-train candidate-domain audit",
   "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT",
   "strict_gate": "additional_assignment_losses=0 and additional_full_sample_losses=0"

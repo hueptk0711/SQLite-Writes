@@ -5,7 +5,7 @@
   "gpu_called": false,
   "gretel_pilot_opened": false,
   "model_called": false,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "primary_pass_count": "2/12",
   "protocol_compliance_status": "PASS",
   "required_pass_count": "12/12",

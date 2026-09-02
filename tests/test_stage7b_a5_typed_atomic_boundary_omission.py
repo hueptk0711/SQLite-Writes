@@ -26,6 +26,7 @@ from scripts.data.build_stage7b_a5_typed_atomic_boundary_omission import (  # no
     detect_omission_constructions,
     generate_candidate_inventory,
     omission_construction_region_reason,
+    omittable_schema_aliases_from_inventory,
     package_reviewer,
     schema_label_alias_index,
     typed_complete_literal_reason,
@@ -51,29 +52,75 @@ def by_text(question: str) -> dict[str, object]:
     return {candidate.text: candidate for candidate in generate_candidate_inventory(question)}
 
 
+def candidate_for_text_in_region(question: str, text: str, region: str):
+    inventory = generate_candidate_inventory(question)
+    region_start = question.casefold().index(region.casefold())
+    region_end = region_start + len(region)
+    return next(
+        candidate
+        for candidate in inventory
+        if candidate.text == text and region_start <= candidate.start_char and candidate.end_char <= region_end
+    )
+
+
 def test_typed_complete_literal_suppresses_numeric_percent_child() -> None:
-    question = "Insert hydration_pct 68% and proof_minutes 42."
+    question = "Insert hydration_pct 68%, completion_percentage 68 percent, and proof_minutes 42."
     inventory = generate_candidate_inventory(question)
     candidates = by_text(question)
 
-    reason = typed_complete_literal_reason(candidates["68"], inventory)
+    pct_child = candidate_for_text_in_region(question, "68", "hydration_pct 68%")
+    reason = typed_complete_literal_reason(pct_child, inventory)
     assert reason is not None
     assert reason["complete_literal_text"] == "68%"
+    percent_phrase = candidate_for_text_in_region(question, "68", "completion_percentage 68 percent")
+    phrase_reason = typed_complete_literal_reason(percent_phrase, inventory)
+    assert phrase_reason is not None
+    assert phrase_reason["complete_literal_text"] == "68 percent"
     assert typed_complete_literal_reason(candidates["42"], inventory) is None
 
 
-def test_full_omission_construction_region_suppresses_broad_spans_but_keeps_quoted_literal() -> None:
-    question = 'Insert record. Field memo absent. Status "Absent".'
+def test_typed_complete_literal_does_not_suppress_generic_alpha_or_unit_suffixes() -> None:
+    question = "Insert hydration_pct 68kg, completion_percentage 68abc, weight_kg 68kg, and duration_ms 25ms."
     inventory = generate_candidate_inventory(question)
-    aliases = schema_label_alias_index({"field memo", "status"})
-    detections = detect_omission_constructions(question, aliases)
+    aliases = schema_label_alias_index({"hydration pct", "completion percentage", "weight kg", "duration ms"})
+    reasons = a5_suppression_reasons(inventory, aliases, [], include_a4=False)
+
+    for text in ["68", "68kg", "68abc", "25", "25ms"]:
+        candidate = candidate_for_text_in_region(question, text, text)
+        assert typed_complete_literal_reason(candidate, inventory) is None
+        assert candidate.span_ref not in reasons
+
+
+def test_omission_construction_respects_schema_admissibility_and_keeps_literals() -> None:
+    question = 'Insert record. Required status absent, required status missing, optional memo absent, status "Absent", and status "Missing".'
+    inventory = generate_candidate_inventory(question)
+    aliases = schema_label_alias_index({"status", "memo"})
+    schema_inventory = {
+        "columns": [
+            {"column_name": "status", "nullable": False, "has_default": False},
+            {"column_name": "memo", "nullable": True, "has_default": False},
+        ]
+    }
+    detections = detect_omission_constructions(question, omittable_schema_aliases_from_inventory(schema_inventory))
     candidates = by_text(question)
     reasons = a5_suppression_reasons(inventory, aliases, detections, include_a4=False)
 
-    assert omission_construction_region_reason(candidates["memo absent"], detections)["rule"] == "FULL_OMISSION_CONSTRUCTION_REGION"
-    assert candidates["memo absent"].span_ref in reasons
-    assert candidates["absent"].span_ref in reasons
+    optional_memo_absent = candidate_for_text_in_region(question, "memo absent", "optional memo absent")
+    optional_absent = candidate_for_text_in_region(question, "absent", "optional memo absent")
+    required_status_absent = candidate_for_text_in_region(question, "status absent", "required status absent")
+    required_absent = candidate_for_text_in_region(question, "absent", "required status absent")
+    required_status_missing = candidate_for_text_in_region(question, "status missing", "required status missing")
+    required_missing = candidate_for_text_in_region(question, "missing", "required status missing")
+
+    assert omission_construction_region_reason(optional_memo_absent, detections)["rule"] == "FULL_OMISSION_CONSTRUCTION_REGION"
+    assert optional_memo_absent.span_ref in reasons
+    assert optional_absent.span_ref in reasons
+    assert required_status_absent.span_ref not in reasons
+    assert required_absent.span_ref not in reasons
+    assert required_status_missing.span_ref not in reasons
+    assert required_missing.span_ref not in reasons
     assert candidates["Absent"].span_ref not in reasons
+    assert candidates["Missing"].span_ref not in reasons
 
 
 def test_boundary_quality_suppresses_unbalanced_quote_and_schema_label_partial_value() -> None:
@@ -113,6 +160,9 @@ def test_build_and_validator_pass_on_728_design_train(tmp_path: Path) -> None:
     assert false["additional_full_sample_losses"] == 0
     assert a6["case_exact_pass_count"] == "2/12"
     assert a6["wrong_decision_count"] == 15
+    assert a6["stage7b_a5_wrong_span_choices_suppressed"] == 14
+    assert a6["stage7b_a5_wrong_required_omit_structurally_impossible"] == 1
+    assert a6["stage7b_a5_observed_wrong_decisions_addressed"] == 15
     assert a6["stage7b_a5_correct_gold_suppressed"] == 0
 
 
@@ -144,7 +194,7 @@ def test_reviewer_package_clean_validator_passes(tmp_path: Path) -> None:
     env = dict(os.environ)
     env["PYTHONPATH"] = os.pathsep.join([".", "tests/support/windows_py314_pytest_tempdir"])
     result = subprocess.run(
-        [sys.executable, "scripts/data/validate_stage7b_a5_typed_atomic_boundary_omission.py", "--stage-dir", STAGE_NAME],
+        [sys.executable, "-m", "pytest", "-q"],
         cwd=extract,
         env=env,
         text=True,

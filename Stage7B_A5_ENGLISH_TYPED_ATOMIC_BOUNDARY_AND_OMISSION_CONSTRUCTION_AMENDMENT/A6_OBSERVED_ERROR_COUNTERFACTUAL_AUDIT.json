@@ -18,7 +18,8 @@
         "numeric_child_text": "6.8",
         "rule": "TYPED_COMPLETE_LITERAL_DOMINATES_NUMERIC_CHILD"
       },
-      "stage7b_a5_wrong_decision_suppressed": true
+      "stage7b_a5_wrong_required_omit_structurally_impossible": false,
+      "stage7b_a5_wrong_span_choice_suppressed": true
     },
     {
       "column_name": "battery_pct",
@@ -36,7 +37,8 @@
         "numeric_child_text": "82",
         "rule": "TYPED_COMPLETE_LITERAL_DOMINATES_NUMERIC_CHILD"
       },
-      "stage7b_a5_wrong_decision_suppressed": true
+      "stage7b_a5_wrong_required_omit_structurally_impossible": false,
+      "stage7b_a5_wrong_span_choice_suppressed": true
     },
     {
       "column_name": "short_label",
@@ -51,7 +53,8 @@
       "stage7b_a5_suppression_reason": {
         "rule": "BOUNDARY_UNBALANCED_DOUBLE_QUOTE"
       },
-      "stage7b_a5_wrong_decision_suppressed": true
+      "stage7b_a5_wrong_required_omit_structurally_impossible": false,
+      "stage7b_a5_wrong_span_choice_suppressed": true
     },
     {
       "column_name": "captured_on",
@@ -66,7 +69,8 @@
       "stage7b_a5_suppression_reason": {
         "rule": "BOUNDARY_UNBALANCED_DOUBLE_QUOTE"
       },
-      "stage7b_a5_wrong_decision_suppressed": true
+      "stage7b_a5_wrong_required_omit_structurally_impossible": false,
+      "stage7b_a5_wrong_span_choice_suppressed": true
     },
     {
       "column_name": "altitude_m",
@@ -84,7 +88,8 @@
         "rule": "BOUNDARY_SCHEMA_LABEL_PREFIX_PARTIAL_VALUE",
         "schema_alias_residual": "altitude m"
       },
-      "stage7b_a5_wrong_decision_suppressed": true
+      "stage7b_a5_wrong_required_omit_structurally_impossible": false,
+      "stage7b_a5_wrong_span_choice_suppressed": true
     },
     {
       "column_name": "operator_note",
@@ -105,7 +110,8 @@
         ],
         "schema_label": "operator note"
       },
-      "stage7b_a5_wrong_decision_suppressed": true
+      "stage7b_a5_wrong_required_omit_structurally_impossible": false,
+      "stage7b_a5_wrong_span_choice_suppressed": true
     },
     {
       "column_name": "docket_stage",
@@ -123,7 +129,8 @@
         "rule": "BOUNDARY_SCHEMA_LABEL_PREFIX_PARTIAL_VALUE",
         "schema_alias_residual": "docket stage"
       },
-      "stage7b_a5_wrong_decision_suppressed": true
+      "stage7b_a5_wrong_required_omit_structurally_impossible": false,
+      "stage7b_a5_wrong_span_choice_suppressed": true
     },
     {
       "column_name": "salinity_pct",
@@ -141,7 +148,8 @@
         "rule": "BOUNDARY_SCHEMA_LABEL_PREFIX_PARTIAL_VALUE",
         "schema_alias_residual": "salinity pct"
       },
-      "stage7b_a5_wrong_decision_suppressed": true
+      "stage7b_a5_wrong_required_omit_structurally_impossible": false,
+      "stage7b_a5_wrong_span_choice_suppressed": true
     },
     {
       "column_name": "mordant_pct",
@@ -159,7 +167,8 @@
         "numeric_child_text": "12",
         "rule": "TYPED_COMPLETE_LITERAL_DOMINATES_NUMERIC_CHILD"
       },
-      "stage7b_a5_wrong_decision_suppressed": true
+      "stage7b_a5_wrong_required_omit_structurally_impossible": false,
+      "stage7b_a5_wrong_span_choice_suppressed": true
     },
     {
       "column_name": "rinse_note",
@@ -180,7 +189,8 @@
         ],
         "schema_label": "rinse note"
       },
-      "stage7b_a5_wrong_decision_suppressed": true
+      "stage7b_a5_wrong_required_omit_structurally_impossible": false,
+      "stage7b_a5_wrong_span_choice_suppressed": true
     },
     {
       "column_name": "field_memo",
@@ -201,7 +211,8 @@
         ],
         "schema_label": "field memo"
       },
-      "stage7b_a5_wrong_decision_suppressed": true
+      "stage7b_a5_wrong_required_omit_structurally_impossible": false,
+      "stage7b_a5_wrong_span_choice_suppressed": true
     },
     {
       "column_name": "scanner_name",
@@ -216,7 +227,8 @@
       "stage7b_a5_suppression_reason": {
         "rule": "BOUNDARY_UNBALANCED_DOUBLE_QUOTE"
       },
-      "stage7b_a5_wrong_decision_suppressed": true
+      "stage7b_a5_wrong_required_omit_structurally_impossible": false,
+      "stage7b_a5_wrong_span_choice_suppressed": true
     },
     {
       "column_name": "conservation_memo",
@@ -237,7 +249,8 @@
         ],
         "schema_label": "conservation memo"
       },
-      "stage7b_a5_wrong_decision_suppressed": true
+      "stage7b_a5_wrong_required_omit_structurally_impossible": false,
+      "stage7b_a5_wrong_span_choice_suppressed": true
     },
     {
       "column_name": "hydration_pct",
@@ -255,7 +268,8 @@
         "numeric_child_text": "68",
         "rule": "TYPED_COMPLETE_LITERAL_DOMINATES_NUMERIC_CHILD"
       },
-      "stage7b_a5_wrong_decision_suppressed": true
+      "stage7b_a5_wrong_required_omit_structurally_impossible": false,
+      "stage7b_a5_wrong_span_choice_suppressed": true
     },
     {
       "column_name": "checkout_id",
@@ -268,7 +282,8 @@
       "sample_id": "stage7c_a6_primary_english_012",
       "stage7b_a5_correct_gold_suppressed": false,
       "stage7b_a5_suppression_reason": null,
-      "stage7b_a5_wrong_decision_suppressed": false
+      "stage7b_a5_wrong_required_omit_structurally_impossible": true,
+      "stage7b_a5_wrong_span_choice_suppressed": false
     }
   ],
   "error_family_counts": {
@@ -279,12 +294,14 @@
   },
   "gpu_called": false,
   "model_called": false,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "source_primary_result": "2/12 valid feasibility failure, closed",
   "source_stage": "Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT",
   "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT",
   "stage7b_a5_correct_gold_suppressed": 0,
-  "stage7b_a5_wrong_decisions_suppressed": 14,
+  "stage7b_a5_observed_wrong_decisions_addressed": 15,
+  "stage7b_a5_wrong_required_omit_structurally_impossible": 1,
+  "stage7b_a5_wrong_span_choices_suppressed": 14,
   "status": "PASS",
   "wrong_decision_count": 15
 }

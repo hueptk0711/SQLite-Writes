@@ -2,7 +2,7 @@
   "gold_blind": true,
   "gpu_called": false,
   "model_called": false,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "rules": [
     "unbalanced double quote",
     "trailing punctuation when stripped candidate exists",
