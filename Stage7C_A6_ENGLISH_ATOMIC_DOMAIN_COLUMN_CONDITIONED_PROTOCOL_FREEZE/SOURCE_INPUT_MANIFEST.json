@@ -1,7 +1,7 @@
 {
   "gpu_called": false,
   "model_called": false,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "source_files": [
     {
       "bytes": 1322,
@@ -70,10 +70,52 @@
       "source_stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"
     },
     {
+      "bytes": 6370,
+      "path": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT/SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json",
+      "sha256": "5a25327ad6b584a80455a167e08f9c096698ceb1600f0805d6dbd33ce5eac9b8",
+      "source_stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"
+    },
+    {
+      "bytes": 571,
+      "path": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT/FALSE_SUPPRESSION_AUDIT.json",
+      "sha256": "277976e6836001a948afb54db8891720cc4af65fc103e985dbdf27a647ad89f0",
+      "source_stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"
+    },
+    {
+      "bytes": 242432,
+      "path": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT/CANDIDATE_SUPPRESSION_EXAMPLES.jsonl",
+      "sha256": "e38dc92ddd4a8ee289b3308a4e39c2cf4423f810b9b8c5268f5107d3c67c086b",
+      "source_stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"
+    },
+    {
       "bytes": 1484,
       "path": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL/STAGE7C_A4_LOCK.json",
       "sha256": "091a42deb7bf667d4f0ec27eb39299bed7ad2311353d998e72c08a494174e523",
       "source_stage": "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL"
+    },
+    {
+      "bytes": 738,
+      "path": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0/ERRATUM_LOCK.json",
+      "sha256": "49478f448744802ca4472073979f54a0002937ceb1639e89298350cca36e33b5",
+      "source_stage": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0"
+    },
+    {
+      "bytes": 226156,
+      "path": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0/CORRECTED_FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl",
+      "sha256": "2019cc234888f3a43e96adbda993cbe24819f224b22398012591fba362cbabdc",
+      "source_stage": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0"
+    },
+    {
+      "bytes": 204521,
+      "path": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0/CORRECTED_A4_DERIVED_REGRESSION_DIAGNOSTICS_A5.jsonl",
+      "sha256": "41b226d29286dac3569fb78b97117cd1a8ba2eb552fbd7d7a96fbcc0d3d501d3",
+      "source_stage": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0"
+    },
+    {
+      "bytes": 1238,
+      "path": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0/GOLD_PROVENANCE_ERRATUM.json",
+      "sha256": "d85c0fa17c467a40a828c1feecabcd29ab8f966e709b0d12b5959b0b3bdc51df",
+      "source_stage": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0"
     },
     {
       "bytes": 923,

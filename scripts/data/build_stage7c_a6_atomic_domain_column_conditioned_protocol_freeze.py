@@ -12,6 +12,7 @@ import argparse
 import difflib
 import hashlib
 import json
+import re
 import shutil
 import sqlite3
 import subprocess
@@ -62,12 +63,13 @@ from scripts.data.build_stage7b_a4_atomic_candidate_domain_omission_cue import (
 
 
 STAGE_NAME = "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE"
-PATCH_NAME = "PATCH0"
+PATCH_NAME = "PATCH1"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260902.zip"
 STAGE7B_A2_NAME = "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
 STAGE7B_A3_NAME = "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT"
 STAGE7B_A4_NAME = STAGE7B_A4_SOURCE_NAME
 STAGE7C_A4_NAME = "Stage7C_A4_ENGLISH_CANDIDATE_SPAN_PHASE_O_PROTOCOL"
+STAGE7C_A5_ERRATUM_NAME = "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0"
 STAGE7E0_A4_NAME = "Stage7E0_A4_ENGLISH_CANDIDATE_SPAN_REAL_GENERATION_PREFLIGHT"
 STAGE7E0_A5_NAME = "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT"
 MODEL_ID = QWEN_TOKENIZER_ID
@@ -111,10 +113,13 @@ SCIENTIFIC_ARTIFACTS = [
     "OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A6.json",
     "EVALUATOR_SEMANTICS_A6.json",
     "A6_PRIMARY_INDEPENDENCE_AUDIT.json",
+    "PRIOR_DESIGN_EVIDENCE_INDEPENDENCE_AUDIT_A6.json",
     "FRESH_ENGLISH_A6_PRIMARY_FEASIBILITY_SET.jsonl",
     "A5_OBSERVED_REGRESSION_DIAGNOSTICS_A6.jsonl",
+    "A6_METHOD_STRESS_REGRESSION_DIAGNOSTICS_A6.jsonl",
     "ORACLE_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl",
     "ORACLE_A5_OBSERVED_DIAGNOSTIC_RESULTS.jsonl",
+    "ORACLE_A6_METHOD_STRESS_DIAGNOSTIC_RESULTS.jsonl",
     "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json",
     "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl",
     "ACCEPTANCE_POLICY_A6.json",
@@ -438,266 +443,289 @@ def _legacy_a5_protocol_case_definitions() -> list[dict[str, Any]]:
 ]
 
 
-def a5_observed_diagnostic_case_definitions() -> list[dict[str, Any]]:
-    return [
-        {
-            "sample_id": "stage7c_a5_primary_english_001",
-            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "quoted_multiword", "identifier", "integer", "date"],
-            "question": 'For library_loans, create loan_id LOAN-842, title "River Atlas", borrower card CARD-190, loan_days 21, due_on 2026-10-15. Hold shelf is not provided.',
-            "selected_table": "library_loans",
-            "tables": [
-                {
-                    "table_name": "library_loans",
-                    "columns": [
-                        {"column_name": "loan_id", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "title", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "borrower_card", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "loan_days", "source_type": "INTEGER", "nullable": False},
-                        {"column_name": "due_on", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "hold_shelf", "source_type": "TEXT", "nullable": True},
-                    ],
-                }
-            ],
-            "assigned_values": {"loan_id": "LOAN-842", "title": "River Atlas", "borrower_card": "CARD-190", "loan_days": "21", "due_on": "2026-10-15"},
-        },
-        {
-            "sample_id": "stage7c_a5_primary_english_002",
-            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "three_word_value", "quoted_multiword", "real", "integer"],
-            "question": 'Store research grant "Aurora Mapping Study", grant_code GR-2042, amount 87500.50, fiscal_year 2027. Sponsor contact omitted.',
-            "selected_table": "research_grants",
-            "tables": [
-                {
-                    "table_name": "research_grants",
-                    "columns": [
-                        {"column_name": "grant_title", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "grant_code", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "amount", "source_type": "REAL", "nullable": False},
-                        {"column_name": "fiscal_year", "source_type": "INTEGER", "nullable": False},
-                        {"column_name": "sponsor_contact", "source_type": "TEXT", "nullable": True},
-                    ],
-                }
-            ],
-            "assigned_values": {"grant_title": "Aurora Mapping Study", "grant_code": "GR-2042", "amount": "87500.50", "fiscal_year": "2027"},
-        },
-        {
-            "sample_id": "stage7c_a5_primary_english_003",
-            "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "identifier", "integer"],
-            "question": "Create vehicle inspection VIN-9K2L7M, plate HZX-482, mileage 64012, passed 7, bay BAY_14. Inspector note left empty.",
-            "selected_table": "vehicle_inspections",
-            "tables": [
-                {
-                    "table_name": "vehicle_inspections",
-                    "columns": [
-                        {"column_name": "vin_code", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "plate", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "mileage", "source_type": "INTEGER", "nullable": False},
-                        {"column_name": "passed", "source_type": "INTEGER", "nullable": False},
-                        {"column_name": "bay", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "inspector_note", "source_type": "TEXT", "nullable": True},
-                    ],
-                }
-            ],
-            "assigned_values": {"vin_code": "VIN-9K2L7M", "plate": "HZX-482", "mileage": "64012", "passed": "7", "bay": "BAY_14"},
-            "assigned_value_spans": {"passed": {"start_char": 75, "end_char": 76}},
-        },
-        {
-            "sample_id": "stage7c_a5_primary_english_004",
-            "coverage_tags": ["single_table", "3_assigned_columns", "true_omit", "three_word_value", "real"],
-            "question": 'Add subscription plan "Silver Archive Plus", plan_code PLAN-77, monthly_fee 14.95. Seat count and coupon code are absent.',
-            "selected_table": "subscription_plans",
-            "tables": [
-                {
-                    "table_name": "subscription_plans",
-                    "columns": [
-                        {"column_name": "plan_name", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "plan_code", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "monthly_fee", "source_type": "REAL", "nullable": False},
-                        {"column_name": "seats", "source_type": "INTEGER", "nullable": True},
-                        {"column_name": "coupon_code", "source_type": "TEXT", "nullable": True},
-                    ],
-                }
-            ],
-            "assigned_values": {"plan_name": "Silver Archive Plus", "plan_code": "PLAN-77", "monthly_fee": "14.95"},
-        },
-        {
-            "sample_id": "stage7c_a5_primary_english_005",
-            "coverage_tags": ["single_table", "4_assigned_columns", "many_nullable_columns", "true_omit", "three_word_value", "real", "percent", "hex_identifier"],
-            "question": 'Record weather station "Cedar Ridge Outpost", station_id 0xA6C0DE, temperature 19.6, humidity 72%. Leave operator, alert_code, and maintenance_note blank.',
-            "selected_table": "weather_stations",
-            "tables": [
-                {
-                    "table_name": "weather_stations",
-                    "columns": [
-                        {"column_name": "station_name", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "station_id", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "temperature_c", "source_type": "REAL", "nullable": False},
-                        {"column_name": "humidity_text", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "operator", "source_type": "TEXT", "nullable": True},
-                        {"column_name": "alert_code", "source_type": "TEXT", "nullable": True},
-                        {"column_name": "maintenance_note", "source_type": "TEXT", "nullable": True},
-                    ],
-                }
-            ],
-            "assigned_values": {"station_name": "Cedar Ridge Outpost", "station_id": "0xA6C0DE", "temperature_c": "19.6", "humidity_text": "72%"},
-        },
-        {
-            "sample_id": "stage7c_a5_primary_english_006",
-            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "quoted_multiword", "real", "integer", "text_numeric_mix"],
-            "question": 'Open warehouse bin BIN-A17 on aisle 6 with capacity 240.5 and stored_item "copper rivets". Reorder flag not set.',
-            "selected_table": "warehouse_bins",
-            "tables": [
-                {
-                    "table_name": "warehouse_bins",
-                    "columns": [
-                        {"column_name": "bin_code", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "aisle", "source_type": "INTEGER", "nullable": False},
-                        {"column_name": "capacity", "source_type": "REAL", "nullable": False},
-                        {"column_name": "stored_item", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "reorder_flag", "source_type": "INTEGER", "nullable": True},
-                    ],
-                }
-            ],
-            "assigned_values": {"bin_code": "BIN-A17", "aisle": "6", "capacity": "240.5", "stored_item": "copper rivets"},
-        },
-        {
-            "sample_id": "stage7c_a5_primary_english_007",
-            "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "quoted_multiword", "email", "integer"],
-            "question": 'Register conference attendee "Leah Morton", badge_email leah.morton@conf.example, track "data systems", paid 2, seat A-14. Dietary note missing.',
-            "selected_table": "conference_registrations",
-            "tables": [
-                {
-                    "table_name": "conference_registrations",
-                    "columns": [
-                        {"column_name": "attendee_name", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "badge_email", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "track", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "paid", "source_type": "INTEGER", "nullable": False},
-                        {"column_name": "seat", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "dietary_note", "source_type": "TEXT", "nullable": True},
-                    ],
-                }
-            ],
-            "assigned_values": {"attendee_name": "Leah Morton", "badge_email": "leah.morton@conf.example", "track": "data systems", "paid": "2", "seat": "A-14"},
-        },
-        {
-            "sample_id": "stage7c_a5_primary_english_008",
-            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "quoted_multiword", "integer"],
-            "question": 'Create flight segment FL-390 from origin "Da Nang" to destination "Seoul", duration_minutes 285, gate C7. Delay reason omitted.',
-            "selected_table": "flight_segments",
-            "tables": [
-                {
-                    "table_name": "flight_segments",
-                    "columns": [
-                        {"column_name": "flight_no", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "origin", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "destination", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "duration_minutes", "source_type": "INTEGER", "nullable": False},
-                        {"column_name": "gate", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "delay_reason", "source_type": "TEXT", "nullable": True},
-                    ],
-                }
-            ],
-            "assigned_values": {"flight_no": "FL-390", "origin": "Da Nang", "destination": "Seoul", "duration_minutes": "285", "gate": "C7"},
-        },
-        {
-            "sample_id": "stage7c_a5_primary_english_009",
-            "coverage_tags": ["multi_table", "oneOf", "4_assigned_columns", "true_omit", "quoted_multiword", "real"],
-            "question": 'Use the specimens table: insert specimen_code SPEC-019, tissue "maple leaf", mass 0.42, freezer_slot FZ-3. Analysis note is absent.',
-            "selected_table": "specimens",
-            "tables": [
-                {
-                    "table_name": "researchers",
-                    "columns": [
-                        {"column_name": "researcher_code", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "researcher_name", "source_type": "TEXT", "nullable": False},
-                    ],
-                },
-                {
-                    "table_name": "specimens",
-                    "columns": [
-                        {"column_name": "specimen_code", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "tissue", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "mass_g", "source_type": "REAL", "nullable": False},
-                        {"column_name": "freezer_slot", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "analysis_note", "source_type": "TEXT", "nullable": True},
-                    ],
-                },
-            ],
-            "assigned_values": {"specimen_code": "SPEC-019", "tissue": "maple leaf", "mass_g": "0.42", "freezer_slot": "FZ-3"},
-        },
-        {
-            "sample_id": "stage7c_a5_primary_english_010",
-            "coverage_tags": ["multi_table", "oneOf", "4_assigned_columns", "true_omit", "identifier", "real", "date"],
-            "question": 'For the permits table, insert permit_no BP-2027-18, parcel LOT-88A, fee 315.25, issued_on 2026-11-04. Inspector initials are not supplied.',
-            "selected_table": "permits",
-            "tables": [
-                {
-                    "table_name": "contractors",
-                    "columns": [
-                        {"column_name": "contractor_code", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "company_name", "source_type": "TEXT", "nullable": False},
-                    ],
-                },
-                {
-                    "table_name": "permits",
-                    "columns": [
-                        {"column_name": "permit_no", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "parcel", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "fee", "source_type": "REAL", "nullable": False},
-                        {"column_name": "issued_on", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "inspector_initials", "source_type": "TEXT", "nullable": True},
-                    ],
-                },
-            ],
-            "assigned_values": {"permit_no": "BP-2027-18", "parcel": "LOT-88A", "fee": "315.25", "issued_on": "2026-11-04"},
-        },
-        {
-            "sample_id": "stage7c_a5_primary_english_011",
-            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "overlapping_candidates", "quoted_multiword", "integer"],
-            "question": 'Add music release "Glass Harbor", artist "Glass", track_count 11, label "Northline". Region omitted.',
-            "selected_table": "music_releases",
-            "tables": [
-                {
-                    "table_name": "music_releases",
-                    "columns": [
-                        {"column_name": "release_title", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "artist_name", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "track_count", "source_type": "INTEGER", "nullable": False},
-                        {"column_name": "label", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "region", "source_type": "TEXT", "nullable": True},
-                    ],
-                }
-            ],
-            "assigned_values": {"release_title": "Glass Harbor", "artist_name": "Glass", "track_count": "11", "label": "Northline"},
-            "assigned_value_spans": {"artist_name": {"start_char": 42, "end_char": 47}},
-        },
-        {
-            "sample_id": "stage7c_a5_primary_english_012",
-            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "quoted_multiword", "real", "integer"],
-            "question": 'Insert rental RENT_504 for asset "thermal camera", days 8, deposit 300.00, pickup_window "morning". Return slot blank.',
-            "selected_table": "equipment_rentals",
-            "tables": [
-                {
-                    "table_name": "equipment_rentals",
-                    "columns": [
-                        {"column_name": "rental_id", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "asset", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "days", "source_type": "INTEGER", "nullable": False},
-                        {"column_name": "deposit", "source_type": "REAL", "nullable": False},
-                        {"column_name": "pickup_window", "source_type": "TEXT", "nullable": False},
-                        {"column_name": "return_slot", "source_type": "TEXT", "nullable": True},
-                    ],
-                }
-            ],
-            "assigned_values": {"rental_id": "RENT_504", "asset": "thermal camera", "days": "8", "deposit": "300.00", "pickup_window": "morning"},
-        },
-    ]
+def _case_from_corrected_a5_row(row: dict[str, Any]) -> dict[str, Any]:
+    assigned_values = {
+        item["column_name"]: item["text"]
+        for item in row["label_side_expected"]["gold_column_span_ref_oracle"]
+    }
+    assigned_value_spans = {
+        item["column_name"]: {"start_char": item["start_char"], "end_char": item["end_char"]}
+        for item in row["label_side_expected"]["gold_column_span_ref_oracle"]
+    }
+    return {
+        "sample_id": row["sample_id"],
+        "coverage_tags": row["coverage_tags"],
+        "question": row["model_side_input"]["question"],
+        "selected_table": row["synthetic_db_spec"]["selected_table"],
+        "tables": row["synthetic_db_spec"]["source_tables"],
+        "assigned_values": assigned_values,
+        "assigned_value_spans": assigned_value_spans,
+    }
+
+
+def a5_observed_diagnostic_case_definitions(stage7c_a5_erratum_dir: Path) -> list[dict[str, Any]]:
+    rows = read_jsonl(stage7c_a5_erratum_dir / "CORRECTED_FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl")
+    return [_case_from_corrected_a5_row(row) for row in rows]
 
 
 def case_definitions() -> list[dict[str, Any]]:
     return [
         {
             "sample_id": "stage7c_a6_primary_english_001",
+            "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "date", "datetime", "quoted_multiword", "schema_alias"],
+            "question": 'Log astronomy observation OBS-742 for target "Vela Dwarf", band "Lyman alpha", captured_at 2026-12-03 04:15:30, aperture_code AP-9. Calibration memo absent.',
+            "selected_table": "astronomy_observations",
+            "tables": [
+                {
+                    "table_name": "astronomy_observations",
+                    "columns": [
+                        {"column_name": "observation_id", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "target_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "spectral_band", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "captured_at", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "aperture_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "calibration_memo", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"observation_id": "OBS-742", "target_name": "Vela Dwarf", "spectral_band": "Lyman alpha", "captured_at": "2026-12-03 04:15:30", "aperture_code": "AP-9"},
+        },
+        {
+            "sample_id": "stage7c_a6_primary_english_002",
+            "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "percent", "real", "quoted_multiword"],
+            "question": 'File insurance claim CLM-880 for policy POL-44, claimant "Ivy Raman", loss_pct 18%, reserve_usd 2400.75. Adjuster comment not provided.',
+            "selected_table": "insurance_claims",
+            "tables": [
+                {
+                    "table_name": "insurance_claims",
+                    "columns": [
+                        {"column_name": "claim_no", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "policy_no", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "claimant_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "loss_pct", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "reserve_usd", "source_type": "REAL", "nullable": False},
+                        {"column_name": "adjuster_comment", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"claim_no": "CLM-880", "policy_no": "POL-44", "claimant_name": "Ivy Raman", "loss_pct": "18%", "reserve_usd": "2400.75"},
+        },
+        {
+            "sample_id": "stage7c_a6_primary_english_003",
+            "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "ordinal_phrase", "possessive_text", "three_word_value", "quoted_multiword", "real"],
+            "question": 'Register museum shipment MSH-640 with crate "Curator\'s Ivory Compass", origin "Quito", weight_kg 16.2, arrival_rank third. Customs note omitted.',
+            "selected_table": "museum_shipments",
+            "tables": [
+                {
+                    "table_name": "museum_shipments",
+                    "columns": [
+                        {"column_name": "shipment_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "crate_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "origin_city", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "weight_kg", "source_type": "REAL", "nullable": False},
+                        {"column_name": "arrival_rank", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "customs_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"shipment_code": "MSH-640", "crate_name": "Curator's Ivory Compass", "origin_city": "Quito", "weight_kg": "16.2", "arrival_rank": "third"},
+        },
+        {
+            "sample_id": "stage7c_a6_primary_english_004",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "hex_identifier", "generic_stoplist", "integer", "real", "schema_alias"],
+            "question": "Create energy meter row meter 0xD00DCAFE, reading_kwh 735.4, voltage_v 221, tariff_code TAR-C2. Service memo left empty.",
+            "selected_table": "energy_meters",
+            "tables": [
+                {
+                    "table_name": "energy_meters",
+                    "columns": [
+                        {"column_name": "meter_id", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "reading_kwh", "source_type": "REAL", "nullable": False},
+                        {"column_name": "voltage_v", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "tariff_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "service_memo", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"meter_id": "0xD00DCAFE", "reading_kwh": "735.4", "voltage_v": "221", "tariff_code": "TAR-C2"},
+        },
+        {
+            "sample_id": "stage7c_a6_primary_english_005",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "identifier", "integer", "many_nullable_columns"],
+            "question": 'Enroll student "Noor Patel", course_code CHEM-220, section S-7, credit_units 4. Accommodation plan blank.',
+            "selected_table": "course_enrollments",
+            "tables": [
+                {
+                    "table_name": "course_enrollments",
+                    "columns": [
+                        {"column_name": "student_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "course_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "section_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "credit_units", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "accommodation_plan", "source_type": "TEXT", "nullable": True},
+                        {"column_name": "advisor_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"student_name": "Noor Patel", "course_code": "CHEM-220", "section_code": "S-7", "credit_units": "4"},
+        },
+        {
+            "sample_id": "stage7c_a6_primary_english_006",
+            "coverage_tags": ["multi_table", "oneOf", "5_assigned_columns", "true_omit", "real", "text_numeric_mix"],
+            "question": 'For ferry_bookings, add booking_ref FERRY-118, route_code BAY-6, passenger "Omar Silva", fare 32.50, seat 12A. Meal preference missing.',
+            "selected_table": "ferry_bookings",
+            "tables": [
+                {
+                    "table_name": "ferry_routes",
+                    "columns": [
+                        {"column_name": "route_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "route_name", "source_type": "TEXT", "nullable": False},
+                    ],
+                },
+                {
+                    "table_name": "ferry_bookings",
+                    "columns": [
+                        {"column_name": "booking_ref", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "route_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "passenger_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "fare", "source_type": "REAL", "nullable": False},
+                        {"column_name": "seat", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "meal_preference", "source_type": "TEXT", "nullable": True},
+                    ],
+                },
+            ],
+            "assigned_values": {"booking_ref": "FERRY-118", "route_code": "BAY-6", "passenger_name": "Omar Silva", "fare": "32.50", "seat": "12A"},
+        },
+        {
+            "sample_id": "stage7c_a6_primary_english_007",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "percent", "schema_alias", "quoted_multiword"],
+            "question": 'Insert chemical batch BATCH-Q9, compound_name "Sodium Formate", purity_pct 99.1%, mass_kg 2.75. Storage advisory not supplied.',
+            "selected_table": "chemical_batches",
+            "tables": [
+                {
+                    "table_name": "chemical_batches",
+                    "columns": [
+                        {"column_name": "batch_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "compound_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "purity_pct", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "mass_kg", "source_type": "REAL", "nullable": False},
+                        {"column_name": "storage_advisory", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"batch_code": "BATCH-Q9", "compound_name": "Sodium Formate", "purity_pct": "99.1%", "mass_kg": "2.75"},
+        },
+        {
+            "sample_id": "stage7c_a6_primary_english_008",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "legitimate_omission_literals", "integer"],
+            "question": 'Create building sensor sensor_tag SNS-330, floor_label L14, co2_ppm 640, status "Unavailable". Maintenance ticket absent.',
+            "selected_table": "building_sensors",
+            "tables": [
+                {
+                    "table_name": "building_sensors",
+                    "columns": [
+                        {"column_name": "sensor_tag", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "floor_label", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "co2_ppm", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "status", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "maintenance_ticket", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"sensor_tag": "SNS-330", "floor_label": "L14", "co2_ppm": "640", "status": "Unavailable"},
+        },
+        {
+            "sample_id": "stage7c_a6_primary_english_009",
+            "coverage_tags": ["multi_table", "oneOf", "4_assigned_columns", "true_omit", "email", "quoted_multiword", "integer"],
+            "question": 'Use journal_submissions: manuscript_id MS-772, title "Quiet Methods", author_email lee.kwon@journal.example, page_count 27. Reviewer note omitted.',
+            "selected_table": "journal_submissions",
+            "tables": [
+                {
+                    "table_name": "journals",
+                    "columns": [
+                        {"column_name": "journal_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "journal_name", "source_type": "TEXT", "nullable": False},
+                    ],
+                },
+                {
+                    "table_name": "journal_submissions",
+                    "columns": [
+                        {"column_name": "manuscript_id", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "title", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "author_email", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "page_count", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "reviewer_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                },
+            ],
+            "assigned_values": {"manuscript_id": "MS-772", "title": "Quiet Methods", "author_email": "lee.kwon@journal.example", "page_count": "27"},
+        },
+        {
+            "sample_id": "stage7c_a6_primary_english_010",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "overlapping_candidates", "quoted_multiword", "identifier"],
+            "question": 'Record orchard harvest lot HARV-26, cultivar "Pink Dawn", bushel_count 58, quality_grade "Pink". Weather memo not provided.',
+            "selected_table": "orchard_harvests",
+            "tables": [
+                {
+                    "table_name": "orchard_harvests",
+                    "columns": [
+                        {"column_name": "harvest_lot", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "cultivar", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "bushel_count", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "quality_grade", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "weather_memo", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"harvest_lot": "HARV-26", "cultivar": "Pink Dawn", "bushel_count": "58", "quality_grade": "Pink"},
+            "assigned_value_spans": {"quality_grade": {"start_char": 90, "end_char": 94}},
+        },
+        {
+            "sample_id": "stage7c_a6_primary_english_011",
+            "coverage_tags": ["single_table", "3_assigned_columns", "true_omit", "many_nullable_columns", "quoted_multiword", "real"],
+            "question": 'Calibrate device DEV-515 against standard "Delta Zero" with error_margin 0.006. Technician memo missing and certificate note left empty.',
+            "selected_table": "device_calibrations",
+            "tables": [
+                {
+                    "table_name": "device_calibrations",
+                    "columns": [
+                        {"column_name": "device_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "standard_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "error_margin", "source_type": "REAL", "nullable": False},
+                        {"column_name": "technician_memo", "source_type": "TEXT", "nullable": True},
+                        {"column_name": "certificate_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"device_code": "DEV-515", "standard_name": "Delta Zero", "error_margin": "0.006"},
+        },
+        {
+            "sample_id": "stage7c_a6_primary_english_012",
+            "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "legitimate_omission_literals", "datetime", "quoted_multiword"],
+            "question": 'Schedule film screening SCR-442 for film_title "Not Found", auditorium AUD-3, start_time 2026-12-22 19:45:00, ticket_price 11.25. Sponsor text blank.',
+            "selected_table": "film_screenings",
+            "tables": [
+                {
+                    "table_name": "film_screenings",
+                    "columns": [
+                        {"column_name": "screening_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "film_title", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "auditorium", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "start_time", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "ticket_price", "source_type": "REAL", "nullable": False},
+                        {"column_name": "sponsor_text", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"screening_code": "SCR-442", "film_title": "Not Found", "auditorium": "AUD-3", "start_time": "2026-12-22 19:45:00", "ticket_price": "11.25"},
+        },
+    ]
+
+
+def a6_method_stress_diagnostic_case_definitions() -> list[dict[str, Any]]:
+    return [
+        {
+            "sample_id": "stage7c_a6_method_stress_english_001",
             "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "possessive_text", "ordinal_phrase", "datetime", "identifier"],
             "question": "Create archive record archive_code ARC-901, exhibit_title Children's Rights, era_label 20th Century, opened_at 2026-09-02 10:30:00, case_no CASE-77. Curator note not provided.",
             "selected_table": "archive_records",
@@ -717,7 +745,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"archive_code": "ARC-901", "exhibit_title": "Children's Rights", "era_label": "20th Century", "opened_at": "2026-09-02 10:30:00", "case_no": "CASE-77"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_002",
+            "sample_id": "stage7c_a6_method_stress_english_002",
             "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "hex_identifier", "real", "percent", "schema_alias"],
             "question": "Record sensor station 0xBEEF2026, temperature 23.4, humidity 67%, mass 0.58. Accessibility note missing.",
             "selected_table": "sensor_readings",
@@ -736,7 +764,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"station_id": "0xBEEF2026", "temperature_c": "23.4", "humidity_pct": "67%", "mass_g": "0.58"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_003",
+            "sample_id": "stage7c_a6_method_stress_english_003",
             "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "identifier", "schema_alias", "integer"],
             "question": 'Add checkout loan LOAN-314, card CARD-314, title "Ocean Ledger", days 14. Shelf omitted.',
             "selected_table": "checkout_events",
@@ -756,7 +784,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_value_spans": {"loan_days": {"start_char": 70, "end_char": 72}},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_004",
+            "sample_id": "stage7c_a6_method_stress_english_004",
             "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "generic_stoplist", "legitimate_omission_literals", "quoted_multiword"],
             "question": 'Insert product_id PRD-55, product_name "Missing Link", display_name "Blank Space", state "Absent". Code value is not supplied.',
             "selected_table": "catalog_items",
@@ -775,7 +803,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"product_id": "PRD-55", "product_name": "Missing Link", "display_name": "Blank Space", "state": "Absent"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_005",
+            "sample_id": "stage7c_a6_method_stress_english_005",
             "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "email", "identifier", "schema_alias", "integer"],
             "question": 'Register attendee "Maya Ortiz", email maya.ortiz@conf.example, badge BADGE-82, seat B-22, paid 1. Contact omitted.',
             "selected_table": "event_registrations",
@@ -795,7 +823,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"attendee_name": "Maya Ortiz", "badge_email": "maya.ortiz@conf.example", "badge_code": "BADGE-82", "seat": "B-22", "paid": "1"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_006",
+            "sample_id": "stage7c_a6_method_stress_english_006",
             "coverage_tags": ["single_table", "3_assigned_columns", "many_nullable_columns", "true_omit", "quoted_multiword", "date"],
             "question": 'Create task title "Audit packet", owner "qa team", due_date 2026-09-20. Leave description, tag, reviewer, and closed_at empty.',
             "selected_table": "workflow_tasks",
@@ -816,7 +844,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"title": "Audit packet", "owner": "qa team", "due_date": "2026-09-20"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_007",
+            "sample_id": "stage7c_a6_method_stress_english_007",
             "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "overlapping_candidates", "quoted_multiword", "integer"],
             "question": 'Add city "New York City", state "New York", rank 1, nickname "Harbor Light". Region omitted.',
             "selected_table": "city_aliases",
@@ -836,7 +864,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_value_spans": {"state_name": {"start_char": 33, "end_char": 41}},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_008",
+            "sample_id": "stage7c_a6_method_stress_english_008",
             "coverage_tags": ["multi_table", "oneOf", "4_assigned_columns", "true_omit", "identifier", "real", "date"],
             "question": "Log maintenance job MX-741 for asset ELEV-3, cost 412.60, opened_on 2026-12-19. Supervisor initials absent.",
             "selected_table": "maintenance_jobs",
@@ -862,7 +890,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"job_code": "MX-741", "asset_tag": "ELEV-3", "cost": "412.60", "opened_on": "2026-12-19"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_009",
+            "sample_id": "stage7c_a6_method_stress_english_009",
             "coverage_tags": ["multi_table", "oneOf", "4_assigned_columns", "true_omit", "quoted_multiword", "schema_alias", "real"],
             "question": 'Use lab_vials: vial_code VIAL-771, specimen_name "cedar cutting", weight 0.93, freezer_slot RACK-42. Analysis note missing.',
             "selected_table": "lab_vials",
@@ -888,7 +916,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"vial_code": "VIAL-771", "specimen_name": "cedar cutting", "weight_g": "0.93", "freezer_slot": "RACK-42"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_010",
+            "sample_id": "stage7c_a6_method_stress_english_010",
             "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "quoted_multiword", "integer", "schema_alias"],
             "question": 'Schedule rail service RAIL-602 from "Hue" toward "Osaka"; travel_minutes 318 and boarding_platform P5. Delay reason not supplied.',
             "selected_table": "rail_trips",
@@ -908,7 +936,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"trip_code": "RAIL-602", "origin": "Hue", "destination": "Osaka", "duration_minutes": "318", "platform": "P5"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_011",
+            "sample_id": "stage7c_a6_method_stress_english_011",
             "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "three_word_value", "quoted_multiword", "real"],
             "question": 'Insert material "Copper Dawn Textile", batch MAT-44, density 7.8, source "lab bench". Leave remarks blank.',
             "selected_table": "materials",
@@ -927,7 +955,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"material_name": "Copper Dawn Textile", "batch": "MAT-44", "density": "7.8", "source": "lab bench"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_012",
+            "sample_id": "stage7c_a6_method_stress_english_012",
             "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "quoted_multiword", "real", "integer", "text_numeric_mix"],
             "question": 'Prepare field kit KIT-902: item "field scanner", loan_length 9, bond_amount 450.25, pickup_period "afternoon". Return slot blank.',
             "selected_table": "field_kits",
@@ -950,8 +978,8 @@ def case_definitions() -> list[dict[str, Any]]:
     ]
 
 
-def diagnostic_case_definitions() -> list[dict[str, Any]]:
-    return a5_observed_diagnostic_case_definitions()
+def diagnostic_case_definitions(stage7c_a5_erratum_dir: Path) -> list[dict[str, Any]]:
+    return a5_observed_diagnostic_case_definitions(stage7c_a5_erratum_dir)
 
 
 
@@ -1467,49 +1495,120 @@ def acceptance_policy() -> dict[str, Any]:
             ],
         },
         "diagnostic_gate": {
-            "sample_set": "12 A4-derived regression diagnostics",
+            "sample_set": "12 corrected A5 observed diagnostics plus 12 A6 method-stress diagnostics",
             "required_pass_count": "12/12",
             "role": "diagnostic_only_after_primary",
             "can_compensate_primary_failure": False,
         },
-        "before_stage7e0_a5": "A protocol-compliant column-conditioned oracle path must pass all fresh cases.",
+        "before_stage7e0_a6": "A protocol-compliant atomic-domain column-conditioned oracle path must pass all fresh primary cases before any Stage7E0-A6 GPU run.",
         "gretel_pilot_opened": False,
         "model_called": False,
         "gpu_called": False,
     }
 
 
-def primary_independence_audit(primary_cases: list[dict[str, Any]], diagnostic_cases: list[dict[str, Any]]) -> dict[str, Any]:
-    diagnostic_questions = {case["sample_id"]: case["question"] for case in diagnostic_cases}
-    diagnostic_literals = {
-        literal
-        for case in diagnostic_cases
-        for literal in case["assigned_values"].values()
+def _is_design_literal(value: str) -> bool:
+    stripped = value.strip()
+    return len(stripped) >= 2 and (any(ch.isalpha() for ch in stripped) or any(ch in stripped for ch in "-_@.%:"))
+
+
+def _collect_design_strings(payload: Any) -> set[str]:
+    strings: set[str] = set()
+    if isinstance(payload, str):
+        if _is_design_literal(payload):
+            strings.add(payload)
+        strings.update(item for item in re.findall(r'"([^"]+)"', payload) if _is_design_literal(item))
+    elif isinstance(payload, list):
+        for item in payload:
+            strings.update(_collect_design_strings(item))
+    elif isinstance(payload, dict):
+        for value in payload.values():
+            strings.update(_collect_design_strings(value))
+    return strings
+
+
+def prior_design_evidence(
+    stage7b_a4_dir: Path,
+    stage7c_a5_erratum_dir: Path,
+    a5_diagnostic_cases: list[dict[str, Any]],
+    method_stress_cases: list[dict[str, Any]],
+) -> dict[str, Any]:
+    questions: dict[str, str] = {}
+    literals_by_source: dict[str, set[str]] = {}
+
+    def add_source(source_name: str, *, payload: Any | None = None, cases: list[dict[str, Any]] | None = None) -> None:
+        literals = literals_by_source.setdefault(source_name, set())
+        if cases:
+            for case in cases:
+                questions[f"{source_name}:{case['sample_id']}"] = case["question"]
+                literals.update(str(value) for value in case["assigned_values"].values() if _is_design_literal(str(value)))
+        if payload is not None:
+            literals.update(_collect_design_strings(payload))
+
+    corrected_rows = read_jsonl(stage7c_a5_erratum_dir / "CORRECTED_FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl")
+    corrected_questions = {
+        f"corrected_a5:{row['sample_id']}": row["model_side_input"]["question"]
+        for row in corrected_rows
     }
+    questions.update(corrected_questions)
+    add_source("corrected_a5_erratum_primary", cases=a5_diagnostic_cases, payload=corrected_rows)
+    add_source("a6_method_stress_diagnostics", cases=method_stress_cases)
+    for filename in [
+        "SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json",
+        "A5_OBSERVED_ERROR_COUNTERFACTUAL_DOMAIN_AUDIT.json",
+        "FALSE_SUPPRESSION_AUDIT.json",
+    ]:
+        payload = read_json(stage7b_a4_dir / filename)
+        add_source(f"{STAGE7B_A4_NAME}:{filename}", payload=payload)
+        for fixture in payload.get("fixtures", []) if isinstance(payload, dict) else []:
+            if "question" in fixture:
+                questions[f"{filename}:{fixture.get('case_id', len(questions))}"] = fixture["question"]
+    return {
+        "source_literal_counts": {source: len(values) for source, values in sorted(literals_by_source.items())},
+        "source_question_count": len(questions),
+        "literals_by_source": {source: sorted(values) for source, values in sorted(literals_by_source.items())},
+        "questions": questions,
+    }
+
+
+def primary_independence_audit(primary_cases: list[dict[str, Any]], prior_evidence: dict[str, Any]) -> dict[str, Any]:
+    prior_questions = prior_evidence["questions"]
+    literals_by_source = prior_evidence["literals_by_source"]
+    prior_literals = {
+        literal
+        for literals in literals_by_source.values()
+        for literal in literals
+    }
+    synthetic_fixture_literals = set(literals_by_source.get(f"{STAGE7B_A4_NAME}:SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json", []))
     rows = []
-    exact_literal_overlap_count = 0
+    exact_literal_reuse_count = 0
+    exact_synthetic_fixture_reuse_count = 0
     max_similarity = 0.0
     for case in primary_cases:
-        literals = set(case["assigned_values"].values())
-        overlaps = sorted(literals & diagnostic_literals)
+        literals = {str(value) for value in case["assigned_values"].values() if _is_design_literal(str(value))}
+        overlaps = sorted(literals & prior_literals)
+        synthetic_overlaps = sorted(literals & synthetic_fixture_literals)
         similarities = [
             {
-                "diagnostic_sample_id": diagnostic_id,
-                "sequence_similarity": difflib.SequenceMatcher(None, case["question"], diagnostic_question).ratio(),
+                "prior_evidence_id": prior_id,
+                "sequence_similarity": difflib.SequenceMatcher(None, case["question"], prior_question).ratio(),
             }
-            for diagnostic_id, diagnostic_question in diagnostic_questions.items()
+            for prior_id, prior_question in prior_questions.items()
         ]
         nearest = max(similarities, key=lambda item: item["sequence_similarity"])
         max_similarity = max(max_similarity, float(nearest["sequence_similarity"]))
         if overlaps:
-            exact_literal_overlap_count += 1
+            exact_literal_reuse_count += 1
+        if synthetic_overlaps:
+            exact_synthetic_fixture_reuse_count += 1
         rows.append(
             {
                 "sample_id": case["sample_id"],
-                "exact_literal_overlaps_with_a4_derived_diagnostics": overlaps,
-                "nearest_a4_derived_question": nearest["diagnostic_sample_id"],
+                "exact_prior_design_literal_reuse": overlaps,
+                "exact_synthetic_fixture_literal_reuse": synthetic_overlaps,
+                "nearest_prior_design_question": nearest["prior_evidence_id"],
                 "nearest_question_sequence_similarity": nearest["sequence_similarity"],
-                "passes_independence_gate": not overlaps and nearest["sequence_similarity"] < 0.60,
+                "passes_independence_gate": not overlaps and not synthetic_overlaps and nearest["sequence_similarity"] < 0.60,
             }
         )
     failures = [row["sample_id"] for row in rows if not row["passes_independence_gate"]]
@@ -1517,8 +1616,18 @@ def primary_independence_audit(primary_cases: list[dict[str, Any]], diagnostic_c
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
         "primary_case_count": len(primary_cases),
-        "a4_derived_diagnostic_case_count": len(diagnostic_cases),
-        "exact_literal_overlap_case_count": exact_literal_overlap_count,
+        "prior_design_scope": [
+            "corrected A5 primary/regression cases from Gold Provenance Erratum",
+            "Stage7B-A4 synthetic omission safety fixtures",
+            "Stage7B-A4 A5 observed-error counterfactual examples",
+            "Stage7B-A4 known false-suppression audit payload",
+            "A6 method-stress diagnostics moved out of primary acceptance",
+        ],
+        "prior_design_source_literal_counts": prior_evidence["source_literal_counts"],
+        "prior_design_source_question_count": prior_evidence["source_question_count"],
+        "exact_prior_design_literal_reuse_case_count": exact_literal_reuse_count,
+        "exact_synthetic_fixture_reuse_case_count": exact_synthetic_fixture_reuse_count,
+        "known_development_example_reuse_case_count": exact_literal_reuse_count,
         "max_nearest_question_sequence_similarity": max_similarity,
         "similarity_threshold": 0.60,
         "status": "PASS" if not failures else "FAIL",
@@ -1529,7 +1638,15 @@ def primary_independence_audit(primary_cases: list[dict[str, Any]], diagnostic_c
     }
 
 
-def source_input_manifest(stage7b_a2_dir: Path, stage7b_a3_dir: Path, stage7b_a4_dir: Path, stage7c_a4_dir: Path, stage7e0_a4_dir: Path, stage7e0_a5_dir: Path) -> dict[str, Any]:
+def source_input_manifest(
+    stage7b_a2_dir: Path,
+    stage7b_a3_dir: Path,
+    stage7b_a4_dir: Path,
+    stage7c_a4_dir: Path,
+    stage7c_a5_erratum_dir: Path,
+    stage7e0_a4_dir: Path,
+    stage7e0_a5_dir: Path,
+) -> dict[str, Any]:
     files = [
         (STAGE7B_A2_NAME, stage7b_a2_dir, "STAGE7B_A2_LOCK.json"),
         (STAGE7B_A2_NAME, stage7b_a2_dir, "CANDIDATE_GENERATION_ALGORITHM_SPEC.json"),
@@ -1542,7 +1659,14 @@ def source_input_manifest(stage7b_a2_dir: Path, stage7b_a3_dir: Path, stage7b_a4
         (STAGE7B_A4_NAME, stage7b_a4_dir, "SCHEMA_LABEL_ALIAS_SPEC.json"),
         (STAGE7B_A4_NAME, stage7b_a4_dir, "OMISSION_CUE_SUPPRESSION_RULE_SPEC.json"),
         (STAGE7B_A4_NAME, stage7b_a4_dir, "A5_OBSERVED_ERROR_COUNTERFACTUAL_DOMAIN_AUDIT.json"),
+        (STAGE7B_A4_NAME, stage7b_a4_dir, "SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json"),
+        (STAGE7B_A4_NAME, stage7b_a4_dir, "FALSE_SUPPRESSION_AUDIT.json"),
+        (STAGE7B_A4_NAME, stage7b_a4_dir, "CANDIDATE_SUPPRESSION_EXAMPLES.jsonl"),
         (STAGE7C_A4_NAME, stage7c_a4_dir, "STAGE7C_A4_LOCK.json"),
+        (STAGE7C_A5_ERRATUM_NAME, stage7c_a5_erratum_dir, "ERRATUM_LOCK.json"),
+        (STAGE7C_A5_ERRATUM_NAME, stage7c_a5_erratum_dir, "CORRECTED_FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl"),
+        (STAGE7C_A5_ERRATUM_NAME, stage7c_a5_erratum_dir, "CORRECTED_A4_DERIVED_REGRESSION_DIAGNOSTICS_A5.jsonl"),
+        (STAGE7C_A5_ERRATUM_NAME, stage7c_a5_erratum_dir, "GOLD_PROVENANCE_ERRATUM.json"),
         (STAGE7E0_A4_NAME, stage7e0_a4_dir, "STAGE7E0_A4_SERVER_RESULT_LOCK.json"),
         (STAGE7E0_A5_NAME, stage7e0_a5_dir, "STAGE7E0_A5_SERVER_RESULT_LOCK.json"),
     ]
@@ -1870,8 +1994,8 @@ sample from pilot/dev/test denominators.
 def reviewer_readme(out_dir: Path) -> str:
     return f"""# Stage7C-A6 English Column-Conditioned Phase O Protocol Freeze
 
-This package freezes the one-call column-conditioned candidate-selection
-protocol proposed after Stage7B-A3 PASS/CLOSE. The primary A6 path removes
+This package freezes the one-call atomic-domain column-conditioned candidate-selection
+protocol opened after Stage7B-A4 PATCH2 PASS/CLOSE. The primary A6 path removes
 Phase M as a model call and derives the compiler IR deterministically from
 `table_ref` and `column_span_refs`.
 
@@ -1887,21 +2011,24 @@ Review order:
 8. `{STAGE_NAME}/A6_ORACLE_CANDIDATE_DOMAIN_AUDIT.json`
 9. `{STAGE_NAME}/FRESH_ENGLISH_A6_PRIMARY_FEASIBILITY_SET.jsonl`
 10. `{STAGE_NAME}/A5_OBSERVED_REGRESSION_DIAGNOSTICS_A6.jsonl`
-11. `{STAGE_NAME}/ORACLE_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl`
-12. `{STAGE_NAME}/ORACLE_A5_OBSERVED_DIAGNOSTIC_RESULTS.jsonl`
-13. `{STAGE_NAME}/A6_PRIMARY_INDEPENDENCE_AUDIT.json`
-14. `{STAGE_NAME}/EVALUATOR_SEMANTICS_A6.json`
-15. `{STAGE_NAME}/ACCEPTANCE_POLICY_A6.json`
-16. `{STAGE_NAME}/OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A6.json`
-17. `{STAGE_NAME}/SOURCE_INPUT_MANIFEST.json`
-18. `{STAGE_NAME}/SYNTHETIC_SQLITE_DB_MANIFEST.jsonl`
-19. `{STAGE_NAME}/PACKAGE_FILE_INTEGRITY_MANIFEST.json`
-20. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
-21. `{STAGE_NAME}/STAGE7C_A6_LOCK.json`
-22. `{STAGE_NAME}/VALIDATION_REPORT.md`
-23. `scripts/data/build_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py`
-24. `scripts/data/validate_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py`
-25. `tests/test_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py`
+11. `{STAGE_NAME}/A6_METHOD_STRESS_REGRESSION_DIAGNOSTICS_A6.jsonl`
+12. `{STAGE_NAME}/ORACLE_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl`
+13. `{STAGE_NAME}/ORACLE_A5_OBSERVED_DIAGNOSTIC_RESULTS.jsonl`
+14. `{STAGE_NAME}/ORACLE_A6_METHOD_STRESS_DIAGNOSTIC_RESULTS.jsonl`
+15. `{STAGE_NAME}/A6_PRIMARY_INDEPENDENCE_AUDIT.json`
+16. `{STAGE_NAME}/PRIOR_DESIGN_EVIDENCE_INDEPENDENCE_AUDIT_A6.json`
+17. `{STAGE_NAME}/EVALUATOR_SEMANTICS_A6.json`
+18. `{STAGE_NAME}/ACCEPTANCE_POLICY_A6.json`
+19. `{STAGE_NAME}/OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A6.json`
+20. `{STAGE_NAME}/SOURCE_INPUT_MANIFEST.json`
+21. `{STAGE_NAME}/SYNTHETIC_SQLITE_DB_MANIFEST.jsonl`
+22. `{STAGE_NAME}/PACKAGE_FILE_INTEGRITY_MANIFEST.json`
+23. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
+24. `{STAGE_NAME}/STAGE7C_A6_LOCK.json`
+25. `{STAGE_NAME}/VALIDATION_REPORT.md`
+26. `scripts/data/build_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py`
+27. `scripts/data/validate_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py`
+28. `tests/test_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py`
 
 Clean extraction commands:
 
@@ -1933,6 +2060,7 @@ def build_stage(
     stage7b_a3_dir: Path = PROJECT_ROOT / STAGE7B_A3_NAME,
     stage7b_a4_dir: Path = PROJECT_ROOT / STAGE7B_A4_NAME,
     stage7c_a4_dir: Path = PROJECT_ROOT / STAGE7C_A4_NAME,
+    stage7c_a5_erratum_dir: Path = PROJECT_ROOT / STAGE7C_A5_ERRATUM_NAME,
     stage7e0_a4_dir: Path = PROJECT_ROOT / STAGE7E0_A4_NAME,
     stage7e0_a5_dir: Path = PROJECT_ROOT / STAGE7E0_A5_NAME,
     tokenizer_name_or_path: str | None = None,
@@ -1942,8 +2070,12 @@ def build_stage(
         shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     db_dir = out_dir / "sqlite_dbs"
+    primary_cases = case_definitions()
+    a5_diagnostic_cases = diagnostic_case_definitions(stage7c_a5_erratum_dir)
+    method_stress_cases = a6_method_stress_diagnostic_case_definitions()
+    prior_evidence = prior_design_evidence(stage7b_a4_dir, stage7c_a5_erratum_dir, a5_diagnostic_cases, method_stress_cases)
 
-    write_json(out_dir / "SOURCE_INPUT_MANIFEST.json", source_input_manifest(stage7b_a2_dir, stage7b_a3_dir, stage7b_a4_dir, stage7c_a4_dir, stage7e0_a4_dir, stage7e0_a5_dir))
+    write_json(out_dir / "SOURCE_INPUT_MANIFEST.json", source_input_manifest(stage7b_a2_dir, stage7b_a3_dir, stage7b_a4_dir, stage7c_a4_dir, stage7c_a5_erratum_dir, stage7e0_a4_dir, stage7e0_a5_dir))
     write_json(out_dir / "ATOMIC_DOMAIN_COLUMN_CONDITIONED_OUTPUT_SPEC_A6.json", output_spec())
     write_json(out_dir / "ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROMPT_SPEC_A6_ENGLISH.json", prompt_spec())
     write_json(out_dir / "ATOMIC_DOMAIN_COLUMN_CONDITIONED_RUNTIME_SCHEMA_SPEC_A6.json", runtime_schema_spec())
@@ -1954,14 +2086,36 @@ def build_stage(
     write_json(out_dir / "OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A6.json", failure_policy())
     write_json(out_dir / "EVALUATOR_SEMANTICS_A6.json", evaluator_semantics())
     write_json(out_dir / "ACCEPTANCE_POLICY_A6.json", acceptance_policy())
-    write_json(out_dir / "A6_PRIMARY_INDEPENDENCE_AUDIT.json", primary_independence_audit(case_definitions(), diagnostic_case_definitions()))
+    independence_audit = primary_independence_audit(primary_cases, prior_evidence)
+    write_json(out_dir / "A6_PRIMARY_INDEPENDENCE_AUDIT.json", independence_audit)
+    write_json(
+        out_dir / "PRIOR_DESIGN_EVIDENCE_INDEPENDENCE_AUDIT_A6.json",
+        {
+            "stage": STAGE_NAME,
+            "patch": PATCH_NAME,
+            "status": independence_audit["status"],
+            "prior_design_scope": independence_audit["prior_design_scope"],
+            "prior_design_source_literal_counts": independence_audit["prior_design_source_literal_counts"],
+            "prior_design_source_question_count": independence_audit["prior_design_source_question_count"],
+            "exact_prior_design_literal_reuse_case_count": independence_audit["exact_prior_design_literal_reuse_case_count"],
+            "exact_synthetic_fixture_reuse_case_count": independence_audit["exact_synthetic_fixture_reuse_case_count"],
+            "known_development_example_reuse_case_count": independence_audit["known_development_example_reuse_case_count"],
+            "max_nearest_question_sequence_similarity": independence_audit["max_nearest_question_sequence_similarity"],
+            "similarity_threshold": independence_audit["similarity_threshold"],
+            "failures": independence_audit["failures"],
+            "model_called": False,
+            "gpu_called": False,
+        },
+    )
 
     rows = []
     diagnostic_rows = []
+    method_stress_rows = []
     db_manifest = []
     oracle_results = []
     diagnostic_oracle_results = []
-    for case in case_definitions():
+    method_stress_oracle_results = []
+    for case in primary_cases:
         db_info = create_case_db(case, db_dir)
         row = smoke_row(case, db_info)
         oracle = oracle_column_conditioned_path(row, out_dir / db_info["sqlite_db_path"])
@@ -1971,22 +2125,37 @@ def build_stage(
         rows.append(row)
         db_manifest.append({**db_info, "source_tables": case["tables"]})
         oracle_results.append(oracle)
-    for case in diagnostic_case_definitions():
+    for case in a5_diagnostic_cases:
         db_info = create_case_db(case, db_dir)
         row = smoke_row(case, db_info)
         row["diagnostic_role"] = "diagnostic_only_after_primary"
+        row["diagnostic_source"] = "corrected_a5_gold_provenance_erratum"
         oracle = oracle_column_conditioned_path(row, out_dir / db_info["sqlite_db_path"])
         row["label_side_expected"]["resolved_column_span_oracle"] = oracle["resolved_column_spans"]
         row["label_side_expected"]["deterministic_ir_oracle"] = oracle["deterministic_ir"]
         row["label_side_expected"]["target_state"]["compiler_observed_target_state_hash"] = oracle["observed_target_state_hash"]
         diagnostic_rows.append(row)
-        db_manifest.append({**db_info, "source_tables": case["tables"], "diagnostic_role": "diagnostic_only_after_primary"})
+        db_manifest.append({**db_info, "source_tables": case["tables"], "diagnostic_role": "diagnostic_only_after_primary", "diagnostic_source": "corrected_a5_gold_provenance_erratum"})
         diagnostic_oracle_results.append(oracle)
+    for case in method_stress_cases:
+        db_info = create_case_db(case, db_dir)
+        row = smoke_row(case, db_info)
+        row["diagnostic_role"] = "diagnostic_only_after_primary"
+        row["diagnostic_source"] = "a6_patch0_method_stress_regression"
+        oracle = oracle_column_conditioned_path(row, out_dir / db_info["sqlite_db_path"])
+        row["label_side_expected"]["resolved_column_span_oracle"] = oracle["resolved_column_spans"]
+        row["label_side_expected"]["deterministic_ir_oracle"] = oracle["deterministic_ir"]
+        row["label_side_expected"]["target_state"]["compiler_observed_target_state_hash"] = oracle["observed_target_state_hash"]
+        method_stress_rows.append(row)
+        db_manifest.append({**db_info, "source_tables": case["tables"], "diagnostic_role": "diagnostic_only_after_primary", "diagnostic_source": "a6_patch0_method_stress_regression"})
+        method_stress_oracle_results.append(oracle)
 
     write_jsonl(out_dir / "FRESH_ENGLISH_A6_PRIMARY_FEASIBILITY_SET.jsonl", rows)
     write_jsonl(out_dir / "A5_OBSERVED_REGRESSION_DIAGNOSTICS_A6.jsonl", diagnostic_rows)
+    write_jsonl(out_dir / "A6_METHOD_STRESS_REGRESSION_DIAGNOSTICS_A6.jsonl", method_stress_rows)
     write_jsonl(out_dir / "ORACLE_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl", oracle_results)
     write_jsonl(out_dir / "ORACLE_A5_OBSERVED_DIAGNOSTIC_RESULTS.jsonl", diagnostic_oracle_results)
+    write_jsonl(out_dir / "ORACLE_A6_METHOD_STRESS_DIAGNOSTIC_RESULTS.jsonl", method_stress_oracle_results)
     write_jsonl(out_dir / "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl", db_manifest)
     candidate_domain_audit = candidate_domain_oracle_audit(rows)
     write_json(out_dir / "A6_ORACLE_CANDIDATE_DOMAIN_AUDIT.json", candidate_domain_audit)
@@ -2000,6 +2169,8 @@ def build_stage(
     multi_table_count = sum(1 for row in rows if row["runtime_constraints"]["schema_table_count"] > 1)
     diagnostic_assigned_count = sum(sum(1 for value in row["label_side_expected"]["phase_o"]["column_span_refs"].values() if value != "OMIT") for row in diagnostic_rows)
     diagnostic_omit_count = sum(sum(1 for value in row["label_side_expected"]["phase_o"]["column_span_refs"].values() if value == "OMIT") for row in diagnostic_rows)
+    method_stress_assigned_count = sum(sum(1 for value in row["label_side_expected"]["phase_o"]["column_span_refs"].values() if value != "OMIT") for row in method_stress_rows)
+    method_stress_omit_count = sum(sum(1 for value in row["label_side_expected"]["phase_o"]["column_span_refs"].values() if value == "OMIT") for row in method_stress_rows)
     lock = {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
@@ -2010,6 +2181,7 @@ def build_stage(
         "source_stage7b_a3_status": read_json(stage7b_a3_dir / "STAGE7B_A3_LOCK.json").get("status"),
         "source_stage7b_a4_status": read_json(stage7b_a4_dir / "STAGE7B_A4_LOCK.json").get("status"),
         "source_stage7b_a4_patch": read_json(stage7b_a4_dir / "STAGE7B_A4_LOCK.json").get("patch"),
+        "source_stage7c_a5_erratum_status": read_json(stage7c_a5_erratum_dir / "ERRATUM_LOCK.json").get("status"),
         "source_stage7e0_a4_closed": True,
         "source_stage7e0_a5_closed": True,
         "fresh_english_case_count": len(rows),
@@ -2022,6 +2194,10 @@ def build_stage(
         "diagnostic_assigned_column_decision_count": diagnostic_assigned_count,
         "diagnostic_omit_column_decision_count": diagnostic_omit_count,
         "diagnostic_oracle_preflight_admitted_count": sum(1 for item in diagnostic_oracle_results if item["preflight"] == "ADMITTED"),
+        "a6_method_stress_regression_diagnostic_count": len(method_stress_rows),
+        "method_stress_assigned_column_decision_count": method_stress_assigned_count,
+        "method_stress_omit_column_decision_count": method_stress_omit_count,
+        "method_stress_oracle_preflight_admitted_count": sum(1 for item in method_stress_oracle_results if item["preflight"] == "ADMITTED"),
         "primary_acceptance_precedes_diagnostics": True,
         "diagnostics_can_compensate_primary_failure": False,
         "phase_m_primary_pipeline_removed": True,
@@ -2035,6 +2211,9 @@ def build_stage(
         "column_span_refs_mapping_equality": "order_insensitive_by_object_key",
         "type_based_candidate_pruning_enabled": False,
         "candidate_domain_filter_enabled": True,
+        "exact_prior_design_literal_reuse_case_count": independence_audit["exact_prior_design_literal_reuse_case_count"],
+        "exact_synthetic_fixture_reuse_case_count": independence_audit["exact_synthetic_fixture_reuse_case_count"],
+        "known_development_example_reuse_case_count": independence_audit["known_development_example_reuse_case_count"],
         "candidate_domain_gold_suppressed_total": read_json(out_dir / "A6_ORACLE_CANDIDATE_DOMAIN_AUDIT.json")["gold_suppressed_total"],
         "candidate_domain_suppressed_candidate_total": read_json(out_dir / "A6_ORACLE_CANDIDATE_DOMAIN_AUDIT.json")["suppressed_candidate_total"],
         "tokenizer_status": token_audit["tokenizer_status"],
@@ -2050,7 +2229,7 @@ def build_stage(
     write_json(out_dir / "STAGE7C_A6_LOCK.json", lock)
     write_text(out_dir / "VALIDATION_REPORT.md", validation_report(len(rows), assigned_count, omit_count, multi_table_count, token_audit, candidate_domain_audit).replace(
         "Candidate-generator miss is a method failure, not OMIT, and may not exclude a\nsample from pilot/dev/test denominators.\n",
-        f"Candidate-generator miss is a method failure, not OMIT, and may not exclude a\nsample from pilot/dev/test denominators. Diagnostics are run after primary and cannot compensate primary failures.\n\n```text\na4_derived_regression_diagnostics={len(diagnostic_rows)}\ndiagnostic_oracle_preflight={sum(1 for item in diagnostic_oracle_results if item['preflight'] == 'ADMITTED')}/{len(diagnostic_rows)} ADMITTED\ncolumn_span_refs_mapping_equality=order_insensitive_by_object_key\nduplicate_span_reuse_is_method_failure=true\n```\n",
+        f"Candidate-generator miss is a method failure, not OMIT, and may not exclude a\nsample from pilot/dev/test denominators. Diagnostics are run after primary and cannot compensate primary failures.\n\n```text\na5_corrected_regression_diagnostics={len(diagnostic_rows)}\na5_diagnostic_oracle_preflight={sum(1 for item in diagnostic_oracle_results if item['preflight'] == 'ADMITTED')}/{len(diagnostic_rows)} ADMITTED\na6_method_stress_regression_diagnostics={len(method_stress_rows)}\nmethod_stress_oracle_preflight={sum(1 for item in method_stress_oracle_results if item['preflight'] == 'ADMITTED')}/{len(method_stress_rows)} ADMITTED\nexact_prior_design_literal_reuse_case_count={independence_audit['exact_prior_design_literal_reuse_case_count']}\nexact_synthetic_fixture_reuse_case_count={independence_audit['exact_synthetic_fixture_reuse_case_count']}\ncolumn_span_refs_mapping_equality=order_insensitive_by_object_key\nduplicate_span_reuse_is_method_failure=true\n```\n",
     ))
     write_text(out_dir / "REVIEWER_README.md", reviewer_readme(out_dir))
     return {
@@ -2064,6 +2243,8 @@ def build_stage(
         "oracle_preflight_admitted_count": lock["oracle_preflight_admitted_count"],
         "a4_derived_regression_diagnostic_count": len(diagnostic_rows),
         "diagnostic_oracle_preflight_admitted_count": lock["diagnostic_oracle_preflight_admitted_count"],
+        "a6_method_stress_regression_diagnostic_count": len(method_stress_rows),
+        "method_stress_oracle_preflight_admitted_count": lock["method_stress_oracle_preflight_admitted_count"],
         "tokenizer_status": token_audit["tokenizer_status"],
         "model_called": False,
         "gpu_called": False,
@@ -2096,8 +2277,15 @@ def include_paths_for_package(stage_dir: Path) -> list[Path]:
         f"{STAGE7B_A4_NAME}/SCHEMA_LABEL_ALIAS_SPEC.json",
         f"{STAGE7B_A4_NAME}/OMISSION_CUE_SUPPRESSION_RULE_SPEC.json",
         f"{STAGE7B_A4_NAME}/A5_OBSERVED_ERROR_COUNTERFACTUAL_DOMAIN_AUDIT.json",
+        f"{STAGE7B_A4_NAME}/SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json",
+        f"{STAGE7B_A4_NAME}/FALSE_SUPPRESSION_AUDIT.json",
+        f"{STAGE7B_A4_NAME}/CANDIDATE_SUPPRESSION_EXAMPLES.jsonl",
         f"{STAGE7B_A3_NAME}/TARGET_TABLE_RUNTIME_FEASIBILITY_AUDIT.json",
         f"{STAGE7C_A4_NAME}/STAGE7C_A4_LOCK.json",
+        f"{STAGE7C_A5_ERRATUM_NAME}/ERRATUM_LOCK.json",
+        f"{STAGE7C_A5_ERRATUM_NAME}/CORRECTED_FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl",
+        f"{STAGE7C_A5_ERRATUM_NAME}/CORRECTED_A4_DERIVED_REGRESSION_DIAGNOSTICS_A5.jsonl",
+        f"{STAGE7C_A5_ERRATUM_NAME}/GOLD_PROVENANCE_ERRATUM.json",
         f"{STAGE7E0_A4_NAME}/STAGE7E0_A4_SERVER_RESULT_LOCK.json",
         f"{STAGE7E0_A5_NAME}/STAGE7E0_A5_SERVER_RESULT_LOCK.json",
     ]:
@@ -2146,6 +2334,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-
-

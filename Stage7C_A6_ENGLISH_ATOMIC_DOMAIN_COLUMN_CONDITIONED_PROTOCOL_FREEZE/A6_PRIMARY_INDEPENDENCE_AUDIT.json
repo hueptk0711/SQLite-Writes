@@ -1,98 +1,126 @@
 {
-  "a4_derived_diagnostic_case_count": 12,
-  "exact_literal_overlap_case_count": 0,
+  "exact_prior_design_literal_reuse_case_count": 0,
+  "exact_synthetic_fixture_reuse_case_count": 0,
   "failures": [],
   "gpu_called": false,
-  "max_nearest_question_sequence_similarity": 0.5658914728682171,
+  "known_development_example_reuse_case_count": 0,
+  "max_nearest_question_sequence_similarity": 0.4444444444444444,
   "model_called": false,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "per_primary_case": [
     {
-      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
-      "nearest_a4_derived_question": "stage7c_a5_primary_english_001",
-      "nearest_question_sequence_similarity": 0.35802469135802467,
+      "exact_prior_design_literal_reuse": [],
+      "exact_synthetic_fixture_literal_reuse": [],
+      "nearest_prior_design_question": "a6_method_stress_diagnostics:stage7c_a6_method_stress_english_008",
+      "nearest_question_sequence_similarity": 0.41825095057034223,
       "passes_independence_gate": true,
       "sample_id": "stage7c_a6_primary_english_001"
     },
     {
-      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
-      "nearest_a4_derived_question": "stage7c_a5_primary_english_005",
-      "nearest_question_sequence_similarity": 0.4806201550387597,
+      "exact_prior_design_literal_reuse": [],
+      "exact_synthetic_fixture_literal_reuse": [],
+      "nearest_prior_design_question": "corrected_a5:stage7c_a5_primary_english_001",
+      "nearest_question_sequence_similarity": 0.36619718309859156,
       "passes_independence_gate": true,
       "sample_id": "stage7c_a6_primary_english_002"
     },
     {
-      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
-      "nearest_a4_derived_question": "stage7c_a5_primary_english_001",
-      "nearest_question_sequence_similarity": 0.4388185654008439,
+      "exact_prior_design_literal_reuse": [],
+      "exact_synthetic_fixture_literal_reuse": [],
+      "nearest_prior_design_question": "corrected_a5:stage7c_a5_primary_english_008",
+      "nearest_question_sequence_similarity": 0.35424354243542433,
       "passes_independence_gate": true,
       "sample_id": "stage7c_a6_primary_english_003"
     },
     {
-      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
-      "nearest_a4_derived_question": "stage7c_a5_primary_english_011",
-      "nearest_question_sequence_similarity": 0.34513274336283184,
+      "exact_prior_design_literal_reuse": [],
+      "exact_synthetic_fixture_literal_reuse": [],
+      "nearest_prior_design_question": "corrected_a5:stage7c_a5_primary_english_003",
+      "nearest_question_sequence_similarity": 0.3305084745762712,
       "passes_independence_gate": true,
       "sample_id": "stage7c_a6_primary_english_004"
     },
     {
-      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
-      "nearest_a4_derived_question": "stage7c_a5_primary_english_007",
-      "nearest_question_sequence_similarity": 0.5658914728682171,
+      "exact_prior_design_literal_reuse": [],
+      "exact_synthetic_fixture_literal_reuse": [],
+      "nearest_prior_design_question": "corrected_a5:stage7c_a5_primary_english_012",
+      "nearest_question_sequence_similarity": 0.33183856502242154,
       "passes_independence_gate": true,
       "sample_id": "stage7c_a6_primary_english_005"
     },
     {
-      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
-      "nearest_a4_derived_question": "stage7c_a5_primary_english_001",
-      "nearest_question_sequence_similarity": 0.3709090909090909,
+      "exact_prior_design_literal_reuse": [],
+      "exact_synthetic_fixture_literal_reuse": [],
+      "nearest_prior_design_question": "a6_method_stress_diagnostics:stage7c_a6_method_stress_english_009",
+      "nearest_question_sequence_similarity": 0.3953488372093023,
       "passes_independence_gate": true,
       "sample_id": "stage7c_a6_primary_english_006"
     },
     {
-      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
-      "nearest_a4_derived_question": "stage7c_a5_primary_english_011",
-      "nearest_question_sequence_similarity": 0.40625,
+      "exact_prior_design_literal_reuse": [],
+      "exact_synthetic_fixture_literal_reuse": [],
+      "nearest_prior_design_question": "a6_method_stress_diagnostics:stage7c_a6_method_stress_english_004",
+      "nearest_question_sequence_similarity": 0.4444444444444444,
       "passes_independence_gate": true,
       "sample_id": "stage7c_a6_primary_english_007"
     },
     {
-      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
-      "nearest_a4_derived_question": "stage7c_a5_primary_english_002",
-      "nearest_question_sequence_similarity": 0.3203463203463203,
+      "exact_prior_design_literal_reuse": [],
+      "exact_synthetic_fixture_literal_reuse": [],
+      "nearest_prior_design_question": "a6_method_stress_diagnostics:stage7c_a6_method_stress_english_002",
+      "nearest_question_sequence_similarity": 0.3466666666666667,
       "passes_independence_gate": true,
       "sample_id": "stage7c_a6_primary_english_008"
     },
     {
-      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
-      "nearest_a4_derived_question": "stage7c_a5_primary_english_009",
-      "nearest_question_sequence_similarity": 0.5433070866141733,
+      "exact_prior_design_literal_reuse": [],
+      "exact_synthetic_fixture_literal_reuse": [],
+      "nearest_prior_design_question": "corrected_a5:stage7c_a5_primary_english_007",
+      "nearest_question_sequence_similarity": 0.4206896551724138,
       "passes_independence_gate": true,
       "sample_id": "stage7c_a6_primary_english_009"
     },
     {
-      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
-      "nearest_a4_derived_question": "stage7c_a5_primary_english_008",
-      "nearest_question_sequence_similarity": 0.5078125,
+      "exact_prior_design_literal_reuse": [],
+      "exact_synthetic_fixture_literal_reuse": [],
+      "nearest_prior_design_question": "a6_method_stress_diagnostics:stage7c_a6_method_stress_english_011",
+      "nearest_question_sequence_similarity": 0.34934497816593885,
       "passes_independence_gate": true,
       "sample_id": "stage7c_a6_primary_english_010"
     },
     {
-      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
-      "nearest_a4_derived_question": "stage7c_a5_primary_english_012",
-      "nearest_question_sequence_similarity": 0.44642857142857145,
+      "exact_prior_design_literal_reuse": [],
+      "exact_synthetic_fixture_literal_reuse": [],
+      "nearest_prior_design_question": "corrected_a5:stage7c_a5_primary_english_003",
+      "nearest_question_sequence_similarity": 0.373015873015873,
       "passes_independence_gate": true,
       "sample_id": "stage7c_a6_primary_english_011"
     },
     {
-      "exact_literal_overlaps_with_a4_derived_diagnostics": [],
-      "nearest_a4_derived_question": "stage7c_a5_primary_english_012",
-      "nearest_question_sequence_similarity": 0.42105263157894735,
+      "exact_prior_design_literal_reuse": [],
+      "exact_synthetic_fixture_literal_reuse": [],
+      "nearest_prior_design_question": "corrected_a5:stage7c_a5_primary_english_012",
+      "nearest_question_sequence_similarity": 0.3595505617977528,
       "passes_independence_gate": true,
       "sample_id": "stage7c_a6_primary_english_012"
     }
   ],
   "primary_case_count": 12,
+  "prior_design_scope": [
+    "corrected A5 primary/regression cases from Gold Provenance Erratum",
+    "Stage7B-A4 synthetic omission safety fixtures",
+    "Stage7B-A4 A5 observed-error counterfactual examples",
+    "Stage7B-A4 known false-suppression audit payload",
+    "A6 method-stress diagnostics moved out of primary acceptance"
+  ],
+  "prior_design_source_literal_counts": {
+    "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT:A5_OBSERVED_ERROR_COUNTERFACTUAL_DOMAIN_AUDIT.json": 136,
+    "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT:FALSE_SUPPRESSION_AUDIT.json": 4,
+    "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT:SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json": 42,
+    "a6_method_stress_diagnostics": 46,
+    "corrected_a5_erratum_primary": 836
+  },
+  "prior_design_source_question_count": 44,
   "similarity_threshold": 0.6,
   "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE",
   "status": "PASS"

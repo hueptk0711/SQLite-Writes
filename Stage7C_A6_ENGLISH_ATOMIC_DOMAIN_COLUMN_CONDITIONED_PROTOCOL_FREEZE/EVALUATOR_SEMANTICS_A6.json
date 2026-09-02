@@ -5,7 +5,7 @@
   "gpu_called": false,
   "json_object_key_order_has_semantics": false,
   "model_called": false,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "primary_acceptance_precedes_diagnostics": true,
   "span_reuse_rule": "Each non-OMIT SPAN reference may be used for at most one column.",
   "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE"

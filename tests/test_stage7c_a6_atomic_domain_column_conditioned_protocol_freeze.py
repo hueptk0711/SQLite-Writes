@@ -139,8 +139,8 @@ def test_phase_o_output_uses_only_column_conditioned_surface(built_stage: Path) 
                 omit_count += 1
             else:
                 assigned_count += 1
-    assert assigned_count == 51
-    assert omit_count == 15
+    assert assigned_count == 52
+    assert omit_count == 14
 
 
 def test_gold_refs_slice_exact_values_and_cover_candidate_inventory(built_stage: Path) -> None:
@@ -153,7 +153,7 @@ def test_gold_refs_slice_exact_values_and_cover_candidate_inventory(built_stage:
             assert gold["candidate_span_ref"] in candidate_refs
             assert row["label_side_expected"]["phase_o"]["column_span_refs"][gold["column_ref"]] == gold["candidate_span_ref"]
             total += 1
-    assert total == 51
+    assert total == 52
 
 
 def test_rendered_prompt_contains_column_omit_and_candidate_inventory(built_stage: Path) -> None:
@@ -186,16 +186,35 @@ def test_a4_derived_cases_are_diagnostics_only_after_primary(built_stage: Path) 
     assert len(results) == 12
     assert all(row["sample_id"].startswith("stage7c_a5_primary_english_") for row in rows)
     assert all(row["diagnostic_role"] == "diagnostic_only_after_primary" for row in rows)
+    assert all(row["diagnostic_source"] == "corrected_a5_gold_provenance_erratum" for row in rows)
+    assert sum(result["preflight"] == "ADMITTED" for result in results) == 12
+    assert all(result["canonical_target_state_exact"] for result in results)
+
+
+def test_a6_method_stress_cases_are_diagnostics_only_after_primary(built_stage: Path) -> None:
+    rows = read_jsonl(built_stage / "A6_METHOD_STRESS_REGRESSION_DIAGNOSTICS_A6.jsonl")
+    results = read_jsonl(built_stage / "ORACLE_A6_METHOD_STRESS_DIAGNOSTIC_RESULTS.jsonl")
+    assert len(rows) == 12
+    assert len(results) == 12
+    assert all(row["sample_id"].startswith("stage7c_a6_method_stress_english_") for row in rows)
+    assert all(row["diagnostic_role"] == "diagnostic_only_after_primary" for row in rows)
+    assert all(row["diagnostic_source"] == "a6_patch0_method_stress_regression" for row in rows)
     assert sum(result["preflight"] == "ADMITTED" for result in results) == 12
     assert all(result["canonical_target_state_exact"] for result in results)
 
 
 def test_primary_independence_and_evaluator_semantics_are_frozen(built_stage: Path) -> None:
     audit = read_json(built_stage / "A6_PRIMARY_INDEPENDENCE_AUDIT.json")
+    prior_audit = read_json(built_stage / "PRIOR_DESIGN_EVIDENCE_INDEPENDENCE_AUDIT_A6.json")
     evaluator = read_json(built_stage / "EVALUATOR_SEMANTICS_A6.json")
     output = read_json(built_stage / "ATOMIC_DOMAIN_COLUMN_CONDITIONED_OUTPUT_SPEC_A6.json")
     assert audit["status"] == "PASS"
-    assert audit["exact_literal_overlap_case_count"] == 0
+    assert audit["exact_prior_design_literal_reuse_case_count"] == 0
+    assert audit["exact_synthetic_fixture_reuse_case_count"] == 0
+    assert audit["known_development_example_reuse_case_count"] == 0
+    assert prior_audit["status"] == "PASS"
+    assert prior_audit["exact_prior_design_literal_reuse_case_count"] == 0
+    assert prior_audit["exact_synthetic_fixture_reuse_case_count"] == 0
     assert evaluator["column_span_refs_mapping_equality"] == "order_insensitive_by_object_key"
     assert evaluator["json_object_key_order_has_semantics"] is False
     assert evaluator["duplicate_span_reuse_outcome"] == "method_failure"
@@ -212,10 +231,13 @@ def test_lock_and_policy_close_gpu_gretel_and_type_pruning(built_stage: Path) ->
     assert lock["gretel_pilot_opened"] is False
     assert lock["development_dev_used"] is False
     assert lock["official_test_used"] is False
+    assert lock["source_stage7c_a5_erratum_status"] is not None
     assert lock["type_based_candidate_pruning_enabled"] is False
     assert lock["candidate_domain_filter_enabled"] is True
     assert lock["candidate_domain_gold_suppressed_total"] == 0
     assert lock["candidate_domain_suppressed_candidate_total"] > 0
+    assert lock["exact_prior_design_literal_reuse_case_count"] == 0
+    assert lock["exact_synthetic_fixture_reuse_case_count"] == 0
     assert lock["primary_acceptance_precedes_diagnostics"] is True
     assert lock["diagnostics_can_compensate_primary_failure"] is False
     assert lock["duplicate_span_reuse_is_method_failure"] is True
@@ -230,10 +252,11 @@ def test_validator_accepts_frozen_generated_artifacts() -> None:
     report = validate(ROOT / STAGE_NAME)
     assert report["status"] == "PASS", report["failures"]
     assert report["fresh_english_case_count"] == 12
-    assert report["assigned_column_decision_count"] == 51
-    assert report["omit_column_decision_count"] == 15
+    assert report["assigned_column_decision_count"] == 52
+    assert report["omit_column_decision_count"] == 14
     assert report["multi_table_oneof_case_count"] == 2
     assert report["a4_derived_regression_diagnostic_count"] == 12
+    assert report["a6_method_stress_regression_diagnostic_count"] == 12
 
 
 def test_semantic_rebuild_requires_tokenizer_after_token_audit_pass() -> None:
@@ -294,8 +317,12 @@ def test_reviewer_package_opens_and_contains_stage_files(tmp_path: Path, built_s
         assert archive.testzip() is None
         names = set(archive.namelist())
     assert f"{STAGE_NAME}/VALIDATION_REPORT.md" in names
+    assert f"{STAGE_NAME}/A6_METHOD_STRESS_REGRESSION_DIAGNOSTICS_A6.jsonl" in names
+    assert f"{STAGE_NAME}/PRIOR_DESIGN_EVIDENCE_INDEPENDENCE_AUDIT_A6.json" in names
     assert "scripts/data/build_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py" in names
     assert "scripts/data/build_stageeng0_gretel_qualification.py" in names
     assert "tests/test_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py" in names
+    assert "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0/ERRATUM_LOCK.json" in names
+    assert "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0/CORRECTED_FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl" in names
 
 

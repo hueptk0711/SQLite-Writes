@@ -1,104 +1,119 @@
 {
-  "artifact_count": 19,
+  "artifact_count": 22,
   "artifacts": [
     {
-      "bytes": 243805,
+      "bytes": 244463,
       "path": "A5_OBSERVED_REGRESSION_DIAGNOSTICS_A6.jsonl",
-      "sha256": "6c106a1bca1dbe0753fe5f6a43169101d94ba52c2e771910192267a7d9093283"
+      "sha256": "b756752428d06d4f36e6b6babf156f4157c598e82efaa7fb58d19d5cd61f499e"
     },
     {
-      "bytes": 4732,
+      "bytes": 231746,
+      "path": "A6_METHOD_STRESS_REGRESSION_DIAGNOSTICS_A6.jsonl",
+      "sha256": "1bcfd9d55f17c8773a60ba195541acd8680e1a208b927e994b305266400dd802"
+    },
+    {
+      "bytes": 4869,
       "path": "A6_ORACLE_CANDIDATE_DOMAIN_AUDIT.json",
-      "sha256": "7c9c3bb2b9b5d7994317c9900683b5fba48f7f97593649df5b0e9e77dc4bf423"
+      "sha256": "6c05c2f2f7888cd1b9c74a605b2791a2581ece7cc053cd254616bcfe1dbd3219"
     },
     {
-      "bytes": 4084,
+      "bytes": 5735,
       "path": "A6_PRIMARY_INDEPENDENCE_AUDIT.json",
-      "sha256": "0171da80585e18bf937803f057c30857e5d9664c5b9ddbdd089e72bdcd274754"
+      "sha256": "93682d6ef9a23c1d22de35112308070b622ca5dd60f98ed795b56fb4fcc29b26"
     },
     {
-      "bytes": 1254,
+      "bytes": 1344,
       "path": "ACCEPTANCE_POLICY_A6.json",
-      "sha256": "e1a9e3dc9cfe8b034b6ec83653caa15f27eed58ba22905b4e4d7a2925426fa90"
+      "sha256": "fe3bd8823714ff1d2c9af390a0e4c41d61029b9f11c1e85f02e5eb6c80451146"
     },
     {
       "bytes": 825,
       "path": "ATOMIC_DOMAIN_COLUMN_CONDITIONED_OUTPUT_SPEC_A6.json",
-      "sha256": "8800d43a838a66a04326fca0b126c2561ca11024841c1c97e1c1e3c7538d1c7d"
+      "sha256": "6f69be7f5b86ed160d7d99a2cf7ee3b36625f2bfbbae69bb90f47d2d5a0e894a"
     },
     {
       "bytes": 2468,
       "path": "ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROMPT_SPEC_A6_ENGLISH.json",
-      "sha256": "00c653de496646bd8cde8574b388c92cdee66daccd242e22c51e9dbd0e33d132"
+      "sha256": "3e9b9fb4682e8fda696bf5bb1244e0d81e7c9fdacbd435a716638ebb4fcf4911"
     },
     {
       "bytes": 963,
       "path": "ATOMIC_DOMAIN_COLUMN_CONDITIONED_RUNTIME_SCHEMA_SPEC_A6.json",
-      "sha256": "9462eaadd208074d11317e6cb0670fb0ee76c04da0ddf283a01f6c35c0906987"
+      "sha256": "af1525cfae29e7f9ea986a02a2bdecb23bb26409783e77f1522daeed3f42862d"
     },
     {
       "bytes": 716,
       "path": "ATOMIC_DOMAIN_COLUMN_CONDITIONED_SERIALIZATION_FREEZE.json",
-      "sha256": "5ed673f0c9162657bdf95e957288b97de115a65ade40a075075a1d242a2a9f1e"
+      "sha256": "335705dd711a105e4e054d6574a1470337dba0f8279bce93f0138d1a691d10f9"
     },
     {
       "bytes": 1490,
       "path": "CANDIDATE_DOMAIN_RUNTIME_FREEZE_A6.json",
-      "sha256": "233bd5b09981dd2263170906a0d1af8fae4911480ac8d9e26e1f95568ca89781"
+      "sha256": "708a98ca08e441a27809b54159358919372526d6c1f78508759a229db43c6706"
     },
     {
       "bytes": 534,
       "path": "EVALUATOR_SEMANTICS_A6.json",
-      "sha256": "7af59527b1b32fe4f59b9fbb3fdbce8c0bf30ae0cc8c1f8cf33a976173a8c2c2"
+      "sha256": "cb7a7574221dc73774510896a1afff06436ac431c21c2125eaf56c8af601de92"
     },
     {
-      "bytes": 230246,
+      "bytes": 237952,
       "path": "FRESH_ENGLISH_A6_PRIMARY_FEASIBILITY_SET.jsonl",
-      "sha256": "0c005adaa8ce7e3010e244a48390712aae1e0f6c95d7090448ad63d8a2c4d4c5"
+      "sha256": "856e5b4c53b7277d67f390bd414c576a138babb3f2ed9601d4fa036d2643588d"
     },
     {
-      "bytes": 6773,
+      "bytes": 6750,
       "path": "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json",
-      "sha256": "c1485045eb4a5250eb60de9e2fd02fd88d4f618de1bf77f52a24efd22c4dd114"
+      "sha256": "e46905325a79816902b9ed389ffaa572b75e76086221826c0d654eedc75eed29"
     },
     {
       "bytes": 838,
       "path": "NO_PHASE_M_PRIMARY_PIPELINE_SPEC_A6.json",
-      "sha256": "2474d5ce4a951783db4bb9d146edd04152d644e053636a459da4f496acff6b85"
+      "sha256": "c3a641732a59c421304b157e58752f74d1cc846c9182ad4959bfcf55364592b8"
     },
     {
       "bytes": 600,
       "path": "OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A6.json",
-      "sha256": "0446af4390d18028280f7b41ca47301a0c6eeef3c6f603657e90e2ead83ebd07"
+      "sha256": "085ed3bd6aee82ab66856913eecd9b1552b403c2d5036eb229f1987f24628506"
     },
     {
       "bytes": 23953,
       "path": "ORACLE_A5_OBSERVED_DIAGNOSTIC_RESULTS.jsonl",
-      "sha256": "43c5b39ce388a71b260df22da2d5b93352f6eefaadfd35b7c6150fb737b51b5f"
+      "sha256": "754c30e93c812f88a6985c2477ed65997c664e007846998233a2bf993b874543"
     },
     {
-      "bytes": 23751,
+      "bytes": 23823,
+      "path": "ORACLE_A6_METHOD_STRESS_DIAGNOSTIC_RESULTS.jsonl",
+      "sha256": "c2f1c730fd13ad8d797d9a511a6a0117e72ae01d5b67b371b966f90c8ab6bcba"
+    },
+    {
+      "bytes": 24095,
       "path": "ORACLE_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl",
-      "sha256": "be2e5d22bc41fadbe835a2244c7da1a68b50a1478f325d76101f3386fdde398a"
+      "sha256": "d5b5fa34b7d770c6d729c55b22a597dfc53d83305258327424bcbb0804712744"
     },
     {
-      "bytes": 4661,
+      "bytes": 1317,
+      "path": "PRIOR_DESIGN_EVIDENCE_INDEPENDENCE_AUDIT_A6.json",
+      "sha256": "47b8bf28e07286e244774d67be706c335e8ee688ac7ef735bfa3852531c9704e"
+    },
+    {
+      "bytes": 6862,
       "path": "SOURCE_INPUT_MANIFEST.json",
-      "sha256": "5be3a6e689b0fef8a9ee21b9b01891b89f406aebe2ce5cb6ade2ed3c4264d53f"
+      "sha256": "10c4fa25904d38967648bba26eb450ee619f1605a13c46a5f0749da42fdcf0ee"
     },
     {
-      "bytes": 26901,
+      "bytes": 42501,
       "path": "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl",
-      "sha256": "08afb6fa8206b41561d586e79a60580c77141fde6c0d16ea3e5d4e7684f7a389"
+      "sha256": "e999b2c1af8f28792d1f75352f6a782f9490c4694dcbd2dd61669058ae8be316"
     },
     {
       "bytes": 479,
       "path": "TARGET_TABLE_BRANCHING_PROTOCOL_A6.json",
-      "sha256": "bacc0ee5745c7d549f6db74729acf1eb53e5597cf048314403ade1942858e6a9"
+      "sha256": "51ff75965c0be16ea3a8505f452ebbc01372f1907085ea6322d2705ae38b5d8e"
     }
   ],
-  "combined_scientific_artifacts_sha256": "42a4d969ec430f4fd5251f2caf9b2df863fcc1d091ccbe1450916d8190eff90d",
+  "combined_scientific_artifacts_sha256": "de16771219d57d6d9402e2f229610db5a7bb4ca9a950b3be611345ac2d3a8f1d",
   "identity_scope": "scientific_logical_artifacts_only",
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE"
 }

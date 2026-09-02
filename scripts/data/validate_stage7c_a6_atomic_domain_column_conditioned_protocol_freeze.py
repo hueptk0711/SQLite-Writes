@@ -29,6 +29,7 @@ from scripts.data.build_stage7c_a6_atomic_domain_column_conditioned_protocol_fre
     QWEN_TOKENIZER_REVISION,
     SCIENTIFIC_ARTIFACTS,
     STAGE_NAME,
+    STAGE7C_A5_ERRATUM_NAME,
     STAGE7B_SELECTED_VARIANT,
     build_stage,
     canonical_json,
@@ -308,6 +309,7 @@ def validate_manifests(stage_dir: Path, failures: list[str]) -> None:
     token_audit = read_json(stage_dir / "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json")
     acceptance = read_json(stage_dir / "ACCEPTANCE_POLICY_A6.json")
     independence = read_json(stage_dir / "A6_PRIMARY_INDEPENDENCE_AUDIT.json")
+    prior_independence = read_json(stage_dir / "PRIOR_DESIGN_EVIDENCE_INDEPENDENCE_AUDIT_A6.json")
     domain_audit = read_json(stage_dir / "A6_ORACLE_CANDIDATE_DOMAIN_AUDIT.json")
     runtime_freeze = read_json(stage_dir / "CANDIDATE_DOMAIN_RUNTIME_FREEZE_A6.json")
 
@@ -344,19 +346,30 @@ def validate_manifests(stage_dir: Path, failures: list[str]) -> None:
         failures.append("lock_mapping_equality_mismatch")
     if lock.get("primary_acceptance_precedes_diagnostics") is not True or lock.get("diagnostics_can_compensate_primary_failure") is not False:
         failures.append("lock_primary_diagnostic_order_mismatch")
+    if "before_stage7e0_a5" in acceptance or "before_stage7e0_a6" not in acceptance:
+        failures.append("acceptance_stage7e0_a6_label_mismatch")
     if token_audit.get("tokenizer_status") != "PASS":
         failures.append("tokenizer_status_not_pass")
     if token_audit.get("rendered_prompt_token_stats") is None:
         failures.append("token_stats_missing")
     if token_audit.get("chat_template_hash_matches_required") is not True:
         failures.append("chat_template_hash_mismatch")
-    if independence.get("status") != "PASS" or independence.get("exact_literal_overlap_case_count") != 0:
+    if independence.get("status") != "PASS" or independence.get("exact_prior_design_literal_reuse_case_count") != 0:
         failures.append("primary_independence_audit_not_pass")
+    if prior_independence.get("status") != "PASS" or prior_independence.get("exact_synthetic_fixture_reuse_case_count") != 0:
+        failures.append("primary_independence_audit_not_pass")
+    if lock.get("source_stage7c_a5_erratum_status") is None:
+        failures.append("lock_missing_a5_erratum_lineage")
 
     for item in source_manifest.get("source_files", []):
         path = PROJECT_ROOT / item["path"]
         if path.is_file() and sha256_file(path) != item["sha256"]:
             failures.append(f"source_manifest_hash_mismatch:{item['path']}")
+    source_paths = {item["path"] for item in source_manifest.get("source_files", [])}
+    if f"{STAGE7C_A5_ERRATUM_NAME}/ERRATUM_LOCK.json" not in source_paths:
+        failures.append("source_manifest_missing_a5_erratum_lock")
+    if f"{STAGE7C_A5_ERRATUM_NAME}/CORRECTED_FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl" not in source_paths:
+        failures.append("source_manifest_missing_corrected_a5_primary")
     artifacts = derived_manifest.get("artifacts", [])
     if derived_manifest.get("artifact_count") != len(SCIENTIFIC_ARTIFACTS):
         failures.append("derived_artifact_count_mismatch")
@@ -370,7 +383,7 @@ def validate_manifests(stage_dir: Path, failures: list[str]) -> None:
             failures.append(f"derived_artifact_hash_mismatch:{item['path']}")
 
     sqlite_artifacts = package_integrity.get("sqlite_binary_artifacts", [])
-    if package_integrity.get("sqlite_binary_artifact_count") != 24 or len(sqlite_artifacts) != 24:
+    if package_integrity.get("sqlite_binary_artifact_count") != 36 or len(sqlite_artifacts) != 36:
         failures.append("sqlite_binary_artifact_count_mismatch")
     for item in sqlite_artifacts:
         path = stage_dir / item["path"]
@@ -404,6 +417,15 @@ def validate(stage_dir: Path, *, rebuild: bool = False, tokenizer_name_or_path: 
         diagnostic=True,
         require_coverage_tags=False,
     )
+    method_stress_case_count, method_stress_assigned_count, method_stress_omit_count, method_stress_multi_table_count = validate_rows(
+        stage_dir,
+        failures,
+        rows_name="A6_METHOD_STRESS_REGRESSION_DIAGNOSTICS_A6.jsonl",
+        oracle_name="ORACLE_A6_METHOD_STRESS_DIAGNOSTIC_RESULTS.jsonl",
+        expected_prefix="stage7c_a6_method_stress_english_",
+        diagnostic=True,
+        require_coverage_tags=False,
+    )
     validate_manifests(stage_dir, failures)
 
     if rebuild:
@@ -419,6 +441,7 @@ def validate(stage_dir: Path, *, rebuild: bool = False, tokenizer_name_or_path: 
                 "omit_column_decision_count": omit_count,
                 "multi_table_oneof_case_count": multi_table_count,
                 "a4_derived_regression_diagnostic_count": diagnostic_case_count,
+                "a6_method_stress_regression_diagnostic_count": method_stress_case_count,
             }
         rebuild_parent = stage_dir.parent / f"{stage_dir.name}__semantic_rebuild_tmp"
         if rebuild_parent.exists():
@@ -443,6 +466,15 @@ def validate(stage_dir: Path, *, rebuild: bool = False, tokenizer_name_or_path: 
                 diagnostic=True,
                 require_coverage_tags=False,
             )
+            rebuilt_method_stress_counts = validate_rows(
+                rebuild_parent,
+                rebuilt_failures,
+                rows_name="A6_METHOD_STRESS_REGRESSION_DIAGNOSTICS_A6.jsonl",
+                oracle_name="ORACLE_A6_METHOD_STRESS_DIAGNOSTIC_RESULTS.jsonl",
+                expected_prefix="stage7c_a6_method_stress_english_",
+                diagnostic=True,
+                require_coverage_tags=False,
+            )
             validate_manifests(rebuild_parent, rebuilt_failures)
             if rebuilt_failures:
                 failures.append(f"semantic_rebuild_failed:{rebuilt_failures}")
@@ -450,6 +482,8 @@ def validate(stage_dir: Path, *, rebuild: bool = False, tokenizer_name_or_path: 
                 failures.append("semantic_rebuild_counts_mismatch")
             if rebuilt_diagnostic_counts != (diagnostic_case_count, diagnostic_assigned_count, diagnostic_omit_count, diagnostic_multi_table_count):
                 failures.append("semantic_rebuild_diagnostic_counts_mismatch")
+            if rebuilt_method_stress_counts != (method_stress_case_count, method_stress_assigned_count, method_stress_omit_count, method_stress_multi_table_count):
+                failures.append("semantic_rebuild_method_stress_counts_mismatch")
         finally:
             shutil.rmtree(rebuild_parent, ignore_errors=True)
 
@@ -465,6 +499,10 @@ def validate(stage_dir: Path, *, rebuild: bool = False, tokenizer_name_or_path: 
         "diagnostic_assigned_column_decision_count": diagnostic_assigned_count,
         "diagnostic_omit_column_decision_count": diagnostic_omit_count,
         "diagnostic_multi_table_oneof_case_count": diagnostic_multi_table_count,
+        "a6_method_stress_regression_diagnostic_count": method_stress_case_count,
+        "method_stress_assigned_column_decision_count": method_stress_assigned_count,
+        "method_stress_omit_column_decision_count": method_stress_omit_count,
+        "method_stress_multi_table_oneof_case_count": method_stress_multi_table_count,
     }
 
 
