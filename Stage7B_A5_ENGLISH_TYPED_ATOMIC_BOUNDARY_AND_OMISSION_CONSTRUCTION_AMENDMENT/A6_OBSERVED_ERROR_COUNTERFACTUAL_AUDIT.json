@@ -1,0 +1,290 @@
+{
+  "audit_type": "development_diagnostic_not_independent_evaluation",
+  "case_exact_pass_count": "2/12",
+  "decision_rows": [
+    {
+      "column_name": "interest_pct",
+      "column_ref": "COL_4",
+      "error_family": "typed_complete_literal_numeric_child",
+      "expected_span_ref": "SPAN_0029",
+      "expected_text": "6.8%",
+      "predicted_span_ref": "SPAN_0028",
+      "predicted_text": "6.8",
+      "sample_id": "stage7c_a6_primary_english_001",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": {
+        "complete_literal_span_ref": "SPAN_0029",
+        "complete_literal_text": "6.8%",
+        "numeric_child_text": "6.8",
+        "rule": "TYPED_COMPLETE_LITERAL_DOMINATES_NUMERIC_CHILD"
+      },
+      "stage7b_a5_wrong_decision_suppressed": true
+    },
+    {
+      "column_name": "battery_pct",
+      "column_ref": "COL_3",
+      "error_family": "typed_complete_literal_numeric_child",
+      "expected_span_ref": "SPAN_0027",
+      "expected_text": "82%",
+      "predicted_span_ref": "SPAN_0026",
+      "predicted_text": "82",
+      "sample_id": "stage7c_a6_primary_english_002",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": {
+        "complete_literal_span_ref": "SPAN_0027",
+        "complete_literal_text": "82%",
+        "numeric_child_text": "82",
+        "rule": "TYPED_COMPLETE_LITERAL_DOMINATES_NUMERIC_CHILD"
+      },
+      "stage7b_a5_wrong_decision_suppressed": true
+    },
+    {
+      "column_name": "short_label",
+      "column_ref": "COL_3",
+      "error_family": "quote_punctuation_boundary_quality",
+      "expected_span_ref": "SPAN_0026",
+      "expected_text": "North",
+      "predicted_span_ref": "SPAN_0022",
+      "predicted_text": "short_label \"North",
+      "sample_id": "stage7c_a6_primary_english_003",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": {
+        "rule": "BOUNDARY_UNBALANCED_DOUBLE_QUOTE"
+      },
+      "stage7b_a5_wrong_decision_suppressed": true
+    },
+    {
+      "column_name": "captured_on",
+      "column_ref": "COL_4",
+      "error_family": "quote_punctuation_boundary_quality",
+      "expected_span_ref": "SPAN_0032",
+      "expected_text": "2026-11-05",
+      "predicted_span_ref": "SPAN_0027",
+      "predicted_text": "North\", captured_on",
+      "sample_id": "stage7c_a6_primary_english_003",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": {
+        "rule": "BOUNDARY_UNBALANCED_DOUBLE_QUOTE"
+      },
+      "stage7b_a5_wrong_decision_suppressed": true
+    },
+    {
+      "column_name": "altitude_m",
+      "column_ref": "COL_5",
+      "error_family": "quote_punctuation_boundary_quality",
+      "expected_span_ref": "SPAN_0040",
+      "expected_text": "120",
+      "predicted_span_ref": "SPAN_0039",
+      "predicted_text": "altitude_m 120.",
+      "sample_id": "stage7c_a6_primary_english_003",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": {
+        "partial_value_span_ref": "SPAN_0041",
+        "partial_value_text": "120.",
+        "rule": "BOUNDARY_SCHEMA_LABEL_PREFIX_PARTIAL_VALUE",
+        "schema_alias_residual": "altitude m"
+      },
+      "stage7b_a5_wrong_decision_suppressed": true
+    },
+    {
+      "column_name": "operator_note",
+      "column_ref": "COL_6",
+      "error_family": "omission_construction_candidate_leak",
+      "expected_span_ref": "OMIT",
+      "expected_text": null,
+      "predicted_span_ref": "SPAN_0049",
+      "predicted_text": "absent.",
+      "sample_id": "stage7c_a6_primary_english_003",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": {
+        "construction_text": "Operator note absent",
+        "cue_phrase": "absent",
+        "rule": "FULL_OMISSION_CONSTRUCTION_REGION",
+        "schema_alias_source_labels": [
+          "operator note"
+        ],
+        "schema_label": "operator note"
+      },
+      "stage7b_a5_wrong_decision_suppressed": true
+    },
+    {
+      "column_name": "docket_stage",
+      "column_ref": "COL_3",
+      "error_family": "quote_punctuation_boundary_quality",
+      "expected_span_ref": "SPAN_0028",
+      "expected_text": "second review",
+      "predicted_span_ref": "SPAN_0026",
+      "predicted_text": "docket_stage second",
+      "sample_id": "stage7c_a6_primary_english_004",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": {
+        "partial_value_span_ref": "SPAN_0027",
+        "partial_value_text": "second",
+        "rule": "BOUNDARY_SCHEMA_LABEL_PREFIX_PARTIAL_VALUE",
+        "schema_alias_residual": "docket stage"
+      },
+      "stage7b_a5_wrong_decision_suppressed": true
+    },
+    {
+      "column_name": "salinity_pct",
+      "column_ref": "COL_4",
+      "error_family": "quote_punctuation_boundary_quality",
+      "expected_span_ref": "SPAN_0031",
+      "expected_text": "3.5%",
+      "predicted_span_ref": "SPAN_0029",
+      "predicted_text": "salinity_pct 3.5%.",
+      "sample_id": "stage7c_a6_primary_english_005",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": {
+        "partial_value_span_ref": "SPAN_0032",
+        "partial_value_text": "3.5%.",
+        "rule": "BOUNDARY_SCHEMA_LABEL_PREFIX_PARTIAL_VALUE",
+        "schema_alias_residual": "salinity pct"
+      },
+      "stage7b_a5_wrong_decision_suppressed": true
+    },
+    {
+      "column_name": "mordant_pct",
+      "column_ref": "COL_3",
+      "error_family": "typed_complete_literal_numeric_child",
+      "expected_span_ref": "SPAN_0027",
+      "expected_text": "12%",
+      "predicted_span_ref": "SPAN_0026",
+      "predicted_text": "12",
+      "sample_id": "stage7c_a6_primary_english_007",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": {
+        "complete_literal_span_ref": "SPAN_0027",
+        "complete_literal_text": "12%",
+        "numeric_child_text": "12",
+        "rule": "TYPED_COMPLETE_LITERAL_DOMINATES_NUMERIC_CHILD"
+      },
+      "stage7b_a5_wrong_decision_suppressed": true
+    },
+    {
+      "column_name": "rinse_note",
+      "column_ref": "COL_5",
+      "error_family": "omission_construction_candidate_leak",
+      "expected_span_ref": "OMIT",
+      "expected_text": null,
+      "predicted_span_ref": "SPAN_0042",
+      "predicted_text": "blank.",
+      "sample_id": "stage7c_a6_primary_english_007",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": {
+        "construction_text": "Rinse note blank",
+        "cue_phrase": "blank",
+        "rule": "FULL_OMISSION_CONSTRUCTION_REGION",
+        "schema_alias_source_labels": [
+          "rinse note"
+        ],
+        "schema_label": "rinse note"
+      },
+      "stage7b_a5_wrong_decision_suppressed": true
+    },
+    {
+      "column_name": "field_memo",
+      "column_ref": "COL_6",
+      "error_family": "omission_construction_candidate_leak",
+      "expected_span_ref": "OMIT",
+      "expected_text": null,
+      "predicted_span_ref": "SPAN_0051",
+      "predicted_text": "memo absent.",
+      "sample_id": "stage7c_a6_primary_english_008",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": {
+        "construction_text": "Field memo absent",
+        "cue_phrase": "absent",
+        "rule": "FULL_OMISSION_CONSTRUCTION_REGION",
+        "schema_alias_source_labels": [
+          "field memo"
+        ],
+        "schema_label": "field memo"
+      },
+      "stage7b_a5_wrong_decision_suppressed": true
+    },
+    {
+      "column_name": "scanner_name",
+      "column_ref": "COL_3",
+      "error_family": "quote_punctuation_boundary_quality",
+      "expected_span_ref": "SPAN_0032",
+      "expected_text": "flatbed nine",
+      "predicted_span_ref": "SPAN_0028",
+      "predicted_text": "scanner \"flatbed",
+      "sample_id": "stage7c_a6_primary_english_009",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": {
+        "rule": "BOUNDARY_UNBALANCED_DOUBLE_QUOTE"
+      },
+      "stage7b_a5_wrong_decision_suppressed": true
+    },
+    {
+      "column_name": "conservation_memo",
+      "column_ref": "COL_6",
+      "error_family": "omission_construction_candidate_leak",
+      "expected_span_ref": "OMIT",
+      "expected_text": null,
+      "predicted_span_ref": "SPAN_0055",
+      "predicted_text": "memo omitted.",
+      "sample_id": "stage7c_a6_primary_english_009",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": {
+        "construction_text": "Conservation memo omitted",
+        "cue_phrase": "omitted",
+        "rule": "FULL_OMISSION_CONSTRUCTION_REGION",
+        "schema_alias_source_labels": [
+          "conservation memo"
+        ],
+        "schema_label": "conservation memo"
+      },
+      "stage7b_a5_wrong_decision_suppressed": true
+    },
+    {
+      "column_name": "hydration_pct",
+      "column_ref": "COL_3",
+      "error_family": "typed_complete_literal_numeric_child",
+      "expected_span_ref": "SPAN_0027",
+      "expected_text": "68%",
+      "predicted_span_ref": "SPAN_0026",
+      "predicted_text": "68",
+      "sample_id": "stage7c_a6_primary_english_011",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": {
+        "complete_literal_span_ref": "SPAN_0027",
+        "complete_literal_text": "68%",
+        "numeric_child_text": "68",
+        "rule": "TYPED_COMPLETE_LITERAL_DOMINATES_NUMERIC_CHILD"
+      },
+      "stage7b_a5_wrong_decision_suppressed": true
+    },
+    {
+      "column_name": "checkout_id",
+      "column_ref": "COL_1",
+      "error_family": "false_omit_required_value",
+      "expected_span_ref": "SPAN_0009",
+      "expected_text": "PROP-618",
+      "predicted_span_ref": "OMIT",
+      "predicted_text": null,
+      "sample_id": "stage7c_a6_primary_english_012",
+      "stage7b_a5_correct_gold_suppressed": false,
+      "stage7b_a5_suppression_reason": null,
+      "stage7b_a5_wrong_decision_suppressed": false
+    }
+  ],
+  "error_family_counts": {
+    "false_omit_required_value": 1,
+    "omission_construction_candidate_leak": 4,
+    "quote_punctuation_boundary_quality": 6,
+    "typed_complete_literal_numeric_child": 4
+  },
+  "gpu_called": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "source_primary_result": "2/12 valid feasibility failure, closed",
+  "source_stage": "Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT",
+  "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT",
+  "stage7b_a5_correct_gold_suppressed": 0,
+  "stage7b_a5_wrong_decisions_suppressed": 14,
+  "status": "PASS",
+  "wrong_decision_count": 15
+}

@@ -1,0 +1,193 @@
+{
+  "failures": [],
+  "fixture_count": 4,
+  "fixtures": [
+    {
+      "fixture": "percent_complete_literal",
+      "reasons": {
+        "SPAN_0004": {
+          "partial_value_span_ref": "SPAN_0006",
+          "partial_value_text": "68",
+          "rule": "BOUNDARY_SCHEMA_LABEL_PREFIX_PARTIAL_VALUE",
+          "schema_alias_residual": "hydration pct"
+        },
+        "SPAN_0005": {
+          "partial_value_span_ref": "SPAN_0007",
+          "partial_value_text": "68%",
+          "rule": "BOUNDARY_SCHEMA_LABEL_PREFIX_PARTIAL_VALUE",
+          "schema_alias_residual": "hydration pct"
+        },
+        "SPAN_0006": {
+          "complete_literal_span_ref": "SPAN_0007",
+          "complete_literal_text": "68%",
+          "numeric_child_text": "68",
+          "rule": "TYPED_COMPLETE_LITERAL_DOMINATES_NUMERIC_CHILD"
+        },
+        "SPAN_0012": {
+          "partial_value_span_ref": "SPAN_0014",
+          "partial_value_text": "42",
+          "rule": "BOUNDARY_SCHEMA_LABEL_PREFIX_PARTIAL_VALUE",
+          "schema_alias_residual": "proof minutes"
+        },
+        "SPAN_0015": {
+          "rule": "BOUNDARY_TRAILING_PUNCTUATION_HAS_STRIPPED_CANDIDATE",
+          "stripped_span_ref": "SPAN_0014"
+        }
+      },
+      "suppressed_texts": [
+        "42.",
+        "68",
+        "hydration_pct 68",
+        "hydration_pct 68%",
+        "proof_minutes 42"
+      ]
+    },
+    {
+      "fixture": "omission_region",
+      "reasons": {
+        "SPAN_0007": {
+          "construction_text": "Field memo absent",
+          "cue_phrase": "absent",
+          "rule": "FULL_OMISSION_CONSTRUCTION_REGION",
+          "schema_alias_source_labels": [
+            "field memo"
+          ],
+          "schema_label": "field memo"
+        },
+        "SPAN_0008": {
+          "construction_text": "Field memo absent",
+          "cue_phrase": "absent",
+          "rule": "FULL_OMISSION_CONSTRUCTION_REGION",
+          "schema_alias_source_labels": [
+            "field memo"
+          ],
+          "schema_label": "field memo"
+        },
+        "SPAN_0009": {
+          "construction_text": "Field memo absent",
+          "cue_phrase": "absent",
+          "rule": "FULL_OMISSION_CONSTRUCTION_REGION",
+          "schema_alias_source_labels": [
+            "field memo"
+          ],
+          "schema_label": "field memo"
+        },
+        "SPAN_0010": {
+          "construction_text": "Field memo absent",
+          "cue_phrase": "absent",
+          "rule": "FULL_OMISSION_CONSTRUCTION_REGION",
+          "schema_alias_source_labels": [
+            "field memo"
+          ],
+          "schema_label": "field memo"
+        },
+        "SPAN_0011": {
+          "construction_text": "Field memo absent",
+          "cue_phrase": "absent",
+          "rule": "FULL_OMISSION_CONSTRUCTION_REGION",
+          "schema_alias_source_labels": [
+            "field memo"
+          ],
+          "schema_label": "field memo"
+        },
+        "SPAN_0012": {
+          "construction_text": "Field memo absent",
+          "cue_phrase": "absent",
+          "rule": "FULL_OMISSION_CONSTRUCTION_REGION",
+          "schema_alias_source_labels": [
+            "field memo"
+          ],
+          "schema_label": "field memo"
+        },
+        "SPAN_0013": {
+          "construction_text": "Field memo absent",
+          "cue_phrase": "absent",
+          "rule": "FULL_OMISSION_CONSTRUCTION_REGION",
+          "schema_alias_source_labels": [
+            "field memo"
+          ],
+          "schema_label": "field memo"
+        },
+        "SPAN_0016": {
+          "rule": "BOUNDARY_UNBALANCED_DOUBLE_QUOTE"
+        }
+      },
+      "suppressed_texts": [
+        "Field",
+        "Field memo",
+        "Status \"Absent",
+        "absent",
+        "absent.",
+        "memo",
+        "memo absent",
+        "memo absent."
+      ]
+    },
+    {
+      "fixture": "unbalanced_quote_boundary",
+      "reasons": {
+        "SPAN_0004": {
+          "rule": "BOUNDARY_UNBALANCED_DOUBLE_QUOTE"
+        },
+        "SPAN_0005": {
+          "rule": "BOUNDARY_UNBALANCED_DOUBLE_QUOTE"
+        },
+        "SPAN_0010": {
+          "rule": "BOUNDARY_UNBALANCED_DOUBLE_QUOTE"
+        },
+        "SPAN_0011": {
+          "rule": "BOUNDARY_UNBALANCED_DOUBLE_QUOTE"
+        },
+        "SPAN_0015": {
+          "partial_value_span_ref": "SPAN_0017",
+          "partial_value_text": "JOB-9",
+          "rule": "BOUNDARY_SCHEMA_LABEL_PREFIX_PARTIAL_VALUE",
+          "schema_alias_residual": "job id"
+        },
+        "SPAN_0018": {
+          "rule": "BOUNDARY_TRAILING_PUNCTUATION_HAS_STRIPPED_CANDIDATE",
+          "stripped_span_ref": "SPAN_0017"
+        }
+      },
+      "suppressed_texts": [
+        "\"flatbed",
+        "JOB-9.",
+        "job_id JOB-9",
+        "nine\"",
+        "nine\" and",
+        "scanner \"flatbed"
+      ]
+    },
+    {
+      "fixture": "label_prefix_partial_value",
+      "reasons": {
+        "SPAN_0004": {
+          "partial_value_span_ref": "SPAN_0005",
+          "partial_value_text": "second",
+          "rule": "BOUNDARY_SCHEMA_LABEL_PREFIX_PARTIAL_VALUE",
+          "schema_alias_residual": "docket stage"
+        },
+        "SPAN_0012": {
+          "partial_value_span_ref": "SPAN_0014",
+          "partial_value_text": "INT-7",
+          "rule": "BOUNDARY_SCHEMA_LABEL_PREFIX_PARTIAL_VALUE",
+          "schema_alias_residual": "intake id"
+        },
+        "SPAN_0015": {
+          "rule": "BOUNDARY_TRAILING_PUNCTUATION_HAS_STRIPPED_CANDIDATE",
+          "stripped_span_ref": "SPAN_0014"
+        }
+      },
+      "suppressed_texts": [
+        "INT-7.",
+        "docket_stage second",
+        "intake_id INT-7"
+      ]
+    }
+  ],
+  "gpu_called": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT",
+  "status": "PASS"
+}

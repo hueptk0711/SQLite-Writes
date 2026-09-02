@@ -1,0 +1,13 @@
+{
+  "gold_blind": true,
+  "gpu_called": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "rules": [
+    "unbalanced double quote",
+    "trailing punctuation when stripped candidate exists",
+    "candidate crossing a comma field separator into a schema label",
+    "schema-label prefix plus partial value when a longer value candidate exists"
+  ],
+  "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT"
+}

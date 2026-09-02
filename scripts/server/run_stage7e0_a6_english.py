@@ -622,6 +622,29 @@ def parse_phase_o_column_conditioned_output(raw: str, schema: dict[str, Any]) ->
     return {"operation": "INSERT", "table_ref": branch["table_ref"], "column_span_refs": ordered}
 
 
+def required_column_omissions(row: dict[str, Any], phase_o: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return NOT NULL/no-default selected-table columns that the model omitted."""
+
+    selected_table_ref = phase_o["table_ref"]
+    columns = [
+        column
+        for column in row["model_side_input"]["schema_inventory"]["columns"]
+        if column["table_ref"] == selected_table_ref
+    ]
+    return [
+        {
+            "column_ref": column["column_ref"],
+            "column_name": column["column_name"],
+            "table_ref": column["table_ref"],
+            "table_name": column["table_name"],
+        }
+        for column in columns
+        if phase_o["column_span_refs"].get(column["column_ref"]) == "OMIT"
+        and column.get("nullable") is False
+        and column.get("has_default") is False
+    ]
+
+
 def _failed_row(row: dict[str, Any], stage: str, error: str | None, phase_o_hash: str) -> dict[str, Any]:
     return {"sample_id": row["sample_id"], "status": "FAIL", "failure_stage": stage, "error": error, "checks": {}, "phase_o_messages_sha256": phase_o_hash}
 
@@ -635,6 +658,9 @@ def evaluate_case(row: dict[str, Any], generator: OneCallGenerator, *, phase_o_m
         return _failed_row(row, "phase_o_generation", phase_o_call.error, phase_o_prompt_hash), raw_o
     try:
         phase_o = parse_phase_o_column_conditioned_output(phase_o_call.raw_output, row["runtime_constraints"]["phase_o_schema"])
+        omitted_required = required_column_omissions(row, phase_o)
+        if omitted_required:
+            raise V2A1Error("required_column_omitted", "OMIT is forbidden for NOT NULL columns without defaults", details={"omitted_required_columns": omitted_required})
         predicted = json.loads(canonical_json(row))
         predicted["label_side_expected"]["phase_o"] = phase_o
         db_path = PROJECT_ROOT / STAGE7C_A6_DIR / row["synthetic_db_spec"]["sqlite_db_path"]

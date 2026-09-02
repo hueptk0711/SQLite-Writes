@@ -1,0 +1,18 @@
+{
+  "a6_failures_used_as": "development_diagnostic_not_independent_evaluation",
+  "diagnostics_run": false,
+  "evidence_integrity_status": "PASS",
+  "gpu_called": false,
+  "gretel_pilot_opened": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "primary_pass_count": "2/12",
+  "protocol_compliance_status": "PASS",
+  "required_pass_count": "12/12",
+  "scientific_result_eligible": true,
+  "source_lock_status": "REAL_CONSTRAINED_PRIMARY_FAIL_DO_NOT_OPEN_GRETEL",
+  "source_stage": "Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT",
+  "source_status": "VALID_FEASIBILITY_FAIL_CLOSED",
+  "source_tar_sha256": "328a3840cb9c349969029479cc5e0ea0baf4499b50bf2c74927d3e9c394af459",
+  "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT"
+}

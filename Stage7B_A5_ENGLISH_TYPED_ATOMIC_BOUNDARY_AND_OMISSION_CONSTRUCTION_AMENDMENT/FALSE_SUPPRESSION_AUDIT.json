@@ -1,0 +1,13 @@
+{
+  "additional_assignment_losses": 0,
+  "additional_full_sample_losses": 0,
+  "baseline_domain": "stage7b_a4_patch2_baseline_domain",
+  "candidate_domain_under_review": "stage7b_a5_typed_boundary_omission_domain_audit",
+  "false_suppression_examples": [],
+  "gpu_called": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT",
+  "status": "PASS",
+  "strict_gate": "additional gold assignment loss = 0 and additional full-sample loss = 0"
+}

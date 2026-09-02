@@ -35,6 +35,7 @@ from scripts.server.run_stage7e0_a6_english import (
     evaluate_case,
     load_stage7c_a6_rows,
     parse_phase_o_column_conditioned_output,
+    required_column_omissions,
     run_stage7e0,
     validate_runtime_versions,
     verify_accepted_protocol_commit_argument,
@@ -186,6 +187,27 @@ def test_wrong_span_mapping_fails_acceptance_gate() -> None:
     assert result["status"] == "FAIL"
     assert result["failure_stage"] == "acceptance_gate"
     assert result["checks"]["column_span_refs_mapping_exact"] is False
+
+
+def test_required_column_omit_rejected_before_preflight_execution() -> None:
+    row = load_stage7c_a6_rows(ROOT)[-1]
+    phase_o = json.loads(canonical_json(row["label_side_expected"]["phase_o"]))
+    phase_o["column_span_refs"]["COL_1"] = "OMIT"
+
+    omissions = required_column_omissions(row, phase_o)
+    assert omissions == [
+        {
+            "column_ref": "COL_1",
+            "column_name": "checkout_id",
+            "table_ref": "TAB_1",
+            "table_name": "theater_prop_checkouts",
+        }
+    ]
+
+    result, _raw = evaluate_case(row, OverrideGenerator([row], phase_o_override=phase_o), phase_o_max_new_tokens=512)
+    assert result["status"] == "FAIL"
+    assert result["failure_stage"] == "required_column_omitted"
+    assert "NOT NULL constraint failed" not in str(result["error"])
 
 
 def test_runtime_lock_accepts_uet_rtx4090_profile() -> None:

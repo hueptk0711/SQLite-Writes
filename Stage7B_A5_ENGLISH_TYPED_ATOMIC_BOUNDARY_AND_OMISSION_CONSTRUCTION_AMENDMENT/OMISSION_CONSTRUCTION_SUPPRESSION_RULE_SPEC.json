@@ -1,0 +1,18 @@
+{
+  "cue_phrases": [
+    "omitted",
+    "missing",
+    "not provided",
+    "not supplied",
+    "blank",
+    "absent",
+    "left empty"
+  ],
+  "gold_blind": true,
+  "gpu_called": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "purpose": "Suppress every normal candidate span inside deterministic schema-label omission constructions; keep the special OMIT decision.",
+  "rule_name": "full_omission_construction_region_suppression",
+  "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT"
+}

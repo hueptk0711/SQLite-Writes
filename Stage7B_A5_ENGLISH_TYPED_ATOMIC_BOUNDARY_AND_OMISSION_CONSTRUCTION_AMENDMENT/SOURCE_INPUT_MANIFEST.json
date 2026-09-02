@@ -1,0 +1,78 @@
+{
+  "git_branch": "stage6/crudsql-eligibility-audit",
+  "git_commit": "d8538542300a219f3466d0e183c169d154a716d5",
+  "gpu_called": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "raw_dir": "D:\\paper kltn\\text to sql\\external_sources\\gretel_synthetic_text_to_sql_740ab236",
+  "raw_train_parquet_present": true,
+  "raw_train_parquet_sha256": "2bee9ac07cf5057d36b5ea30fb47d948697e882f42bd1cc661185396287c0180",
+  "source_files": [
+    {
+      "bytes": 44637,
+      "path": "scripts/data/build_stage7b_a5_typed_atomic_boundary_omission.py",
+      "sha256": "9e7e144887636512aa9f039473388fe54c8f0268d807cf5bc8af6bbd66525f37"
+    },
+    {
+      "bytes": 12693,
+      "path": "scripts/data/validate_stage7b_a5_typed_atomic_boundary_omission.py",
+      "sha256": "c8ae65fc2087d29770d6675ba92d9ec9deeca503c9a0d32c804da3ba5fde6668"
+    },
+    {
+      "bytes": 83730,
+      "path": "scripts/data/build_stage7b_a4_atomic_candidate_domain_omission_cue.py",
+      "sha256": "4785e35039a118bf72c70d493cd9e706d14ff6281969430d6c81aecc98ab6f48"
+    },
+    {
+      "bytes": 43875,
+      "path": "scripts/data/build_stage7b_a2_candidate_span_reference.py",
+      "sha256": "769bb0733a2dcc451cc60d48c049b32fa5e586836858678b11b226d3db7a0f42"
+    },
+    {
+      "bytes": 55779,
+      "path": "scripts/data/build_stage7b_a3_column_conditioned_candidate_selection.py",
+      "sha256": "df4f8bb26f83ac13f34895c1b4f509c9c0074cf27bc96fd9e0b89d5faea12d73"
+    },
+    {
+      "bytes": 70963,
+      "path": "scripts/data/build_stageeng0_gretel_qualification.py",
+      "sha256": "16f99e789a01040213fc1be7be8cb153c9db39aefee02eae3700ec3d1aefd377"
+    },
+    {
+      "bytes": 41946,
+      "path": "scripts/server/run_stage7e0_a6_english.py",
+      "sha256": "b1c4b1a4e4818661ff1f958edd70b950754a1b3d271309e5772bc46b6c5e0242"
+    },
+    {
+      "bytes": 19802,
+      "path": "scripts/data/validate_stage7e0_a6_server_results.py",
+      "sha256": "0b417bf6a27c277129ae7e393549d34191b0b181b7fe1334b472240e86119b70"
+    },
+    {
+      "bytes": 6518,
+      "path": "tests/test_stage7b_a5_typed_atomic_boundary_omission.py",
+      "sha256": "5d8b5b28e7ae9350b0c1150250c5de085a5645bc1a8f7a42bb940710bd8de1f0"
+    },
+    {
+      "bytes": 31721,
+      "path": "tests/test_stage7e0_a6_english_preflight.py",
+      "sha256": "bd751095743686cca96a944566fefb6a1ba49a6bea1462e3d72e56c251e11d05"
+    },
+    {
+      "bytes": 3321,
+      "path": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE/STAGE7C_A6_LOCK.json",
+      "sha256": "82ed8abbe4353c97ad9a0e87f944bc70e20610e094a99ceb8d3342c3e34b5a53"
+    },
+    {
+      "bytes": 901,
+      "path": "Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT/STAGE7E0_A6_SERVER_RESULT_LOCK.json",
+      "sha256": "55642f09be11efb04f393644efbe30e4c510354c679f5c5b3663071f4a36f0be"
+    },
+    {
+      "bytes": 2020,
+      "path": "Stage7E0_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT/SERVER_RESULT_IMPORT_REPORT.json",
+      "sha256": "1bbb113f40b60df2764029ff7540fbb177cef9fe522bdade2d4f85ba443bba11"
+    }
+  ],
+  "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT"
+}

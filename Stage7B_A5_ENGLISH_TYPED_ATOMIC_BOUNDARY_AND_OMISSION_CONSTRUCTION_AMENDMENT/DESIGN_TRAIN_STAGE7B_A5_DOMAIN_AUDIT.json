@@ -1,0 +1,38 @@
+{
+  "assignment_count": 2256,
+  "assignment_representability": 0.99822695035461,
+  "broader_containing_gold_count_stats": {
+    "max": 7,
+    "mean": 1.8466312056737588,
+    "median": 1.0,
+    "min": 0,
+    "p95": 5
+  },
+  "broader_containing_gold_total": 4166,
+  "candidate_count_stats": {
+    "max": 87,
+    "mean": 40.37362637362637,
+    "median": 40.0,
+    "min": 9,
+    "p95": 60
+  },
+  "covered_assignment_count": 2252,
+  "design_sample_count": 728,
+  "domain": "stage7b_a5_typed_boundary_omission_domain_audit",
+  "full_sample_covered_count": 724,
+  "full_sample_representability": 0.9945054945054945,
+  "gpu_called": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT",
+  "status": "PASS",
+  "suppressed_candidate_total": 3957,
+  "suppression_rule_counts": {
+    "BOUNDARY_CROSSES_FIELD_SEPARATOR": 445,
+    "BOUNDARY_SCHEMA_LABEL_PREFIX_PARTIAL_VALUE": 969,
+    "BOUNDARY_TRAILING_PUNCTUATION_HAS_STRIPPED_CANDIDATE": 417,
+    "BOUNDARY_UNBALANCED_DOUBLE_QUOTE": 780,
+    "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 180,
+    "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 1166
+  }
+}

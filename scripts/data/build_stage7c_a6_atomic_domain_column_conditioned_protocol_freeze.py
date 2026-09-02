@@ -1635,6 +1635,18 @@ def gold_column_span_refs(case: dict[str, Any], inventory: list[Any]) -> tuple[d
 
 def deterministic_ir_from_column_spans(row: dict[str, Any]) -> tuple[dict[str, Any], tuple[Any, ...], list[dict[str, Any]]]:
     column_decisions = row["label_side_expected"]["phase_o"]["column_span_refs"]
+    selected_table_ref_value = row["label_side_expected"]["phase_o"]["table_ref"]
+    omitted_required = [
+        column
+        for column in row["model_side_input"]["schema_inventory"]["columns"]
+        if column["table_ref"] == selected_table_ref_value
+        and column_decisions.get(column["column_ref"]) == "OMIT"
+        and column.get("nullable") is False
+        and column.get("has_default") is False
+    ]
+    if omitted_required:
+        names = ", ".join(f"{column['column_ref']}:{column['column_name']}" for column in omitted_required)
+        raise ValueError(f"required_column_omitted:{names}")
     candidate_inventory = [type("CandidateRecord", (), candidate)() for candidate in row["runtime_constraints"]["candidate_inventory"]]
     selected_refs = [span_ref for _column_ref, span_ref in column_decisions.items() if span_ref != "OMIT"]
     if len(selected_refs) != len(set(selected_refs)):
@@ -2214,13 +2226,41 @@ def oracle_column_conditioned_path(row: dict[str, Any], db_path: Path) -> dict[s
     verify_completeness(ir, slots)
     program = compile_sqlite_program(ir, inventory, materialized)
     preflight = preflight_sqlite(db_path, program)
+    target = row["label_side_expected"]["target_state"]["typed_target_rows"]
+    phase_o = row["label_side_expected"]["phase_o"]
+    if not preflight.admitted:
+        return {
+            "sample_id": row["sample_id"],
+            "phase_o_operation_exact": phase_o["operation"] == "INSERT",
+            "phase_o_output_keys_exact": sorted(phase_o) == ["column_span_refs", "operation", "table_ref"],
+            "phase_m_model_call_removed": True,
+            "model_generated_slot_refs": False,
+            "model_generated_phase_m": False,
+            "selected_table_ref": phase_o["table_ref"],
+            "selected_span_ref_count": len(spans),
+            "omit_decision_count": sum(1 for value in phase_o["column_span_refs"].values() if value == "OMIT"),
+            "candidate_inventory_contains_all_gold_spans": True,
+            "dynamic_schema_exact": True,
+            "resolver": "PASS",
+            "deterministic_ir": ir,
+            "slot_ev_coherence": "PASS",
+            "typed_materialization": "PASS",
+            "completeness": "PASS",
+            "compilation": "PASS",
+            "compiled_sql": program.sql,
+            "compiled_parameters": list(program.parameters),
+            "preflight": "REJECTED",
+            "preflight_reason_code": preflight.reason_code,
+            "canonical_target_state_exact": False,
+            "observed_target_state_hash": None,
+            "expected_target_state_hash": row["label_side_expected"]["target_state"]["target_state_hash"],
+            "resolved_column_spans": resolved,
+        }
     with sqlite3.connect(db_path) as source, sqlite3.connect(":memory:") as connection:
         source.backup(connection)
         connection.execute(program.sql, program.parameters)
         connection.commit()
         observed = read_rows(connection, row["synthetic_db_spec"]["selected_table"])
-    target = row["label_side_expected"]["target_state"]["typed_target_rows"]
-    phase_o = row["label_side_expected"]["phase_o"]
     return {
         "sample_id": row["sample_id"],
         "phase_o_operation_exact": phase_o["operation"] == "INSERT",

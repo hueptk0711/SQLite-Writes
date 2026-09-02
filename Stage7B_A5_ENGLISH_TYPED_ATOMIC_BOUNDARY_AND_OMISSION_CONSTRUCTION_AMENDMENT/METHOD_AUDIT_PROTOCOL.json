@@ -1,0 +1,18 @@
+{
+  "a6_observed_errors_used_as": "development_diagnostic_not_independent_evaluation",
+  "assignment_count": 2256,
+  "baseline": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT PATCH2",
+  "design_train_non_pilot_rows": 728,
+  "forbidden": [
+    "model rerun",
+    "A6 primary rerun",
+    "prompt tuning on A6 primary",
+    "Gretel pilot"
+  ],
+  "gpu_called": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "scope": "CPU-only design-train candidate-domain audit",
+  "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT",
+  "strict_gate": "additional_assignment_losses=0 and additional_full_sample_losses=0"
+}

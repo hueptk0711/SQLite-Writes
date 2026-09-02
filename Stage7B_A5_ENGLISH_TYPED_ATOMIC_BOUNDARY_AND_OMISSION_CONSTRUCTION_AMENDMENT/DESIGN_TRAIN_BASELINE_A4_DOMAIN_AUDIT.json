@@ -1,0 +1,34 @@
+{
+  "assignment_count": 2256,
+  "assignment_representability": 0.99822695035461,
+  "broader_containing_gold_count_stats": {
+    "max": 7,
+    "mean": 2.329343971631206,
+    "median": 2.0,
+    "min": 0,
+    "p95": 5
+  },
+  "broader_containing_gold_total": 5255,
+  "candidate_count_stats": {
+    "max": 114,
+    "mean": 43.96016483516483,
+    "median": 43.0,
+    "min": 9,
+    "p95": 67
+  },
+  "covered_assignment_count": 2252,
+  "design_sample_count": 728,
+  "domain": "stage7b_a4_patch2_baseline_domain",
+  "full_sample_covered_count": 724,
+  "full_sample_representability": 0.9945054945054945,
+  "gpu_called": false,
+  "model_called": false,
+  "patch": "PATCH0",
+  "stage": "Stage7B_A5_ENGLISH_TYPED_ATOMIC_BOUNDARY_AND_OMISSION_CONSTRUCTION_AMENDMENT",
+  "status": "PASS",
+  "suppressed_candidate_total": 1346,
+  "suppression_rule_counts": {
+    "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 180,
+    "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 1166
+  }
+}
