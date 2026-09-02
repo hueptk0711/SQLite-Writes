@@ -1,0 +1,180 @@
+{
+  "case_domain_ids_match_selected_order": true,
+  "construction_date": "2026-09-02",
+  "domain_pool": [
+    {
+      "domain_id": "aquifer_sample_log",
+      "domain_label": "aquifer sample log"
+    },
+    {
+      "domain_id": "bakery_proofing_batch",
+      "domain_label": "bakery proofing batch"
+    },
+    {
+      "domain_id": "ceramic_kiln_cycle",
+      "domain_label": "ceramic kiln cycle"
+    },
+    {
+      "domain_id": "court_filing_packet",
+      "domain_label": "court filing packet"
+    },
+    {
+      "domain_id": "greenhouse_nutrient_mix",
+      "domain_label": "greenhouse nutrient mix"
+    },
+    {
+      "domain_id": "harbor_beacon_inspection",
+      "domain_label": "harbor beacon inspection"
+    },
+    {
+      "domain_id": "language_exam_roster",
+      "domain_label": "language exam roster"
+    },
+    {
+      "domain_id": "textile_dye_lot",
+      "domain_label": "textile dye lot"
+    },
+    {
+      "domain_id": "robotics_bench_calibration",
+      "domain_label": "robotics bench calibration"
+    },
+    {
+      "domain_id": "pharmacy_refill_queue",
+      "domain_label": "pharmacy refill queue"
+    },
+    {
+      "domain_id": "wildfire_sensor_ping",
+      "domain_label": "wildfire sensor ping"
+    },
+    {
+      "domain_id": "transit_card_adjustment",
+      "domain_label": "transit card adjustment"
+    },
+    {
+      "domain_id": "archive_digitization_job",
+      "domain_label": "archive digitization job"
+    },
+    {
+      "domain_id": "coral_tank_chemistry",
+      "domain_label": "coral tank chemistry"
+    },
+    {
+      "domain_id": "drone_survey_tile",
+      "domain_label": "drone survey tile"
+    },
+    {
+      "domain_id": "ceramic_glaze_recipe",
+      "domain_label": "ceramic glaze recipe"
+    },
+    {
+      "domain_id": "microloan_disbursement",
+      "domain_label": "microloan disbursement"
+    },
+    {
+      "domain_id": "theater_prop_checkout",
+      "domain_label": "theater prop checkout"
+    },
+    {
+      "domain_id": "lab_reagent_shelf",
+      "domain_label": "lab reagent shelf"
+    },
+    {
+      "domain_id": "bike_share_rebalance",
+      "domain_label": "bike share rebalance"
+    },
+    {
+      "domain_id": "canal_lock_maintenance",
+      "domain_label": "canal lock maintenance"
+    },
+    {
+      "domain_id": "patent_intake_record",
+      "domain_label": "patent intake record"
+    },
+    {
+      "domain_id": "payroll_exception_log",
+      "domain_label": "payroll exception log"
+    },
+    {
+      "domain_id": "vineyard_irrigation_run",
+      "domain_label": "vineyard irrigation run"
+    }
+  ],
+  "domain_pool_sha256": "aa254cfb42eb975726765fdbc00731cbae6d63352a37ee098193d7b4af56fb92",
+  "domain_pool_size": 24,
+  "domain_source": "frozen internal neutral domain pool created before PATCH2 primary case materialization",
+  "exact_reviewer_suggested_domain_reuse_count": 0,
+  "exact_reviewer_suggested_literal_reuse_count": 0,
+  "gpu_called": false,
+  "model_called": false,
+  "patch": "PATCH2",
+  "prior_reviewer_example_blacklist": {
+    "domains": [
+      "astronomy observation",
+      "insurance claim",
+      "museum shipment",
+      "energy meter",
+      "course enrollment",
+      "ferry booking",
+      "chemical batch",
+      "building sensor",
+      "journal submission",
+      "orchard harvest",
+      "device calibration",
+      "film screening"
+    ],
+    "literals": [
+      "Not Found",
+      "Unavailable",
+      "Empty Quarter"
+    ]
+  },
+  "reviewer_suggested_domain_overlaps": [],
+  "reviewer_suggested_domains_used": false,
+  "reviewer_suggested_literal_overlaps": [],
+  "reviewer_suggested_literals_used": false,
+  "selected_domain_ids": [
+    "microloan_disbursement",
+    "harbor_beacon_inspection",
+    "drone_survey_tile",
+    "patent_intake_record",
+    "coral_tank_chemistry",
+    "bike_share_rebalance",
+    "textile_dye_lot",
+    "wildfire_sensor_ping",
+    "archive_digitization_job",
+    "language_exam_roster",
+    "bakery_proofing_batch",
+    "theater_prop_checkout"
+  ],
+  "selected_domain_labels": [
+    "microloan disbursement",
+    "harbor beacon inspection",
+    "drone survey tile",
+    "patent intake record",
+    "coral tank chemistry",
+    "bike share rebalance",
+    "textile dye lot",
+    "wildfire sensor ping",
+    "archive digitization job",
+    "language exam roster",
+    "bakery proofing batch",
+    "theater prop checkout"
+  ],
+  "selection_algorithm": "sort domain_pool rows by sha256(selection_seed + ':' + canonical_json(row)); select first 12 rows",
+  "selection_seed": "stage7c-a6-patch2-fresh-primary-v1-20260902",
+  "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE",
+  "status": "PASS",
+  "stress_requirements": [
+    "schema-label + identifier",
+    "alias-bearing column",
+    "legitimate multiword compound",
+    "DATETIME",
+    "possessive text",
+    "ordinal/compound expression",
+    "true omission constructions using the frozen cue rules",
+    "legitimate omission-looking literal",
+    "multi-table oneOf branch selection",
+    "generic alias-stoplist case",
+    "overlapping candidate spans"
+  ]
+}

@@ -12,7 +12,7 @@
   "gpu_called": false,
   "model_called": false,
   "multi_table_strategy": "oneOf branch per model-visible table_ref with branch-local required column_span_refs",
-  "patch": "PATCH1",
+  "patch": "PATCH2",
   "runtime_builder": "dynamic_schema_for_schema_tables(model_visible_schema_tables, filtered_candidate_span_refs)",
   "single_table_strategy": "const table_ref TAB_1 with every COL_n key required",
   "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE",

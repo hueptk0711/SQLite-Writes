@@ -4,12 +4,12 @@
     "can_compensate_primary_failure": false,
     "required_pass_count": "12/12",
     "role": "diagnostic_only_after_primary",
-    "sample_set": "12 corrected A5 observed diagnostics plus 12 A6 method-stress diagnostics"
+    "sample_set": "12 corrected A5 observed diagnostics plus 12 A6 method-stress diagnostics plus 12 reviewer-guided A6 stress diagnostics"
   },
   "gpu_called": false,
   "gretel_pilot_opened": false,
   "model_called": false,
-  "patch": "PATCH1",
+  "patch": "PATCH2",
   "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE",
   "synthetic_feasibility_gate": {
     "averaging_allowed": false,

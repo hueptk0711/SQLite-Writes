@@ -1,85 +1,61 @@
 {
-  "filtered_candidate_total": 483,
+  "filtered_candidate_total": 537,
   "fresh_primary_case_count": 12,
   "gold_suppressed_total": 0,
   "gpu_called": false,
   "model_called": false,
-  "patch": "PATCH1",
+  "patch": "PATCH2",
   "per_sample": [
     {
-      "filtered_candidate_count": 51,
+      "filtered_candidate_count": 57,
       "gold_suppressed_count": 0,
       "sample_id": "stage7c_a6_primary_english_001",
-      "suppressed_candidate_count": 6,
+      "suppressed_candidate_count": 4,
       "suppression_rule_counts": {
-        "CONTEXT_AWARE_OMISSION_CUE": 2,
-        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 1,
+        "CONTEXT_AWARE_OMISSION_CUE": 1,
         "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 3
       },
-      "unfiltered_candidate_count": 57
-    },
-    {
-      "filtered_candidate_count": 44,
-      "gold_suppressed_count": 0,
-      "sample_id": "stage7c_a6_primary_english_002",
-      "suppressed_candidate_count": 5,
-      "suppression_rule_counts": {
-        "CONTEXT_AWARE_OMISSION_CUE": 1,
-        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 4
-      },
-      "unfiltered_candidate_count": 49
-    },
-    {
-      "filtered_candidate_count": 47,
-      "gold_suppressed_count": 0,
-      "sample_id": "stage7c_a6_primary_english_003",
-      "suppressed_candidate_count": 3,
-      "suppression_rule_counts": {
-        "CONTEXT_AWARE_OMISSION_CUE": 2,
-        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 1
-      },
-      "unfiltered_candidate_count": 50
-    },
-    {
-      "filtered_candidate_count": 39,
-      "gold_suppressed_count": 0,
-      "sample_id": "stage7c_a6_primary_english_004",
-      "suppressed_candidate_count": 5,
-      "suppression_rule_counts": {
-        "CONTEXT_AWARE_OMISSION_CUE": 1,
-        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 2,
-        "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 2
-      },
-      "unfiltered_candidate_count": 44
-    },
-    {
-      "filtered_candidate_count": 31,
-      "gold_suppressed_count": 0,
-      "sample_id": "stage7c_a6_primary_english_005",
-      "suppressed_candidate_count": 7,
-      "suppression_rule_counts": {
-        "CONTEXT_AWARE_OMISSION_CUE": 2,
-        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 3,
-        "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 2
-      },
-      "unfiltered_candidate_count": 38
+      "unfiltered_candidate_count": 61
     },
     {
       "filtered_candidate_count": 41,
       "gold_suppressed_count": 0,
-      "sample_id": "stage7c_a6_primary_english_006",
-      "suppressed_candidate_count": 10,
+      "sample_id": "stage7c_a6_primary_english_002",
+      "suppressed_candidate_count": 3,
+      "suppression_rule_counts": {
+        "CONTEXT_AWARE_OMISSION_CUE": 1,
+        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 2
+      },
+      "unfiltered_candidate_count": 44
+    },
+    {
+      "filtered_candidate_count": 43,
+      "gold_suppressed_count": 0,
+      "sample_id": "stage7c_a6_primary_english_003",
+      "suppressed_candidate_count": 6,
       "suppression_rule_counts": {
         "CONTEXT_AWARE_OMISSION_CUE": 2,
-        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 1,
-        "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 7
+        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 2,
+        "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 2
       },
-      "unfiltered_candidate_count": 51
+      "unfiltered_candidate_count": 49
+    },
+    {
+      "filtered_candidate_count": 46,
+      "gold_suppressed_count": 0,
+      "sample_id": "stage7c_a6_primary_english_004",
+      "suppressed_candidate_count": 9,
+      "suppression_rule_counts": {
+        "CONTEXT_AWARE_OMISSION_CUE": 2,
+        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 2,
+        "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 5
+      },
+      "unfiltered_candidate_count": 55
     },
     {
       "filtered_candidate_count": 39,
       "gold_suppressed_count": 0,
-      "sample_id": "stage7c_a6_primary_english_007",
+      "sample_id": "stage7c_a6_primary_english_005",
       "suppressed_candidate_count": 3,
       "suppression_rule_counts": {
         "CONTEXT_AWARE_OMISSION_CUE": 1,
@@ -88,65 +64,87 @@
       "unfiltered_candidate_count": 42
     },
     {
-      "filtered_candidate_count": 32,
+      "filtered_candidate_count": 38,
       "gold_suppressed_count": 0,
-      "sample_id": "stage7c_a6_primary_english_008",
-      "suppressed_candidate_count": 9,
+      "sample_id": "stage7c_a6_primary_english_006",
+      "suppressed_candidate_count": 7,
       "suppression_rule_counts": {
         "CONTEXT_AWARE_OMISSION_CUE": 2,
-        "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 7
+        "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 5
       },
-      "unfiltered_candidate_count": 41
+      "unfiltered_candidate_count": 45
     },
     {
-      "filtered_candidate_count": 32,
+      "filtered_candidate_count": 38,
       "gold_suppressed_count": 0,
-      "sample_id": "stage7c_a6_primary_english_009",
-      "suppressed_candidate_count": 9,
-      "suppression_rule_counts": {
-        "CONTEXT_AWARE_OMISSION_CUE": 2,
-        "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 7
-      },
-      "unfiltered_candidate_count": 41
-    },
-    {
-      "filtered_candidate_count": 40,
-      "gold_suppressed_count": 0,
-      "sample_id": "stage7c_a6_primary_english_010",
+      "sample_id": "stage7c_a6_primary_english_007",
       "suppressed_candidate_count": 4,
       "suppression_rule_counts": {
-        "CONTEXT_AWARE_OMISSION_CUE": 1,
-        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 2,
-        "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 1
+        "CONTEXT_AWARE_OMISSION_CUE": 2,
+        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 2
       },
-      "unfiltered_candidate_count": 44
+      "unfiltered_candidate_count": 42
+    },
+    {
+      "filtered_candidate_count": 46,
+      "gold_suppressed_count": 0,
+      "sample_id": "stage7c_a6_primary_english_008",
+      "suppressed_candidate_count": 7,
+      "suppression_rule_counts": {
+        "CONTEXT_AWARE_OMISSION_CUE": 2,
+        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 2,
+        "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 3
+      },
+      "unfiltered_candidate_count": 53
+    },
+    {
+      "filtered_candidate_count": 52,
+      "gold_suppressed_count": 0,
+      "sample_id": "stage7c_a6_primary_english_009",
+      "suppressed_candidate_count": 5,
+      "suppression_rule_counts": {
+        "CONTEXT_AWARE_OMISSION_CUE": 2,
+        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 1,
+        "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 2
+      },
+      "unfiltered_candidate_count": 57
     },
     {
       "filtered_candidate_count": 39,
       "gold_suppressed_count": 0,
-      "sample_id": "stage7c_a6_primary_english_011",
-      "suppressed_candidate_count": 4,
-      "suppression_rule_counts": {
-        "CONTEXT_AWARE_OMISSION_CUE": 3,
-        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 1
-      },
-      "unfiltered_candidate_count": 43
-    },
-    {
-      "filtered_candidate_count": 48,
-      "gold_suppressed_count": 0,
-      "sample_id": "stage7c_a6_primary_english_012",
+      "sample_id": "stage7c_a6_primary_english_010",
       "suppressed_candidate_count": 6,
       "suppression_rule_counts": {
         "CONTEXT_AWARE_OMISSION_CUE": 1,
-        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 2,
-        "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 3
+        "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 5
       },
-      "unfiltered_candidate_count": 54
+      "unfiltered_candidate_count": 45
+    },
+    {
+      "filtered_candidate_count": 47,
+      "gold_suppressed_count": 0,
+      "sample_id": "stage7c_a6_primary_english_011",
+      "suppressed_candidate_count": 5,
+      "suppression_rule_counts": {
+        "CONTEXT_AWARE_OMISSION_CUE": 3,
+        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 2
+      },
+      "unfiltered_candidate_count": 52
+    },
+    {
+      "filtered_candidate_count": 51,
+      "gold_suppressed_count": 0,
+      "sample_id": "stage7c_a6_primary_english_012",
+      "suppressed_candidate_count": 5,
+      "suppression_rule_counts": {
+        "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE": 1,
+        "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE": 4
+      },
+      "unfiltered_candidate_count": 56
     }
   ],
   "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE",
   "status": "PASS",
-  "suppressed_candidate_total": 71,
-  "unfiltered_candidate_total": 554
+  "suppressed_candidate_total": 64,
+  "unfiltered_candidate_total": 601
 }

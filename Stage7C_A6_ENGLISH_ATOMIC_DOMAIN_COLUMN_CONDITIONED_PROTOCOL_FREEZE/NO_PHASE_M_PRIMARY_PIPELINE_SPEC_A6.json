@@ -17,7 +17,7 @@
     "Phase O span selection",
     "Phase M slot-to-column mapping"
   ],
-  "patch": "PATCH1",
+  "patch": "PATCH2",
   "primary_pipeline_phase_m_removed": true,
   "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE"
 }

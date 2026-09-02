@@ -17,7 +17,7 @@
   "model_selects_column_span_refs": true,
   "model_selects_table_ref": true,
   "operation_scope": "INSERT",
-  "patch": "PATCH1",
+  "patch": "PATCH2",
   "prompt_hashes": {
     "phase_o_system_prompt_sha256": "57c27cc632cfc89826d90dab7861e1aea4051b8bcedada73b0f7fed2ddadf7a6",
     "phase_o_user_prompt_template_sha256": "e259bcf0c0a186f53381722bca6836eea6c2b1e4345f4716332b80310bff0236"

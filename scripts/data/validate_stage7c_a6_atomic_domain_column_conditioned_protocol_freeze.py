@@ -310,6 +310,7 @@ def validate_manifests(stage_dir: Path, failures: list[str]) -> None:
     acceptance = read_json(stage_dir / "ACCEPTANCE_POLICY_A6.json")
     independence = read_json(stage_dir / "A6_PRIMARY_INDEPENDENCE_AUDIT.json")
     prior_independence = read_json(stage_dir / "PRIOR_DESIGN_EVIDENCE_INDEPENDENCE_AUDIT_A6.json")
+    construction = read_json(stage_dir / "A6_PRIMARY_SET_CONSTRUCTION_PROTOCOL.json")
     domain_audit = read_json(stage_dir / "A6_ORACLE_CANDIDATE_DOMAIN_AUDIT.json")
     runtime_freeze = read_json(stage_dir / "CANDIDATE_DOMAIN_RUNTIME_FREEZE_A6.json")
 
@@ -358,6 +359,24 @@ def validate_manifests(stage_dir: Path, failures: list[str]) -> None:
         failures.append("primary_independence_audit_not_pass")
     if prior_independence.get("status") != "PASS" or prior_independence.get("exact_synthetic_fixture_reuse_case_count") != 0:
         failures.append("primary_independence_audit_not_pass")
+    if construction.get("status") != "PASS" or construction.get("case_domain_ids_match_selected_order") is not True:
+        failures.append("primary_construction_protocol_not_pass")
+    if construction.get("reviewer_suggested_domains_used") is not False or construction.get("reviewer_suggested_literals_used") is not False:
+        failures.append("primary_construction_reviewer_guidance_reused")
+    if construction.get("exact_reviewer_suggested_domain_reuse_count") != 0 or construction.get("exact_reviewer_suggested_literal_reuse_count") != 0:
+        failures.append("primary_construction_reviewer_guidance_reused")
+    if len(str(construction.get("domain_pool_sha256", ""))) != 64:
+        failures.append("primary_construction_domain_pool_hash_missing")
+    if independence.get("exact_reviewer_suggested_domain_reuse_case_count") != 0 or independence.get("exact_reviewer_suggested_literal_reuse_case_count") != 0:
+        failures.append("primary_independence_reviewer_guidance_reused")
+    if prior_independence.get("exact_reviewer_suggested_domain_reuse_case_count") != 0 or prior_independence.get("exact_reviewer_suggested_literal_reuse_case_count") != 0:
+        failures.append("primary_independence_reviewer_guidance_reused")
+    if lock.get("exact_reviewer_suggested_domain_reuse_case_count") != 0 or lock.get("exact_reviewer_suggested_literal_reuse_case_count") != 0:
+        failures.append("lock_reviewer_guidance_reused")
+    if lock.get("reviewer_suggested_domains_used") is not False or lock.get("reviewer_suggested_literals_used") is not False:
+        failures.append("lock_reviewer_guidance_reused")
+    if lock.get("primary_set_construction_protocol_status") != "PASS":
+        failures.append("lock_primary_construction_protocol_not_pass")
     if lock.get("source_stage7c_a5_erratum_status") is None:
         failures.append("lock_missing_a5_erratum_lineage")
 
@@ -383,7 +402,7 @@ def validate_manifests(stage_dir: Path, failures: list[str]) -> None:
             failures.append(f"derived_artifact_hash_mismatch:{item['path']}")
 
     sqlite_artifacts = package_integrity.get("sqlite_binary_artifacts", [])
-    if package_integrity.get("sqlite_binary_artifact_count") != 36 or len(sqlite_artifacts) != 36:
+    if package_integrity.get("sqlite_binary_artifact_count") != 48 or len(sqlite_artifacts) != 48:
         failures.append("sqlite_binary_artifact_count_mismatch")
     for item in sqlite_artifacts:
         path = stage_dir / item["path"]
@@ -426,6 +445,15 @@ def validate(stage_dir: Path, *, rebuild: bool = False, tokenizer_name_or_path: 
         diagnostic=True,
         require_coverage_tags=False,
     )
+    reviewer_guided_case_count, reviewer_guided_assigned_count, reviewer_guided_omit_count, reviewer_guided_multi_table_count = validate_rows(
+        stage_dir,
+        failures,
+        rows_name="REVIEWER_GUIDED_A6_STRESS_DIAGNOSTICS.jsonl",
+        oracle_name="ORACLE_REVIEWER_GUIDED_A6_STRESS_DIAGNOSTIC_RESULTS.jsonl",
+        expected_prefix="stage7c_a6_reviewer_guided_english_",
+        diagnostic=True,
+        require_coverage_tags=False,
+    )
     validate_manifests(stage_dir, failures)
 
     if rebuild:
@@ -442,6 +470,7 @@ def validate(stage_dir: Path, *, rebuild: bool = False, tokenizer_name_or_path: 
                 "multi_table_oneof_case_count": multi_table_count,
                 "a4_derived_regression_diagnostic_count": diagnostic_case_count,
                 "a6_method_stress_regression_diagnostic_count": method_stress_case_count,
+                "a6_reviewer_guided_regression_diagnostic_count": reviewer_guided_case_count,
             }
         rebuild_parent = stage_dir.parent / f"{stage_dir.name}__semantic_rebuild_tmp"
         if rebuild_parent.exists():
@@ -475,6 +504,15 @@ def validate(stage_dir: Path, *, rebuild: bool = False, tokenizer_name_or_path: 
                 diagnostic=True,
                 require_coverage_tags=False,
             )
+            rebuilt_reviewer_guided_counts = validate_rows(
+                rebuild_parent,
+                rebuilt_failures,
+                rows_name="REVIEWER_GUIDED_A6_STRESS_DIAGNOSTICS.jsonl",
+                oracle_name="ORACLE_REVIEWER_GUIDED_A6_STRESS_DIAGNOSTIC_RESULTS.jsonl",
+                expected_prefix="stage7c_a6_reviewer_guided_english_",
+                diagnostic=True,
+                require_coverage_tags=False,
+            )
             validate_manifests(rebuild_parent, rebuilt_failures)
             if rebuilt_failures:
                 failures.append(f"semantic_rebuild_failed:{rebuilt_failures}")
@@ -484,6 +522,8 @@ def validate(stage_dir: Path, *, rebuild: bool = False, tokenizer_name_or_path: 
                 failures.append("semantic_rebuild_diagnostic_counts_mismatch")
             if rebuilt_method_stress_counts != (method_stress_case_count, method_stress_assigned_count, method_stress_omit_count, method_stress_multi_table_count):
                 failures.append("semantic_rebuild_method_stress_counts_mismatch")
+            if rebuilt_reviewer_guided_counts != (reviewer_guided_case_count, reviewer_guided_assigned_count, reviewer_guided_omit_count, reviewer_guided_multi_table_count):
+                failures.append("semantic_rebuild_reviewer_guided_counts_mismatch")
         finally:
             shutil.rmtree(rebuild_parent, ignore_errors=True)
 
@@ -503,6 +543,10 @@ def validate(stage_dir: Path, *, rebuild: bool = False, tokenizer_name_or_path: 
         "method_stress_assigned_column_decision_count": method_stress_assigned_count,
         "method_stress_omit_column_decision_count": method_stress_omit_count,
         "method_stress_multi_table_oneof_case_count": method_stress_multi_table_count,
+        "a6_reviewer_guided_regression_diagnostic_count": reviewer_guided_case_count,
+        "reviewer_guided_assigned_column_decision_count": reviewer_guided_assigned_count,
+        "reviewer_guided_omit_column_decision_count": reviewer_guided_omit_count,
+        "reviewer_guided_multi_table_oneof_case_count": reviewer_guided_multi_table_count,
     }
 
 

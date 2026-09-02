@@ -17,7 +17,7 @@
   "gpu_called": false,
   "manual_alias_additions_allowed_after_a6_outputs": false,
   "model_called": false,
-  "patch": "PATCH1",
+  "patch": "PATCH2",
   "runtime_order": [
     "generate lexical_ngram2 candidate inventory",
     "derive schema-label aliases from model-visible table and column names",

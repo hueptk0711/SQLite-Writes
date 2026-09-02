@@ -28,6 +28,6 @@
   "model_called": false,
   "non_omit_span_refs_unique_across_columns": true,
   "omit_token": "OMIT",
-  "patch": "PATCH1",
+  "patch": "PATCH2",
   "stage": "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE"
 }

@@ -63,7 +63,7 @@ from scripts.data.build_stage7b_a4_atomic_candidate_domain_omission_cue import (
 
 
 STAGE_NAME = "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE"
-PATCH_NAME = "PATCH1"
+PATCH_NAME = "PATCH2"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_20260902.zip"
 STAGE7B_A2_NAME = "Stage7B_A2_ENGLISH_CANDIDATE_SPAN_REFERENCE_AMENDMENT"
 STAGE7B_A3_NAME = "Stage7B_A3_ENGLISH_COLUMN_CONDITIONED_CANDIDATE_SELECTION_AMENDMENT"
@@ -112,14 +112,17 @@ SCIENTIFIC_ARTIFACTS = [
     "NO_PHASE_M_PRIMARY_PIPELINE_SPEC_A6.json",
     "OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A6.json",
     "EVALUATOR_SEMANTICS_A6.json",
+    "A6_PRIMARY_SET_CONSTRUCTION_PROTOCOL.json",
     "A6_PRIMARY_INDEPENDENCE_AUDIT.json",
     "PRIOR_DESIGN_EVIDENCE_INDEPENDENCE_AUDIT_A6.json",
     "FRESH_ENGLISH_A6_PRIMARY_FEASIBILITY_SET.jsonl",
     "A5_OBSERVED_REGRESSION_DIAGNOSTICS_A6.jsonl",
     "A6_METHOD_STRESS_REGRESSION_DIAGNOSTICS_A6.jsonl",
+    "REVIEWER_GUIDED_A6_STRESS_DIAGNOSTICS.jsonl",
     "ORACLE_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl",
     "ORACLE_A5_OBSERVED_DIAGNOSTIC_RESULTS.jsonl",
     "ORACLE_A6_METHOD_STRESS_DIAGNOSTIC_RESULTS.jsonl",
+    "ORACLE_REVIEWER_GUIDED_A6_STRESS_DIAGNOSTIC_RESULTS.jsonl",
     "FULL_RENDERED_PROMPT_TOKEN_AUDIT.json",
     "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl",
     "ACCEPTANCE_POLICY_A6.json",
@@ -468,10 +471,419 @@ def a5_observed_diagnostic_case_definitions(stage7c_a5_erratum_dir: Path) -> lis
     return [_case_from_corrected_a5_row(row) for row in rows]
 
 
+PRIMARY_DOMAIN_SELECTION_SEED = "stage7c-a6-patch2-fresh-primary-v1-20260902"
+FROZEN_PRIMARY_DOMAIN_POOL = [
+    {"domain_id": "aquifer_sample_log", "domain_label": "aquifer sample log"},
+    {"domain_id": "bakery_proofing_batch", "domain_label": "bakery proofing batch"},
+    {"domain_id": "ceramic_kiln_cycle", "domain_label": "ceramic kiln cycle"},
+    {"domain_id": "court_filing_packet", "domain_label": "court filing packet"},
+    {"domain_id": "greenhouse_nutrient_mix", "domain_label": "greenhouse nutrient mix"},
+    {"domain_id": "harbor_beacon_inspection", "domain_label": "harbor beacon inspection"},
+    {"domain_id": "language_exam_roster", "domain_label": "language exam roster"},
+    {"domain_id": "textile_dye_lot", "domain_label": "textile dye lot"},
+    {"domain_id": "robotics_bench_calibration", "domain_label": "robotics bench calibration"},
+    {"domain_id": "pharmacy_refill_queue", "domain_label": "pharmacy refill queue"},
+    {"domain_id": "wildfire_sensor_ping", "domain_label": "wildfire sensor ping"},
+    {"domain_id": "transit_card_adjustment", "domain_label": "transit card adjustment"},
+    {"domain_id": "archive_digitization_job", "domain_label": "archive digitization job"},
+    {"domain_id": "coral_tank_chemistry", "domain_label": "coral tank chemistry"},
+    {"domain_id": "drone_survey_tile", "domain_label": "drone survey tile"},
+    {"domain_id": "ceramic_glaze_recipe", "domain_label": "ceramic glaze recipe"},
+    {"domain_id": "microloan_disbursement", "domain_label": "microloan disbursement"},
+    {"domain_id": "theater_prop_checkout", "domain_label": "theater prop checkout"},
+    {"domain_id": "lab_reagent_shelf", "domain_label": "lab reagent shelf"},
+    {"domain_id": "bike_share_rebalance", "domain_label": "bike share rebalance"},
+    {"domain_id": "canal_lock_maintenance", "domain_label": "canal lock maintenance"},
+    {"domain_id": "patent_intake_record", "domain_label": "patent intake record"},
+    {"domain_id": "payroll_exception_log", "domain_label": "payroll exception log"},
+    {"domain_id": "vineyard_irrigation_run", "domain_label": "vineyard irrigation run"},
+]
+REVIEWER_SUGGESTED_DOMAIN_BLACKLIST = [
+    "astronomy observation",
+    "insurance claim",
+    "museum shipment",
+    "energy meter",
+    "course enrollment",
+    "ferry booking",
+    "chemical batch",
+    "building sensor",
+    "journal submission",
+    "orchard harvest",
+    "device calibration",
+    "film screening",
+]
+REVIEWER_SUGGESTED_LITERAL_BLACKLIST = ["Not Found", "Unavailable", "Empty Quarter"]
+STRESS_REQUIREMENTS = [
+    "schema-label + identifier",
+    "alias-bearing column",
+    "legitimate multiword compound",
+    "DATETIME",
+    "possessive text",
+    "ordinal/compound expression",
+    "true omission constructions using the frozen cue rules",
+    "legitimate omission-looking literal",
+    "multi-table oneOf branch selection",
+    "generic alias-stoplist case",
+    "overlapping candidate spans",
+]
+
+
+def _normalize_blacklist_text(value: str) -> str:
+    return re.sub(r"\s+", " ", value.casefold().strip())
+
+
+def selected_primary_domains() -> list[dict[str, str]]:
+    return sorted(
+        FROZEN_PRIMARY_DOMAIN_POOL,
+        key=lambda row: sha256_text(f"{PRIMARY_DOMAIN_SELECTION_SEED}:{canonical_json(row)}"),
+    )[:12]
+
+
 def case_definitions() -> list[dict[str, Any]]:
-    return [
-        {
+    case_by_domain = {
+        "microloan_disbursement": {
+            "construction_domain_id": "microloan_disbursement",
+            "construction_domain_label": "microloan disbursement",
             "sample_id": "stage7c_a6_primary_english_001",
+            "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "identifier", "real", "percent", "datetime", "schema_alias"],
+            "question": 'Insert microloan LOAN-P72 for borrower "Anika Bose", principal_usd 1250.40, interest_pct 6.8%, disbursed_at 2026-10-12 09:35:00, officer_code OFC-3. Cosigner note not provided.',
+            "selected_table": "microloan_disbursements",
+            "tables": [
+                {
+                    "table_name": "microloan_disbursements",
+                    "columns": [
+                        {"column_name": "loan_ref", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "borrower_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "principal_usd", "source_type": "REAL", "nullable": False},
+                        {"column_name": "interest_pct", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "disbursed_at", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "officer_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "cosigner_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"loan_ref": "LOAN-P72", "borrower_name": "Anika Bose", "principal_usd": "1250.40", "interest_pct": "6.8%", "disbursed_at": "2026-10-12 09:35:00", "officer_code": "OFC-3"},
+        },
+        "harbor_beacon_inspection": {
+            "construction_domain_id": "harbor_beacon_inspection",
+            "construction_domain_label": "harbor beacon inspection",
+            "sample_id": "stage7c_a6_primary_english_002",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "hex_identifier", "integer", "real", "generic_stoplist", "schema_alias"],
+            "question": "Create harbor beacon inspection beacon 0xA17C, lens_rating 4.7, battery_pct 82%, tower_height_m 31. Inspector memo left empty.",
+            "selected_table": "harbor_beacon_inspections",
+            "tables": [
+                {
+                    "table_name": "harbor_beacon_inspections",
+                    "columns": [
+                        {"column_name": "beacon_id", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "lens_rating", "source_type": "REAL", "nullable": False},
+                        {"column_name": "battery_pct", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "tower_height_m", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "inspector_memo", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"beacon_id": "0xA17C", "lens_rating": "4.7", "battery_pct": "82%", "tower_height_m": "31"},
+        },
+        "drone_survey_tile": {
+            "construction_domain_id": "drone_survey_tile",
+            "construction_domain_label": "drone survey tile",
+            "sample_id": "stage7c_a6_primary_english_003",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "overlapping_candidates", "quoted_multiword", "identifier", "date", "integer"],
+            "question": 'Add drone_survey_tiles tile TILE-884 for sector "North Pier", short_label "North", captured_on 2026-11-05, altitude_m 120. Operator note absent.',
+            "selected_table": "drone_survey_tiles",
+            "tables": [
+                {
+                    "table_name": "drone_survey_tiles",
+                    "columns": [
+                        {"column_name": "tile_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "sector_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "short_label", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "captured_on", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "altitude_m", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "operator_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"tile_code": "TILE-884", "sector_name": "North Pier", "short_label": "North", "captured_on": "2026-11-05", "altitude_m": "120"},
+            "assigned_value_spans": {"short_label": {"start_char": 75, "end_char": 80}},
+        },
+        "patent_intake_record": {
+            "construction_domain_id": "patent_intake_record",
+            "construction_domain_label": "patent intake record",
+            "sample_id": "stage7c_a6_primary_english_004",
+            "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "ordinal_phrase", "possessive_text", "three_word_value", "quoted_multiword", "email", "identifier"],
+            "question": 'Register patent intake PAT-410, invention_title "Iris\'s Quiet Valve", docket_stage second review, applicant_email iris.cho@patent.example, filing_code F-2026-7. Prior art note omitted.',
+            "selected_table": "patent_intake_records",
+            "tables": [
+                {
+                    "table_name": "patent_intake_records",
+                    "columns": [
+                        {"column_name": "intake_id", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "invention_title", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "docket_stage", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "applicant_email", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "filing_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "prior_art_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"intake_id": "PAT-410", "invention_title": "Iris's Quiet Valve", "docket_stage": "second review", "applicant_email": "iris.cho@patent.example", "filing_code": "F-2026-7"},
+        },
+        "coral_tank_chemistry": {
+            "construction_domain_id": "coral_tank_chemistry",
+            "construction_domain_label": "coral tank chemistry",
+            "sample_id": "stage7c_a6_primary_english_005",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "legitimate_omission_literals", "quoted_multiword", "real", "percent"],
+            "question": 'Record coral tank TANK-19, sample_label "Missing Current", ph_level 8.1, salinity_pct 3.5%. Reagent note not supplied.',
+            "selected_table": "coral_tank_chemistry",
+            "tables": [
+                {
+                    "table_name": "coral_tank_chemistry",
+                    "columns": [
+                        {"column_name": "tank_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "sample_label", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "ph_level", "source_type": "REAL", "nullable": False},
+                        {"column_name": "salinity_pct", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "reagent_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"tank_code": "TANK-19", "sample_label": "Missing Current", "ph_level": "8.1", "salinity_pct": "3.5%"},
+        },
+        "bike_share_rebalance": {
+            "construction_domain_id": "bike_share_rebalance",
+            "construction_domain_label": "bike share rebalance",
+            "sample_id": "stage7c_a6_primary_english_006",
+            "coverage_tags": ["multi_table", "oneOf", "5_assigned_columns", "true_omit", "identifier", "integer", "real", "text_numeric_mix"],
+            "question": 'Use bike_rebalance_jobs: job_code BRB-552, station_code ST-9B, bikes_in 14, bikes_out 6, truck_load 20.5. Route note missing.',
+            "selected_table": "bike_rebalance_jobs",
+            "tables": [
+                {
+                    "table_name": "bike_stations",
+                    "columns": [
+                        {"column_name": "station_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "station_name", "source_type": "TEXT", "nullable": False},
+                    ],
+                },
+                {
+                    "table_name": "bike_rebalance_jobs",
+                    "columns": [
+                        {"column_name": "job_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "station_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "bikes_in", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "bikes_out", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "truck_load", "source_type": "REAL", "nullable": False},
+                        {"column_name": "route_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                },
+            ],
+            "assigned_values": {"job_code": "BRB-552", "station_code": "ST-9B", "bikes_in": "14", "bikes_out": "6", "truck_load": "20.5"},
+        },
+        "textile_dye_lot": {
+            "construction_domain_id": "textile_dye_lot",
+            "construction_domain_label": "textile dye lot",
+            "sample_id": "stage7c_a6_primary_english_007",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "quoted_multiword", "real", "percent", "schema_alias"],
+            "question": 'Insert textile dye lot DYE-307, shade_name "Copper Rain", mordant_pct 12%, bath_temp_c 61.5. Rinse note blank.',
+            "selected_table": "textile_dye_lots",
+            "tables": [
+                {
+                    "table_name": "textile_dye_lots",
+                    "columns": [
+                        {"column_name": "lot_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "shade_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "mordant_pct", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "bath_temp_c", "source_type": "REAL", "nullable": False},
+                        {"column_name": "rinse_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"lot_code": "DYE-307", "shade_name": "Copper Rain", "mordant_pct": "12%", "bath_temp_c": "61.5"},
+        },
+        "wildfire_sensor_ping": {
+            "construction_domain_id": "wildfire_sensor_ping",
+            "construction_domain_label": "wildfire sensor ping",
+            "sample_id": "stage7c_a6_primary_english_008",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "datetime", "integer", "real", "schema_alias"],
+            "question": "Log wildfire sensor ping PING-640, sensor_tag WF-12, heat_index 91.4, smoke_ppm 388, pinged_at 2026-09-14 18:22:10. Field memo absent.",
+            "selected_table": "wildfire_sensor_pings",
+            "tables": [
+                {
+                    "table_name": "wildfire_sensor_pings",
+                    "columns": [
+                        {"column_name": "ping_id", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "sensor_tag", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "heat_index", "source_type": "REAL", "nullable": False},
+                        {"column_name": "smoke_ppm", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "pinged_at", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "field_memo", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"ping_id": "PING-640", "sensor_tag": "WF-12", "heat_index": "91.4", "smoke_ppm": "388", "pinged_at": "2026-09-14 18:22:10"},
+        },
+        "archive_digitization_job": {
+            "construction_domain_id": "archive_digitization_job",
+            "construction_domain_label": "archive digitization job",
+            "sample_id": "stage7c_a6_primary_english_009",
+            "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "possessive_text", "three_word_value", "quoted_multiword", "integer", "date"],
+            "question": 'Create archive digitization job DIG-226 for collection "Baker\'s Street Ledger", scanner "flatbed nine", page_count 142, due_date 2026-10-28. Conservation memo omitted.',
+            "selected_table": "archive_digitization_jobs",
+            "tables": [
+                {
+                    "table_name": "archive_digitization_jobs",
+                    "columns": [
+                        {"column_name": "job_id", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "collection_title", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "scanner_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "page_count", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "due_date", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "conservation_memo", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"job_id": "DIG-226", "collection_title": "Baker's Street Ledger", "scanner_name": "flatbed nine", "page_count": "142", "due_date": "2026-10-28"},
+        },
+        "language_exam_roster": {
+            "construction_domain_id": "language_exam_roster",
+            "construction_domain_label": "language exam roster",
+            "sample_id": "stage7c_a6_primary_english_010",
+            "coverage_tags": ["multi_table", "oneOf", "4_assigned_columns", "true_omit", "email", "identifier", "integer"],
+            "question": 'For exam_roster_entries, add candidate "Lena Ortiz", candidate_email lena.ortiz@exam.example, exam_code LANG-44, room_number 205. Listening accommodation not provided.',
+            "selected_table": "exam_roster_entries",
+            "tables": [
+                {
+                    "table_name": "exam_sessions",
+                    "columns": [
+                        {"column_name": "exam_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "exam_name", "source_type": "TEXT", "nullable": False},
+                    ],
+                },
+                {
+                    "table_name": "exam_roster_entries",
+                    "columns": [
+                        {"column_name": "candidate_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "candidate_email", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "exam_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "room_number", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "listening_accommodation", "source_type": "TEXT", "nullable": True},
+                    ],
+                },
+            ],
+            "assigned_values": {"candidate_name": "Lena Ortiz", "candidate_email": "lena.ortiz@exam.example", "exam_code": "LANG-44", "room_number": "205"},
+        },
+        "bakery_proofing_batch": {
+            "construction_domain_id": "bakery_proofing_batch",
+            "construction_domain_label": "bakery proofing batch",
+            "sample_id": "stage7c_a6_primary_english_011",
+            "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "many_nullable_columns", "quoted_multiword", "integer", "real"],
+            "question": 'Add bakery proofing batch BAK-731, dough_name "Rye Lantern", hydration_pct 68%, proof_minutes 44. Baker note missing and glaze memo left empty.',
+            "selected_table": "bakery_proofing_batches",
+            "tables": [
+                {
+                    "table_name": "bakery_proofing_batches",
+                    "columns": [
+                        {"column_name": "batch_code", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "dough_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "hydration_pct", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "proof_minutes", "source_type": "INTEGER", "nullable": False},
+                        {"column_name": "baker_note", "source_type": "TEXT", "nullable": True},
+                        {"column_name": "glaze_memo", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"batch_code": "BAK-731", "dough_name": "Rye Lantern", "hydration_pct": "68%", "proof_minutes": "44"},
+        },
+        "theater_prop_checkout": {
+            "construction_domain_id": "theater_prop_checkout",
+            "construction_domain_label": "theater prop checkout",
+            "sample_id": "stage7c_a6_primary_english_012",
+            "coverage_tags": ["single_table", "3_assigned_columns", "true_omit", "many_nullable_columns", "quoted_multiword", "identifier", "date"],
+            "question": 'Prepare theater prop checkout PROP-618 for prop_name "Silver Lantern", return_date 2026-12-08. Handler, repair note, sponsor note, and deposit memo absent.',
+            "selected_table": "theater_prop_checkouts",
+            "tables": [
+                {
+                    "table_name": "theater_prop_checkouts",
+                    "columns": [
+                        {"column_name": "checkout_id", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "prop_name", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "handler", "source_type": "TEXT", "nullable": True},
+                        {"column_name": "return_date", "source_type": "TEXT", "nullable": False},
+                        {"column_name": "deposit_usd", "source_type": "REAL", "nullable": True},
+                        {"column_name": "repair_note", "source_type": "TEXT", "nullable": True},
+                        {"column_name": "sponsor_note", "source_type": "TEXT", "nullable": True},
+                    ],
+                }
+            ],
+            "assigned_values": {"checkout_id": "PROP-618", "prop_name": "Silver Lantern", "return_date": "2026-12-08"},
+        },
+    }
+    selected = selected_primary_domains()
+    missing = [row["domain_id"] for row in selected if row["domain_id"] not in case_by_domain]
+    if missing:
+        raise RuntimeError(f"missing constructed primary case(s): {missing}")
+    return [case_by_domain[row["domain_id"]] for row in selected]
+
+
+def primary_set_construction_protocol(primary_cases: list[dict[str, Any]]) -> dict[str, Any]:
+    selected = selected_primary_domains()
+    selected_domain_ids = [row["domain_id"] for row in selected]
+    selected_domain_labels = [row["domain_label"] for row in selected]
+    case_domain_ids = [case["construction_domain_id"] for case in primary_cases]
+    normalized_reviewer_domains = {_normalize_blacklist_text(value) for value in REVIEWER_SUGGESTED_DOMAIN_BLACKLIST}
+    normalized_reviewer_literals = {_normalize_blacklist_text(value) for value in REVIEWER_SUGGESTED_LITERAL_BLACKLIST}
+    selected_domain_overlaps = sorted(
+        label for label in selected_domain_labels if _normalize_blacklist_text(label) in normalized_reviewer_domains
+    )
+    literal_values = [
+        str(value)
+        for case in primary_cases
+        for value in case["assigned_values"].values()
+        if _is_design_literal(str(value))
+    ]
+    literal_overlaps = sorted(
+        value for value in literal_values if _normalize_blacklist_text(value) in normalized_reviewer_literals
+    )
+    question_literal_overlaps = sorted(
+        literal
+        for literal in REVIEWER_SUGGESTED_LITERAL_BLACKLIST
+        if any(re.search(rf"\b{re.escape(literal)}\b", case["question"], flags=re.IGNORECASE) for case in primary_cases)
+    )
+    return {
+        "stage": STAGE_NAME,
+        "patch": PATCH_NAME,
+        "construction_date": "2026-09-02",
+        "domain_source": "frozen internal neutral domain pool created before PATCH2 primary case materialization",
+        "domain_pool_size": len(FROZEN_PRIMARY_DOMAIN_POOL),
+        "domain_pool": FROZEN_PRIMARY_DOMAIN_POOL,
+        "domain_pool_sha256": sha256_text(canonical_json(FROZEN_PRIMARY_DOMAIN_POOL)),
+        "selection_seed": PRIMARY_DOMAIN_SELECTION_SEED,
+        "selection_algorithm": "sort domain_pool rows by sha256(selection_seed + ':' + canonical_json(row)); select first 12 rows",
+        "selected_domain_ids": selected_domain_ids,
+        "selected_domain_labels": selected_domain_labels,
+        "case_domain_ids_match_selected_order": case_domain_ids == selected_domain_ids,
+        "stress_requirements": STRESS_REQUIREMENTS,
+        "prior_reviewer_example_blacklist": {
+            "domains": REVIEWER_SUGGESTED_DOMAIN_BLACKLIST,
+            "literals": REVIEWER_SUGGESTED_LITERAL_BLACKLIST,
+        },
+        "exact_reviewer_suggested_domain_reuse_count": len(selected_domain_overlaps),
+        "exact_reviewer_suggested_literal_reuse_count": len(set(literal_overlaps) | set(question_literal_overlaps)),
+        "reviewer_suggested_domain_overlaps": selected_domain_overlaps,
+        "reviewer_suggested_literal_overlaps": sorted(set(literal_overlaps) | set(question_literal_overlaps)),
+        "reviewer_suggested_domains_used": False,
+        "reviewer_suggested_literals_used": False,
+        "status": "PASS" if case_domain_ids == selected_domain_ids and not selected_domain_overlaps and not literal_overlaps and not question_literal_overlaps else "FAIL",
+        "model_called": False,
+        "gpu_called": False,
+    }
+
+
+def reviewer_guided_a6_stress_diagnostic_case_definitions() -> list[dict[str, Any]]:
+    cases = [
+        {
+            "sample_id": "stage7c_a6_reviewer_guided_english_001",
             "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "date", "datetime", "quoted_multiword", "schema_alias"],
             "question": 'Log astronomy observation OBS-742 for target "Vela Dwarf", band "Lyman alpha", captured_at 2026-12-03 04:15:30, aperture_code AP-9. Calibration memo absent.',
             "selected_table": "astronomy_observations",
@@ -491,7 +903,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"observation_id": "OBS-742", "target_name": "Vela Dwarf", "spectral_band": "Lyman alpha", "captured_at": "2026-12-03 04:15:30", "aperture_code": "AP-9"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_002",
+            "sample_id": "stage7c_a6_reviewer_guided_english_002",
             "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "percent", "real", "quoted_multiword"],
             "question": 'File insurance claim CLM-880 for policy POL-44, claimant "Ivy Raman", loss_pct 18%, reserve_usd 2400.75. Adjuster comment not provided.',
             "selected_table": "insurance_claims",
@@ -511,7 +923,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"claim_no": "CLM-880", "policy_no": "POL-44", "claimant_name": "Ivy Raman", "loss_pct": "18%", "reserve_usd": "2400.75"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_003",
+            "sample_id": "stage7c_a6_reviewer_guided_english_003",
             "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "ordinal_phrase", "possessive_text", "three_word_value", "quoted_multiword", "real"],
             "question": 'Register museum shipment MSH-640 with crate "Curator\'s Ivory Compass", origin "Quito", weight_kg 16.2, arrival_rank third. Customs note omitted.',
             "selected_table": "museum_shipments",
@@ -531,7 +943,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"shipment_code": "MSH-640", "crate_name": "Curator's Ivory Compass", "origin_city": "Quito", "weight_kg": "16.2", "arrival_rank": "third"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_004",
+            "sample_id": "stage7c_a6_reviewer_guided_english_004",
             "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "hex_identifier", "generic_stoplist", "integer", "real", "schema_alias"],
             "question": "Create energy meter row meter 0xD00DCAFE, reading_kwh 735.4, voltage_v 221, tariff_code TAR-C2. Service memo left empty.",
             "selected_table": "energy_meters",
@@ -550,7 +962,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"meter_id": "0xD00DCAFE", "reading_kwh": "735.4", "voltage_v": "221", "tariff_code": "TAR-C2"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_005",
+            "sample_id": "stage7c_a6_reviewer_guided_english_005",
             "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "identifier", "integer", "many_nullable_columns"],
             "question": 'Enroll student "Noor Patel", course_code CHEM-220, section S-7, credit_units 4. Accommodation plan blank.',
             "selected_table": "course_enrollments",
@@ -570,7 +982,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"student_name": "Noor Patel", "course_code": "CHEM-220", "section_code": "S-7", "credit_units": "4"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_006",
+            "sample_id": "stage7c_a6_reviewer_guided_english_006",
             "coverage_tags": ["multi_table", "oneOf", "5_assigned_columns", "true_omit", "real", "text_numeric_mix"],
             "question": 'For ferry_bookings, add booking_ref FERRY-118, route_code BAY-6, passenger "Omar Silva", fare 32.50, seat 12A. Meal preference missing.',
             "selected_table": "ferry_bookings",
@@ -597,7 +1009,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"booking_ref": "FERRY-118", "route_code": "BAY-6", "passenger_name": "Omar Silva", "fare": "32.50", "seat": "12A"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_007",
+            "sample_id": "stage7c_a6_reviewer_guided_english_007",
             "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "percent", "schema_alias", "quoted_multiword"],
             "question": 'Insert chemical batch BATCH-Q9, compound_name "Sodium Formate", purity_pct 99.1%, mass_kg 2.75. Storage advisory not supplied.',
             "selected_table": "chemical_batches",
@@ -616,7 +1028,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"batch_code": "BATCH-Q9", "compound_name": "Sodium Formate", "purity_pct": "99.1%", "mass_kg": "2.75"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_008",
+            "sample_id": "stage7c_a6_reviewer_guided_english_008",
             "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "legitimate_omission_literals", "integer"],
             "question": 'Create building sensor sensor_tag SNS-330, floor_label L14, co2_ppm 640, status "Unavailable". Maintenance ticket absent.',
             "selected_table": "building_sensors",
@@ -635,7 +1047,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"sensor_tag": "SNS-330", "floor_label": "L14", "co2_ppm": "640", "status": "Unavailable"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_009",
+            "sample_id": "stage7c_a6_reviewer_guided_english_009",
             "coverage_tags": ["multi_table", "oneOf", "4_assigned_columns", "true_omit", "email", "quoted_multiword", "integer"],
             "question": 'Use journal_submissions: manuscript_id MS-772, title "Quiet Methods", author_email lee.kwon@journal.example, page_count 27. Reviewer note omitted.',
             "selected_table": "journal_submissions",
@@ -661,7 +1073,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"manuscript_id": "MS-772", "title": "Quiet Methods", "author_email": "lee.kwon@journal.example", "page_count": "27"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_010",
+            "sample_id": "stage7c_a6_reviewer_guided_english_010",
             "coverage_tags": ["single_table", "4_assigned_columns", "true_omit", "overlapping_candidates", "quoted_multiword", "identifier"],
             "question": 'Record orchard harvest lot HARV-26, cultivar "Pink Dawn", bushel_count 58, quality_grade "Pink". Weather memo not provided.',
             "selected_table": "orchard_harvests",
@@ -681,7 +1093,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_value_spans": {"quality_grade": {"start_char": 90, "end_char": 94}},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_011",
+            "sample_id": "stage7c_a6_reviewer_guided_english_011",
             "coverage_tags": ["single_table", "3_assigned_columns", "true_omit", "many_nullable_columns", "quoted_multiword", "real"],
             "question": 'Calibrate device DEV-515 against standard "Delta Zero" with error_margin 0.006. Technician memo missing and certificate note left empty.',
             "selected_table": "device_calibrations",
@@ -700,7 +1112,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"device_code": "DEV-515", "standard_name": "Delta Zero", "error_margin": "0.006"},
         },
         {
-            "sample_id": "stage7c_a6_primary_english_012",
+            "sample_id": "stage7c_a6_reviewer_guided_english_012",
             "coverage_tags": ["single_table", "5_assigned_columns", "true_omit", "legitimate_omission_literals", "datetime", "quoted_multiword"],
             "question": 'Schedule film screening SCR-442 for film_title "Not Found", auditorium AUD-3, start_time 2026-12-22 19:45:00, ticket_price 11.25. Sponsor text blank.',
             "selected_table": "film_screenings",
@@ -720,6 +1132,7 @@ def case_definitions() -> list[dict[str, Any]]:
             "assigned_values": {"screening_code": "SCR-442", "film_title": "Not Found", "auditorium": "AUD-3", "start_time": "2026-12-22 19:45:00", "ticket_price": "11.25"},
         },
     ]
+    return cases
 
 
 def a6_method_stress_diagnostic_case_definitions() -> list[dict[str, Any]]:
@@ -1495,7 +1908,7 @@ def acceptance_policy() -> dict[str, Any]:
             ],
         },
         "diagnostic_gate": {
-            "sample_set": "12 corrected A5 observed diagnostics plus 12 A6 method-stress diagnostics",
+            "sample_set": "12 corrected A5 observed diagnostics plus 12 A6 method-stress diagnostics plus 12 reviewer-guided A6 stress diagnostics",
             "required_pass_count": "12/12",
             "role": "diagnostic_only_after_primary",
             "can_compensate_primary_failure": False,
@@ -1532,6 +1945,7 @@ def prior_design_evidence(
     stage7c_a5_erratum_dir: Path,
     a5_diagnostic_cases: list[dict[str, Any]],
     method_stress_cases: list[dict[str, Any]],
+    reviewer_guided_cases: list[dict[str, Any]],
 ) -> dict[str, Any]:
     questions: dict[str, str] = {}
     literals_by_source: dict[str, set[str]] = {}
@@ -1553,6 +1967,7 @@ def prior_design_evidence(
     questions.update(corrected_questions)
     add_source("corrected_a5_erratum_primary", cases=a5_diagnostic_cases, payload=corrected_rows)
     add_source("a6_method_stress_diagnostics", cases=method_stress_cases)
+    add_source("reviewer_guided_after_method_freeze_diagnostics", cases=reviewer_guided_cases)
     for filename in [
         "SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json",
         "A5_OBSERVED_ERROR_COUNTERFACTUAL_DOMAIN_AUDIT.json",
@@ -1571,7 +1986,11 @@ def prior_design_evidence(
     }
 
 
-def primary_independence_audit(primary_cases: list[dict[str, Any]], prior_evidence: dict[str, Any]) -> dict[str, Any]:
+def primary_independence_audit(
+    primary_cases: list[dict[str, Any]],
+    prior_evidence: dict[str, Any],
+    construction_protocol: dict[str, Any],
+) -> dict[str, Any]:
     prior_questions = prior_evidence["questions"]
     literals_by_source = prior_evidence["literals_by_source"]
     prior_literals = {
@@ -1580,14 +1999,28 @@ def primary_independence_audit(primary_cases: list[dict[str, Any]], prior_eviden
         for literal in literals
     }
     synthetic_fixture_literals = set(literals_by_source.get(f"{STAGE7B_A4_NAME}:SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json", []))
+    normalized_reviewer_domains = {_normalize_blacklist_text(value) for value in REVIEWER_SUGGESTED_DOMAIN_BLACKLIST}
+    normalized_reviewer_literals = {_normalize_blacklist_text(value) for value in REVIEWER_SUGGESTED_LITERAL_BLACKLIST}
     rows = []
     exact_literal_reuse_count = 0
     exact_synthetic_fixture_reuse_count = 0
+    exact_reviewer_domain_reuse_count = 0
+    exact_reviewer_literal_reuse_count = 0
     max_similarity = 0.0
     for case in primary_cases:
         literals = {str(value) for value in case["assigned_values"].values() if _is_design_literal(str(value))}
         overlaps = sorted(literals & prior_literals)
         synthetic_overlaps = sorted(literals & synthetic_fixture_literals)
+        reviewer_domain_overlaps = sorted(
+            value
+            for value in [case.get("construction_domain_label", "")]
+            if _normalize_blacklist_text(str(value)) in normalized_reviewer_domains
+        )
+        reviewer_literal_overlaps = sorted(
+            value
+            for value in literals
+            if _normalize_blacklist_text(value) in normalized_reviewer_literals
+        )
         similarities = [
             {
                 "prior_evidence_id": prior_id,
@@ -1601,14 +2034,20 @@ def primary_independence_audit(primary_cases: list[dict[str, Any]], prior_eviden
             exact_literal_reuse_count += 1
         if synthetic_overlaps:
             exact_synthetic_fixture_reuse_count += 1
+        if reviewer_domain_overlaps:
+            exact_reviewer_domain_reuse_count += 1
+        if reviewer_literal_overlaps:
+            exact_reviewer_literal_reuse_count += 1
         rows.append(
             {
                 "sample_id": case["sample_id"],
                 "exact_prior_design_literal_reuse": overlaps,
                 "exact_synthetic_fixture_literal_reuse": synthetic_overlaps,
+                "exact_reviewer_suggested_domain_reuse": reviewer_domain_overlaps,
+                "exact_reviewer_suggested_literal_reuse": reviewer_literal_overlaps,
                 "nearest_prior_design_question": nearest["prior_evidence_id"],
                 "nearest_question_sequence_similarity": nearest["sequence_similarity"],
-                "passes_independence_gate": not overlaps and not synthetic_overlaps and nearest["sequence_similarity"] < 0.60,
+                "passes_independence_gate": not overlaps and not synthetic_overlaps and not reviewer_domain_overlaps and not reviewer_literal_overlaps and nearest["sequence_similarity"] < 0.60,
             }
         )
     failures = [row["sample_id"] for row in rows if not row["passes_independence_gate"]]
@@ -1622,15 +2061,24 @@ def primary_independence_audit(primary_cases: list[dict[str, Any]], prior_eviden
             "Stage7B-A4 A5 observed-error counterfactual examples",
             "Stage7B-A4 known false-suppression audit payload",
             "A6 method-stress diagnostics moved out of primary acceptance",
+            "Reviewer-guided A6 stress diagnostics moved out of primary acceptance",
+            "Reviewer-suggested PATCH0 domain and literal blacklist",
         ],
         "prior_design_source_literal_counts": prior_evidence["source_literal_counts"],
         "prior_design_source_question_count": prior_evidence["source_question_count"],
+        "construction_protocol_status": construction_protocol["status"],
+        "domain_pool_sha256": construction_protocol["domain_pool_sha256"],
+        "selection_seed": construction_protocol["selection_seed"],
         "exact_prior_design_literal_reuse_case_count": exact_literal_reuse_count,
         "exact_synthetic_fixture_reuse_case_count": exact_synthetic_fixture_reuse_count,
+        "exact_reviewer_suggested_domain_reuse_case_count": exact_reviewer_domain_reuse_count,
+        "exact_reviewer_suggested_literal_reuse_case_count": exact_reviewer_literal_reuse_count,
+        "reviewer_suggested_domains_used": construction_protocol["reviewer_suggested_domains_used"],
+        "reviewer_suggested_literals_used": construction_protocol["reviewer_suggested_literals_used"],
         "known_development_example_reuse_case_count": exact_literal_reuse_count,
         "max_nearest_question_sequence_similarity": max_similarity,
         "similarity_threshold": 0.60,
-        "status": "PASS" if not failures else "FAIL",
+        "status": "PASS" if not failures and construction_protocol["status"] == "PASS" else "FAIL",
         "failures": failures,
         "per_primary_case": rows,
         "model_called": False,
@@ -1880,6 +2328,9 @@ def smoke_row(case: dict[str, Any], db_info: dict[str, Any]) -> dict[str, Any]:
         },
         "synthetic_db_spec": {**db_info, "source_tables": case["tables"]},
     }
+    if "construction_domain_id" in case:
+        row["construction_domain_id"] = case["construction_domain_id"]
+        row["construction_domain_label"] = case["construction_domain_label"]
     return row
 
 
@@ -2009,26 +2460,29 @@ Review order:
 6. `{STAGE_NAME}/ATOMIC_DOMAIN_COLUMN_CONDITIONED_SERIALIZATION_FREEZE.json`
 7. `{STAGE_NAME}/CANDIDATE_DOMAIN_RUNTIME_FREEZE_A6.json`
 8. `{STAGE_NAME}/A6_ORACLE_CANDIDATE_DOMAIN_AUDIT.json`
-9. `{STAGE_NAME}/FRESH_ENGLISH_A6_PRIMARY_FEASIBILITY_SET.jsonl`
-10. `{STAGE_NAME}/A5_OBSERVED_REGRESSION_DIAGNOSTICS_A6.jsonl`
-11. `{STAGE_NAME}/A6_METHOD_STRESS_REGRESSION_DIAGNOSTICS_A6.jsonl`
-12. `{STAGE_NAME}/ORACLE_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl`
-13. `{STAGE_NAME}/ORACLE_A5_OBSERVED_DIAGNOSTIC_RESULTS.jsonl`
-14. `{STAGE_NAME}/ORACLE_A6_METHOD_STRESS_DIAGNOSTIC_RESULTS.jsonl`
-15. `{STAGE_NAME}/A6_PRIMARY_INDEPENDENCE_AUDIT.json`
-16. `{STAGE_NAME}/PRIOR_DESIGN_EVIDENCE_INDEPENDENCE_AUDIT_A6.json`
-17. `{STAGE_NAME}/EVALUATOR_SEMANTICS_A6.json`
-18. `{STAGE_NAME}/ACCEPTANCE_POLICY_A6.json`
-19. `{STAGE_NAME}/OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A6.json`
-20. `{STAGE_NAME}/SOURCE_INPUT_MANIFEST.json`
-21. `{STAGE_NAME}/SYNTHETIC_SQLITE_DB_MANIFEST.jsonl`
-22. `{STAGE_NAME}/PACKAGE_FILE_INTEGRITY_MANIFEST.json`
-23. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
-24. `{STAGE_NAME}/STAGE7C_A6_LOCK.json`
-25. `{STAGE_NAME}/VALIDATION_REPORT.md`
-26. `scripts/data/build_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py`
-27. `scripts/data/validate_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py`
-28. `tests/test_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py`
+9. `{STAGE_NAME}/A6_PRIMARY_SET_CONSTRUCTION_PROTOCOL.json`
+10. `{STAGE_NAME}/FRESH_ENGLISH_A6_PRIMARY_FEASIBILITY_SET.jsonl`
+11. `{STAGE_NAME}/A5_OBSERVED_REGRESSION_DIAGNOSTICS_A6.jsonl`
+12. `{STAGE_NAME}/A6_METHOD_STRESS_REGRESSION_DIAGNOSTICS_A6.jsonl`
+13. `{STAGE_NAME}/REVIEWER_GUIDED_A6_STRESS_DIAGNOSTICS.jsonl`
+14. `{STAGE_NAME}/ORACLE_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl`
+15. `{STAGE_NAME}/ORACLE_A5_OBSERVED_DIAGNOSTIC_RESULTS.jsonl`
+16. `{STAGE_NAME}/ORACLE_A6_METHOD_STRESS_DIAGNOSTIC_RESULTS.jsonl`
+17. `{STAGE_NAME}/ORACLE_REVIEWER_GUIDED_A6_STRESS_DIAGNOSTIC_RESULTS.jsonl`
+18. `{STAGE_NAME}/A6_PRIMARY_INDEPENDENCE_AUDIT.json`
+19. `{STAGE_NAME}/PRIOR_DESIGN_EVIDENCE_INDEPENDENCE_AUDIT_A6.json`
+20. `{STAGE_NAME}/EVALUATOR_SEMANTICS_A6.json`
+21. `{STAGE_NAME}/ACCEPTANCE_POLICY_A6.json`
+22. `{STAGE_NAME}/OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A6.json`
+23. `{STAGE_NAME}/SOURCE_INPUT_MANIFEST.json`
+24. `{STAGE_NAME}/SYNTHETIC_SQLITE_DB_MANIFEST.jsonl`
+25. `{STAGE_NAME}/PACKAGE_FILE_INTEGRITY_MANIFEST.json`
+26. `{STAGE_NAME}/DERIVED_ARTIFACT_MANIFEST.json`
+27. `{STAGE_NAME}/STAGE7C_A6_LOCK.json`
+28. `{STAGE_NAME}/VALIDATION_REPORT.md`
+29. `scripts/data/build_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py`
+30. `scripts/data/validate_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py`
+31. `tests/test_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py`
 
 Clean extraction commands:
 
@@ -2073,7 +2527,9 @@ def build_stage(
     primary_cases = case_definitions()
     a5_diagnostic_cases = diagnostic_case_definitions(stage7c_a5_erratum_dir)
     method_stress_cases = a6_method_stress_diagnostic_case_definitions()
-    prior_evidence = prior_design_evidence(stage7b_a4_dir, stage7c_a5_erratum_dir, a5_diagnostic_cases, method_stress_cases)
+    reviewer_guided_cases = reviewer_guided_a6_stress_diagnostic_case_definitions()
+    construction_protocol = primary_set_construction_protocol(primary_cases)
+    prior_evidence = prior_design_evidence(stage7b_a4_dir, stage7c_a5_erratum_dir, a5_diagnostic_cases, method_stress_cases, reviewer_guided_cases)
 
     write_json(out_dir / "SOURCE_INPUT_MANIFEST.json", source_input_manifest(stage7b_a2_dir, stage7b_a3_dir, stage7b_a4_dir, stage7c_a4_dir, stage7c_a5_erratum_dir, stage7e0_a4_dir, stage7e0_a5_dir))
     write_json(out_dir / "ATOMIC_DOMAIN_COLUMN_CONDITIONED_OUTPUT_SPEC_A6.json", output_spec())
@@ -2086,7 +2542,8 @@ def build_stage(
     write_json(out_dir / "OMIT_AND_CANDIDATE_MISS_FAILURE_POLICY_A6.json", failure_policy())
     write_json(out_dir / "EVALUATOR_SEMANTICS_A6.json", evaluator_semantics())
     write_json(out_dir / "ACCEPTANCE_POLICY_A6.json", acceptance_policy())
-    independence_audit = primary_independence_audit(primary_cases, prior_evidence)
+    write_json(out_dir / "A6_PRIMARY_SET_CONSTRUCTION_PROTOCOL.json", construction_protocol)
+    independence_audit = primary_independence_audit(primary_cases, prior_evidence, construction_protocol)
     write_json(out_dir / "A6_PRIMARY_INDEPENDENCE_AUDIT.json", independence_audit)
     write_json(
         out_dir / "PRIOR_DESIGN_EVIDENCE_INDEPENDENCE_AUDIT_A6.json",
@@ -2099,6 +2556,13 @@ def build_stage(
             "prior_design_source_question_count": independence_audit["prior_design_source_question_count"],
             "exact_prior_design_literal_reuse_case_count": independence_audit["exact_prior_design_literal_reuse_case_count"],
             "exact_synthetic_fixture_reuse_case_count": independence_audit["exact_synthetic_fixture_reuse_case_count"],
+            "exact_reviewer_suggested_domain_reuse_case_count": independence_audit["exact_reviewer_suggested_domain_reuse_case_count"],
+            "exact_reviewer_suggested_literal_reuse_case_count": independence_audit["exact_reviewer_suggested_literal_reuse_case_count"],
+            "reviewer_suggested_domains_used": independence_audit["reviewer_suggested_domains_used"],
+            "reviewer_suggested_literals_used": independence_audit["reviewer_suggested_literals_used"],
+            "construction_protocol_status": independence_audit["construction_protocol_status"],
+            "domain_pool_sha256": independence_audit["domain_pool_sha256"],
+            "selection_seed": independence_audit["selection_seed"],
             "known_development_example_reuse_case_count": independence_audit["known_development_example_reuse_case_count"],
             "max_nearest_question_sequence_similarity": independence_audit["max_nearest_question_sequence_similarity"],
             "similarity_threshold": independence_audit["similarity_threshold"],
@@ -2111,10 +2575,12 @@ def build_stage(
     rows = []
     diagnostic_rows = []
     method_stress_rows = []
+    reviewer_guided_rows = []
     db_manifest = []
     oracle_results = []
     diagnostic_oracle_results = []
     method_stress_oracle_results = []
+    reviewer_guided_oracle_results = []
     for case in primary_cases:
         db_info = create_case_db(case, db_dir)
         row = smoke_row(case, db_info)
@@ -2149,13 +2615,27 @@ def build_stage(
         method_stress_rows.append(row)
         db_manifest.append({**db_info, "source_tables": case["tables"], "diagnostic_role": "diagnostic_only_after_primary", "diagnostic_source": "a6_patch0_method_stress_regression"})
         method_stress_oracle_results.append(oracle)
+    for case in reviewer_guided_cases:
+        db_info = create_case_db(case, db_dir)
+        row = smoke_row(case, db_info)
+        row["diagnostic_role"] = "diagnostic_only_after_primary"
+        row["diagnostic_source"] = "reviewer_guided_after_method_freeze"
+        oracle = oracle_column_conditioned_path(row, out_dir / db_info["sqlite_db_path"])
+        row["label_side_expected"]["resolved_column_span_oracle"] = oracle["resolved_column_spans"]
+        row["label_side_expected"]["deterministic_ir_oracle"] = oracle["deterministic_ir"]
+        row["label_side_expected"]["target_state"]["compiler_observed_target_state_hash"] = oracle["observed_target_state_hash"]
+        reviewer_guided_rows.append(row)
+        db_manifest.append({**db_info, "source_tables": case["tables"], "diagnostic_role": "diagnostic_only_after_primary", "diagnostic_source": "reviewer_guided_after_method_freeze"})
+        reviewer_guided_oracle_results.append(oracle)
 
     write_jsonl(out_dir / "FRESH_ENGLISH_A6_PRIMARY_FEASIBILITY_SET.jsonl", rows)
     write_jsonl(out_dir / "A5_OBSERVED_REGRESSION_DIAGNOSTICS_A6.jsonl", diagnostic_rows)
     write_jsonl(out_dir / "A6_METHOD_STRESS_REGRESSION_DIAGNOSTICS_A6.jsonl", method_stress_rows)
+    write_jsonl(out_dir / "REVIEWER_GUIDED_A6_STRESS_DIAGNOSTICS.jsonl", reviewer_guided_rows)
     write_jsonl(out_dir / "ORACLE_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PRIMARY_RESULTS.jsonl", oracle_results)
     write_jsonl(out_dir / "ORACLE_A5_OBSERVED_DIAGNOSTIC_RESULTS.jsonl", diagnostic_oracle_results)
     write_jsonl(out_dir / "ORACLE_A6_METHOD_STRESS_DIAGNOSTIC_RESULTS.jsonl", method_stress_oracle_results)
+    write_jsonl(out_dir / "ORACLE_REVIEWER_GUIDED_A6_STRESS_DIAGNOSTIC_RESULTS.jsonl", reviewer_guided_oracle_results)
     write_jsonl(out_dir / "SYNTHETIC_SQLITE_DB_MANIFEST.jsonl", db_manifest)
     candidate_domain_audit = candidate_domain_oracle_audit(rows)
     write_json(out_dir / "A6_ORACLE_CANDIDATE_DOMAIN_AUDIT.json", candidate_domain_audit)
@@ -2171,6 +2651,8 @@ def build_stage(
     diagnostic_omit_count = sum(sum(1 for value in row["label_side_expected"]["phase_o"]["column_span_refs"].values() if value == "OMIT") for row in diagnostic_rows)
     method_stress_assigned_count = sum(sum(1 for value in row["label_side_expected"]["phase_o"]["column_span_refs"].values() if value != "OMIT") for row in method_stress_rows)
     method_stress_omit_count = sum(sum(1 for value in row["label_side_expected"]["phase_o"]["column_span_refs"].values() if value == "OMIT") for row in method_stress_rows)
+    reviewer_guided_assigned_count = sum(sum(1 for value in row["label_side_expected"]["phase_o"]["column_span_refs"].values() if value != "OMIT") for row in reviewer_guided_rows)
+    reviewer_guided_omit_count = sum(sum(1 for value in row["label_side_expected"]["phase_o"]["column_span_refs"].values() if value == "OMIT") for row in reviewer_guided_rows)
     lock = {
         "stage": STAGE_NAME,
         "patch": PATCH_NAME,
@@ -2198,6 +2680,10 @@ def build_stage(
         "method_stress_assigned_column_decision_count": method_stress_assigned_count,
         "method_stress_omit_column_decision_count": method_stress_omit_count,
         "method_stress_oracle_preflight_admitted_count": sum(1 for item in method_stress_oracle_results if item["preflight"] == "ADMITTED"),
+        "a6_reviewer_guided_regression_diagnostic_count": len(reviewer_guided_rows),
+        "reviewer_guided_assigned_column_decision_count": reviewer_guided_assigned_count,
+        "reviewer_guided_omit_column_decision_count": reviewer_guided_omit_count,
+        "reviewer_guided_oracle_preflight_admitted_count": sum(1 for item in reviewer_guided_oracle_results if item["preflight"] == "ADMITTED"),
         "primary_acceptance_precedes_diagnostics": True,
         "diagnostics_can_compensate_primary_failure": False,
         "phase_m_primary_pipeline_removed": True,
@@ -2213,6 +2699,13 @@ def build_stage(
         "candidate_domain_filter_enabled": True,
         "exact_prior_design_literal_reuse_case_count": independence_audit["exact_prior_design_literal_reuse_case_count"],
         "exact_synthetic_fixture_reuse_case_count": independence_audit["exact_synthetic_fixture_reuse_case_count"],
+        "exact_reviewer_suggested_domain_reuse_case_count": independence_audit["exact_reviewer_suggested_domain_reuse_case_count"],
+        "exact_reviewer_suggested_literal_reuse_case_count": independence_audit["exact_reviewer_suggested_literal_reuse_case_count"],
+        "reviewer_suggested_domains_used": independence_audit["reviewer_suggested_domains_used"],
+        "reviewer_suggested_literals_used": independence_audit["reviewer_suggested_literals_used"],
+        "primary_set_construction_protocol_status": construction_protocol["status"],
+        "primary_domain_pool_sha256": construction_protocol["domain_pool_sha256"],
+        "primary_selection_seed": construction_protocol["selection_seed"],
         "known_development_example_reuse_case_count": independence_audit["known_development_example_reuse_case_count"],
         "candidate_domain_gold_suppressed_total": read_json(out_dir / "A6_ORACLE_CANDIDATE_DOMAIN_AUDIT.json")["gold_suppressed_total"],
         "candidate_domain_suppressed_candidate_total": read_json(out_dir / "A6_ORACLE_CANDIDATE_DOMAIN_AUDIT.json")["suppressed_candidate_total"],
@@ -2229,7 +2722,7 @@ def build_stage(
     write_json(out_dir / "STAGE7C_A6_LOCK.json", lock)
     write_text(out_dir / "VALIDATION_REPORT.md", validation_report(len(rows), assigned_count, omit_count, multi_table_count, token_audit, candidate_domain_audit).replace(
         "Candidate-generator miss is a method failure, not OMIT, and may not exclude a\nsample from pilot/dev/test denominators.\n",
-        f"Candidate-generator miss is a method failure, not OMIT, and may not exclude a\nsample from pilot/dev/test denominators. Diagnostics are run after primary and cannot compensate primary failures.\n\n```text\na5_corrected_regression_diagnostics={len(diagnostic_rows)}\na5_diagnostic_oracle_preflight={sum(1 for item in diagnostic_oracle_results if item['preflight'] == 'ADMITTED')}/{len(diagnostic_rows)} ADMITTED\na6_method_stress_regression_diagnostics={len(method_stress_rows)}\nmethod_stress_oracle_preflight={sum(1 for item in method_stress_oracle_results if item['preflight'] == 'ADMITTED')}/{len(method_stress_rows)} ADMITTED\nexact_prior_design_literal_reuse_case_count={independence_audit['exact_prior_design_literal_reuse_case_count']}\nexact_synthetic_fixture_reuse_case_count={independence_audit['exact_synthetic_fixture_reuse_case_count']}\ncolumn_span_refs_mapping_equality=order_insensitive_by_object_key\nduplicate_span_reuse_is_method_failure=true\n```\n",
+        f"Candidate-generator miss is a method failure, not OMIT, and may not exclude a\nsample from pilot/dev/test denominators. Diagnostics are run after primary and cannot compensate primary failures.\n\n```text\na5_corrected_regression_diagnostics={len(diagnostic_rows)}\na5_diagnostic_oracle_preflight={sum(1 for item in diagnostic_oracle_results if item['preflight'] == 'ADMITTED')}/{len(diagnostic_rows)} ADMITTED\na6_method_stress_regression_diagnostics={len(method_stress_rows)}\nmethod_stress_oracle_preflight={sum(1 for item in method_stress_oracle_results if item['preflight'] == 'ADMITTED')}/{len(method_stress_rows)} ADMITTED\na6_reviewer_guided_regression_diagnostics={len(reviewer_guided_rows)}\nreviewer_guided_oracle_preflight={sum(1 for item in reviewer_guided_oracle_results if item['preflight'] == 'ADMITTED')}/{len(reviewer_guided_rows)} ADMITTED\nprimary_set_construction_protocol_status={construction_protocol['status']}\nexact_prior_design_literal_reuse_case_count={independence_audit['exact_prior_design_literal_reuse_case_count']}\nexact_synthetic_fixture_reuse_case_count={independence_audit['exact_synthetic_fixture_reuse_case_count']}\nexact_reviewer_suggested_domain_reuse_case_count={independence_audit['exact_reviewer_suggested_domain_reuse_case_count']}\nexact_reviewer_suggested_literal_reuse_case_count={independence_audit['exact_reviewer_suggested_literal_reuse_case_count']}\ncolumn_span_refs_mapping_equality=order_insensitive_by_object_key\nduplicate_span_reuse_is_method_failure=true\n```\n",
     ))
     write_text(out_dir / "REVIEWER_README.md", reviewer_readme(out_dir))
     return {
@@ -2245,6 +2738,8 @@ def build_stage(
         "diagnostic_oracle_preflight_admitted_count": lock["diagnostic_oracle_preflight_admitted_count"],
         "a6_method_stress_regression_diagnostic_count": len(method_stress_rows),
         "method_stress_oracle_preflight_admitted_count": lock["method_stress_oracle_preflight_admitted_count"],
+        "a6_reviewer_guided_regression_diagnostic_count": len(reviewer_guided_rows),
+        "reviewer_guided_oracle_preflight_admitted_count": lock["reviewer_guided_oracle_preflight_admitted_count"],
         "tokenizer_status": token_audit["tokenizer_status"],
         "model_called": False,
         "gpu_called": False,

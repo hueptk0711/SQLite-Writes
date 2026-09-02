@@ -27,15 +27,15 @@ runtime_order=lexical_ngram2 inventory -> schema-label + conservative-alias atom
 
 ```text
 fresh_cases=12
-assigned_column_decisions=52
-omit_column_decisions=14
+assigned_column_decisions=54
+omit_column_decisions=16
 multi_table_oneof_cases=2
 oracle_preflight=12/12 ADMITTED
 canonical_target_state=12/12 exact
 gold_suppressed_by_candidate_domain_filter=0
-unfiltered_candidate_total=554
-filtered_candidate_total=483
-suppressed_candidate_total=71
+unfiltered_candidate_total=601
+filtered_candidate_total=537
+suppressed_candidate_total=64
 ```
 
 ## Full Prompt Token Burden
@@ -44,12 +44,12 @@ suppressed_candidate_total=71
 tokenizer_status=PASS
 tokenizer=Qwen/Qwen2.5-Coder-7B-Instruct
 tokenizer_revision=c03e6d358207e414f1eca0bb1891e29f1db0e242
-rendered_prompt_chars_median=3103.0
-rendered_prompt_tokens_min=863
-rendered_prompt_chars_p95=3493
-rendered_prompt_tokens_median=998.5
-rendered_prompt_tokens_p95=1194
-rendered_prompt_tokens_max=1226
+rendered_prompt_chars_median=3354.0
+rendered_prompt_tokens_min=988
+rendered_prompt_chars_p95=3680
+rendered_prompt_tokens_median=1103.0
+rendered_prompt_tokens_p95=1215
+rendered_prompt_tokens_max=1412
 ```
 
 ## Locked Failure Policy
@@ -62,8 +62,13 @@ a5_corrected_regression_diagnostics=12
 a5_diagnostic_oracle_preflight=12/12 ADMITTED
 a6_method_stress_regression_diagnostics=12
 method_stress_oracle_preflight=12/12 ADMITTED
+a6_reviewer_guided_regression_diagnostics=12
+reviewer_guided_oracle_preflight=12/12 ADMITTED
+primary_set_construction_protocol_status=PASS
 exact_prior_design_literal_reuse_case_count=0
 exact_synthetic_fixture_reuse_case_count=0
+exact_reviewer_suggested_domain_reuse_case_count=0
+exact_reviewer_suggested_literal_reuse_case_count=0
 column_span_refs_mapping_equality=order_insensitive_by_object_key
 duplicate_span_reuse_is_method_failure=true
 ```
