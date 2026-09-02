@@ -1,11 +1,11 @@
 {
   "assignment_representability_delta": 0.0,
   "audit_only": true,
-  "broader_containing_gold_total_delta": -1121,
+  "broader_containing_gold_total_delta": -1286,
   "candidate_count_max_delta": 0,
   "candidate_count_median_delta": -2.0,
-  "candidate_count_p95_delta": -2,
-  "candidate_domain_under_review": "patch1_schema_label_aware_candidate_domain_audit",
+  "candidate_count_p95_delta": -3,
+  "candidate_domain_under_review": "patch2_schema_label_alias_candidate_domain_audit",
   "current_domain": "current_lexical_ngram2",
   "full_sample_representability_delta": 0.0,
   "gpu_called": false,
@@ -34,6 +34,14 @@
       "candidate_count_median": 43.0,
       "candidate_count_p95": 68,
       "domain": "patch1_schema_label_aware",
+      "full_sample_representability": 0.9945054945054945
+    },
+    {
+      "assignment_representability": 0.99822695035461,
+      "broader_containing_gold_total": 5255,
+      "candidate_count_median": 43.0,
+      "candidate_count_p95": 67,
+      "domain": "patch2_schema_label_alias",
       "full_sample_representability": 0.9945054945054945
     }
   ],

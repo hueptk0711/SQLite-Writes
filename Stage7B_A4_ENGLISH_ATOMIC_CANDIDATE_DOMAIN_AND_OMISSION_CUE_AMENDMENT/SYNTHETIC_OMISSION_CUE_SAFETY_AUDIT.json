@@ -10,7 +10,11 @@
             "construction_text": "phone not provided",
             "cue_phrase": "not provided",
             "rule": "CONTEXT_AWARE_OMISSION_CUE",
-            "schema_label": "phone"
+            "schema_alias_source_labels": [
+              "phone"
+            ],
+            "schema_label": "phone",
+            "suppressed_span_kind": "exact_cue"
           },
           "span_ref": "SPAN_0012",
           "text": "not provided"
@@ -23,6 +27,9 @@
           "cue_phrase": "not provided",
           "end_char": 38,
           "label": "phone",
+          "schema_alias_source_labels": [
+            "phone"
+          ],
           "start_char": 20,
           "text": "phone not provided"
         }
@@ -40,7 +47,25 @@
             "construction_text": "region omitted",
             "cue_phrase": "omitted",
             "rule": "CONTEXT_AWARE_OMISSION_CUE",
-            "schema_label": "region"
+            "schema_alias_source_labels": [
+              "region"
+            ],
+            "schema_label": "region",
+            "suppressed_span_kind": "full_omission_construction"
+          },
+          "span_ref": "SPAN_0010",
+          "text": "region omitted"
+        },
+        {
+          "reason": {
+            "construction_text": "region omitted",
+            "cue_phrase": "omitted",
+            "rule": "CONTEXT_AWARE_OMISSION_CUE",
+            "schema_alias_source_labels": [
+              "region"
+            ],
+            "schema_label": "region",
+            "suppressed_span_kind": "exact_cue"
           },
           "span_ref": "SPAN_0012",
           "text": "omitted"
@@ -53,6 +78,9 @@
           "cue_phrase": "omitted",
           "end_char": 28,
           "label": "region",
+          "schema_alias_source_labels": [
+            "region"
+          ],
           "start_char": 14,
           "text": "region omitted"
         }
@@ -70,7 +98,25 @@
             "construction_text": "note missing",
             "cue_phrase": "missing",
             "rule": "CONTEXT_AWARE_OMISSION_CUE",
-            "schema_label": "note"
+            "schema_alias_source_labels": [
+              "note"
+            ],
+            "schema_label": "note",
+            "suppressed_span_kind": "full_omission_construction"
+          },
+          "span_ref": "SPAN_0010",
+          "text": "note missing"
+        },
+        {
+          "reason": {
+            "construction_text": "note missing",
+            "cue_phrase": "missing",
+            "rule": "CONTEXT_AWARE_OMISSION_CUE",
+            "schema_alias_source_labels": [
+              "note"
+            ],
+            "schema_label": "note",
+            "suppressed_span_kind": "exact_cue"
           },
           "span_ref": "SPAN_0012",
           "text": "missing"
@@ -83,6 +129,9 @@
           "cue_phrase": "missing",
           "end_char": 29,
           "label": "note",
+          "schema_alias_source_labels": [
+            "note"
+          ],
           "start_char": 17,
           "text": "note missing"
         }
@@ -100,7 +149,11 @@
             "construction_text": "address left empty",
             "cue_phrase": "left empty",
             "rule": "CONTEXT_AWARE_OMISSION_CUE",
-            "schema_label": "address"
+            "schema_alias_source_labels": [
+              "address"
+            ],
+            "schema_label": "address",
+            "suppressed_span_kind": "exact_cue"
           },
           "span_ref": "SPAN_0010",
           "text": "left empty"
@@ -113,6 +166,9 @@
           "cue_phrase": "left empty",
           "end_char": 37,
           "label": "address",
+          "schema_alias_source_labels": [
+            "address"
+          ],
           "start_char": 19,
           "text": "address left empty"
         }

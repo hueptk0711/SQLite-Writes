@@ -1,7 +1,7 @@
 {
   "audit_only": true,
-  "candidate_is_not_suppressible_when": "The cue phrase appears as a quoted/legitimate value or outside a schema-label omission construction.",
-  "candidate_is_suppressible_when": "Normalized candidate text exactly equals one cue phrase inside a detected schema-label omission construction.",
+  "candidate_is_not_suppressible_when": "The cue phrase appears as a quoted/legitimate value or outside a schema-label/schema-alias omission construction.",
+  "candidate_is_suppressible_when": "Normalized candidate text exactly equals one cue phrase inside a detected schema-label or schema-alias omission construction.",
   "cue_phrases": [
     "omitted",
     "missing",

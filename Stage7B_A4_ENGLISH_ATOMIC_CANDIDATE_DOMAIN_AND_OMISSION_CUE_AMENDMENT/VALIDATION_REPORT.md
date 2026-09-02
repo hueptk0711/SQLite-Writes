@@ -2,7 +2,7 @@
 
 Status: PASS
 
-Validation date: 2026-09-01
+Validation date: 2026-09-02
 
 ## Scope
 
@@ -50,6 +50,18 @@ candidate_count_p95=68
 candidate_count_max=114
 suppressed_candidate_total=1166
 broader_containing_gold_total=5420
+```
+
+## PATCH2 Schema-Label-Alias Domain
+
+```text
+assignment_representability=2252/2256
+full_sample_representability=724/728
+candidate_count_median=43.0
+candidate_count_p95=67
+candidate_count_max=114
+suppressed_candidate_total=1346
+broader_containing_gold_total=5255
 threshold_decision=PASS_AUDIT_THRESHOLDS_READY_FOR_REVIEW
 additional_assignment_losses=0
 additional_full_sample_losses=0
@@ -70,10 +82,23 @@ synthetic_positive_fixtures=4
 synthetic_negative_literal_fixtures=4
 ```
 
+## A5 Observed Error Counterfactual
+
+This is a development diagnostic over the already-closed A5 UET outputs, not an
+independent evaluation.
+
+```text
+corrected_a5_wrong_decision_count=23
+patch1_wrong_decisions_suppressed=16
+patch1_correct_gold_suppressed=0
+patch2_wrong_decisions_suppressed=23
+patch2_correct_gold_suppressed=0
+```
+
 ## Decision
 
-The PATCH1 schema-label-aware candidate-domain amendment preserves the current
-baseline representability while reducing label-plus-value distractors. This
-package does not freeze a new runtime protocol and does not authorize a model
-rerun; it provides the evidence needed for reviewer approval of a later
-protocol freeze.
+The PATCH2 schema-label-alias candidate-domain amendment preserves the current
+baseline representability while removing more observed A5 label-plus-value
+distractors. This package does not freeze a new runtime protocol and does not
+authorize a model rerun; it provides the evidence needed for reviewer approval
+of a later protocol freeze.

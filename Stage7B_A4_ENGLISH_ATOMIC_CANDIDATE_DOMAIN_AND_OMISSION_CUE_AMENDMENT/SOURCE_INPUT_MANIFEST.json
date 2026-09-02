@@ -1,7 +1,7 @@
 {
   "gpu_called": false,
   "model_called": false,
-  "patch": "PATCH1",
+  "patch": "PATCH2",
   "source_files": [
     {
       "bytes": 604,
@@ -86,6 +86,24 @@
       "path": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0/CORRECTED_FRESH_ENGLISH_A5_PRIMARY_FEASIBILITY_SET.jsonl",
       "sha256": "2019cc234888f3a43e96adbda993cbe24819f224b22398012591fba362cbabdc",
       "source_stage": "Stage7C_A5_PRIMARY_GOLD_PROVENANCE_ERRATUM_PATCH0"
+    },
+    {
+      "bytes": 386,
+      "path": "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT/SERVER_RESULT_CLASSIFICATION_PATCH5.json",
+      "sha256": "72921f43408989f878529395915b5c9326400916b98e18c16641a6046c650c45",
+      "source_stage": "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT"
+    },
+    {
+      "bytes": 17056,
+      "path": "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT/uet_p4/stage7e0_a5_english_column_conditioned_uet_rtx4090_primary_results_20260901/raw_primary_phase_o_generations.jsonl",
+      "sha256": "3ff2c3e079f19099dcce9b1883faca98156376b24a097f080886e5dfbeedb1d9",
+      "source_stage": "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT"
+    },
+    {
+      "bytes": 22951,
+      "path": "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT/uet_p4/stage7e0_a5_english_column_conditioned_uet_rtx4090_primary_results_20260901/primary_case_results.jsonl",
+      "sha256": "f41908184b54d67732f847318957650e2d154046e94923c5e73878b0a86fb842",
+      "source_stage": "Stage7E0_A5_ENGLISH_COLUMN_CONDITIONED_REAL_GENERATION_PREFLIGHT"
     }
   ],
   "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"

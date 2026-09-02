@@ -27,6 +27,8 @@ from scripts.data.build_stage7b_a4_atomic_candidate_domain_omission_cue import (
     generic_atomic_dominance_reason,
     is_exact_omission_cue,
     package_reviewer,
+    schema_label_alias_aware_dominance_reason,
+    schema_label_alias_index,
     schema_label_aware_dominance_reason,
     suppressible_span_refs,
 )
@@ -56,10 +58,10 @@ def by_text(question: str) -> dict[str, object]:
 
 
 def test_atomic_dominance_suppresses_label_plus_identifier_but_keeps_atomic_child() -> None:
-    question = "Insert loan_id LOAN-842, mass 0.42, station_id 0xA5C0DE."
+    question = "Insert loan_id LOAN-842, mass 0.42, station_id 0xA5C0DE, borrower card CARD-190."
     inventory = generate_candidate_inventory(question)
     candidates = by_text(question)
-    reasons = suppressible_span_refs(inventory, {"loan id", "mass", "station id"}, [])
+    reasons = suppressible_span_refs(inventory, schema_label_alias_index({"loan id", "mass g", "station id", "borrower card"}), [])
 
     broad = candidates["loan_id LOAN-842"]
     child = candidates["LOAN-842"]
@@ -67,7 +69,10 @@ def test_atomic_dominance_suppresses_label_plus_identifier_but_keeps_atomic_chil
     assert reasons[broad.span_ref]["rule"] == "SCHEMA_LABEL_AWARE_ATOMIC_DOMINANCE"
     assert reasons[broad.span_ref]["dominant_child_text"] == "LOAN-842"
     assert child.span_ref not in reasons
-    assert schema_label_aware_dominance_reason(candidates["mass 0.42"], inventory, {"mass"})["dominant_child_text"] == "0.42"
+    assert schema_label_alias_aware_dominance_reason(candidates["mass 0.42"], inventory, schema_label_alias_index({"mass g"}))["dominant_child_text"] == "0.42"
+    card_reason = schema_label_alias_aware_dominance_reason(candidates["card CARD-190"], inventory, schema_label_alias_index({"borrower card"}))
+    assert card_reason["rule"] == "SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE"
+    assert card_reason["schema_alias_source_labels"] == ["borrower card"]
     assert schema_label_aware_dominance_reason(candidates["station_id 0xA5C0DE"], inventory, {"station id"})["dominant_child_text"] == "0xA5C0DE"
 
 
@@ -101,14 +106,17 @@ def test_omission_cue_detection_is_exact_for_suppression() -> None:
 
 
 def test_context_aware_omission_preserves_quoted_cue_literals() -> None:
-    question = 'Insert status "missing". phone not provided.'
+    question = 'Insert status "missing". phone not provided. Dietary note missing.'
     inventory = generate_candidate_inventory(question)
-    detections = detect_omission_constructions(question, {"status", "phone"})
-    reasons = suppressible_span_refs(inventory, {"status", "phone"}, detections)
+    aliases = schema_label_alias_index({"status", "phone", "dietary note"})
+    detections = detect_omission_constructions(question, aliases)
+    reasons = suppressible_span_refs(inventory, aliases, detections)
     suppressed = {candidate.text for candidate in inventory if candidate.span_ref in reasons}
+    quoted_missing = next(candidate for candidate in inventory if candidate.text == "missing" and candidate.start_char < question.index("."))
 
     assert "not provided" in suppressed
-    assert "missing" not in suppressed
+    assert "note missing" in suppressed
+    assert quoted_missing.span_ref not in reasons
 
 
 def test_build_and_validator_pass_on_728_design_train(tmp_path: Path) -> None:
@@ -120,10 +128,12 @@ def test_build_and_validator_pass_on_728_design_train(tmp_path: Path) -> None:
     current = read_json(stage_dir / "CURRENT_LEXICAL_NGRAM2_DOMAIN_AUDIT.json")
     patch0 = read_json(stage_dir / "PATCH0_GENERIC_ATOMIC_DOMAIN_AUDIT.json")
     filtered = read_json(stage_dir / "SCHEMA_LABEL_AWARE_DOMAIN_AUDIT.json")
+    alias_filtered = read_json(stage_dir / "SCHEMA_LABEL_ALIAS_DOMAIN_AUDIT.json")
     comparison = read_json(stage_dir / "DOMAIN_COMPARISON_AUDIT.json")
     false_suppression = read_json(stage_dir / "FALSE_SUPPRESSION_AUDIT.json")
     cue = read_json(stage_dir / "OMISSION_CUE_DESIGN_TRAIN_AUDIT.json")
     synthetic = read_json(stage_dir / "SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json")
+    a5_counterfactual = read_json(stage_dir / "A5_OBSERVED_ERROR_COUNTERFACTUAL_DOMAIN_AUDIT.json")
     rows = read_jsonl(stage_dir / "CANDIDATE_DOMAIN_AUDIT_ROWS.jsonl")
 
     assert current["covered_assignment_count"] == 2252
@@ -132,15 +142,21 @@ def test_build_and_validator_pass_on_728_design_train(tmp_path: Path) -> None:
     assert patch0["full_sample_covered_count"] == 721
     assert filtered["covered_assignment_count"] == 2252
     assert filtered["full_sample_covered_count"] == 724
-    assert filtered["assignment_representability"] >= 0.99
-    assert filtered["full_sample_representability"] >= 0.99
-    assert filtered["suppressed_candidate_total"] > 0
+    assert alias_filtered["covered_assignment_count"] == 2252
+    assert alias_filtered["full_sample_covered_count"] == 724
+    assert alias_filtered["assignment_representability"] >= 0.99
+    assert alias_filtered["full_sample_representability"] >= 0.99
+    assert alias_filtered["suppression_rule_counts"]["SCHEMA_LABEL_ALIAS_ATOMIC_DOMINANCE"] > 0
     assert false_suppression["additional_assignment_losses"] == 0
     assert false_suppression["additional_full_sample_losses"] == 0
     assert comparison["threshold_decision"] == "PASS_AUDIT_THRESHOLDS_READY_FOR_REVIEW"
     assert comparison["method_freeze_authorized"] is False
     assert comparison["candidate_count_p95_delta"] < 0
     assert comparison["broader_containing_gold_total_delta"] < 0
+    assert a5_counterfactual["corrected_a5_wrong_decision_count"] == 23
+    assert a5_counterfactual["patch1_wrong_decisions_suppressed"] == 16
+    assert a5_counterfactual["patch2_wrong_decisions_suppressed"] == 23
+    assert a5_counterfactual["patch2_correct_gold_suppressed"] == 0
     assert cue["true_assigned_value_exact_cue_count"] == 0
     assert cue["true_assigned_value_contains_cue_count"] == 0
     assert synthetic["status"] == "PASS"
@@ -150,15 +166,15 @@ def test_build_and_validator_pass_on_728_design_train(tmp_path: Path) -> None:
 def test_validator_rejects_threshold_tamper(tmp_path: Path) -> None:
     stage_dir = tmp_path / STAGE_NAME
     build_stage(stage_dir, raw_dir_or_skip())
-    filtered_path = stage_dir / "SCHEMA_LABEL_AWARE_DOMAIN_AUDIT.json"
+    filtered_path = stage_dir / "SCHEMA_LABEL_ALIAS_DOMAIN_AUDIT.json"
     filtered = read_json(filtered_path)
     filtered["full_sample_covered_count"] = 700
     filtered["full_sample_representability"] = 700 / filtered["design_sample_count"]
     filtered_path.write_text(json.dumps(filtered, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     report = validate(stage_dir)
     assert report["status"] == "FAIL"
-    assert "schema_aware_full_sample_representability_below_threshold" in report["failures"]
-    assert "derived_manifest_hash_mismatch:SCHEMA_LABEL_AWARE_DOMAIN_AUDIT.json" in report["failures"]
+    assert "schema_alias_full_sample_representability_below_threshold" in report["failures"]
+    assert "derived_manifest_hash_mismatch:SCHEMA_LABEL_ALIAS_DOMAIN_AUDIT.json" in report["failures"]
 
 
 def test_reviewer_package_clean_validator_passes(tmp_path: Path) -> None:

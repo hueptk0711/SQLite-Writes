@@ -1,10 +1,10 @@
 {
-  "artifact_count": 15,
+  "artifact_count": 18,
   "artifacts": [
     {
-      "bytes": 4346,
+      "bytes": 5486,
       "path": "SOURCE_INPUT_MANIFEST.json",
-      "sha256": "a156e3bc955a229f19b1b6e37bddf0d342b14fc3dd3fcd69ea87003c1c5e82f5"
+      "sha256": "661669ef6a4370c76d9abbb0678bbb24f106c428ab03425a7702af587ece1b00"
     },
     {
       "bytes": 888,
@@ -12,19 +12,24 @@
       "sha256": "e460cac4bcdf9901b7125aec5c969220df0373c2ab446eee96d539d855be7277"
     },
     {
-      "bytes": 854,
+      "bytes": 978,
       "path": "DOMAIN_AUDIT_PROTOCOL.json",
-      "sha256": "7dbd5050d26dfe905ab32b35072191ae7b1900270055ac30d7e0227aabfdd725"
+      "sha256": "4a81a57607bc3f9ada315f41e670263067af1ffd64dcc6a4b4ad11f9c449e9e5"
     },
     {
-      "bytes": 1334,
+      "bytes": 1723,
       "path": "ATOMIC_CANDIDATE_DOMINANCE_RULE_SPEC.json",
-      "sha256": "5e6126c99e31bff518bee8c97e97759375d5a96654e81ea402141ec073120171"
+      "sha256": "d3b709741ca36e023e35f48299802c1ed5a094e7dc6651fd4804afc4037c01cc"
     },
     {
-      "bytes": 736,
+      "bytes": 1482,
+      "path": "SCHEMA_LABEL_ALIAS_SPEC.json",
+      "sha256": "94b68510e0f4f461c46483209459899fec84104573326071a8a22118f0a2fb92"
+    },
+    {
+      "bytes": 765,
       "path": "OMISSION_CUE_SUPPRESSION_RULE_SPEC.json",
-      "sha256": "20415d809a672000e4301e64b0fdff0c2b59801b2fd1032dd453d179c1f3f978"
+      "sha256": "06b5ee3fe6e26c8e09cd0125319e402baf24d0c5e3b01c19583a96d0760f2cd8"
     },
     {
       "bytes": 824,
@@ -42,19 +47,24 @@
       "sha256": "4ac37cb476dcd13f4ace16bbbbf03b667ed061c6762fe56f7ede59653a1c4204"
     },
     {
-      "bytes": 1183,
+      "bytes": 1489,
+      "path": "SCHEMA_LABEL_ALIAS_DOMAIN_AUDIT.json",
+      "sha256": "2b71ebd7722b18c12cf5d96c57c7dd795e4aad29cf50c93cacba5eb500c018d2"
+    },
+    {
+      "bytes": 1489,
       "path": "ATOMIC_FILTERED_DOMAIN_AUDIT.json",
-      "sha256": "4ac37cb476dcd13f4ace16bbbbf03b667ed061c6762fe56f7ede59653a1c4204"
+      "sha256": "2b71ebd7722b18c12cf5d96c57c7dd795e4aad29cf50c93cacba5eb500c018d2"
     },
     {
-      "bytes": 1667,
+      "bytes": 1953,
       "path": "DOMAIN_COMPARISON_AUDIT.json",
-      "sha256": "d471ca0bedefab243be6d6df84927cf8ae95d9674d5ae62d9890e6bdc5e8c1cc"
+      "sha256": "404fe4a60efe6178cf80411e6a78672705a26c191959e2a32508c8d05c4ca08d"
     },
     {
-      "bytes": 528,
+      "bytes": 571,
       "path": "FALSE_SUPPRESSION_AUDIT.json",
-      "sha256": "923d8bd9751c369d37da134c6cfa18a23570c107686a910ea7925736947a3af1"
+      "sha256": "277976e6836001a948afb54db8891720cc4af65fc103e985dbdf27a647ad89f0"
     },
     {
       "bytes": 752,
@@ -62,22 +72,27 @@
       "sha256": "c629e49424bff9e8ff7f3dd1192c4769781fd4c48ff2381aee5398f7b4d136cf"
     },
     {
-      "bytes": 4656,
+      "bytes": 6370,
       "path": "SYNTHETIC_OMISSION_CUE_SAFETY_AUDIT.json",
-      "sha256": "d414c283dfce30490559afcc831b883741a15830bf2266f4aaa981b637bbb9d4"
+      "sha256": "5a25327ad6b584a80455a167e08f9c096698ceb1600f0805d6dbd33ce5eac9b8"
     },
     {
-      "bytes": 1317763,
+      "bytes": 26690,
+      "path": "A5_OBSERVED_ERROR_COUNTERFACTUAL_DOMAIN_AUDIT.json",
+      "sha256": "58c02a313ae01a0add30b9737ad038d2fb63edb562067f4129cc44a13fa8b61a"
+    },
+    {
+      "bytes": 1710614,
       "path": "CANDIDATE_DOMAIN_AUDIT_ROWS.jsonl",
-      "sha256": "e8385a56d721dd9a075e2f1a6aed6c66900488c4ee93cee46fd9dfb5a2b12df1"
+      "sha256": "e17dc4e75ba04c93abc33a548c49fb6fba55d65aa75a65010326cae84d4e4dbf"
     },
     {
-      "bytes": 204943,
+      "bytes": 242432,
       "path": "CANDIDATE_SUPPRESSION_EXAMPLES.jsonl",
-      "sha256": "70460df6cbecdbc51fd5bd3455275c359ebbb2a9938edcc716d55c6f1cc85d5d"
+      "sha256": "e38dc92ddd4a8ee289b3308a4e39c2cf4423f810b9b8c5268f5107d3c67c086b"
     }
   ],
-  "combined_scientific_artifacts_sha256": "0723adfd6e195e2c4985509f473ce3dc5c61b2b6619cd7debeb2aeeb1f96a13f",
-  "patch": "PATCH1",
+  "combined_scientific_artifacts_sha256": "1705c3014aaee98c61ca0095889b3eb6ad1e510a71e41a761dd9d7d7a70a56fc",
+  "patch": "PATCH2",
   "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"
 }

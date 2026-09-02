@@ -1,0 +1,65 @@
+{
+  "alias_sources": [
+    "full normalized model-visible table names",
+    "full normalized model-visible column names",
+    "terminal non-generic tokens from multi-token labels",
+    "non-generic tokens immediately followed by a generic schema suffix token"
+  ],
+  "audit_only": true,
+  "examples": {
+    "accessibility_note": [
+      "accessibility note",
+      "note"
+    ],
+    "bin_code": [
+      "bin code",
+      "bin"
+    ],
+    "borrower_card": [
+      "borrower card",
+      "card"
+    ],
+    "humidity_pct": [
+      "humidity pct",
+      "humidity"
+    ],
+    "mass_kg": [
+      "mass kg",
+      "mass"
+    ],
+    "temperature_c": [
+      "temperature c",
+      "temperature"
+    ]
+  },
+  "forbidden": [
+    "Do not use gold SQL, gold values, target states, or model outputs to construct aliases.",
+    "Do not expose generic tokens such as id, code, name, value, number, no, or text as standalone aliases."
+  ],
+  "generic_token_stoplist": [
+    "c",
+    "code",
+    "count",
+    "date",
+    "flag",
+    "g",
+    "id",
+    "kg",
+    "name",
+    "no",
+    "number",
+    "pct",
+    "percent",
+    "percentage",
+    "text",
+    "time",
+    "type",
+    "value"
+  ],
+  "gold_blind": true,
+  "gpu_called": false,
+  "model_called": false,
+  "normalization": "casefold plus underscore/dash/dot to space, then whitespace collapse",
+  "rule_name": "conservative_schema_label_alias_generation",
+  "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT"
+}

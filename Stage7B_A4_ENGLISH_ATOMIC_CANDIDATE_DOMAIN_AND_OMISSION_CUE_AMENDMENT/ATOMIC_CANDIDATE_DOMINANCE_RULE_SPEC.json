@@ -4,20 +4,40 @@
     "The candidate is a single-token alphanumeric literal such as Q2, 789B, or S102.",
     "The candidate itself is tagged as EMAIL, NUMBER, IDENTIFIER, QUOTED_TEXT, or URL.",
     "The candidate is a complete datetime, ordinal phrase, or possessive/compound literal.",
-    "The residual outside the atomic child is not a visible schema label.",
+    "The residual outside the atomic child is neither a visible schema label nor a conservative schema-derived alias.",
     "No strong atomic child candidate is contained by the span."
   ],
   "candidate_is_suppressible_when": [
     "The candidate has at least two whitespace-delimited tokens.",
     "The candidate itself is not a recognized complete atomic, datetime, ordinal, possessive, or compound literal.",
     "The candidate strictly contains another candidate tagged EMAIL, NUMBER, IDENTIFIER, QUOTED_TEXT, or URL.",
-    "The text outside the dominant child normalizes to a model-visible schema table or column label."
+    "The text outside the dominant child normalizes to a model-visible schema table/column label or a conservative schema-derived alias."
   ],
   "gold_blind": true,
   "gpu_called": false,
   "model_called": false,
-  "purpose": "Reduce broad label-plus-value candidates such as 'loan_id LOAN-842' only when the label residual matches visible schema.",
-  "rule_name": "schema_label_aware_atomic_dominated_broad_span_suppression_audit",
+  "purpose": "Reduce broad label-plus-value candidates such as 'loan_id LOAN-842' and 'card CARD-190' only when the label residual matches visible schema or a locked schema-derived alias.",
+  "rule_name": "schema_label_alias_aware_atomic_dominated_broad_span_suppression_audit",
+  "schema_alias_stopwords": [
+    "c",
+    "code",
+    "count",
+    "date",
+    "flag",
+    "g",
+    "id",
+    "kg",
+    "name",
+    "no",
+    "number",
+    "pct",
+    "percent",
+    "percentage",
+    "text",
+    "time",
+    "type",
+    "value"
+  ],
   "stage": "Stage7B_A4_ENGLISH_ATOMIC_CANDIDATE_DOMAIN_AND_OMISSION_CUE_AMENDMENT",
   "uses_model_visible_schema": true
 }
