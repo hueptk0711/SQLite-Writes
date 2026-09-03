@@ -1,0 +1,14 @@
+{
+  "a7_vs_a3_a4_a5_a6_exact_id_overlap": 0,
+  "a7_vs_a3_a4_a5_a6_normalized_question_overlap": 0,
+  "a7_vs_a3_a4_a5_a6_schema_signature_overlap": 0,
+  "a7_vs_gretel_dev_overlap": 0,
+  "a7_vs_gretel_official_test_overlap": 0,
+  "a7_vs_gretel_pilot_overlap": 0,
+  "a7_vs_gretel_train_normalized_question_overlap": 0,
+  "gpu_called": false,
+  "gretel_train_audit_status": "PASS",
+  "model_called": false,
+  "stage": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY",
+  "status": "PASS"
+}

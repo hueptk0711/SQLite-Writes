@@ -1,0 +1,20 @@
+{
+  "forbidden_model_side_keys": [
+    "evaluator_outcome",
+    "gold_post_state",
+    "gold_row",
+    "gold_sql",
+    "label_side_expected"
+  ],
+  "gpu_called": false,
+  "leakage_failure_sample_ids": [],
+  "model_called": false,
+  "model_side_input_keys": [
+    "candidate_inventory_text",
+    "question",
+    "schema_inventory"
+  ],
+  "prompt_hash_invariant_under_gold_mutation": true,
+  "stage": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY",
+  "status": "PASS"
+}

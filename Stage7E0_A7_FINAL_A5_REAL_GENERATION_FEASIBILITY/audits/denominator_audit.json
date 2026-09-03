@@ -1,0 +1,8 @@
+{
+  "dropped_sample_count": 0,
+  "expected_primary_n": 12,
+  "frozen_primary_n": 12,
+  "silent_skip_count": 0,
+  "stage": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY",
+  "status": "PASS"
+}

@@ -1,0 +1,27 @@
+{
+  "accepted_protocol_commit": "01f3331d655c54bbf2e5062d2a7d7d12f5d51ef7",
+  "backend": "mock",
+  "model": {
+    "backend": "mock",
+    "mock_uses_label_side_expected": true,
+    "model_called": false
+  },
+  "phase_m_removed": true,
+  "phase_o_max_new_tokens": 512,
+  "primary_case_count": 12,
+  "repair": "none",
+  "result_dir_name": "stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903",
+  "retry": 0,
+  "runtime_versions": {
+    "accelerate": null,
+    "cuda_available": false,
+    "gpu_count": 0,
+    "gpu_devices": [],
+    "safetensors": null,
+    "tokenizers": null,
+    "torch": null,
+    "torch_cuda": null,
+    "transformers": null
+  },
+  "stage": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY"
+}

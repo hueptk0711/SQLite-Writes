@@ -1,0 +1,12 @@
+{
+  "allowed_retries": 0,
+  "eleven_of_twelve_allowed": false,
+  "model_calls_per_sample": 1,
+  "primary_n": 12,
+  "required_integrity": "PASS",
+  "required_protocol_compliance": "PASS",
+  "required_target_state_correct": 12,
+  "silent_skip_allowed": false,
+  "target_state_accuracy_gate": "12/12",
+  "unexpected_fallback_allowed": false
+}

@@ -1,0 +1,12 @@
+{
+  "do_sample": false,
+  "model_calls_per_sample": 1,
+  "phase_m_invocations": 0,
+  "phase_o_max_new_tokens": 512,
+  "quantization": "none",
+  "repair": "none",
+  "retry": 0,
+  "temperature": 0,
+  "top_k": null,
+  "top_p": null
+}

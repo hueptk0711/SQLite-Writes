@@ -1,0 +1,19 @@
+{
+  "a5_spec_sha": "c89efeb7901afd2e76573b29dc7ea81d66f8946905a467934d14e44115667d0e",
+  "a6_protocol_sha": "82ed8abbe4353c97ad9a0e87f944bc70e20610e094a99ceb8d3342c3e34b5a53",
+  "a7_rerun_authorized": false,
+  "architecture": "User request -> schema/column inventory -> A5 typed atomic candidate construction -> one LLM call -> deterministic span resolution -> deterministic typed materialization -> semantic completeness verification -> parameterized SQLite compilation -> rolled-back transactional preflight -> final execution -> full database state evaluation",
+  "branch_name": "stage7e0/a7-final-a5-feasibility",
+  "data_independence_status": "PASS",
+  "fresh_primary_count": 12,
+  "gpu_called": false,
+  "gretel_opened": false,
+  "mock_target_state_correct": 12,
+  "model_called": false,
+  "official_generation_completed": false,
+  "parent_commit_sha": "01f3331d655c54bbf2e5062d2a7d7d12f5d51ef7",
+  "patch": "PATCH0",
+  "phase_m_removed": true,
+  "stage": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY",
+  "status": "FROZEN_READY_FOR_ONE_OFFICIAL_SERVER_RUN"
+}

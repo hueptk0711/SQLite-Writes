@@ -1,0 +1,86 @@
+{
+  "allowed_runtime_profiles": [
+    {
+      "gpu_requirement": "cuda_available=true",
+      "packages": {
+        "accelerate": [
+          "1.14.0"
+        ],
+        "safetensors": [
+          "0.5.3"
+        ],
+        "tokenizers": [
+          "0.22.2"
+        ],
+        "torch": [
+          "2.6.0+cu124"
+        ],
+        "transformers": [
+          "5.5.3"
+        ]
+      },
+      "profile_id": "uet_server_cuda124",
+      "role": "historical_reference_only",
+      "torch_cuda": "12.4"
+    },
+    {
+      "cuda_available": true,
+      "gpu_count": 2,
+      "gpu_device_substring": "Tesla T4",
+      "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
+      "packages": {
+        "accelerate": [
+          "1.14.0"
+        ],
+        "safetensors": [
+          "0.5.3"
+        ],
+        "tokenizers": [
+          "0.22.2"
+        ],
+        "torch": [
+          "2.13.0",
+          "2.13.0+cu130"
+        ],
+        "transformers": [
+          "5.5.3"
+        ]
+      },
+      "profile_id": "kaggle_t4x2_cuda130",
+      "role": "primary_scientific_runtime",
+      "torch_cuda": "13.0"
+    },
+    {
+      "cuda_available": true,
+      "gpu_count": 1,
+      "gpu_device_substring": "RTX 4090",
+      "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
+      "packages": {
+        "accelerate": [
+          "1.14.0"
+        ],
+        "safetensors": [
+          "0.5.3"
+        ],
+        "tokenizers": [
+          "0.22.2"
+        ],
+        "torch": [
+          "2.6.0+cu124"
+        ],
+        "transformers": [
+          "5.5.3"
+        ]
+      },
+      "profile_id": "uet_rtx4090_cuda124_visible0",
+      "role": "primary_scientific_runtime_patch3_uet_server",
+      "torch_cuda": "12.4"
+    }
+  ],
+  "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+  "default_model_path": "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+  "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+  "runtime_profile_id": "uet_rtx4090_cuda124_visible0",
+  "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242"
+}

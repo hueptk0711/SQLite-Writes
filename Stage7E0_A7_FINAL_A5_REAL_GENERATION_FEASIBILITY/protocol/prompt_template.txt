@@ -1,0 +1,23 @@
+You select one source span or OMIT for every SQLite INSERT column. Return only JSON that matches the provided schema.
+
+Select the literal source span for each target-table column in the INSERT request.
+
+Rules:
+- Choose exactly one SPAN reference or OMIT for every column in the selected table branch.
+- Use each non-OMIT SPAN reference for at most one column.
+- Use OMIT only when the request gives no literal value for that column.
+- Choose the smallest complete atomic value span.
+- The candidate span inventory has already removed deterministic schema-label/value distractors and omission-cue distractors.
+- Do not select field labels, instruction text, table names, column names, or label-plus-value spans.
+- For multi-table schemas, choose exactly one table_ref branch from the model-visible schema.
+- Do not invent span refs.
+- Do not output character offsets, raw values, SLOT refs, Phase M JSON, explanations, or markdown.
+
+Original request:
+{question}
+
+Schema inventory:
+{schema_inventory}
+
+Candidate span inventory:
+{candidate_inventory}

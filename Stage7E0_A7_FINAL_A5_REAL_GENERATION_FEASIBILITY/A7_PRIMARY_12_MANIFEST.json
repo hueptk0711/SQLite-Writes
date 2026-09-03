@@ -1,0 +1,102 @@
+{
+  "samples": [
+    {
+      "database_id": "a7_people_alpha",
+      "operation": "INSERT",
+      "question_hash": "b883454cf8760d3e57ed4be2e7c0ca758b6ac6805573a861da4df020cfdb64c9",
+      "sample_id": "stage7e0_a7_fresh_english_001",
+      "schema_hash": "3a484ecb9feb0ed3c8f5bc216de3885cb05cc3048317dcaa0a8e1b163c846a84",
+      "source_group": "a7_fresh_synthetic_handcrafted_20260903"
+    },
+    {
+      "database_id": "a7_city_registry",
+      "operation": "INSERT",
+      "question_hash": "cb1b5618b9ffec1dd8cd52011f5415bef7a2f70ada0e4b2f708d5fc475949be8",
+      "sample_id": "stage7e0_a7_fresh_english_002",
+      "schema_hash": "545af97b78db1f740f552b22d649c5386b653ae57599f3c153ef119840d9e174",
+      "source_group": "a7_fresh_synthetic_handcrafted_20260903"
+    },
+    {
+      "database_id": "a7_calibration_events",
+      "operation": "INSERT",
+      "question_hash": "8c154e0263b23a9b27d4f6364f17d36d2e442efa7f7f80ea04b86b3d87a21a52",
+      "sample_id": "stage7e0_a7_fresh_english_003",
+      "schema_hash": "9727a4f110f92fe252a7b3952c3f37ddd01ae9f7c2e078dffa2dea74ceb757bc",
+      "source_group": "a7_fresh_synthetic_handcrafted_20260903"
+    },
+    {
+      "database_id": "a7_store_items",
+      "operation": "INSERT",
+      "question_hash": "8127807d8b7bcedb75d954e9843bb4869d896afa7748cfc32b55f3fe8346568c",
+      "sample_id": "stage7e0_a7_fresh_english_004",
+      "schema_hash": "28882fd1442ee4dfec66864dfee5435160f66b163e2c7f85608c527d70db45fa",
+      "source_group": "a7_fresh_synthetic_handcrafted_20260903"
+    },
+    {
+      "database_id": "a7_shipments",
+      "operation": "INSERT",
+      "question_hash": "bed21d3ffd842fd8b9287371fad977736715868a2ad10f230e661e0e2df31759",
+      "sample_id": "stage7e0_a7_fresh_english_005",
+      "schema_hash": "cb249ef01d757761467fa651577af9a89bb6773fc57525519d5704de087b4672",
+      "source_group": "a7_fresh_synthetic_handcrafted_20260903"
+    },
+    {
+      "database_id": "a7_support_tickets",
+      "operation": "INSERT",
+      "question_hash": "29e02ce5a5146159ce02c7540d13b3a6f3f9ea978c87d2b33594dae087d49099",
+      "sample_id": "stage7e0_a7_fresh_english_006",
+      "schema_hash": "71250dd858ec9c4443ba33cb21a2ca7da30038facbaceccea602db52fa841d68",
+      "source_group": "a7_fresh_synthetic_handcrafted_20260903"
+    },
+    {
+      "database_id": "a7_event_badges",
+      "operation": "INSERT",
+      "question_hash": "3259f035c1c9178b538117aa7746d72263f4db8513b7b00fdbb6974e4b492746",
+      "sample_id": "stage7e0_a7_fresh_english_007",
+      "schema_hash": "066b9fb0c46c5ca30fd90ffce906f7891ea380744b2105c380ae098046e0e7a7",
+      "source_group": "a7_fresh_synthetic_handcrafted_20260903"
+    },
+    {
+      "database_id": "a7_material_samples",
+      "operation": "INSERT",
+      "question_hash": "5bef4f55e26fe420d1494d4994d5dee5e48b6497e24dbc3ee36404328fcdfa45",
+      "sample_id": "stage7e0_a7_fresh_english_008",
+      "schema_hash": "90cd4dd594ad062b7ef35728baaeffd4a1608a11c5ef3220195bbef576544e4b",
+      "source_group": "a7_fresh_synthetic_handcrafted_20260903"
+    },
+    {
+      "database_id": "a7_library_loans",
+      "operation": "INSERT",
+      "question_hash": "ab41c3bb099df506be03d291da917c080c02d9f20bd71fee46ecb5a915208012",
+      "sample_id": "stage7e0_a7_fresh_english_009",
+      "schema_hash": "7c344ae9b4c38580dadd1a939cdefc4decc18c8243fafd10c1c201f9e6a700a8",
+      "source_group": "a7_fresh_synthetic_handcrafted_20260903"
+    },
+    {
+      "database_id": "a7_weather_stations",
+      "operation": "INSERT",
+      "question_hash": "93822347e1002378bcc52a6f97b07fcbeec100bc203e6a1c357994eefb3896e6",
+      "sample_id": "stage7e0_a7_fresh_english_010",
+      "schema_hash": "7969091abe320708e2ddc09a08aefca3f6b0e5e12426dc083b68907b941e1fd7",
+      "source_group": "a7_fresh_synthetic_handcrafted_20260903"
+    },
+    {
+      "database_id": "a7_audit_jobs",
+      "operation": "INSERT",
+      "question_hash": "a54189639b795361c74342041d4e881aa0cec392ff026326dfb5ae7c5f4e797f",
+      "sample_id": "stage7e0_a7_fresh_english_011",
+      "schema_hash": "24b7b48d9756994bc9740f9a22f38be3249cf26f29de4fc0569b0c565ff31267",
+      "source_group": "a7_fresh_synthetic_handcrafted_20260903"
+    },
+    {
+      "database_id": "a7_label_checks",
+      "operation": "INSERT",
+      "question_hash": "1acde8b06c7a01c2f1af7412a80eaf3b73cfd64f51adba001ece3a88261b1675",
+      "sample_id": "stage7e0_a7_fresh_english_012",
+      "schema_hash": "52ce5b79c4da5886131cc22090499d47bc7ba1dd4400991d13008a9fed1a97d7",
+      "source_group": "a7_fresh_synthetic_handcrafted_20260903"
+    }
+  ],
+  "stage": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY",
+  "status": "PASS"
+}
