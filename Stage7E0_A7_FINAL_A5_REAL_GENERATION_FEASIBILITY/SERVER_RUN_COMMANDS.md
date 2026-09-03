@@ -4,7 +4,7 @@ Run the shell script, not this Markdown file:
 
 ```bash
 cd /home/uet/hue_ptk
-unzip -q -o Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY_PATCH1_FINAL_REVIEWER_PACKAGE_20260903.zip -d Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY_runner
+unzip -q -o Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY_PATCH2_FINAL_REVIEWER_PACKAGE_20260903.zip -d Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY_runner
 cd Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY_runner
 bash Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY/SERVER_RUN_COMMANDS.sh
 ```
@@ -13,4 +13,8 @@ The run is the single official A7 generation. Do not use `--resume`, do not
 change the gate after seeing results, and do not open Gretel unless A7 reaches
 12/12 target-state correctness and validation passes.
 
-Accepted protocol commit frozen before GPU run: `1b73498d64ac2e233ba953e8fdf3cc98992026ea`
+PATCH2 note: if a previous PATCH1 run already created `stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903`
+and crashed only during summary writing, this script finalizes that existing
+result-root without new model calls.
+
+Accepted protocol commit frozen before GPU run: `3a0efa879c6cc6cc2b585af2187f62135706072b`

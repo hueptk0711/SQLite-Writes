@@ -129,6 +129,20 @@ def test_a7_invalid_output_fails_without_retry(tmp_path: Path) -> None:
     assert generator.calls == 1
 
 
+def test_a7_summary_handles_failed_case_with_none_preflight(tmp_path: Path) -> None:
+    stage_dir = build_tmp_stage(tmp_path)
+    row = read_jsonl(stage_dir / "FRESH_ENGLISH_A7_PRIMARY_FEASIBILITY_SET.jsonl")[0]
+    result_root = tmp_path / "summary_result"
+    generator = InvalidOnceGenerator()
+    case, raw, _candidate, _prompt = evaluate_case(row, generator, phase_o_max_new_tokens=128)
+    assert case["preflight_result"] is None
+    a7_runner.write_jsonl(result_root / "results" / "per_sample_results.jsonl", [case])
+    a7_runner.write_jsonl(result_root / "raw" / "model_outputs.jsonl", [raw])
+    summary = a7_runner.write_summary(result_root, "mock", {"backend": "invalid_once"}, [case], [raw])
+    assert summary["status"] == "FAIL"
+    assert summary["preflight_pass_count"] == 0
+
+
 def test_a7_prompt_hash_is_gold_isolated(tmp_path: Path) -> None:
     stage_dir = build_tmp_stage(tmp_path)
     row = read_jsonl(stage_dir / "FRESH_ENGLISH_A7_PRIMARY_FEASIBILITY_SET.jsonl")[0]
@@ -228,3 +242,48 @@ def test_a7_constrained_runner_defaults_resume_false(tmp_path: Path, monkeypatch
     summary = run_stage7e0_a7(args)
     assert args.resume is False
     assert summary["target_state_accuracy"] == "12/12"
+
+
+def test_a7_finalize_existing_result_does_not_call_model_again(tmp_path: Path, monkeypatch) -> None:
+    build_tmp_stage(tmp_path)
+    first_args = argparse.Namespace(
+        accepted_protocol_commit="test",
+        result_root=str(tmp_path / "existing_runner_result"),
+        backend="mock",
+        model_name_or_path="unused",
+        quantization="none",
+        phase_o_max_new_tokens=512,
+        max_input_tokens=28672,
+        seed=42,
+        trust_remote_code=False,
+        skip_git_assertions=True,
+        allow_result_root_inside_git=True,
+        stage_root=tmp_path,
+    )
+    run_stage7e0_a7(first_args)
+    (tmp_path / "existing_runner_result" / "results" / "summary.json").unlink()
+    (tmp_path / "existing_runner_result" / "results" / "failure_analysis.json").unlink()
+
+    class NoSecondModelCall:
+        def __init__(self, *args, **kwargs) -> None:
+            raise AssertionError("finalize must not construct a generator")
+
+    monkeypatch.setattr(a7_runner, "ConstrainedTransformersChatGenerator", NoSecondModelCall)
+    finalize_args = argparse.Namespace(
+        accepted_protocol_commit="test",
+        result_root=str(tmp_path / "existing_runner_result"),
+        backend="constrained_hf",
+        model_name_or_path="unused",
+        quantization="none",
+        phase_o_max_new_tokens=512,
+        max_input_tokens=28672,
+        seed=42,
+        trust_remote_code=False,
+        skip_git_assertions=True,
+        allow_result_root_inside_git=True,
+        finalize_existing_result=True,
+        stage_root=tmp_path,
+    )
+    summary = run_stage7e0_a7(finalize_args)
+    assert summary["target_state_accuracy"] == "12/12"
+    assert read_json(tmp_path / "existing_runner_result" / "audits" / "model_call_audit.json")["finalized_existing_result"] is True

@@ -104,6 +104,11 @@ def failed_result(row: dict[str, Any], failure_code: str, error: str | None, pro
     }
 
 
+def dict_field(row: dict[str, Any], key: str) -> dict[str, Any]:
+    value = row.get(key)
+    return value if isinstance(value, dict) else {}
+
+
 def evaluate_case(row: dict[str, Any], generator: OneCallGenerator, *, phase_o_max_new_tokens: int, root: Path = PROJECT_ROOT) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
     sample_id = row["sample_id"]
     messages, _user, prompt_hash = render_phase_o_messages(row)
@@ -184,9 +189,9 @@ def write_summary(result_root: Path, backend: str, metadata: dict[str, Any], cas
         "parse_success_count": sum(1 for row in cases if row.get("parsed_selection") is not None),
         "valid_candidate_selection_count": sum(1 for row in cases if row.get("parsed_selection") is not None and row.get("failure_code") not in {"INVALID_SELECTION", "SPAN_RESOLUTION_FAILURE"}),
         "materialization_success_count": sum(1 for row in cases if row.get("typed_value") is not None),
-        "completeness_pass_count": sum(1 for row in cases if row.get("checks", {}).get("completeness_pass") is True),
+        "completeness_pass_count": sum(1 for row in cases if dict_field(row, "checks").get("completeness_pass") is True),
         "compilation_success_count": sum(1 for row in cases if row.get("compiled_sql") is not None),
-        "preflight_pass_count": sum(1 for row in cases if row.get("preflight_result", {}).get("status") == "ADMITTED"),
+        "preflight_pass_count": sum(1 for row in cases if dict_field(row, "preflight_result").get("status") == "ADMITTED"),
         "execution_success_count": target_correct,
         "off_target_effects": 0,
         "rejected_samples": [row["sample_id"] for row in cases if row["status"] != "PASS"],
@@ -208,6 +213,26 @@ def write_summary(result_root: Path, backend: str, metadata: dict[str, Any], cas
     return summary
 
 
+def finalize_existing_result(args: argparse.Namespace, root: Path, result_root: Path) -> dict[str, Any]:
+    rows = load_stage7e0_a7_rows(root)
+    cases = read_jsonl(result_root / "results" / "per_sample_results.jsonl")
+    raw_rows = read_jsonl(result_root / "raw" / "model_outputs.jsonl")
+    manifest = json.loads((result_root / "run_manifest.json").read_text(encoding="utf-8"))
+    frozen_ids = [row["sample_id"] for row in rows]
+    if [row.get("sample_id") for row in cases] != frozen_ids:
+        raise SystemExit("STOP: existing A7 result cannot be finalized because per-sample ids/count drifted")
+    if [row.get("sample_id") for row in raw_rows] != frozen_ids:
+        raise SystemExit("STOP: existing A7 result cannot be finalized because raw model-output ids/count drifted")
+    backend = str(manifest.get("backend") or args.backend).lower()
+    metadata = manifest.get("model") if isinstance(manifest.get("model"), dict) else {}
+    write_jsonl(result_root / "runtime" / "token_usage.jsonl", [{"sample_id": row["sample_id"], **dict_field(row, "token_count")} for row in cases])
+    write_jsonl(result_root / "runtime" / "latency.jsonl", [{"sample_id": row["sample_id"], "latency": row.get("latency")} for row in cases])
+    write_json(result_root / "audits" / "model_call_audit.json", {"stage": STAGE_NAME, "status": "PASS", "model_calls_total": len(raw_rows), "model_calls_per_sample": 1, "phase_m_invocations": 0, "finalized_existing_result": True})
+    write_json(result_root / "audits" / "retry_audit.json", {"stage": STAGE_NAME, "status": "PASS", "retry_count": 0, "allowed_retries": 0, "finalized_existing_result": True})
+    write_json(result_root / "audits" / "denominator_audit.json", {"stage": STAGE_NAME, "status": "PASS", "expected_primary_n": EXPECTED_PRIMARY_COUNT, "observed_primary_n": len(cases), "silent_skip_count": 0, "dropped_sample_count": 0, "finalized_existing_result": True})
+    return write_summary(result_root, backend, metadata, cases, raw_rows)
+
+
 def run_stage7e0_a7(args: argparse.Namespace) -> dict[str, Any]:
     result_root = Path(args.result_root).resolve()
     backend = str(args.backend).lower()
@@ -217,6 +242,10 @@ def run_stage7e0_a7(args: argparse.Namespace) -> dict[str, Any]:
     assert_result_root_policy(result_root, backend=backend, allow_inside_git=args.allow_result_root_inside_git)
     root = Path(getattr(args, "stage_root", PROJECT_ROOT)).resolve()
     rows = load_stage7e0_a7_rows(root)
+    if getattr(args, "finalize_existing_result", False):
+        if not result_root.exists():
+            raise SystemExit("STOP: --finalize-existing-result requires an existing A7 result-root")
+        return finalize_existing_result(args, root, result_root)
     if result_root.exists():
         raise SystemExit("STOP: result-root already exists; A7 allows exactly one official run directory")
     result_root.mkdir(parents=True, exist_ok=True)
@@ -259,7 +288,7 @@ def run_stage7e0_a7(args: argparse.Namespace) -> dict[str, Any]:
         write_jsonl(result_root / "raw" / "model_outputs.jsonl", raw_rows)
         write_jsonl(result_root / "raw" / "candidate_domains.jsonl", candidate_rows)
         write_jsonl(result_root / "raw" / "prompts_or_prompt_hashes.jsonl", prompt_rows)
-    write_jsonl(result_root / "runtime" / "token_usage.jsonl", [{"sample_id": row["sample_id"], **row["token_count"]} for row in cases])
+    write_jsonl(result_root / "runtime" / "token_usage.jsonl", [{"sample_id": row["sample_id"], **dict_field(row, "token_count")} for row in cases])
     write_jsonl(result_root / "runtime" / "latency.jsonl", [{"sample_id": row["sample_id"], "latency": row["latency"]} for row in cases])
     write_json(result_root / "runtime" / "environment.json", {"stage": STAGE_NAME, "backend": backend, "runtime_versions": runtime_versions(), "model": metadata})
     write_json(result_root / "audits" / "model_call_audit.json", {"stage": STAGE_NAME, "status": "PASS", "model_calls_total": len(raw_rows), "model_calls_per_sample": 1, "phase_m_invocations": 0})
@@ -281,6 +310,7 @@ def main() -> int:
     parser.add_argument("--trust-remote-code", action="store_true")
     parser.add_argument("--skip-git-assertions", action="store_true")
     parser.add_argument("--allow-result-root-inside-git", action="store_true")
+    parser.add_argument("--finalize-existing-result", action="store_true", help="Finalize an existing complete A7 result-root without new model calls.")
     parser.add_argument("--stage-root", type=Path, default=PROJECT_ROOT, help="Root containing the frozen A7 stage directory.")
     parser.set_defaults(resume=False)
     args = parser.parse_args()

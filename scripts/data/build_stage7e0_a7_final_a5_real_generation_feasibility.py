@@ -77,7 +77,7 @@ from scripts.server.run_stage7e0_a6_english import (  # noqa: E402
 
 
 STAGE_NAME = "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY"
-PATCH_NAME = "PATCH1"
+PATCH_NAME = "PATCH2"
 PACKAGE_DATE = "20260903"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
 EXPECTED_PRIMARY_COUNT = 12
@@ -631,16 +631,33 @@ RESULT_ROOT="{SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}"
 
 python scripts/server/preflight_runtime_stage7e0_a6.py --expected-profile {PRIMARY_RUNTIME_PROFILE_ID}
 python scripts/data/validate_stage7e0_a7_final_a5_real_generation_feasibility.py --stage-dir {STAGE_NAME}
-python scripts/server/run_stage7e0_a7_english.py \\
-  --accepted-protocol-commit {accepted_commit} \\
-  --result-root "$RESULT_ROOT" \\
-  --backend constrained_hf \\
-  --model-name-or-path "{DEFAULT_MODEL_PATH}" \\
-  --quantization none \\
-  --phase-o-max-new-tokens {PHASE_O_MAX_NEW_TOKENS}
+
+if [ -d "$RESULT_ROOT" ]; then
+  python scripts/server/run_stage7e0_a7_english.py \\
+    --accepted-protocol-commit {accepted_commit} \\
+    --result-root "$RESULT_ROOT" \\
+    --backend constrained_hf \\
+    --model-name-or-path "{DEFAULT_MODEL_PATH}" \\
+    --quantization none \\
+    --phase-o-max-new-tokens {PHASE_O_MAX_NEW_TOKENS} \\
+    --finalize-existing-result
+else
+  python scripts/server/run_stage7e0_a7_english.py \\
+    --accepted-protocol-commit {accepted_commit} \\
+    --result-root "$RESULT_ROOT" \\
+    --backend constrained_hf \\
+    --model-name-or-path "{DEFAULT_MODEL_PATH}" \\
+    --quantization none \\
+    --phase-o-max-new-tokens {PHASE_O_MAX_NEW_TOKENS}
+fi
+
+set +e
 python scripts/data/validate_stage7e0_a7_final_a5_real_generation_feasibility.py --stage-dir {STAGE_NAME} --result-dir "$RESULT_ROOT"
+VALIDATION_STATUS=$?
+set -e
 tar -C "$(dirname "$RESULT_ROOT")" -czf "{SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}.tar.gz" "$(basename "$RESULT_ROOT")"
 sha256sum "{SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}.tar.gz" > "{SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}.tar.gz.sha256"
+exit "$VALIDATION_STATUS"
 """
 
 
@@ -659,6 +676,10 @@ bash {STAGE_NAME}/SERVER_RUN_COMMANDS.sh
 The run is the single official A7 generation. Do not use `--resume`, do not
 change the gate after seeing results, and do not open Gretel unless A7 reaches
 12/12 target-state correctness and validation passes.
+
+PATCH2 note: if a previous PATCH1 run already created `{PRIMARY_RESULT_DIR_NAME}`
+and crashed only during summary writing, this script finalizes that existing
+result-root without new model calls.
 
 Accepted protocol commit frozen before GPU run: `{accepted_commit}`
 """
