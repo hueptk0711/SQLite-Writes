@@ -53,7 +53,7 @@
     {
       "bytes": 1781,
       "path": "ENG2A_PROTOCOL_FREEZE.json",
-      "sha256": "9966d59020d8a934f92d2019bf15b99dc6004b81ba4b84bda6abcb90d155f40f"
+      "sha256": "7f5a40715faddcf2aefbb189ede6ad4d05bccabb82e2acf24241b89d039b8b15"
     },
     {
       "bytes": 108901,
@@ -121,6 +121,86 @@
       "sha256": "72d8614632dcccaf7a64640ef274c426bafec7e31e78b6f933fe1928b8ac0463"
     },
     {
+      "bytes": 1094,
+      "path": "OFFICIAL_RESULT_REPORT.md",
+      "sha256": "d4672622ed87e98e9d6a0177e8949c0c9b8cb1170e736565e521ec60cd8bb52d"
+    },
+    {
+      "bytes": 112306,
+      "path": "official_server_run/analysis/a7_failure_taxonomy.json",
+      "sha256": "e89a660ef86410757c6d90f9605f3ace266a68a8ffc92fbd8f47d4b158d74885"
+    },
+    {
+      "bytes": 179,
+      "path": "official_server_run/audits/denominator_audit.json",
+      "sha256": "6744e857163ac5c2be39b66e2b54096423c544e96d2ae8035b19eb45337356d2"
+    },
+    {
+      "bytes": 152,
+      "path": "official_server_run/audits/model_call_audit.json",
+      "sha256": "923396565dff4f6b04fbd9e22a912b25cb824d24b45a1612aa725c5fb927a83c"
+    },
+    {
+      "bytes": 126,
+      "path": "official_server_run/audits/retry_audit.json",
+      "sha256": "97d174eeb2f37d5e29b32c7aab014150a734ca92e7bd12af30446c7734e75463"
+    },
+    {
+      "bytes": 28847,
+      "path": "official_server_run/efficiency/latency.jsonl",
+      "sha256": "ce241110833df53998462233fc63fa1090387ffeb317e71bc89d08ee91e7823e"
+    },
+    {
+      "bytes": 31717,
+      "path": "official_server_run/efficiency/token_usage.jsonl",
+      "sha256": "c97ba111effff35a35dea6c57aa8d00d501f75bcc53c6778e5093ca9ac24be21"
+    },
+    {
+      "bytes": 12908,
+      "path": "official_server_run/environment/environment.json",
+      "sha256": "ed0cb90c9dbfff86be8ae5dbf041e6192058564407f291aa61aafef942a35524"
+    },
+    {
+      "bytes": 227120,
+      "path": "official_server_run/raw/model_outputs.jsonl",
+      "sha256": "53c420d4f2609c091a177142d9979f1471430adfa13550b4a02a93f88a38814d"
+    },
+    {
+      "bytes": 251793,
+      "path": "official_server_run/raw/parsed_outputs.jsonl",
+      "sha256": "a1cd57107853d6b2aced041c6f3c6c14b6d04d4b3bec3e9be9930809aa761d44"
+    },
+    {
+      "bytes": 252283,
+      "path": "official_server_run/results/per_sample_results.jsonl",
+      "sha256": "fb12748542f091125b2fea86701aa6a280a36c90bb9045a78ee0210b97479c9b"
+    },
+    {
+      "bytes": 14240,
+      "path": "official_server_run/results/summary.json",
+      "sha256": "89b7d6363c9cd46207952bffc8a45a178645e5aa3d2f481ddf2dd29de7af442a"
+    },
+    {
+      "bytes": 378,
+      "path": "official_server_run/results/summary.md",
+      "sha256": "d99cd98306c2d8d31b068495be530869405ee541579eaadcb68a4b9dcde2e8b2"
+    },
+    {
+      "bytes": 12709,
+      "path": "official_server_run/run_manifest.json",
+      "sha256": "2b42f7d5548e011f03f76d8637e3e629cf173857c96ab16d6e5c62fb5e3b967b"
+    },
+    {
+      "bytes": 147,
+      "path": "official_server_run/SERVER_RESULT_ARCHIVE.sha256",
+      "sha256": "0746c1b39197c26687c367c7aedb38b23631a58d53a4c4649690c7f266ec056c"
+    },
+    {
+      "bytes": 381,
+      "path": "official_server_run/SERVER_RESULT_ARCHIVE_MANIFEST.json",
+      "sha256": "b8530b43a85f98616650ff20832df03d6b0d12437169aa38d67986979710042d"
+    },
+    {
       "bytes": 146774,
       "path": "prompts/M0_DIRECT_SQL_PROMPTS.jsonl",
       "sha256": "b2b7e1805b91b09764de7ab40b753842c564068496f757707b8c5f1b6c5738d0"
@@ -136,9 +216,9 @@
       "sha256": "02d4a73575198e6a0770cc21120298242ef118105c068e65f204cee875b2781b"
     },
     {
-      "bytes": 703,
+      "bytes": 818,
       "path": "REVIEWER_README.md",
-      "sha256": "3c539bafaca47f85057c83b46472e18c2b5f3476ffa4d481f0c1929f2a98f42c"
+      "sha256": "95c43233c8f0107aa855209fdba94cee560ebbbe48b1d333f6851dbd8c09a5f3"
     },
     {
       "bytes": 143,
@@ -146,9 +226,9 @@
       "sha256": "3c38bd8680f3dfdef2390e61a50dfcb47c562f9bf9dd49af069da70ac1bea775"
     },
     {
-      "bytes": 2043,
+      "bytes": 2059,
       "path": "SERVER_RUN_COMMANDS.sh",
-      "sha256": "dc999ed908ef9192cc36c927ecbe7ec92f86c16f722fb06f1ba8dbc6dfa5ae12"
+      "sha256": "687f4aaf7704f1e9769bb157ac80455fa199ec0f4a3c7fb63dc3fc6a43765586"
     },
     {
       "bytes": 8192,
@@ -656,11 +736,11 @@
       "sha256": "138df967370ac4d8996df25c494299cd5af3d4bfbfcb48a0f69fa8b979683de2"
     },
     {
-      "bytes": 253,
+      "bytes": 496,
       "path": "VALIDATION_REPORT.md",
-      "sha256": "b13d0de540057603a73a82fb8d5aa216af351f9f4429fff0d04e1fd55814a236"
+      "sha256": "c49e2108bf31bfdd7dbf0a0429ad296cd624f60b9990e608ef3a2696ab15c30f"
     }
   ],
-  "generated_at_utc": "2026-09-03T15:26:20.771815+00:00",
+  "generated_at_utc": "2026-09-03T16:36:02.562236+00:00",
   "stage": "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT"
 }

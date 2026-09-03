@@ -1,9 +1,14 @@
 # Validation Report
 
 stage=StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT
-patch=PATCH2
+patch=PATCH3
 pilot_n=100
 mock_methods=M0_DIRECT_SQL,M1_J_FS,M2_FROZEN_A7
 mock_model_called=false
-official_generation_validated=false
-status=FROZEN_READY_FOR_ONE_OFFICIAL_SERVER_RUN
+official_generation_validated=true
+official_backend=hf
+official_model_calls_total=300
+official_retry_count=0
+official_target_state_accuracy=M0_DIRECT_SQL:96/100;M1_J_FS:87/100;M2_FROZEN_A7:50/100
+server_result_archive_sha256=22492d6cdb1638761b0873cbd768b8be19f0dcb6c8c3148f5cac663bc5f7c728
+status=OFFICIAL_SERVER_RUN_VALIDATED

@@ -1,0 +1,3359 @@
+{
+  "counts": {
+    "E1": 21,
+    "E10": 50,
+    "E7": 20,
+    "E9": 9
+  },
+  "rows": [
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 39.27549413405359,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0031\",\"COL_2\":\"SPAN_0037\",\"COL_3\":\"SPAN_0047\",\"COL_4\":\"SPAN_0054\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:12097:026084",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "climate_adaptation_measures"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 1266,
+        "output_tokens": 66
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 24.338859208859503,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0032\",\"COL_2\":\"SPAN_0045\",\"COL_3\":\"SPAN_0058\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:12420:026407",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1083,
+        "output_tokens": 56
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 23.860259612090886,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0029\",\"COL_2\":\"SPAN_0039\",\"COL_3\":\"SPAN_0049\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:12755:026742",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "Policies"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 1117,
+        "output_tokens": 53
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 36.79593915399164,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0030\",\"COL_3\":\"SPAN_0041\",\"COL_4\":\"SPAN_0057\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:13069:027056",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "biosensor_readings"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 1241,
+        "output_tokens": 60
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 50.038424441125244,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0031\",\"COL_3\":\"SPAN_0037\",\"COL_4\":\"SPAN_0048\",\"COL_5\":\"SPAN_0054\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:13493:021504",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "community_education"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 1194,
+        "output_tokens": 72
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 20.340454056393355,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0016\",\"COL_2\":\"SPAN_0025\",\"COL_3\":\"SPAN_0037\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:17011:025022",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 843,
+        "output_tokens": 53
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 13.292116906959563,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0028\",\"COL_2\":\"SPAN_0045\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:17565:036619",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1029,
+        "output_tokens": 42
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 15.863027296029031,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "departments"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"TAB_1_COL_1\":\"OMIT\",\"TAB_1_COL_2\":\"SPAN_0012\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:18148:037202",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "employees"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 1086,
+        "output_tokens": 43
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 42.18092181393877,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0020\",\"COL_3\":\"SPAN_0028\",\"COL_4\":\"SPAN_0041\",\"COL_5\":\"SPAN_0050\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:19571:052132",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "circular_economy"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 961,
+        "output_tokens": 72
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 38.25961485505104,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "design_standards"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0027\",\"COL_3\":\"SPAN_0042\",\"COL_4\":\"SPAN_0059\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:19577:052138",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "design_standards"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 1180,
+        "output_tokens": 61
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 18.931418599095196,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0034\",\"COL_3\":\"SPAN_0042\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:19913:052474",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 872,
+        "output_tokens": 50
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 34.605082703754306,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0034\",\"COL_3\":\"SPAN_0049\",\"COL_4\":\"SPAN_0059\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:20813:013717",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1100,
+        "output_tokens": 61
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 29.25314848870039,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "Farmers"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0034\",\"COL_3\":\"SPAN_0042\",\"COL_4\":\"SPAN_0028\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:22063:014967",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "Farmers"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 871,
+        "output_tokens": 61
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 30.650810460094362,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0029\",\"COL_2\":\"SPAN_0033\",\"COL_3\":\"SPAN_0038\",\"COL_4\":\"SPAN_0042\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:22676:077014",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "ai_ethics"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 967,
+        "output_tokens": 66
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 112.80792063195258,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0028\",\"COL_3\":\"SPAN_0084\",\"COL_4\":\"SPAN_0086\",\"COL_5\":\"SPAN_0066\",\"COL_6\":\"SPAN_0073\",\"COL_7\":\"SPAN_0078\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:236:043414",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "cargo_movements"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 1598,
+        "output_tokens": 95
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 69.05329443095252,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0038\",\"COL_2\":\"SPAN_0051\",\"COL_3\":\"SPAN_0065\",\"COL_4\":\"SPAN_0077\",\"COL_5\":\"SPAN_0089\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:24664:055601",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1504,
+        "output_tokens": 79
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 14.835147149860859,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0027\",\"COL_3\":\"SPAN_0027\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:26953:012735",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "regulatory_compliance"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 642,
+        "output_tokens": 49
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 16.19089849991724,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0015\",\"COL_2\":\"SPAN_0019\",\"COL_3\":\"SPAN_0027\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:27126:012908",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 674,
+        "output_tokens": 54
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 43.4933275221847,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "customer"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0031\",\"COL_2\":\"SPAN_0045\",\"COL_3\":\"SPAN_0058\",\"COL_4\":\"SPAN_0069\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:28061:003843",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "customer"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E9",
+      "token_count": {
+        "input_tokens": 1339,
+        "output_tokens": 64
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 9.869282024912536,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0029\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:28063:003845",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 718,
+        "output_tokens": 39
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 32.12415535096079,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "green_buildings"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0030\",\"COL_2\":\"SPAN_0040\",\"COL_3\":\"SPAN_0042\",\"COL_4\":\"SPAN_0045\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:28253:004035",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "green_buildings"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E9",
+      "token_count": {
+        "input_tokens": 935,
+        "output_tokens": 66
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 18.14501093700528,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0016\",\"COL_3\":\"SPAN_0027\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:28631:004413",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 817,
+        "output_tokens": 50
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 22.500679407734424,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0020\",\"COL_2\":\"SPAN_0028\",\"COL_3\":\"SPAN_0035\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:30676:035110",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "Player"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 982,
+        "output_tokens": 55
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 7.958999913651496,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0014\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:33518:033980",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 570,
+        "output_tokens": 37
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 11.53487615287304,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0021\",\"COL_2\":\"SPAN_0034\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:35201:049166",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 795,
+        "output_tokens": 43
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 39.14056099578738,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0021\",\"COL_2\":\"SPAN_0026\",\"COL_3\":\"SPAN_0033\",\"COL_4\":\"SPAN_0037\",\"COL_5\":\"SPAN_0042\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:35457:049422",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 846,
+        "output_tokens": 77
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 59.24040258023888,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "crops"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0011\",\"COL_3\":\"SPAN_0021\",\"COL_4\":\"SPAN_0029\",\"COL_5\":\"SPAN_0036\",\"COL_6\":\"SPAN_0042\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:36096:050061",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "crops"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 964,
+        "output_tokens": 83
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 10.98260211199522,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0032\",\"COL_2\":\"SPAN_0016\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:3751:002174",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "factories"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 733,
+        "output_tokens": 41
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 48.57265839772299,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0035\",\"COL_2\":\"SPAN_0040\",\"COL_3\":\"SPAN_0044\",\"COL_4\":\"SPAN_0048\",\"COL_5\":\"SPAN_0055\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:38843:042821",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1052,
+        "output_tokens": 77
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 27.25526982732117,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "artists"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0064\",\"COL_2\":\"SPAN_0032\",\"COL_3\":\"SPAN_0050\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:41003:070347",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "artists"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E9",
+      "token_count": {
+        "input_tokens": 1220,
+        "output_tokens": 55
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 18.342705491930246,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0014\",\"COL_2\":\"SPAN_0022\",\"COL_3\":\"SPAN_0028\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:4100:002523",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 781,
+        "output_tokens": 55
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 24.429600703064352,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0027\",\"COL_2\":\"SPAN_0038\",\"COL_3\":\"SPAN_0056\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:41454:082322",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1087,
+        "output_tokens": 54
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 16.74679873790592,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "biosensors"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"OMIT\",\"COL_3\":\"SPAN_0036\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:41663:082531",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "biosensors"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 876,
+        "output_tokens": 44
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 25.99343527574092,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0009\",\"COL_3\":\"SPAN_0019\",\"COL_4\":\"SPAN_0026\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:41981:082849",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 818,
+        "output_tokens": 60
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 24.25957610225305,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0032\",\"COL_2\":\"SPAN_0045\",\"COL_3\":\"SPAN_0058\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:42097:082965",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1083,
+        "output_tokens": 55
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 34.011368945240974,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0010\",\"COL_2\":\"SPAN_0023\",\"COL_3\":\"SPAN_0040\",\"COL_4\":\"SPAN_0049\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:42718:083586",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "Menu"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 1035,
+        "output_tokens": 65
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 19.603268050123006,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0016\",\"COL_3\":\"SPAN_0038\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:43635:027457",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "volunteers"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 917,
+        "output_tokens": 49
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 13.742551593109965,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "Staff"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0010\",\"COL_3\":\"SPAN_0021\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:46607:087884",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "Staff"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 578,
+        "output_tokens": 50
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 10.573420949280262,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0028\",\"COL_2\":\"SPAN_0035\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:49007:015240",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 721,
+        "output_tokens": 43
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 19.629007881041616,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0027\",\"COL_2\":\"SPAN_0032\",\"COL_3\":\"SPAN_0037\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:49231:015464",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 851,
+        "output_tokens": 55
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 19.290105980820954,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0027\",\"COL_2\":\"SPAN_0032\",\"COL_3\":\"SPAN_0038\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:50283:016516",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 835,
+        "output_tokens": 54
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 20.04674219386652,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0022\",\"COL_3\":\"SPAN_0033\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:50812:017045",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 938,
+        "output_tokens": 49
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 51.65708305686712,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0038\",\"COL_2\":\"SPAN_0045\",\"COL_3\":\"SPAN_0052\",\"COL_4\":\"SPAN_0057\",\"COL_5\":\"SPAN_0020\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:51297:005929",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "cargo_tracking"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 1183,
+        "output_tokens": 76
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 41.016576196067035,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "sales"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0027\",\"COL_2\":\"SPAN_0029\",\"COL_3\":\"SPAN_0030\",\"COL_4\":\"SPAN_0031\",\"COL_5\":\"SPAN_0032\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:51344:005976",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "sales"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E9",
+      "token_count": {
+        "input_tokens": 921,
+        "output_tokens": 78
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 20.202421837951988,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0025\",\"COL_2\":\"SPAN_0035\",\"COL_3\":\"SPAN_0044\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:51769:006401",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 920,
+        "output_tokens": 53
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 56.472990894224495,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0014\",\"COL_2\":\"SPAN_0023\",\"COL_3\":\"SPAN_0037\",\"COL_4\":\"SPAN_0048\",\"COL_5\":\"SPAN_0060\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:51806:006438",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "papers"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 1260,
+        "output_tokens": 77
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 26.489023810252547,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0022\",\"COL_3\":\"SPAN_0032\",\"COL_4\":\"SPAN_0038\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:53680:054070",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 831,
+        "output_tokens": 61
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 35.905715686269104,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0019\",\"COL_3\":\"SPAN_0035\",\"COL_4\":\"SPAN_0047\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:54633:055023",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "healthcare_centers"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 1167,
+        "output_tokens": 61
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 18.33761260798201,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0027\",\"COL_2\":\"SPAN_0033\",\"COL_3\":\"SPAN_0039\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:54651:055041",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 776,
+        "output_tokens": 54
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 36.17319739423692,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0031\",\"COL_3\":\"SPAN_0050\",\"COL_4\":\"SPAN_0063\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:55699:048135",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1163,
+        "output_tokens": 60
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 18.99285596003756,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0029\",\"COL_2\":\"SPAN_0040\",\"COL_3\":\"SPAN_0050\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:56275:048711",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 854,
+        "output_tokens": 54
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 46.22626998089254,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0033\",\"COL_2\":\"SPAN_0040\",\"COL_3\":\"SPAN_0047\",\"COL_4\":\"SPAN_0049\",\"COL_5\":\"SPAN_0053\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:57236:059564",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "public_transportation"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 1034,
+        "output_tokens": 77
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 15.77849971409887,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "departments"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"TAB_1_COL_1\":\"OMIT\",\"TAB_1_COL_2\":\"SPAN_0010\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:57598:059926",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "employees"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 1078,
+        "output_tokens": 43
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 21.788856107741594,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0020\",\"COL_2\":\"SPAN_0028\",\"COL_3\":\"SPAN_0035\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:57916:060244",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "Player"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 988,
+        "output_tokens": 54
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 15.071461629122496,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "clinical_trials"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0017\",\"COL_2\":\"SPAN_0012\",\"COL_3\":\"SPAN_0022\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:5965:000868",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "clinical_trials"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E9",
+      "token_count": {
+        "input_tokens": 614,
+        "output_tokens": 53
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 59.21672132005915,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0038\",\"COL_2\":\"SPAN_0049\",\"COL_3\":\"SPAN_0060\",\"COL_4\":\"SPAN_0071\",\"COL_5\":\"SPAN_0086\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:60579:066404",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "incidents"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 1361,
+        "output_tokens": 75
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 18.692352840211242,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0024\",\"COL_2\":\"SPAN_0032\",\"COL_3\":\"SPAN_0040\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:6251:001154",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 787,
+        "output_tokens": 54
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 35.75899798795581,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0027\",\"COL_3\":\"SPAN_0042\",\"COL_4\":\"SPAN_0059\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:63725:081534",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1116,
+        "output_tokens": 61
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 46.67629768885672,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0048\",\"COL_2\":\"SPAN_0032\",\"COL_3\":\"SPAN_0059\",\"COL_4\":\"SPAN_0074\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:63953:081762",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "Bridges"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 1495,
+        "output_tokens": 65
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 10.66067731520161,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0026\",\"COL_2\":\"SPAN_0036\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:65099:096804",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 758,
+        "output_tokens": 42
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 19.851592598017305,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "marine_protected_areas"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0017\",\"COL_3\":\"SPAN_0033\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:67233:046084",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "marine_protected_areas"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 914,
+        "output_tokens": 50
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 20.079122220166028,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0029\",\"COL_3\":\"SPAN_0041\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:69890:091647",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 934,
+        "output_tokens": 50
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 32.968258960172534,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0028\",\"COL_2\":\"SPAN_0038\",\"COL_3\":\"SPAN_0049\",\"COL_4\":\"SPAN_0058\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:70170:091927",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "satellites"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 1014,
+        "output_tokens": 65
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 21.938633335754275,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0027\",\"COL_2\":\"SPAN_0035\",\"COL_3\":\"SPAN_0053\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:7025:001928",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1021,
+        "output_tokens": 54
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 34.273550336714834,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0033\",\"COL_2\":\"SPAN_0037\",\"COL_3\":\"SPAN_0039\",\"COL_4\":\"SPAN_0047\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:70937:084768",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "autonomous_driving_tests"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 1083,
+        "output_tokens": 66
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 16.417742512188852,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0021\",\"COL_3\":\"SPAN_0032\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:71196:085027",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 745,
+        "output_tokens": 49
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 38.240743085742,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "infrastructure_projects"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0029\",\"COL_2\":\"SPAN_0020\",\"COL_3\":\"SPAN_0038\",\"COL_4\":\"SPAN_0050\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:71474:085305",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "infrastructure_projects"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E9",
+      "token_count": {
+        "input_tokens": 1130,
+        "output_tokens": 66
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 10.346180326770991,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0024\",\"COL_2\":\"SPAN_0034\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:7213:019246",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 733,
+        "output_tokens": 42
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 18.21868583280593,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "products"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0025\",\"COL_2\":\"SPAN_0031\",\"COL_3\":\"SPAN_0039\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:72713:029089",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "products"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E9",
+      "token_count": {
+        "input_tokens": 773,
+        "output_tokens": 53
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 20.31273243902251,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0029\",\"COL_2\":\"SPAN_0042\",\"COL_3\":\"SPAN_0050\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:7338:019371",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 905,
+        "output_tokens": 55
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 51.41482612071559,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0031\",\"COL_3\":\"SPAN_0037\",\"COL_4\":\"SPAN_0048\",\"COL_5\":\"SPAN_0054\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:73519:029895",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "community_education"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 1194,
+        "output_tokens": 75
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 19.093118977267295,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0016\",\"COL_3\":\"SPAN_0027\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:74270:007478",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 864,
+        "output_tokens": 50
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 21.602256570011377,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0053\",\"COL_2\":\"SPAN_0045\",\"COL_3\":\"SPAN_0053\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:74968:008176",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "water_conservation_funding"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 980,
+        "output_tokens": 52
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 31.404864477925003,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0047\",\"COL_2\":\"SPAN_0014\",\"COL_3\":\"SPAN_0023\",\"COL_4\":\"SPAN_0034\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:75182:008390",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 926,
+        "output_tokens": 65
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 18.8053083489649,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0024\",\"COL_2\":\"SPAN_0033\",\"COL_3\":\"SPAN_0042\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:75420:008628",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 859,
+        "output_tokens": 54
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 31.46066862391308,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0040\",\"COL_2\":\"SPAN_0044\",\"COL_3\":\"SPAN_0039\",\"COL_4\":\"SPAN_0044\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:76610:061439",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "community_engagement"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 958,
+        "output_tokens": 64
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 24.433151128236204,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0038\",\"COL_2\":\"SPAN_0020\",\"COL_3\":\"SPAN_0054\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:76628:061457",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "SpaceMissions"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 1138,
+        "output_tokens": 54
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 27.22427255101502,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0012\",\"COL_3\":\"SPAN_0018\",\"COL_4\":\"SPAN_0027\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:77133:061962",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 795,
+        "output_tokens": 61
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 17.56525014201179,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0025\",\"COL_2\":\"SPAN_0033\",\"COL_3\":\"SPAN_0039\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:78887:058201",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 763,
+        "output_tokens": 54
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 30.709482514765114,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0027\",\"COL_3\":\"SPAN_0036\",\"COL_4\":\"SPAN_0050\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:79693:059007",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 967,
+        "output_tokens": 60
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 13.99791384767741,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0028\",\"COL_2\":\"SPAN_0045\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:82140:079001",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1111,
+        "output_tokens": 42
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 36.3849320858717,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0037\",\"COL_3\":\"SPAN_0046\",\"COL_4\":\"SPAN_0059\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:90058:063037",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1149,
+        "output_tokens": 61
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 107.5404563350603,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0028\",\"COL_3\":\"SPAN_0066\",\"COL_4\":\"SPAN_0068\",\"COL_5\":\"SPAN_0074\",\"COL_6\":\"SPAN_0078\",\"COL_7\":\"SPAN_0082\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:90532:063511",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "cargo_movements"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 1514,
+        "output_tokens": 95
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 24.59665627311915,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0032\",\"COL_2\":\"SPAN_0045\",\"COL_3\":\"SPAN_0058\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:90620:063599",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1083,
+        "output_tokens": 55
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 32.59473112411797,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0025\",\"COL_3\":\"SPAN_0046\",\"COL_4\":\"SPAN_0039\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:91348:064327",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "articles"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 1031,
+        "output_tokens": 61
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 21.780368914827704,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0027\",\"COL_2\":\"SPAN_0035\",\"COL_3\":\"SPAN_0053\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:91797:094211",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1012,
+        "output_tokens": 52
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 35.55190962180495,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "community_development"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0027\",\"COL_2\":\"SPAN_0015\",\"COL_3\":\"SPAN_0035\",\"COL_4\":\"SPAN_0044\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:92985:095399",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "community_development"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E9",
+      "token_count": {
+        "input_tokens": 1048,
+        "output_tokens": 66
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 60.89203186286613,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0028\",\"COL_2\":\"SPAN_0034\",\"COL_3\":\"SPAN_0043\",\"COL_4\":\"SPAN_0054\",\"COL_5\":\"SPAN_0070\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:93412:095826",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "TV_shows"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 1299,
+        "output_tokens": 77
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 17.855734870303422,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0019\",\"COL_2\":\"SPAN_0028\",\"COL_3\":\"SPAN_0040\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:9379:017369",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 755,
+        "output_tokens": 55
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 18.795367378741503,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0021\",\"COL_3\":\"SPAN_0035\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:95011:093501",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "esports_events"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 844,
+        "output_tokens": 50
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 46.55627895286307,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0025\",\"COL_2\":\"SPAN_0033\",\"COL_3\":\"SPAN_0042\",\"COL_4\":\"SPAN_0049\",\"COL_5\":\"SPAN_0055\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:95063:093553",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "charging_stations"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 1025,
+        "output_tokens": 77
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 27.186437787953764,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0012\",\"COL_3\":\"SPAN_0019\",\"COL_4\":\"SPAN_0025\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:95353:093843",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 825,
+        "output_tokens": 61
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 31.194552802015096,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "military_exercises"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0020\",\"COL_3\":\"SPAN_0032\",\"COL_4\":\"SPAN_0046\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:96728:040438",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "military_exercises"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 971,
+        "output_tokens": 61
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 32.412605872843415,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0018\",\"COL_3\":\"SPAN_0029\",\"COL_4\":\"SPAN_0041\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:9744:017734",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "healthcare_centers"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E1",
+      "token_count": {
+        "input_tokens": 1079,
+        "output_tokens": 61
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 25.33030896168202,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0019\",\"COL_2\":\"SPAN_0027\",\"COL_3\":\"SPAN_0034\",\"COL_4\":\"SPAN_0040\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:97977:009941",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 732,
+        "output_tokens": 65
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": true,
+      "error_type": "wrong_state_with_off_target_change",
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 17.467246434651315,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [
+        "waste_generation"
+      ],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0010\",\"COL_2\":\"SPAN_0019\",\"COL_3\":\"SPAN_0029\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:98327:010291",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "waste_generation"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E9",
+      "token_count": {
+        "input_tokens": 757,
+        "output_tokens": 53
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 36.20074447058141,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0037\",\"COL_3\":\"SPAN_0046\",\"COL_4\":\"SPAN_0059\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:99059:011023",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1150,
+        "output_tokens": 61
+      }
+    },
+    {
+      "admitted": false,
+      "any_off_target_change": false,
+      "error_type": "parse_error",
+      "execution_success": false,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 35.75387298874557,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "parse_error",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 0,
+        "status": "not_run"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0010\",\"COL_2\":\"SPAN_0023\",\"COL_3\":\"SPAN_0044\",\"COL_4\":\"SPAN_0053\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:99202:011166",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "FAIL",
+      "strict_full_state_correct": false,
+      "target_mismatched_tables": [
+        "Menu"
+      ],
+      "target_state_correct": false,
+      "taxonomy_code": "E7",
+      "token_count": {
+        "input_tokens": 1097,
+        "output_tokens": 66
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 148.10933132097125,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"SPAN_0022\",\"COL_2\":\"SPAN_0030\",\"COL_3\":\"SPAN_0037\",\"COL_4\":\"SPAN_0044\",\"COL_5\":\"SPAN_0052\",\"COL_6\":\"SPAN_0062\",\"COL_7\":\"SPAN_0074\",\"COL_8\":\"SPAN_0083\",\"COL_9\":\"SPAN_0089\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:99272:011236",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1355,
+        "output_tokens": 123
+      }
+    },
+    {
+      "admitted": true,
+      "any_off_target_change": false,
+      "error_type": null,
+      "execution_success": true,
+      "gold_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "latency": 35.206079395953566,
+      "method_id": "M2_FROZEN_A7",
+      "off_target_mismatched_tables": [],
+      "parse_status": "success",
+      "prediction_execution": {
+        "error": null,
+        "executed_statements": 1,
+        "status": "success"
+      },
+      "raw_model_output": "{\"column_span_refs\":{\"COL_1\":\"OMIT\",\"COL_2\":\"SPAN_0033\",\"COL_3\":\"SPAN_0050\",\"COL_4\":\"SPAN_0061\"},\"operation\":\"INSERT\",\"table_ref\":\"TAB_1\"}",
+      "sample_id": "gretel:train:9934:017924",
+      "state_comparison_scope": "all_persistent_user_tables_delta",
+      "status": "PASS",
+      "strict_full_state_correct": true,
+      "target_mismatched_tables": [],
+      "target_state_correct": true,
+      "taxonomy_code": "E10",
+      "token_count": {
+        "input_tokens": 1118,
+        "output_tokens": 60
+      }
+    }
+  ],
+  "stage": "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT",
+  "taxonomy_codes": [
+    "E1",
+    "E2",
+    "E3",
+    "E4",
+    "E5",
+    "E6",
+    "E7",
+    "E8",
+    "E9",
+    "E10"
+  ]
+}

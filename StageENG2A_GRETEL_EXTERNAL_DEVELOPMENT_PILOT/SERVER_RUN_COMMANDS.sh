@@ -19,7 +19,7 @@ RESULT_ROOT="/home/uet/hue_ptk/stageeng2a_gretel_external_development_pilot_uet_
 MODEL_SNAPSHOT="/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242"
 
 cd "$RUNNER"
-python scripts/data/validate_stageeng2a_gretel_external_development_pilot.py --stage-dir StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT
+python scripts/data/validate_stageeng2a_gretel_external_development_pilot.py --stage-dir StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT --skip-official
 rm -rf "$RESULT_ROOT"
 CUDA_VISIBLE_DEVICES="$CUDA_VISIBLE_DEVICES" python scripts/server/run_stageeng2a_gretel_pilot.py \
   --stage-dir StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT \

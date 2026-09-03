@@ -16,6 +16,8 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from scripts.data.build_stageeng2a_gretel_external_development_pilot import (  # noqa: E402
     EXPECTED_PILOT_N,
+    MODEL_REVISION,
+    OFFICIAL_SERVER_RUN_ARTIFACTS,
     SCIENTIFIC_ARTIFACTS,
     STAGE_NAME,
     sha256_file,
@@ -34,7 +36,62 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
-def validate_stage(stage_dir: Path, *, require_mock: bool = True) -> dict[str, Any]:
+def validate_official_server_run(stage_dir: Path, failures: list[dict[str, Any]]) -> None:
+    for rel in OFFICIAL_SERVER_RUN_ARTIFACTS:
+        if not (stage_dir / rel).is_file():
+            failures.append({"rule": "missing_official_artifact", "path": rel})
+    summary_path = stage_dir / "official_server_run" / "results" / "summary.json"
+    if not summary_path.is_file():
+        return
+    summary = read_json(summary_path)
+    if summary.get("stage") != STAGE_NAME:
+        failures.append({"rule": "official_stage_name", "observed": summary.get("stage")})
+    if summary.get("status") != "PASS" or summary.get("backend") != "hf":
+        failures.append({"rule": "official_status_backend", "status": summary.get("status"), "backend": summary.get("backend")})
+    if summary.get("pilot_n") != EXPECTED_PILOT_N:
+        failures.append({"rule": "official_pilot_n", "observed": summary.get("pilot_n")})
+    if set(summary.get("methods", {})) != METHODS:
+        failures.append({"rule": "official_method_set", "observed": sorted(summary.get("methods", {}))})
+    if summary.get("model_calls_total") != EXPECTED_PILOT_N * len(METHODS):
+        failures.append({"rule": "official_model_calls_total", "observed": summary.get("model_calls_total")})
+    if summary.get("model_calls_per_sample_per_method") != 1:
+        failures.append({"rule": "official_model_calls_per_sample_per_method", "observed": summary.get("model_calls_per_sample_per_method")})
+    if summary.get("retry_count") != 0:
+        failures.append({"rule": "official_retry_count", "observed": summary.get("retry_count")})
+    for method_id, item in summary.get("methods", {}).items():
+        if item.get("samples") != EXPECTED_PILOT_N or item.get("model_calls") != EXPECTED_PILOT_N:
+            failures.append({"rule": "official_method_denominator", "method_id": method_id, "item": item})
+    constrained = (summary.get("generation_metadata", {}).get("constrained") or {})
+    unconstrained = (summary.get("generation_metadata", {}).get("unconstrained") or {})
+    if constrained.get("model_called") is not True or unconstrained.get("model_called") is not True:
+        failures.append({"rule": "official_model_called", "constrained": constrained.get("model_called"), "unconstrained": unconstrained.get("model_called")})
+    if constrained.get("model_revision") != MODEL_REVISION:
+        failures.append({"rule": "official_model_revision", "observed": constrained.get("model_revision"), "expected": MODEL_REVISION})
+    if constrained.get("runtime_lock", {}).get("status") != "PASS" or unconstrained.get("runtime_lock", {}).get("status") != "PASS":
+        failures.append({"rule": "official_runtime_lock"})
+    for rel, expected_rows in {
+        "official_server_run/raw/model_outputs.jsonl": EXPECTED_PILOT_N * len(METHODS),
+        "official_server_run/raw/parsed_outputs.jsonl": EXPECTED_PILOT_N * len(METHODS),
+        "official_server_run/results/per_sample_results.jsonl": EXPECTED_PILOT_N * len(METHODS),
+        "official_server_run/efficiency/token_usage.jsonl": EXPECTED_PILOT_N * len(METHODS),
+        "official_server_run/efficiency/latency.jsonl": EXPECTED_PILOT_N * len(METHODS),
+    }.items():
+        path = stage_dir / rel
+        if path.is_file():
+            observed = len(read_jsonl(path))
+            if observed != expected_rows:
+                failures.append({"rule": "official_row_count", "path": rel, "observed": observed, "expected": expected_rows})
+    for rel in [
+        "official_server_run/audits/denominator_audit.json",
+        "official_server_run/audits/model_call_audit.json",
+        "official_server_run/audits/retry_audit.json",
+    ]:
+        path = stage_dir / rel
+        if path.is_file() and read_json(path).get("status") != "PASS":
+            failures.append({"rule": "official_audit_status", "path": rel})
+
+
+def validate_stage(stage_dir: Path, *, require_mock: bool = True, require_official: bool = True) -> dict[str, Any]:
     failures: list[dict[str, Any]] = []
     for rel in SCIENTIFIC_ARTIFACTS:
         if not (stage_dir / rel).is_file():
@@ -90,6 +147,8 @@ def validate_stage(stage_dir: Path, *, require_mock: bool = True) -> dict[str, A
         results = read_jsonl(stage_dir / "mock_dry_run" / "results" / "per_sample_results.jsonl")
         if len(raw) != EXPECTED_PILOT_N * len(METHODS) or len(results) != EXPECTED_PILOT_N * len(METHODS):
             failures.append({"rule": "mock_result_rows", "raw": len(raw), "results": len(results)})
+    if require_official:
+        validate_official_server_run(stage_dir, failures)
     manifest_file = read_json(stage_dir / "MANIFEST.json")
     manifest_hashes = {row["path"]: row["sha256"] for row in manifest_file.get("files", [])}
     for rel, expected in manifest_hashes.items():
@@ -109,8 +168,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--stage-dir", type=Path, default=PROJECT_ROOT / STAGE_NAME)
     parser.add_argument("--skip-mock", action="store_true")
+    parser.add_argument("--skip-official", action="store_true")
     args = parser.parse_args()
-    result = validate_stage(args.stage_dir.resolve(), require_mock=not args.skip_mock)
+    result = validate_stage(args.stage_dir.resolve(), require_mock=not args.skip_mock, require_official=not args.skip_official)
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     return 0 if result["status"] == "PASS" else 1
 

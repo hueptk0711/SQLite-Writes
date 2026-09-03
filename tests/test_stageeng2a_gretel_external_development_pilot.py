@@ -3,6 +3,7 @@ from __future__ import annotations
 import sqlite3
 import shutil
 import uuid
+import json
 from pathlib import Path
 
 from scripts.data.build_stageeng2a_gretel_external_development_pilot import EXPECTED_PILOT_N, STAGE_NAME
@@ -26,6 +27,22 @@ def test_model_side_inputs_do_not_expose_gold() -> None:
     forbidden = {"gold_sql", "gold_post_state", "target_state", "label_side_expected", "evaluator_side_expected"}
     for line in rows:
         assert not any(token in line.split('"model_side_input":', 1)[1].split('"runtime_constraints":', 1)[0] for token in forbidden)
+
+
+def test_official_server_results_are_frozen_and_validated() -> None:
+    summary_path = PROJECT_ROOT / STAGE_NAME / "official_server_run" / "results" / "summary.json"
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    assert summary["backend"] == "hf"
+    assert summary["status"] == "PASS"
+    assert summary["pilot_n"] == EXPECTED_PILOT_N
+    assert summary["model_calls_total"] == EXPECTED_PILOT_N * 3
+    assert summary["model_calls_per_sample_per_method"] == 1
+    assert summary["retry_count"] == 0
+    assert summary["methods"]["M0_DIRECT_SQL"]["target_state_accuracy"] == "96/100"
+    assert summary["methods"]["M1_J_FS"]["target_state_accuracy"] == "87/100"
+    assert summary["methods"]["M2_FROZEN_A7"]["target_state_accuracy"] == "50/100"
+    assert summary["generation_metadata"]["constrained"]["model_called"] is True
+    assert summary["generation_metadata"]["unconstrained"]["model_called"] is True
 
 
 def test_off_target_delta_detects_extra_persistent_table_write() -> None:

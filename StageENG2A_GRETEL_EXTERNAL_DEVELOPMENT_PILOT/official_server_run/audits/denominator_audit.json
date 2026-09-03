@@ -1,0 +1,8 @@
+{
+  "expected_result_rows": 300,
+  "pilot_n": 100,
+  "result_rows": 300,
+  "silent_skip_count": 0,
+  "stage": "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT",
+  "status": "PASS"
+}

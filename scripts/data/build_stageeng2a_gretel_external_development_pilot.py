@@ -74,7 +74,7 @@ from scripts.data.build_stageeng0_gretel_qualification import (  # noqa: E402
 
 
 STAGE_NAME = "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT"
-PATCH_NAME = "PATCH2"
+PATCH_NAME = "PATCH3"
 PACKAGE_DATE = "20260903"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
 STAGEENG1_NAME = "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
@@ -112,6 +112,25 @@ SCIENTIFIC_ARTIFACTS = [
     "SHA256SUMS",
     "SERVER_RUN_COMMANDS.md",
     "SERVER_RUN_COMMANDS.sh",
+]
+
+OFFICIAL_SERVER_RUN_ARTIFACTS = [
+    "OFFICIAL_RESULT_REPORT.md",
+    "official_server_run/SERVER_RESULT_ARCHIVE.sha256",
+    "official_server_run/SERVER_RESULT_ARCHIVE_MANIFEST.json",
+    "official_server_run/run_manifest.json",
+    "official_server_run/results/summary.json",
+    "official_server_run/results/summary.md",
+    "official_server_run/results/per_sample_results.jsonl",
+    "official_server_run/raw/model_outputs.jsonl",
+    "official_server_run/raw/parsed_outputs.jsonl",
+    "official_server_run/analysis/a7_failure_taxonomy.json",
+    "official_server_run/efficiency/token_usage.jsonl",
+    "official_server_run/efficiency/latency.jsonl",
+    "official_server_run/environment/environment.json",
+    "official_server_run/audits/denominator_audit.json",
+    "official_server_run/audits/model_call_audit.json",
+    "official_server_run/audits/retry_audit.json",
 ]
 
 
@@ -594,7 +613,7 @@ def write_package_integrity(out_dir: Path) -> None:
 def reviewer_readme() -> str:
     return f"""# {STAGE_NAME} {PATCH_NAME}
 
-This package freezes the ENG2A 100-sample Gretel development-pilot evaluation and provides the one-off UET server runner for three arms: M0 Direct SQL, M1 J-FS, and M2 Frozen A7.
+This package freezes the ENG2A 100-sample Gretel development-pilot evaluation and includes the official one-off UET RTX 4090 server results for three arms: M0 Direct SQL, M1 J-FS, and M2 Frozen A7.
 
 Local reviewer checks:
 
@@ -603,11 +622,9 @@ python scripts/data/validate_stageeng2a_gretel_external_development_pilot.py --s
 python -m pytest -q tests/test_stageeng2a_gretel_external_development_pilot.py
 ```
 
-Official server run:
+Official server result summary:
 
-```bash
-bash {STAGE_NAME}/SERVER_RUN_COMMANDS.sh
-```
+See `{STAGE_NAME}/OFFICIAL_RESULT_REPORT.md` and `{STAGE_NAME}/official_server_run/results/summary.json`.
 
 The bundled `mock_dry_run` is a wiring check only. It uses label-side answers and is not a scientific result.
 """
@@ -648,7 +665,7 @@ RESULT_ROOT="{SERVER_WORK_ROOT}/{SERVER_RESULT_DIR}"
 MODEL_SNAPSHOT="{SERVER_WORK_ROOT}/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/{MODEL_REVISION}"
 
 cd "$RUNNER"
-python scripts/data/validate_stageeng2a_gretel_external_development_pilot.py --stage-dir {STAGE_NAME}
+python scripts/data/validate_stageeng2a_gretel_external_development_pilot.py --stage-dir {STAGE_NAME} --skip-official
 rm -rf "$RESULT_ROOT"
 CUDA_VISIBLE_DEVICES="$CUDA_VISIBLE_DEVICES" python scripts/server/run_stageeng2a_gretel_pilot.py \\
   --stage-dir {STAGE_NAME} \\
@@ -735,6 +752,7 @@ def package_reviewer(out_dir: Path, package_path: Path) -> str:
         "scripts/data/build_stage7c_a6_atomic_domain_column_conditioned_protocol_freeze.py",
         "scripts/data/build_stage7e0_a7_final_a5_real_generation_feasibility.py",
         "scripts/data/build_stageeng2a_gretel_external_development_pilot.py",
+        "scripts/data/finalize_stageeng2a_gretel_external_results.py",
         "scripts/data/validate_stageeng2a_gretel_external_development_pilot.py",
         "scripts/server/run_stage7e0_v2_a1_preflight.py",
         "scripts/server/run_stage7e0_a4_english.py",
