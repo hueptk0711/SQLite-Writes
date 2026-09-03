@@ -17,3 +17,19 @@ bash Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY/SERVER_RUN_COMMANDS.sh
 ```
 
 The Markdown command file is documentation only. Run `SERVER_RUN_COMMANDS.sh`.
+
+Official UET RTX4090 result:
+
+```text
+target_state_accuracy=7/12
+status=FAIL
+model_calls_total=12
+model_calls_per_sample=1
+phase_m_invocations=0
+retry_count=0
+```
+
+The official result archive and extracted raw outputs are under
+`Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY/official_results/`. The frozen gate remains 12/12, so a 7/12 run
+is an official FAIL result, not a package/test failure to be repaired by rerun.
+

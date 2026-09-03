@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
+import tarfile
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -13,6 +16,8 @@ from scripts.data.build_stage7c_a6_atomic_domain_column_conditioned_protocol_fre
 from scripts.data.build_stage7e0_a7_final_a5_real_generation_feasibility import (
     EXPECTED_PRIMARY_COUNT,
     PACKAGE_NAME,
+    PRIMARY_RESULT_ARCHIVE_NAME,
+    PRIMARY_RESULT_DIR_NAME,
     STAGE_NAME,
     build_stage,
     filtered_candidate_inventory_for_a7_case,
@@ -179,6 +184,32 @@ def test_a7_build_validator_and_clean_package_pytest(tmp_path: Path) -> None:
         check=False,
     )
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_a7_build_can_bundle_official_result_archive(tmp_path: Path) -> None:
+    freeze_stage = tmp_path / "freeze" / STAGE_NAME
+    build_stage(freeze_stage, raw_dir=None)
+    source_result = freeze_stage / "mock_dry_run"
+    archive_root = tmp_path / "official_archive_root"
+    official_result = archive_root / PRIMARY_RESULT_DIR_NAME
+    archive_root.mkdir(parents=True)
+    shutil.copytree(source_result, official_result)
+    archive_path = tmp_path / PRIMARY_RESULT_ARCHIVE_NAME
+    with tarfile.open(archive_path, "w:gz") as archive:
+        archive.add(official_result, arcname=PRIMARY_RESULT_DIR_NAME)
+    digest = hashlib.sha256(archive_path.read_bytes()).hexdigest()
+    archive_path.with_suffix(archive_path.suffix + ".sha256").write_text(f"{digest}  {PRIMARY_RESULT_ARCHIVE_NAME}\n", encoding="utf-8")
+
+    stage_dir = tmp_path / STAGE_NAME
+    package_path = tmp_path / PACKAGE_NAME
+    summary = build_stage(stage_dir, package_path, raw_dir=None, official_result_archive=archive_path)
+
+    assert summary["official_generation_completed"] is True
+    assert read_json(stage_dir / "official_results" / "OFFICIAL_RESULT_MANIFEST.json")["raw_model_output_count"] == EXPECTED_PRIMARY_COUNT
+    with zipfile.ZipFile(package_path) as archive:
+        names = set(archive.namelist())
+    assert f"{STAGE_NAME}/official_results/{PRIMARY_RESULT_ARCHIVE_NAME}" in names
+    assert f"{STAGE_NAME}/official_results/OFFICIAL_RESULT_MANIFEST.json" in names
 
 
 def test_a7_runner_writes_expected_result_layout(tmp_path: Path, monkeypatch) -> None:

@@ -12,7 +12,7 @@ python scripts/data/validate_stage7e0_a7_final_a5_real_generation_feasibility.py
 
 if [ -d "$RESULT_ROOT" ]; then
   python scripts/server/run_stage7e0_a7_english.py \
-    --accepted-protocol-commit 3a0efa879c6cc6cc2b585af2187f62135706072b \
+    --accepted-protocol-commit e31489e02f37f40fc7646fe0d8659557427ebe79 \
     --result-root "$RESULT_ROOT" \
     --backend constrained_hf \
     --model-name-or-path "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242" \
@@ -21,7 +21,7 @@ if [ -d "$RESULT_ROOT" ]; then
     --finalize-existing-result
 else
   python scripts/server/run_stage7e0_a7_english.py \
-    --accepted-protocol-commit 3a0efa879c6cc6cc2b585af2187f62135706072b \
+    --accepted-protocol-commit e31489e02f37f40fc7646fe0d8659557427ebe79 \
     --result-root "$RESULT_ROOT" \
     --backend constrained_hf \
     --model-name-or-path "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242" \

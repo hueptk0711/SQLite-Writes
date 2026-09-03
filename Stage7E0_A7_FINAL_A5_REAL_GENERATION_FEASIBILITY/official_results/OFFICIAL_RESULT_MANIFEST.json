@@ -1,0 +1,25 @@
+{
+  "archive_sha256": "1618a3ec83ca4c2b5edbb941e8958a18f30aa6c84774e112331f0293831c2bd9",
+  "expected_primary_n": 12,
+  "failure_count": 5,
+  "model_calls_per_sample": 1,
+  "model_calls_total": 12,
+  "official_generation_completed": true,
+  "official_validation_status": "FAIL",
+  "patch": "PATCH3",
+  "per_sample_result_count": 12,
+  "phase_m_invocations": 0,
+  "raw_model_output_count": 12,
+  "rejected_samples": [
+    "stage7e0_a7_fresh_english_004",
+    "stage7e0_a7_fresh_english_005",
+    "stage7e0_a7_fresh_english_006",
+    "stage7e0_a7_fresh_english_008",
+    "stage7e0_a7_fresh_english_012"
+  ],
+  "retry_count": 0,
+  "source_archive": "stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903.tar.gz",
+  "stage": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY",
+  "target_state_accuracy": "7/12",
+  "target_state_correct_count": 7
+}

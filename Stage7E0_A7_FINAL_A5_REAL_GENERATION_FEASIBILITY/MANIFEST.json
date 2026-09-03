@@ -1,5 +1,5 @@
 {
-  "artifact_count": 49,
+  "artifact_count": 67,
   "artifacts": [
     {
       "bytes": 340,
@@ -14,7 +14,7 @@
     {
       "bytes": 978,
       "path": "A7_PROTOCOL_FREEZE.json",
-      "sha256": "195ab697c691d8f2e9990279df4ad0e625f8f4ac303a73c445dab6e7a4fbcac2"
+      "sha256": "59381617d5b09baea38d8ddd2378cefb3e84e1f3718610154747adad7aea9212"
     },
     {
       "bytes": 487,
@@ -99,7 +99,7 @@
     {
       "bytes": 717,
       "path": "mock_dry_run/run_manifest.json",
-      "sha256": "54ce0326be2896b02e6372af4c339cf19338004f1b14201599c39284e79800c0"
+      "sha256": "3e72619ce2a30603c98a8aee40ec317e92697b636af5ec9932558634d05a75f0"
     },
     {
       "bytes": 439,
@@ -115,6 +115,96 @@
       "bytes": 972,
       "path": "mock_dry_run/runtime/token_usage.jsonl",
       "sha256": "02fe3f3beaf2a59273bb593bd258391fe973533f24d84d34706b4b43edf9ea70"
+    },
+    {
+      "bytes": 234,
+      "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/audits/denominator_audit.json",
+      "sha256": "d0c676f68f9d7d558ce4fd464a371b9cc027a1332b7fa61fa7968a217a13c74e"
+    },
+    {
+      "bytes": 209,
+      "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/audits/model_call_audit.json",
+      "sha256": "4b955fdbef0fd8e964d549d5572e93a706c893fc64a96f3b37ed7afad91580de"
+    },
+    {
+      "bytes": 167,
+      "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/audits/retry_audit.json",
+      "sha256": "c830e0d31ae9af07267a698da82b510b66f052da59fc78dff6dce2495d4e45ff"
+    },
+    {
+      "bytes": 29923,
+      "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/raw/candidate_domains.jsonl",
+      "sha256": "6557f1c950a09b280aa841d22d3aa50cbb15f4cdc3d4fa806d22305c2ca0a725"
+    },
+    {
+      "bytes": 17417,
+      "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/raw/model_outputs.jsonl",
+      "sha256": "934bb5d9e9c769edd9e01331ea615e1e89deddf106329bac67ebe06360e14595"
+    },
+    {
+      "bytes": 1740,
+      "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/raw/prompts_or_prompt_hashes.jsonl",
+      "sha256": "eacad18ce5e8d7a822acfe92a07a06151f77449399a4153dcad8842dd5867aa1"
+    },
+    {
+      "bytes": 9624,
+      "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/results/failure_analysis.json",
+      "sha256": "913825b7c727c94ffc1bbee63cbe0f4f0b02702aaf0711e508921ac44a52f12e"
+    },
+    {
+      "bytes": 22022,
+      "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/results/per_sample_results.jsonl",
+      "sha256": "aff51d3c35217a8895b3e6acca2042de191fd613433f46689f7689e2810b878f"
+    },
+    {
+      "bytes": 1211,
+      "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/results/summary.json",
+      "sha256": "9618ae31fb43b6314aca82dc44c08a0bdf6d5cdd453cf86d93684043f7aedb17"
+    },
+    {
+      "bytes": 64,
+      "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/results/summary.md",
+      "sha256": "c3c78c9bd5715387519587c8629dc858e3e14b7dc824cff15f76a3a1995b87a4"
+    },
+    {
+      "bytes": 8318,
+      "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/run_manifest.json",
+      "sha256": "f9cd1eb190784924388e84b801dc0a0bebb9847b76f95ed3e58cb9302a07755c"
+    },
+    {
+      "bytes": 8040,
+      "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/runtime/environment.json",
+      "sha256": "f88db042c96345c4c901dce7f16d40c7eb4bbb932b1b5cdeedb8da7cf503996d"
+    },
+    {
+      "bytes": 898,
+      "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/runtime/latency.jsonl",
+      "sha256": "b580074ec7f4bb971efa7546d5070ee7d482b6e626627f8566072585e5cb09bc"
+    },
+    {
+      "bytes": 1008,
+      "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/runtime/token_usage.jsonl",
+      "sha256": "c2d6ac4ec6c4b990ea710fcf655b685133cc9b402bac30c48ffb320e942a5070"
+    },
+    {
+      "bytes": 848,
+      "path": "official_results/OFFICIAL_RESULT_MANIFEST.json",
+      "sha256": "13f763a2cb9b72cc528fa0e248124d3bd3b27583127a8a901e80dcc243f568ab"
+    },
+    {
+      "bytes": 349,
+      "path": "official_results/OFFICIAL_RESULT_SUMMARY.md",
+      "sha256": "a70729faad551c046ecc9de255819e128f84f48dd7ee5fabde18e3ab9e206276"
+    },
+    {
+      "bytes": 12676,
+      "path": "official_results/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903.tar.gz",
+      "sha256": "1618a3ec83ca4c2b5edbb941e8958a18f30aa6c84774e112331f0293831c2bd9"
+    },
+    {
+      "bytes": 131,
+      "path": "official_results/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903.tar.gz.sha256",
+      "sha256": "99dfa3897506a6021894bd3b14706ff1a2247414c72fa3c2c63c87ee74eeccd4"
     },
     {
       "bytes": 5159,
@@ -147,24 +237,24 @@
       "sha256": "7668b1a8bca202e50ce6988e7c4fac451c4cd5ce15040a68309a42f9bab53dea"
     },
     {
-      "bytes": 660,
+      "bytes": 1085,
       "path": "REVIEWER_README.md",
-      "sha256": "a616929de60ae8d30f0171e22ca86d72be3fa1769ce406de8d08bea28d1b83b2"
+      "sha256": "f44e4cedc671c23f34d7dec2afa9a99793421884e05be03c1c8af78eb6fe8dcd"
     },
     {
       "bytes": 945,
       "path": "SERVER_RUN_COMMANDS.md",
-      "sha256": "fe6dde5b61dc6203b4c3f15ec44616ac00c107cf5d06552390379cbe2c1fcf0c"
+      "sha256": "249088735ccde4ba4dd8e2958d220e073ac40694bef52d28f79a8817d32674a8"
     },
     {
       "bytes": 1927,
       "path": "SERVER_RUN_COMMANDS.sh",
-      "sha256": "f8b2451add0ec01a82b1cc199e89e36c9b9946dc33edfe9d21df5e14dfa4f81e"
+      "sha256": "f49e0434170808ed3dede0007a678b6f316e963fdbecd9c78ef86e493fb4990e"
     },
     {
-      "bytes": 4906,
+      "bytes": 7910,
       "path": "SHA256SUMS",
-      "sha256": "ecd2afba3bac758b9fbbbb7817579d2a07da23cff5346fd67511aa7a3f4dc475"
+      "sha256": "967728d2f7fbf2b226a2345f4fe43797649a4212feb42bd88d83acabde8ca165"
     },
     {
       "bytes": 57839,
@@ -234,7 +324,7 @@
     {
       "bytes": 1071,
       "path": "STAGE7E0_A7_LOCK.json",
-      "sha256": "46c44c4999f6b9b76cf16416250bfba41861006c562fe683743bb6c07bf2876a"
+      "sha256": "f6cba336ee0da95a5934e2c64a48bfb5c89e3367328f27a44137de7a2980022d"
     },
     {
       "bytes": 6852,
@@ -242,12 +332,12 @@
       "sha256": "1d4700ca220f51db9d5c2b2f5cfc277dae8028d5e9fa25fd4d7d6f00f311778c"
     },
     {
-      "bytes": 590,
+      "bytes": 820,
       "path": "VALIDATION_REPORT.md",
-      "sha256": "60a7e52767e2dd4fc9473be17fa0b28aae1c5e07d9ec5e6dd9f41b4ad933b1d2"
+      "sha256": "74219afaeb0659f7a13ecae478e5ef77e48620800162f5dba332d608c9d7821f"
     }
   ],
-  "combined_sha256": "19528211f847b8abb3dd8c45868b45085ef959c449a96166f75d3f25ea186b2f",
-  "patch": "PATCH2",
+  "combined_sha256": "87ec8e5e9888169864ebf81f6d42b87620b2a971953bfa9f75f38ff0c6e3d2d6",
+  "patch": "PATCH3",
   "stage": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY"
 }

@@ -11,9 +11,14 @@ gold_leakage=PASS
 mock_target_state_correct=12/12
 mock_model_called=false
 mock_gpu_called=false
-official_generation_completed=false
-required_official_gate=12/12 target-state correctness
+official_generation_completed=true
+official_target_state_accuracy=7/12
+official_status=FAIL
+official_model_calls_total=12
+official_model_calls_per_sample=1
+official_phase_m_invocations=0
+official_retry_count=0
+official_rejected_samples=stage7e0_a7_fresh_english_004,stage7e0_a7_fresh_english_005,stage7e0_a7_fresh_english_006,stage7e0_a7_fresh_english_008,stage7e0_a7_fresh_english_012
 ```
 
-This is the pre-GPU A7 freeze package. The official result must be produced once
-with `Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY/SERVER_RUN_COMMANDS.sh` on the locked UET RTX 4090 runtime.
+The official A7 UET RTX4090 run is included. It failed the frozen 12/12 gate and must be reviewed as an official negative result.

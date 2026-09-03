@@ -1,0 +1,279 @@
+{
+  "backend": "constrained_hf",
+  "model": {
+    "accelerate_version": "1.14.0",
+    "allowed_frozen_runtime_profiles": [
+      {
+        "gpu_requirement": "cuda_available=true",
+        "packages": {
+          "accelerate": [
+            "1.14.0"
+          ],
+          "safetensors": [
+            "0.5.3"
+          ],
+          "tokenizers": [
+            "0.22.2"
+          ],
+          "torch": [
+            "2.6.0+cu124"
+          ],
+          "transformers": [
+            "5.5.3"
+          ]
+        },
+        "profile_id": "uet_server_cuda124",
+        "role": "historical_reference_only",
+        "torch_cuda": "12.4"
+      },
+      {
+        "cuda_available": true,
+        "gpu_count": 2,
+        "gpu_device_substring": "Tesla T4",
+        "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
+        "packages": {
+          "accelerate": [
+            "1.14.0"
+          ],
+          "safetensors": [
+            "0.5.3"
+          ],
+          "tokenizers": [
+            "0.22.2"
+          ],
+          "torch": [
+            "2.13.0",
+            "2.13.0+cu130"
+          ],
+          "transformers": [
+            "5.5.3"
+          ]
+        },
+        "profile_id": "kaggle_t4x2_cuda130",
+        "role": "primary_scientific_runtime",
+        "torch_cuda": "13.0"
+      },
+      {
+        "cuda_available": true,
+        "gpu_count": 1,
+        "gpu_device_substring": "RTX 4090",
+        "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
+        "packages": {
+          "accelerate": [
+            "1.14.0"
+          ],
+          "safetensors": [
+            "0.5.3"
+          ],
+          "tokenizers": [
+            "0.22.2"
+          ],
+          "torch": [
+            "2.6.0+cu124"
+          ],
+          "transformers": [
+            "5.5.3"
+          ]
+        },
+        "profile_id": "uet_rtx4090_cuda124_visible0",
+        "role": "primary_scientific_runtime_patch3_uet_server",
+        "torch_cuda": "12.4"
+      }
+    ],
+    "automatic_repair": false,
+    "backend": "incremental_json_schema_grammar",
+    "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "cuda_available": true,
+    "cuda_runtime": "12.4",
+    "device_map": "auto",
+    "fallback_to_unconstrained": false,
+    "finite_complete_object_enumeration": false,
+    "finite_known_answer_candidates": false,
+    "gpu_count": 1,
+    "gpu_devices": [
+      "NVIDIA GeForce RTX 4090"
+    ],
+    "historical_runtime_profile_ids": [
+      "uet_server_cuda124",
+      "kaggle_t4x2_cuda130"
+    ],
+    "label_side_data_used_for_constraints": false,
+    "max_memory": null,
+    "model_called": true,
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "model_name_or_path": "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "primary_runtime_profile": {
+      "cuda_available": true,
+      "gpu_count": 1,
+      "gpu_device_substring": "RTX 4090",
+      "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
+      "packages": {
+        "accelerate": [
+          "1.14.0"
+        ],
+        "safetensors": [
+          "0.5.3"
+        ],
+        "tokenizers": [
+          "0.22.2"
+        ],
+        "torch": [
+          "2.6.0+cu124"
+        ],
+        "transformers": [
+          "5.5.3"
+        ]
+      },
+      "profile_id": "uet_rtx4090_cuda124_visible0",
+      "role": "primary_scientific_runtime_patch3_uet_server",
+      "torch_cuda": "12.4"
+    },
+    "primary_runtime_profile_id": "uet_rtx4090_cuda124_visible0",
+    "quantization": "none",
+    "retry": 0,
+    "runtime_lock": {
+      "allowed_frozen_runtime_profiles": [
+        {
+          "gpu_requirement": "cuda_available=true",
+          "packages": {
+            "accelerate": [
+              "1.14.0"
+            ],
+            "safetensors": [
+              "0.5.3"
+            ],
+            "tokenizers": [
+              "0.22.2"
+            ],
+            "torch": [
+              "2.6.0+cu124"
+            ],
+            "transformers": [
+              "5.5.3"
+            ]
+          },
+          "profile_id": "uet_server_cuda124",
+          "role": "historical_reference_only",
+          "torch_cuda": "12.4"
+        },
+        {
+          "cuda_available": true,
+          "gpu_count": 2,
+          "gpu_device_substring": "Tesla T4",
+          "gpu_requirement": "two Tesla T4 devices expected on Kaggle",
+          "packages": {
+            "accelerate": [
+              "1.14.0"
+            ],
+            "safetensors": [
+              "0.5.3"
+            ],
+            "tokenizers": [
+              "0.22.2"
+            ],
+            "torch": [
+              "2.13.0",
+              "2.13.0+cu130"
+            ],
+            "transformers": [
+              "5.5.3"
+            ]
+          },
+          "profile_id": "kaggle_t4x2_cuda130",
+          "role": "primary_scientific_runtime",
+          "torch_cuda": "13.0"
+        },
+        {
+          "cuda_available": true,
+          "gpu_count": 1,
+          "gpu_device_substring": "RTX 4090",
+          "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
+          "packages": {
+            "accelerate": [
+              "1.14.0"
+            ],
+            "safetensors": [
+              "0.5.3"
+            ],
+            "tokenizers": [
+              "0.22.2"
+            ],
+            "torch": [
+              "2.6.0+cu124"
+            ],
+            "transformers": [
+              "5.5.3"
+            ]
+          },
+          "profile_id": "uet_rtx4090_cuda124_visible0",
+          "role": "primary_scientific_runtime_patch3_uet_server",
+          "torch_cuda": "12.4"
+        }
+      ],
+      "observed_runtime_versions": {
+        "accelerate": "1.14.0",
+        "cuda_available": true,
+        "gpu_count": 1,
+        "gpu_devices": [
+          "NVIDIA GeForce RTX 4090"
+        ],
+        "safetensors": "0.5.3",
+        "tokenizers": "0.22.2",
+        "torch": "2.6.0+cu124",
+        "torch_cuda": "12.4",
+        "transformers": "5.5.3"
+      },
+      "runtime_profile": {
+        "cuda_available": true,
+        "gpu_count": 1,
+        "gpu_device_substring": "RTX 4090",
+        "gpu_requirement": "CUDA_VISIBLE_DEVICES=0 exposing exactly one healthy NVIDIA GeForce RTX 4090 on UET server; NVIDIA driver may report CUDA 12.8 while PyTorch uses cu124",
+        "packages": {
+          "accelerate": [
+            "1.14.0"
+          ],
+          "safetensors": [
+            "0.5.3"
+          ],
+          "tokenizers": [
+            "0.22.2"
+          ],
+          "torch": [
+            "2.6.0+cu124"
+          ],
+          "transformers": [
+            "5.5.3"
+          ]
+        },
+        "profile_id": "uet_rtx4090_cuda124_visible0",
+        "role": "primary_scientific_runtime_patch3_uet_server",
+        "torch_cuda": "12.4"
+      },
+      "runtime_profile_id": "uet_rtx4090_cuda124_visible0",
+      "status": "PASS"
+    },
+    "runtime_profile_id": "uet_rtx4090_cuda124_visible0",
+    "safetensors_version": "0.5.3",
+    "schema_enforcement_mode": "transformers_prefix_allowed_tokens_fn",
+    "token_level_enforcement": true,
+    "tokenizers_version": "0.22.2",
+    "torch_dtype": "auto",
+    "torch_version": "2.6.0+cu124",
+    "transformers_version": "5.5.3"
+  },
+  "runtime_versions": {
+    "accelerate": "1.14.0",
+    "cuda_available": true,
+    "gpu_count": 1,
+    "gpu_devices": [
+      "NVIDIA GeForce RTX 4090"
+    ],
+    "safetensors": "0.5.3",
+    "tokenizers": "0.22.2",
+    "torch": "2.6.0+cu124",
+    "torch_cuda": "12.4",
+    "transformers": "5.5.3"
+  },
+  "stage": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY"
+}

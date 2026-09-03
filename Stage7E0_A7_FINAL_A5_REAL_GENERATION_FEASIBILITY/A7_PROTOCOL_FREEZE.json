@@ -8,8 +8,8 @@
   "gpu_called": false,
   "model_called": false,
   "official_generation_completed": false,
-  "parent_commit_sha": "3a0efa879c6cc6cc2b585af2187f62135706072b",
-  "patch": "PATCH2",
+  "parent_commit_sha": "e31489e02f37f40fc7646fe0d8659557427ebe79",
+  "patch": "PATCH3",
   "phase_m_removed": true,
   "stage": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY",
   "status": "FROZEN_READY_FOR_ONE_OFFICIAL_SERVER_RUN"

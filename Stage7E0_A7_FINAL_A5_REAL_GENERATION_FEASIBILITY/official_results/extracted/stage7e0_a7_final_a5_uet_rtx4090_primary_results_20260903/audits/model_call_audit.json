@@ -1,0 +1,8 @@
+{
+  "finalized_existing_result": true,
+  "model_calls_per_sample": 1,
+  "model_calls_total": 12,
+  "phase_m_invocations": 0,
+  "stage": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY",
+  "status": "PASS"
+}

@@ -17,6 +17,7 @@ import shutil
 import sqlite3
 import subprocess
 import sys
+import tarfile
 import zipfile
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -77,12 +78,13 @@ from scripts.server.run_stage7e0_a6_english import (  # noqa: E402
 
 
 STAGE_NAME = "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY"
-PATCH_NAME = "PATCH2"
+PATCH_NAME = "PATCH3"
 PACKAGE_DATE = "20260903"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
 EXPECTED_PRIMARY_COUNT = 12
 SERVER_WORK_ROOT = "/home/uet/hue_ptk"
 PRIMARY_RESULT_DIR_NAME = "stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903"
+PRIMARY_RESULT_ARCHIVE_NAME = f"{PRIMARY_RESULT_DIR_NAME}.tar.gz"
 SERVER_REQUIREMENTS_LOCK = "requirements-inference-uet-rtx4090-cu124.lock.txt"
 STAGE7C_A6_NAME = "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE"
 
@@ -159,6 +161,10 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     if not path.is_file():
         return []
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def read_json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def write_text(path: Path, value: str) -> None:
@@ -697,7 +703,27 @@ def source_diff() -> str:
     return result.stdout or "A7 runner is a new one-call runtime derived from A6; no diff available.\n"
 
 
-def validation_report(protocol: dict[str, Any], independence: dict[str, Any], mock_summary: dict[str, Any]) -> str:
+def validation_report(protocol: dict[str, Any], independence: dict[str, Any], mock_summary: dict[str, Any], official_result: dict[str, Any] | None = None) -> str:
+    official_block = (
+        f"""official_generation_completed=true
+official_target_state_accuracy={official_result["target_state_accuracy"]}
+official_status={official_result["official_validation_status"]}
+official_model_calls_total={official_result["model_calls_total"]}
+official_model_calls_per_sample={official_result["model_calls_per_sample"]}
+official_phase_m_invocations={official_result["phase_m_invocations"]}
+official_retry_count={official_result["retry_count"]}
+official_rejected_samples={",".join(official_result["rejected_samples"])}
+"""
+        if official_result
+        else """official_generation_completed=false
+required_official_gate=12/12 target-state correctness
+"""
+    )
+    conclusion = (
+        "The official A7 UET RTX4090 run is included. It failed the frozen 12/12 gate and must be reviewed as an official negative result."
+        if official_result
+        else f"This is the pre-GPU A7 freeze package. The official result must be produced once with `{STAGE_NAME}/SERVER_RUN_COMMANDS.sh` on the locked UET RTX 4090 runtime."
+    )
     return f"""# Stage7E0-A7 Final A5 Real-Generation Feasibility Validation Report
 
 Status: {protocol["status"]}
@@ -711,16 +737,34 @@ gold_leakage=PASS
 mock_target_state_correct={mock_summary["target_state_correct_count"]}/12
 mock_model_called=false
 mock_gpu_called=false
-official_generation_completed=false
-required_official_gate=12/12 target-state correctness
+{official_block.rstrip()}
 ```
 
-This is the pre-GPU A7 freeze package. The official result must be produced once
-with `{STAGE_NAME}/SERVER_RUN_COMMANDS.sh` on the locked UET RTX 4090 runtime.
+{conclusion}
 """
 
 
-def reviewer_readme() -> str:
+def reviewer_readme(official_result: dict[str, Any] | None = None) -> str:
+    official_section = (
+        f"""
+Official UET RTX4090 result:
+
+```text
+target_state_accuracy={official_result["target_state_accuracy"]}
+status={official_result["official_validation_status"]}
+model_calls_total={official_result["model_calls_total"]}
+model_calls_per_sample={official_result["model_calls_per_sample"]}
+phase_m_invocations={official_result["phase_m_invocations"]}
+retry_count={official_result["retry_count"]}
+```
+
+The official result archive and extracted raw outputs are under
+`{STAGE_NAME}/official_results/`. The frozen gate remains 12/12, so a 7/12 run
+is an official FAIL result, not a package/test failure to be repaired by rerun.
+"""
+        if official_result
+        else ""
+    )
     return f"""# Stage7E0-A7 Final A5 Real-Generation Feasibility
 
 This package freezes the A7 one-call protocol before model execution. It uses
@@ -740,6 +784,7 @@ bash {STAGE_NAME}/SERVER_RUN_COMMANDS.sh
 ```
 
 The Markdown command file is documentation only. Run `SERVER_RUN_COMMANDS.sh`.
+{official_section}
 """
 
 
@@ -749,6 +794,85 @@ def write_sha256s(stage_dir: Path) -> None:
         if path.is_file() and path.name != "SHA256SUMS":
             lines.append(f"{sha256_file(path)}  {path.relative_to(stage_dir).as_posix()}")
     write_text(stage_dir / "SHA256SUMS", "\n".join(lines) + "\n")
+
+
+def extract_tar_safely(archive_path: Path, destination: Path) -> None:
+    destination.mkdir(parents=True, exist_ok=True)
+    destination_root = destination.resolve()
+    with tarfile.open(archive_path, "r:gz") as archive:
+        members = archive.getmembers()
+        for member in members:
+            target = (destination / member.name).resolve()
+            if not target.is_relative_to(destination_root):
+                raise RuntimeError(f"Unsafe tar member path: {member.name}")
+        archive.extractall(destination, members=members)
+
+
+def bundle_official_result(out_dir: Path, archive_path: Path | None) -> dict[str, Any] | None:
+    if archive_path is None:
+        return None
+    archive_path = archive_path.resolve()
+    if not archive_path.is_file():
+        raise FileNotFoundError(f"official result archive not found: {archive_path}")
+    official_dir = out_dir / "official_results"
+    official_dir.mkdir(parents=True, exist_ok=True)
+    copied_archive = official_dir / PRIMARY_RESULT_ARCHIVE_NAME
+    shutil.copyfile(archive_path, copied_archive)
+    archive_digest = sha256_file(copied_archive)
+    source_sidecar = archive_path.with_suffix(archive_path.suffix + ".sha256")
+    if source_sidecar.is_file():
+        sidecar_text = source_sidecar.read_text(encoding="utf-8").strip()
+        sidecar_digest = sidecar_text.split()[0].lower() if sidecar_text else ""
+        if sidecar_digest != archive_digest:
+            raise RuntimeError("official result archive SHA-256 sidecar mismatch")
+        write_text(official_dir / f"{PRIMARY_RESULT_ARCHIVE_NAME}.sha256", f"{archive_digest}  {PRIMARY_RESULT_ARCHIVE_NAME}\n")
+    extracted_root = official_dir / "extracted"
+    extract_tar_safely(copied_archive, extracted_root)
+    result_dir = extracted_root / PRIMARY_RESULT_DIR_NAME
+    summary = read_json(result_dir / "results" / "summary.json")
+    failure_analysis = read_json(result_dir / "results" / "failure_analysis.json")
+    raw_rows = read_jsonl(result_dir / "raw" / "model_outputs.jsonl")
+    case_rows = read_jsonl(result_dir / "results" / "per_sample_results.jsonl")
+    manifest = {
+        "stage": STAGE_NAME,
+        "patch": PATCH_NAME,
+        "source_archive": archive_path.name,
+        "archive_sha256": archive_digest,
+        "official_generation_completed": True,
+        "official_validation_status": summary.get("status"),
+        "target_state_accuracy": summary.get("target_state_accuracy"),
+        "target_state_correct_count": summary.get("target_state_correct_count"),
+        "expected_primary_n": EXPECTED_PRIMARY_COUNT,
+        "raw_model_output_count": len(raw_rows),
+        "per_sample_result_count": len(case_rows),
+        "model_calls_total": summary.get("model_calls_total"),
+        "model_calls_per_sample": summary.get("model_calls_per_sample"),
+        "phase_m_invocations": summary.get("phase_m_invocations"),
+        "retry_count": summary.get("retry_count"),
+        "rejected_samples": summary.get("rejected_samples", []),
+        "failure_count": len(failure_analysis.get("failures", [])),
+    }
+    write_json(official_dir / "OFFICIAL_RESULT_MANIFEST.json", manifest)
+    write_text(
+        official_dir / "OFFICIAL_RESULT_SUMMARY.md",
+        "\n".join(
+            [
+                "# Stage7E0-A7 Official UET RTX4090 Result",
+                "",
+                f"Status: {manifest['official_validation_status']}",
+                f"Target-state accuracy: {manifest['target_state_accuracy']}",
+                f"Model calls total: {manifest['model_calls_total']}",
+                f"Model calls per sample: {manifest['model_calls_per_sample']}",
+                f"Phase M invocations: {manifest['phase_m_invocations']}",
+                f"Retry count: {manifest['retry_count']}",
+                "",
+                "Rejected samples:",
+                *[f"- {sample_id}" for sample_id in manifest["rejected_samples"]],
+                "",
+            ]
+        ),
+    )
+    return manifest
 
 
 def build_manifest(stage_dir: Path) -> dict[str, Any]:
@@ -786,7 +910,7 @@ def run_mock_dry_run(out_dir: Path, accepted_commit: str) -> dict[str, Any]:
     return run_stage7e0_a7(args)
 
 
-def build_stage(out_dir: Path, package_path: Path | None = None, raw_dir: Path | None = None) -> dict[str, Any]:
+def build_stage(out_dir: Path, package_path: Path | None = None, raw_dir: Path | None = None, official_result_archive: Path | None = None) -> dict[str, Any]:
     if out_dir.exists():
         shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -814,9 +938,10 @@ def build_stage(out_dir: Path, package_path: Path | None = None, raw_dir: Path |
     write_json(out_dir / "audits" / "denominator_audit.json", {"stage": STAGE_NAME, "status": "PASS", "expected_primary_n": EXPECTED_PRIMARY_COUNT, "frozen_primary_n": len(rows), "silent_skip_count": 0, "dropped_sample_count": 0})
     write_text(out_dir / "source_diff" / "A6_to_A7.patch", source_diff())
     mock_summary = run_mock_dry_run(out_dir, accepted_commit)
+    official_result = bundle_official_result(out_dir, official_result_archive)
     write_json(out_dir / "STAGE7E0_A7_LOCK.json", {**freeze, "mock_target_state_correct": mock_summary["target_state_correct_count"], "a7_rerun_authorized": False, "gretel_opened": False})
-    write_text(out_dir / "VALIDATION_REPORT.md", validation_report(freeze, independence, mock_summary))
-    write_text(out_dir / "REVIEWER_README.md", reviewer_readme())
+    write_text(out_dir / "VALIDATION_REPORT.md", validation_report(freeze, independence, mock_summary, official_result))
+    write_text(out_dir / "REVIEWER_README.md", reviewer_readme(official_result))
     write_text(out_dir / "SERVER_RUN_COMMANDS.sh", server_commands(accepted_commit))
     write_text(out_dir / "SERVER_RUN_COMMANDS.md", server_commands_md(accepted_commit))
     write_sha256s(out_dir)
@@ -831,9 +956,11 @@ def build_stage(out_dir: Path, package_path: Path | None = None, raw_dir: Path |
         "data_independence": independence["status"],
         "gold_leakage": leakage["status"],
         "mock_target_state_correct": mock_summary["target_state_correct_count"],
-        "official_generation_completed": False,
-        "model_called": False,
-        "gpu_called": False,
+        "official_generation_completed": official_result is not None,
+        "official_target_state_accuracy": (official_result or {}).get("target_state_accuracy"),
+        "official_status": (official_result or {}).get("official_validation_status"),
+        "model_called": official_result is not None,
+        "gpu_called": official_result is not None,
     }
     if package_path is not None:
         summary["package_sha256"] = package_reviewer(out_dir, package_path)
@@ -905,8 +1032,9 @@ def main() -> int:
     parser.add_argument("--out-dir", type=Path, default=PROJECT_ROOT / STAGE_NAME)
     parser.add_argument("--package", type=Path, default=PROJECT_ROOT / PACKAGE_NAME)
     parser.add_argument("--raw-dir", type=Path, default=PROJECT_ROOT.parents[1] / "external_sources" / "gretel_synthetic_text_to_sql_740ab236")
+    parser.add_argument("--official-result-archive", type=Path)
     args = parser.parse_args()
-    summary = build_stage(args.out_dir, args.package, args.raw_dir)
+    summary = build_stage(args.out_dir, args.package, args.raw_dir, args.official_result_archive)
     print(json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True))
     return 0
 
