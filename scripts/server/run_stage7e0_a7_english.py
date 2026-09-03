@@ -211,6 +211,8 @@ def write_summary(result_root: Path, backend: str, metadata: dict[str, Any], cas
 def run_stage7e0_a7(args: argparse.Namespace) -> dict[str, Any]:
     result_root = Path(args.result_root).resolve()
     backend = str(args.backend).lower()
+    if not hasattr(args, "resume"):
+        args.resume = False
     validate_generation_config(args)
     assert_result_root_policy(result_root, backend=backend, allow_inside_git=args.allow_result_root_inside_git)
     root = Path(getattr(args, "stage_root", PROJECT_ROOT)).resolve()
@@ -280,6 +282,7 @@ def main() -> int:
     parser.add_argument("--skip-git-assertions", action="store_true")
     parser.add_argument("--allow-result-root-inside-git", action="store_true")
     parser.add_argument("--stage-root", type=Path, default=PROJECT_ROOT, help="Root containing the frozen A7 stage directory.")
+    parser.set_defaults(resume=False)
     args = parser.parse_args()
     print(json.dumps(run_stage7e0_a7(args), ensure_ascii=False, indent=2, sort_keys=True))
     return 0

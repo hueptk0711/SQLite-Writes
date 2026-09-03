@@ -14,7 +14,7 @@
     {
       "bytes": 978,
       "path": "A7_PROTOCOL_FREEZE.json",
-      "sha256": "77b65eb3b299234335b4e247486f97a8d7398755bd23f23fb913ce57d17546fb"
+      "sha256": "b5d78261b9ff45c2c155cd4b23dd8d040d2b91b14e820d12b570dbcecd8be466"
     },
     {
       "bytes": 487,
@@ -99,7 +99,7 @@
     {
       "bytes": 717,
       "path": "mock_dry_run/run_manifest.json",
-      "sha256": "ab1449c214c11bd7bc6b54357bfaeb85c8eb7951538d3f855dfd50ca4d7e2e5d"
+      "sha256": "d8aa340cb781d8fecf7e58e92716169a5057581973098b6781141286916ebb26"
     },
     {
       "bytes": 439,
@@ -152,24 +152,24 @@
       "sha256": "a616929de60ae8d30f0171e22ca86d72be3fa1769ce406de8d08bea28d1b83b2"
     },
     {
-      "bytes": 709,
+      "bytes": 716,
       "path": "SERVER_RUN_COMMANDS.md",
-      "sha256": "a0beafceb4889681f1bb5180bce6d15fea4327aeee47818cb6b043c6bb028e14"
+      "sha256": "bd684e50097ad95819ff1a80b12095166170095b6d1a4a0f4977f65fe06d79cf"
     },
     {
       "bytes": 1375,
       "path": "SERVER_RUN_COMMANDS.sh",
-      "sha256": "2e5d1daf70562660b38646026e75ab280f8427944533e4252575b4d10a67a3d1"
+      "sha256": "3711d6fe677720d662bab774eb4f0018ee6f4950a20b4cd2df39ec643c34c65a"
     },
     {
       "bytes": 4906,
       "path": "SHA256SUMS",
-      "sha256": "8540f1846afc325221c88ee3468418180a8d0acf6784700c185dae7823e15aed"
+      "sha256": "9746c8efb16771c26b018dfc34124bc8847f28536811117094f8fa9d8011239d"
     },
     {
-      "bytes": 55140,
+      "bytes": 55245,
       "path": "source_diff/A6_to_A7.patch",
-      "sha256": "3cf3803177491bd6669c3e41f7784979b25d2fabaae20f91e624289a8e221599"
+      "sha256": "9591147e6ada24da94e016cc384b27854206bc92f1890159d4186502a0974ff8"
     },
     {
       "bytes": 8192,
@@ -234,7 +234,7 @@
     {
       "bytes": 1071,
       "path": "STAGE7E0_A7_LOCK.json",
-      "sha256": "76a81d15dd983507e42132ecb31bc36507deb8bc3f51b66d78f1639a7da37628"
+      "sha256": "575660b595467b2a87d0b2eed97faabfe29d55767a9f08db9520bc4f77ecbeb1"
     },
     {
       "bytes": 6852,
@@ -247,7 +247,7 @@
       "sha256": "60a7e52767e2dd4fc9473be17fa0b28aae1c5e07d9ec5e6dd9f41b4ad933b1d2"
     }
   ],
-  "combined_sha256": "cdae3310424cb9005c8d45b48515ecd1bbdf3602584327c1981053980231af13",
-  "patch": "PATCH0",
+  "combined_sha256": "fb7a2c792b58c3ff3c943cf84fa16c91397c744603160e3422a1222b6028b340",
+  "patch": "PATCH1",
   "stage": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY"
 }

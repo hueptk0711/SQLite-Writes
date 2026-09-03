@@ -77,9 +77,9 @@ from scripts.server.run_stage7e0_a6_english import (  # noqa: E402
 
 
 STAGE_NAME = "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY"
-PATCH_NAME = "PATCH0"
+PATCH_NAME = "PATCH1"
 PACKAGE_DATE = "20260903"
-PACKAGE_NAME = f"{STAGE_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
+PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
 EXPECTED_PRIMARY_COUNT = 12
 SERVER_WORK_ROOT = "/home/uet/hue_ptk"
 PRIMARY_RESULT_DIR_NAME = "stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903"
@@ -757,6 +757,7 @@ def run_mock_dry_run(out_dir: Path, accepted_commit: str) -> dict[str, Any]:
         max_input_tokens=28672,
         seed=42,
         trust_remote_code=False,
+        resume=False,
         skip_git_assertions=True,
         allow_result_root_inside_git=True,
         stage_root=out_dir.parent,

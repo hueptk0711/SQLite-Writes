@@ -20,6 +20,7 @@ from scripts.data.build_stage7e0_a7_final_a5_real_generation_feasibility import 
     stage7e0_a7_cases,
 )
 from scripts.data.validate_stage7e0_a7_final_a5_real_generation_feasibility import validate
+import scripts.server.run_stage7e0_a7_english as a7_runner
 from scripts.server.run_stage7e0_a7_english import evaluate_case, run_stage7e0_a7
 from scripts.server.run_stage7e0_a6_english import CallResult
 
@@ -189,3 +190,41 @@ def test_a7_runner_writes_expected_result_layout(tmp_path: Path, monkeypatch) ->
     assert summary["target_state_accuracy"] == "12/12"
     assert (tmp_path / "runner_result" / "raw" / "model_outputs.jsonl").is_file()
     assert (tmp_path / "runner_result" / "results" / "per_sample_results.jsonl").is_file()
+
+
+def test_a7_constrained_runner_defaults_resume_false(tmp_path: Path, monkeypatch) -> None:
+    build_tmp_stage(tmp_path)
+    rows = read_jsonl(tmp_path / STAGE_NAME / "FRESH_ENGLISH_A7_PRIMARY_FEASIBILITY_SET.jsonl")
+
+    class FakeConstrainedGenerator:
+        def __init__(self, *args, **kwargs) -> None:
+            self.mock = a7_runner.LabelMockGenerator(rows)
+
+        def metadata(self) -> dict:
+            return {
+                "backend": a7_runner.CONSTRAINED_BACKEND_ID,
+                "cuda_available": True,
+                "mocked_for_test": True,
+            }
+
+        def generate(self, **kwargs) -> CallResult:
+            return self.mock.generate(**kwargs)
+
+    monkeypatch.setattr(a7_runner, "ConstrainedTransformersChatGenerator", FakeConstrainedGenerator)
+    args = argparse.Namespace(
+        accepted_protocol_commit="test",
+        result_root=str(tmp_path / "constrained_runner_result"),
+        backend="constrained_hf",
+        model_name_or_path="unused",
+        quantization="none",
+        phase_o_max_new_tokens=512,
+        max_input_tokens=28672,
+        seed=42,
+        trust_remote_code=False,
+        skip_git_assertions=True,
+        allow_result_root_inside_git=True,
+        stage_root=tmp_path,
+    )
+    summary = run_stage7e0_a7(args)
+    assert args.resume is False
+    assert summary["target_state_accuracy"] == "12/12"
