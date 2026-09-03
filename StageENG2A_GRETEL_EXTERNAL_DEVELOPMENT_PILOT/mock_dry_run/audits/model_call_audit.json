@@ -1,0 +1,6 @@
+{
+  "model_calls_per_sample_per_method": 1,
+  "model_calls_total": 300,
+  "stage": "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT",
+  "status": "PASS"
+}

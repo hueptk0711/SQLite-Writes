@@ -1,0 +1,12 @@
+{
+  "gold_visible_to_model": false,
+  "model_side_input_keys": [
+    "candidate_inventory_text",
+    "question",
+    "schema_inventory"
+  ],
+  "pilot_n": 100,
+  "silent_drop_count": 0,
+  "stage": "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT",
+  "status": "PASS"
+}

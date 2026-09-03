@@ -1,0 +1,34 @@
+{
+  "backend": "mock",
+  "metadata": {
+    "constrained": null,
+    "runtime_versions": {
+      "accelerate": null,
+      "cuda_available": false,
+      "gpu_count": 0,
+      "gpu_devices": [],
+      "safetensors": null,
+      "tokenizers": null,
+      "torch": null,
+      "torch_cuda": null,
+      "transformers": null
+    },
+    "unconstrained": {
+      "backend": "mock",
+      "label_side_data_used_for_constraints": true,
+      "model_called": false
+    }
+  },
+  "runtime_versions": {
+    "accelerate": null,
+    "cuda_available": false,
+    "gpu_count": 0,
+    "gpu_devices": [],
+    "safetensors": null,
+    "tokenizers": null,
+    "torch": null,
+    "torch_cuda": null,
+    "transformers": null
+  },
+  "stage": "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT"
+}

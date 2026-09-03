@@ -1,0 +1,30 @@
+{
+  "backend": "mock",
+  "methods": [
+    "M0_DIRECT_SQL",
+    "M1_J_FS",
+    "M2_FROZEN_A7"
+  ],
+  "model": {
+    "constrained": null,
+    "runtime_versions": {
+      "accelerate": null,
+      "cuda_available": false,
+      "gpu_count": 0,
+      "gpu_devices": [],
+      "safetensors": null,
+      "tokenizers": null,
+      "torch": null,
+      "torch_cuda": null,
+      "transformers": null
+    },
+    "unconstrained": {
+      "backend": "mock",
+      "label_side_data_used_for_constraints": true,
+      "model_called": false
+    }
+  },
+  "pilot_n": 100,
+  "retry": 0,
+  "stage": "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT"
+}

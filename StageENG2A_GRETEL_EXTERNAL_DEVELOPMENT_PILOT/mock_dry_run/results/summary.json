@@ -1,0 +1,74 @@
+{
+  "backend": "mock",
+  "generation_metadata": {
+    "constrained": null,
+    "runtime_versions": {
+      "accelerate": null,
+      "cuda_available": false,
+      "gpu_count": 0,
+      "gpu_devices": [],
+      "safetensors": null,
+      "tokenizers": null,
+      "torch": null,
+      "torch_cuda": null,
+      "transformers": null
+    },
+    "unconstrained": {
+      "backend": "mock",
+      "label_side_data_used_for_constraints": true,
+      "model_called": false
+    }
+  },
+  "methods": {
+    "M0_DIRECT_SQL": {
+      "accepted_write_correctness": "100/100",
+      "admission_count": 100,
+      "admission_rate": "100/100",
+      "execution_success": 100,
+      "execution_success_rate": "100/100",
+      "input_tokens": 0,
+      "model_calls": 100,
+      "off_target_state_change": 0,
+      "output_tokens": 1184,
+      "samples": 100,
+      "target_state_accuracy": "100/100",
+      "target_state_correct": 100
+    },
+    "M1_J_FS": {
+      "accepted_write_correctness": "96/98",
+      "admission_count": 98,
+      "admission_rate": "98/100",
+      "execution_success": 98,
+      "execution_success_rate": "98/100",
+      "input_tokens": 0,
+      "model_calls": 100,
+      "off_target_state_change": 2,
+      "output_tokens": 229,
+      "samples": 100,
+      "target_state_accuracy": "96/100",
+      "target_state_correct": 96
+    },
+    "M2_FROZEN_A7": {
+      "accepted_write_correctness": "71/73",
+      "admission_count": 73,
+      "admission_rate": "73/100",
+      "execution_success": 73,
+      "execution_success_rate": "73/100",
+      "input_tokens": 0,
+      "model_calls": 100,
+      "off_target_state_change": 2,
+      "output_tokens": 100,
+      "samples": 100,
+      "target_state_accuracy": "71/100",
+      "target_state_correct": 71
+    }
+  },
+  "model_calls_per_sample_per_method": 1,
+  "model_calls_total": 300,
+  "per_sample_results_sha256": "6436cd5a5b4e9f07b11aaee9fc14731661003d2eee83629146e20cf052f258b4",
+  "pilot_n": 100,
+  "raw_model_outputs_sha256": "bfa236974db00df6f5649f81442100068409fcf57cb8a45cf7931958b0967616",
+  "retry_count": 0,
+  "stage": "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT",
+  "status": "PASS"
+}

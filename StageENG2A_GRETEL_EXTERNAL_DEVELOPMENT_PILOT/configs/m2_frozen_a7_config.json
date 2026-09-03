@@ -1,0 +1,7 @@
+{
+  "phase_o_system_prompt": "You select one source span or OMIT for every SQLite INSERT column. Return only JSON that matches the provided schema.",
+  "phase_o_user_prompt_template": "Select the literal source span for each target-table column in the INSERT request.\n\nRules:\n- Choose exactly one SPAN reference or OMIT for every column in the selected table branch.\n- Use each non-OMIT SPAN reference for at most one column.\n- Use OMIT only when the request gives no literal value for that column.\n- Choose the smallest complete atomic value span.\n- The candidate span inventory has already removed deterministic schema-label/value distractors and omission-cue distractors.\n- Do not select field labels, instruction text, table names, column names, or label-plus-value spans.\n- For multi-table schemas, choose exactly one table_ref branch from the model-visible schema.\n- Do not invent span refs.\n- Do not output character offsets, raw values, SLOT refs, Phase M JSON, explanations, or markdown.\n\nOriginal request:\n{question}\n\nSchema inventory:\n{schema_inventory}\n\nCandidate span inventory:\n{candidate_inventory}\n",
+  "source_patch": "PATCH4",
+  "source_stage": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY",
+  "stage": "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT"
+}

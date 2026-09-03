@@ -1,0 +1,12 @@
+{
+  "model_side_forbidden_keys": [
+    "gold_sql",
+    "gold_assignments",
+    "gold_post_state",
+    "target_state",
+    "evaluator_side_expected"
+  ],
+  "stage": "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT",
+  "status": "PASS",
+  "violations": []
+}

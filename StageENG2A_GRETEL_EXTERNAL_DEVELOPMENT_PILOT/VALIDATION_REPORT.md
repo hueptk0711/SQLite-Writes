@@ -1,0 +1,9 @@
+# Validation Report
+
+stage=StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT
+patch=PATCH0
+pilot_n=100
+mock_methods=M0_DIRECT_SQL,M1_J_FS,M2_FROZEN_A7
+mock_model_called=false
+official_generation_validated=false
+status=FROZEN_READY_FOR_ONE_OFFICIAL_SERVER_RUN

@@ -1,0 +1,6 @@
+{
+  "definition": "Compare D0->Dpred and D0->Dgold deltas across all persistent user tables; extra predicted added/removed row deltas are off-target even when the target table is also wrong.",
+  "persistent_user_tables_only": true,
+  "stage": "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT",
+  "status": "PASS"
+}

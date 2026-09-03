@@ -1,0 +1,49 @@
+{
+  "dataset": "StageENG1 development-pilot pool exactly 100 rows",
+  "forbidden_data": "StageENG0 official confirmation raw question/context/gold SQL are not opened; official manifest is used only for isolation hashes.",
+  "methods": [
+    {
+      "calls_per_sample": 1,
+      "method_id": "M0_DIRECT_SQL",
+      "output": "SQLite INSERT/REPLACE SQL only",
+      "retry": 0,
+      "source": "configs/stage5/resolved_direct_confirmation.json"
+    },
+    {
+      "calls_per_sample": 1,
+      "method_id": "M1_J_FS",
+      "output": "legacy table-operation-values JSON compiled with common v3 verifier/compiler",
+      "retry": 0,
+      "source": "configs/stage5/resolved_j_fs_confirmation.json"
+    },
+    {
+      "calls_per_sample": 1,
+      "method_id": "M2_FROZEN_A7",
+      "output": "frozen A7 column-conditioned JSON schema with Phase M removed",
+      "retry": 0,
+      "source": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY PATCH4"
+    }
+  ],
+  "model": {
+    "deterministic": true,
+    "do_sample": false,
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "temperature": null
+  },
+  "no_artificial_accuracy_gate": true,
+  "off_target_metric": "Compare D0->Dpred and D0->Dgold deltas across all persistent user tables; extra predicted added/removed row deltas are off-target even when the target table is also wrong.",
+  "patch": "PATCH0",
+  "primary_metric": "target_state_accuracy",
+  "secondary_metrics": [
+    "execution_success",
+    "target_state_correct",
+    "off_target_state_change",
+    "admission_rate",
+    "accepted_write_correctness",
+    "tokens",
+    "latency"
+  ],
+  "stage": "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT",
+  "status": "FROZEN_READY_FOR_ONE_OFFICIAL_SERVER_RUN"
+}
