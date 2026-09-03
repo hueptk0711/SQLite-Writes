@@ -54,6 +54,21 @@ def candidate_texts_for_case(sample_id: str) -> set[str]:
     return {candidate.text for candidate in filtered}
 
 
+def test_a7_independence_audit_uses_gretel_split_manifests(tmp_path: Path) -> None:
+    stage_dir = build_tmp_stage(tmp_path)
+    audit = read_json(stage_dir / "audits" / "data_independence_audit.json")
+    assert audit["status"] == "PASS"
+    assert audit["gretel_split_manifest_audit_status"] == "PASS"
+    for key in ("a7_vs_gretel_train_overlap", "a7_vs_gretel_dev_overlap", "a7_vs_gretel_pilot_overlap", "a7_vs_gretel_official_test_overlap"):
+        split_audit = audit[key]
+        assert split_audit["manifest_available"] is True
+        assert split_audit["manifest_row_count"] > 0
+        assert split_audit["sample_id_overlap"] == 0
+        assert split_audit["normalized_question_hash_overlap"] == 0
+        assert split_audit["signature_hash_overlap"] == 0
+        assert split_audit["schema_signature_overlap"] == 0
+
+
 def test_a7_atomic_boundary_prefers_clean_values() -> None:
     texts = candidate_texts_for_case("stage7e0_a7_fresh_english_001")
     assert "Alice" in texts
@@ -148,6 +163,46 @@ def test_a7_summary_handles_failed_case_with_none_preflight(tmp_path: Path) -> N
     assert summary["preflight_pass_count"] == 0
 
 
+def test_a7_summary_separates_execution_success_from_target_state(tmp_path: Path) -> None:
+    result_root = tmp_path / "summary_result"
+    cases = [
+        {
+            "sample_id": "executed_wrong_state",
+            "status": "FAIL",
+            "parsed_selection": {"operation": "INSERT"},
+            "typed_value": ["value"],
+            "compiled_sql": "INSERT INTO t VALUES (?)",
+            "preflight_result": {"status": "ADMITTED"},
+            "execution_result": {"target_state_hash": "wrong-state"},
+            "target_state_correct": False,
+            "checks": {"completeness_pass": True},
+            "failure_code": "STATE_MISMATCH",
+        },
+        {
+            "sample_id": "parse_failure",
+            "status": "FAIL",
+            "parsed_selection": None,
+            "typed_value": None,
+            "compiled_sql": None,
+            "preflight_result": None,
+            "execution_result": None,
+            "target_state_correct": False,
+            "checks": None,
+            "failure_code": "MODEL_PARSE_FAILURE",
+        },
+    ]
+    raw_rows = [
+        {"sample_id": "executed_wrong_state", "raw_output": "{}"},
+        {"sample_id": "parse_failure", "raw_output": "{not-json"},
+    ]
+    a7_runner.write_jsonl(result_root / "results" / "per_sample_results.jsonl", cases)
+    a7_runner.write_jsonl(result_root / "raw" / "model_outputs.jsonl", raw_rows)
+    summary = a7_runner.write_summary(result_root, "mock", {"backend": "test"}, cases, raw_rows)
+    assert summary["target_state_correct_count"] == 0
+    assert summary["execution_success_count"] == 1
+    assert summary["preflight_pass_count"] == 1
+
+
 def test_a7_prompt_hash_is_gold_isolated(tmp_path: Path) -> None:
     stage_dir = build_tmp_stage(tmp_path)
     row = read_jsonl(stage_dir / "FRESH_ENGLISH_A7_PRIMARY_FEASIBILITY_SET.jsonl")[0]
@@ -206,6 +261,7 @@ def test_a7_build_can_bundle_official_result_archive(tmp_path: Path) -> None:
 
     assert summary["official_generation_completed"] is True
     assert read_json(stage_dir / "official_results" / "OFFICIAL_RESULT_MANIFEST.json")["raw_model_output_count"] == EXPECTED_PRIMARY_COUNT
+    assert read_json(stage_dir / "official_results" / "extracted" / PRIMARY_RESULT_DIR_NAME / "results" / "summary.json")["execution_success_count"] == EXPECTED_PRIMARY_COUNT
     with zipfile.ZipFile(package_path) as archive:
         names = set(archive.namelist())
     assert f"{STAGE_NAME}/official_results/{PRIMARY_RESULT_ARCHIVE_NAME}" in names

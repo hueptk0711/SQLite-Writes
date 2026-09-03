@@ -192,7 +192,7 @@ def write_summary(result_root: Path, backend: str, metadata: dict[str, Any], cas
         "completeness_pass_count": sum(1 for row in cases if dict_field(row, "checks").get("completeness_pass") is True),
         "compilation_success_count": sum(1 for row in cases if row.get("compiled_sql") is not None),
         "preflight_pass_count": sum(1 for row in cases if dict_field(row, "preflight_result").get("status") == "ADMITTED"),
-        "execution_success_count": target_correct,
+        "execution_success_count": sum(1 for row in cases if dict_field(row, "execution_result").get("target_state_hash")),
         "off_target_effects": 0,
         "rejected_samples": [row["sample_id"] for row in cases if row["status"] != "PASS"],
         "model_calls_total": len(raw_rows),

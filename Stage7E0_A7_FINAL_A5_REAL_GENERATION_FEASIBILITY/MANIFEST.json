@@ -14,12 +14,12 @@
     {
       "bytes": 978,
       "path": "A7_PROTOCOL_FREEZE.json",
-      "sha256": "59381617d5b09baea38d8ddd2378cefb3e84e1f3718610154747adad7aea9212"
+      "sha256": "14792e74bdede69b529014c365332d546aecb30ccbb7d4b603d5a3b85ec57fdf"
     },
     {
-      "bytes": 487,
+      "bytes": 1847,
       "path": "audits/data_independence_audit.json",
-      "sha256": "6e5294b312ea280a6f5eafe3bf7f4b6fb07f98371cc14597c5ea7d790f7a42ea"
+      "sha256": "bc61ac7936c33d17c551966b9d4a1dbd9609d72de44b87f32ef879c6480ce43b"
     },
     {
       "bytes": 195,
@@ -99,7 +99,7 @@
     {
       "bytes": 717,
       "path": "mock_dry_run/run_manifest.json",
-      "sha256": "3e72619ce2a30603c98a8aee40ec317e92697b636af5ec9932558634d05a75f0"
+      "sha256": "1e124654c79abcd0d37f30c60ae0c8304e951e4f865fb6c29404307b05bc628c"
     },
     {
       "bytes": 439,
@@ -157,14 +157,14 @@
       "sha256": "aff51d3c35217a8895b3e6acca2042de191fd613433f46689f7689e2810b878f"
     },
     {
-      "bytes": 1211,
+      "bytes": 1301,
       "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/results/summary.json",
-      "sha256": "9618ae31fb43b6314aca82dc44c08a0bdf6d5cdd453cf86d93684043f7aedb17"
+      "sha256": "97271e6299c248e9529e0dd02dacfab9952f09dfbbc2b97a0537c03c0e9b4275"
     },
     {
-      "bytes": 64,
+      "bytes": 88,
       "path": "official_results/extracted/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903/results/summary.md",
-      "sha256": "c3c78c9bd5715387519587c8629dc858e3e14b7dc824cff15f76a3a1995b87a4"
+      "sha256": "25e2aa783d01a0a960b51a529ab47dbe82df2af6d8b7a3f4f89127d840d678ac"
     },
     {
       "bytes": 8318,
@@ -189,7 +189,7 @@
     {
       "bytes": 848,
       "path": "official_results/OFFICIAL_RESULT_MANIFEST.json",
-      "sha256": "13f763a2cb9b72cc528fa0e248124d3bd3b27583127a8a901e80dcc243f568ab"
+      "sha256": "2e6a5c07ee1af36b8ca7677d442708fd2b72366a01ddbf856b048b2335e72ecd"
     },
     {
       "bytes": 349,
@@ -237,29 +237,29 @@
       "sha256": "7668b1a8bca202e50ce6988e7c4fac451c4cd5ce15040a68309a42f9bab53dea"
     },
     {
-      "bytes": 1085,
+      "bytes": 1472,
       "path": "REVIEWER_README.md",
-      "sha256": "f44e4cedc671c23f34d7dec2afa9a99793421884e05be03c1c8af78eb6fe8dcd"
+      "sha256": "2afe98a08fd982039ff61b13711ee15ad6300354389e68161f2bc1eea5d0c969"
     },
     {
       "bytes": 945,
       "path": "SERVER_RUN_COMMANDS.md",
-      "sha256": "249088735ccde4ba4dd8e2958d220e073ac40694bef52d28f79a8817d32674a8"
+      "sha256": "6fecbf93679872a1b643a993fc81068306af70aed9e95a9003b7c686f42fb36b"
     },
     {
-      "bytes": 1927,
+      "bytes": 1958,
       "path": "SERVER_RUN_COMMANDS.sh",
-      "sha256": "f49e0434170808ed3dede0007a678b6f316e963fdbecd9c78ef86e493fb4990e"
+      "sha256": "974262b839e92666986e4282efa625170e6c92624fcc6508b2265040891d8219"
     },
     {
       "bytes": 7910,
       "path": "SHA256SUMS",
-      "sha256": "967728d2f7fbf2b226a2345f4fe43797649a4212feb42bd88d83acabde8ca165"
+      "sha256": "d06bec214f570321cb16fdacc87fcff9c3025ee72e40a72891062a2e23c65f28"
     },
     {
-      "bytes": 57839,
+      "bytes": 57912,
       "path": "source_diff/A6_to_A7.patch",
-      "sha256": "474bbe41957eb4a56e4de9dc6c669d3ca1ac5008a3f4f0758f4179f4ca725c6a"
+      "sha256": "ef384f029ff9c9b014296e2b3834424d99af692a48576253ac6b4b327f7f1368"
     },
     {
       "bytes": 8192,
@@ -324,7 +324,7 @@
     {
       "bytes": 1071,
       "path": "STAGE7E0_A7_LOCK.json",
-      "sha256": "f6cba336ee0da95a5934e2c64a48bfb5c89e3367328f27a44137de7a2980022d"
+      "sha256": "f64fdc62dd319fe5619e5edab3ee9ede99c81c6546e662917960cd368e7f44de"
     },
     {
       "bytes": 6852,
@@ -337,7 +337,7 @@
       "sha256": "74219afaeb0659f7a13ecae478e5ef77e48620800162f5dba332d608c9d7821f"
     }
   ],
-  "combined_sha256": "87ec8e5e9888169864ebf81f6d42b87620b2a971953bfa9f75f38ff0c6e3d2d6",
-  "patch": "PATCH3",
+  "combined_sha256": "267ee84de8f2e0984d37d1808aba45f463a612d5232b56359b8bdf72824c998b",
+  "patch": "PATCH4",
   "stage": "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY"
 }

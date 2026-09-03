@@ -8,11 +8,11 @@ export CUDA_VISIBLE_DEVICES=0
 RESULT_ROOT="/home/uet/hue_ptk/stage7e0_a7_final_a5_uet_rtx4090_primary_results_20260903"
 
 python scripts/server/preflight_runtime_stage7e0_a6.py --expected-profile uet_rtx4090_cuda124_visible0
-python scripts/data/validate_stage7e0_a7_final_a5_real_generation_feasibility.py --stage-dir Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY
+python scripts/data/validate_stage7e0_a7_final_a5_real_generation_feasibility.py --stage-dir Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY --skip-bundled-official-result
 
 if [ -d "$RESULT_ROOT" ]; then
   python scripts/server/run_stage7e0_a7_english.py \
-    --accepted-protocol-commit e31489e02f37f40fc7646fe0d8659557427ebe79 \
+    --accepted-protocol-commit 5b1a23ad677d34ec0021d5610d0734ab123908ac \
     --result-root "$RESULT_ROOT" \
     --backend constrained_hf \
     --model-name-or-path "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242" \
@@ -21,7 +21,7 @@ if [ -d "$RESULT_ROOT" ]; then
     --finalize-existing-result
 else
   python scripts/server/run_stage7e0_a7_english.py \
-    --accepted-protocol-commit e31489e02f37f40fc7646fe0d8659557427ebe79 \
+    --accepted-protocol-commit 5b1a23ad677d34ec0021d5610d0734ab123908ac \
     --result-root "$RESULT_ROOT" \
     --backend constrained_hf \
     --model-name-or-path "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242" \

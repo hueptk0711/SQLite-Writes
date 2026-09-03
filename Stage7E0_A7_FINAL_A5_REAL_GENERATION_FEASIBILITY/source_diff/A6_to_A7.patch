@@ -1,7 +1,7 @@
 warning: in the working copy of 'scripts/server/run_stage7e0_a6_english.py', LF will be replaced by CRLF the next time Git touches it
 warning: in the working copy of 'scripts/server/run_stage7e0_a7_english.py', LF will be replaced by CRLF the next time Git touches it
 diff --git a/scripts/server/run_stage7e0_a6_english.py b/scripts/server/run_stage7e0_a7_english.py
-index ddb8caa..196c062 100644
+index ddb8caa..184bdb3 100644
 --- a/scripts/server/run_stage7e0_a6_english.py
 +++ b/scripts/server/run_stage7e0_a7_english.py
 @@ -1,19 +1,16 @@
@@ -847,7 +847,7 @@ index ddb8caa..196c062 100644
 +        "completeness_pass_count": sum(1 for row in cases if dict_field(row, "checks").get("completeness_pass") is True),
 +        "compilation_success_count": sum(1 for row in cases if row.get("compiled_sql") is not None),
 +        "preflight_pass_count": sum(1 for row in cases if dict_field(row, "preflight_result").get("status") == "ADMITTED"),
-+        "execution_success_count": target_correct,
++        "execution_success_count": sum(1 for row in cases if dict_field(row, "execution_result").get("target_state_hash")),
 +        "off_target_effects": 0,
 +        "rejected_samples": [row["sample_id"] for row in cases if row["status"] != "PASS"],
 +        "model_calls_total": len(raw_rows),

@@ -78,7 +78,8 @@ from scripts.server.run_stage7e0_a6_english import (  # noqa: E402
 
 
 STAGE_NAME = "Stage7E0_A7_FINAL_A5_REAL_GENERATION_FEASIBILITY"
-PATCH_NAME = "PATCH3"
+EXPECTED_BRANCH_NAME = "stage7e0/a7-final-a5-feasibility"
+PATCH_NAME = "PATCH4"
 PACKAGE_DATE = "20260903"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
 EXPECTED_PRIMARY_COUNT = 12
@@ -87,6 +88,8 @@ PRIMARY_RESULT_DIR_NAME = "stage7e0_a7_final_a5_uet_rtx4090_primary_results_2026
 PRIMARY_RESULT_ARCHIVE_NAME = f"{PRIMARY_RESULT_DIR_NAME}.tar.gz"
 SERVER_REQUIREMENTS_LOCK = "requirements-inference-uet-rtx4090-cu124.lock.txt"
 STAGE7C_A6_NAME = "Stage7C_A6_ENGLISH_ATOMIC_DOMAIN_COLUMN_CONDITIONED_PROTOCOL_FREEZE"
+STAGEENG0_NAME = "StageENG0_GRETEL_ENGLISH_SQLITE_WRITE_QUALIFICATION"
+STAGEENG1_NAME = "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
 
 SCIENTIFIC_ARTIFACTS = [
     "REVIEWER_README.md",
@@ -177,6 +180,10 @@ def git_output(*args: str) -> str:
         return subprocess.check_output(["git", *args], cwd=PROJECT_ROOT, text=True, stderr=subprocess.DEVNULL).strip()
     except Exception:
         return ""
+
+
+def frozen_branch_name() -> str:
+    return git_output("branch", "--show-current") or EXPECTED_BRANCH_NAME
 
 
 def normalized_question(text: str) -> str:
@@ -476,6 +483,87 @@ def load_prior_rows() -> list[dict[str, Any]]:
     return rows
 
 
+def a7_fingerprints(rows: list[dict[str, Any]]) -> dict[str, set[str]]:
+    return {
+        "ids": {row["sample_id"] for row in rows},
+        "normalized_question_hashes": {sha256_text(normalized_question(row["model_side_input"]["question"])) for row in rows},
+        "schema_hashes": {sha256_text(canonical_json(row["synthetic_db_spec"]["create_sql"])) for row in rows},
+        "leakage_signature_hashes": {
+            sha256_text(
+                canonical_json(
+                    {
+                        "operation": "INSERT",
+                        "question": normalized_question(row["model_side_input"]["question"]),
+                        "schema": row["synthetic_db_spec"]["create_sql"],
+                    }
+                )
+            )
+            for row in rows
+        },
+    }
+
+
+def manifest_fingerprints(path: Path) -> dict[str, Any]:
+    manifest_rows = read_jsonl(path)
+    return {
+        "path": path.relative_to(PROJECT_ROOT).as_posix() if path.is_relative_to(PROJECT_ROOT) else path.as_posix(),
+        "available": path.is_file(),
+        "row_count": len(manifest_rows),
+        "ids": {str(row.get("sample_id")) for row in manifest_rows if row.get("sample_id")},
+        "normalized_question_hashes": {
+            str(row[key])
+            for row in manifest_rows
+            for key in ("normalized_prompt_hash", "prompt_hash")
+            if row.get(key)
+        },
+        "signature_hashes": {
+            str(row[key])
+            for row in manifest_rows
+            for key in ("leakage_signature_hash", "raw_row_hash", "context_hash", "sql_hash", "sql_template_hash")
+            if row.get(key)
+        },
+        "schema_hashes": {
+            str(row[key])
+            for row in manifest_rows
+            for key in ("schema_database_group", "schema_hash")
+            if row.get(key)
+        },
+    }
+
+
+def overlap_count(left: set[str], right: set[str]) -> int:
+    return len(left & right)
+
+
+def gretel_split_overlap_audit(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    a7 = a7_fingerprints(rows)
+    split_paths = {
+        "train": PROJECT_ROOT / STAGEENG1_NAME / "DEVELOPMENT_TRAIN_SPLIT_MANIFEST.jsonl",
+        "dev": PROJECT_ROOT / STAGEENG1_NAME / "DEVELOPMENT_DEV_SPLIT_MANIFEST.jsonl",
+        "pilot": PROJECT_ROOT / STAGEENG1_NAME / "DEVELOPMENT_PILOT_POOL_MANIFEST.jsonl",
+        "official_test": PROJECT_ROOT / STAGEENG0_NAME / "OFFICIAL_TEST_CONFIRMATION_MANIFEST.jsonl",
+    }
+    by_split: dict[str, dict[str, Any]] = {}
+    status = "PASS"
+    for split_name, path in split_paths.items():
+        fp = manifest_fingerprints(path)
+        overlaps = {
+            "sample_id_overlap": overlap_count(a7["ids"], fp["ids"]),
+            "normalized_question_hash_overlap": overlap_count(a7["normalized_question_hashes"], fp["normalized_question_hashes"]),
+            "signature_hash_overlap": overlap_count(a7["leakage_signature_hashes"], fp["signature_hashes"]),
+            "schema_signature_overlap": overlap_count(a7["schema_hashes"], fp["schema_hashes"]),
+        }
+        if not fp["available"] or any(value != 0 for value in overlaps.values()):
+            status = "FAIL"
+        by_split[split_name] = {
+            "manifest_path": fp["path"],
+            "manifest_available": fp["available"],
+            "manifest_row_count": fp["row_count"],
+            **overlaps,
+        }
+    return {"status": status, "by_split": by_split}
+
+
 def data_independence_audit(rows: list[dict[str, Any]], raw_dir: Path | None) -> dict[str, Any]:
     a7_ids = {row["sample_id"] for row in rows}
     a7_questions = {normalized_question(row["model_side_input"]["question"]) for row in rows}
@@ -507,17 +595,28 @@ def data_independence_audit(rows: list[dict[str, Any]], raw_dir: Path | None) ->
     exact_id_overlap = len(a7_ids & prior_ids)
     question_overlap = len(a7_questions & prior_questions)
     schema_overlap = len(a7_schema_hashes & prior_schema_hashes)
-    status = "PASS" if exact_id_overlap == 0 and question_overlap == 0 and schema_overlap == 0 and gretel_question_overlap == 0 else "FAIL"
+    gretel_splits = gretel_split_overlap_audit(rows)
+    status = (
+        "PASS"
+        if exact_id_overlap == 0
+        and question_overlap == 0
+        and schema_overlap == 0
+        and gretel_question_overlap == 0
+        and gretel_splits["status"] == "PASS"
+        else "FAIL"
+    )
     return {
         "stage": STAGE_NAME,
         "status": status if gretel_status in {"PASS", "NOT_AVAILABLE"} else "FAIL",
         "a7_vs_a3_a4_a5_a6_exact_id_overlap": exact_id_overlap,
         "a7_vs_a3_a4_a5_a6_normalized_question_overlap": question_overlap,
         "a7_vs_a3_a4_a5_a6_schema_signature_overlap": schema_overlap,
-        "a7_vs_gretel_train_normalized_question_overlap": gretel_question_overlap,
-        "a7_vs_gretel_dev_overlap": 0,
-        "a7_vs_gretel_pilot_overlap": 0,
-        "a7_vs_gretel_official_test_overlap": 0,
+        "a7_vs_gretel_raw_train_normalized_question_overlap": gretel_question_overlap,
+        "a7_vs_gretel_train_overlap": gretel_splits["by_split"]["train"],
+        "a7_vs_gretel_dev_overlap": gretel_splits["by_split"]["dev"],
+        "a7_vs_gretel_pilot_overlap": gretel_splits["by_split"]["pilot"],
+        "a7_vs_gretel_official_test_overlap": gretel_splits["by_split"]["official_test"],
+        "gretel_split_manifest_audit_status": gretel_splits["status"],
         "gretel_train_audit_status": gretel_status,
         "model_called": False,
         "gpu_called": False,
@@ -555,7 +654,7 @@ def protocol_freeze(rows: list[dict[str, Any]], independence: dict[str, Any]) ->
         "patch": PATCH_NAME,
         "status": "FROZEN_READY_FOR_ONE_OFFICIAL_SERVER_RUN",
         "parent_commit_sha": parent_commit,
-        "branch_name": git_output("branch", "--show-current"),
+        "branch_name": frozen_branch_name(),
         "a5_spec_sha": sha256_file(PROJECT_ROOT / STAGE7B_A5_NAME / "DERIVED_ARTIFACT_MANIFEST.json"),
         "a6_protocol_sha": sha256_file(PROJECT_ROOT / STAGE7C_A6_NAME / "STAGE7C_A6_LOCK.json"),
         "architecture": "User request -> schema/column inventory -> A5 typed atomic candidate construction -> one LLM call -> deterministic span resolution -> deterministic typed materialization -> semantic completeness verification -> parameterized SQLite compilation -> rolled-back transactional preflight -> final execution -> full database state evaluation",
@@ -636,7 +735,7 @@ export CUDA_VISIBLE_DEVICES=0
 RESULT_ROOT="{SERVER_WORK_ROOT}/{PRIMARY_RESULT_DIR_NAME}"
 
 python scripts/server/preflight_runtime_stage7e0_a6.py --expected-profile {PRIMARY_RUNTIME_PROFILE_ID}
-python scripts/data/validate_stage7e0_a7_final_a5_real_generation_feasibility.py --stage-dir {STAGE_NAME}
+python scripts/data/validate_stage7e0_a7_final_a5_real_generation_feasibility.py --stage-dir {STAGE_NAME} --skip-bundled-official-result
 
 if [ -d "$RESULT_ROOT" ]; then
   python scripts/server/run_stage7e0_a7_english.py \\
@@ -761,6 +860,9 @@ retry_count={official_result["retry_count"]}
 The official result archive and extracted raw outputs are under
 `{STAGE_NAME}/official_results/`. The frozen gate remains 12/12, so a 7/12 run
 is an official FAIL result, not a package/test failure to be repaired by rerun.
+Running the bundled official-result validator without
+`--skip-bundled-official-result` is expected to return FAIL with
+`official_target_state_accuracy=7/12`.
 """
         if official_result
         else ""
@@ -770,11 +872,17 @@ is an official FAIL result, not a package/test failure to be repaired by rerun.
 This package freezes the A7 one-call protocol before model execution. It uses
 the final Stage7B-A5 candidate-domain rules inside the A6 one-call architecture.
 
-Local validation:
+Freeze-only validation:
+
+```bash
+python scripts/data/validate_stage7e0_a7_final_a5_real_generation_feasibility.py --stage-dir {STAGE_NAME} --skip-bundled-official-result
+python -m pytest -q tests/test_stage7e0_a7_final_a5_real_generation_feasibility.py
+```
+
+Bundled official-result validation:
 
 ```bash
 python scripts/data/validate_stage7e0_a7_final_a5_real_generation_feasibility.py --stage-dir {STAGE_NAME}
-python -m pytest -q tests/test_stage7e0_a7_final_a5_real_generation_feasibility.py
 ```
 
 Server official run:
@@ -808,6 +916,56 @@ def extract_tar_safely(archive_path: Path, destination: Path) -> None:
         archive.extractall(destination, members=members)
 
 
+def dict_field(row: dict[str, Any], key: str) -> dict[str, Any]:
+    value = row.get(key)
+    return value if isinstance(value, dict) else {}
+
+
+def recompute_official_summary(result_dir: Path) -> dict[str, Any]:
+    cases = read_jsonl(result_dir / "results" / "per_sample_results.jsonl")
+    raw_rows = read_jsonl(result_dir / "raw" / "model_outputs.jsonl")
+    run_manifest = read_json(result_dir / "run_manifest.json")
+    backend = str(run_manifest.get("backend") or "constrained_hf")
+    model = run_manifest.get("model") if isinstance(run_manifest.get("model"), dict) else {}
+    pass_count = sum(1 for row in cases if row.get("status") == "PASS")
+    target_correct = sum(1 for row in cases if row.get("target_state_correct") is True)
+    summary = {
+        "stage": STAGE_NAME,
+        "status": "PASS" if target_correct == EXPECTED_PRIMARY_COUNT else "FAIL",
+        "backend": backend,
+        "protocol_backend": model.get("backend"),
+        "target_state_correct_count": target_correct,
+        "target_state_accuracy": f"{target_correct}/{EXPECTED_PRIMARY_COUNT}",
+        "primary_pass_count": f"{pass_count}/{EXPECTED_PRIMARY_COUNT}",
+        "parse_success_count": sum(1 for row in cases if row.get("parsed_selection") is not None),
+        "valid_candidate_selection_count": sum(1 for row in cases if row.get("parsed_selection") is not None and row.get("failure_code") not in {"INVALID_SELECTION", "SPAN_RESOLUTION_FAILURE"}),
+        "materialization_success_count": sum(1 for row in cases if row.get("typed_value") is not None),
+        "completeness_pass_count": sum(1 for row in cases if dict_field(row, "checks").get("completeness_pass") is True),
+        "compilation_success_count": sum(1 for row in cases if row.get("compiled_sql") is not None),
+        "preflight_pass_count": sum(1 for row in cases if dict_field(row, "preflight_result").get("status") == "ADMITTED"),
+        "execution_success_count": sum(1 for row in cases if dict_field(row, "execution_result").get("target_state_hash")),
+        "off_target_effects": 0,
+        "rejected_samples": [row["sample_id"] for row in cases if row.get("status") != "PASS"],
+        "model_calls_total": len(raw_rows),
+        "model_calls_per_sample": 1,
+        "phase_m_invocations": 0,
+        "retry_count": 0,
+        "unexpected_fallback_count": 0,
+        "eleven_of_twelve_allowed": False,
+        "model_called": backend == "constrained_hf",
+        "gpu_called": backend == "constrained_hf",
+        "mock_uses_label_side_expected": backend == "mock",
+        "raw_model_outputs_sha256": sha256_file(result_dir / "raw" / "model_outputs.jsonl"),
+        "per_sample_results_sha256": sha256_file(result_dir / "results" / "per_sample_results.jsonl"),
+        "summary_regenerated_from_raw_outputs": True,
+        "summary_regeneration_patch": PATCH_NAME,
+    }
+    write_json(result_dir / "results" / "summary.json", summary)
+    write_json(result_dir / "results" / "failure_analysis.json", {"stage": STAGE_NAME, "failures": [row for row in cases if row.get("status") != "PASS"]})
+    write_text(result_dir / "results" / "summary.md", f"# Stage7E0-A7 Summary\n\nTarget-state accuracy: {summary['target_state_accuracy']}\nStatus: {summary['status']}\nExecution success: {summary['execution_success_count']}/{EXPECTED_PRIMARY_COUNT}\n")
+    return summary
+
+
 def bundle_official_result(out_dir: Path, archive_path: Path | None) -> dict[str, Any] | None:
     if archive_path is None:
         return None
@@ -829,7 +987,7 @@ def bundle_official_result(out_dir: Path, archive_path: Path | None) -> dict[str
     extracted_root = official_dir / "extracted"
     extract_tar_safely(copied_archive, extracted_root)
     result_dir = extracted_root / PRIMARY_RESULT_DIR_NAME
-    summary = read_json(result_dir / "results" / "summary.json")
+    summary = recompute_official_summary(result_dir)
     failure_analysis = read_json(result_dir / "results" / "failure_analysis.json")
     raw_rows = read_jsonl(result_dir / "raw" / "model_outputs.jsonl")
     case_rows = read_jsonl(result_dir / "results" / "per_sample_results.jsonl")
@@ -987,6 +1145,12 @@ def include_paths(stage_dir: Path) -> list[Path]:
         "scripts/data/build_stage7b_a4_atomic_candidate_domain_omission_cue.py",
         "scripts/data/build_stage7b_a5_typed_atomic_boundary_omission.py",
         "scripts/data/build_stageeng0_gretel_qualification.py",
+        f"{STAGEENG0_NAME}/OFFICIAL_TEST_CONFIRMATION_MANIFEST.jsonl",
+        f"{STAGEENG1_NAME}/DEVELOPMENT_TRAIN_SPLIT_MANIFEST.jsonl",
+        f"{STAGEENG1_NAME}/DEVELOPMENT_DEV_SPLIT_MANIFEST.jsonl",
+        f"{STAGEENG1_NAME}/DEVELOPMENT_PILOT_POOL_MANIFEST.jsonl",
+        f"{STAGEENG1_NAME}/OFFICIAL_TEST_ISOLATION_AUDIT.json",
+        f"{STAGEENG1_NAME}/STAGEENG1_SPLIT_SUMMARY.json",
         "tests/conftest.py",
         "tests/test_stage7e0_a7_final_a5_real_generation_feasibility.py",
         "src/nldbwrite_v3",

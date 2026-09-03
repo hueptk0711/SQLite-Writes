@@ -6,7 +6,7 @@
   "model_calls_total": 12,
   "official_generation_completed": true,
   "official_validation_status": "FAIL",
-  "patch": "PATCH3",
+  "patch": "PATCH4",
   "per_sample_result_count": 12,
   "phase_m_invocations": 0,
   "raw_model_output_count": 12,

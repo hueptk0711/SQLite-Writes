@@ -19,6 +19,8 @@ if str(SRC_ROOT) not in sys.path:
 
 from scripts.data.build_stage7e0_a7_final_a5_real_generation_feasibility import (  # noqa: E402
     EXPECTED_PRIMARY_COUNT,
+    EXPECTED_BRANCH_NAME,
+    PRIMARY_RESULT_DIR_NAME,
     SCIENTIFIC_ARTIFACTS,
     STAGE_NAME,
     canonical_json,
@@ -57,7 +59,7 @@ def validate_stage(stage_dir: Path, failures: list[str]) -> dict[str, Any]:
         failures.append("protocol_not_frozen_for_server_run")
     if freeze.get("phase_m_removed") is not True:
         failures.append("phase_m_not_removed")
-    if freeze.get("branch_name") != "stage7e0/a7-final-a5-feasibility":
+    if freeze.get("branch_name") != EXPECTED_BRANCH_NAME:
         failures.append("branch_name_mismatch")
     if gate.get("primary_n") != EXPECTED_PRIMARY_COUNT or gate.get("required_target_state_correct") != EXPECTED_PRIMARY_COUNT:
         failures.append("gate_primary_count_mismatch")
@@ -156,10 +158,18 @@ def validate_result(result_dir: Path, failures: list[str]) -> dict[str, Any]:
     return summary
 
 
-def validate(stage_dir: Path, result_dir: Path | None = None) -> dict[str, Any]:
+def bundled_official_result_dir(stage_dir: Path) -> Path | None:
+    result_dir = stage_dir / "official_results" / "extracted" / PRIMARY_RESULT_DIR_NAME
+    return result_dir if result_dir.is_dir() else None
+
+
+def validate(stage_dir: Path, result_dir: Path | None = None, *, validate_bundled_official_result: bool = True) -> dict[str, Any]:
     failures: list[str] = []
     stage_payload = validate_stage(stage_dir, failures)
-    result_summary = validate_result(result_dir, failures) if result_dir else None
+    effective_result_dir = result_dir
+    if effective_result_dir is None and validate_bundled_official_result:
+        effective_result_dir = bundled_official_result_dir(stage_dir)
+    result_summary = validate_result(effective_result_dir, failures) if effective_result_dir else None
     return {
         "stage": STAGE_NAME,
         "status": "PASS" if not failures else "FAIL",
@@ -170,7 +180,8 @@ def validate(stage_dir: Path, result_dir: Path | None = None) -> dict[str, Any]:
         "gold_leakage": (stage_payload.get("leakage") or {}).get("status"),
         "mock_target_state_accuracy": (stage_payload.get("mock_summary") or {}).get("target_state_accuracy"),
         "official_target_state_accuracy": (result_summary or {}).get("target_state_accuracy") if result_summary else None,
-        "official_generation_validated": result_dir is not None and not failures,
+        "official_generation_validated": effective_result_dir is not None and not failures,
+        "official_result_dir": str(effective_result_dir) if effective_result_dir else None,
     }
 
 
@@ -178,8 +189,9 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--stage-dir", type=Path, default=PROJECT_ROOT / STAGE_NAME)
     parser.add_argument("--result-dir", type=Path)
+    parser.add_argument("--skip-bundled-official-result", action="store_true")
     args = parser.parse_args()
-    report = validate(args.stage_dir, args.result_dir)
+    report = validate(args.stage_dir, args.result_dir, validate_bundled_official_result=not args.skip_bundled_official_result)
     print(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True))
     return 0 if report["status"] == "PASS" else 1
 
