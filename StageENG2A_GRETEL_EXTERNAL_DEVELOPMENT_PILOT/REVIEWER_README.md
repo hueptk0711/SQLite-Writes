@@ -1,4 +1,4 @@
-# StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT PATCH1
+# StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT PATCH2
 
 This package freezes the ENG2A 100-sample Gretel development-pilot evaluation and provides the one-off UET server runner for three arms: M0 Direct SQL, M1 J-FS, and M2 Frozen A7.
 

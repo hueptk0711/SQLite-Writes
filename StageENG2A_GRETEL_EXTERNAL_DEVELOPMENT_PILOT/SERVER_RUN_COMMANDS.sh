@@ -2,15 +2,15 @@
 set -euo pipefail
 
 cd /home/uet/hue_ptk
-if ! command -v conda >/dev/null 2>&1; then
-  if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
-    . "$HOME/miniconda3/etc/profile.d/conda.sh"
-  elif [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
-    . "$HOME/anaconda3/etc/profile.d/conda.sh"
-  else
-    echo "STOP: conda command not found and conda.sh was not found under $HOME/miniconda3 or $HOME/anaconda3" >&2
-    exit 2
-  fi
+if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+  . "$HOME/miniconda3/etc/profile.d/conda.sh"
+elif [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
+  . "$HOME/anaconda3/etc/profile.d/conda.sh"
+elif command -v conda >/dev/null 2>&1; then
+  eval "$(conda shell.bash hook)"
+else
+  echo "STOP: conda command not found and conda.sh was not found under $HOME/miniconda3 or $HOME/anaconda3" >&2
+  exit 2
 fi
 conda activate stage7e0_a7_py311
 export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"

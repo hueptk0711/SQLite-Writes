@@ -1,7 +1,7 @@
 # Validation Report
 
 stage=StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT
-patch=PATCH1
+patch=PATCH2
 pilot_n=100
 mock_methods=M0_DIRECT_SQL,M1_J_FS,M2_FROZEN_A7
 mock_model_called=false
