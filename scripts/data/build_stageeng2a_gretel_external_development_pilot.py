@@ -74,7 +74,7 @@ from scripts.data.build_stageeng0_gretel_qualification import (  # noqa: E402
 
 
 STAGE_NAME = "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT"
-PATCH_NAME = "PATCH0"
+PATCH_NAME = "PATCH1"
 PACKAGE_DATE = "20260903"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
 STAGEENG1_NAME = "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT"
@@ -631,6 +631,16 @@ def server_commands() -> str:
 set -euo pipefail
 
 cd {SERVER_WORK_ROOT}
+if ! command -v conda >/dev/null 2>&1; then
+  if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+    . "$HOME/miniconda3/etc/profile.d/conda.sh"
+  elif [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
+    . "$HOME/anaconda3/etc/profile.d/conda.sh"
+  else
+    echo "STOP: conda command not found and conda.sh was not found under $HOME/miniconda3 or $HOME/anaconda3" >&2
+    exit 2
+  fi
+fi
 conda activate stage7e0_a7_py311
 export CUDA_VISIBLE_DEVICES="${{CUDA_VISIBLE_DEVICES:-0}}"
 RUNNER="{STAGE_NAME}_runner"

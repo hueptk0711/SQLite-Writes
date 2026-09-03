@@ -33,7 +33,7 @@
   },
   "no_artificial_accuracy_gate": true,
   "off_target_metric": "Compare D0->Dpred and D0->Dgold deltas across all persistent user tables; extra predicted added/removed row deltas are off-target even when the target table is also wrong.",
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "primary_metric": "target_state_accuracy",
   "secondary_metrics": [
     "execution_success",
