@@ -55,11 +55,7 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def sha256_file(path: Path) -> str:
-    data = path.read_bytes()
-    if path.suffix.lower() in {".json", ".jsonl", ".md", ".py", ".txt", ".sh"}:
-        text = data.decode("utf-8-sig").replace("\r\n", "\n").replace("\r", "\n")
-        data = text.encode("utf-8")
-    return hashlib.sha256(data).hexdigest()
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def check(condition: bool, failures: list[str], message: str) -> None:
@@ -131,12 +127,20 @@ def validate_stage(stage_dir: Path) -> dict[str, Any]:
     check(representability["audited_samples"] == 828, failures, "expected 828 unique audited external-development samples")
     check(representability["sample_level_representability"]["newly_semantically_suppressed_gold"] == 0, failures, "ENG2B filtering introduced semantic gold suppression")
     check("official" in representability["scope"] and "excluded" in representability["scope"], failures, "representability scope does not exclude official data")
+    check(representability["domain_semantics_status"]["text_strong_local_rule_restricts_domain"] is True, failures, "TEXT strong-local rule does not restrict domains")
+    check(representability["domain_semantics_status"]["boundary_dominance_suppressed_any"] is True, failures, "boundary dominance did not suppress any overlapping variants")
 
     domain = read_json(stage_dir / "audits" / "column_specific_domain_audit.json")
     check(domain["status"] == "PASS", failures, "column-specific domain audit is not PASS")
     check(domain["domain_construction_uses_gold"] is False, failures, "domain construction must not use gold")
     check(domain["summary"]["column_count"] > 0, failures, "domain audit has no columns")
     check(domain["semantic_representability_primary_metric"]["newly_semantically_suppressed_gold"] == 0, failures, "domain audit semantic primary metric failed")
+    check(domain["summary"]["text_strong_evidence_columns"] > 0, failures, "domain audit has no TEXT strong-evidence columns")
+    check(domain["summary"]["text_strong_evidence_restricted_columns"] > 0, failures, "TEXT strong-evidence domains were never restricted")
+    check(domain["summary"]["text_strong_evidence_unrestricted_columns"] < domain["summary"]["text_strong_evidence_columns"], failures, "all TEXT strong-evidence domains stayed unrestricted")
+    check(domain["summary"]["dominated_boundary_suppressed_total"] > 0, failures, "overlapping boundary dominance suppressed zero candidates")
+    check(domain["domain_semantics_status"]["text_strong_local_rule_restricts_domain"] is True, failures, "domain semantics status reports TEXT restriction failure")
+    check(domain["domain_semantics_status"]["boundary_dominance_suppressed_any"] is True, failures, "domain semantics status reports boundary dominance failure")
 
     duplicate = read_json(stage_dir / "audits" / "duplicate_span_constraint_audit.json")
     check(duplicate["status"] == "PASS", failures, "duplicate span constraint audit is not PASS")
@@ -150,6 +154,13 @@ def validate_stage(stage_dir: Path) -> dict[str, Any]:
     check(runtime["runtime_uses_eng2b_dynamic_schema"] is True, failures, "final runner does not use ENG2B dynamic schema")
     check(runtime["generation_schema_hash_equals_parser_schema_hash"] is True, failures, "generation/parser schema hash mismatch")
     check(runtime["duplicate_span_impossible_in_stateful_grammar"] is True, failures, "duplicate span is not impossible in grammar")
+    runner_cli = runtime["runner_cli_contract"]
+    check(runner_cli["help_exit_code"] == 0, failures, "canonical final runner --help failed")
+    check(runner_cli["help_mentions_mode"] is True, failures, "canonical final runner --help does not advertise live/replay modes")
+    check(runner_cli["live_dry_run_exit_code"] == 0, failures, "canonical final runner live dry-run config failed")
+    check(runner_cli["live_dry_run_method_id"] == "M2_FINAL_ENG2B", failures, "live dry-run method id drifted")
+    check(runner_cli["mode_paths_share_evaluate_final_method"] is True, failures, "live/replay do not share final implementation")
+    check(runner_cli["one_call_per_sample_no_retry"] is True, failures, "live runtime is not frozen to one call/sample with no retry")
     for row in runtime.get("rows", []):
         check(row["generation_schema_sha256"] == row["eng2b_dynamic_schema_sha256"], failures, f"generation schema not ENG2B dynamic for {row['sample_id']}")
         check(row["generation_schema_sha256"] == row["parser_schema_sha256"], failures, f"parser schema hash mismatch for {row['sample_id']}")
@@ -186,6 +197,8 @@ def validate_stage(stage_dir: Path) -> dict[str, Any]:
             "consumed_pilot_subset_samples": representability.get("consumed_pilot_subset_samples"),
             "audited_samples": representability.get("audited_samples"),
             "newly_semantically_suppressed_gold": representability.get("sample_level_representability", {}).get("newly_semantically_suppressed_gold"),
+            "text_strong_evidence_restricted_columns": representability.get("column_level_representability", {}).get("text_strong_evidence_restricted_columns"),
+            "dominated_boundary_suppressed_total": representability.get("column_level_representability", {}).get("dominated_boundary_suppressed_total"),
         },
     }
 

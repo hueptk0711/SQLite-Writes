@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -86,3 +88,40 @@ def test_stageeng2b_final_runner_uses_same_dynamic_schema_for_generation_and_par
         assert row["generation_schema_sha256"] == row["eng2b_dynamic_schema_sha256"]
         assert row["generation_schema_sha256"] == row["parser_schema_sha256"]
         assert row["domain_construction_uses_gold"] is False
+
+
+def test_stageeng2b_domain_semantics_are_effective() -> None:
+    domain = read_json(STAGE_DIR / "audits" / "column_specific_domain_audit.json")
+    summary = domain["summary"]
+    assert domain["domain_semantics_status"]["text_strong_local_rule_restricts_domain"] is True
+    assert summary["text_strong_evidence_columns"] > 0
+    assert summary["text_strong_evidence_restricted_columns"] > 0
+    assert summary["text_strong_evidence_unrestricted_columns"] < summary["text_strong_evidence_columns"]
+    assert domain["domain_semantics_status"]["boundary_dominance_suppressed_any"] is True
+    assert summary["dominated_boundary_suppressed_total"] > 0
+
+
+def test_stageeng2b_final_runner_cli_is_self_contained() -> None:
+    help_proc = subprocess.run(
+        [sys.executable, "scripts/server/run_eng2_final_method.py", "--help"],
+        cwd=PROJECT_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert help_proc.returncode == 0, help_proc.stderr
+    assert "--mode" in help_proc.stdout
+    assert "replay" in help_proc.stdout
+    assert "live" in help_proc.stdout
+    dry_proc = subprocess.run(
+        [sys.executable, "scripts/server/run_eng2_final_method.py", "--mode", "live", "--dry-run-live-config"],
+        cwd=PROJECT_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert dry_proc.returncode == 0, dry_proc.stderr
+    config = json.loads(dry_proc.stdout)
+    assert config["method_id"] == "M2_FINAL_ENG2B"
+    assert config["generation_settings"]["calls_per_sample"] == 1
+    assert config["generation_settings"]["retry"] == 0

@@ -1,14 +1,14 @@
 {
   "files": [
     {
-      "bytes": 1503945,
+      "bytes": 1504756,
       "path": "audits/candidate_representability.json",
-      "sha256": "7e2b2994d3a44c7ef211fcf9e2f93234e30e9137d6953038d4b77b0d8e38805c"
+      "sha256": "9c9d0b70049e69671bd603c8cc3467a244fa04839b17206d3189c0601a59bd0d"
     },
     {
-      "bytes": 1524083,
+      "bytes": 2120133,
       "path": "audits/column_specific_domain_audit.json",
-      "sha256": "9cd67405178028b94288f099c7580bf33aaac56f88d74b02d5c8cc4eb1d641df"
+      "sha256": "34f78a66cbafcd2425bd73bfd57e5e075c472025925ee6f492e7c6ece913d89a"
     },
     {
       "bytes": 471,
@@ -16,9 +16,9 @@
       "sha256": "42911912331039cac7ee2adba25e42c9ecde34db585fc69f142a65aaec4ff024"
     },
     {
-      "bytes": 158914,
+      "bytes": 160506,
       "path": "audits/final_runtime_integration_audit.json",
-      "sha256": "a283a1d0cdb6454b1f939fe46fc4cd29023f22959e5c2aabdfb56e7f4ecdeea0"
+      "sha256": "0d7cbfc0aa03278701171b7d4ed41cf9983b5b16af68b0608bde8bbf1ef72687"
     },
     {
       "bytes": 247,
@@ -51,9 +51,9 @@
       "sha256": "23d748d608545946ecf2c959fc08edadb54d2b5c335a35fbffe3fcacd00460cd"
     },
     {
-      "bytes": 9874,
+      "bytes": 33678,
       "path": "code/scripts/server/run_eng2_final_method.py",
-      "sha256": "658d2abfd5522797cb85f7186abbc8d9f07f9c6fbeb5432fad5c1145766855ca"
+      "sha256": "651302224c4177cb1155015261ab50c3301701380184638149a393a9107d49a6"
     },
     {
       "bytes": 28880,
@@ -66,9 +66,9 @@
       "sha256": "a964cd6f07f82dea413fc53127b4d6e56a703364c6a4c599ec4176a554a7f186"
     },
     {
-      "bytes": 14588,
+      "bytes": 27150,
       "path": "code/src/nldbwrite_v3/v2_a1/eng2b_candidate_domains.py",
-      "sha256": "0fe4188bfe2ffaea048aa7d100150a60e0aef02360958d674e951f9aa612a741"
+      "sha256": "32f537133300934f6ef14d47026de7a56d6634b9040481bc16d10229986b98f9"
     },
     {
       "bytes": 7633,
@@ -78,17 +78,17 @@
     {
       "bytes": 6987,
       "path": "code/src/nldbwrite_v3/v2_a1/typed_materializer.py",
-      "sha256": "2fe622164f3df2ca6e48d9902e12c659c9cb43a94241d97ad4fd884f3db47aab"
+      "sha256": "605a069a825ce118c3292696674206169b32c14c7764fd97409fa9a93fced4c4"
     },
     {
-      "bytes": 1306,
+      "bytes": 1362,
       "path": "ENG2B_FINAL_METHOD_FREEZE.json",
-      "sha256": "b679443a3a8a7e83111af73be5fbadadcbec5ee16b92a683fbb3aee3d8b34788"
+      "sha256": "09a69b52bfdf31d5f3903f02b3695881956a67f4d75d89b469a12b691be3aac6"
     },
     {
-      "bytes": 1614,
+      "bytes": 1957,
       "path": "ENG2B_METHOD_AMENDMENT.json",
-      "sha256": "248a5fff454a7bec572caf146b39b1e5f1f9e52dfb80725ff653b8ee36cc259d"
+      "sha256": "f35e31de3994111b2c0ec4ed288ea51c65a6988bd28b9d52ef68ea65a17e08cd"
     },
     {
       "bytes": 313,
@@ -121,26 +121,26 @@
       "sha256": "17688b9e433fc45ba1365122d2c27f3bd8661445273b291316c09a4d05f1f9c4"
     },
     {
-      "bytes": 703,
+      "bytes": 713,
       "path": "REVIEWER_README.md",
-      "sha256": "f95ff8fb11f36e2a32d9d7343a4cd75e2b395136e1302618bd10ac7afdb5f08a"
+      "sha256": "bc2fee1a19e842cc74ec13e8532d0cdf98c436b7de1d446c831fbffe28d49f2c"
     },
     {
-      "bytes": 11919,
+      "bytes": 18394,
       "path": "tests/test_eng2b_materialization_and_domains.py",
-      "sha256": "1f550a759acb9ae57d47a63ed080262f3cef4bf0978fb28b0252aff6281585d3"
+      "sha256": "208b045a738c3e68c7e693494d1c4cb09604a0273cf3157afb1b821fb358c229"
     },
     {
-      "bytes": 4142,
+      "bytes": 5788,
       "path": "tests/test_stageeng2b_final_external_development_redesign_freeze.py",
-      "sha256": "d96cb8810d0dbcc3e9eb42f855ef1babae4ceaded1af5f1c6b4eaddb1568bb40"
+      "sha256": "47495674fd42891c447967144eb1990824e16fadfe4e0f06e2ec76214b18bcdb"
     },
     {
-      "bytes": 577,
+      "bytes": 751,
       "path": "VALIDATION_REPORT.md",
-      "sha256": "b1a11c5299fecf2ad88653f839c63da50a3d05e93f3a8451a4f15a25e826f60e"
+      "sha256": "c2f0b65fd9debc86cea330a18d7f2b9048950ec4040a725c92782d1eaa5597e2"
     }
   ],
-  "generated_at_utc": "2026-09-04T04:46:48.567279+00:00",
+  "generated_at_utc": "2026-09-04T00:00:00+00:00",
   "stage": "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE"
 }

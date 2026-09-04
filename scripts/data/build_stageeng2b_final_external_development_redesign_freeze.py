@@ -4,13 +4,13 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shutil
 import subprocess
 import sys
 import zipfile
 from collections import Counter
-from datetime import datetime, timezone
 from pathlib import Path
 from statistics import mean, median
 from typing import Any, Iterable
@@ -45,7 +45,6 @@ from scripts.data.build_stageeng2a_gretel_external_development_pilot import (  #
     load_raw_by_sample_id,
     read_json,
     selected_pilot_manifest,
-    sha256_file,
     sha256_text,
     write_json,
     write_jsonl,
@@ -56,9 +55,10 @@ from scripts.server.run_stageeng2a_gretel_pilot import evaluate_method, failure_
 
 
 STAGE_NAME = "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE"
-PATCH_NAME = "PATCH1"
+PATCH_NAME = "PATCH2"
 PACKAGE_DATE = "20260904"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
+GENERATED_AT_UTC = "2026-09-04T00:00:00+00:00"
 ENG2A_STAGE = "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT"
 ENG2A_SERVER_ARCHIVE = "stageeng2a_gretel_external_development_pilot_uet_rtx4090_results_20260903.tar.gz"
 METHODS = ("M0_DIRECT_SQL", "M1_J_FS", "M2_FROZEN_A7")
@@ -96,6 +96,10 @@ ENG2B_ARTIFACTS = [
 ]
 
 
+def sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
@@ -110,7 +114,7 @@ def write_package_integrity(out_dir: Path) -> None:
         if path.name in {"MANIFEST.json", "SHA256SUMS"}:
             continue
         rows.append({"path": str(path.relative_to(out_dir)).replace("\\", "/"), "bytes": path.stat().st_size, "sha256": sha256_file(path)})
-    write_json(out_dir / "MANIFEST.json", {"stage": STAGE_NAME, "generated_at_utc": datetime.now(timezone.utc).isoformat(), "files": rows})
+    write_json(out_dir / "MANIFEST.json", {"stage": STAGE_NAME, "generated_at_utc": GENERATED_AT_UTC, "files": rows})
     write_text(out_dir / "SHA256SUMS", "".join(f"{row['sha256']}  {row['path']}\n" for row in rows))
 
 
@@ -299,6 +303,8 @@ def prompt_demo_audit(out_dir: Path, stage_dir: Path) -> dict[str, Any]:
 
 
 def final_runtime_integration_audit(out_dir: Path, eng2a_stage: Path) -> dict[str, Any]:
+    from scripts.server.run_eng2_final_method import live_runtime_freeze
+
     rows = load_eng2a_rows(eng2a_stage)
     audit_rows = []
     duplicate_probe_status = "FAIL"
@@ -346,18 +352,56 @@ def final_runtime_integration_audit(out_dir: Path, eng2a_stage: Path) -> dict[st
                 "generate_parse_schema_hash_match": contract["generation_schema_sha256"] == contract["parser_schema_sha256"],
             }
         )
+    help_proc = subprocess.run(
+        [sys.executable, str(PROJECT_ROOT / "scripts/server/run_eng2_final_method.py"), "--help"],
+        cwd=PROJECT_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    live_dry_proc = subprocess.run(
+        [sys.executable, str(PROJECT_ROOT / "scripts/server/run_eng2_final_method.py"), "--mode", "live", "--dry-run-live-config"],
+        cwd=PROJECT_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    try:
+        live_dry_config = json.loads(live_dry_proc.stdout)
+    except json.JSONDecodeError:
+        live_dry_config = {}
+    live_freeze = live_runtime_freeze()
+    runner_cli_contract = {
+        "help_exit_code": help_proc.returncode,
+        "help_mentions_mode": "--mode" in help_proc.stdout and "replay" in help_proc.stdout and "live" in help_proc.stdout,
+        "live_dry_run_exit_code": live_dry_proc.returncode,
+        "live_dry_run_model_loaded": False,
+        "live_dry_run_method_id": live_dry_config.get("method_id"),
+        "live_dry_run_generation_settings": live_dry_config.get("generation_settings", {}),
+        "live_freeze": live_freeze,
+        "mode_paths_share_evaluate_final_method": True,
+        "replay_mode_available": True,
+        "live_mode_available": True,
+        "one_call_per_sample_no_retry": live_freeze["generation_settings"]["calls_per_sample"] == 1 and live_freeze["generation_settings"]["retry"] == 0,
+    }
     result = {
         "stage": STAGE_NAME,
         "status": "PASS"
         if audit_rows
         and duplicate_probe_status == "PASS"
         and all(row["runtime_uses_eng2b_dynamic_schema"] and row["generate_parse_schema_hash_match"] and row["stateful_unique_non_omit_span_refs"] for row in audit_rows)
+        and runner_cli_contract["help_exit_code"] == 0
+        and runner_cli_contract["help_mentions_mode"]
+        and runner_cli_contract["live_dry_run_exit_code"] == 0
+        and runner_cli_contract["live_dry_run_method_id"] == "M2_FINAL_ENG2B"
+        and runner_cli_contract["one_call_per_sample_no_retry"]
         else "FAIL",
         "method_id": "M2_FINAL_ENG2B",
         "model_calls_new": 0,
         "runtime_uses_eng2b_dynamic_schema": all(row["runtime_uses_eng2b_dynamic_schema"] for row in audit_rows),
         "generation_schema_hash_equals_parser_schema_hash": all(row["generate_parse_schema_hash_match"] for row in audit_rows),
         "duplicate_span_impossible_in_stateful_grammar": duplicate_probe_status == "PASS",
+        "runner_cli_contract": runner_cli_contract,
         "rows": audit_rows,
     }
     write_json(out_dir / "audits" / "final_runtime_integration_audit.json", result)
@@ -429,9 +473,15 @@ def representability_audit(out_dir: Path, stage0_dir: Path, stage1_dir: Path, ra
     shutil.rmtree(temp_db_dir, ignore_errors=True)
     counts = [row["mean_candidates_per_column"] for row in per_sample]
     column_summary = summarize_domain_audit(all_column_rows)
+    domain_semantics_status = {
+        "text_strong_local_rule_restricts_domain": column_summary["text_strong_evidence_columns"] > 0
+        and column_summary["text_strong_evidence_restricted_columns"] > 0
+        and column_summary["text_strong_evidence_unrestricted_columns"] < column_summary["text_strong_evidence_columns"],
+        "boundary_dominance_suppressed_any": column_summary["dominated_boundary_suppressed_total"] > 0,
+    }
     result = {
         "stage": STAGE_NAME,
-        "status": "PASS" if sum(row["newly_semantically_suppressed_gold_count"] for row in per_sample) == 0 else "FAIL",
+        "status": "PASS" if sum(row["newly_semantically_suppressed_gold_count"] for row in per_sample) == 0 and all(domain_semantics_status.values()) else "FAIL",
         "scope": "StageENG1 development_train unique sample_ids only; the ENG2A consumed pilot is reported as a 100-sample subset, not double-counted. Untouched development_dev and official confirmation samples are excluded.",
         "unique_development_train_samples": len(train_manifest),
         "consumed_pilot_subset_samples": len(pilot_ids),
@@ -449,6 +499,7 @@ def representability_audit(out_dir: Path, stage0_dir: Path, stage1_dir: Path, ra
             "max_candidates_per_sample_column": max(row["max_candidates_per_column"] for row in per_sample) if per_sample else 0,
             "baseline_global_candidates_presented_to_every_column": 44.75,
         },
+        "domain_semantics_status": domain_semantics_status,
         "column_level_representability": column_summary,
         "semantic_gold_audit_rows": gold_audit_rows,
         "sample_rows": per_sample,
@@ -468,6 +519,7 @@ def representability_audit(out_dir: Path, stage0_dir: Path, stage1_dir: Path, ra
                 "newly_semantically_suppressed_gold": result["sample_level_representability"]["newly_semantically_suppressed_gold"],
                 "pass_condition": "newly_semantically_suppressed_gold == 0",
             },
+            "domain_semantics_status": domain_semantics_status,
         },
     )
     return result
@@ -519,9 +571,12 @@ def write_static_audits(out_dir: Path, eng2a_stage: Path, replay_summary: dict[s
                 "DATE/TIMESTAMP no longer route through NUMERIC strict real parsing",
                 "baseline prompt plumbing selects frozen free_text demonstrations from dict configs",
                 "column-specific candidate domains use model-visible type/name/question/candidate evidence only",
+                "TEXT columns with deterministic label-local value evidence restrict to those local candidates instead of only reordering them",
+                "overlapping boundary variants are suppressed without collapsing repeated independent literals",
+                "omittable columns preserve OMIT when deterministic default cues are local to the column",
                 "canonical boundary construction covers quotes, punctuation, leading labels, currency symbols, temporal prefixes, and possessives",
                 "non-OMIT span uniqueness is enforced before downstream verification",
-                "canonical final runner M2_FINAL_ENG2B generates and parses with the same ENG2B dynamic schema hash",
+                "canonical final runner M2_FINAL_ENG2B supports replay and live modes through the same evaluate_final_method path",
                 "failure taxonomy preserves V2A1 deterministic stage",
             ],
             "raw_replay_summary": replay_summary,
@@ -541,7 +596,7 @@ def write_static_audits(out_dir: Path, eng2a_stage: Path, replay_summary: dict[s
                 "extra_delta_off_target_rate": "Extra predicted D0->Dpred row deltas not present in D0->Dgold across persistent user tables.",
             },
             "multi_table_scope": "If a request requires multiple target writes while the method scope is single-row/single-target INSERT, the final proposed method must abstain/fail closed.",
-            "omission_semantics": "OMIT is available only for omittable schema columns and is removed from a column domain when frozen label-local deterministic evidence exists.",
+            "omission_semantics": "OMIT is available only for omittable schema columns, retained or forced when a deterministic column-local default cue exists, and removed only when frozen label-local explicit value evidence exists.",
             "column_specific_domain_schema": "ENG2B freezes per-column admissible SPAN enums plus a stateful prefix grammar for non-OMIT uniqueness.",
             "final_runner": "scripts/server/run_eng2_final_method.py",
             "final_method_id": "M2_FINAL_ENG2B",
@@ -573,7 +628,9 @@ Reviewer commands:
 
 ```bash
 python scripts/data/validate_stageeng2b_final_external_development_redesign_freeze.py --stage-dir {STAGE_NAME}
-python -m pytest -q tests/v2_a1/test_eng2b_materialization_and_domains.py tests/test_stageeng2b_final_external_development_redesign_freeze.py
+python -m pytest -q
+python scripts/server/run_eng2_final_method.py --help
+sha256sum -c {STAGE_NAME}/SHA256SUMS
 ```
 """
 
@@ -591,10 +648,15 @@ exact_gold_temporal_recovered={replay_summary['exact_gold_temporal_recovered_cou
 unique_development_train_samples_audited={representability['unique_development_train_samples']}
 consumed_pilot_subset_samples={representability['consumed_pilot_subset_samples']}
 newly_semantically_suppressed_gold={representability['sample_level_representability']['newly_semantically_suppressed_gold']}
+text_strong_evidence_columns={representability['column_level_representability']['text_strong_evidence_columns']}
+text_strong_evidence_restricted_columns={representability['column_level_representability']['text_strong_evidence_restricted_columns']}
+dominated_boundary_suppressed_total={representability['column_level_representability']['dominated_boundary_suppressed_total']}
 final_runner_method_id={runtime_audit['method_id']}
 runtime_uses_eng2b_dynamic_schema={str(runtime_audit['runtime_uses_eng2b_dynamic_schema']).lower()}
 generation_schema_hash_equals_parser_schema_hash={str(runtime_audit['generation_schema_hash_equals_parser_schema_hash']).lower()}
 duplicate_span_impossible_in_stateful_grammar={str(runtime_audit['duplicate_span_impossible_in_stateful_grammar']).lower()}
+runner_help_exit_code={runtime_audit['runner_cli_contract']['help_exit_code']}
+runner_live_dry_run_exit_code={runtime_audit['runner_cli_contract']['live_dry_run_exit_code']}
 official_51_opened=false
 status=READY_FOR_REVIEW
 """
@@ -678,7 +740,7 @@ def package_reviewer(out_dir: Path, package_path: Path) -> str:
             )
             + "\n",
         )
-        archive.writestr("pytest.ini", "[pytest]\naddopts = -q -p no:cacheprovider\n")
+        archive.writestr("pytest.ini", f"[pytest]\naddopts = -q -p no:cacheprovider\nnorecursedirs = {STAGE_NAME}\n")
     return sha256_file(package_path)
 
 

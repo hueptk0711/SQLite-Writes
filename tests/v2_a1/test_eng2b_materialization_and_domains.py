@@ -15,6 +15,7 @@ from nldbwrite_v3.v2_a1.eng2b_candidate_domains import (
     canonical_boundary_text,
     column_allows_candidate,
     dynamic_schema_with_column_domains,
+    filter_dominated_boundaries,
 )
 from nldbwrite_v3.v2_a1.eng2b_runtime import build_eng2b_constraint_grammar, prepare_eng2b_runtime_row, sha256_text
 from nldbwrite_v3.v2_a1.typed_materializer import (
@@ -115,13 +116,134 @@ def test_column_specific_domains_filter_by_type_text_label_and_omit_semantics() 
     assert result["domain_construction_uses_gold"] is False
     assert result["domains"]["COL_1"] == ["SPAN_1"]
     assert result["domains"]["COL_2"] == ["SPAN_2"]
-    assert result["domains"]["COL_3"][0] == "SPAN_4"
+    assert result["domains"]["COL_3"] == ["SPAN_4"]
     assert "OMIT" not in result["domains"]["COL_3"]
     status_row = next(row for row in result["audit_rows"] if row["column_ref"] == "COL_3")
     assert status_row["text_label_segment_filter_applied"] is True
+    assert status_row["text_domain_restricted_by_label_segment"] is True
     assert status_row["omit_removed_by_strong_evidence"] is True
     schema = dynamic_schema_with_column_domains(model_side_input=model_side, runtime_constraints=constraints, domains=result["domains"])
     assert schema["x-eng2b-span-uniqueness"].startswith("stateful prefix grammar")
+
+
+def test_boundary_dominance_suppresses_overlapping_atomic_variants() -> None:
+    kept, suppressed = filter_dominated_boundaries(
+        [
+            {"span_ref": "SPAN_QUOTED", "text": "'completed'", "start_char": 10, "end_char": 21, "tags": ["quoted"]},
+            {"span_ref": "SPAN_ATOMIC", "text": "completed", "start_char": 11, "end_char": 20, "tags": ["quoted"]},
+            {"span_ref": "SPAN_OTHER", "text": "completed", "start_char": 40, "end_char": 49, "tags": ["quoted"]},
+        ]
+    )
+    assert [candidate["span_ref"] for candidate in kept] == ["SPAN_ATOMIC", "SPAN_OTHER"]
+    assert [candidate["span_ref"] for candidate in suppressed] == ["SPAN_QUOTED"]
+
+
+def test_boundary_dominance_suppresses_punctuated_variants() -> None:
+    kept, suppressed = filter_dominated_boundaries(
+        [
+            {"span_ref": "SPAN_PUNCT", "text": "'Pre-rolls',", "start_char": 10, "end_char": 23},
+            {"span_ref": "SPAN_ATOMIC", "text": "Pre-rolls", "start_char": 11, "end_char": 20},
+        ]
+    )
+    assert [candidate["span_ref"] for candidate in kept] == ["SPAN_ATOMIC"]
+    assert [candidate["span_ref"] for candidate in suppressed] == ["SPAN_PUNCT"]
+
+
+def test_default_cue_forces_or_retains_omit_for_omittable_text_column() -> None:
+    model_side = {
+        "question": "Active should use default.",
+        "schema_inventory": {
+            "columns": [
+                {"column_ref": "COL_ACTIVE", "column_name": "active", "source_type": "TEXT", "nullable": True, "has_default": True, "table_ref": "TAB_1"},
+            ]
+        },
+    }
+    constraints = {
+        "candidate_inventory": [
+            {"span_ref": "SPAN_DEFAULT", "text": "use default", "start_char": 14, "end_char": 25},
+            {"span_ref": "SPAN_OTHER", "text": "enabled", "start_char": 30, "end_char": 37},
+        ],
+        "phase_o_schema": {
+            "type": "object",
+            "properties": {
+                "column_span_refs": {"type": "object", "required": ["COL_ACTIVE"], "properties": {"COL_ACTIVE": {"type": "string", "enum": ["OMIT", "SPAN_DEFAULT", "SPAN_OTHER"]}}},
+                "operation": {"const": "INSERT"},
+                "table_ref": {"const": "TAB_1"},
+            },
+        },
+    }
+    result = build_column_specific_domains(model_side_input=model_side, runtime_constraints=constraints)
+    assert result["domains"]["COL_ACTIVE"] == ["OMIT"]
+    row = result["audit_rows"][0]
+    assert row["omit_forced_by_default_cue"] is True
+    assert row["omit_removed_by_strong_evidence"] is False
+
+
+def test_explicit_value_removes_omit_but_missing_evidence_retains_it() -> None:
+    model_side, constraints = toy_model_side_and_constraints()
+    explicit = build_column_specific_domains(model_side_input=model_side, runtime_constraints=constraints)
+    assert explicit["domains"]["COL_3"] == ["SPAN_4"]
+    no_local = copy.deepcopy(model_side)
+    no_local["question"] = "Set id to 5 and start date to 2024-01-01."
+    missing = build_column_specific_domains(model_side_input=no_local, runtime_constraints=constraints)
+    assert "OMIT" in missing["domains"]["COL_3"]
+
+
+def test_identifier_suffix_label_does_not_block_long_text_value() -> None:
+    question = (
+        "Add a new record to the cybersecurity_strategy table with strategy_id 987, "
+        "strategy_name 'Intrusion Detection', strategy_description "
+        "'Detailed description of intrusion detection strategy'"
+    )
+    value = "Detailed description of intrusion detection strategy"
+    start = question.index(value)
+    model_side = {
+        "question": question,
+        "schema_inventory": {
+            "columns": [
+                {"column_ref": "COL_ID", "column_name": "strategy_id", "source_type": "INTEGER", "nullable": False, "table_ref": "TAB_1"},
+                {"column_ref": "COL_NAME", "column_name": "strategy_name", "source_type": "TEXT", "nullable": False, "table_ref": "TAB_1"},
+                {"column_ref": "COL_DESC", "column_name": "strategy_description", "source_type": "TEXT", "nullable": False, "table_ref": "TAB_1"},
+            ]
+        },
+    }
+    constraints = {
+        "candidate_inventory": [
+            {"span_ref": "SPAN_ID", "text": "987", "start_char": question.index("987"), "end_char": question.index("987") + 3},
+            {"span_ref": "SPAN_DESC", "text": value, "start_char": start, "end_char": start + len(value), "tags": ["QUOTED_TEXT"]},
+        ],
+        "phase_o_schema": {"type": "object", "properties": {"column_span_refs": {"type": "object", "required": ["COL_ID", "COL_NAME", "COL_DESC"], "properties": {}}}},
+    }
+    result = build_column_specific_domains(model_side_input=model_side, runtime_constraints=constraints)
+    assert result["domains"]["COL_DESC"] == ["SPAN_DESC"]
+    desc_row = next(row for row in result["audit_rows"] if row["column_ref"] == "COL_DESC")
+    assert desc_row["text_domain_restricted_by_label_segment"] is True
+
+
+def test_text_domain_falls_back_when_local_candidate_is_only_connector() -> None:
+    question = "Insert a new record into events table with comment and severity high."
+    and_start = question.index("and")
+    high_start = question.index("high")
+    model_side = {
+        "question": question,
+        "schema_inventory": {
+            "columns": [
+                {"column_ref": "COL_COMMENT", "column_name": "comment", "source_type": "TEXT", "nullable": False, "table_ref": "TAB_1"},
+                {"column_ref": "COL_SEVERITY", "column_name": "severity", "source_type": "TEXT", "nullable": False, "table_ref": "TAB_1"},
+            ]
+        },
+    }
+    constraints = {
+        "candidate_inventory": [
+            {"span_ref": "SPAN_AND", "text": "and", "start_char": and_start, "end_char": and_start + 3},
+            {"span_ref": "SPAN_HIGH", "text": "high", "start_char": high_start, "end_char": high_start + 4},
+        ],
+        "phase_o_schema": {"type": "object", "properties": {"column_span_refs": {"type": "object", "required": ["COL_COMMENT", "COL_SEVERITY"], "properties": {}}}},
+    }
+    result = build_column_specific_domains(model_side_input=model_side, runtime_constraints=constraints)
+    assert set(result["domains"]["COL_COMMENT"]) == {"SPAN_AND", "SPAN_HIGH"}
+    comment_row = next(row for row in result["audit_rows"] if row["column_ref"] == "COL_COMMENT")
+    assert comment_row["text_label_segment_filter_applied"] is False
 
 
 def test_gold_blind_domain_hash_invariant() -> None:

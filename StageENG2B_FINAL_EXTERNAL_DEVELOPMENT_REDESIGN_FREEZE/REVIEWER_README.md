@@ -1,4 +1,4 @@
-# StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE PATCH1
+# StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE PATCH2
 
 ENG2B freezes one final external-development redesign before opening the untouched development-dev 100 or the 51 official confirmation samples.
 
@@ -12,5 +12,7 @@ Reviewer commands:
 
 ```bash
 python scripts/data/validate_stageeng2b_final_external_development_redesign_freeze.py --stage-dir StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE
-python -m pytest -q tests/v2_a1/test_eng2b_materialization_and_domains.py tests/test_stageeng2b_final_external_development_redesign_freeze.py
+python -m pytest -q
+python scripts/server/run_eng2_final_method.py --help
+sha256sum -c StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE/SHA256SUMS
 ```
