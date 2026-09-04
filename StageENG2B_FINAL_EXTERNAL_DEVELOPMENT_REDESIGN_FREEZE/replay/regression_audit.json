@@ -1,0 +1,8 @@
+{
+  "no_new_model_calls": true,
+  "previously_correct_count": 50,
+  "previously_correct_regression_count": 0,
+  "previously_correct_regressions": [],
+  "stage": "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE",
+  "status": "PASS"
+}

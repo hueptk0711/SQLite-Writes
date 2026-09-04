@@ -1,0 +1,8 @@
+{
+  "new_model_calls": 0,
+  "prompt_demo_audit_status": "PASS",
+  "raw_replay_uses_existing_eng2a_model_outputs": true,
+  "redesign_domain_uses_gold": false,
+  "stage": "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE",
+  "status": "PASS"
+}

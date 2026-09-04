@@ -1,0 +1,25 @@
+{
+  "methods": {
+    "M0_DIRECT_SQL": {
+      "example_input_count": 2,
+      "frozen_demonstration_ids": [
+        "free_plain_insert",
+        "free_conflict_aware"
+      ],
+      "prompt_contains_example_1": true,
+      "prompt_contains_example_2": true
+    },
+    "M1_J_FS": {
+      "example_input_count": 2,
+      "frozen_demonstration_ids": [
+        "free_plain_insert",
+        "free_conflict_aware"
+      ],
+      "prompt_contains_example_1": true,
+      "prompt_contains_example_2": true
+    }
+  },
+  "mode": "free_text",
+  "stage": "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE",
+  "status": "PASS"
+}

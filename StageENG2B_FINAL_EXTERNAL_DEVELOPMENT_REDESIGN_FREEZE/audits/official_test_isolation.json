@@ -1,0 +1,48 @@
+{
+  "eng2a_isolation_audit": {
+    "development_dev_overlap": 0,
+    "development_dev_overlap_by_field": {
+      "context_hash": 0,
+      "leakage_signature_hash": 0,
+      "normalized_prompt_hash": 0,
+      "prompt_hash": 0,
+      "raw_row_hash": 0,
+      "sample_id": 0,
+      "source_row_key": 0,
+      "sql_hash": 0
+    },
+    "development_train_overlap_by_field": {
+      "context_hash": 85,
+      "leakage_signature_hash": 100,
+      "normalized_prompt_hash": 100,
+      "prompt_hash": 100,
+      "raw_row_hash": 100,
+      "sample_id": 100,
+      "source_row_key": 100,
+      "sql_hash": 100
+    },
+    "development_train_self_overlap_expected_nonzero": 785,
+    "official_raw_question_context_sql_opened": false,
+    "official_schema_context_hash_overlap_diagnostic": 1,
+    "official_test_manifest_rows_seen_for_isolation_audit_only": 51,
+    "official_test_overlap": 0,
+    "official_test_overlap_by_field": {
+      "context_hash": 1,
+      "leakage_signature_hash": 0,
+      "normalized_prompt_hash": 0,
+      "prompt_hash": 0,
+      "raw_row_hash": 0,
+      "sample_id": 0,
+      "source_row_key": 0,
+      "sql_hash": 0
+    },
+    "pilot_n": 100,
+    "stage": "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT",
+    "status": "PASS"
+  },
+  "official_51_opened": false,
+  "official_confirmation_raw_question_context_sql_opened": false,
+  "source": "D:/paper kltn/text to sql/github_publish/SQLite-Writes/StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT/audits/official_test_isolation_audit.json",
+  "stage": "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE",
+  "status": "PASS"
+}

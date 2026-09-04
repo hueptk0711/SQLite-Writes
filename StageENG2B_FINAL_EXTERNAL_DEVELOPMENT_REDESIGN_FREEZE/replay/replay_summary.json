@@ -1,0 +1,20 @@
+{
+  "exact_gold_temporal_false_reject_count": 13,
+  "exact_gold_temporal_not_recovered": [],
+  "exact_gold_temporal_recovered_count": 13,
+  "failure_stage_counts": {
+    "MATERIALIZATION_DATE_FAILURE": 12,
+    "MATERIALIZATION_INTEGER_FAILURE": 2,
+    "PHASE_O_PARSE_FAILURE": 3,
+    "TYPED_MATERIALIZATION_FAILURE": 3,
+    "wrong_state_with_off_target_change": 17
+  },
+  "model_calls_new": 0,
+  "previous_target_state_correct": 50,
+  "previously_correct_regression_count": 0,
+  "previously_correct_regressions": [],
+  "raw_outputs_replayed": 100,
+  "replay_target_state_correct": 63,
+  "stage": "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE",
+  "status": "PASS"
+}

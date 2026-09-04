@@ -1,0 +1,131 @@
+{
+  "files": [
+    {
+      "bytes": 314296,
+      "path": "audits/candidate_representability.json",
+      "sha256": "690ac16f1e68aaf46f4a758b4d0e479180d535d97aac5d53f59b390d5907f31b"
+    },
+    {
+      "bytes": 1451989,
+      "path": "audits/column_specific_domain_audit.json",
+      "sha256": "327e0863a18bd21cfe2a41d48d2f5b7c8a8d27f6e198ab541ecc439b6b042804"
+    },
+    {
+      "bytes": 364,
+      "path": "audits/duplicate_span_constraint_audit.json",
+      "sha256": "c079deae26b01a99083e8aa086ddf26fe4c52406b59770161cc96a956256c6f9"
+    },
+    {
+      "bytes": 247,
+      "path": "audits/gold_leakage_audit.json",
+      "sha256": "6e5f323a9a1068bb8d25a0d37975547030fd6d2700a926c04f70a70ef027700e"
+    },
+    {
+      "bytes": 1590,
+      "path": "audits/official_test_isolation.json",
+      "sha256": "b46ebd22dce718a454ede5efe7814c3a33533b302a4e2d6dc96acef0fe3e1735"
+    },
+    {
+      "bytes": 3605,
+      "path": "audits/temporal_materialization_audit.json",
+      "sha256": "1469a0f89d5d8dac7d5bbc13073b2d56066b2c982900f044fd9d9cf64bba0fdd"
+    },
+    {
+      "bytes": 3963,
+      "path": "baselines/corrected_direct_fs_config.json",
+      "sha256": "0795d31926345c62d5ba832d8374c9ac067967a3842c45854a2fff9b32c9f826"
+    },
+    {
+      "bytes": 4390,
+      "path": "baselines/corrected_jfs_config.json",
+      "sha256": "a4006a423eb62fd37e5b370aca48a3b9337971f49d94700703d634a3d25c0cfe"
+    },
+    {
+      "bytes": 621,
+      "path": "baselines/prompt_demo_audit.json",
+      "sha256": "23d748d608545946ecf2c959fc08edadb54d2b5c335a35fbffe3fcacd00460cd"
+    },
+    {
+      "bytes": 28880,
+      "path": "code/scripts/server/run_stageeng2a_gretel_pilot.py",
+      "sha256": "33938abeddccebd1943c665c07f024147ccfa184106babc325015ef1c0c42639"
+    },
+    {
+      "bytes": 7241,
+      "path": "code/src/nldbwrite_v3/experiments/prompts.py",
+      "sha256": "a964cd6f07f82dea413fc53127b4d6e56a703364c6a4c599ec4176a554a7f186"
+    },
+    {
+      "bytes": 9064,
+      "path": "code/src/nldbwrite_v3/v2_a1/eng2b_candidate_domains.py",
+      "sha256": "5f2061f1a421a58454cbdd2465c712582eea4d6ce5c0747e125dc115642c2857"
+    },
+    {
+      "bytes": 6987,
+      "path": "code/src/nldbwrite_v3/v2_a1/typed_materializer.py",
+      "sha256": "2fe622164f3df2ca6e48d9902e12c659c9cb43a94241d97ad4fd884f3db47aab"
+    },
+    {
+      "bytes": 1203,
+      "path": "ENG2B_FINAL_METHOD_FREEZE.json",
+      "sha256": "71161d136d196cccbd3531ae982f060014f4a6ec03f96cc0ee3cab1545f4972c"
+    },
+    {
+      "bytes": 1508,
+      "path": "ENG2B_METHOD_AMENDMENT.json",
+      "sha256": "662fcf4f720e93004a338a90e0b27f6998fd96b8ece3f184a45cbcf768367459"
+    },
+    {
+      "bytes": 300,
+      "path": "OFFICIAL_DATA_GUARDRAIL.md",
+      "sha256": "b0166f99057d43511656055c94b0913e145ee62a99bbbfb4752708328b34c55e"
+    },
+    {
+      "bytes": 674,
+      "path": "replay/ENG2B_FROZEN_RAW_REPLAY.json",
+      "sha256": "17688b9e433fc45ba1365122d2c27f3bd8661445273b291316c09a4d05f1f9c4"
+    },
+    {
+      "bytes": 130850,
+      "path": "replay/frozen_eng2a_raw_outputs.jsonl",
+      "sha256": "b76ced916d8240be70310c76f6573ac5f3663068cc2a03d7616141231455e557"
+    },
+    {
+      "bytes": 239,
+      "path": "replay/regression_audit.json",
+      "sha256": "410f09b92e9886e9276c8998f80fcbe18b83bdb170b313d558a13cc40bdaf13c"
+    },
+    {
+      "bytes": 49673,
+      "path": "replay/replay_per_sample.jsonl",
+      "sha256": "e1d043de0812d69cde9a338a8ab5e65d1a8b68881439f0a59f867c217f298f36"
+    },
+    {
+      "bytes": 674,
+      "path": "replay/replay_summary.json",
+      "sha256": "17688b9e433fc45ba1365122d2c27f3bd8661445273b291316c09a4d05f1f9c4"
+    },
+    {
+      "bytes": 703,
+      "path": "REVIEWER_README.md",
+      "sha256": "83f551d0f6190a9bc3b27b04a2fbcf7f0e1749d8aa82af6e30b73fc217d7af85"
+    },
+    {
+      "bytes": 5943,
+      "path": "tests/test_eng2b_materialization_and_domains.py",
+      "sha256": "76910407b36552863ddfc8167408b568e78ccf8d4d44cf753e82472542f23c3f"
+    },
+    {
+      "bytes": 3110,
+      "path": "tests/test_stageeng2b_final_external_development_redesign_freeze.py",
+      "sha256": "e7f45e5e749609ae68f13dafa95adfdf60ba93e2702cbec743aa171a017cad69"
+    },
+    {
+      "bytes": 349,
+      "path": "VALIDATION_REPORT.md",
+      "sha256": "5b9991d3fefc9ac1b88fb368b5f67b59df46b86c6a7f79eb7d2dc6a120cea4f4"
+    }
+  ],
+  "generated_at_utc": "2026-09-04T01:56:18.108024+00:00",
+  "stage": "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE"
+}

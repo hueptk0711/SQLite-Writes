@@ -1,0 +1,13 @@
+# Validation Report
+
+stage=StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE
+patch=PATCH0
+new_model_calls=0
+replay_status=PASS
+raw_outputs_replayed=100
+previously_correct_regression_count=0
+exact_gold_temporal_recovered=13/13
+development_train_samples_audited=828
+eng2a_pilot_samples_audited=100
+official_51_opened=false
+status=READY_FOR_REVIEW

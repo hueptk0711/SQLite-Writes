@@ -575,7 +575,7 @@ def test_upsert_rejects_invalid_semantics(ir: dict) -> None:
 
 @pytest.mark.parametrize(
     "declared,affinity",
-    [("INTEGER", "INTEGER"), ("varchar(10)", "TEXT"), ("REAL", "REAL"), ("DOUBLE", "REAL"), ("", "BLOB"), ("DATE", "NUMERIC")],
+    [("INTEGER", "INTEGER"), ("varchar(10)", "TEXT"), ("REAL", "REAL"), ("DOUBLE", "REAL"), ("", "BLOB"), ("DATE", "TEXT")],
 )
 def test_sqlite_affinity_rules(declared: str, affinity: str) -> None:
     assert sqlite_affinity(declared) == affinity

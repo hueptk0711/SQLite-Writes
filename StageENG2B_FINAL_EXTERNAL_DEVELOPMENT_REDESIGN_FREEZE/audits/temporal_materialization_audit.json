@@ -1,0 +1,137 @@
+{
+  "cases": [
+    {
+      "case": {
+        "declared_type": "DATE",
+        "expected": "2024-01-01",
+        "raw": "2024-01-01",
+        "valid": true
+      },
+      "outcome": {
+        "sqlite_affinity": "TEXT",
+        "status": "accepted",
+        "value": "2024-01-01"
+      },
+      "semantic_materialization_type": "DATE"
+    },
+    {
+      "case": {
+        "declared_type": "TIMESTAMP",
+        "expected": "2022-03-02 10:30:00",
+        "raw": "2022-03-02 10:30:00",
+        "valid": true
+      },
+      "outcome": {
+        "sqlite_affinity": "TEXT",
+        "status": "accepted",
+        "value": "2022-03-02 10:30:00"
+      },
+      "semantic_materialization_type": "DATETIME"
+    },
+    {
+      "case": {
+        "declared_type": "FLOAT",
+        "expected": 12.5,
+        "raw": "12.5",
+        "valid": true
+      },
+      "outcome": {
+        "sqlite_affinity": "REAL",
+        "status": "accepted",
+        "value": 12.5
+      },
+      "semantic_materialization_type": "REAL"
+    },
+    {
+      "case": {
+        "declared_type": "INTEGER",
+        "expected": 5,
+        "raw": "5",
+        "valid": true
+      },
+      "outcome": {
+        "sqlite_affinity": "INTEGER",
+        "status": "accepted",
+        "value": 5
+      },
+      "semantic_materialization_type": "INTEGER"
+    },
+    {
+      "case": {
+        "declared_type": "DATE",
+        "raw": "2024-13-01",
+        "valid": false
+      },
+      "outcome": {
+        "details": {
+          "declared_type": "DATE",
+          "reason": "DATE",
+          "semantic_materialization_type": "DATE"
+        },
+        "error": "Evidence is not a supported unambiguous year-first DATE/DATETIME; Stage E refuses to guess or repair the evidence span.",
+        "reason_code": "materialization_failure",
+        "status": "rejected"
+      },
+      "semantic_materialization_type": "DATE"
+    },
+    {
+      "case": {
+        "declared_type": "TIMESTAMP",
+        "raw": "2022-03-02",
+        "valid": false
+      },
+      "outcome": {
+        "details": {
+          "declared_type": "TIMESTAMP",
+          "reason": "DATETIME",
+          "semantic_materialization_type": "DATETIME"
+        },
+        "error": "DATETIME-typed evidence matched DATE grammar; Stage E refuses subtype reinterpretation.",
+        "reason_code": "materialization_failure",
+        "status": "rejected"
+      },
+      "semantic_materialization_type": "DATETIME"
+    },
+    {
+      "case": {
+        "declared_type": "FLOAT",
+        "raw": "abc",
+        "valid": false
+      },
+      "outcome": {
+        "details": {
+          "declared_type": "FLOAT",
+          "reason": "REAL",
+          "semantic_materialization_type": "REAL"
+        },
+        "error": "Numeric evidence must be a strict finite numeric literal",
+        "reason_code": "materialization_failure",
+        "status": "rejected"
+      },
+      "semantic_materialization_type": "REAL"
+    },
+    {
+      "case": {
+        "declared_type": "INTEGER",
+        "raw": "5.5",
+        "valid": false
+      },
+      "outcome": {
+        "details": {
+          "declared_type": "INTEGER",
+          "reason": "INTEGER",
+          "semantic_materialization_type": "INTEGER"
+        },
+        "error": "INTEGER evidence must be a strict lossless integer literal",
+        "reason_code": "materialization_failure",
+        "status": "rejected"
+      },
+      "semantic_materialization_type": "INTEGER"
+    }
+  ],
+  "date_no_longer_numeric": true,
+  "failures": [],
+  "stage": "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE",
+  "status": "PASS",
+  "timestamp_no_longer_numeric": true
+}

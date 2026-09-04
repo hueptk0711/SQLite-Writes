@@ -1,0 +1,15 @@
+{
+  "column_specific_domain_schema": "ENG2B freezes per-column admissible SPAN enums plus a prefix/state constraint for non-OMIT uniqueness.",
+  "frozen_before_official_51": true,
+  "frozen_before_untouched_dev100": true,
+  "metric_definitions": {
+    "extra_delta_off_target_rate": "Extra predicted D0->Dpred row deltas not present in D0->Dgold across persistent user tables.",
+    "strict_full_state_accuracy": "Predicted full persistent-user-table post-state equals gold full post-state; recommended strongest correctness metric.",
+    "target_table_state_accuracy": "Predicted post-state equals gold post-state for the gold target table."
+  },
+  "model_call_policy": "No model calls in ENG2B; ENG2C may evaluate a frozen method on untouched development_dev.",
+  "multi_table_scope": "If a request requires multiple target writes while the method scope is single-row/single-target INSERT, the final proposed method must abstain/fail closed.",
+  "omission_semantics": "OMIT is available only for omittable schema columns and should be removed from a column domain when strong column-specific evidence exists.",
+  "patch": "PATCH0",
+  "stage": "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE"
+}
