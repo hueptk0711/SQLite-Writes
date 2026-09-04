@@ -20,12 +20,15 @@ ENG2B_ARTIFACTS = [
     "VALIDATION_REPORT.md",
     "code/src/nldbwrite_v3/v2_a1/typed_materializer.py",
     "code/src/nldbwrite_v3/v2_a1/eng2b_candidate_domains.py",
+    "code/src/nldbwrite_v3/v2_a1/eng2b_runtime.py",
     "code/src/nldbwrite_v3/experiments/prompts.py",
     "code/scripts/server/run_stageeng2a_gretel_pilot.py",
+    "code/scripts/server/run_eng2_final_method.py",
     "audits/temporal_materialization_audit.json",
     "audits/candidate_representability.json",
     "audits/column_specific_domain_audit.json",
     "audits/duplicate_span_constraint_audit.json",
+    "audits/final_runtime_integration_audit.json",
     "audits/gold_leakage_audit.json",
     "audits/official_test_isolation.json",
     "replay/ENG2B_FROZEN_RAW_REPLAY.json",
@@ -122,19 +125,35 @@ def validate_stage(stage_dir: Path) -> dict[str, Any]:
 
     representability = read_json(stage_dir / "audits" / "candidate_representability.json")
     check(representability["status"] == "PASS", failures, "candidate representability audit is not PASS")
-    check(representability["development_train_samples"] == 828, failures, "development_train audit count drifted")
-    check(representability["eng2a_pilot_samples"] == 100, failures, "ENG2A consumed pilot audit count drifted")
-    check(representability["audited_samples"] == 928, failures, "expected 928 audited external-development samples")
+    check(representability["unique_development_train_samples"] == 828, failures, "unique development_train audit count drifted")
+    check(representability["consumed_pilot_subset_samples"] == 100, failures, "ENG2A consumed pilot subset count drifted")
+    check(representability["remaining_train_only_samples"] == 728, failures, "remaining train-only count drifted")
+    check(representability["audited_samples"] == 828, failures, "expected 828 unique audited external-development samples")
+    check(representability["sample_level_representability"]["newly_semantically_suppressed_gold"] == 0, failures, "ENG2B filtering introduced semantic gold suppression")
     check("official" in representability["scope"] and "excluded" in representability["scope"], failures, "representability scope does not exclude official data")
 
     domain = read_json(stage_dir / "audits" / "column_specific_domain_audit.json")
     check(domain["status"] == "PASS", failures, "column-specific domain audit is not PASS")
     check(domain["domain_construction_uses_gold"] is False, failures, "domain construction must not use gold")
     check(domain["summary"]["column_count"] > 0, failures, "domain audit has no columns")
+    check(domain["semantic_representability_primary_metric"]["newly_semantically_suppressed_gold"] == 0, failures, "domain audit semantic primary metric failed")
 
     duplicate = read_json(stage_dir / "audits" / "duplicate_span_constraint_audit.json")
     check(duplicate["status"] == "PASS", failures, "duplicate span constraint audit is not PASS")
-    check("enforce_unique_non_omit_span_refs" in duplicate["implementation"], failures, "duplicate span implementation not recorded")
+    check(duplicate["during_decoding"] is True, failures, "duplicate span uniqueness is not recorded as decoding-time")
+    check("Eng2BConstraintGrammar" in duplicate["implementation"], failures, "stateful grammar implementation not recorded")
+
+    runtime = read_json(stage_dir / "audits" / "final_runtime_integration_audit.json")
+    check(runtime["status"] == "PASS", failures, "final runtime integration audit is not PASS")
+    check(runtime["method_id"] == "M2_FINAL_ENG2B", failures, "final runtime method id drifted")
+    check(runtime["model_calls_new"] == 0, failures, "runtime integration audit must not use model calls")
+    check(runtime["runtime_uses_eng2b_dynamic_schema"] is True, failures, "final runner does not use ENG2B dynamic schema")
+    check(runtime["generation_schema_hash_equals_parser_schema_hash"] is True, failures, "generation/parser schema hash mismatch")
+    check(runtime["duplicate_span_impossible_in_stateful_grammar"] is True, failures, "duplicate span is not impossible in grammar")
+    for row in runtime.get("rows", []):
+        check(row["generation_schema_sha256"] == row["eng2b_dynamic_schema_sha256"], failures, f"generation schema not ENG2B dynamic for {row['sample_id']}")
+        check(row["generation_schema_sha256"] == row["parser_schema_sha256"], failures, f"parser schema hash mismatch for {row['sample_id']}")
+        check(row["domain_construction_uses_gold"] is False, failures, f"runtime domain uses gold for {row['sample_id']}")
 
     official = read_json(stage_dir / "audits" / "official_test_isolation.json")
     check(official["status"] == "PASS", failures, "official test isolation audit is not PASS")
@@ -145,6 +164,7 @@ def validate_stage(stage_dir: Path) -> dict[str, Any]:
     check(method_freeze["frozen_before_untouched_dev100"] is True, failures, "method not frozen before untouched dev100")
     check(method_freeze["frozen_before_official_51"] is True, failures, "method not frozen before official 51")
     check("No model calls in ENG2B" in method_freeze["model_call_policy"], failures, "model-call policy missing from freeze")
+    check(method_freeze["final_method_id"] == "M2_FINAL_ENG2B", failures, "final method id missing from freeze")
 
     amendment = read_json(stage_dir / "ENG2B_METHOD_AMENDMENT.json")
     check(amendment["no_new_model_calls"] is True, failures, "method amendment permits new model calls")
@@ -162,9 +182,10 @@ def validate_stage(stage_dir: Path) -> dict[str, Any]:
             "exact_gold_temporal_recovered": f"{replay.get('exact_gold_temporal_recovered_count')}/{replay.get('exact_gold_temporal_false_reject_count')}",
         },
         "representability": {
-            "development_train_samples": representability.get("development_train_samples"),
-            "eng2a_pilot_samples": representability.get("eng2a_pilot_samples"),
+            "unique_development_train_samples": representability.get("unique_development_train_samples"),
+            "consumed_pilot_subset_samples": representability.get("consumed_pilot_subset_samples"),
             "audited_samples": representability.get("audited_samples"),
+            "newly_semantically_suppressed_gold": representability.get("sample_level_representability", {}).get("newly_semantically_suppressed_gold"),
         },
     }
 

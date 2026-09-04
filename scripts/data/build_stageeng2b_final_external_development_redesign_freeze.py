@@ -26,11 +26,13 @@ if str(SRC_ROOT) not in sys.path:
 from nldbwrite_v3.experiments.prompts import build_direct_prompt, build_legacy_json_prompt  # noqa: E402
 from nldbwrite_v3.schema.profile import build_profile  # noqa: E402
 from nldbwrite_v3.v2_a1.eng2b_candidate_domains import (  # noqa: E402
+    audit_domains_against_gold,
     build_column_specific_domains,
     canonical_boundary_text,
     dynamic_schema_with_column_domains,
     summarize_domain_audit,
 )
+from nldbwrite_v3.v2_a1.eng2b_runtime import build_eng2b_constraint_grammar, prepare_eng2b_runtime_row  # noqa: E402
 from nldbwrite_v3.v2_a1.typed_materializer import materialize_value, semantic_materialization_type  # noqa: E402
 from scripts.data.build_stageeng2a_gretel_external_development_pilot import (  # noqa: E402
     DIRECT_CONFIG_REL,
@@ -54,7 +56,7 @@ from scripts.server.run_stageeng2a_gretel_pilot import evaluate_method, failure_
 
 
 STAGE_NAME = "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE"
-PATCH_NAME = "PATCH0"
+PATCH_NAME = "PATCH1"
 PACKAGE_DATE = "20260904"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
 ENG2A_STAGE = "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT"
@@ -68,12 +70,15 @@ ENG2B_ARTIFACTS = [
     "VALIDATION_REPORT.md",
     "code/src/nldbwrite_v3/v2_a1/typed_materializer.py",
     "code/src/nldbwrite_v3/v2_a1/eng2b_candidate_domains.py",
+    "code/src/nldbwrite_v3/v2_a1/eng2b_runtime.py",
     "code/src/nldbwrite_v3/experiments/prompts.py",
     "code/scripts/server/run_stageeng2a_gretel_pilot.py",
+    "code/scripts/server/run_eng2_final_method.py",
     "audits/temporal_materialization_audit.json",
     "audits/candidate_representability.json",
     "audits/column_specific_domain_audit.json",
     "audits/duplicate_span_constraint_audit.json",
+    "audits/final_runtime_integration_audit.json",
     "audits/gold_leakage_audit.json",
     "audits/official_test_isolation.json",
     "replay/ENG2B_FROZEN_RAW_REPLAY.json",
@@ -113,8 +118,10 @@ def copy_code_snapshot(out_dir: Path) -> None:
     mappings = [
         ("src/nldbwrite_v3/v2_a1/typed_materializer.py", "code/src/nldbwrite_v3/v2_a1/typed_materializer.py"),
         ("src/nldbwrite_v3/v2_a1/eng2b_candidate_domains.py", "code/src/nldbwrite_v3/v2_a1/eng2b_candidate_domains.py"),
+        ("src/nldbwrite_v3/v2_a1/eng2b_runtime.py", "code/src/nldbwrite_v3/v2_a1/eng2b_runtime.py"),
         ("src/nldbwrite_v3/experiments/prompts.py", "code/src/nldbwrite_v3/experiments/prompts.py"),
         ("scripts/server/run_stageeng2a_gretel_pilot.py", "code/scripts/server/run_stageeng2a_gretel_pilot.py"),
+        ("scripts/server/run_eng2_final_method.py", "code/scripts/server/run_eng2_final_method.py"),
         ("tests/v2_a1/test_eng2b_materialization_and_domains.py", "tests/test_eng2b_materialization_and_domains.py"),
         ("tests/test_stageeng2b_final_external_development_redesign_freeze.py", "tests/test_stageeng2b_final_external_development_redesign_freeze.py"),
     ]
@@ -291,13 +298,85 @@ def prompt_demo_audit(out_dir: Path, stage_dir: Path) -> dict[str, Any]:
     return result
 
 
+def final_runtime_integration_audit(out_dir: Path, eng2a_stage: Path) -> dict[str, Any]:
+    rows = load_eng2a_rows(eng2a_stage)
+    audit_rows = []
+    duplicate_probe_status = "FAIL"
+    for row in rows:
+        runtime_row, contract = prepare_eng2b_runtime_row(row)
+        grammar = build_eng2b_constraint_grammar(runtime_row["runtime_constraints"]["phase_o_schema"])
+        if duplicate_probe_status != "PASS":
+            branch = grammar.branches[0]
+            duplicate_domains = [domain for domain in branch["column_domains"].values() if any(value != "OMIT" for value in domain)]
+            if len(duplicate_domains) >= 2:
+                first_ref = next(value for value in duplicate_domains[0] if value != "OMIT")
+                duplicate_schema = {
+                    "type": "object",
+                    "properties": {
+                        "column_span_refs": {
+                            "type": "object",
+                            "required": ["COL_A", "COL_B"],
+                            "properties": {
+                                "COL_A": {"type": "string", "enum": [first_ref]},
+                                "COL_B": {"type": "string", "enum": [first_ref]},
+                            },
+                        },
+                        "operation": {"const": "INSERT"},
+                        "table_ref": {"const": "TAB_X"},
+                    },
+                }
+                duplicate_grammar = build_eng2b_constraint_grammar(duplicate_schema)
+                duplicate_raw = canonical_json({"column_span_refs": {"COL_A": first_ref, "COL_B": first_ref}, "operation": "INSERT", "table_ref": "TAB_X"})
+                distinct_schema = copy_json(duplicate_schema)
+                distinct_schema["properties"]["column_span_refs"]["properties"]["COL_B"]["enum"] = ["SPAN_DISTINCT"]
+                distinct_grammar = build_eng2b_constraint_grammar(distinct_schema)
+                distinct_raw = canonical_json({"column_span_refs": {"COL_A": first_ref, "COL_B": "SPAN_DISTINCT"}, "operation": "INSERT", "table_ref": "TAB_X"})
+                omit_schema = copy_json(duplicate_schema)
+                omit_schema["properties"]["column_span_refs"]["properties"]["COL_A"]["enum"] = ["OMIT"]
+                omit_schema["properties"]["column_span_refs"]["properties"]["COL_B"]["enum"] = ["OMIT"]
+                omit_grammar = build_eng2b_constraint_grammar(omit_schema)
+                omit_raw = canonical_json({"column_span_refs": {"COL_A": "OMIT", "COL_B": "OMIT"}, "operation": "INSERT", "table_ref": "TAB_X"})
+                duplicate_probe_status = "PASS" if (not duplicate_grammar.is_complete(duplicate_raw) and distinct_grammar.is_complete(distinct_raw) and omit_grammar.is_complete(omit_raw)) else "FAIL"
+        audit_rows.append(
+            {
+                "sample_id": row["sample_id"],
+                **contract,
+                "grammar_metadata": grammar.metadata(),
+                "runtime_uses_eng2b_dynamic_schema": contract["generation_schema_sha256"] == contract["eng2b_dynamic_schema_sha256"],
+                "generate_parse_schema_hash_match": contract["generation_schema_sha256"] == contract["parser_schema_sha256"],
+            }
+        )
+    result = {
+        "stage": STAGE_NAME,
+        "status": "PASS"
+        if audit_rows
+        and duplicate_probe_status == "PASS"
+        and all(row["runtime_uses_eng2b_dynamic_schema"] and row["generate_parse_schema_hash_match"] and row["stateful_unique_non_omit_span_refs"] for row in audit_rows)
+        else "FAIL",
+        "method_id": "M2_FINAL_ENG2B",
+        "model_calls_new": 0,
+        "runtime_uses_eng2b_dynamic_schema": all(row["runtime_uses_eng2b_dynamic_schema"] for row in audit_rows),
+        "generation_schema_hash_equals_parser_schema_hash": all(row["generate_parse_schema_hash_match"] for row in audit_rows),
+        "duplicate_span_impossible_in_stateful_grammar": duplicate_probe_status == "PASS",
+        "rows": audit_rows,
+    }
+    write_json(out_dir / "audits" / "final_runtime_integration_audit.json", result)
+    return result
+
+
+def copy_json(value: Any) -> Any:
+    return json.loads(canonical_json(value))
+
+
 def representability_audit(out_dir: Path, stage0_dir: Path, stage1_dir: Path, raw_dir: Path) -> dict[str, Any]:
     train_manifest = read_jsonl(stage1_dir / "DEVELOPMENT_TRAIN_SPLIT_MANIFEST.jsonl")
     pilot_manifest = selected_pilot_manifest(stage1_dir)
-    audit_manifest = [*train_manifest, *pilot_manifest]
+    pilot_ids = {str(row["sample_id"]) for row in pilot_manifest}
+    audit_manifest = list({str(row["sample_id"]): row for row in train_manifest}.values())
     raw_by_id = load_raw_by_sample_id(raw_dir)
     grounding = load_insert_grounding(stage0_dir, {str(row["sample_id"]) for row in audit_manifest})
     all_column_rows = []
+    gold_audit_rows = []
     per_sample = []
     schema_rows = []
     temp_db_dir = PROJECT_ROOT / ".codex_tmp" / "stageeng2b_representability_tmp"
@@ -309,18 +388,24 @@ def representability_audit(out_dir: Path, stage0_dir: Path, stage1_dir: Path, ra
         safe_sample_id = "".join(ch if ch.isalnum() or ch in "._-" else "_" for ch in str(manifest_row["sample_id"]))
         row_tmp_dir = temp_db_dir / f"{index:04d}_{safe_sample_id}"
         row, _ = build_eng2a_case(manifest_row, raw, grounding[str(manifest_row["sample_id"])], row_tmp_dir)
-        domain_result = build_column_specific_domains(row)
+        domain_result = build_column_specific_domains(
+            model_side_input=row["model_side_input"],
+            runtime_constraints=row["runtime_constraints"],
+        )
+        gold_audit = audit_domains_against_gold(row, domain_result)
         domain_counts = [audit["column_domain_count"] for audit in domain_result["audit_rows"]]
         original_misses = sum(1 for item in row["label_side_expected"]["gold_column_span_ref_oracle"] if item.get("candidate_generation_miss"))
-        sample_represented = all(audit.get("gold_represented") is not False for audit in domain_result["audit_rows"])
         all_column_rows.extend({**audit, "sample_id": row["sample_id"]} for audit in domain_result["audit_rows"])
+        gold_audit_rows.extend({**audit, "sample_id": row["sample_id"]} for audit in gold_audit["gold_audit_rows"])
         per_sample.append(
             {
                 "sample_id": row["sample_id"],
                 "stageeng1_split": manifest_row.get("stageeng1_split"),
-                "sample_represented": sample_represented,
+                "was_consumed_eng2a_pilot": str(row["sample_id"]) in pilot_ids,
+                "sample_semantically_represented": gold_audit["newly_semantically_suppressed_gold_count"] == 0,
                 "candidate_miss_count": original_misses,
-                "gold_candidate_suppressed_count": domain_result["gold_suppressed_count"],
+                "newly_semantically_suppressed_gold_count": gold_audit["newly_semantically_suppressed_gold_count"],
+                "exact_ref_missing_after_filter_count": gold_audit["exact_ref_missing_count"],
                 "global_candidate_count": row["runtime_constraints"]["candidate_count"],
                 "mean_candidates_per_column": mean(domain_counts) if domain_counts else 0.0,
                 "max_candidates_per_column": max(domain_counts) if domain_counts else 0,
@@ -329,7 +414,15 @@ def representability_audit(out_dir: Path, stage0_dir: Path, stage1_dir: Path, ra
         schema_rows.append(
             {
                 "sample_id": row["sample_id"],
-                "column_specific_phase_o_schema_sha256": sha256_text(canonical_json(dynamic_schema_with_column_domains(row, domain_result["domains"]))),
+                "column_specific_phase_o_schema_sha256": sha256_text(
+                    canonical_json(
+                        dynamic_schema_with_column_domains(
+                            model_side_input=row["model_side_input"],
+                            runtime_constraints=row["runtime_constraints"],
+                            domains=domain_result["domains"],
+                        )
+                    )
+                ),
                 "domains": domain_result["domains"],
             }
         )
@@ -338,15 +431,17 @@ def representability_audit(out_dir: Path, stage0_dir: Path, stage1_dir: Path, ra
     column_summary = summarize_domain_audit(all_column_rows)
     result = {
         "stage": STAGE_NAME,
-        "status": "PASS",
-        "scope": "StageENG1 development_train plus ENG2A consumed development_pilot only; untouched development_dev and official confirmation samples are excluded.",
-        "development_train_samples": len(train_manifest),
-        "eng2a_pilot_samples": len(pilot_manifest),
+        "status": "PASS" if sum(row["newly_semantically_suppressed_gold_count"] for row in per_sample) == 0 else "FAIL",
+        "scope": "StageENG1 development_train unique sample_ids only; the ENG2A consumed pilot is reported as a 100-sample subset, not double-counted. Untouched development_dev and official confirmation samples are excluded.",
+        "unique_development_train_samples": len(train_manifest),
+        "consumed_pilot_subset_samples": len(pilot_ids),
+        "remaining_train_only_samples": len(train_manifest) - len(pilot_ids),
         "audited_samples": len(per_sample),
         "sample_level_representability": {
-            "represented_samples": sum(1 for row in per_sample if row["sample_represented"]),
+            "semantically_represented_samples": sum(1 for row in per_sample if row["sample_semantically_represented"]),
             "candidate_miss_count": sum(row["candidate_miss_count"] for row in per_sample),
-            "gold_candidate_suppressed_count": sum(row["gold_candidate_suppressed_count"] for row in per_sample),
+            "newly_semantically_suppressed_gold": sum(row["newly_semantically_suppressed_gold_count"] for row in per_sample),
+            "exact_ref_missing_after_filter": sum(row["exact_ref_missing_after_filter_count"] for row in per_sample),
         },
         "candidate_domain_size": {
             "mean_candidates_per_sample_column": mean(counts) if counts else 0.0,
@@ -355,6 +450,7 @@ def representability_audit(out_dir: Path, stage0_dir: Path, stage1_dir: Path, ra
             "baseline_global_candidates_presented_to_every_column": 44.75,
         },
         "column_level_representability": column_summary,
+        "semantic_gold_audit_rows": gold_audit_rows,
         "sample_rows": per_sample,
     }
     write_json(out_dir / "audits" / "candidate_representability.json", result)
@@ -362,12 +458,16 @@ def representability_audit(out_dir: Path, stage0_dir: Path, stage1_dir: Path, ra
         out_dir / "audits" / "column_specific_domain_audit.json",
         {
             "stage": STAGE_NAME,
-            "status": "PASS",
+            "status": result["status"],
             "domain_construction_uses_gold": False,
-            "model_visible_inputs": ["declared column type", "column/table name", "question", "deterministic candidate tags", "deterministic lexical/boundary rules"],
+            "model_visible_inputs": domain_result["model_visible_inputs"] if per_sample else [],
             "column_rows": all_column_rows,
             "schema_rows_sha256": sha256_text(canonical_json(schema_rows)),
             "summary": column_summary,
+            "semantic_representability_primary_metric": {
+                "newly_semantically_suppressed_gold": result["sample_level_representability"]["newly_semantically_suppressed_gold"],
+                "pass_condition": "newly_semantically_suppressed_gold == 0",
+            },
         },
     )
     return result
@@ -380,7 +480,9 @@ def write_static_audits(out_dir: Path, eng2a_stage: Path, replay_summary: dict[s
             "stage": STAGE_NAME,
             "status": "PASS",
             "constraint": "Each selected non-OMIT SPAN is removed from later column domains by the ENG2B prefix/state constraint before downstream verification.",
-            "implementation": "nldbwrite_v3.v2_a1.typed_materializer.enforce_unique_non_omit_span_refs",
+            "implementation": "nldbwrite_v3.v2_a1.eng2b_runtime.Eng2BConstraintGrammar",
+            "postparse_guard": "nldbwrite_v3.v2_a1.typed_materializer.enforce_unique_non_omit_span_refs",
+            "during_decoding": True,
             "no_model_call": True,
         },
     )
@@ -419,6 +521,7 @@ def write_static_audits(out_dir: Path, eng2a_stage: Path, replay_summary: dict[s
                 "column-specific candidate domains use model-visible type/name/question/candidate evidence only",
                 "canonical boundary construction covers quotes, punctuation, leading labels, currency symbols, temporal prefixes, and possessives",
                 "non-OMIT span uniqueness is enforced before downstream verification",
+                "canonical final runner M2_FINAL_ENG2B generates and parses with the same ENG2B dynamic schema hash",
                 "failure taxonomy preserves V2A1 deterministic stage",
             ],
             "raw_replay_summary": replay_summary,
@@ -438,15 +541,17 @@ def write_static_audits(out_dir: Path, eng2a_stage: Path, replay_summary: dict[s
                 "extra_delta_off_target_rate": "Extra predicted D0->Dpred row deltas not present in D0->Dgold across persistent user tables.",
             },
             "multi_table_scope": "If a request requires multiple target writes while the method scope is single-row/single-target INSERT, the final proposed method must abstain/fail closed.",
-            "omission_semantics": "OMIT is available only for omittable schema columns and should be removed from a column domain when strong column-specific evidence exists.",
-            "column_specific_domain_schema": "ENG2B freezes per-column admissible SPAN enums plus a prefix/state constraint for non-OMIT uniqueness.",
+            "omission_semantics": "OMIT is available only for omittable schema columns and is removed from a column domain when frozen label-local deterministic evidence exists.",
+            "column_specific_domain_schema": "ENG2B freezes per-column admissible SPAN enums plus a stateful prefix grammar for non-OMIT uniqueness.",
+            "final_runner": "scripts/server/run_eng2_final_method.py",
+            "final_method_id": "M2_FINAL_ENG2B",
         },
     )
     write_text(
         out_dir / "OFFICIAL_DATA_GUARDRAIL.md",
         f"""# Official Data Guardrail
 
-ENG2B did not open or use the 51 official confirmation raw samples. It uses only the ENG2A consumed 100-pilot artifacts, StageENG1 development-train manifests, historical A7 failures, and synthetic unit tests.
+ENG2B did not open or use the 51 official confirmation raw samples. It uses only the ENG2A consumed 100-pilot artifacts, the 828 unique StageENG1 development-train samples, historical A7 failures, and synthetic unit tests.
 
 The untouched development-dev 100 remains reserved for ENG2C.
 """,
@@ -473,7 +578,7 @@ python -m pytest -q tests/v2_a1/test_eng2b_materialization_and_domains.py tests/
 """
 
 
-def validation_report(replay_summary: dict[str, Any], representability: dict[str, Any]) -> str:
+def validation_report(replay_summary: dict[str, Any], representability: dict[str, Any], runtime_audit: dict[str, Any]) -> str:
     return f"""# Validation Report
 
 stage={STAGE_NAME}
@@ -483,8 +588,13 @@ replay_status={replay_summary['status']}
 raw_outputs_replayed={replay_summary['raw_outputs_replayed']}
 previously_correct_regression_count={replay_summary['previously_correct_regression_count']}
 exact_gold_temporal_recovered={replay_summary['exact_gold_temporal_recovered_count']}/{replay_summary['exact_gold_temporal_false_reject_count']}
-development_train_samples_audited={representability['development_train_samples']}
-eng2a_pilot_samples_audited={representability['eng2a_pilot_samples']}
+unique_development_train_samples_audited={representability['unique_development_train_samples']}
+consumed_pilot_subset_samples={representability['consumed_pilot_subset_samples']}
+newly_semantically_suppressed_gold={representability['sample_level_representability']['newly_semantically_suppressed_gold']}
+final_runner_method_id={runtime_audit['method_id']}
+runtime_uses_eng2b_dynamic_schema={str(runtime_audit['runtime_uses_eng2b_dynamic_schema']).lower()}
+generation_schema_hash_equals_parser_schema_hash={str(runtime_audit['generation_schema_hash_equals_parser_schema_hash']).lower()}
+duplicate_span_impossible_in_stateful_grammar={str(runtime_audit['duplicate_span_impossible_in_stateful_grammar']).lower()}
 official_51_opened=false
 status=READY_FOR_REVIEW
 """
@@ -503,14 +613,15 @@ def build_stage(args: argparse.Namespace) -> dict[str, Any]:
         (out_dir / folder).mkdir(parents=True, exist_ok=True)
     replay_summary = replay_frozen_a7_raw_outputs(eng2a_stage, out_dir)
     prompt_audit = prompt_demo_audit(out_dir, eng2a_stage)
+    runtime_audit = final_runtime_integration_audit(out_dir, eng2a_stage)
     representability = representability_audit(out_dir, stage0_dir, stage1_dir, raw_dir)
     write_json(out_dir / "audits" / "temporal_materialization_audit.json", temporal_materialization_audit())
     write_static_audits(out_dir, eng2a_stage, replay_summary, prompt_audit)
     write_text(out_dir / "REVIEWER_README.md", reviewer_readme(replay_summary))
-    write_text(out_dir / "VALIDATION_REPORT.md", validation_report(replay_summary, representability))
+    write_text(out_dir / "VALIDATION_REPORT.md", validation_report(replay_summary, representability, runtime_audit))
     copy_code_snapshot(out_dir)
     write_package_integrity(out_dir)
-    status = "PASS" if replay_summary["status"] == "PASS" and prompt_audit["status"] == "PASS" else "FAIL"
+    status = "PASS" if replay_summary["status"] == "PASS" and prompt_audit["status"] == "PASS" and runtime_audit["status"] == "PASS" and representability["status"] == "PASS" else "FAIL"
     return {"stage": STAGE_NAME, "patch": PATCH_NAME, "status": status, "replay_summary": replay_summary, "representability": representability["candidate_domain_size"]}
 
 
@@ -519,15 +630,24 @@ def package_reviewer(out_dir: Path, package_path: Path) -> str:
     if package_path.exists():
         package_path.unlink()
     include = [
+        "sitecustomize.py",
+        "conftest.py",
         STAGE_NAME,
-        "src/nldbwrite_v3/v2_a1/typed_materializer.py",
-        "src/nldbwrite_v3/v2_a1/eng2b_candidate_domains.py",
+        "src/nldbwrite_v3/v2_a1",
         "src/nldbwrite_v3/vnext/typed_normalization.py",
         "src/nldbwrite_v3/experiments/prompts.py",
+        "src/nldbwrite_v3/schema",
+        "src/nldbwrite_v3/inference",
+        "src/nldbwrite_v3/baselines",
+        "src/nldbwrite_v3/compiler",
+        "src/nldbwrite_v3/verifier",
         "scripts/data/build_stageeng2b_final_external_development_redesign_freeze.py",
         "scripts/data/validate_stageeng2b_final_external_development_redesign_freeze.py",
         "scripts/data/build_stageeng2a_gretel_external_development_pilot.py",
         "scripts/server/run_stageeng2a_gretel_pilot.py",
+        "scripts/server/run_eng2_final_method.py",
+        "scripts/server/run_stage7e0_a6_english.py",
+        "scripts/server/run_stage7e0_v2_a1_preflight.py",
         "tests/v2_a1/test_eng2b_materialization_and_domains.py",
         "tests/test_stageeng2b_final_external_development_redesign_freeze.py",
         DIRECT_CONFIG_REL,
@@ -558,6 +678,7 @@ def package_reviewer(out_dir: Path, package_path: Path) -> str:
             )
             + "\n",
         )
+        archive.writestr("pytest.ini", "[pytest]\naddopts = -q -p no:cacheprovider\n")
     return sha256_file(package_path)
 
 

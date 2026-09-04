@@ -1,7 +1,9 @@
 {
   "constraint": "Each selected non-OMIT SPAN is removed from later column domains by the ENG2B prefix/state constraint before downstream verification.",
-  "implementation": "nldbwrite_v3.v2_a1.typed_materializer.enforce_unique_non_omit_span_refs",
+  "during_decoding": true,
+  "implementation": "nldbwrite_v3.v2_a1.eng2b_runtime.Eng2BConstraintGrammar",
   "no_model_call": true,
+  "postparse_guard": "nldbwrite_v3.v2_a1.typed_materializer.enforce_unique_non_omit_span_refs",
   "stage": "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE",
   "status": "PASS"
 }

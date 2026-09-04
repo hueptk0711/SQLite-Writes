@@ -1,19 +1,24 @@
 {
   "files": [
     {
-      "bytes": 314296,
+      "bytes": 1503945,
       "path": "audits/candidate_representability.json",
-      "sha256": "690ac16f1e68aaf46f4a758b4d0e479180d535d97aac5d53f59b390d5907f31b"
+      "sha256": "7e2b2994d3a44c7ef211fcf9e2f93234e30e9137d6953038d4b77b0d8e38805c"
     },
     {
-      "bytes": 1451989,
+      "bytes": 1524083,
       "path": "audits/column_specific_domain_audit.json",
-      "sha256": "327e0863a18bd21cfe2a41d48d2f5b7c8a8d27f6e198ab541ecc439b6b042804"
+      "sha256": "9cd67405178028b94288f099c7580bf33aaac56f88d74b02d5c8cc4eb1d641df"
     },
     {
-      "bytes": 364,
+      "bytes": 471,
       "path": "audits/duplicate_span_constraint_audit.json",
-      "sha256": "c079deae26b01a99083e8aa086ddf26fe4c52406b59770161cc96a956256c6f9"
+      "sha256": "42911912331039cac7ee2adba25e42c9ecde34db585fc69f142a65aaec4ff024"
+    },
+    {
+      "bytes": 158914,
+      "path": "audits/final_runtime_integration_audit.json",
+      "sha256": "a283a1d0cdb6454b1f939fe46fc4cd29023f22959e5c2aabdfb56e7f4ecdeea0"
     },
     {
       "bytes": 247,
@@ -46,6 +51,11 @@
       "sha256": "23d748d608545946ecf2c959fc08edadb54d2b5c335a35fbffe3fcacd00460cd"
     },
     {
+      "bytes": 9874,
+      "path": "code/scripts/server/run_eng2_final_method.py",
+      "sha256": "658d2abfd5522797cb85f7186abbc8d9f07f9c6fbeb5432fad5c1145766855ca"
+    },
+    {
       "bytes": 28880,
       "path": "code/scripts/server/run_stageeng2a_gretel_pilot.py",
       "sha256": "33938abeddccebd1943c665c07f024147ccfa184106babc325015ef1c0c42639"
@@ -56,9 +66,14 @@
       "sha256": "a964cd6f07f82dea413fc53127b4d6e56a703364c6a4c599ec4176a554a7f186"
     },
     {
-      "bytes": 9064,
+      "bytes": 14588,
       "path": "code/src/nldbwrite_v3/v2_a1/eng2b_candidate_domains.py",
-      "sha256": "5f2061f1a421a58454cbdd2465c712582eea4d6ce5c0747e125dc115642c2857"
+      "sha256": "0fe4188bfe2ffaea048aa7d100150a60e0aef02360958d674e951f9aa612a741"
+    },
+    {
+      "bytes": 7633,
+      "path": "code/src/nldbwrite_v3/v2_a1/eng2b_runtime.py",
+      "sha256": "bb296bc1a1a0018b3e4d43a078d8a7f04c378177a03ff1732fd646c2368f6d89"
     },
     {
       "bytes": 6987,
@@ -66,19 +81,19 @@
       "sha256": "2fe622164f3df2ca6e48d9902e12c659c9cb43a94241d97ad4fd884f3db47aab"
     },
     {
-      "bytes": 1203,
+      "bytes": 1306,
       "path": "ENG2B_FINAL_METHOD_FREEZE.json",
-      "sha256": "71161d136d196cccbd3531ae982f060014f4a6ec03f96cc0ee3cab1545f4972c"
+      "sha256": "b679443a3a8a7e83111af73be5fbadadcbec5ee16b92a683fbb3aee3d8b34788"
     },
     {
-      "bytes": 1508,
+      "bytes": 1614,
       "path": "ENG2B_METHOD_AMENDMENT.json",
-      "sha256": "662fcf4f720e93004a338a90e0b27f6998fd96b8ece3f184a45cbcf768367459"
+      "sha256": "248a5fff454a7bec572caf146b39b1e5f1f9e52dfb80725ff653b8ee36cc259d"
     },
     {
-      "bytes": 300,
+      "bytes": 313,
       "path": "OFFICIAL_DATA_GUARDRAIL.md",
-      "sha256": "b0166f99057d43511656055c94b0913e145ee62a99bbbfb4752708328b34c55e"
+      "sha256": "1d53e9fcbc9142a0127e932f4b98b42a5a5eb26bedc311f9d68ab1b636e0132f"
     },
     {
       "bytes": 674,
@@ -108,24 +123,24 @@
     {
       "bytes": 703,
       "path": "REVIEWER_README.md",
-      "sha256": "83f551d0f6190a9bc3b27b04a2fbcf7f0e1749d8aa82af6e30b73fc217d7af85"
+      "sha256": "f95ff8fb11f36e2a32d9d7343a4cd75e2b395136e1302618bd10ac7afdb5f08a"
     },
     {
-      "bytes": 5943,
+      "bytes": 11919,
       "path": "tests/test_eng2b_materialization_and_domains.py",
-      "sha256": "76910407b36552863ddfc8167408b568e78ccf8d4d44cf753e82472542f23c3f"
+      "sha256": "1f550a759acb9ae57d47a63ed080262f3cef4bf0978fb28b0252aff6281585d3"
     },
     {
-      "bytes": 3110,
+      "bytes": 4142,
       "path": "tests/test_stageeng2b_final_external_development_redesign_freeze.py",
-      "sha256": "e7f45e5e749609ae68f13dafa95adfdf60ba93e2702cbec743aa171a017cad69"
+      "sha256": "d96cb8810d0dbcc3e9eb42f855ef1babae4ceaded1af5f1c6b4eaddb1568bb40"
     },
     {
-      "bytes": 349,
+      "bytes": 577,
       "path": "VALIDATION_REPORT.md",
-      "sha256": "5b9991d3fefc9ac1b88fb368b5f67b59df46b86c6a7f79eb7d2dc6a120cea4f4"
+      "sha256": "b1a11c5299fecf2ad88653f839c63da50a3d05e93f3a8451a4f15a25e826f60e"
     }
   ],
-  "generated_at_utc": "2026-09-04T01:56:18.108024+00:00",
+  "generated_at_utc": "2026-09-04T04:46:48.567279+00:00",
   "stage": "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE"
 }

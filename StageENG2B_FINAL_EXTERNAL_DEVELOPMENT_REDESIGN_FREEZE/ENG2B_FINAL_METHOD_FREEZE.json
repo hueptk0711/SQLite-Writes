@@ -1,5 +1,7 @@
 {
-  "column_specific_domain_schema": "ENG2B freezes per-column admissible SPAN enums plus a prefix/state constraint for non-OMIT uniqueness.",
+  "column_specific_domain_schema": "ENG2B freezes per-column admissible SPAN enums plus a stateful prefix grammar for non-OMIT uniqueness.",
+  "final_method_id": "M2_FINAL_ENG2B",
+  "final_runner": "scripts/server/run_eng2_final_method.py",
   "frozen_before_official_51": true,
   "frozen_before_untouched_dev100": true,
   "metric_definitions": {
@@ -9,7 +11,7 @@
   },
   "model_call_policy": "No model calls in ENG2B; ENG2C may evaluate a frozen method on untouched development_dev.",
   "multi_table_scope": "If a request requires multiple target writes while the method scope is single-row/single-target INSERT, the final proposed method must abstain/fail closed.",
-  "omission_semantics": "OMIT is available only for omittable schema columns and should be removed from a column domain when strong column-specific evidence exists.",
-  "patch": "PATCH0",
+  "omission_semantics": "OMIT is available only for omittable schema columns and is removed from a column domain when frozen label-local deterministic evidence exists.",
+  "patch": "PATCH1",
   "stage": "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE"
 }

@@ -6,10 +6,11 @@
     "column-specific candidate domains use model-visible type/name/question/candidate evidence only",
     "canonical boundary construction covers quotes, punctuation, leading labels, currency symbols, temporal prefixes, and possessives",
     "non-OMIT span uniqueness is enforced before downstream verification",
+    "canonical final runner M2_FINAL_ENG2B generates and parses with the same ENG2B dynamic schema hash",
     "failure taxonomy preserves V2A1 deterministic stage"
   ],
   "no_new_model_calls": true,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "raw_replay_summary": {
     "exact_gold_temporal_false_reject_count": 13,
     "exact_gold_temporal_not_recovered": [],

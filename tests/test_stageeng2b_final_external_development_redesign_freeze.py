@@ -44,9 +44,11 @@ def test_stageeng2b_freeze_excludes_untouched_dev_and_official_51() -> None:
     assert isolation["official_confirmation_raw_question_context_sql_opened"] is False
     assert freeze["frozen_before_untouched_dev100"] is True
     assert freeze["frozen_before_official_51"] is True
-    assert representability["development_train_samples"] == 828
-    assert representability["eng2a_pilot_samples"] == 100
-    assert representability["audited_samples"] == 928
+    assert freeze["final_method_id"] == "M2_FINAL_ENG2B"
+    assert representability["unique_development_train_samples"] == 828
+    assert representability["consumed_pilot_subset_samples"] == 100
+    assert representability["remaining_train_only_samples"] == 728
+    assert representability["audited_samples"] == 828
 
 
 def test_stageeng2b_corrected_baseline_prompt_plumbing_is_frozen() -> None:
@@ -67,5 +69,20 @@ def test_stageeng2b_column_domains_do_not_use_gold() -> None:
     assert domain["status"] == "PASS"
     assert domain["domain_construction_uses_gold"] is False
     assert "declared column type" in domain["model_visible_inputs"]
+    assert domain["semantic_representability_primary_metric"]["newly_semantically_suppressed_gold"] == 0
     assert duplicate["status"] == "PASS"
-    assert "enforce_unique_non_omit_span_refs" in duplicate["implementation"]
+    assert duplicate["during_decoding"] is True
+    assert "Eng2BConstraintGrammar" in duplicate["implementation"]
+
+
+def test_stageeng2b_final_runner_uses_same_dynamic_schema_for_generation_and_parse() -> None:
+    runtime = read_json(STAGE_DIR / "audits" / "final_runtime_integration_audit.json")
+    assert runtime["status"] == "PASS"
+    assert runtime["method_id"] == "M2_FINAL_ENG2B"
+    assert runtime["runtime_uses_eng2b_dynamic_schema"] is True
+    assert runtime["generation_schema_hash_equals_parser_schema_hash"] is True
+    assert runtime["duplicate_span_impossible_in_stateful_grammar"] is True
+    for row in runtime["rows"]:
+        assert row["generation_schema_sha256"] == row["eng2b_dynamic_schema_sha256"]
+        assert row["generation_schema_sha256"] == row["parser_schema_sha256"]
+        assert row["domain_construction_uses_gold"] is False

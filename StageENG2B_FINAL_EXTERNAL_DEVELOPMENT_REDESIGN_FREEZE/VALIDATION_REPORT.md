@@ -1,13 +1,18 @@
 # Validation Report
 
 stage=StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE
-patch=PATCH0
+patch=PATCH1
 new_model_calls=0
 replay_status=PASS
 raw_outputs_replayed=100
 previously_correct_regression_count=0
 exact_gold_temporal_recovered=13/13
-development_train_samples_audited=828
-eng2a_pilot_samples_audited=100
+unique_development_train_samples_audited=828
+consumed_pilot_subset_samples=100
+newly_semantically_suppressed_gold=0
+final_runner_method_id=M2_FINAL_ENG2B
+runtime_uses_eng2b_dynamic_schema=true
+generation_schema_hash_equals_parser_schema_hash=true
+duplicate_span_impossible_in_stateful_grammar=true
 official_51_opened=false
 status=READY_FOR_REVIEW
