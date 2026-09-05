@@ -1,0 +1,25 @@
+{
+  "methods": {
+    "M0_DIRECT_FS": {
+      "input_tokens": 52609,
+      "latency_sec": 112.36111409496516,
+      "output_tokens": 3239
+    },
+    "M0_DIRECT_ZERO": {
+      "input_tokens": 32609,
+      "latency_sec": 116.8519125925377,
+      "output_tokens": 3478
+    },
+    "M1_J_FS": {
+      "input_tokens": 52639,
+      "latency_sec": 245.38571577239782,
+      "output_tokens": 7311
+    },
+    "M2_FINAL_ENG2B": {
+      "input_tokens": 90780,
+      "latency_sec": 1338.560649394989,
+      "output_tokens": 5640
+    }
+  },
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION"
+}

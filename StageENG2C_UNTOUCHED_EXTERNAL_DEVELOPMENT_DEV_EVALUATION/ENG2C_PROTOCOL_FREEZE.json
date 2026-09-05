@@ -63,7 +63,13 @@
   },
   "no_method_changes_after_official_eng2c_run": true,
   "official51_remains_unopened": true,
-  "patch": "PATCH1",
+  "official_server_run": {
+    "archive_sha256": "d04ae46a04bde3f0a27b686ea7348a336960990803dd7fdb6fdbc28d21f2a809",
+    "backend": "hf",
+    "included": true,
+    "result_root": "official_server_run"
+  },
+  "patch": "PATCH2",
   "primary_metric": "strict_full_state_accuracy",
   "prompt_hashes": {
     "M0_DIRECT_FS": "ebb698e7693cf8abb4faa45e57c8cc1b856ef2a992f3cde7fa0bcc9fedad82b9",

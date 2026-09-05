@@ -40,7 +40,7 @@ from scripts.server.run_eng2_final_method import EXPECTED_CHAT_TEMPLATE_SHA256, 
 from scripts.server.run_stageeng2c_dev100_evaluation import METHODS, STAGE_NAME, zero_shot_direct_config  # noqa: E402
 
 
-PATCH_NAME = "PATCH1"
+PATCH_NAME = "PATCH2"
 PACKAGE_DATE = "20260905"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
 GENERATED_AT_UTC = "2026-09-05T00:00:00+00:00"

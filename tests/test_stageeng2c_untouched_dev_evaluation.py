@@ -78,6 +78,22 @@ def test_stageeng2c_mock_dry_run_covers_all_methods() -> None:
         assert "strict_full_state_accuracy" in summary["methods"][method_id]
 
 
+def test_stageeng2c_official_results_validate_when_included() -> None:
+    official_root = STAGE_DIR / "official_server_run"
+    if not official_root.exists():
+        pytest.skip("Official ENG2C server results are not included in this package")
+
+    result = validate_stage(STAGE_DIR, skip_official=False, require_official=True, official_result_root=None)
+    assert result["status"] == "PASS", result["failures"]
+    summary = read_json(official_root / "results" / "aggregate_results.json")
+    assert summary["backend"] == "hf"
+    assert summary["model_calls_total"] == 400
+    assert summary["methods"]["M0_DIRECT_ZERO"]["strict_full_state_accuracy"] == "95/100"
+    assert summary["methods"]["M0_DIRECT_FS"]["strict_full_state_accuracy"] == "96/100"
+    assert summary["methods"]["M1_J_FS"]["strict_full_state_accuracy"] == "92/100"
+    assert summary["methods"]["M2_FINAL_ENG2B"]["strict_full_state_accuracy"] == "88/100"
+
+
 def test_stageeng2c_runner_cli_and_live_dry_config() -> None:
     help_proc = subprocess.run(
         [sys.executable, "scripts/server/run_stageeng2c_dev100_evaluation.py", "--help"],

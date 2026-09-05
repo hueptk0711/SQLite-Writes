@@ -1,7 +1,7 @@
 # VALIDATION REPORT
 
 stage=StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION
-patch=PATCH1
+patch=PATCH2
 status=PASS
 dev100_n=100
 development_train_overlap=0
@@ -12,4 +12,11 @@ methods=M0_DIRECT_ZERO,M0_DIRECT_FS,M1_J_FS,M2_FINAL_ENG2B
 primary_metric=strict_full_state_accuracy
 retry=0
 mock_model_calls_total=400
-official_model_run_included=false
+official_model_run_included=true
+official_backend=hf
+official_model_calls_total=400
+official_strict_full_state_accuracy_M0_DIRECT_ZERO=95/100
+official_strict_full_state_accuracy_M0_DIRECT_FS=96/100
+official_strict_full_state_accuracy_M1_J_FS=92/100
+official_strict_full_state_accuracy_M2_FINAL_ENG2B=88/100
+official_archive_sha256=d04ae46a04bde3f0a27b686ea7348a336960990803dd7fdb6fdbc28d21f2a809

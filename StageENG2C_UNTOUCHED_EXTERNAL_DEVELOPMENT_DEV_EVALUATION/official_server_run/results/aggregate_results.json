@@ -1,0 +1,173 @@
+{
+  "backend": "hf",
+  "denominator": 100,
+  "generation_metadata": {
+    "generator": {
+      "backend": "transformers_hf_unified_eng2c",
+      "chat_template_hash_verified": true,
+      "chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "cuda_available": true,
+      "expected_chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "generation_settings": {
+        "calls_per_sample": 1,
+        "do_sample": false,
+        "max_input_tokens": 24576,
+        "phase_o_max_new_tokens": 512,
+        "repair": "none",
+        "retry": 0,
+        "seed": 20260905,
+        "temperature": null,
+        "top_k": null,
+        "top_p": null
+      },
+      "identity_fail_closed": {
+        "chat_template_sha256_must_equal": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+        "model_snapshot_basename_must_equal_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+        "tokenizer_snapshot_basename_must_equal_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242"
+      },
+      "method_id": "M2_FINAL_ENG2B",
+      "mode": "live",
+      "model_called": true,
+      "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+      "model_name_or_path": "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "model_revision_verified": true,
+      "tokenizer_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+      "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "tokenizer_revision_verified": true,
+      "torch_version": "2.6.0+cu124"
+    },
+    "m2_runtime_freeze": {
+      "expected_chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "generation_settings": {
+        "calls_per_sample": 1,
+        "do_sample": false,
+        "max_input_tokens": 24576,
+        "phase_o_max_new_tokens": 512,
+        "repair": "none",
+        "retry": 0,
+        "seed": 20260905,
+        "temperature": null,
+        "top_k": null,
+        "top_p": null
+      },
+      "identity_fail_closed": {
+        "chat_template_sha256_must_equal": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+        "model_snapshot_basename_must_equal_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+        "tokenizer_snapshot_basename_must_equal_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242"
+      },
+      "method_id": "M2_FINAL_ENG2B",
+      "mode": "live",
+      "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+      "model_name_or_path": "/home/uet/hue_ptk/hf_cache/hub/models--Qwen--Qwen2.5-Coder-7B-Instruct/snapshots/c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "tokenizer_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+      "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242"
+    }
+  },
+  "methods": {
+    "M0_DIRECT_FS": {
+      "accepted_write_correctness": "96/100",
+      "admission_count": 100,
+      "admission_rate": "100/100",
+      "execution_success": 100,
+      "execution_success_rate": "100/100",
+      "generation_latency_sec": 112.36111409496516,
+      "input_tokens": 52609,
+      "model_calls": 100,
+      "off_target_extra_delta_count": 4,
+      "output_tokens": 3239,
+      "samples": 100,
+      "strict_full_state_accuracy": "96/100",
+      "strict_full_state_correct": 96,
+      "target_state_accuracy": "96/100",
+      "target_state_correct": 96,
+      "total_tokens": 55848,
+      "wrong_admitted_writes": 4
+    },
+    "M0_DIRECT_ZERO": {
+      "accepted_write_correctness": "95/100",
+      "admission_count": 100,
+      "admission_rate": "100/100",
+      "execution_success": 100,
+      "execution_success_rate": "100/100",
+      "generation_latency_sec": 116.8519125925377,
+      "input_tokens": 32609,
+      "model_calls": 100,
+      "off_target_extra_delta_count": 5,
+      "output_tokens": 3478,
+      "samples": 100,
+      "strict_full_state_accuracy": "95/100",
+      "strict_full_state_correct": 95,
+      "target_state_accuracy": "95/100",
+      "target_state_correct": 95,
+      "total_tokens": 36087,
+      "wrong_admitted_writes": 5
+    },
+    "M1_J_FS": {
+      "accepted_write_correctness": "92/97",
+      "admission_count": 97,
+      "admission_rate": "97/100",
+      "execution_success": 97,
+      "execution_success_rate": "97/100",
+      "generation_latency_sec": 245.38571577239782,
+      "input_tokens": 52639,
+      "model_calls": 100,
+      "off_target_extra_delta_count": 5,
+      "output_tokens": 7311,
+      "samples": 100,
+      "strict_full_state_accuracy": "92/100",
+      "strict_full_state_correct": 92,
+      "target_state_accuracy": "92/100",
+      "target_state_correct": 92,
+      "total_tokens": 59950,
+      "wrong_admitted_writes": 5
+    },
+    "M2_FINAL_ENG2B": {
+      "accepted_write_correctness": "88/99",
+      "admission_count": 99,
+      "admission_rate": "99/100",
+      "execution_success": 99,
+      "execution_success_rate": "99/100",
+      "generation_latency_sec": 1338.560649394989,
+      "input_tokens": 90780,
+      "model_calls": 100,
+      "off_target_extra_delta_count": 11,
+      "output_tokens": 5640,
+      "samples": 100,
+      "strict_full_state_accuracy": "88/100",
+      "strict_full_state_correct": 88,
+      "target_state_accuracy": "88/100",
+      "target_state_correct": 88,
+      "total_tokens": 96420,
+      "wrong_admitted_writes": 11
+    }
+  },
+  "model_calls_per_sample_per_method": 1,
+  "model_calls_total": 400,
+  "paired_outcomes": {
+    "M0_DIRECT_FS": {
+      "baseline_correct_m2_wrong": 8,
+      "both_correct": 88,
+      "both_wrong": 4
+    },
+    "M0_DIRECT_ZERO": {
+      "baseline_correct_m2_wrong": 8,
+      "both_correct": 87,
+      "both_wrong": 4,
+      "m2_correct_baseline_wrong": 1
+    },
+    "M1_J_FS": {
+      "baseline_correct_m2_wrong": 8,
+      "both_correct": 84,
+      "both_wrong": 4,
+      "m2_correct_baseline_wrong": 4
+    }
+  },
+  "per_sample_results_sha256": "d4e879f203a20484fac60efbf925d25dcdbd4066ec080f4ba1b0c62be8783b73",
+  "primary_metric": "strict_full_state_accuracy",
+  "raw_model_outputs_sha256": "72db59829f38ef79fdb5a84ac7496767f46f326cea97d42a82ca1983ae78caf5",
+  "retry_count": 0,
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION",
+  "status": "PASS"
+}

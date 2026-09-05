@@ -1,6 +1,6 @@
-# StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION PATCH1
+# StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION PATCH2
 
-This package freezes the untouched Gretel development-dev 100-sample ENG2C protocol before any official model call.
+This package freezes and reports the untouched Gretel development-dev 100-sample ENG2C protocol after the official UET RTX4090 model run.
 
 It authorizes exactly one official server run for four arms:
 
@@ -10,6 +10,15 @@ It authorizes exactly one official server run for four arms:
 - M2_FINAL_ENG2B
 
 Primary metric: strict full-state accuracy across all persistent user tables.
+
+Official server result root: `StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION/official_server_run`
+
+Official strict full-state accuracy:
+
+- M0_DIRECT_ZERO: 95/100
+- M0_DIRECT_FS: 96/100
+- M1_J_FS: 92/100
+- M2_FINAL_ENG2B: 88/100
 
 Local reviewer checks:
 

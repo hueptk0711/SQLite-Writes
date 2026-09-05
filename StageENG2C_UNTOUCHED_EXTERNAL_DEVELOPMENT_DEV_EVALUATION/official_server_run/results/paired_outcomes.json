@@ -1,0 +1,23 @@
+{
+  "pairs": {
+    "M0_DIRECT_FS": {
+      "baseline_correct_m2_wrong": 8,
+      "both_correct": 88,
+      "both_wrong": 4
+    },
+    "M0_DIRECT_ZERO": {
+      "baseline_correct_m2_wrong": 8,
+      "both_correct": 87,
+      "both_wrong": 4,
+      "m2_correct_baseline_wrong": 1
+    },
+    "M1_J_FS": {
+      "baseline_correct_m2_wrong": 8,
+      "both_correct": 84,
+      "both_wrong": 4,
+      "m2_correct_baseline_wrong": 4
+    }
+  },
+  "primary_metric": "strict_full_state_accuracy",
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION"
+}

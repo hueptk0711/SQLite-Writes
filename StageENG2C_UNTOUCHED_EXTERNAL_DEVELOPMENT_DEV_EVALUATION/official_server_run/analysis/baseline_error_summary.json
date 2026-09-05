@@ -1,0 +1,18 @@
+{
+  "counts": {
+    "M0_DIRECT_FS": {
+      "OFF_TARGET_STATE_CHANGE": 4,
+      "PASS": 96
+    },
+    "M0_DIRECT_ZERO": {
+      "OFF_TARGET_STATE_CHANGE": 5,
+      "PASS": 95
+    },
+    "M1_J_FS": {
+      "COMPILATION_FAILURE": 3,
+      "OFF_TARGET_STATE_CHANGE": 5,
+      "PASS": 92
+    }
+  },
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION"
+}
