@@ -74,9 +74,8 @@ def materialize_candidate_for_column(candidate: dict[str, Any], column: dict[str
     semantic = semantic_materialization_type(str(column.get("source_type") or column.get("type") or ""))
     if semantic in {"INTEGER", "REAL", "NUMERIC"} and raw.strip().startswith("$"):
         return False, None, "currency_prefixed_numeric_reject"
-    canonical, _rules = canonical_boundary_text(raw)
     try:
-        materialized = materialize_value(canonical, str(column.get("source_type") or column.get("type") or ""))
+        materialized = materialize_value(raw, str(column.get("source_type") or column.get("type") or ""))
     except Exception as exc:  # noqa: BLE001
         return False, None, str(getattr(exc, "reason_code", "") or exc)
     return True, materialized.value, "materializer_accept"
@@ -118,13 +117,7 @@ def provenance_family(candidate: dict[str, Any]) -> tuple[str, ...]:
 def intervals_overlap(left: tuple[int, int] | None, right: tuple[int, int] | None) -> bool:
     if left is None or right is None:
         return left == right
-    return max(left[0], right[0]) <= min(left[1], right[1])
-
-
-def same_provenance_family(left: dict[str, Any], right: dict[str, Any]) -> bool:
-    left_tags = set(provenance_family(left))
-    right_tags = set(provenance_family(right))
-    return not left_tags or not right_tags or bool(left_tags & right_tags) or left_tags == right_tags
+    return max(left[0], right[0]) < min(left[1], right[1])
 
 
 def dominated_boundary_signature(candidate: dict[str, Any]) -> tuple[str, str]:
@@ -136,7 +129,6 @@ def same_boundary_occurrence(left: dict[str, Any], right: dict[str, Any]) -> boo
     return (
         dominated_boundary_signature(left) == dominated_boundary_signature(right)
         and intervals_overlap(interval(left), interval(right))
-        and same_provenance_family(left, right)
     )
 
 
@@ -466,6 +458,49 @@ def build_column_specific_domains(
     }
 
 
+def audit_admissibility_runtime_equivalence(
+    *,
+    model_side_input: dict[str, Any],
+    runtime_constraints: dict[str, Any],
+) -> dict[str, Any]:
+    inventory = [dict(candidate) for candidate in runtime_constraints["candidate_inventory"]]
+    columns = [dict(column) for column in model_side_input["schema_inventory"]["columns"]]
+    mismatch_rows: list[dict[str, Any]] = []
+    checked = 0
+    for column in columns:
+        semantic = semantic_materialization_type(str(column.get("source_type") or column.get("type") or ""))
+        for candidate in inventory:
+            checked += 1
+            domain_admits, domain_reason = column_allows_candidate(column, candidate)
+            try:
+                materialize_value(str(candidate.get("text") or ""), str(column.get("source_type") or column.get("type") or ""))
+                runtime_accepts = True
+                runtime_reason = "materializer_accept"
+            except Exception as exc:  # noqa: BLE001
+                runtime_accepts = False
+                runtime_reason = str(getattr(exc, "reason_code", "") or exc)
+            if domain_admits != runtime_accepts:
+                mismatch_rows.append(
+                    {
+                        "column_ref": column.get("column_ref"),
+                        "column_name": column.get("column_name"),
+                        "source_type": column.get("source_type"),
+                        "semantic_materialization_type": semantic,
+                        "span_ref": candidate.get("span_ref"),
+                        "candidate_text": candidate.get("text"),
+                        "domain_admits": domain_admits,
+                        "domain_reason": domain_reason,
+                        "runtime_accepts_raw": runtime_accepts,
+                        "runtime_reason": runtime_reason,
+                    }
+                )
+    return {
+        "checked_candidate_column_pairs": checked,
+        "admissibility_runtime_mismatch": len(mismatch_rows),
+        "mismatch_rows": mismatch_rows[:50],
+    }
+
+
 def dynamic_schema_with_column_domains(
     *,
     model_side_input: dict[str, Any],
@@ -537,6 +572,7 @@ def audit_domains_against_gold(row: dict[str, Any], domain_result: dict[str, Any
         "sample_id": row["sample_id"],
         "gold_audit_rows": rows,
         "newly_semantically_suppressed_gold_count": newly_suppressed,
+        "candidate_generation_miss_count": sum(1 for audit in rows if audit["candidate_generation_miss"]),
         "exact_ref_missing_count": sum(1 for audit in rows if not audit["exact_ref_represented"] and not audit["candidate_generation_miss"]),
         "semantic_missing_after_filter_count": sum(1 for audit in rows if not audit["semantic_gold_represented_in_final_domain"] and audit["semantic_gold_represented_in_prefilter_inventory"]),
     }

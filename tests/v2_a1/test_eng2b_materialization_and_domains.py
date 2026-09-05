@@ -10,12 +10,14 @@ import pytest
 from nldbwrite_v3.experiments.prompts import build_direct_prompt, build_legacy_json_prompt
 from nldbwrite_v3.schema.profile import build_profile
 from nldbwrite_v3.v2_a1.eng2b_candidate_domains import (
+    audit_admissibility_runtime_equivalence,
     build_column_specific_domains,
     candidate_kind,
     canonical_boundary_text,
     column_allows_candidate,
     dynamic_schema_with_column_domains,
     filter_dominated_boundaries,
+    intervals_overlap,
 )
 from nldbwrite_v3.v2_a1.eng2b_runtime import build_eng2b_constraint_grammar, prepare_eng2b_runtime_row, sha256_text
 from nldbwrite_v3.v2_a1.typed_materializer import (
@@ -147,6 +149,31 @@ def test_boundary_dominance_suppresses_punctuated_variants() -> None:
     )
     assert [candidate["span_ref"] for candidate in kept] == ["SPAN_ATOMIC"]
     assert [candidate["span_ref"] for candidate in suppressed] == ["SPAN_PUNCT"]
+
+
+@pytest.mark.parametrize(
+    "noisy,atomic",
+    [
+        ("'2020-01-01',", "2020-01-01"),
+        ('"2022-01-01"', "2022-01-01"),
+        ("'completed'", "completed"),
+    ],
+)
+def test_boundary_dominance_uses_canonical_overlap_not_provenance(noisy: str, atomic: str) -> None:
+    base = noisy.index(atomic)
+    kept, suppressed = filter_dominated_boundaries(
+        [
+            {"span_ref": "SPAN_NOISY", "text": noisy, "start_char": 10, "end_char": 10 + len(noisy), "provenance_tags": ["whitespace_ngram"]},
+            {"span_ref": "SPAN_ATOMIC", "text": atomic, "start_char": 10 + base, "end_char": 10 + base + len(atomic), "provenance_tags": ["quoted_content"]},
+        ]
+    )
+    assert [candidate["span_ref"] for candidate in kept] == ["SPAN_ATOMIC"]
+    assert [candidate["span_ref"] for candidate in suppressed] == ["SPAN_NOISY"]
+
+
+def test_half_open_intervals_do_not_overlap_when_adjacent() -> None:
+    assert intervals_overlap((0, 4), (4, 8)) is False
+    assert intervals_overlap((0, 5), (4, 8)) is True
 
 
 def test_default_cue_forces_or_retains_omit_for_omittable_text_column() -> None:
@@ -330,6 +357,11 @@ def test_domain_admissibility_uses_materializer_rules() -> None:
     with pytest.raises(V2A1Error):
         materialize_value("2022-03-02", "TIMESTAMP")
     assert column_allows_candidate(timestamp_column, {"text": "2022-03-02"})[0] is False
+    assert column_allows_candidate(date_column, {"text": "date 2020-08-10"})[0] is False
+    assert column_allows_candidate(date_column, {"text": "'2020-01-01',"})[0] is False
+    model_side, constraints = toy_model_side_and_constraints()
+    equivalence = audit_admissibility_runtime_equivalence(model_side_input=model_side, runtime_constraints=constraints)
+    assert equivalence["admissibility_runtime_mismatch"] == 0
 
 
 def test_prepare_eng2b_runtime_row_replaces_global_schema_with_dynamic_schema() -> None:

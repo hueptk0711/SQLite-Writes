@@ -126,6 +126,11 @@ def validate_stage(stage_dir: Path) -> dict[str, Any]:
     check(representability["remaining_train_only_samples"] == 728, failures, "remaining train-only count drifted")
     check(representability["audited_samples"] == 828, failures, "expected 828 unique audited external-development samples")
     check(representability["sample_level_representability"]["newly_semantically_suppressed_gold"] == 0, failures, "ENG2B filtering introduced semantic gold suppression")
+    check(representability["sample_level_representability"]["admissibility_runtime_mismatch"] == 0, failures, "domain admissibility does not match raw runtime materializer")
+    check(representability["sample_level_representability"]["samples_with_no_new_semantic_suppression"] == 828, failures, "samples with no new semantic suppression drifted")
+    check(representability["sample_level_representability"]["fully_semantically_represented_samples"] < 828, failures, "fully represented count is misleadingly equal to all samples")
+    check(representability["admissibility_runtime_equivalence"]["status"] == "PASS", failures, "admissibility/runtime equivalence audit is not PASS")
+    check(representability["admissibility_runtime_equivalence"]["admissibility_runtime_mismatch"] == 0, failures, "admissibility/runtime mismatch audit is nonzero")
     check("official" in representability["scope"] and "excluded" in representability["scope"], failures, "representability scope does not exclude official data")
     check(representability["domain_semantics_status"]["text_strong_local_rule_restricts_domain"] is True, failures, "TEXT strong-local rule does not restrict domains")
     check(representability["domain_semantics_status"]["boundary_dominance_suppressed_any"] is True, failures, "boundary dominance did not suppress any overlapping variants")
@@ -139,6 +144,7 @@ def validate_stage(stage_dir: Path) -> dict[str, Any]:
     check(domain["summary"]["text_strong_evidence_restricted_columns"] > 0, failures, "TEXT strong-evidence domains were never restricted")
     check(domain["summary"]["text_strong_evidence_unrestricted_columns"] < domain["summary"]["text_strong_evidence_columns"], failures, "all TEXT strong-evidence domains stayed unrestricted")
     check(domain["summary"]["dominated_boundary_suppressed_total"] > 0, failures, "overlapping boundary dominance suppressed zero candidates")
+    check(domain["admissibility_runtime_equivalence"]["admissibility_runtime_mismatch"] == 0, failures, "domain audit reports admissibility/runtime mismatches")
     check(domain["domain_semantics_status"]["text_strong_local_rule_restricts_domain"] is True, failures, "domain semantics status reports TEXT restriction failure")
     check(domain["domain_semantics_status"]["boundary_dominance_suppressed_any"] is True, failures, "domain semantics status reports boundary dominance failure")
 
@@ -160,7 +166,11 @@ def validate_stage(stage_dir: Path) -> dict[str, Any]:
     check(runner_cli["live_dry_run_exit_code"] == 0, failures, "canonical final runner live dry-run config failed")
     check(runner_cli["live_dry_run_method_id"] == "M2_FINAL_ENG2B", failures, "live dry-run method id drifted")
     check(runner_cli["mode_paths_share_evaluate_final_method"] is True, failures, "live/replay do not share final implementation")
+    check(runner_cli["method_compile_path"] == "compile_column_conditioned_prediction", failures, "final compile path is not the gold-isolated compile API")
+    check(runner_cli["method_compile_path_reads_gold"] is False, failures, "final compile path is recorded as reading gold")
+    check(runner_cli["method_compile_path_accepts_label_side_expected"] is False, failures, "final compile API accepts label_side_expected")
     check(runner_cli["one_call_per_sample_no_retry"] is True, failures, "live runtime is not frozen to one call/sample with no retry")
+    check(runner_cli["live_identity_fail_closed"] is True, failures, "live model/tokenizer/chat-template identity is not fail-closed")
     for row in runtime.get("rows", []):
         check(row["generation_schema_sha256"] == row["eng2b_dynamic_schema_sha256"], failures, f"generation schema not ENG2B dynamic for {row['sample_id']}")
         check(row["generation_schema_sha256"] == row["parser_schema_sha256"], failures, f"parser schema hash mismatch for {row['sample_id']}")
@@ -197,6 +207,9 @@ def validate_stage(stage_dir: Path) -> dict[str, Any]:
             "consumed_pilot_subset_samples": representability.get("consumed_pilot_subset_samples"),
             "audited_samples": representability.get("audited_samples"),
             "newly_semantically_suppressed_gold": representability.get("sample_level_representability", {}).get("newly_semantically_suppressed_gold"),
+            "samples_with_no_new_semantic_suppression": representability.get("sample_level_representability", {}).get("samples_with_no_new_semantic_suppression"),
+            "fully_semantically_represented_samples": representability.get("sample_level_representability", {}).get("fully_semantically_represented_samples"),
+            "admissibility_runtime_mismatch": representability.get("sample_level_representability", {}).get("admissibility_runtime_mismatch"),
             "text_strong_evidence_restricted_columns": representability.get("column_level_representability", {}).get("text_strong_evidence_restricted_columns"),
             "dominated_boundary_suppressed_total": representability.get("column_level_representability", {}).get("dominated_boundary_suppressed_total"),
         },

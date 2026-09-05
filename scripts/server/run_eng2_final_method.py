@@ -182,12 +182,16 @@ def parse_phase_o_column_conditioned_output(raw: str, schema: dict[str, Any]) ->
     return {"operation": "INSERT", "table_ref": branch["table_ref"], "column_span_refs": ordered}
 
 
-def deterministic_ir_from_column_spans(row: dict[str, Any]) -> tuple[dict[str, Any], tuple[AcceptedSpan, ...], list[dict[str, Any]]]:
-    column_decisions = row["label_side_expected"]["phase_o"]["column_span_refs"]
-    selected_table_ref_value = row["label_side_expected"]["phase_o"]["table_ref"]
+def deterministic_ir_from_column_spans(
+    model_side_input: dict[str, Any],
+    runtime_constraints: dict[str, Any],
+    phase_o_prediction: dict[str, Any],
+) -> tuple[dict[str, Any], tuple[AcceptedSpan, ...], list[dict[str, Any]]]:
+    column_decisions = phase_o_prediction["column_span_refs"]
+    selected_table_ref_value = phase_o_prediction["table_ref"]
     omitted_required = [
         column
-        for column in row["model_side_input"]["schema_inventory"]["columns"]
+        for column in model_side_input["schema_inventory"]["columns"]
         if column["table_ref"] == selected_table_ref_value
         and column_decisions.get(column["column_ref"]) == "OMIT"
         and column.get("nullable") is False
@@ -199,7 +203,7 @@ def deterministic_ir_from_column_spans(row: dict[str, Any]) -> tuple[dict[str, A
     selected_refs = [span_ref for _column_ref, span_ref in column_decisions.items() if span_ref != "OMIT"]
     if len(selected_refs) != len(set(selected_refs)):
         raise V2A1Error("duplicate_span_ref", "Duplicate span_refs are forbidden")
-    by_ref = {candidate["span_ref"]: candidate for candidate in row["runtime_constraints"]["candidate_inventory"]}
+    by_ref = {candidate["span_ref"]: candidate for candidate in runtime_constraints["candidate_inventory"]}
     unknown = [span_ref for span_ref in selected_refs if span_ref not in by_ref]
     if unknown:
         raise V2A1Error("unknown_span_ref", f"Unknown span_refs: {unknown}")
@@ -239,27 +243,31 @@ def read_rows(connection: sqlite3.Connection, table: str) -> list[dict[str, Any]
     return [dict(row) for row in rows]
 
 
-def oracle_column_conditioned_path(row: dict[str, Any], db_path: Path) -> dict[str, Any]:
-    ir, spans, resolved = deterministic_ir_from_column_spans(row)
+def compile_column_conditioned_prediction(
+    *,
+    sample_id: str,
+    model_side_input: dict[str, Any],
+    runtime_constraints: dict[str, Any],
+    phase_o_prediction: dict[str, Any],
+    db_path: Path,
+) -> dict[str, Any]:
+    ir, spans, resolved = deterministic_ir_from_column_spans(model_side_input, runtime_constraints, phase_o_prediction)
     slots = build_slot_bundle(spans)
-    inventory = build_schema_inventory(row["model_side_input"]["schema_inventory"])
+    inventory = build_schema_inventory(model_side_input["schema_inventory"])
     materialized = materialize_ir_values(ir, inventory, slots)
     verify_completeness(ir, slots)
     program = compile_sqlite_program(ir, inventory, materialized)
     preflight = preflight_sqlite(db_path, program)
-    target = row["label_side_expected"]["target_state"]["typed_target_rows"]
-    phase_o = row["label_side_expected"]["phase_o"]
-    result = {
-        "sample_id": row["sample_id"],
-        "phase_o_operation_exact": phase_o["operation"] == "INSERT",
-        "phase_o_output_keys_exact": sorted(phase_o) == ["column_span_refs", "operation", "table_ref"],
+    return {
+        "sample_id": sample_id,
+        "phase_o_operation_exact": phase_o_prediction["operation"] == "INSERT",
+        "phase_o_output_keys_exact": sorted(phase_o_prediction) == ["column_span_refs", "operation", "table_ref"],
         "phase_m_model_call_removed": True,
         "model_generated_slot_refs": False,
         "model_generated_phase_m": False,
-        "selected_table_ref": phase_o["table_ref"],
+        "selected_table_ref": phase_o_prediction["table_ref"],
         "selected_span_ref_count": len(spans),
-        "omit_decision_count": sum(1 for value in phase_o["column_span_refs"].values() if value == "OMIT"),
-        "candidate_inventory_contains_all_gold_spans": True,
+        "omit_decision_count": sum(1 for value in phase_o_prediction["column_span_refs"].values() if value == "OMIT"),
         "dynamic_schema_exact": True,
         "resolver": "PASS",
         "deterministic_ir": ir,
@@ -271,19 +279,7 @@ def oracle_column_conditioned_path(row: dict[str, Any], db_path: Path) -> dict[s
         "compiled_parameters": list(program.parameters),
         "preflight": "ADMITTED" if preflight.admitted else "REJECTED",
         "preflight_reason_code": preflight.reason_code,
-        "expected_target_state_hash": row["label_side_expected"]["target_state"]["target_state_hash"],
         "resolved_column_spans": resolved,
-    }
-    if not preflight.admitted:
-        return result | {"canonical_target_state_exact": False, "observed_target_state_hash": None}
-    with sqlite3.connect(db_path) as source, sqlite3.connect(":memory:") as connection:
-        source.backup(connection)
-        connection.execute(program.sql, program.parameters)
-        connection.commit()
-        observed = read_rows(connection, row["synthetic_db_spec"]["selected_table"])
-    return result | {
-        "canonical_target_state_exact": observed == target,
-        "observed_target_state_hash": sha256_text(canonical_json(observed)),
     }
 
 
@@ -456,6 +452,11 @@ def live_runtime_freeze(*, model_name_or_path: str = DEFAULT_MODEL_PATH, max_inp
         "tokenizer_id": MODEL_ID,
         "tokenizer_revision": MODEL_REVISION,
         "expected_chat_template_sha256": EXPECTED_CHAT_TEMPLATE_SHA256,
+        "identity_fail_closed": {
+            "model_snapshot_basename_must_equal_revision": MODEL_REVISION,
+            "tokenizer_snapshot_basename_must_equal_revision": MODEL_REVISION,
+            "chat_template_sha256_must_equal": EXPECTED_CHAT_TEMPLATE_SHA256,
+        },
         "generation_settings": {
             "max_input_tokens": max_input_tokens,
             "phase_o_max_new_tokens": phase_o_max_new_tokens,
@@ -468,6 +469,36 @@ def live_runtime_freeze(*, model_name_or_path: str = DEFAULT_MODEL_PATH, max_inp
             "calls_per_sample": 1,
             "seed": seed,
         },
+    }
+
+
+def verify_live_model_identity(*, model_name_or_path: str, tokenizer_name_or_path: str, chat_template_sha256: str) -> dict[str, Any]:
+    model_path = Path(model_name_or_path)
+    tokenizer_path = Path(tokenizer_name_or_path)
+    model_revision_observed = model_path.name if model_path.exists() else MODEL_REVISION
+    tokenizer_revision_observed = tokenizer_path.name if tokenizer_path.exists() else MODEL_REVISION
+    if model_revision_observed != MODEL_REVISION:
+        raise V2A1Error(
+            "model_revision_mismatch",
+            "STOP: ENG2B live model snapshot revision does not match the frozen revision",
+            details={"expected": MODEL_REVISION, "observed": model_revision_observed, "model_name_or_path": model_name_or_path},
+        )
+    if tokenizer_revision_observed != MODEL_REVISION:
+        raise V2A1Error(
+            "tokenizer_revision_mismatch",
+            "STOP: ENG2B live tokenizer snapshot revision does not match the frozen revision",
+            details={"expected": MODEL_REVISION, "observed": tokenizer_revision_observed, "tokenizer_name_or_path": tokenizer_name_or_path},
+        )
+    if chat_template_sha256 != EXPECTED_CHAT_TEMPLATE_SHA256:
+        raise V2A1Error(
+            "chat_template_hash_mismatch",
+            "STOP: ENG2B live tokenizer chat template hash does not match the frozen hash",
+            details={"expected": EXPECTED_CHAT_TEMPLATE_SHA256, "observed": chat_template_sha256},
+        )
+    return {
+        "model_revision_verified": True,
+        "tokenizer_revision_verified": True,
+        "chat_template_hash_verified": True,
     }
 
 
@@ -524,13 +555,18 @@ class Eng2BConstrainedTransformersChatGenerator:
         if self.tokenizer.pad_token_id is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
         self.tokenizer.padding_side = "left"
+        self.chat_template_sha256 = sha256_text(str(getattr(self.tokenizer, "chat_template", "") or ""))
+        self.identity_verification = verify_live_model_identity(
+            model_name_or_path=model_name_or_path,
+            tokenizer_name_or_path=model_name_or_path,
+            chat_template_sha256=self.chat_template_sha256,
+        )
         model_kwargs = {"trust_remote_code": trust_remote_code, "device_map": "auto", "torch_dtype": "auto"}
         if not Path(model_name_or_path).exists():
             model_kwargs["revision"] = MODEL_REVISION
         self.model = AutoModelForCausalLM.from_pretrained(model_name_or_path, **model_kwargs)
         self.model.eval()
         self.model_name_or_path = model_name_or_path
-        self.chat_template_sha256 = sha256_text(str(getattr(self.tokenizer, "chat_template", "") or ""))
 
     def generate(self, *, sample_id: str, messages: list[dict[str, str]], max_new_tokens: int, row: dict[str, Any]) -> CallResult:
         torch = self.torch
@@ -558,7 +594,7 @@ class Eng2BConstrainedTransformersChatGenerator:
             "backend": "transformers_hf_constrained_eng2b",
             "model_called": True,
             "chat_template_sha256": self.chat_template_sha256,
-            "chat_template_hash_matches_expected": self.chat_template_sha256 == EXPECTED_CHAT_TEMPLATE_SHA256,
+            **self.identity_verification,
             "torch_version": self.torch.__version__,
             "cuda_available": bool(self.torch.cuda.is_available()),
         }
@@ -591,12 +627,16 @@ def evaluate_final_method(row: dict[str, Any], stage_dir: Path, generator: Any, 
         schema = runtime_row["runtime_constraints"]["phase_o_schema"]
         phase_o = parse_phase_o_column_conditioned_output(call.raw_output, schema)
         parsed.update({"parse_status": "success", "phase_o": phase_o})
-        predicted = json.loads(canonical_json(runtime_row))
-        predicted["label_side_expected"]["phase_o"] = phase_o
-        oracle = oracle_column_conditioned_path(predicted, stage_dir / runtime_row["synthetic_db_spec"]["sqlite_db_path"])
-        parsed["oracle"] = oracle
-        preflight = {"accepted": oracle["preflight"] == "ADMITTED", "error": oracle.get("preflight_reason_code")}
-        evaluation = evaluate_sql(runtime_row, stage_dir, [oracle["compiled_sql"]], params=tuple(oracle["compiled_parameters"]), preflight=preflight)
+        compiled = compile_column_conditioned_prediction(
+            sample_id=runtime_row["sample_id"],
+            model_side_input=runtime_row["model_side_input"],
+            runtime_constraints=runtime_row["runtime_constraints"],
+            phase_o_prediction=phase_o,
+            db_path=stage_dir / runtime_row["synthetic_db_spec"]["sqlite_db_path"],
+        )
+        parsed["compiled_prediction"] = compiled
+        preflight = {"accepted": compiled["preflight"] == "ADMITTED", "error": compiled.get("preflight_reason_code")}
+        evaluation = evaluate_sql(runtime_row, stage_dir, [compiled["compiled_sql"]], params=tuple(compiled["compiled_parameters"]), preflight=preflight)
         return parsed, evaluation, raw_o
     except V2A1Error as exc:
         failure_stage = failure_stage_from_v2a1_error(exc)

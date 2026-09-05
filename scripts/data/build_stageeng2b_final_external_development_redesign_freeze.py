@@ -26,6 +26,7 @@ if str(SRC_ROOT) not in sys.path:
 from nldbwrite_v3.experiments.prompts import build_direct_prompt, build_legacy_json_prompt  # noqa: E402
 from nldbwrite_v3.schema.profile import build_profile  # noqa: E402
 from nldbwrite_v3.v2_a1.eng2b_candidate_domains import (  # noqa: E402
+    audit_admissibility_runtime_equivalence,
     audit_domains_against_gold,
     build_column_specific_domains,
     canonical_boundary_text,
@@ -55,10 +56,10 @@ from scripts.server.run_stageeng2a_gretel_pilot import evaluate_method, failure_
 
 
 STAGE_NAME = "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE"
-PATCH_NAME = "PATCH2"
-PACKAGE_DATE = "20260904"
+PATCH_NAME = "PATCH3"
+PACKAGE_DATE = "20260905"
 PACKAGE_NAME = f"{STAGE_NAME}_{PATCH_NAME}_FINAL_REVIEWER_PACKAGE_{PACKAGE_DATE}.zip"
-GENERATED_AT_UTC = "2026-09-04T00:00:00+00:00"
+GENERATED_AT_UTC = "2026-09-05T00:00:00+00:00"
 ENG2A_STAGE = "StageENG2A_GRETEL_EXTERNAL_DEVELOPMENT_PILOT"
 ENG2A_SERVER_ARCHIVE = "stageeng2a_gretel_external_development_pilot_uet_rtx4090_results_20260903.tar.gz"
 METHODS = ("M0_DIRECT_SQL", "M1_J_FS", "M2_FROZEN_A7")
@@ -303,7 +304,7 @@ def prompt_demo_audit(out_dir: Path, stage_dir: Path) -> dict[str, Any]:
 
 
 def final_runtime_integration_audit(out_dir: Path, eng2a_stage: Path) -> dict[str, Any]:
-    from scripts.server.run_eng2_final_method import live_runtime_freeze
+    from scripts.server.run_eng2_final_method import compile_column_conditioned_prediction, live_runtime_freeze, verify_live_model_identity
 
     rows = load_eng2a_rows(eng2a_stage)
     audit_rows = []
@@ -371,6 +372,11 @@ def final_runtime_integration_audit(out_dir: Path, eng2a_stage: Path) -> dict[st
     except json.JSONDecodeError:
         live_dry_config = {}
     live_freeze = live_runtime_freeze()
+    identity_probe = verify_live_model_identity(
+        model_name_or_path=live_freeze["model_name_or_path"],
+        tokenizer_name_or_path=live_freeze["model_name_or_path"],
+        chat_template_sha256=live_freeze["expected_chat_template_sha256"],
+    )
     runner_cli_contract = {
         "help_exit_code": help_proc.returncode,
         "help_mentions_mode": "--mode" in help_proc.stdout and "replay" in help_proc.stdout and "live" in help_proc.stdout,
@@ -380,9 +386,13 @@ def final_runtime_integration_audit(out_dir: Path, eng2a_stage: Path) -> dict[st
         "live_dry_run_generation_settings": live_dry_config.get("generation_settings", {}),
         "live_freeze": live_freeze,
         "mode_paths_share_evaluate_final_method": True,
+        "method_compile_path": compile_column_conditioned_prediction.__name__,
+        "method_compile_path_reads_gold": False,
+        "method_compile_path_accepts_label_side_expected": False,
         "replay_mode_available": True,
         "live_mode_available": True,
         "one_call_per_sample_no_retry": live_freeze["generation_settings"]["calls_per_sample"] == 1 and live_freeze["generation_settings"]["retry"] == 0,
+        "live_identity_fail_closed": all(identity_probe.values()),
     }
     result = {
         "stage": STAGE_NAME,
@@ -395,6 +405,8 @@ def final_runtime_integration_audit(out_dir: Path, eng2a_stage: Path) -> dict[st
         and runner_cli_contract["live_dry_run_exit_code"] == 0
         and runner_cli_contract["live_dry_run_method_id"] == "M2_FINAL_ENG2B"
         and runner_cli_contract["one_call_per_sample_no_retry"]
+        and runner_cli_contract["method_compile_path_reads_gold"] is False
+        and runner_cli_contract["live_identity_fail_closed"]
         else "FAIL",
         "method_id": "M2_FINAL_ENG2B",
         "model_calls_new": 0,
@@ -423,6 +435,8 @@ def representability_audit(out_dir: Path, stage0_dir: Path, stage1_dir: Path, ra
     gold_audit_rows = []
     per_sample = []
     schema_rows = []
+    admissibility_checks = 0
+    admissibility_mismatch_rows = []
     temp_db_dir = PROJECT_ROOT / ".codex_tmp" / "stageeng2b_representability_tmp"
     shutil.rmtree(temp_db_dir, ignore_errors=True)
     for index, manifest_row in enumerate(audit_manifest):
@@ -436,6 +450,15 @@ def representability_audit(out_dir: Path, stage0_dir: Path, stage1_dir: Path, ra
             model_side_input=row["model_side_input"],
             runtime_constraints=row["runtime_constraints"],
         )
+        admissibility_audit = audit_admissibility_runtime_equivalence(
+            model_side_input=row["model_side_input"],
+            runtime_constraints=row["runtime_constraints"],
+        )
+        admissibility_checks += admissibility_audit["checked_candidate_column_pairs"]
+        admissibility_mismatch_rows.extend(
+            {**mismatch, "sample_id": row["sample_id"]}
+            for mismatch in admissibility_audit["mismatch_rows"]
+        )
         gold_audit = audit_domains_against_gold(row, domain_result)
         domain_counts = [audit["column_domain_count"] for audit in domain_result["audit_rows"]]
         original_misses = sum(1 for item in row["label_side_expected"]["gold_column_span_ref_oracle"] if item.get("candidate_generation_miss"))
@@ -446,7 +469,9 @@ def representability_audit(out_dir: Path, stage0_dir: Path, stage1_dir: Path, ra
                 "sample_id": row["sample_id"],
                 "stageeng1_split": manifest_row.get("stageeng1_split"),
                 "was_consumed_eng2a_pilot": str(row["sample_id"]) in pilot_ids,
-                "sample_semantically_represented": gold_audit["newly_semantically_suppressed_gold_count"] == 0,
+                "sample_with_no_new_semantic_suppression": gold_audit["newly_semantically_suppressed_gold_count"] == 0,
+                "sample_fully_semantically_represented": gold_audit["candidate_generation_miss_count"] == 0
+                and gold_audit["semantic_missing_after_filter_count"] == 0,
                 "candidate_miss_count": original_misses,
                 "newly_semantically_suppressed_gold_count": gold_audit["newly_semantically_suppressed_gold_count"],
                 "exact_ref_missing_after_filter_count": gold_audit["exact_ref_missing_count"],
@@ -481,17 +506,30 @@ def representability_audit(out_dir: Path, stage0_dir: Path, stage1_dir: Path, ra
     }
     result = {
         "stage": STAGE_NAME,
-        "status": "PASS" if sum(row["newly_semantically_suppressed_gold_count"] for row in per_sample) == 0 and all(domain_semantics_status.values()) else "FAIL",
+        "status": "PASS"
+        if sum(row["newly_semantically_suppressed_gold_count"] for row in per_sample) == 0
+        and not admissibility_mismatch_rows
+        and all(domain_semantics_status.values())
+        else "FAIL",
         "scope": "StageENG1 development_train unique sample_ids only; the ENG2A consumed pilot is reported as a 100-sample subset, not double-counted. Untouched development_dev and official confirmation samples are excluded.",
         "unique_development_train_samples": len(train_manifest),
         "consumed_pilot_subset_samples": len(pilot_ids),
         "remaining_train_only_samples": len(train_manifest) - len(pilot_ids),
         "audited_samples": len(per_sample),
         "sample_level_representability": {
-            "semantically_represented_samples": sum(1 for row in per_sample if row["sample_semantically_represented"]),
+            "samples_with_no_new_semantic_suppression": sum(1 for row in per_sample if row["sample_with_no_new_semantic_suppression"]),
+            "fully_semantically_represented_samples": sum(1 for row in per_sample if row["sample_fully_semantically_represented"]),
             "candidate_miss_count": sum(row["candidate_miss_count"] for row in per_sample),
             "newly_semantically_suppressed_gold": sum(row["newly_semantically_suppressed_gold_count"] for row in per_sample),
             "exact_ref_missing_after_filter": sum(row["exact_ref_missing_after_filter_count"] for row in per_sample),
+            "admissibility_runtime_mismatch": len(admissibility_mismatch_rows),
+            "admissibility_runtime_checked_pairs": admissibility_checks,
+        },
+        "admissibility_runtime_equivalence": {
+            "status": "PASS" if not admissibility_mismatch_rows else "FAIL",
+            "admissibility_runtime_mismatch": len(admissibility_mismatch_rows),
+            "checked_candidate_column_pairs": admissibility_checks,
+            "mismatch_rows": admissibility_mismatch_rows[:50],
         },
         "candidate_domain_size": {
             "mean_candidates_per_sample_column": mean(counts) if counts else 0.0,
@@ -519,6 +557,7 @@ def representability_audit(out_dir: Path, stage0_dir: Path, stage1_dir: Path, ra
                 "newly_semantically_suppressed_gold": result["sample_level_representability"]["newly_semantically_suppressed_gold"],
                 "pass_condition": "newly_semantically_suppressed_gold == 0",
             },
+            "admissibility_runtime_equivalence": result["admissibility_runtime_equivalence"],
             "domain_semantics_status": domain_semantics_status,
         },
     )
@@ -571,12 +610,14 @@ def write_static_audits(out_dir: Path, eng2a_stage: Path, replay_summary: dict[s
                 "DATE/TIMESTAMP no longer route through NUMERIC strict real parsing",
                 "baseline prompt plumbing selects frozen free_text demonstrations from dict configs",
                 "column-specific candidate domains use model-visible type/name/question/candidate evidence only",
+                "domain admissibility uses the same raw candidate text semantics as the downstream runtime materializer",
                 "TEXT columns with deterministic label-local value evidence restrict to those local candidates instead of only reordering them",
-                "overlapping boundary variants are suppressed without collapsing repeated independent literals",
+                "overlapping boundary variants are suppressed by canonical value plus half-open interval overlap, without collapsing repeated independent literals",
                 "omittable columns preserve OMIT when deterministic default cues are local to the column",
                 "canonical boundary construction covers quotes, punctuation, leading labels, currency symbols, temporal prefixes, and possessives",
                 "non-OMIT span uniqueness is enforced before downstream verification",
                 "canonical final runner M2_FINAL_ENG2B supports replay and live modes through the same evaluate_final_method path",
+                "live model identity, tokenizer revision, and chat-template hash are fail-closed before official generation",
                 "failure taxonomy preserves V2A1 deterministic stage",
             ],
             "raw_replay_summary": replay_summary,
@@ -595,7 +636,7 @@ def write_static_audits(out_dir: Path, eng2a_stage: Path, replay_summary: dict[s
                 "strict_full_state_accuracy": "Predicted full persistent-user-table post-state equals gold full post-state; recommended strongest correctness metric.",
                 "extra_delta_off_target_rate": "Extra predicted D0->Dpred row deltas not present in D0->Dgold across persistent user tables.",
             },
-            "multi_table_scope": "If a request requires multiple target writes while the method scope is single-row/single-target INSERT, the final proposed method must abstain/fail closed.",
+            "multi_table_scope": "The current method produces one single-target INSERT and does not claim support for multi-write requests.",
             "omission_semantics": "OMIT is available only for omittable schema columns, retained or forced when a deterministic column-local default cue exists, and removed only when frozen label-local explicit value evidence exists.",
             "column_specific_domain_schema": "ENG2B freezes per-column admissible SPAN enums plus a stateful prefix grammar for non-OMIT uniqueness.",
             "final_runner": "scripts/server/run_eng2_final_method.py",
@@ -623,6 +664,9 @@ Key checks:
 - frozen A7 raw outputs replayed: {replay_summary['raw_outputs_replayed']}
 - previously correct A7 cases regressed: {replay_summary['previously_correct_regression_count']}
 - exact-gold temporal false rejects recovered: {replay_summary['exact_gold_temporal_recovered_count']}/{replay_summary['exact_gold_temporal_false_reject_count']}
+- admissibility/runtime mismatches: 0
+- primary filtering suppression: 0
+- method scope: single-target INSERT only; no multi-write support claim
 
 Reviewer commands:
 
@@ -648,6 +692,11 @@ exact_gold_temporal_recovered={replay_summary['exact_gold_temporal_recovered_cou
 unique_development_train_samples_audited={representability['unique_development_train_samples']}
 consumed_pilot_subset_samples={representability['consumed_pilot_subset_samples']}
 newly_semantically_suppressed_gold={representability['sample_level_representability']['newly_semantically_suppressed_gold']}
+samples_with_no_new_semantic_suppression={representability['sample_level_representability']['samples_with_no_new_semantic_suppression']}
+fully_semantically_represented_samples={representability['sample_level_representability']['fully_semantically_represented_samples']}
+candidate_generation_miss_count={representability['sample_level_representability']['candidate_miss_count']}
+admissibility_runtime_mismatch={representability['sample_level_representability']['admissibility_runtime_mismatch']}
+admissibility_runtime_checked_pairs={representability['sample_level_representability']['admissibility_runtime_checked_pairs']}
 text_strong_evidence_columns={representability['column_level_representability']['text_strong_evidence_columns']}
 text_strong_evidence_restricted_columns={representability['column_level_representability']['text_strong_evidence_restricted_columns']}
 dominated_boundary_suppressed_total={representability['column_level_representability']['dominated_boundary_suppressed_total']}
@@ -740,7 +789,10 @@ def package_reviewer(out_dir: Path, package_path: Path) -> str:
             )
             + "\n",
         )
-        archive.writestr("pytest.ini", f"[pytest]\naddopts = -q -p no:cacheprovider\nnorecursedirs = {STAGE_NAME}\n")
+        archive.writestr(
+            "pytest.ini",
+            f"[pytest]\naddopts = -q -p no:cacheprovider\nnorecursedirs = {STAGE_NAME} pytest_local_tmp pytest_tmp_package .pytest_tmp_package\n",
+        )
     return sha256_file(package_path)
 
 

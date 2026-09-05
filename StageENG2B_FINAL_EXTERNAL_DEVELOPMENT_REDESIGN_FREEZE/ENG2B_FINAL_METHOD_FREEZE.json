@@ -10,8 +10,8 @@
     "target_table_state_accuracy": "Predicted post-state equals gold post-state for the gold target table."
   },
   "model_call_policy": "No model calls in ENG2B; ENG2C may evaluate a frozen method on untouched development_dev.",
-  "multi_table_scope": "If a request requires multiple target writes while the method scope is single-row/single-target INSERT, the final proposed method must abstain/fail closed.",
+  "multi_table_scope": "The current method produces one single-target INSERT and does not claim support for multi-write requests.",
   "omission_semantics": "OMIT is available only for omittable schema columns, retained or forced when a deterministic column-local default cue exists, and removed only when frozen label-local explicit value evidence exists.",
-  "patch": "PATCH2",
+  "patch": "PATCH3",
   "stage": "StageENG2B_FINAL_EXTERNAL_DEVELOPMENT_REDESIGN_FREEZE"
 }
