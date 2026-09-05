@@ -1,0 +1,7 @@
+{
+  "model_calls_per_sample_per_method": 1,
+  "model_calls_total": 400,
+  "retry_count": 0,
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION",
+  "status": "PASS"
+}

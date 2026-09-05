@@ -1,0 +1,38 @@
+{
+  "dev100_n": 100,
+  "development_train_overlap_by_field": {
+    "leakage_signature_hash": 0,
+    "normalized_prompt_hash": 0,
+    "prompt_hash": 0,
+    "raw_row_hash": 0,
+    "sample_id": 0,
+    "source_row_key": 0,
+    "sql_hash": 0
+  },
+  "development_train_overlap_total": 0,
+  "eng2a_pilot_overlap_by_field": {
+    "leakage_signature_hash": 0,
+    "normalized_prompt_hash": 0,
+    "prompt_hash": 0,
+    "raw_row_hash": 0,
+    "sample_id": 0,
+    "source_row_key": 0,
+    "sql_hash": 0
+  },
+  "eng2a_pilot_overlap_total": 0,
+  "official51_manifest_rows_seen_for_hash_guard_only": 51,
+  "official51_overlap_by_field": {
+    "leakage_signature_hash": 0,
+    "normalized_prompt_hash": 0,
+    "prompt_hash": 0,
+    "raw_row_hash": 0,
+    "sample_id": 0,
+    "source_row_key": 0,
+    "sql_hash": 0
+  },
+  "official51_overlap_total": 0,
+  "official_raw_question_context_sql_opened": false,
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION",
+  "status": "PASS",
+  "unique_dev100_fingerprints": 100
+}

@@ -1,0 +1,89 @@
+{
+  "baseline_demonstration_ids": [
+    "free_plain_insert",
+    "free_conflict_aware"
+  ],
+  "created_at_utc": "2026-09-05T00:00:00+00:00",
+  "dataset": {
+    "denominator": 100,
+    "frozen_rows_sha256": "f71e89653c4c4f6ea2440c89902401f453061498ce388d80b46e0b7f2b8b4f21",
+    "manifest_sha256": "94924145b89a86ada55e4b4da9a71d4cea10fe46da2cd7d44a94434e3924679a",
+    "sample_ids_sha256": "3aaa3f2b414909274ee21279f39f375bcedea87135e9b234b5a140274fe389f9",
+    "source": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT/DEVELOPMENT_DEV_SPLIT_MANIFEST.jsonl"
+  },
+  "evaluator_sha256": "35d80d828682f97b5e7e85292dd74fb29d74eea6f0406469162a282b452b3586",
+  "final_source_commit_sha_record": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION/REVIEWER_PACKAGE_GIT_INFO.json",
+  "m2_method_freeze_sha256": "ba7a113f670956316afdfeaddafc15471db44151ff5d7bf091e0c69a4c1025c3",
+  "m2_runner_sha256": "dee4d5e5f1ea60ed6a0a32ebcc692c8c49e41a948d35f280d011b70f37632b30",
+  "methods": [
+    {
+      "calls_per_sample": 1,
+      "method_id": "M0_DIRECT_ZERO",
+      "prompt_file": "prompts/m0_direct_zero.jsonl",
+      "retry": 0
+    },
+    {
+      "calls_per_sample": 1,
+      "frozen_demonstration_ids": [
+        "free_plain_insert",
+        "free_conflict_aware"
+      ],
+      "method_id": "M0_DIRECT_FS",
+      "prompt_file": "prompts/m0_direct_fewshot.jsonl",
+      "retry": 0
+    },
+    {
+      "calls_per_sample": 1,
+      "frozen_demonstration_ids": [
+        "free_plain_insert",
+        "free_conflict_aware"
+      ],
+      "method_id": "M1_J_FS",
+      "prompt_file": "prompts/m1_jfs.jsonl",
+      "retry": 0
+    },
+    {
+      "calls_per_sample": 1,
+      "method_id": "M2_FINAL_ENG2B",
+      "retry": 0,
+      "runner": "scripts/server/run_eng2_final_method.py"
+    }
+  ],
+  "model": {
+    "best_of_n": 1,
+    "do_sample": false,
+    "expected_chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+    "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+    "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "self_consistency": "none",
+    "temperature": null,
+    "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+    "top_k": null,
+    "top_p": null
+  },
+  "no_method_changes_after_official_eng2c_run": true,
+  "official51_remains_unopened": true,
+  "patch": "PATCH0",
+  "primary_metric": "strict_full_state_accuracy",
+  "prompt_hashes": {
+    "M0_DIRECT_FS": "ebb698e7693cf8abb4faa45e57c8cc1b856ef2a992f3cde7fa0bcc9fedad82b9",
+    "M0_DIRECT_ZERO": "81b6bbd5fbd9185ec48ac67a9d67e88d906da03ded9a4635837391a03d8e2048",
+    "M1_J_FS": "f314ad0447e02d774b3180dc7295c14497eb296311eb66ef7e0026d2de2b0bed",
+    "M2_FINAL_ENG2B": "2cd51d3c1fd2853e3480b91721eba9d3b685eac57b5efa8db9efca1cbf208521"
+  },
+  "secondary_metrics": [
+    "target_table_state_accuracy",
+    "execution_success",
+    "off_target_extra_delta_rate",
+    "wrong_admitted_writes",
+    "admission_rate",
+    "accepted_write_correctness",
+    "input_tokens",
+    "output_tokens",
+    "generation_latency",
+    "end_to_end_latency"
+  ],
+  "source_base_commit_sha": "fb2004d9f3da3eb8820fbefa9a6d0249d9ced183",
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION",
+  "status": "FROZEN_READY_FOR_ONE_OFFICIAL_SERVER_RUN"
+}

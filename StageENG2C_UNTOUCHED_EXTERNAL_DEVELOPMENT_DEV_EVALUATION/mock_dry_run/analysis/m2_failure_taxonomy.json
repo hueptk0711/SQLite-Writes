@@ -1,0 +1,610 @@
+{
+  "counts": {
+    "OFF_TARGET_STATE_CHANGE": 2,
+    "PASS": 93,
+    "PHASE_O_PARSE_FAILURE": 5
+  },
+  "rows": [
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:10202:018192",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:10397:018387",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:10513:018503",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:10517:018507",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:10591:018581",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:10992:018982",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:11485:025472",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:12878:026865",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:13319:021330",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:15013:023024",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:17411:036465",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:17468:036522",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "OFF_TARGET_STATE_CHANGE",
+      "sample_id": "gretel:train:18307:037361",
+      "semantic_selection_subtype": "unclassified",
+      "strict_full_state_correct": false
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:18847:051408",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:19967:052528",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:21470:014374",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:23264:077602",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:26582:012364",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:27536:013318",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:27853:003635",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:28699:004481",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:28867:004649",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:29000:004782",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:29092:004874",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:30502:034936",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:30723:035157",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:30843:035277",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:3112:031733",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:31775:032237",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:32896:033358",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PHASE_O_PARSE_FAILURE",
+      "sample_id": "gretel:train:32945:033407",
+      "semantic_selection_subtype": "unclassified",
+      "strict_full_state_correct": false
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:36581:050546",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:39667:069011",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:40790:070134",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:40832:070176",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:41850:082718",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:42896:083764",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:43451:027273",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:43526:027348",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:45411:086688",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:46644:087921",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:47364:073109",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:47511:073256",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PHASE_O_PARSE_FAILURE",
+      "sample_id": "gretel:train:47646:073391",
+      "semantic_selection_subtype": "candidate-generation miss",
+      "strict_full_state_correct": false
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:49902:016135",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:50822:017055",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:50998:005630",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PHASE_O_PARSE_FAILURE",
+      "sample_id": "gretel:train:51875:006507",
+      "semantic_selection_subtype": "unclassified",
+      "strict_full_state_correct": false
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:52124:006756",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:53278:053668",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:53807:054197",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:53919:054309",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:54391:054781",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:54469:054859",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:54607:054997",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:56035:048471",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:56195:048631",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:57853:060181",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:59427:065252",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:61197:067022",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:61907:067732",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:63402:081211",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:6434:001337",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:64435:096140",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:64755:096460",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:65962:097667",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:68154:047005",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:68657:090414",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:68759:090516",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:69252:091009",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:70806:084637",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:72744:029120",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:73808:030184",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:74353:007561",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "OFF_TARGET_STATE_CHANGE",
+      "sample_id": "gretel:train:74898:008106",
+      "semantic_selection_subtype": "unclassified",
+      "strict_full_state_correct": false
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:75428:008636",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PHASE_O_PARSE_FAILURE",
+      "sample_id": "gretel:train:76208:009416",
+      "semantic_selection_subtype": "unclassified",
+      "strict_full_state_correct": false
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:7641:019674",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:76585:061414",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:77240:062069",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:78716:058030",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:80074:074907",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:80845:075678",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:82379:079240",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:82904:079765",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:84328:071213",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:85128:072013",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:85224:072109",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:85943:088360",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:8846:020879",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:89324:099668",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:90479:063458",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:96961:040671",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:97358:041068",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:9738:017728",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PHASE_O_PARSE_FAILURE",
+      "sample_id": "gretel:train:98142:010106",
+      "semantic_selection_subtype": "unclassified",
+      "strict_full_state_correct": false
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:99415:011379",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:99542:011506",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:99969:011933",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    },
+    {
+      "failure_stage": "PASS",
+      "sample_id": "gretel:train:9998:017988",
+      "semantic_selection_subtype": null,
+      "strict_full_state_correct": true
+    }
+  ],
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION"
+}

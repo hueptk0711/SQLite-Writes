@@ -1,0 +1,731 @@
+{
+  "files": [
+    {
+      "bytes": 275,
+      "path": "audits/call_retry_audit.json",
+      "sha256": "6e9b00980cdf41267f90c18dc5a167bc8d45c31944511732308b91c25df0a0b6"
+    },
+    {
+      "bytes": 164,
+      "path": "audits/denominator_audit.json",
+      "sha256": "a8da4e738d9a946f7ea4b5ed74151f58217eaebbc63917999ad70280b23e220e"
+    },
+    {
+      "bytes": 193,
+      "path": "audits/evaluator_commonality.json",
+      "sha256": "59cd01e7d609701d39af093c39fd6321fcd7092aa080d6ad93a32571b3cb5fd9"
+    },
+    {
+      "bytes": 305,
+      "path": "audits/method_freeze_integrity.json",
+      "sha256": "3acccdac9649d08a540ddd146b991c736bea74303977bded2ebd2caf2fe98845"
+    },
+    {
+      "bytes": 1346,
+      "path": "audits/model_identity_audit.json",
+      "sha256": "0becb0c019abe219f8b91699414454e7ef4da6c19f41b0dbb2b1c654a9394961"
+    },
+    {
+      "bytes": 196,
+      "path": "audits/official51_guardrail.json",
+      "sha256": "e67322ed039fa29669f4b7731ea43a28e725905926cd60e9b54c55dc14d8bbc3"
+    },
+    {
+      "bytes": 1019,
+      "path": "audits/split_isolation.json",
+      "sha256": "3a730d4e9d3389e273f1ee7d37a012309ec925505585bf03f3d60f8983d80425"
+    },
+    {
+      "bytes": 3963,
+      "path": "configs/m0_direct_fewshot_config.json",
+      "sha256": "0795d31926345c62d5ba832d8374c9ac067967a3842c45854a2fff9b32c9f826"
+    },
+    {
+      "bytes": 696,
+      "path": "configs/m0_direct_zero_config.json",
+      "sha256": "b8af85c8d3c3cf549f681697a93f6b36da1500593f0d491b44a318132ef3de06"
+    },
+    {
+      "bytes": 4390,
+      "path": "configs/m1_j_fs_config.json",
+      "sha256": "a4006a423eb62fd37e5b370aca48a3b9337971f49d94700703d634a3d25c0cfe"
+    },
+    {
+      "bytes": 178,
+      "path": "ENG2C_DEV100_FREEZE.json",
+      "sha256": "3edbc5ce287519291a4d6cc7b04172d6a3e591fb8e44371c79740fc0c032542c"
+    },
+    {
+      "bytes": 1523495,
+      "path": "ENG2C_DEV100_FREEZE.jsonl",
+      "sha256": "f71e89653c4c4f6ea2440c89902401f453061498ce388d80b46e0b7f2b8b4f21"
+    },
+    {
+      "bytes": 142468,
+      "path": "ENG2C_DEV100_MANIFEST.jsonl",
+      "sha256": "94924145b89a86ada55e4b4da9a71d4cea10fe46da2cd7d44a94434e3924679a"
+    },
+    {
+      "bytes": 3274,
+      "path": "ENG2C_PROTOCOL_FREEZE.json",
+      "sha256": "ff67d0c7c3bb0f8cd9d8dc0c85c05595c464082da8900d1d53125abd7386bfa8"
+    },
+    {
+      "bytes": 4290,
+      "path": "methods/m0_direct_fewshot.json",
+      "sha256": "a94f561af3361ec7052ceeec7e179eaf5db551a9de839a01c12327e08a89c97e"
+    },
+    {
+      "bytes": 857,
+      "path": "methods/m0_direct_zero.json",
+      "sha256": "f00dfdcbf8c8c3be53e5df306f56ac5dc4d7582be3f1409a21c94dcfbeac8bf7"
+    },
+    {
+      "bytes": 4738,
+      "path": "methods/m1_jfs.json",
+      "sha256": "ba146f5f76a3850f0104c29bd1bc6f918b9ca1491c9e2273fb73703d878a2e93"
+    },
+    {
+      "bytes": 1425,
+      "path": "methods/m2_final_eng2b.json",
+      "sha256": "c7f27dc911920b2bcd73d70bbaf793fd5284174e22350f87471b0edf3f0f7ba8"
+    },
+    {
+      "bytes": 297,
+      "path": "mock_dry_run/analysis/baseline_error_summary.json",
+      "sha256": "06d910e3cd2c06b7e588e6415c7299549cb6a1f45fdc4cbea09e27bb2585cd0b"
+    },
+    {
+      "bytes": 17797,
+      "path": "mock_dry_run/analysis/m2_failure_taxonomy.json",
+      "sha256": "68c9fc0d778f213ffc0421fc60c14ab280aa84fb9f68cb10e8ed5416f4baa79b"
+    },
+    {
+      "bytes": 129,
+      "path": "mock_dry_run/analysis/representative_failures.md",
+      "sha256": "532aff773351e505015932e9d8855341299ba04a7ff4a70fa809e3e52cfebd08"
+    },
+    {
+      "bytes": 184,
+      "path": "mock_dry_run/audits/call_retry_audit.json",
+      "sha256": "7e3949a3b8c83dce0c8233748a573e039c28ad57225a180890e0cbec8c2221dd"
+    },
+    {
+      "bytes": 195,
+      "path": "mock_dry_run/audits/denominator_audit.json",
+      "sha256": "0c62db256d85d22860f96cb29056a29a75437f8065d5555796ebd534f90bdb76"
+    },
+    {
+      "bytes": 191,
+      "path": "mock_dry_run/audits/evaluator_commonality.json",
+      "sha256": "738cbfd25ab2e12b37a25b266c472817923154377470a3442dc198dac30090cc"
+    },
+    {
+      "bytes": 249,
+      "path": "mock_dry_run/audits/method_freeze_integrity.json",
+      "sha256": "585f6e4b3d46aca582dbdb28b20bc9fc351b4d900d633fd2c1b14613ffbbd34f"
+    },
+    {
+      "bytes": 1345,
+      "path": "mock_dry_run/audits/model_identity_audit.json",
+      "sha256": "36da81fec406dd71a804aed9f0b983dad2f5beeece9a468c2570cb90b658e7b0"
+    },
+    {
+      "bytes": 34676,
+      "path": "mock_dry_run/efficiency/latency.jsonl",
+      "sha256": "9bbfa435b8b5e41c1e4d2716d3c4e7bf6655d80e9f25ac4dca26bd361e689a56"
+    },
+    {
+      "bytes": 522,
+      "path": "mock_dry_run/efficiency/summary.json",
+      "sha256": "9e737405e6167f35ef6d29ba443da17282dba3f5bc86a90bd55d2288d98811d9"
+    },
+    {
+      "bytes": 41635,
+      "path": "mock_dry_run/efficiency/tokens.jsonl",
+      "sha256": "d0332e780e1acaf84aca67a29bbe96b2e5bbb7816605b7d6a067f973010856aa"
+    },
+    {
+      "bytes": 363542,
+      "path": "mock_dry_run/parsed/parsed_outputs.jsonl",
+      "sha256": "b0bb20de6976247953ebf8c2d53b1ee7fb989fec9069def4782feb1493221f17"
+    },
+    {
+      "bytes": 245880,
+      "path": "mock_dry_run/raw/model_outputs.jsonl",
+      "sha256": "b7d08b5d8d702009dc65a0f89f4e0206f35d454f556736f0b4f71d9065908e43"
+    },
+    {
+      "bytes": 4540,
+      "path": "mock_dry_run/results/aggregate_results.json",
+      "sha256": "78c0942e984ca4e5aee469f0c2e119b4ef07386273741cab008bd65193b14ba4"
+    },
+    {
+      "bytes": 552,
+      "path": "mock_dry_run/results/comparison_table.md",
+      "sha256": "aa3af863283645e07f1a91b801998f7606bde49675d1bd8220386b2659119f22"
+    },
+    {
+      "bytes": 437,
+      "path": "mock_dry_run/results/paired_outcomes.json",
+      "sha256": "c90c38a09e14223d4cf47d152a6f579b29a284ae722b13b7181ca1ea6be903fd"
+    },
+    {
+      "bytes": 265213,
+      "path": "mock_dry_run/results/per_sample_results.jsonl",
+      "sha256": "9e51c147a8f6fdc82e447df863c18236f304a5d72c2601defe75202325180039"
+    },
+    {
+      "bytes": 1530,
+      "path": "mock_dry_run/run_manifest.json",
+      "sha256": "5f7045b26383ce7035a1df57d5f0a83f59beff31203177d5d010a66f1fae5d02"
+    },
+    {
+      "bytes": 202312,
+      "path": "prompts/m0_direct_fewshot.jsonl",
+      "sha256": "ebb698e7693cf8abb4faa45e57c8cc1b856ef2a992f3cde7fa0bcc9fedad82b9"
+    },
+    {
+      "bytes": 139912,
+      "path": "prompts/m0_direct_zero.jsonl",
+      "sha256": "81b6bbd5fbd9185ec48ac67a9d67e88d906da03ded9a4635837391a03d8e2048"
+    },
+    {
+      "bytes": 198712,
+      "path": "prompts/m1_jfs.jsonl",
+      "sha256": "f314ad0447e02d774b3180dc7295c14497eb296311eb66ef7e0026d2de2b0bed"
+    },
+    {
+      "bytes": 309047,
+      "path": "prompts/m2_final_eng2b.jsonl",
+      "sha256": "2cd51d3c1fd2853e3480b91721eba9d3b685eac57b5efa8db9efca1cbf208521"
+    },
+    {
+      "bytes": 1222,
+      "path": "REVIEWER_README.md",
+      "sha256": "72a9af946c4be121e2639506e99d172f556510e2199c156c26475eb778ad6747"
+    },
+    {
+      "bytes": 155,
+      "path": "SERVER_RUN_COMMANDS.md",
+      "sha256": "4c4f3d5d7e9e505405bfd54cfed6ce2526e3514d46a64c1b40287e068769cdd5"
+    },
+    {
+      "bytes": 1504,
+      "path": "SERVER_RUN_COMMANDS.sh",
+      "sha256": "7eaf4e448d74db4ebcb661f5ac5a25c1be8a546b5a63ff6b7605307304246405"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_10202_018192.sqlite",
+      "sha256": "0a3576aa46c54d2e930f0d83a091ad65700cbd6b2ad2ec205d437f9b7f58b942"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_10397_018387.sqlite",
+      "sha256": "716be30c0a92155735e3e4644abdc26b5c62aec55ba65ab7690358fe6b4877ca"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_10513_018503.sqlite",
+      "sha256": "566e081093cdaf3798e7056dfff73dbf97dff753c83df61e2166a6e279fab13b"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_10517_018507.sqlite",
+      "sha256": "40d600d44a3107c6cdf7982ce87e7ab37e4d69a1a2cf08b6e7ea0240175d090a"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_10591_018581.sqlite",
+      "sha256": "f11205ca1fe676a0864b25f57051891859b6113636676f44e1d0375058c7ce1e"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_10992_018982.sqlite",
+      "sha256": "df4b38bc333574e5d595ec72bd36667d4f922a0e915ea517c063675968492476"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_11485_025472.sqlite",
+      "sha256": "82798d122843c751405092a6e580387ca502613a9b3a8340a5c38fa7c84f6d0c"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_12878_026865.sqlite",
+      "sha256": "aa1ed2121baca3ac2967e805cc3f8dd7a2886b1bd098b1d0bf9a23a3913709bb"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_13319_021330.sqlite",
+      "sha256": "42af462134af4a7bc874934f02f39f99b5c3b74cdcfbaa53be666760fb27509e"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_15013_023024.sqlite",
+      "sha256": "826790fe3af0ae2fcd602afee6cf47db0bcae0834dcb4c6f6d4c7719ccca5230"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_17411_036465.sqlite",
+      "sha256": "6e0de652f5e5835034f88c9da06856ef09522850293056515a43aa36cecaa8fe"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_17468_036522.sqlite",
+      "sha256": "e67f0df238bcbdd382f8c9bc5ae6ee01fe57157c665ca7348e21b1202bbbdde8"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_18307_037361.sqlite",
+      "sha256": "cfc5f2a25e55cf5757fe41df4eabbd8da06e9cb0b5cbf99d3460702364168145"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_18847_051408.sqlite",
+      "sha256": "bdb4ef17ff11041884a0daa362d8f3019154605f858b887e440038db400c3056"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_19967_052528.sqlite",
+      "sha256": "b732905966b26d96c69f5bda44ad2e980f683741bbac8a3fa00c64f2e5b610e6"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_21470_014374.sqlite",
+      "sha256": "1206f138eecae5704353554ab910a53314e8731cbdef9c9449831b24e9586e40"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_23264_077602.sqlite",
+      "sha256": "bf9bbf3d66de5ac67d72e163d5bb7834d7b6356ff3586200c959329cb2d19fb1"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_26582_012364.sqlite",
+      "sha256": "ca200692100158b6abc203f0e44d0abdb2475592251f3f6cd586221bd0c2d89e"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_27536_013318.sqlite",
+      "sha256": "96c51dd1c1006786b4e8fbff726ab4a77488423c81a91eb1a2b0c750d3ce9bd4"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_27853_003635.sqlite",
+      "sha256": "3c2cf7bc9dec25c0f1234ace27dcf1467c6562c7ef750addf6c9ca6c39195f56"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_28699_004481.sqlite",
+      "sha256": "1033fd33d3c9cfc87d9db48f20ebd48ad0b882f59a442e7bd4c19c937a8359e0"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_28867_004649.sqlite",
+      "sha256": "191e4889dae60fe5d4c1b2a9a0b6a35ba6156cf0cb493f3ee86f984402298382"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_29000_004782.sqlite",
+      "sha256": "0aa4a629f9d7dd9d855b1a6d74d3bc9e0c60831298c986ffaab4007b6a89f3b2"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_29092_004874.sqlite",
+      "sha256": "f06bda1f95c4e1573881dbcc41f621dc20be0774974c768f0c07502875bd51e3"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_30502_034936.sqlite",
+      "sha256": "876cc5ed69e847653e46d68d5796849ed51547fe5ca30f99662f9029cf16a87a"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_30723_035157.sqlite",
+      "sha256": "19db4375874cd2ed0c35260a272a8e50ffa825161f7b89979f8422402ba3ecd3"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_30843_035277.sqlite",
+      "sha256": "1071ad6d77cec5b48e6c366ead43319b6fe57bedde098c155b9c75f6f63d7d56"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_3112_031733.sqlite",
+      "sha256": "c6363275f85b9142a88fa9e715b54ca60f64e4c1045fa2562cb02891ee5dc8de"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_31775_032237.sqlite",
+      "sha256": "3e824975a5b032eeddad16d688955f44be7a696c8106d336a551092038ae6d92"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_32896_033358.sqlite",
+      "sha256": "89ac218d20c8751da3e86cf9378050ab992559e8055b3513f3aea49a92996a41"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_32945_033407.sqlite",
+      "sha256": "0130d69d404f128b11326d78735ca30177acfb3ada23168237b38f1a053066ee"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_36581_050546.sqlite",
+      "sha256": "d7c606582dc09dc130cb9c4b1058145b440f263762db0449562d9acd4012ecf6"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_39667_069011.sqlite",
+      "sha256": "12f820c10cde04141e309b404c1620d654e415ede3a8620230165b5e659ca9c8"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_40790_070134.sqlite",
+      "sha256": "21a04fff810b06637f256cb0fc8471bc9673a56aec3b149930774760f1795128"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_40832_070176.sqlite",
+      "sha256": "bf560e547d6e639e63797d6a33762bcb23205f1f355bbee13da16d89907fe683"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_41850_082718.sqlite",
+      "sha256": "1206f138eecae5704353554ab910a53314e8731cbdef9c9449831b24e9586e40"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_42896_083764.sqlite",
+      "sha256": "bc2e6a3b5e7b65af7197c7ea91c4ae2ac6a94b4010154f5cbec28c1bd720a187"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_43451_027273.sqlite",
+      "sha256": "684fc6d60d5b84cf8d9f2ad925e9243fdbff9329e7ce1177c3b0ff4ee867620b"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_43526_027348.sqlite",
+      "sha256": "fbe0d0237ddc690e93ef3bfb9adb2beebd7aa5695c78866024ff8474df759693"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_45411_086688.sqlite",
+      "sha256": "76df4570ca982dfaa6d596db2145c76fe31c3686982a08a22a1b8c4fafb76bee"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_46644_087921.sqlite",
+      "sha256": "fd71a53b60838bf2124d447eca58926de9938085dae80818e863f894c8186b63"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_47364_073109.sqlite",
+      "sha256": "d180e00d0c98f509e778c005138f04185641ffd6ee20d4605ce6f2aa9894a36b"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_47511_073256.sqlite",
+      "sha256": "4fe6c824f77e88f2fdd20f37a10969574bcdc82465bad6e1ca472de0969b637b"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_47646_073391.sqlite",
+      "sha256": "0ef171fa6b75690938a7d2ab60150a75a6ce347d1085985e34124e23b10fceef"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_49902_016135.sqlite",
+      "sha256": "58486eb53e3a074f2e8dd1cc56bebc4892e333398a4471eeab0e36dd1234d1b2"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_50822_017055.sqlite",
+      "sha256": "3cd2bcf08cf23cd5f6b95b1b58b2791818d61de4aecffeb67fed95b5bd84ef63"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_50998_005630.sqlite",
+      "sha256": "637502f9bbb5d2a8ed1190dc4be57c046fb29a248ccf3dfa42c7e752e3375054"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_51875_006507.sqlite",
+      "sha256": "0130d69d404f128b11326d78735ca30177acfb3ada23168237b38f1a053066ee"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_52124_006756.sqlite",
+      "sha256": "19db4375874cd2ed0c35260a272a8e50ffa825161f7b89979f8422402ba3ecd3"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_53278_053668.sqlite",
+      "sha256": "3e824975a5b032eeddad16d688955f44be7a696c8106d336a551092038ae6d92"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_53807_054197.sqlite",
+      "sha256": "e99564f05004fda0b44a6fdd7a9bd1d00a5478c4adcd9d581b9c8009b714cd35"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_53919_054309.sqlite",
+      "sha256": "ccd7b7c2c1e99a222f708e7e7e481dfd4c33c0e0500515bd8829dcfab8129cec"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_54391_054781.sqlite",
+      "sha256": "241cb335b2c78e09174efc5aba123436a62b499d803b2d881760c4e5067d9601"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_54469_054859.sqlite",
+      "sha256": "6ff01f8f5ef59cc0b0c71648a008a51b1ad36d0d9683e2c2c95dface99380548"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_54607_054997.sqlite",
+      "sha256": "649a7e39e742c4b71aeede8c8c7d8abcec5e891ef3569caf049f520d218cb4ce"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_56035_048471.sqlite",
+      "sha256": "7eb8435efcc1ae41394442a6653c694784830ed3f1c71a1312401f020b052f7b"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_56195_048631.sqlite",
+      "sha256": "ede824cdf02b13358ac5c98ac5953796cf75d14d3d10c3f71610625ca629fb5a"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_57853_060181.sqlite",
+      "sha256": "0742bae2dda3285b1eddafbc15b8919867dc862f2a98fa260befc66ed33376b1"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_59427_065252.sqlite",
+      "sha256": "dc01871ca5989854c45f7052d116d0fc5c091b46990bf245398161cdff68ad42"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_61197_067022.sqlite",
+      "sha256": "36e61d5270b069751e6e46259445a15d2308b791a010e54e7a105f3ab1705ead"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_61907_067732.sqlite",
+      "sha256": "826790fe3af0ae2fcd602afee6cf47db0bcae0834dcb4c6f6d4c7719ccca5230"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_63402_081211.sqlite",
+      "sha256": "9ac7bb014cc9b106c64107dbe6e00433c687484b48a14096aadd2fb27204fa5b"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_6434_001337.sqlite",
+      "sha256": "89ac218d20c8751da3e86cf9378050ab992559e8055b3513f3aea49a92996a41"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_64435_096140.sqlite",
+      "sha256": "b6c9aa46bdea2727c4498b7ae9f75d68ee4faa4f4b12077d74f29461543c51ec"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_64755_096460.sqlite",
+      "sha256": "16edf5e9fb298195e6be5b208a22e641a629037c7fde0d7ab8a0d4ce7ef27687"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_65962_097667.sqlite",
+      "sha256": "81e3818875869f4da351bfdcfba255dbcf05f4b72e1df5ef143e1cef9e9313c6"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_68154_047005.sqlite",
+      "sha256": "517120caf8380399502cdd07b4a2288ca0260ab7b8998e968f19cf4cb116e314"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_68657_090414.sqlite",
+      "sha256": "b31e3cfb91bfadc121d3ff140a58163331b7c04a8a127690d8c6964904e64c60"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_68759_090516.sqlite",
+      "sha256": "c4fed3b34de8b45876a234461e796b0842a7a42f395ece1faf7a441a61ec73e2"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_69252_091009.sqlite",
+      "sha256": "9512c67d00b7cc2c8615c9f52284a850a1acd22c4a57cb76ed7ea88e6ed71352"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_70806_084637.sqlite",
+      "sha256": "354ef3b58bfe30ee693ee09788dfb84f17c84d99dda337d511852d990ec111f8"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_72744_029120.sqlite",
+      "sha256": "f00adbe17ccb3650e10305718696af9d209052409dbd153866fecf67aa165d79"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_73808_030184.sqlite",
+      "sha256": "1033fd33d3c9cfc87d9db48f20ebd48ad0b882f59a442e7bd4c19c937a8359e0"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_74353_007561.sqlite",
+      "sha256": "cd51eb264f1fbe14ce68026212964f563b91754ec59727d0a8b82d40b6ab70dc"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_74898_008106.sqlite",
+      "sha256": "95f85206504f029c0b2f1b7038bf94785ab8913696f3750c69b973b44a464ee5"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_75428_008636.sqlite",
+      "sha256": "139ead89a2e957dbac36900307e96c071612b83292af9643c85d1d2e13e5e85c"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_76208_009416.sqlite",
+      "sha256": "aec27cda144832d7558f82b1f9e8f9cca26267f4e9a87a315da834d9e7737477"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_7641_019674.sqlite",
+      "sha256": "e53839f875475ef4a01b9fd9707505ed618f1945eeaf51ccb92990c0d77eff81"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_76585_061414.sqlite",
+      "sha256": "d2f07aeede6b34bd15d3a550d084e3eea6bcee74a3020a15301ada61e5959dce"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_77240_062069.sqlite",
+      "sha256": "5b1d6d44ebe3c41ef74df2d44f66155155258b734592ca3030082718cb1ef998"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_78716_058030.sqlite",
+      "sha256": "91990535d98445919bcb4df9ca8985dc74ae8a9dabdc84095e145a7c45c0b87b"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_80074_074907.sqlite",
+      "sha256": "bd5fd8ebb5b88c2dceab84ad8f04b2ecd4c9b8167469fc6ea927138554804a2f"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_80845_075678.sqlite",
+      "sha256": "2be30529bf65e47d4b6eeb905a06a672f0c6020029503e9cbc5cc3a6f2020abf"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_82379_079240.sqlite",
+      "sha256": "aec27cda144832d7558f82b1f9e8f9cca26267f4e9a87a315da834d9e7737477"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_82904_079765.sqlite",
+      "sha256": "e83af172306d6d2b9a5f12f748ae430f404bc2a4f3cf569d9eb1efface7b0123"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_84328_071213.sqlite",
+      "sha256": "d37f50a71708e7e4ebc1b1b9a192421bb5d0e818fbaf68d95d7fcf98c6f77c53"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_85128_072013.sqlite",
+      "sha256": "e613879fc2e3b4aff2496f2d3c7fd4a8c62549c8c66861a04038a2dff51aaa09"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_85224_072109.sqlite",
+      "sha256": "be08796788006bcb5f3cee81f679d7f2d00be8768916a3f71780a1b0ed903605"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_85943_088360.sqlite",
+      "sha256": "d0f14a0f15df75a61ecacc8de81b13a6da55da3a507be9cb91674296da57d914"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_8846_020879.sqlite",
+      "sha256": "191e4889dae60fe5d4c1b2a9a0b6a35ba6156cf0cb493f3ee86f984402298382"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_89324_099668.sqlite",
+      "sha256": "40d600d44a3107c6cdf7982ce87e7ab37e4d69a1a2cf08b6e7ea0240175d090a"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_90479_063458.sqlite",
+      "sha256": "2856036e97fd329c09ef876f6bfb89520294245210952b57ca8ae5d88e74ec45"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_96961_040671.sqlite",
+      "sha256": "8e118f589b8f8568f225b7c8ce45c9fdfc4aeaea0913840e02628dc77abe7871"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_97358_041068.sqlite",
+      "sha256": "47ce8ea24e2610634d95a6e498cdfd9ba83da2e13126e6e3579d4947c3f5ccb0"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_9738_017728.sqlite",
+      "sha256": "877fdc19a6e715799660e6b1360238852feb683ece771fec1193349e66b9edee"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_98142_010106.sqlite",
+      "sha256": "aec27cda144832d7558f82b1f9e8f9cca26267f4e9a87a315da834d9e7737477"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_99415_011379.sqlite",
+      "sha256": "6105ce7dfd86d708263fc2b8d751f996466882b90d7aa03358e2eedc176fcd2e"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_99542_011506.sqlite",
+      "sha256": "df1d56ad6625991cbfedfee0d2712b02f91b85d1de9e2e6eebf6505afd90dec3"
+    },
+    {
+      "bytes": 12288,
+      "path": "sqlite_dbs/gretel_train_99969_011933.sqlite",
+      "sha256": "7610fc47ff9b7b801cc7172cf117e5da37189a7ff92002bdfc25c34a5ea53fbe"
+    },
+    {
+      "bytes": 8192,
+      "path": "sqlite_dbs/gretel_train_9998_017988.sqlite",
+      "sha256": "1033fd33d3c9cfc87d9db48f20ebd48ad0b882f59a442e7bd4c19c937a8359e0"
+    },
+    {
+      "bytes": 33277,
+      "path": "sqlite_dbs/SQLITE_DB_MANIFEST.jsonl",
+      "sha256": "6d17241317eb9b43a7d3767a5bbb2339b14e1841596bbf7303757ab7ad6a43ae"
+    },
+    {
+      "bytes": 391,
+      "path": "VALIDATION_REPORT.md",
+      "sha256": "f3ecea57662ec3af788a92d6efaa0ab32968d718a39b6ef013e9c64a647d334e"
+    }
+  ],
+  "generated_at_utc": "2026-09-05T00:00:00+00:00",
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION"
+}

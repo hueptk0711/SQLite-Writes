@@ -1,0 +1,64 @@
+{
+  "builder": "common_v3_verifier_compiler",
+  "demonstration_policy": "matched_semantic_bank_v1",
+  "demonstration_representation": "record",
+  "demonstrations": {
+    "free_text": [
+      {
+        "demonstration_id": "free_plain_insert",
+        "input": "REQUEST: Create major DS with name Data Science.\nEVIDENCE: e1=DS, e2=Data Science.\nDEMO SCHEMA: t1=majors; t1.c1=major_id; t1.c2=major_name; t1.u1=PRIMARY KEY(t1.c1).",
+        "output": "{\"records\":[{\"table\":\"majors\",\"operation\":\"insert\",\"values\":{\"major_id\":\"DS\",\"major_name\":\"Data Science\"}}]}"
+      },
+      {
+        "demonstration_id": "free_conflict_aware",
+        "input": "REQUEST: Add product P01 described as Paper; ignore it if P01 already exists.\nEVIDENCE: e1=P01, e2=Paper.\nDEMO SCHEMA: t1=products; t1.c1=product_id; t1.c2=description; t1.u1=PRIMARY KEY(t1.c1).",
+        "output": "{\"records\":[{\"table\":\"products\",\"operation\":\"insert_ignore\",\"values\":{\"product_id\":\"P01\",\"description\":\"Paper\"}}]}"
+      }
+    ],
+    "semi_structured": [
+      {
+        "demonstration_id": "semi_plain_insert",
+        "input": "REQUEST: Add the listed majors.\nSOURCE: c1/s1 at $[*], c1.f1=major code, c1.f2=major name.\nDATA: [{\"major code\":\"DS\",\"major name\":\"Data Science\"}]\nDEMO SCHEMA: t1=majors; t1.c1=major_id; t1.c2=major_name; t1.u1=PRIMARY KEY(t1.c1).",
+        "output": "{\"records\":[{\"table\":\"majors\",\"operation\":\"insert\",\"values\":{\"major_id\":\"DS\",\"major_name\":\"Data Science\"}}]}"
+      },
+      {
+        "demonstration_id": "semi_insert_ignore",
+        "input": "REQUEST: Add the listed products and ignore an item when its product ID already exists.\nSOURCE: c1/s1 at $[*], c1.f1=product id, c1.f2=description.\nDATA: [{\"product id\":\"P01\",\"description\":\"Paper\"}]\nDEMO SCHEMA: t1=products; t1.c1=product_id; t1.c2=description; t1.u1=PRIMARY KEY(t1.c1).",
+        "output": "{\"records\":[{\"table\":\"products\",\"operation\":\"insert_ignore\",\"values\":{\"product_id\":\"P01\",\"description\":\"Paper\"}}]}"
+      },
+      {
+        "demonstration_id": "semi_upsert_update",
+        "input": "REQUEST: Add the students; when a student ID exists, update only the supplied name and website.\nSOURCE: c1/s1 at $[*], c1.f1=student id, c1.f2=name, c1.f3=website.\nDATA: [{\"student id\":\"S001\",\"name\":\"Nguyen A\",\"website\":\"https://example.test\"}]\nDEMO SCHEMA: t1=students; t1.c1=student_id; t1.c2=name; t1.c3=website; t1.u1=PRIMARY KEY(t1.c1).",
+        "output": "{\"records\":[{\"table\":\"students\",\"operation\":\"upsert_update\",\"values\":{\"student_id\":\"S001\",\"name\":\"Nguyen A\",\"website\":\"https://example.test\"}}]}"
+      },
+      {
+        "demonstration_id": "semi_parent_child",
+        "input": "REQUEST: Add the customer before the related order.\nSOURCE: c1/s1 at $.customers[*], c1.f1=customer id, c1.f2=name; c2/s2 at $.orders[*], c2.f1=order id, c2.f2=customer id, c2.f3=amount.\nDATA: {\"customers\":[{\"customer id\":\"C1\",\"name\":\"Minh\"}],\"orders\":[{\"order id\":\"O1\",\"customer id\":\"C1\",\"amount\":120}]}\nDEMO SCHEMA: t1=customers(t1.c1=customer_id,t1.c2=name,t1.u1=PK); t2=orders(t2.c1=order_id,t2.c2=customer_id,t2.c3=amount,t2.u1=PK), FK t2.c2->t1.c1.",
+        "output": "{\"records\":[{\"table\":\"customers\",\"operation\":\"insert\",\"values\":{\"customer_id\":\"C1\",\"name\":\"Minh\"}},{\"table\":\"orders\",\"operation\":\"insert\",\"values\":{\"order_id\":\"O1\",\"customer_id\":\"C1\",\"amount\":120}}]}"
+      }
+    ]
+  },
+  "family": "record_json_common_v3_compiler",
+  "freeze_usage": "confirmation comparator runs must use this resolved config directly; do not resolve base_config or demonstration_bank dynamically",
+  "method_id": "J-FS-M",
+  "representation": "legacy_table_operation_values",
+  "resolved_demonstration_ids": {
+    "free_text": [
+      "free_plain_insert",
+      "free_conflict_aware"
+    ],
+    "semi_structured": [
+      "semi_plain_insert",
+      "semi_insert_ignore",
+      "semi_upsert_update",
+      "semi_parent_child"
+    ]
+  },
+  "resolved_from": {
+    "demonstration_bank": "configs/demonstrations/matched_semantic_bank.json",
+    "demonstration_representation": "record",
+    "overlay_config": "configs/stage4/j_fs.json",
+    "source_config": "configs/stage4/j_fs.json"
+  },
+  "role": "representation_ablation_with_common_compiler"
+}

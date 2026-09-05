@@ -1,0 +1,6 @@
+{
+  "all_methods_use_same_state_comparison": true,
+  "primary_metric": "strict_full_state_accuracy",
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION",
+  "status": "PASS"
+}

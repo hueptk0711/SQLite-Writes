@@ -1,0 +1,8 @@
+{
+  "denominator": 100,
+  "expected_result_rows": 400,
+  "result_rows": 400,
+  "silent_skip_count": 0,
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION",
+  "status": "PASS"
+}

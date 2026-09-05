@@ -1,0 +1,6 @@
+{
+  "primary_metric": "strict_full_state_accuracy",
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION",
+  "state_scope": "all persistent user tables",
+  "status": "PASS"
+}

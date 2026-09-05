@@ -1,0 +1,25 @@
+{
+  "methods": {
+    "M0_DIRECT_FS": {
+      "input_tokens": 0,
+      "latency_sec": 0.0,
+      "output_tokens": 1120
+    },
+    "M0_DIRECT_ZERO": {
+      "input_tokens": 0,
+      "latency_sec": 0.0,
+      "output_tokens": 1120
+    },
+    "M1_J_FS": {
+      "input_tokens": 0,
+      "latency_sec": 0.0,
+      "output_tokens": 229
+    },
+    "M2_FINAL_ENG2B": {
+      "input_tokens": 0,
+      "latency_sec": 0.0,
+      "output_tokens": 100
+    }
+  },
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION"
+}

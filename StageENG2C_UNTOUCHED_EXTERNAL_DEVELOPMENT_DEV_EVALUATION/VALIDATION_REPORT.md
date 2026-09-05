@@ -1,0 +1,15 @@
+# VALIDATION REPORT
+
+stage=StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION
+patch=PATCH0
+status=PASS
+dev100_n=100
+development_train_overlap=0
+eng2a_pilot_overlap=0
+official51_overlap=0
+official51_raw_opened=false
+methods=M0_DIRECT_ZERO,M0_DIRECT_FS,M1_J_FS,M2_FINAL_ENG2B
+primary_metric=strict_full_state_accuracy
+retry=0
+mock_model_calls_total=400
+official_model_run_included=false

@@ -1,0 +1,13 @@
+{
+  "calls_per_sample_per_method": 1,
+  "methods": [
+    "M0_DIRECT_ZERO",
+    "M0_DIRECT_FS",
+    "M1_J_FS",
+    "M2_FINAL_ENG2B"
+  ],
+  "mock_model_calls_total": 400,
+  "retry": 0,
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION",
+  "status": "PASS"
+}

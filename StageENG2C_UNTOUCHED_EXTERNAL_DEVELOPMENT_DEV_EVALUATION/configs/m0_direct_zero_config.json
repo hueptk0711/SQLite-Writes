@@ -1,0 +1,21 @@
+{
+  "demonstration_policy": "none",
+  "demonstration_representation": "direct",
+  "demonstrations": {
+    "free_text": [],
+    "semi_structured": []
+  },
+  "family": "direct_sql",
+  "freeze_usage": "confirmation comparator runs must use this resolved config directly; do not resolve base_config or demonstration_bank dynamically",
+  "method_id": "D-ZERO",
+  "resolved_demonstration_ids": {
+    "free_text": [],
+    "semi_structured": []
+  },
+  "resolved_from": {
+    "demonstration_bank": "configs/demonstrations/matched_semantic_bank.json",
+    "demonstration_representation": "direct",
+    "overlay_config": "configs/stage4/direct.json",
+    "source_config": "configs/stage4/direct.json"
+  }
+}

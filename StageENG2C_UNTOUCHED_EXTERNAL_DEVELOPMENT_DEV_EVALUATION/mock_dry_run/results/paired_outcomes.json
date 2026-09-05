@@ -1,0 +1,19 @@
+{
+  "pairs": {
+    "M0_DIRECT_FS": {
+      "baseline_correct_m2_wrong": 7,
+      "both_correct": 93
+    },
+    "M0_DIRECT_ZERO": {
+      "baseline_correct_m2_wrong": 7,
+      "both_correct": 93
+    },
+    "M1_J_FS": {
+      "both_correct": 92,
+      "both_wrong": 7,
+      "m2_correct_baseline_wrong": 1
+    }
+  },
+  "primary_metric": "strict_full_state_accuracy",
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION"
+}

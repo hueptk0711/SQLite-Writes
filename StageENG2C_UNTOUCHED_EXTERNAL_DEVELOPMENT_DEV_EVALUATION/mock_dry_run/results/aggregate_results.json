@@ -1,0 +1,138 @@
+{
+  "backend": "mock",
+  "denominator": 100,
+  "generation_metadata": {
+    "generator": {
+      "backend": "mock",
+      "model_called": false
+    },
+    "m2_runtime_freeze": {
+      "expected_chat_template_sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "generation_settings": {
+        "calls_per_sample": 1,
+        "do_sample": false,
+        "max_input_tokens": 24576,
+        "phase_o_max_new_tokens": 512,
+        "repair": "none",
+        "retry": 0,
+        "seed": 20260905,
+        "temperature": null,
+        "top_k": null,
+        "top_p": null
+      },
+      "identity_fail_closed": {
+        "chat_template_sha256_must_equal": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+        "model_snapshot_basename_must_equal_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+        "tokenizer_snapshot_basename_must_equal_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242"
+      },
+      "method_id": "M2_FINAL_ENG2B",
+      "mode": "live",
+      "model_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+      "model_name_or_path": "mock",
+      "model_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242",
+      "tokenizer_id": "Qwen/Qwen2.5-Coder-7B-Instruct",
+      "tokenizer_revision": "c03e6d358207e414f1eca0bb1891e29f1db0e242"
+    }
+  },
+  "methods": {
+    "M0_DIRECT_FS": {
+      "accepted_write_correctness": "100/100",
+      "admission_count": 100,
+      "admission_rate": "100/100",
+      "execution_success": 100,
+      "execution_success_rate": "100/100",
+      "generation_latency_sec": 0.0,
+      "input_tokens": 0,
+      "model_calls": 100,
+      "off_target_extra_delta_count": 0,
+      "output_tokens": 1120,
+      "samples": 100,
+      "strict_full_state_accuracy": "100/100",
+      "strict_full_state_correct": 100,
+      "target_state_accuracy": "100/100",
+      "target_state_correct": 100,
+      "total_tokens": 1120,
+      "wrong_admitted_writes": 0
+    },
+    "M0_DIRECT_ZERO": {
+      "accepted_write_correctness": "100/100",
+      "admission_count": 100,
+      "admission_rate": "100/100",
+      "execution_success": 100,
+      "execution_success_rate": "100/100",
+      "generation_latency_sec": 0.0,
+      "input_tokens": 0,
+      "model_calls": 100,
+      "off_target_extra_delta_count": 0,
+      "output_tokens": 1120,
+      "samples": 100,
+      "strict_full_state_accuracy": "100/100",
+      "strict_full_state_correct": 100,
+      "target_state_accuracy": "100/100",
+      "target_state_correct": 100,
+      "total_tokens": 1120,
+      "wrong_admitted_writes": 0
+    },
+    "M1_J_FS": {
+      "accepted_write_correctness": "92/99",
+      "admission_count": 99,
+      "admission_rate": "99/100",
+      "execution_success": 99,
+      "execution_success_rate": "99/100",
+      "generation_latency_sec": 0.0,
+      "input_tokens": 0,
+      "model_calls": 100,
+      "off_target_extra_delta_count": 7,
+      "output_tokens": 229,
+      "samples": 100,
+      "strict_full_state_accuracy": "92/100",
+      "strict_full_state_correct": 92,
+      "target_state_accuracy": "92/100",
+      "target_state_correct": 92,
+      "total_tokens": 229,
+      "wrong_admitted_writes": 7
+    },
+    "M2_FINAL_ENG2B": {
+      "accepted_write_correctness": "93/95",
+      "admission_count": 95,
+      "admission_rate": "95/100",
+      "execution_success": 95,
+      "execution_success_rate": "95/100",
+      "generation_latency_sec": 0.0,
+      "input_tokens": 0,
+      "model_calls": 100,
+      "off_target_extra_delta_count": 2,
+      "output_tokens": 100,
+      "samples": 100,
+      "strict_full_state_accuracy": "93/100",
+      "strict_full_state_correct": 93,
+      "target_state_accuracy": "93/100",
+      "target_state_correct": 93,
+      "total_tokens": 100,
+      "wrong_admitted_writes": 2
+    }
+  },
+  "model_calls_per_sample_per_method": 1,
+  "model_calls_total": 400,
+  "paired_outcomes": {
+    "M0_DIRECT_FS": {
+      "baseline_correct_m2_wrong": 7,
+      "both_correct": 93
+    },
+    "M0_DIRECT_ZERO": {
+      "baseline_correct_m2_wrong": 7,
+      "both_correct": 93
+    },
+    "M1_J_FS": {
+      "both_correct": 92,
+      "both_wrong": 7,
+      "m2_correct_baseline_wrong": 1
+    }
+  },
+  "per_sample_results_sha256": "9e51c147a8f6fdc82e447df863c18236f304a5d72c2601defe75202325180039",
+  "primary_metric": "strict_full_state_accuracy",
+  "raw_model_outputs_sha256": "b7d08b5d8d702009dc65a0f89f4e0206f35d454f556736f0b4f71d9065908e43",
+  "retry_count": 0,
+  "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION",
+  "status": "PASS"
+}
