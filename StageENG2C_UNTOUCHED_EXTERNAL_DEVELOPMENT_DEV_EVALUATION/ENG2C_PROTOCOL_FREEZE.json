@@ -11,7 +11,7 @@
     "sample_ids_sha256": "3aaa3f2b414909274ee21279f39f375bcedea87135e9b234b5a140274fe389f9",
     "source": "StageENG1_GRETEL_ENGLISH_INSERT_DEVELOPMENT_SPLIT/DEVELOPMENT_DEV_SPLIT_MANIFEST.jsonl"
   },
-  "evaluator_sha256": "35d80d828682f97b5e7e85292dd74fb29d74eea6f0406469162a282b452b3586",
+  "evaluator_sha256": "604934a1461bb4ef63b49ad5117a9c65e72a3c843f4c52aa98704545be25344e",
   "final_source_commit_sha_record": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION/REVIEWER_PACKAGE_GIT_INFO.json",
   "m2_method_freeze_sha256": "ba7a113f670956316afdfeaddafc15471db44151ff5d7bf091e0c69a4c1025c3",
   "m2_runner_sha256": "dee4d5e5f1ea60ed6a0a32ebcc692c8c49e41a948d35f280d011b70f37632b30",
@@ -63,7 +63,7 @@
   },
   "no_method_changes_after_official_eng2c_run": true,
   "official51_remains_unopened": true,
-  "patch": "PATCH0",
+  "patch": "PATCH1",
   "primary_metric": "strict_full_state_accuracy",
   "prompt_hashes": {
     "M0_DIRECT_FS": "ebb698e7693cf8abb4faa45e57c8cc1b856ef2a992f3cde7fa0bcc9fedad82b9",
@@ -83,7 +83,7 @@
     "generation_latency",
     "end_to_end_latency"
   ],
-  "source_base_commit_sha": "fb2004d9f3da3eb8820fbefa9a6d0249d9ced183",
+  "source_base_commit_sha": "2cc9e07157bbf8785ee4f3c582e2bb91de0b4b8a",
   "stage": "StageENG2C_UNTOUCHED_EXTERNAL_DEVELOPMENT_DEV_EVALUATION",
   "status": "FROZEN_READY_FOR_ONE_OFFICIAL_SERVER_RUN"
 }

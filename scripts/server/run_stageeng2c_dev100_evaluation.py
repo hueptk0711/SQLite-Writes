@@ -347,7 +347,10 @@ class UnifiedFrozenHFGenerator:
             return CallResult(row["sample_id"], method_id, "", status="generation_error", error=str(exc), generation_metadata={"backend": "transformers_hf_unconstrained", "model_called": False})
 
     def generate_m2(self, row: dict[str, Any], max_new_tokens: int) -> M2CallResult:
-        runtime_row, _contract = prepare_eng2b_runtime_row(row)
+        # evaluate_final_method prepares the ENG2B runtime row before calling
+        # generator.generate(..., row=runtime_row). Preparing again turns the
+        # already-dynamic schema into the comparison baseline and fails closed.
+        runtime_row = row
         messages, _user, _prompt_hash = render_phase_o_messages(runtime_row)
         prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         token_count = len(self.tokenizer(prompt, add_special_tokens=True, truncation=False)["input_ids"])

@@ -8,7 +8,10 @@ from pathlib import Path
 import pytest
 
 from scripts.data.validate_stageeng2c_untouched_dev_evaluation import validate_stage
+from scripts.server import run_stageeng2c_dev100_evaluation as eng2c_runner
 from scripts.server.run_stageeng2c_dev100_evaluation import METHODS
+from nldbwrite_v3.v2_a1.eng2b_runtime import prepare_eng2b_runtime_row
+from nldbwrite_v3.v2_a1.types import V2A1Error
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -106,3 +109,46 @@ def test_stageeng2c_runner_cli_and_live_dry_config() -> None:
     assert config["method_id"] == "M2_FINAL_ENG2B"
     assert config["model_revision"] == "c03e6d358207e414f1eca0bb1891e29f1db0e242"
     assert config["generation_settings"]["retry"] == 0
+
+
+def test_stageeng2c_m2_hf_generator_uses_prepared_runtime_row_once(monkeypatch: pytest.MonkeyPatch) -> None:
+    row = read_jsonl(STAGE_DIR / "ENG2C_DEV100_FREEZE.jsonl")[0]
+    runtime_row, _contract = prepare_eng2b_runtime_row(row)
+    with pytest.raises(V2A1Error, match="ENG2B dynamic schema must differ"):
+        prepare_eng2b_runtime_row(runtime_row)
+
+    class FakeTokenizer:
+        eos_token_id = 0
+
+        def apply_chat_template(self, messages, *, tokenize: bool, add_generation_prompt: bool) -> str:
+            assert tokenize is False
+            assert add_generation_prompt is True
+            return "\n".join(message["content"] for message in messages)
+
+        def __call__(self, text: str, *, add_special_tokens: bool, truncation: bool) -> dict[str, list[int]]:
+            assert add_special_tokens is True
+            assert truncation is False
+            return {"input_ids": list(range(max(1, len(text.split()))))}
+
+    def fake_generate_constrained_eng2b(model, tokenizer, messages, *, max_new_tokens: int, schema: dict) -> dict:
+        assert schema == runtime_row["runtime_constraints"]["phase_o_schema"]
+        return {
+            "raw_output": "{}",
+            "prompt_tokens": 7,
+            "output_tokens": 1,
+            "latency_seconds": 0.0,
+            "hit_max_new_tokens": False,
+            "backend": {"backend": "fake_constrained", "model_called": True},
+        }
+
+    monkeypatch.setattr(eng2c_runner, "generate_constrained_eng2b", fake_generate_constrained_eng2b)
+    generator = eng2c_runner.UnifiedFrozenHFGenerator.__new__(eng2c_runner.UnifiedFrozenHFGenerator)
+    generator.tokenizer = FakeTokenizer()
+    generator.model = object()
+    generator.model_name_or_path = "fake-model"
+    generator.max_input_tokens = 24576
+    generator.seed = 20260905
+
+    call = generator.generate_m2(runtime_row, max_new_tokens=16)
+    assert call.status == "success"
+    assert call.generation_metadata["backend"] == "fake_constrained"

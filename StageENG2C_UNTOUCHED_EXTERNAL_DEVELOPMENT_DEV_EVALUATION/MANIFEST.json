@@ -68,7 +68,7 @@
     {
       "bytes": 3274,
       "path": "ENG2C_PROTOCOL_FREEZE.json",
-      "sha256": "ff67d0c7c3bb0f8cd9d8dc0c85c05595c464082da8900d1d53125abd7386bfa8"
+      "sha256": "f024bca4b80cef5d080711ddba1c2a92b5217bacea206940166fd40d90e2509a"
     },
     {
       "bytes": 4290,
@@ -203,7 +203,7 @@
     {
       "bytes": 1222,
       "path": "REVIEWER_README.md",
-      "sha256": "72a9af946c4be121e2639506e99d172f556510e2199c156c26475eb778ad6747"
+      "sha256": "dcfbb5d2169368e52c3c07c6f93acd401491c3a4e4ea1f05cbd6b4cb23cfddce"
     },
     {
       "bytes": 155,
@@ -723,7 +723,7 @@
     {
       "bytes": 391,
       "path": "VALIDATION_REPORT.md",
-      "sha256": "f3ecea57662ec3af788a92d6efaa0ab32968d718a39b6ef013e9c64a647d334e"
+      "sha256": "7a39ee615db767a5cc6c28a579f58521d33ea8640ddca6ec7db268f14ce0613e"
     }
   ],
   "generated_at_utc": "2026-09-05T00:00:00+00:00",
